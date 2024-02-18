@@ -25,25 +25,9 @@ export function AuditLogTableRow(props: TableRowComponentProps<AuditLog>) {
 
   const showAssetColumn = headCells.length === 7
 
-  // const { value: open, toggle: toggleOpen } = useBoolean(false)
-
   return (
     <>
-      <TableRow
-        hover
-        // hover={!open}
-        // onClick={toggleOpen}
-        // className={open ? "TableRow-open-top" : undefined}
-        // sx={(theme) => ({
-        // ...(open
-        //   ? {
-        //       "--mui-palette-TableCell-border": "rgba(0,0,0,0)",
-        //       background: "var(--mui-palette-background-default)",
-        //     }
-        //   : {}),
-        // })}
-        {...rest}
-      >
+      <TableRow hover {...rest}>
         <TableCell>
           <TimestampBlock timestamp={timestamp} relative={relativeTime} />
         </TableCell>
@@ -77,7 +61,7 @@ export function AuditLogTableRow(props: TableRowComponentProps<AuditLog>) {
             <ActionBlock action={operation} />
           )}
         </TableCell>
-        <TableCell align="right">
+        <TableCell align="right" variant="clickable">
           <AmountBlock
             amount={change}
             showSign

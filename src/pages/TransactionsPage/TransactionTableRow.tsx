@@ -139,7 +139,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
         <TableCell>
           <ActionBlock action={type} />
         </TableCell>
-        <TableCell align="right">
+        <TableCell align="right" variant="clickable">
           <AmountBlock
             colorized
             placeholder=""
@@ -151,7 +151,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
         <TableCell>
           <AssetBlock asset={outgoingAsset} />
         </TableCell>
-        <TableCell align="right">
+        <TableCell align="right" variant="clickable">
           <AmountBlock
             colorized
             placeholder=""
@@ -163,7 +163,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
         <TableCell>
           <AssetBlock asset={incomingAsset} />
         </TableCell>
-        <TableCell align="right">
+        <TableCell align="right" variant="clickable">
           <AmountBlock
             colorized
             placeholder=""

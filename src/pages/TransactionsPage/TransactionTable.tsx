@@ -73,7 +73,7 @@ export function TransactionTable(props: TransactionsTableProps) {
         filterable: true,
         key: "wallet",
         label: "Wallet",
-        sx: { maxWidth: 360, minWidth: 140, width: "100%" },
+        sx: { width: "100%" },
       },
       {
         filterable: true,

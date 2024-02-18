@@ -28,6 +28,12 @@ declare module "@mui/material/Badge" {
   }
 }
 
+declare module "@mui/material/TableCell" {
+  interface TableCellPropsVariantOverrides {
+    clickable: true
+  }
+}
+
 declare module "@mui/material" {
   interface TypeBackground {
     paperSolid: string
@@ -406,13 +412,6 @@ export const theme: CssVarsThemeOptions = {
           padding: "4px 16px 6px 16px",
         },
         root: {
-          // ".MuiTableRow-hover &:hover": {
-          //   outline: "1px dashed rgba(var(--mui-palette-secondary-mainChannel) / 0.5)",
-          //   outlineOffset: -1,
-          // },
-          // "html[data-mui-color-scheme='dark'] .MuiTableRow-hover &:hover": {
-          //   outline: "1px dashed rgba(var(--mui-palette-primary-mainChannel) / 0.33)",
-          // },
           "tbody tr:last-of-type &": {
             borderBottom: "none",
           },
@@ -427,6 +426,25 @@ export const theme: CssVarsThemeOptions = {
           background: "var(--mui-palette-background-paperSolid)",
         },
       },
+      variants: [
+        {
+          props: { variant: "clickable" },
+          style: {
+            "& > *": {
+              display: "block",
+              padding: "6px 16px",
+            },
+            "&:hover": {
+              outline: "1px dashed rgba(var(--mui-palette-secondary-mainChannel) / 0.5)",
+              outlineOffset: -1,
+            },
+            "html[data-mui-color-scheme='dark'] &:hover": {
+              outline: "1px dashed rgba(var(--mui-palette-primary-mainChannel) / 0.33)",
+            },
+            padding: 0,
+          },
+        },
+      ],
     },
     // TESTME why was this needed?
     // MuiTableHead: {

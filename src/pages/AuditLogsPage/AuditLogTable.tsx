@@ -75,13 +75,13 @@ export function AuditLogTable(props: AuditLogsTableProps) {
         filterable: !txId,
         key: "wallet",
         label: "Wallet",
-        sx: { maxWidth: 360, minWidth: 140, width: "66%" },
+        sx: { width: "66%" },
       },
       {
         filterable: !txId,
         key: "operation",
         label: "Operation",
-        sx: { maxWidth: 220, minWidth: 220, width: "66%" },
+        sx: { width: "66%" },
       },
       {
         key: "changeN",
@@ -103,7 +103,7 @@ export function AuditLogTable(props: AuditLogsTableProps) {
         key: "balance",
         label: "New balance",
         numeric: true,
-        sx: { maxWidth: 300, minWidth: 120, width: "50%" },
+        sx: { width: "50%" },
       },
     ],
     [assetId, txId]

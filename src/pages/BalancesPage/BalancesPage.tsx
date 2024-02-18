@@ -64,18 +64,21 @@ export default function BalancesPage({ show }: { show: boolean }) {
         key: "assetId",
         label: "Asset",
         sortable: true,
+        sx: { width: "66%" },
       },
       {
         key: "balanceN",
         label: "Balance",
         numeric: true,
         sortable: true,
+        sx: { maxWidth: 220, minWidth: 220, width: 220 },
       },
       {
         key: "price",
         label: "Price",
         numeric: true,
         sortable: true,
+        sx: { maxWidth: 220, minWidth: 220, width: 220 },
         valueSelector: (row: Balance) => row.price?.value,
       },
       {
@@ -83,6 +86,7 @@ export default function BalancesPage({ show }: { show: boolean }) {
         label: "Value",
         numeric: true,
         sortable: true,
+        sx: { maxWidth: 220, minWidth: 220, width: 220 },
       },
     ],
     []
