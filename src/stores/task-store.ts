@@ -9,6 +9,7 @@ export enum TaskPriority {
   MediumPlus = 6,
   High = 8,
   VeryHigh = 10,
+  Ultra = 11,
 }
 
 export type ProgressUpdate = [] | [number] | [number | undefined, string]

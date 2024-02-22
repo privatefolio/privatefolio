@@ -1,5 +1,5 @@
 import { AddRounded, RemoveRounded } from "@mui/icons-material"
-import { Avatar, Stack, TableCell, TableRow, Tooltip } from "@mui/material"
+import { Avatar, Stack, TableCell, TableRow, Tooltip, Box } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React from "react"
 import { ActionBlock } from "src/components/ActionBlock"
@@ -26,6 +26,65 @@ export function AuditLogTableRow(props: TableRowComponentProps<AuditLog>) {
   const showAssetColumn = headCells.length === 7
 
   // const { value: open, toggle: toggleOpen } = useBoolean(false)
+
+  if (_isTablet) {
+    return (
+      <>
+        <TableRow
+          hover
+          // hover={!open}
+          // onClick={toggleOpen}
+          // className={open ? "TableRow-open-top" : undefined}
+          // sx={(theme) => ({
+          // ...(open
+          //   ? {
+          //       "--mui-palette-TableCell-border": "rgba(0,0,0,0)",
+          //       background: "var(--mui-palette-background-default)",
+          //     }
+          //   : {}),
+          // })}
+          {...rest}
+        >
+          <TableCell sx={{ width: "100%" }}>
+            <Stack direction="column" justifyContent="space-between" alignItems="flex-start" gap={1}>
+              <Box sx={{ color: "text.secondary" }}>
+                <TimestampBlock timestamp={timestamp} relative={relativeTime} />
+              </Box>
+              <Stack direction="row" gap={4} paddingY={1} sx={{ fontSize: "18px", width: "100%" }} justifyContent="space-between" alignItems="center">
+                {operation === "Funding Fee" ? (
+                  <ActionBlock
+                    action={operation}
+                    color={changeColor as any} // FIXME
+                    size="medium"
+                    IconComponent={changeN < 0 ? RemoveRounded : AddRounded}
+                  />
+                ) : (
+                  <ActionBlock action={operation} size="medium" />
+                )}
+                <Stack direction="row" gap={1} paddingY={1} sx={{ fontSize: "18px" }} alignItems="center">
+                  <AmountBlock
+                    amount={change}
+                    showSign
+                    colorized
+                    currencyTicker={getAssetTicker(assetId)}
+                  />
+                  {showAssetColumn && (
+                      <AssetBlock asset={assetId} size="medium" />
+                  )}
+                </Stack>
+              </Stack>
+            </Stack>
+          </TableCell>
+        </TableRow>
+        {/* {open && (
+          <TableRow className={open ? "TableRow-open-bottom" : undefined} sx={{ height: 200 }}>
+            <TableCell colSpan={2}>File Import</TableCell>
+            <TableCell colSpan={5}>Transaction</TableCell>
+          </TableRow>
+        )} */}
+      </>
+    )
+  }
 
   return (
     <>
