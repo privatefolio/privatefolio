@@ -174,7 +174,7 @@ export function ImportDataActions() {
                   $accountReset.set(Math.random())
                 },
                 name: "Reset account",
-                priority: TaskPriority.High,
+                priority: TaskPriority.Ultra,
               })
               handleClose()
             }
