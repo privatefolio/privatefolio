@@ -23,20 +23,22 @@ type ActionBlockProps = {
 
 const colorMap: Partial<Record<Action, string>> = {
   Buy: greenColor,
-  Distribution: greenColor,
   Fee: redColor,
+  Reward: greenColor,
   Sell: redColor,
 }
 
 const iconMap: Partial<Record<Action, SvgIconComponent>> = {
   Buy: AddRounded,
   Deposit: AddRounded,
-  Distribution: AddRounded,
   Fee: RemoveRounded,
+  Reward: AddRounded,
   Sell: RemoveRounded,
   Swap: SwapHoriz,
   Unknown: QuestionMarkRounded,
+  Unwrap: SwapHoriz,
   Withdraw: RemoveRounded,
+  Wrap: SwapHoriz,
 }
 
 export function ActionBlock(props: ActionBlockProps) {

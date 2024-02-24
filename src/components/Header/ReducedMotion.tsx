@@ -29,7 +29,7 @@ export function ReducedMotion() {
         borderRadius: 1,
         padding: 0.5,
         [`& .${tabsClasses.indicator}`]: {
-          background: "var(--mui-palette-background-paperSolid)",
+          background: "var(--mui-palette-background-paper)",
           backgroundImage: "var(--mui-overlays-2)",
           borderRadius: 0.75,
           height: "100%",

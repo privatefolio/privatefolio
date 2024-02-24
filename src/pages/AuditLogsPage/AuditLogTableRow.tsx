@@ -1,29 +1,29 @@
-import { AddRounded, RemoveRounded } from "@mui/icons-material"
-import { Avatar, Stack, TableCell, TableRow, Tooltip } from "@mui/material"
-import { useStore } from "@nanostores/react"
+import { AddRounded, RemoveRounded, Visibility } from "@mui/icons-material"
+import { IconButton, TableCell, TableRow, Tooltip } from "@mui/material"
 import React from "react"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AmountBlock } from "src/components/AmountBlock"
 import { AssetBlock } from "src/components/AssetBlock"
+import { PlatformBlock } from "src/components/PlatformBlock"
+import { useBoolean } from "src/hooks/useBoolean"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { greenColor, redColor } from "src/utils/color-utils"
 
 import { TimestampBlock } from "../../components/TimestampBlock"
 import { Truncate } from "../../components/Truncate"
 import { AuditLog } from "../../interfaces"
-import { PLATFORMS_META } from "../../settings"
-import { $platformMetaMap } from "../../stores/metadata-store"
 import { TableRowComponentProps } from "../../utils/table-utils"
+import { AuditLogDrawer } from "./AuditLogDrawer"
 
 export function AuditLogTableRow(props: TableRowComponentProps<AuditLog>) {
   const { row, relativeTime, headCells, isMobile: _isMobile, isTablet: _isTablet, ...rest } = props
   const { assetId, change, changeN, balance, operation, timestamp, platform, wallet } = row
 
-  const platformMetaMap = useStore($platformMetaMap)
-
   const changeColor = changeN < 0 ? redColor : greenColor
 
-  const showAssetColumn = headCells.length === 7
+  const showAssetColumn = headCells.length === 8
+
+  const { value: open, toggle: toggleOpen } = useBoolean(false)
 
   return (
     <>
@@ -32,18 +32,7 @@ export function AuditLogTableRow(props: TableRowComponentProps<AuditLog>) {
           <TimestampBlock timestamp={timestamp} relative={relativeTime} />
         </TableCell>
         <TableCell>
-          <Stack direction="row" gap={0.5} alignItems="center" component="div">
-            <Avatar
-              src={platformMetaMap[platform]?.image}
-              sx={{
-                borderRadius: "2px",
-                height: 16,
-                width: 16,
-              }}
-              alt={PLATFORMS_META[platform].name}
-            />
-            {/* <span>{PLATFORMS_META[platform].name}</span> */}
-          </Stack>
+          <PlatformBlock platform={platform} hideName />
         </TableCell>
         <TableCell>
           <Tooltip title={wallet}>
@@ -81,13 +70,34 @@ export function AuditLogTableRow(props: TableRowComponentProps<AuditLog>) {
             tooltipMessage="Use the 'Compute balances' action to compute these values."
           />
         </TableCell>
+        <TableCell>
+          <Tooltip title="Inspect">
+            <IconButton
+              size="small"
+              color="secondary"
+              sx={{
+                ".MuiTableRow-root:hover &": {
+                  visibility: "visible",
+                },
+                height: 28,
+                marginLeft: -1,
+                marginY: -0.25,
+                visibility: "hidden",
+              }}
+              onClick={toggleOpen}
+            >
+              <Visibility fontSize="inherit" />
+            </IconButton>
+          </Tooltip>
+        </TableCell>
       </TableRow>
-      {/* {open && (
-        <TableRow className={open ? "TableRow-open-bottom" : undefined} sx={{ height: 200 }}>
-          <TableCell colSpan={2}>File Import</TableCell>
-          <TableCell colSpan={5}>Transaction</TableCell>
-        </TableRow>
-      )} */}
+      <AuditLogDrawer
+        key={row._id}
+        open={open}
+        toggleOpen={toggleOpen}
+        auditLog={row}
+        relativeTime={relativeTime}
+      />
     </>
   )
 }

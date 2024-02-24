@@ -60,7 +60,7 @@ export default function AssetPage({ show }: { show: boolean }) {
         </Tabs>
         {tab === "" && <PriceChart symbol={assetId} />}
         {tab === "balance" && <BalanceChart symbol={assetId} />}
-        {tab === "transactions" && <TransactionTable symbol={assetId} defaultRowsPerPage={10} />}
+        {tab === "transactions" && <TransactionTable assetId={assetId} defaultRowsPerPage={10} />}
         {tab === "audit-logs" && <AuditLogTable assetId={assetId} defaultRowsPerPage={10} />}
       </Stack>
       {/* <AssetInfo

@@ -12,16 +12,13 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material"
-import { useStore } from "@nanostores/react"
 import React, { useState } from "react"
-import { PlatformAvatar } from "src/components/PlatformAvatar"
+import { PlatformBlock } from "src/components/PlatformBlock"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { Truncate } from "src/components/Truncate"
 import { useConfirm } from "src/hooks/useConfirm"
 import { Connection } from "src/interfaces"
-import { PLATFORMS_META } from "src/settings"
 import { $activeAccount } from "src/stores/account-store"
-import { $platformMetaMap } from "src/stores/metadata-store"
 import { enqueueTask, TaskPriority } from "src/stores/task-store"
 import { MonoFont } from "src/theme"
 import { enqueueSyncConnection, handleAuditLogChange } from "src/utils/common-tasks"
@@ -39,8 +36,6 @@ export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
     ...rest
   } = props
   const { address, timestamp, syncedAt, platform, label, meta } = row
-
-  const platformMetaMap = useStore($platformMetaMap)
 
   const confirm = useConfirm()
 
@@ -69,17 +64,7 @@ export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
       </TableCell>
       <TableCell sx={{ fontFamily: MonoFont, maxWidth: 420, minWidth: 300, width: 420 }}>
         <Stack spacing={1} direction="row">
-          {platform ? (
-            <Stack direction="row" gap={0.5} alignItems="center" component="div">
-              <PlatformAvatar
-                size="small"
-                src={platformMetaMap[platform]?.image}
-                alt={PLATFORMS_META[platform].name}
-              />
-            </Stack>
-          ) : (
-            <Skeleton></Skeleton>
-          )}
+          {platform ? <PlatformBlock platform={platform} hideName /> : <Skeleton></Skeleton>}
           <Tooltip title={address}>
             <Truncate>{address}</Truncate>
           </Tooltip>
@@ -173,7 +158,7 @@ export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
                 determinate: true,
                 function: async (progress) => {
                   await clancy.resetConnection(row, progress, $activeAccount.get())
-                  await clancy.syncConnection(progress, row, $activeAccount.get(), 0)
+                  await clancy.syncConnection(progress, row, $activeAccount.get(), "0")
                 },
                 name: `Reset connection`,
                 priority: TaskPriority.High,

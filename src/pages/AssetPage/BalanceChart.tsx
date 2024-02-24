@@ -1,6 +1,7 @@
 import { UTCTimestamp } from "lightweight-charts"
 import React, { useCallback } from "react"
 import { $activeAccount } from "src/stores/account-store"
+import { getAssetTicker } from "src/utils/assets-utils"
 
 import { QueryFunction, SingleSeriesChart } from "../../components/SingleSeriesChart"
 import { clancy } from "../../workers/remotes"
@@ -10,15 +11,15 @@ type BalanceChartProps = {
 }
 
 export function BalanceChart(props: BalanceChartProps) {
-  const { symbol } = props
+  const { symbol: assetId } = props
 
   const queryFn: QueryFunction = useCallback(async () => {
-    const docs = await clancy.getHistoricalBalances($activeAccount.get(), { symbol })
+    const docs = await clancy.getHistoricalBalances($activeAccount.get(), { symbol: assetId })
 
     const records = docs.map((item) => ({
-      color: !item[symbol] ? "gray" : undefined,
+      color: !item[assetId] ? "gray" : undefined,
       time: (item.timestamp / 1000) as UTCTimestamp,
-      value: Number(item[symbol]) || 0,
+      value: Number(item[assetId]) || 0,
     }))
 
     // TODO
@@ -29,14 +30,14 @@ export function BalanceChart(props: BalanceChartProps) {
     // })
 
     return records
-  }, [symbol])
+  }, [assetId])
 
   return (
     <SingleSeriesChart
       queryFn={queryFn}
       initType="Histogram"
       tooltipOptions={{
-        currencySymbol: symbol,
+        currencySymbol: getAssetTicker(assetId),
         significantDigits: 18, // TODO
       }}
     />

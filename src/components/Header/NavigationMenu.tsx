@@ -32,6 +32,7 @@ export function NavigationMenu() {
           }
         >
           <NavMenuItem value="" to={`/u/${accountIndex}/`} label="Home" />
+          <NavMenuItem value="assets" to={`/u/${accountIndex}/assets`} label="Assets" />
           <NavMenuItem
             value="transactions"
             to={`/u/${accountIndex}/transactions`}
@@ -71,6 +72,7 @@ export function NavigationMenu() {
         })}
       >
         <NavTab value="" to={`/u/${accountIndex}/`} label="Home" />
+        <NavTab value="assets" to={`/u/${accountIndex}/assets`} label="Assets" />
         <NavTab value="transactions" to={`/u/${accountIndex}/transactions`} label="Transactions" />
         <NavTab value="audit-logs" to={`/u/${accountIndex}/audit-logs`} label="Audit logs" />
         <NavTab value="import-data" to={`/u/${accountIndex}/import-data`} label="Import data" />

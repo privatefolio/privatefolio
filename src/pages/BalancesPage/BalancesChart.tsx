@@ -6,6 +6,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { DEFAULT_DEBOUNCE_DURATION } from "src/settings"
 import { $baseCurrency } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
+import { $debugMode } from "src/stores/app-store"
 import { createPriceFormatter } from "src/utils/chart-utils"
 
 import { SingleSeriesChart, TooltipOpts } from "../../components/SingleSeriesChart"
@@ -51,17 +52,19 @@ export function BalancesChart() {
     [currency]
   )
 
+  const debugMode = useStore($debugMode)
+
   const tooltipOptions: TooltipOpts = useMemo(
     () => ({
       currencySymbol: currency.symbol,
       significantDigits: isMobile ? currency.significantDigits : currency.maxDigits,
       tooltip: {
         compact: isMobile,
-        dateSecondary: true,
-        showTime: false,
+        dateSecondary: !debugMode,
+        showTime: debugMode,
       },
     }),
-    [currency, isMobile]
+    [currency, debugMode, isMobile]
   )
 
   return (

@@ -17,7 +17,12 @@ import { useStore } from "@nanostores/react"
 import React from "react"
 
 import { useBoolean } from "../../hooks/useBoolean"
-import { $filterOptionsMap, FilterKey, getFilterValueLabel } from "../../stores/metadata-store"
+import {
+  $filterOptionsMap,
+  FILTER_LABEL_MAP,
+  FilterKey,
+  getFilterValueLabel,
+} from "../../stores/metadata-store"
 import { ActiveFilterMap, BaseType, HeadCell, Order } from "../../utils/table-utils"
 
 export interface ConnectedTableHeadProps<T extends BaseType> {
@@ -69,6 +74,7 @@ export function ConnectedTableHead<T extends BaseType>(props: ConnectedTableHead
         {key === "timestamp" && (
           <Tooltip title={`Switch to ${relativeTime ? "absolute" : "relative"} time`}>
             <IconButton
+              color="secondary"
               size="small"
               sx={{ marginLeft: -1, marginRight: 0.5 }}
               edge="start"
@@ -110,7 +116,7 @@ export function ConnectedTableHead<T extends BaseType>(props: ConnectedTableHead
                   </MenuItem>
                 ))}
             </Select>
-            <Tooltip title={`Filter by ${label}`}>
+            <Tooltip title={`Filter by ${FILTER_LABEL_MAP[key as string] || key}`}>
               <IconButton
                 size="small"
                 edge="start"

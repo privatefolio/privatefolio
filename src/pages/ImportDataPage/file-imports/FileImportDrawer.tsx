@@ -1,7 +1,6 @@
 import { CloseRounded } from "@mui/icons-material"
 import { LoadingButton } from "@mui/lab"
 import {
-  Avatar,
   Drawer,
   DrawerProps,
   IconButton,
@@ -10,20 +9,19 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material"
-import { useStore } from "@nanostores/react"
 import React, { MouseEvent, useState } from "react"
 import { AmountBlock } from "src/components/AmountBlock"
 import { FileSizeBlock } from "src/components/FileSizeBlock"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
 import { PlatformAvatar } from "src/components/PlatformAvatar"
+import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { useConfirm } from "src/hooks/useConfirm"
 import { FileImport } from "src/interfaces"
-import { PARSERS_META, PLATFORMS_META } from "src/settings"
+import { PARSERS_META } from "src/settings"
 import { $activeAccount } from "src/stores/account-store"
 import { PopoverToggleProps } from "src/stores/app-store"
-import { $platformMetaMap } from "src/stores/metadata-store"
 import { enqueueTask, TaskPriority } from "src/stores/task-store"
 import { handleAuditLogChange } from "src/utils/common-tasks"
 import { clancy } from "src/workers/remotes"
@@ -38,7 +36,6 @@ export function FileImportDrawer(props: FileImportDrawerProps) {
   const { open, toggleOpen, fileImport, relativeTime, ...rest } = props
 
   // const activeIndex = useStore($activeIndex)
-  const platformMetaMap = useStore($platformMetaMap)
 
   const { _id, timestamp, meta, name, lastModified, size } = fileImport
 
@@ -156,22 +153,7 @@ export function FileImportDrawer(props: FileImportDrawerProps) {
         </div>
         <div>
           <SectionTitle>Platform</SectionTitle>
-          {!meta ? (
-            <Skeleton height={20} width={80} />
-          ) : (
-            <Stack direction="row" gap={0.5} alignItems="center" component="div">
-              <Avatar
-                src={platformMetaMap[meta.platform]?.image}
-                sx={{
-                  borderRadius: "2px",
-                  height: 16,
-                  width: 16,
-                }}
-                alt={PLATFORMS_META[meta.platform].name}
-              />
-              <span>{PLATFORMS_META[meta.platform].name}</span>
-            </Stack>
-          )}
+          {!meta ? <Skeleton height={20} width={80} /> : <PlatformBlock platform={meta.platform} />}
         </div>
         <div>
           <SectionTitle>Audit logs</SectionTitle>

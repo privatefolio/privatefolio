@@ -12,7 +12,7 @@ import { SettingsDrawer } from "./SettingsDrawer"
 
 export function Header() {
   return (
-    <AppBar position="static" elevation={0} color="transparent" sx={{ border: "none" }}>
+    <AppBar position="static" elevation={0} sx={{ background: "none !important", border: "none" }}>
       <Toolbar disableGutters>
         <Container
           disableGutters

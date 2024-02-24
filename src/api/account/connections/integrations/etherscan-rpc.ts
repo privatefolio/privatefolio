@@ -2,6 +2,23 @@ import type { BlockTag } from "ethers"
 import { EtherscanProvider } from "ethers"
 
 export class FullEtherscanProvider extends EtherscanProvider {
+  // https://docs.etherscan.io/api-endpoints/accounts#get-list-of-blocks-validated-by-address
+  async getBlockRewardTransactions(
+    address: string,
+    startBlock?: BlockTag,
+    endBlock?: BlockTag
+  ): Promise<Array<BlockRewardTransaction>> {
+    const params = {
+      action: "getminedblocks",
+      address,
+      endblock: endBlock == null ? 99_999_999_999 : endBlock,
+      sort: "asc",
+      startblock: startBlock == null ? 0 : startBlock,
+    }
+
+    return this.fetch("account", params)
+  }
+
   async getErc20Transactions(
     address: string,
     startBlock?: BlockTag,
@@ -25,6 +42,23 @@ export class FullEtherscanProvider extends EtherscanProvider {
   ): Promise<Array<InternalTransaction>> {
     const params = {
       action: "txlistinternal",
+      address,
+      endblock: endBlock == null ? 99_999_999_999 : endBlock,
+      sort: "asc",
+      startblock: startBlock == null ? 0 : startBlock,
+    }
+
+    return this.fetch("account", params)
+  }
+
+  // https://docs.etherscan.io/api-endpoints/accounts#get-beacon-chain-withdrawals-by-address-and-block-range
+  async getStakingWithdrawalTransactions(
+    address: string,
+    startBlock?: BlockTag,
+    endBlock?: BlockTag
+  ): Promise<Array<StakingWithdrawalTransaction>> {
+    const params = {
+      action: "txsBeaconWithdrawal",
       address,
       endblock: endBlock == null ? 99_999_999_999 : endBlock,
       sort: "asc",
@@ -186,4 +220,42 @@ export interface Erc20Transaction {
   tokenSymbol: string
   transactionIndex: string
   value: string
+}
+
+/**
+ * @example
+ * ```json`
+ * {
+ *    "withdrawalIndex":"14",
+ *    "validatorIndex":"119023",
+ *    "address":"0xb9d7934878b5fb9610b3fe8a5e441e8fad7e293f",
+ *    "amount":"3244098967",
+ *    "blockNumber":"17034877",
+ *    "timestamp":"1681338599"
+ * }
+ * ``
+ */
+export interface StakingWithdrawalTransaction {
+  address: string
+  amount: string
+  blockNumber: string
+  timestamp: string
+  validatorIndex: string
+  withdrawalIndex: string
+}
+
+/**
+ * @example
+ * ```json`
+ * {
+ *     "blockNumber":"3462296",
+ *     "timeStamp":"1491118514",
+ *     "blockReward":"5194770940000000000"
+ * }
+ * ``
+ */
+export interface BlockRewardTransaction {
+  blockNumber: string
+  blockReward: string
+  timeStamp: string
 }

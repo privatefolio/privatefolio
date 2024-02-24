@@ -1,5 +1,8 @@
+import { Box } from "@mui/material"
 import React, { useCallback, useMemo } from "react"
+import { FilterChip } from "src/components/FilterChip"
 import { $activeAccount } from "src/stores/account-store"
+import { stringToColor } from "src/utils/color-utils"
 
 import {
   QueryFunction,
@@ -12,17 +15,23 @@ import { clancy } from "../../workers/remotes"
 import { TransactionTableRow } from "./TransactionTableRow"
 
 interface TransactionsTableProps extends Pick<RemoteTableProps<Transaction>, "defaultRowsPerPage"> {
-  symbol?: string
+  assetId?: string
+  id?: string
 }
 
 export function TransactionTable(props: TransactionsTableProps) {
-  const { symbol, ...rest } = props
+  const { assetId, id, ...rest } = props
 
   const queryFn: QueryFunction<Transaction> = useCallback(
     async (filters, rowsPerPage, page, order) => {
-      const selectorOverrides: PouchDB.Find.Selector = symbol
+      if (id) {
+        const transaction = await clancy.getTransaction($activeAccount.get(), id)
+        return [[transaction], 1]
+      }
+
+      const selectorOverrides: PouchDB.Find.Selector = assetId
         ? {
-            $or: [{ outgoingAsset: symbol }, { incomingAsset: symbol }, { feeAsset: symbol }],
+            $or: [{ outgoingAsset: assetId }, { incomingAsset: assetId }, { feeAsset: assetId }],
           }
         : {}
 
@@ -52,7 +61,7 @@ export function TransactionTable(props: TransactionsTableProps) {
             .then((logs) => logs.length),
       ]
     },
-    [symbol]
+    [assetId, id]
   )
 
   const headCells = useMemo<HeadCell<Transaction>[]>(
@@ -127,6 +136,23 @@ export function TransactionTable(props: TransactionsTableProps) {
 
   return (
     <>
+      {id && (
+        <Box
+          sx={{
+            marginBottom: 1,
+            marginLeft: 1,
+            marginTop: 0.5,
+          }}
+        >
+          <FilterChip
+            label={`Id = ${id}`}
+            color={stringToColor("Id")}
+            // onDelete={() => {
+            // TODO
+            // }}
+          />
+        </Box>
+      )}
       <RemoteTable
         initOrderBy="timestamp"
         headCells={headCells}

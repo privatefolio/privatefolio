@@ -203,9 +203,7 @@ export function RemoteTable<T extends BaseType>(props: RemoteTableProps<T>) {
               <Paper
                 variant="outlined"
                 sx={{
-                  background: stickyVersion
-                    ? "var(--mui-palette-background-paperSolid)"
-                    : undefined,
+                  background: stickyVersion ? "var(--mui-palette-background-paper)" : undefined,
                   overflowX: { lg: "unset", xs: "auto" },
                   paddingY: 0,
                 }}

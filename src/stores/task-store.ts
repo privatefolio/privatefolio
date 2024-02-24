@@ -79,14 +79,14 @@ async function processQueue() {
       let errorMessage: string | undefined
 
       try {
-        console.log(`Processing task: ${task.name}`)
+        // console.log(`Processing task: ${task.name}`)
         const callback = createProgressCallback(task.id)
         await task.function(proxy(callback), task.abortController.signal)
       } catch (error) {
-        console.error("Error processing task:", error)
+        // console.error("Error processing task:", error)
         errorMessage = String(error)
       } finally {
-        console.log(`Completed task: ${task.name}`)
+        // console.log(`Completed task: ${task.name}`)
         const completedAt = Date.now()
         $pendingTask.set(undefined)
         $taskHistory.set([

@@ -1,7 +1,11 @@
 import { Box, BoxProps } from "@mui/material"
-import React from "react"
+import React, { forwardRef } from "react"
 import { Link, LinkProps } from "react-router-dom"
 
-export function AppLink(props: BoxProps & LinkProps) {
-  return <Box component={Link} sx={{ color: "inherit", textDecoration: "none" }} {...props} />
-}
+const AppLink = forwardRef<HTMLAnchorElement, BoxProps & LinkProps>((props, ref) => (
+  <Box ref={ref} component={Link} sx={{ color: "inherit", textDecoration: "none" }} {...props} />
+))
+
+AppLink.displayName = "AppLink"
+
+export { AppLink }

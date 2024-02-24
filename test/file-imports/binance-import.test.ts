@@ -52,7 +52,7 @@ describe("binance test imports", () => {
             "Sell",
             "Buy",
             "Fee",
-            "Gift",
+            "Reward",
           ],
           "platform": "binance",
           "rows": 27,

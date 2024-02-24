@@ -332,7 +332,7 @@
     "change": "6.0E-7",
     "changeN": 6e-7,
     "coin": "ETF",
-    "operation": "Gift",
+    "operation": "Reward",
     "platform": "binance",
     "remark": "ETH ETF 分发",
     "timestamp": 1513513203000,

@@ -142,6 +142,11 @@ type FindTransactionsRequest = {
   skip?: number
 }
 
+export async function getTransaction(accountName: string, id: string) {
+  const account = getAccount(accountName)
+  return account.transactionsDB.get(id)
+}
+
 export async function findTransactions(request: FindTransactionsRequest = {}, accountName: string) {
   const account = getAccount(accountName)
   const { indexes } = await account.transactionsDB.getIndexes()

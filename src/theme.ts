@@ -1,4 +1,4 @@
-import { CssVarsThemeOptions, Fade, PaperProps } from "@mui/material"
+import { CssVarsThemeOptions, Fade } from "@mui/material"
 import { blue, grey } from "@mui/material/colors"
 
 export const MainFont = "'Roboto Flex', sans-serif"
@@ -36,7 +36,7 @@ declare module "@mui/material/TableCell" {
 
 declare module "@mui/material" {
   interface TypeBackground {
-    paperSolid: string
+    paperTransparent: string
   }
   interface Palette {
     accent: Palette["primary"]
@@ -48,8 +48,11 @@ declare module "@mui/material" {
 }
 
 declare module "@mui/material/Paper" {
-  interface AdditionalProps {
-    transparent: boolean
+  interface PaperOwnProps {
+    /**
+     * @default "on"
+     */
+    transparent?: string
   }
 }
 declare module "@mui/material/LinearProgress" {
@@ -79,8 +82,8 @@ export const theme: CssVarsThemeOptions = {
         },
         background: {
           default: "rgb(40, 40, 40)",
-          paper: "rgba(45, 45, 45, 0.5)",
-          paperSolid: "rgb(43 43 43)", // derived from default + paper
+          paper: "rgb(43 43 43)",
+          paperTransparent: "rgba(45, 45, 45, 0.33)", // derived from default + paper
         },
         info: {
           main: blue[400],
@@ -112,8 +115,10 @@ export const theme: CssVarsThemeOptions = {
         },
         background: {
           default: bgColor,
-          paper: "rgba(255, 255, 255, 0.33)",
-          paperSolid: "rgb(246 246 248)", // derived from default + paper
+          paper: "rgba(255, 255, 255, 1)",
+          paperTransparent: "rgba(255, 255, 255, 1)",
+          // paper: "rgb(246 246 248)", // derived from default + paper
+          // paperTransparent: "rgba(255, 255, 255, 0.33)",
         },
         info: {
           main: blue[600],
@@ -212,7 +217,7 @@ export const theme: CssVarsThemeOptions = {
       defaultProps: {
         PaperProps: {
           elevation: 4,
-          transparent: "true",
+          transparent: "on",
         },
       },
       styleOverrides: {
@@ -229,7 +234,7 @@ export const theme: CssVarsThemeOptions = {
       defaultProps: {
         PaperProps: {
           elevation: 2,
-          transparent: "true",
+          transparent: "on",
         },
         anchor: "right",
         disableScrollLock: true,
@@ -297,6 +302,7 @@ export const theme: CssVarsThemeOptions = {
     MuiPaper: {
       defaultProps: {
         elevation: 0,
+        transparent: "on",
       },
       styleOverrides: {
         root: {
@@ -309,11 +315,11 @@ export const theme: CssVarsThemeOptions = {
       },
       variants: [
         {
-          props: { transparent: "true" } as PaperProps,
+          props: { transparent: "on" },
           style: {
-            backgroundColor: "rgba(255,255,255, 0.5) !important",
+            backgroundColor: "var(--mui-palette-background-paperTransparent)",
             "html[data-mui-color-scheme='dark'] &": {
-              backgroundColor: "rgba(255,255,255, 0.025) !important",
+              backgroundColor: "var(--mui-palette-background-paperTransparent)",
             },
           },
         },
@@ -326,8 +332,8 @@ export const theme: CssVarsThemeOptions = {
         slotProps: {
           paper: {
             elevation: 1,
-            transparent: "true",
-          } as PaperProps,
+            transparent: "on",
+          },
         },
       },
     },
@@ -336,7 +342,7 @@ export const theme: CssVarsThemeOptions = {
         MenuProps: {
           PaperProps: {
             elevation: 1,
-            transparent: "true",
+            transparent: "on",
           },
         },
       },
@@ -423,7 +429,7 @@ export const theme: CssVarsThemeOptions = {
           "&:last-of-type": {
             borderTopRightRadius: 8,
           },
-          background: "var(--mui-palette-background-paperSolid)",
+          background: "var(--mui-palette-background-paper)",
         },
       },
       variants: [
@@ -446,14 +452,6 @@ export const theme: CssVarsThemeOptions = {
         },
       ],
     },
-    // TESTME why was this needed?
-    // MuiTableHead: {
-    //   styleOverrides: {
-    //     root: {
-    //       height: "10px !important",
-    //     },
-    //   },
-    // },
     MuiTablePagination: {
       styleOverrides: {
         displayedRows: {
@@ -477,25 +475,6 @@ export const theme: CssVarsThemeOptions = {
           "&.MuiTableRow-hover:hover": {
             background: "rgba(var(--mui-palette-secondary-mainChannel) / 0.075) !important",
           },
-          // "&:nth-of-type(odd)": {
-          //   backgroundColor: "rgba(45, 45, 45, 0.5)",
-          // },
-          // "&.TableRow-open-bottom": {
-          //   background: "var(--mui-palette-background-paper)",
-          //   backgroundImage: "var(--mui-overlays-1)",
-          //   // background: "var(--mui-palette-background-default) !important",
-          // },
-          // "&.TableRow-open-top": {
-          //   "--mui-palette-TableCell-border": "rgba(0,0,0,0)",
-          //   background: "var(--mui-palette-background-paper)",
-          //   backgroundImage: "var(--mui-overlays-1)",
-          //   // borderRadius: 2,
-          //   overflow: "hidden",
-          //   // background: "var(--mui-palette-background-default) !important",
-          //   // outline: "1px dashed red !important",
-          //   // border: "1px dashed red !important",
-          // },
-          // cursor: "pointer",
           "html[data-mui-color-scheme='dark'] &.MuiTableRow-hover:hover": {
             background: "rgba(var(--mui-palette-primary-mainChannel) / 0.05) !important",
           },

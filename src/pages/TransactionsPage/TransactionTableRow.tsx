@@ -1,21 +1,18 @@
-import { ArrowRightAltRounded, Visibility } from "@mui/icons-material"
-import { Avatar, Box, Button, IconButton, Stack, TableCell, TableRow, Tooltip } from "@mui/material"
-import { useStore } from "@nanostores/react"
+import { ArrowRightAltRounded, SwapHoriz, Visibility } from "@mui/icons-material"
+import { Box, Button, IconButton, Stack, TableCell, TableRow, Tooltip } from "@mui/material"
 import React from "react"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AmountBlock } from "src/components/AmountBlock"
 import { AssetBlock } from "src/components/AssetBlock"
+import { PlatformBlock } from "src/components/PlatformBlock"
 import { useBoolean } from "src/hooks/useBoolean"
-import { PLATFORMS_META } from "src/settings"
 import { getAssetTicker } from "src/utils/assets-utils"
 
 import { TimestampBlock } from "../../components/TimestampBlock"
 import { Truncate } from "../../components/Truncate"
 import { Transaction } from "../../interfaces"
-import { $platformMetaMap } from "../../stores/metadata-store"
 import { TableRowComponentProps } from "../../utils/table-utils"
 import { TransactionDrawer } from "./TransactionDrawer"
-import { SwapHoriz } from "@mui/icons-material"
 
 export function TransactionTableRow(props: TableRowComponentProps<Transaction>) {
   const {
@@ -40,8 +37,6 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
     feeAsset,
   } = row
 
-  const platformMetaMap = useStore($platformMetaMap)
-
   const { value: open, toggle: toggleOpen } = useBoolean(false)
 
   if (_isTablet) {
@@ -49,52 +44,52 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
       <>
         <TableRow hover>
           <TableCell sx={{ width: "100%" }}>
-            <Stack direction="column" justifyContent="space-between" alignItems="flex-start" gap={1}>
+            <Stack
+              direction="column"
+              justifyContent="space-between"
+              alignItems="flex-start"
+              gap={1}
+            >
               <Box sx={{ color: "text.secondary" }}>
                 <TimestampBlock timestamp={timestamp} relative={relativeTime} />
               </Box>
               <ActionBlock action={type} size="medium" />
-              <Stack direction="row" gap={3} paddingY={1} sx={{
-                fontSize: "18px"
-              }}
-                alignItems="center">
-                {
-                  outgoing && (
-                    <Stack direction="row" gap={1} alignItems="center">
-                      <AmountBlock
-                        colorized
-                        placeholder=""
-                        amount={outgoing ? `-${outgoing}` : undefined}
-                        showSign
-                        currencyTicker={getAssetTicker(outgoingAsset)}
-                      />
-                      <AssetBlock asset={outgoingAsset} size="medium" />
-                    </Stack>
-                  )
-                }
-                {outgoing && incoming ? (
-                  <SwapHoriz fontSize="small" color="secondary" />
-                ) : null}
-                {
-                  incoming && (
-                    <Stack direction="row" gap={1} alignItems="center">
-                      <AmountBlock
-                        colorized
-                        placeholder=""
-                        amount={incoming}
-                        showSign
-                        currencyTicker={getAssetTicker(incomingAsset)}
-                      />
-                      <AssetBlock asset={incomingAsset} size="medium" />
-                    </Stack>
-                  )
-                }
-              </Stack>
-              <Button
-                size="small"
-                color="primary"
-                onClick={toggleOpen}
+              <Stack
+                direction="row"
+                gap={3}
+                paddingY={1}
+                sx={{
+                  fontSize: "18px",
+                }}
+                alignItems="center"
               >
+                {outgoing && (
+                  <Stack direction="row" gap={1} alignItems="center">
+                    <AmountBlock
+                      colorized
+                      placeholder=""
+                      amount={outgoing ? `-${outgoing}` : undefined}
+                      showSign
+                      currencyTicker={getAssetTicker(outgoingAsset)}
+                    />
+                    <AssetBlock asset={outgoingAsset} size="medium" />
+                  </Stack>
+                )}
+                {outgoing && incoming ? <SwapHoriz fontSize="small" color="secondary" /> : null}
+                {incoming && (
+                  <Stack direction="row" gap={1} alignItems="center">
+                    <AmountBlock
+                      colorized
+                      placeholder=""
+                      amount={incoming}
+                      showSign
+                      currencyTicker={getAssetTicker(incomingAsset)}
+                    />
+                    <AssetBlock asset={incomingAsset} size="medium" />
+                  </Stack>
+                )}
+              </Stack>
+              <Button size="small" color="primary" onClick={toggleOpen}>
                 Inspect details <ArrowRightAltRounded />
               </Button>
             </Stack>
@@ -118,18 +113,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
           <TimestampBlock timestamp={timestamp} relative={relativeTime} />
         </TableCell>
         <TableCell>
-          <Stack direction="row" gap={0.5} alignItems="center" component="div">
-            <Avatar
-              src={platformMetaMap[platform]?.image}
-              sx={{
-                borderRadius: "2px",
-                height: 16,
-                width: 16,
-              }}
-              alt={PLATFORMS_META[platform].name}
-            />
-            {/* <span>{PLATFORMS_META[platform].name}</span> */}
-          </Stack>
+          <PlatformBlock platform={platform} hideName />
         </TableCell>
         <TableCell>
           <Tooltip title={wallet}>

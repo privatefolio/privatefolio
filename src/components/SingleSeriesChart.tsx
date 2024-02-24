@@ -299,14 +299,18 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
       if (activeInterval === "1w") {
         const aggregatedData: ChartData[] = []
 
+        let previousWeek: ChartData | undefined
+
         for (let i = 0; i < result.length; i += 7) {
           const weekData = result.slice(i, i + 7)
-          const open = weekData[0]?.value
+          const open = previousWeek ? previousWeek.close : weekData[0]?.value
           const close = weekData[weekData.length - 1]?.value
           const low = Math.min(...weekData.map((d) => d.value))
           const high = Math.max(...weekData.map((d) => d.value))
 
-          aggregatedData.push({ close, high, low, open, time: weekData[0]?.time, value: close })
+          const weekCandle = { close, high, low, open, time: weekData[0]?.time, value: close }
+          previousWeek = weekCandle
+          aggregatedData.push(weekCandle)
         }
         result = aggregatedData
       }
@@ -575,7 +579,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
                 sx={{
                   "& > *": {
                     alignItems: "center",
-                    background: "var(--mui-palette-background-paperSolid)",
+                    background: "var(--mui-palette-background-paper)",
                     display: "flex",
                     height: 28,
                     paddingX: 1.5,

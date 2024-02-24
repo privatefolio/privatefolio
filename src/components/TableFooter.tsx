@@ -22,7 +22,7 @@ export function TableFooter(props: TableFooterProps) {
     <Stack
       direction="row"
       sx={{
-        background: stickyVersion ? "var(--mui-palette-background-paperSolid)" : undefined,
+        background: stickyVersion ? "var(--mui-palette-background-paper)" : undefined,
         borderBottomLeftRadius: 8,
         borderBottomRightRadius: 8,
         borderTop: "1px solid var(--mui-palette-TableCell-border)",

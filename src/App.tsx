@@ -8,6 +8,7 @@ import { AccountIndexRoute } from "./AccountIndexRoute"
 import { ErrorBoundary } from "./components/ErrorBoundary"
 import { Header } from "./components/Header/Header"
 import AssetPage from "./pages/AssetPage/AssetPage"
+import AssetsPage from "./pages/AssetsPage/AssetsPage"
 import AuditLogsPage from "./pages/AuditLogsPage/AuditLogsPage"
 import BalancesPage from "./pages/BalancesPage/BalancesPage"
 import ImportDataPage from "./pages/ImportDataPage/ImportDataPage"
@@ -117,6 +118,10 @@ export default function App() {
                   <Route
                     path="audit-logs"
                     element={<AuditLogsPage show={key === pathname && appPath === "audit-logs"} />}
+                  />
+                  <Route
+                    path="assets"
+                    element={<AssetsPage show={key === pathname && appPath === "assets"} />}
                   />
                   <Route path="*" element={<Navigate to="/u/0" />} />
                 </Route>

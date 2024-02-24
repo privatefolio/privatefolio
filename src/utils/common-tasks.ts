@@ -1,14 +1,14 @@
-import { Connection } from "src/interfaces"
+import { AuditLog, Connection } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 
 import { $filterOptionsMap, computeMetadata } from "../stores/metadata-store"
 import { $taskQueue, enqueueTask, TaskPriority } from "../stores/task-store"
 import { clancy } from "../workers/remotes"
 
-export function handleAuditLogChange() {
+export function handleAuditLogChange(auditLog?: AuditLog) {
+  // TODO invalidate balancesCursor based on auditLog.timestamp
   enqueueAutoMerge()
   enqueueIndexDatabase()
-  // invalidate balancesCursor
   enqueueRefreshBalances()
   enqueueFetchPrices()
   enqueueRefreshNetworth()

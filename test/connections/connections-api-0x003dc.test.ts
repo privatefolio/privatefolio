@@ -47,16 +47,17 @@ describe("should import 0x003dc via connection", () => {
     // assert
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Starting from block number 0
-      0,Fetching normal transactions
-      10,Parsing 482 normal transactions
-      25,Fetching internal transactions
-      35,Parsing 48 internal transactions
-      50,Fetching erc20 transactions
-      60,Parsing 428 erc20 transactions
-      80,Saving 1024 audit logs to disk
-      90,Saving 948 transactions to disk
-      95,Setting cursor to block number 16727787
-      99,Saving metadata"
+      0,Fetching all transactions
+      10,Fetched 482 Normal transactions
+      20,Fetched 48 Internal transactions
+      30,Fetched 428 ERC20 transactions
+      40,Fetched 0 Staking Withdrawal transactions
+      50,Fetched 0 Block Reward transactions
+      50,Parsing all transactions
+      60,Saving 1024 audit logs to disk
+      70,Saving 948 transactions to disk
+      80,Saving metadata
+      90,Setting cursor to block number 16727787"
     `)
   })
 

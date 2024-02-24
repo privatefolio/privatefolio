@@ -4,7 +4,7 @@ import {
   Erc20Transaction,
   InternalTransaction,
   NormalTransaction,
-} from "./api/account/connections/etherscan-rpc"
+} from "./api/account/connections/integrations/etherscan-rpc"
 import { ParserId, Platform } from "./settings"
 export type { Platform } from "./settings"
 
@@ -17,7 +17,9 @@ export const TRANSACTIONS_TYPES = [
   "Deposit",
   "Withdraw",
   "Unknown",
+  "Reward",
   "Unwrap",
+  "Wrap",
 ] as const
 export type TransactionType = (typeof TRANSACTIONS_TYPES)[number]
 
@@ -77,12 +79,12 @@ export type AuditLogOperation =
   | "Buy with Credit Card"
   | "Sell"
   | "Fee"
-  | "Distribution"
   | "Withdraw"
   | "Funding Fee"
   | "Conversion"
   | "Transfer"
   | "Smart Contract"
+  | "Reward"
 
 export type PlatformId = "ethereum" | "binance" | "coinbase" | "coinmama"
 
@@ -341,3 +343,20 @@ export type EvmParser = (
 ) => ParserResult
 
 export type ParserContextFn = (req: string[]) => Promise<Record<string, unknown>>
+
+export type SyncResult = {
+  assetMap: Record<string, boolean>
+  logMap: Record<string, AuditLog>
+  /**
+   * blockNumber or timestamp
+   */
+  newCursor: string
+  operationMap: Partial<Record<AuditLogOperation, boolean>>
+  rows: number
+  txMap: Record<string, Transaction>
+  walletMap: Record<string, boolean>
+}
+
+export type Asset = AssetMetadata & {
+  _id: string
+}

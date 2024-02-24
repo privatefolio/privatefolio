@@ -35,7 +35,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1663701899000,
-    "txId": undefined,
+    "txId": "0xd5c5e34d06b4bc5f39a4d86b30196ad2d17fad786138d4056ea102dfd17769b2_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -61,7 +61,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1663701899000,
-    "txId": undefined,
+    "txId": "0xd5c5e34d06b4bc5f39a4d86b30196ad2d17fad786138d4056ea102dfd17769b2_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -100,7 +100,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1659520676000,
-    "txId": undefined,
+    "txId": "0x5b1bb246530a22f0754dbdd176c81ef2ca2d8f40736d7bcf5b4741f69669f4ca_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -126,7 +126,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1659520415000,
-    "txId": undefined,
+    "txId": "0xe0061f653c337d4449262b6e49a30abb4927a6af49b4208af8c4084312411f5a_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -139,7 +139,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1659520389000,
-    "txId": undefined,
+    "txId": "0x1395de18ab369da3da712fe50b2cd988f9611cea1d3b7b0f7c48e2df6db4a25a_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -178,7 +178,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1659520389000,
-    "txId": undefined,
+    "txId": "0xc0f79855465a93b32654072daedb68021689ac20cf52e38b51981a51c6501433_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -217,7 +217,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1638445689000,
-    "txId": undefined,
+    "txId": "0x666bfd0b0fcffbd46a0106e33baefd04d9a113991577dbea57a8dc23777d6063_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -230,7 +230,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1638445403000,
-    "txId": undefined,
+    "txId": "0x1c197c607959023d14aa32ded703b86c416243a3d5460401ae7b32671d0904fe_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -243,7 +243,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1638445403000,
-    "txId": undefined,
+    "txId": "0x1c197c607959023d14aa32ded703b86c416243a3d5460401ae7b32671d0904fe_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -269,7 +269,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1637669983000,
-    "txId": undefined,
+    "txId": "0x845fb43532ccec6344542e350fa45a37d64b8294bd1d53e62bdcaf3d87bf115d_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -334,7 +334,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1623930863000,
-    "txId": undefined,
+    "txId": "0x81f3dbd8ea6cd8b99e4b4b5639242d5f0d57526bbed136406e3dbc1c2fca8596_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -360,7 +360,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1623263202000,
-    "txId": undefined,
+    "txId": "0xf219b029bdd44c784855dfeaa32c1c1f7cce069329c168d5881ae1769bd91dfb_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -399,7 +399,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1617421442000,
-    "txId": undefined,
+    "txId": "0x167e96a1e1ce52b9bbe70f02ff992c37c7694e2ad3904e4aa66bdb66311f01f5_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -464,7 +464,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616213287000,
-    "txId": undefined,
+    "txId": "0xc572882d2a54af5e37ff0414286c682fc2ded19497bd00e915077afa75f9c17b_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -490,7 +490,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616213279000,
-    "txId": undefined,
+    "txId": "0x9a93f395422727361956fad57927d0a5e63957d1075ff7d0f6ce7097fff09eff_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -516,7 +516,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616213202000,
-    "txId": undefined,
+    "txId": "0xc926356b839ef6563caf4785d175841bb1ebcbc396dd19e53e750a0ac3a2b0fa_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -542,7 +542,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616212467000,
-    "txId": undefined,
+    "txId": "0xf4b565653a614b817f902dc53e5c11583474e6822ef841c5bec76821f477dadd_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -568,7 +568,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616212361000,
-    "txId": undefined,
+    "txId": "0xcf19d32713829563fba67c8010c3c4e0e16cc30bf5c5c6e8adabf28e04683b18_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -594,7 +594,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616211886000,
-    "txId": undefined,
+    "txId": "0x93096069910907cae5d45c8ca14e9769033babc800e19a9375edd16a6a3b6e69_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -607,7 +607,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616211731000,
-    "txId": undefined,
+    "txId": "0x93068e64fc011575876deb2d197d51387748806a74a5677244e35201e9c316bf_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -633,7 +633,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616211731000,
-    "txId": undefined,
+    "txId": "0x93068e64fc011575876deb2d197d51387748806a74a5677244e35201e9c316bf_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -646,7 +646,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616211573000,
-    "txId": undefined,
+    "txId": "0x1a102a03b0c523e55ed8f7f1199c991bd2604eff400efa4ff9194b0c9558fdb2_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -659,7 +659,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616211573000,
-    "txId": undefined,
+    "txId": "0x9dc6ad32be0828d566d8d6c7c82be40a9515e3a2ecc8e91c62a68f5050d7aabd_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -672,7 +672,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616211573000,
-    "txId": undefined,
+    "txId": "0x1a102a03b0c523e55ed8f7f1199c991bd2604eff400efa4ff9194b0c9558fdb2_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -711,7 +711,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616211573000,
-    "txId": undefined,
+    "txId": "0x9dc6ad32be0828d566d8d6c7c82be40a9515e3a2ecc8e91c62a68f5050d7aabd_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -724,7 +724,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616211090000,
-    "txId": undefined,
+    "txId": "0x8ea8fd26dcd8cd5c9c65970913b17d9b852bfa378ab30190fdcba8de09781f27_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -737,7 +737,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616211090000,
-    "txId": undefined,
+    "txId": "0x8ea8fd26dcd8cd5c9c65970913b17d9b852bfa378ab30190fdcba8de09781f27_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -750,7 +750,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616211090000,
-    "txId": undefined,
+    "txId": "0x8ea8fd26dcd8cd5c9c65970913b17d9b852bfa378ab30190fdcba8de09781f27_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -776,7 +776,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616210964000,
-    "txId": undefined,
+    "txId": "0x7d6360cae57b882f40c62828859ee66f8ecde2795c797407b4e8adc35aebcb12_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -789,7 +789,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616210964000,
-    "txId": undefined,
+    "txId": "0x7d6360cae57b882f40c62828859ee66f8ecde2795c797407b4e8adc35aebcb12_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -815,7 +815,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616210760000,
-    "txId": undefined,
+    "txId": "0x63efc84ec5c6f3991cb07237a512d563ab4e988c12b834d93320afe9ba7a1c2e_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -841,7 +841,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616210690000,
-    "txId": undefined,
+    "txId": "0x3d447d5b5b4f087a3846aa886b0e3665628476d5c19b80fa370be35b5f9a47e9_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -854,7 +854,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616210690000,
-    "txId": undefined,
+    "txId": "0x3d447d5b5b4f087a3846aa886b0e3665628476d5c19b80fa370be35b5f9a47e9_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -867,7 +867,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616210690000,
-    "txId": undefined,
+    "txId": "0x3d447d5b5b4f087a3846aa886b0e3665628476d5c19b80fa370be35b5f9a47e9_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -893,7 +893,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616210273000,
-    "txId": undefined,
+    "txId": "0xe2699c926c4696e7ae63a319d9ab53f9dc39aa6af91a30fd617b47eba78f6dab_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -906,7 +906,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616210273000,
-    "txId": undefined,
+    "txId": "0xe2699c926c4696e7ae63a319d9ab53f9dc39aa6af91a30fd617b47eba78f6dab_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -945,7 +945,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616209537000,
-    "txId": undefined,
+    "txId": "0x017059b2f07f56a83ab2ab323298668be6eee16a25447d7fe7833499399cbaf2_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -984,7 +984,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616209220000,
-    "txId": undefined,
+    "txId": "0xca62eab0bd3f6a50b1db2afb7096fa3a1a4ea982f0e541ec9b6e82c7fd89f61a_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -997,7 +997,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616208817000,
-    "txId": undefined,
+    "txId": "0xcb02e09ade85c8750327cb04e5afdc969087302b8bf65bf44211b9434e989619_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1023,7 +1023,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616208354000,
-    "txId": undefined,
+    "txId": "0x0464adb7da9b904fdf9cacb56586f9a940dc5882ad7b345e51517c5235699ee5_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1049,7 +1049,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616208354000,
-    "txId": undefined,
+    "txId": "0x0464adb7da9b904fdf9cacb56586f9a940dc5882ad7b345e51517c5235699ee5_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1062,7 +1062,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616208278000,
-    "txId": undefined,
+    "txId": "0xe191bf9721c62ec0cc73a5dc41aae8fb4f35059309f64f7774e406b3ad4aa704_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1088,7 +1088,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616208278000,
-    "txId": undefined,
+    "txId": "0xe191bf9721c62ec0cc73a5dc41aae8fb4f35059309f64f7774e406b3ad4aa704_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1114,7 +1114,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616208160000,
-    "txId": undefined,
+    "txId": "0xbc95894d61b1d41059adc0c159eed813c64eb8cce63885ce54b4882c138ec0b7_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1127,7 +1127,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616206477000,
-    "txId": undefined,
+    "txId": "0x96ac753f41f8a43421175a5879c5cf8abd77e7b3da3fe4149e117016549afa7e_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1153,7 +1153,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616206477000,
-    "txId": undefined,
+    "txId": "0x96ac753f41f8a43421175a5879c5cf8abd77e7b3da3fe4149e117016549afa7e_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1166,7 +1166,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616206082000,
-    "txId": undefined,
+    "txId": "0xb702dd98b0854aca3d965adf8c370d4f4bbacd296701cb2ae3ac168dae78af37_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1179,7 +1179,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616206082000,
-    "txId": undefined,
+    "txId": "0xb702dd98b0854aca3d965adf8c370d4f4bbacd296701cb2ae3ac168dae78af37_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1205,7 +1205,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616206082000,
-    "txId": undefined,
+    "txId": "0xb702dd98b0854aca3d965adf8c370d4f4bbacd296701cb2ae3ac168dae78af37_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1218,7 +1218,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616205585000,
-    "txId": undefined,
+    "txId": "0x1897af65b4a406a72304f2bdbbac91b26a31aadc28959876b29c23499a2d69ab_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1244,7 +1244,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616205585000,
-    "txId": undefined,
+    "txId": "0x1897af65b4a406a72304f2bdbbac91b26a31aadc28959876b29c23499a2d69ab_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1257,7 +1257,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616205337000,
-    "txId": undefined,
+    "txId": "0x28151dcb1b136eefbafb21d711608af0a6abb5ed3af5d4c53a4f64a4c8ff0093_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1283,7 +1283,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616205337000,
-    "txId": undefined,
+    "txId": "0x28151dcb1b136eefbafb21d711608af0a6abb5ed3af5d4c53a4f64a4c8ff0093_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1309,7 +1309,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616204355000,
-    "txId": undefined,
+    "txId": "0x3a95be2e17bfa7d3792a66d2b3273991954e78d2bd60ec8d88e0a1b6685b07cc_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1322,7 +1322,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616204355000,
-    "txId": undefined,
+    "txId": "0x05f747faf5180e3adfba3445ee22b48ce783bde86753db2ae8031963c8324e11_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1361,7 +1361,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616204355000,
-    "txId": undefined,
+    "txId": "0x3a95be2e17bfa7d3792a66d2b3273991954e78d2bd60ec8d88e0a1b6685b07cc_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1387,7 +1387,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1616203863000,
-    "txId": undefined,
+    "txId": "0x51f1a1b1253f76653bded2ccf4a2db6436d981226fb1f09032579b3a4321d804_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1426,7 +1426,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1616199297000,
-    "txId": undefined,
+    "txId": "0xb8fdfcacdcb9fd030c26143ffc72ec3b275bd096d9268be3f595870188ad2b84_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1452,7 +1452,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1615993807000,
-    "txId": undefined,
+    "txId": "0xf7bc75f6112da08db4ff072778266d8633b520d8a5831584f693c94d61de8df0_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1478,7 +1478,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1615918776000,
-    "txId": undefined,
+    "txId": "0x094a2d6626f86218216270ffda08275a3c4ce27b309593d5f668f086627c25a1_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1491,7 +1491,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1615918107000,
-    "txId": undefined,
+    "txId": "0xb5058b9318c96b15cd6bc7add45a3eeb545018073498fad81f665aeef71a5268_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1517,7 +1517,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1615918107000,
-    "txId": undefined,
+    "txId": "0xb5058b9318c96b15cd6bc7add45a3eeb545018073498fad81f665aeef71a5268_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1573,7 +1573,7 @@
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
-    "_id": "0x686c8f5b31ad0e3be6d403af5418e86961773414e26a99e499b98af0f34870ce_INTERNAL_ERC20",
+    "_id": "0x686c8f5b31ad0e3be6d403af5418e86961773414e26a99e499b98af0f34870ce_INTERNAL_WETH",
     "assetId": "ethereum:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:WETH",
     "balance": "0.000009564384016465",
     "balanceN": 0.000009564384016465,
@@ -1595,7 +1595,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1612517857000,
-    "txId": undefined,
+    "txId": "0x9098aa387a926f33f81c3a1afd30a6554d17a7f11f1ca1a9f35459db40f6f37f_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1621,7 +1621,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1612517857000,
-    "txId": undefined,
+    "txId": "0x9098aa387a926f33f81c3a1afd30a6554d17a7f11f1ca1a9f35459db40f6f37f_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1686,7 +1686,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1612517125000,
-    "txId": undefined,
+    "txId": "0x0e4f85514241f15e78693cdcdbc80df16336f19d9df1f045b27ee5709710209e_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1699,7 +1699,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1612514872000,
-    "txId": undefined,
+    "txId": "0xf60f1185d405a327a0892cbf9a7de56f60a419f4f1d07483b64c1f4168e4c0b4_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1712,7 +1712,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1612514872000,
-    "txId": undefined,
+    "txId": "0xf60f1185d405a327a0892cbf9a7de56f60a419f4f1d07483b64c1f4168e4c0b4_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1738,7 +1738,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1611404396000,
-    "txId": undefined,
+    "txId": "0x34d6657b2234d14ad01c4094c45a953769f0a81b0bc8c2a13900b58eac58d215_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1751,7 +1751,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1611404396000,
-    "txId": undefined,
+    "txId": "0x34d6657b2234d14ad01c4094c45a953769f0a81b0bc8c2a13900b58eac58d215_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1790,7 +1790,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1611402906000,
-    "txId": undefined,
+    "txId": "0x18dbc5cf5e42f01848265abee42afd3330de4a124f463c06576d2e46e10066d6_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1816,7 +1816,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1611402906000,
-    "txId": undefined,
+    "txId": "0x18dbc5cf5e42f01848265abee42afd3330de4a124f463c06576d2e46e10066d6_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1829,7 +1829,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1611402906000,
-    "txId": undefined,
+    "txId": "0x18dbc5cf5e42f01848265abee42afd3330de4a124f463c06576d2e46e10066d6_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1842,7 +1842,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1611402752000,
-    "txId": undefined,
+    "txId": "0x51d877bbc32d20b904ee4d7d52b86d36cdf7a471b08dcbdffaecea0a9d394574_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1868,7 +1868,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1611402752000,
-    "txId": undefined,
+    "txId": "0x51d877bbc32d20b904ee4d7d52b86d36cdf7a471b08dcbdffaecea0a9d394574_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1894,7 +1894,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1611402345000,
-    "txId": undefined,
+    "txId": "0x44c5966d31253c2b8395859cfcf14a761c128193ac011f1b6807b2adba5697d2_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1920,7 +1920,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1611168518000,
-    "txId": undefined,
+    "txId": "0x19aae99a0fb4ef9cf741ad91ab3975c2900ee5cf574fb009db15b1bd27c52630_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1933,7 +1933,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1611168518000,
-    "txId": undefined,
+    "txId": "0x19aae99a0fb4ef9cf741ad91ab3975c2900ee5cf574fb009db15b1bd27c52630_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1959,7 +1959,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1611168518000,
-    "txId": undefined,
+    "txId": "0x19aae99a0fb4ef9cf741ad91ab3975c2900ee5cf574fb009db15b1bd27c52630_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -1998,7 +1998,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1610101379000,
-    "txId": undefined,
+    "txId": "0x8196834108cd04a23b38c948cf58662f76d58ae5bfb7d911ecc4b78638fdc265_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2011,7 +2011,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1610101379000,
-    "txId": undefined,
+    "txId": "0x8196834108cd04a23b38c948cf58662f76d58ae5bfb7d911ecc4b78638fdc265_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2050,7 +2050,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1610014886000,
-    "txId": undefined,
+    "txId": "0xf0c7c49db9354dcc7f9dde19b99711967484ab117c93541ca3104eadab14b799_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2076,7 +2076,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1610013041000,
-    "txId": undefined,
+    "txId": "0xbe645fb0ad7851f21178f2d87388f9b3ea5e480f777febf35160a173cd3afd84_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2089,7 +2089,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1609971106000,
-    "txId": undefined,
+    "txId": "0xe9d4f759ef525c71b78f0ba2aefddd0874135200f5b36e703ca0d78894f14ff6_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2115,7 +2115,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1609969554000,
-    "txId": undefined,
+    "txId": "0x167685ab25a6d44e05ab62b5209dccee358f4e011efe73f6e2e553a5c31e159b_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2141,7 +2141,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1609969554000,
-    "txId": undefined,
+    "txId": "0x167685ab25a6d44e05ab62b5209dccee358f4e011efe73f6e2e553a5c31e159b_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2180,7 +2180,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1609172728000,
-    "txId": undefined,
+    "txId": "0x51b3e4fd47b4d4340477d786449cd86429129e72dbe130ec308d03debe837189_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2219,7 +2219,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1609168415000,
-    "txId": undefined,
+    "txId": "0xbc8a0458bf91ae96ca99580aafa952838450d85696bb43fd36d1b38628b0135c_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2245,7 +2245,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1609168415000,
-    "txId": undefined,
+    "txId": "0xbc8a0458bf91ae96ca99580aafa952838450d85696bb43fd36d1b38628b0135c_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2271,7 +2271,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1609167660000,
-    "txId": undefined,
+    "txId": "0x3f1bb2bb9f194d0dd8391905d432dde64ba94ae6e30a56fe7e420527225ad492_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2310,7 +2310,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1607088922000,
-    "txId": undefined,
+    "txId": "0xe0f21971897096fa317357c6d6b7758c9c85e1a5d31edef993dba048b53b13d2_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2349,7 +2349,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1607087666000,
-    "txId": undefined,
+    "txId": "0x9cc7eac8a1a4fb9f98e30f770fc12a875197e353e3412ec32cc32d66ab82bbe7_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2362,7 +2362,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1607087666000,
-    "txId": undefined,
+    "txId": "0x9cc7eac8a1a4fb9f98e30f770fc12a875197e353e3412ec32cc32d66ab82bbe7_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2401,7 +2401,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1607087529000,
-    "txId": undefined,
+    "txId": "0xd4553038e044330da15c33d050a116a176c43caf1cccd80ddc9a25a1669b1a82_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2427,7 +2427,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1607087529000,
-    "txId": undefined,
+    "txId": "0xd4553038e044330da15c33d050a116a176c43caf1cccd80ddc9a25a1669b1a82_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2440,7 +2440,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1607087529000,
-    "txId": undefined,
+    "txId": "0xd4553038e044330da15c33d050a116a176c43caf1cccd80ddc9a25a1669b1a82_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2505,7 +2505,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1607086209000,
-    "txId": undefined,
+    "txId": "0xd5638393a147242d76a3487d84d5ba89954673dd2e50435ce64b84bd06c7b01e_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2531,7 +2531,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1607086209000,
-    "txId": undefined,
+    "txId": "0xd5638393a147242d76a3487d84d5ba89954673dd2e50435ce64b84bd06c7b01e_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2544,7 +2544,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1607085809000,
-    "txId": undefined,
+    "txId": "0x95bf3a83c7e701a50509d6a98507a394075517bd7b03ffb56f27e2918ff4e32a_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2570,7 +2570,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1606933905000,
-    "txId": undefined,
+    "txId": "0x277168df56ca48d8b9f73a37fcd31e56dd57686379a0ec08dbc8c46e5f902a08_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2596,7 +2596,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1606905817000,
-    "txId": undefined,
+    "txId": "0x3d5efff416fb9b531e80f9f42e44a4e8a4c6673d22905cf2af0446d5b9e405c4_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2622,7 +2622,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1606902604000,
-    "txId": undefined,
+    "txId": "0xbe189934f6c3703a108da11232568053433c1f90f35276a02191d86a3ab54d20_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2674,7 +2674,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1606902196000,
-    "txId": undefined,
+    "txId": "0xee5f2b452ea6a0f070641becdc919b44acc08bf3b4c5ff3cd7fd1fcce32d6dea_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2700,7 +2700,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1606900696000,
-    "txId": undefined,
+    "txId": "0x9a6e1b69ff202eb42683bfcb8e2e4dc40d35146cc902540cf9a65f519c2e13c6_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2713,7 +2713,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1606900696000,
-    "txId": undefined,
+    "txId": "0x9a6e1b69ff202eb42683bfcb8e2e4dc40d35146cc902540cf9a65f519c2e13c6_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2739,7 +2739,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1606900696000,
-    "txId": undefined,
+    "txId": "0x9a6e1b69ff202eb42683bfcb8e2e4dc40d35146cc902540cf9a65f519c2e13c6_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2752,7 +2752,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1606900603000,
-    "txId": undefined,
+    "txId": "0xce31ad567e3668722c778d4ce9d571a6630dcaecb929716b7d3beca8259fe9e6_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2778,7 +2778,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1606900603000,
-    "txId": undefined,
+    "txId": "0xce31ad567e3668722c778d4ce9d571a6630dcaecb929716b7d3beca8259fe9e6_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2804,7 +2804,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1606241643000,
-    "txId": undefined,
+    "txId": "0x0d9f79bb800e863e8a46ed869c2192c5174a0d5e3a04c715bdf234fc49cd1af9_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2908,7 +2908,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1605944079000,
-    "txId": undefined,
+    "txId": "0x879ae04df13c345172bcb61247978fef12e4005bad886c8ab2523ebb44cbb25c_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2934,7 +2934,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1605944079000,
-    "txId": undefined,
+    "txId": "0x879ae04df13c345172bcb61247978fef12e4005bad886c8ab2523ebb44cbb25c_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2947,7 +2947,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1605912885000,
-    "txId": undefined,
+    "txId": "0x4d9e790b7883c7d78d4354756639facf7330c587a55dc1f2364f679322f02cca_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2973,7 +2973,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1605912885000,
-    "txId": undefined,
+    "txId": "0x4d9e790b7883c7d78d4354756639facf7330c587a55dc1f2364f679322f02cca_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -2999,7 +2999,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1605910365000,
-    "txId": undefined,
+    "txId": "0x789b45fc79a11c0a37895a39d3b33c4d6d52490a62cb20cec49731fc3cd4fc90_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3025,7 +3025,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1605910365000,
-    "txId": undefined,
+    "txId": "0x789b45fc79a11c0a37895a39d3b33c4d6d52490a62cb20cec49731fc3cd4fc90_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3051,7 +3051,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1605905577000,
-    "txId": undefined,
+    "txId": "0xfd187c7ae91d9e23ec9c85ce485e3519f23099866d943d93a7cadd5815154308_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3064,7 +3064,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1605905339000,
-    "txId": undefined,
+    "txId": "0x2c636c80d4a19e291285c82f680f92e9dbeea3a7200049bb0ead7cb25f461f93_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3077,7 +3077,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1605881987000,
-    "txId": undefined,
+    "txId": "0xb9c45a687505defc549030b729855ab4b0dc6f047e001a1611e147b4f39e1624_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3090,7 +3090,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1605881987000,
-    "txId": undefined,
+    "txId": "0xb9c45a687505defc549030b729855ab4b0dc6f047e001a1611e147b4f39e1624_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3116,7 +3116,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1605881987000,
-    "txId": undefined,
+    "txId": "0xb9c45a687505defc549030b729855ab4b0dc6f047e001a1611e147b4f39e1624_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3181,7 +3181,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1605562891000,
-    "txId": undefined,
+    "txId": "0x68337a2009b27cf3d763fb70019da113d8b2187c5a866125e988e42c263f9765_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3207,7 +3207,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1605562891000,
-    "txId": undefined,
+    "txId": "0x68337a2009b27cf3d763fb70019da113d8b2187c5a866125e988e42c263f9765_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3220,7 +3220,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1604626308000,
-    "txId": undefined,
+    "txId": "0x05c2f7cf8acd4204c498ea22efa173c4394dd70946cbf21ed3c40d7ad54bd797_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3259,7 +3259,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1604478992000,
-    "txId": undefined,
+    "txId": "0x12f8e6d3edf3dcc8e1951944508050e2770e6618442631a53bda671788b263ad_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3272,7 +3272,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1604478992000,
-    "txId": undefined,
+    "txId": "0x12f8e6d3edf3dcc8e1951944508050e2770e6618442631a53bda671788b263ad_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3363,7 +3363,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1604429999000,
-    "txId": undefined,
+    "txId": "0x567db34211fe6f32e75bcc527b4274011bf3f155331fedf2921c2f59dfed5c15_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3389,7 +3389,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1604429694000,
-    "txId": undefined,
+    "txId": "0xdc7199e38395dc144448b61359b5b0cb9bce700c4991709127aea27640c5982a_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3441,7 +3441,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1604429019000,
-    "txId": undefined,
+    "txId": "0xde97734a7335de2531b499f9923923a7f00d074d11c15e470c9a611c7949af78_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3467,7 +3467,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1604425440000,
-    "txId": undefined,
+    "txId": "0x60506e013981710b3c78e2b0403f121ddf242d63bcd951e1cf07e2738e208310_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3493,7 +3493,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1604425440000,
-    "txId": undefined,
+    "txId": "0x60506e013981710b3c78e2b0403f121ddf242d63bcd951e1cf07e2738e208310_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3506,7 +3506,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1604425259000,
-    "txId": undefined,
+    "txId": "0xd32cd75c088fa3dbc71db64fb12df857d20efbd132f44ad81996b6f393c9d4aa_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3532,7 +3532,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1604425259000,
-    "txId": undefined,
+    "txId": "0xd32cd75c088fa3dbc71db64fb12df857d20efbd132f44ad81996b6f393c9d4aa_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3571,7 +3571,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1604423792000,
-    "txId": undefined,
+    "txId": "0xcc81e14cb7e1b7bce62bfbce5e4b66e28768ab628df1de2192e929458b084042_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3610,7 +3610,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1604423792000,
-    "txId": undefined,
+    "txId": "0xcc81e14cb7e1b7bce62bfbce5e4b66e28768ab628df1de2192e929458b084042_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3636,7 +3636,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1604423191000,
-    "txId": undefined,
+    "txId": "0x99817a22668cb3b8fd5cc95fcc683725286ec6e675598dbb648ec1ad0a8b433e_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3662,7 +3662,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1604423191000,
-    "txId": undefined,
+    "txId": "0x99817a22668cb3b8fd5cc95fcc683725286ec6e675598dbb648ec1ad0a8b433e_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3688,7 +3688,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1604343551000,
-    "txId": undefined,
+    "txId": "0x64a91ede3851fd7fb8122e25f0b9fa222cdbc3012a00a05b1ab452d6b2e0775e_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3714,7 +3714,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1603276546000,
-    "txId": undefined,
+    "txId": "0x9d3fabb39d7a07c7c1bd42945246b33313face957f9130e70d554c133a199e77_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3779,7 +3779,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1602706477000,
-    "txId": undefined,
+    "txId": "0x2974fe5522bb37ca610fc9cbaaf687fec5d2e12da2c2a856ffaca6507b4ab878_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3792,7 +3792,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1602705290000,
-    "txId": undefined,
+    "txId": "0xe87b638c01921c92b0709b3d1746b61349a739e01742886966e50d49feb08e94_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3818,7 +3818,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1602360724000,
-    "txId": undefined,
+    "txId": "0x0c121c335293f6e658570f08fe8584b717d3aab44f863f9e381f73831d3292b0_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3857,7 +3857,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1602360724000,
-    "txId": undefined,
+    "txId": "0x0c121c335293f6e658570f08fe8584b717d3aab44f863f9e381f73831d3292b0_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3896,7 +3896,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1602360483000,
-    "txId": undefined,
+    "txId": "0xf43ac72f971aebb1a29489ee89e19ef2c1e2d31e17457366ea18b470247d1245_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3909,7 +3909,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1602333272000,
-    "txId": undefined,
+    "txId": "0xe8e8d4ec95387fbb74c08819c240e3808e2758ab5dfc4aa170a8c5fa24f22092_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3948,7 +3948,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1602333272000,
-    "txId": undefined,
+    "txId": "0xe8e8d4ec95387fbb74c08819c240e3808e2758ab5dfc4aa170a8c5fa24f22092_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -3987,7 +3987,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1602331853000,
-    "txId": undefined,
+    "txId": "0xc2b0ae7ce7871af071d9ff65a8609c9d092399f11bce256a519be99497702517_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4013,7 +4013,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1602331853000,
-    "txId": undefined,
+    "txId": "0xc2b0ae7ce7871af071d9ff65a8609c9d092399f11bce256a519be99497702517_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4052,7 +4052,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1602254803000,
-    "txId": undefined,
+    "txId": "0x5a4ef42591d22ab92758a676a17536308ef5be5583420813e15e36b0409efd84_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4078,7 +4078,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1602254803000,
-    "txId": undefined,
+    "txId": "0x5a4ef42591d22ab92758a676a17536308ef5be5583420813e15e36b0409efd84_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4130,7 +4130,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1602241501000,
-    "txId": undefined,
+    "txId": "0xf012d1b04f245edd122d2f7a3d18e81266879cbeb107827514b6decfdf0250a9_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4143,7 +4143,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1602241039000,
-    "txId": undefined,
+    "txId": "0xf9543a201da066b884955b2a419b98df87e68346739dd3b296d9e38bccd6c158_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4169,7 +4169,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1602241039000,
-    "txId": undefined,
+    "txId": "0xf9543a201da066b884955b2a419b98df87e68346739dd3b296d9e38bccd6c158_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4195,7 +4195,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1602240553000,
-    "txId": undefined,
+    "txId": "0x3d6e8d68333c03851e5b0000b28d21a7807327c51b746a973489c82bf6aec037_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4247,7 +4247,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1600672281000,
-    "txId": undefined,
+    "txId": "0x7d08655a4fe5035b3d5f95240ede4d625aa346f7d72df230e16a7b4c669a3dd3_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4286,7 +4286,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1600195125000,
-    "txId": undefined,
+    "txId": "0x7eec7853c72772267a59eabdf9f92ef238332deb657cd697dadaf7460e40c954_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4364,7 +4364,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1598706303000,
-    "txId": undefined,
+    "txId": "0xe4604a49adb5c53fb59500cf0e3d2097b7b3c5fd64bb5e30ed5761d8de0eea29_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4416,7 +4416,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1598705256000,
-    "txId": undefined,
+    "txId": "0x7d25bff86cc72ec346ecec52be48d42057ef0947a1a3702411bd68188ec046cf_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4494,7 +4494,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1597909777000,
-    "txId": undefined,
+    "txId": "0x227a6df0b1272ec66cd851c64be1f78b28c89f1c07039fa1fda80463c0899f52_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4520,7 +4520,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1596980358000,
-    "txId": undefined,
+    "txId": "0xf6bf99b1e0e421f1e571037cc8850a9a5ba4724b6735b49411f8d5cdcec360fa_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4546,7 +4546,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1596980358000,
-    "txId": undefined,
+    "txId": "0xf6bf99b1e0e421f1e571037cc8850a9a5ba4724b6735b49411f8d5cdcec360fa_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4572,7 +4572,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1596974645000,
-    "txId": undefined,
+    "txId": "0x93d051226a4430528eb84205ee2a0ee61b1df4e46295f317dc1b5ecf9bc300ce_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4598,7 +4598,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1596044863000,
-    "txId": undefined,
+    "txId": "0x6df5bb7b4ed8731a68974d548c902e89984e61bb9fc514c2ce80276ae1e7ab0c_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4637,7 +4637,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1596044662000,
-    "txId": undefined,
+    "txId": "0x6f54779daadfa8b0ef56d356883ddd074f954e53d6abee8934f628de3a54462a_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4676,7 +4676,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1596044281000,
-    "txId": undefined,
+    "txId": "0x9531e007b64e5552fcfc06286dd2ad83271cebd72777c0bd6b66a830ecf5f27b_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4754,7 +4754,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1595898312000,
-    "txId": undefined,
+    "txId": "0x4104f2e0496af7c8b00802c2b5588ac7321941bae65be6954c395750d583d227_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4793,7 +4793,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1595897553000,
-    "txId": undefined,
+    "txId": "0xaf2f4245935bd6aabac0008ffd06f5a4dea7aad08da6d339b5570b1766bcaf46_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4832,7 +4832,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1595880708000,
-    "txId": undefined,
+    "txId": "0x50b8b2280176aa2e7b884e57410f6ddcb9283ca96a5c511032455a3a6aec9a5a_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4858,7 +4858,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1595880014000,
-    "txId": undefined,
+    "txId": "0x57183b743c7db3ce7db411f7575d74c560573ea2a1ae546a64dd13a4b4a8c5bb_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4871,7 +4871,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1595880014000,
-    "txId": undefined,
+    "txId": "0x57183b743c7db3ce7db411f7575d74c560573ea2a1ae546a64dd13a4b4a8c5bb_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4897,7 +4897,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1595880014000,
-    "txId": undefined,
+    "txId": "0x57183b743c7db3ce7db411f7575d74c560573ea2a1ae546a64dd13a4b4a8c5bb_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4936,7 +4936,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1594503166000,
-    "txId": undefined,
+    "txId": "0x16aa187a9077acfa3f40596922bfdb0bdedd9ecbf9e659b362acd7dc31430450_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4949,7 +4949,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1594502905000,
-    "txId": undefined,
+    "txId": "0xdf0f78a114201716d3269be07e9e205a7cb27bc9e30e437805f4bb9f9e28bbe0_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -4975,7 +4975,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1594502905000,
-    "txId": undefined,
+    "txId": "0xdf0f78a114201716d3269be07e9e205a7cb27bc9e30e437805f4bb9f9e28bbe0_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5001,7 +5001,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1593639109000,
-    "txId": undefined,
+    "txId": "0x1ee00ef787754995138dd60f5916c540736e5d7c793d3de26b0123af59d99027_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5014,7 +5014,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1593639109000,
-    "txId": undefined,
+    "txId": "0x1ee00ef787754995138dd60f5916c540736e5d7c793d3de26b0123af59d99027_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5040,7 +5040,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1593639109000,
-    "txId": undefined,
+    "txId": "0x1ee00ef787754995138dd60f5916c540736e5d7c793d3de26b0123af59d99027_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5053,7 +5053,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1593638829000,
-    "txId": undefined,
+    "txId": "0xb843b8e860bd9b947f66a795799bd984a40199db0d79b549372b5fe2fcaec5f2_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5079,7 +5079,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1593638829000,
-    "txId": undefined,
+    "txId": "0xb843b8e860bd9b947f66a795799bd984a40199db0d79b549372b5fe2fcaec5f2_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5105,7 +5105,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1593638650000,
-    "txId": undefined,
+    "txId": "0x4806d8d4d3771b16ac4a2a78e914365b2c23335483a29615ce725ecaccd74530_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5118,7 +5118,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1593638650000,
-    "txId": undefined,
+    "txId": "0x4806d8d4d3771b16ac4a2a78e914365b2c23335483a29615ce725ecaccd74530_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5144,7 +5144,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1593638650000,
-    "txId": undefined,
+    "txId": "0x4806d8d4d3771b16ac4a2a78e914365b2c23335483a29615ce725ecaccd74530_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5183,7 +5183,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1592732464000,
-    "txId": undefined,
+    "txId": "0x55aa06b0b008d59e6d289a7db8cb2245baceeab20bc078a426d434dc16b3dbfa_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5209,7 +5209,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1592732464000,
-    "txId": undefined,
+    "txId": "0x55aa06b0b008d59e6d289a7db8cb2245baceeab20bc078a426d434dc16b3dbfa_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5235,7 +5235,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1592693759000,
-    "txId": undefined,
+    "txId": "0x4477afa5c347a0a2e36ca150b53e2ee458333b1963d6caa6901fc2682ce89056_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5287,7 +5287,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1592690559000,
-    "txId": undefined,
+    "txId": "0x64240b9f54303e2bc3487aed08681cc7409effd58f4902ed7afdd64cee4157fe_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5300,7 +5300,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1592690559000,
-    "txId": undefined,
+    "txId": "0x64240b9f54303e2bc3487aed08681cc7409effd58f4902ed7afdd64cee4157fe_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5326,7 +5326,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1592690559000,
-    "txId": undefined,
+    "txId": "0x64240b9f54303e2bc3487aed08681cc7409effd58f4902ed7afdd64cee4157fe_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5339,7 +5339,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1592690032000,
-    "txId": undefined,
+    "txId": "0x3837856db76857dcdda166bd7fa992847f4150e419225a851e068eea23e95624_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5365,7 +5365,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1592688558000,
-    "txId": undefined,
+    "txId": "0xb4edd6859cd1c2948d0fb20b47a04d45849e9b40208fd08b374e24cd81ea0716_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5456,7 +5456,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1591366746000,
-    "txId": undefined,
+    "txId": "0x76777f67e55292201567ba07fa11749ffe35ee8c2e23e939b5a987b0f9ecf27e_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5495,7 +5495,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1591363174000,
-    "txId": undefined,
+    "txId": "0xdd968bc665f7ad98752a1cecd116335068b749beef18faf3b115e5722dbacbb6_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5508,7 +5508,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1590502029000,
-    "txId": undefined,
+    "txId": "0x907735c38875f9fafba82eecfbfa0c7a44dc60ef38c0e3b6e2333bfc4bfcde06_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5534,7 +5534,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1590502029000,
-    "txId": undefined,
+    "txId": "0x907735c38875f9fafba82eecfbfa0c7a44dc60ef38c0e3b6e2333bfc4bfcde06_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5560,7 +5560,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1590501936000,
-    "txId": undefined,
+    "txId": "0x726b12b7b0f8b894b61872d4398ec1d65b63c1056f54686c6b6465904267fef7_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5586,7 +5586,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1590501936000,
-    "txId": undefined,
+    "txId": "0x726b12b7b0f8b894b61872d4398ec1d65b63c1056f54686c6b6465904267fef7_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5625,7 +5625,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1590501475000,
-    "txId": undefined,
+    "txId": "0xe9271e11ba0abd9e4d892880c72d4c993f5da6deafc89de8c01c83166afb26fa_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5677,7 +5677,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1590500267000,
-    "txId": undefined,
+    "txId": "0x950a80861c579589db0e28f777b24f718daf5943e3d163efe663cc042fbeb1b8_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5690,7 +5690,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1590499911000,
-    "txId": undefined,
+    "txId": "0x39efc90fe991bbc61cb330d321f58f8ad73ce126ae1d04eab50f353721c34a82_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5729,7 +5729,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1590499707000,
-    "txId": undefined,
+    "txId": "0xf05f980a118bc5ba11bdf6ea30fe775b1043ca846372f902b792c398c521cb9d_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5742,7 +5742,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1590498517000,
-    "txId": undefined,
+    "txId": "0x1c59fcb2b710c19868ec1f7e77f2b29777ffbadcc944ab532071ca28d49b0bac_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5768,7 +5768,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1589920220000,
-    "txId": undefined,
+    "txId": "0x2183855f42880c32e9a1ed17a9846630128581a55b0e3a2350101b741e2d7188_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5794,7 +5794,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1589920220000,
-    "txId": undefined,
+    "txId": "0x2183855f42880c32e9a1ed17a9846630128581a55b0e3a2350101b741e2d7188_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5807,7 +5807,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1589919539000,
-    "txId": undefined,
+    "txId": "0x990790f8c4a7a33ad35a64f5d141f98e51f18f9b1cf31f52bf5d808a6236fdb4_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5820,7 +5820,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1589919539000,
-    "txId": undefined,
+    "txId": "0xa6e5b10a16003581756d36c474889c8708e9622d784e397545d5212de5a2a41a_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5833,7 +5833,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1589919539000,
-    "txId": undefined,
+    "txId": "0x9f0c665361ea471333599354b955073e6a5897cf799ecea8fd6bd8b3d7c67596_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5898,7 +5898,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1587746965000,
-    "txId": undefined,
+    "txId": "0xb37bf7b9357051ea172cb74a32b3c38232645a862909ebe5d6241942588889eb_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5911,7 +5911,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1587746965000,
-    "txId": undefined,
+    "txId": "0xb37bf7b9357051ea172cb74a32b3c38232645a862909ebe5d6241942588889eb_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5950,7 +5950,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1587578599000,
-    "txId": undefined,
+    "txId": "0x4933cc145f3aa7a3f9802dead4fcc2af95edf64a424b45ce1a8998702e93b018_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5963,7 +5963,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1587577452000,
-    "txId": undefined,
+    "txId": "0xcc7f135c5133063106e0b6d2bf40faaa2c166a3052fae3fbb66970916d7cd270_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -5976,7 +5976,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1587577442000,
-    "txId": undefined,
+    "txId": "0x9dc1a83df70325d748c83dd9f885e99b4667b1b37b02a010194cc551d99dfecf_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6015,7 +6015,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1587387893000,
-    "txId": undefined,
+    "txId": "0x48a7e49591ddb8096bbf6762d501789930880d0db78737a63f0240d0e4d1fb48_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6041,7 +6041,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1587384950000,
-    "txId": undefined,
+    "txId": "0x8573ec5fcf0de2d1186c94ada6616d9db8a727aa77452c6a6d5d053a1068e280_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6054,7 +6054,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1587251065000,
-    "txId": undefined,
+    "txId": "0xb4be10e5ab4cb9d40b1e47f9583bb2087a61c5d379fadf6ee790db8755f1f55e_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6093,7 +6093,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1587248949000,
-    "txId": undefined,
+    "txId": "0xc700bd9efd6e6d729b88038b384340fdc89f92be80031e4a288a870cffffd038_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6145,7 +6145,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1587212065000,
-    "txId": undefined,
+    "txId": "0x57eb2e3b89caf13508a9da2ee7b4fb95d40990113605e28dcc98c63b32ac505b_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6262,7 +6262,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1586984445000,
-    "txId": undefined,
+    "txId": "0x2eb681356fa792cde3adf5c181b3ca9ff329926f574d85786683be7162145007_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6288,7 +6288,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1586984206000,
-    "txId": undefined,
+    "txId": "0x1a1a79a401a064cbd54346e187e6a615768b7c60ef4db06de3f0b1b4097d42b1_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6301,7 +6301,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1586984094000,
-    "txId": undefined,
+    "txId": "0xe1be0420b9c7e4deed50c7a451a25c194872e8c75da5f9c7a779d0f2f9b6ff20_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6327,7 +6327,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1586984094000,
-    "txId": undefined,
+    "txId": "0xe1be0420b9c7e4deed50c7a451a25c194872e8c75da5f9c7a779d0f2f9b6ff20_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6353,7 +6353,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1586981130000,
-    "txId": undefined,
+    "txId": "0xd542464fc95d5195ff4ce3b74ad550f50e83001deaf9c4154f90ad81a752dd3b_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6379,7 +6379,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1586981130000,
-    "txId": undefined,
+    "txId": "0xd542464fc95d5195ff4ce3b74ad550f50e83001deaf9c4154f90ad81a752dd3b_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6405,7 +6405,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1586978565000,
-    "txId": undefined,
+    "txId": "0x00d814d808e8f98f678eccb79c70231ef7b4fbb9f2cdbbc61d8f7e7f0a6375c6_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6431,7 +6431,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1586978565000,
-    "txId": undefined,
+    "txId": "0x00d814d808e8f98f678eccb79c70231ef7b4fbb9f2cdbbc61d8f7e7f0a6375c6_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6444,7 +6444,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1586977387000,
-    "txId": undefined,
+    "txId": "0xc25211decd922cbb55c56665718877f3c66fc5567b36be5583e6b14119ba1c7c_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6470,7 +6470,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1586977387000,
-    "txId": undefined,
+    "txId": "0xc25211decd922cbb55c56665718877f3c66fc5567b36be5583e6b14119ba1c7c_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6496,7 +6496,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1586861989000,
-    "txId": undefined,
+    "txId": "0xa7a69ad976eba495da294b09ebd711721539cffaa98edb5e5a6bf96a85086f3e_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6535,7 +6535,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1586860604000,
-    "txId": undefined,
+    "txId": "0x13114f3d8787571784f79bcd6fa2e35c1fadefdc834be418d8b809e05aba0810_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6574,7 +6574,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1586855329000,
-    "txId": undefined,
+    "txId": "0xeedb69a961b8984d77fe525834153bf3fafb20b2cf1e7aa9b8c4b1b18ea08faf_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6600,7 +6600,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1586530660000,
-    "txId": undefined,
+    "txId": "0xcb0a6f30491b6458b6ca14ad4c890ed0fb9daeec703517ba4cb46f1a5085a243_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6626,7 +6626,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1586527892000,
-    "txId": undefined,
+    "txId": "0xf9a70cb6e8e33eaf18aae4073914149e4ace5ffc86bc101cf6f08247a161710d_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6639,7 +6639,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1585264188000,
-    "txId": undefined,
+    "txId": "0xba6371a943c4fc91a7d0c70612780874107a0dde85ce77ea85a1519e641b5351_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6665,7 +6665,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1585264188000,
-    "txId": undefined,
+    "txId": "0xba6371a943c4fc91a7d0c70612780874107a0dde85ce77ea85a1519e641b5351_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6678,7 +6678,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1585263888000,
-    "txId": undefined,
+    "txId": "0x5a34a456126de42e8c1576cfbe74202f762a871cebd0e75242d99f4abca9ded7_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6704,7 +6704,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1585263888000,
-    "txId": undefined,
+    "txId": "0x5a34a456126de42e8c1576cfbe74202f762a871cebd0e75242d99f4abca9ded7_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6743,7 +6743,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1585262856000,
-    "txId": undefined,
+    "txId": "0x01f54254c843db56025e5c8433fab30f3edb4189bd0dfabb0fd0b458933f0b26_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6769,7 +6769,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1584355308000,
-    "txId": undefined,
+    "txId": "0x109c52604a78a6ef1dd8516b39a567cc9ec2717556a9fddbdfdf79ca727455ab_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6847,7 +6847,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1583935743000,
-    "txId": undefined,
+    "txId": "0x982a15f035b91098213ce60bb846daae5d06bc4fbb83c4282e57ae5856491044_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6860,7 +6860,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1583845489000,
-    "txId": undefined,
+    "txId": "0x7a1690e816555db2ab39f621d2df531dc192a7aee9fc25d570d2bb511ebfd5e6_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6873,7 +6873,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1582813688000,
-    "txId": undefined,
+    "txId": "0x797ac753e35a2d11a271a7eaf0b146c3eff346fefa981929084ba56cd8a92623_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6886,7 +6886,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1582634802000,
-    "txId": undefined,
+    "txId": "0x0e29b4756be0257903ffbcc859f370095f22760b5bde3b4d387e34e6045f5213_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6925,7 +6925,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1582572191000,
-    "txId": undefined,
+    "txId": "0xda54a9850cd57eaef1f35df18b9eaf383a08b5ef3f1993cbcfc0b09b6d3e07a8_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -6938,7 +6938,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1581643501000,
-    "txId": undefined,
+    "txId": "0xfef4fc3916d36ad63672386a2a6f749529f63627e7943e61a8ebe291950af144_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7003,7 +7003,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1581642262000,
-    "txId": undefined,
+    "txId": "0xa267774bb07b2a7b280d16aa7dc5807ffa8fdcdc9e67a977e3e7f9c31bb45d11_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7029,7 +7029,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1581640425000,
-    "txId": undefined,
+    "txId": "0x6568bc0bc887beb1e2e0c46395523a99ba4b2690391b49b50e9271771139218c_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7081,7 +7081,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1581345257000,
-    "txId": undefined,
+    "txId": "0x17287365623bd9e4a75cac6b4503a8c1171648380028a1dadb058e2a5e3337ba_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7107,7 +7107,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1581309287000,
-    "txId": undefined,
+    "txId": "0x1754ea38ad545084a9e24049f847ec16c6e5412fe3a031abed429c57cc0b67a8_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7120,7 +7120,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1581307536000,
-    "txId": undefined,
+    "txId": "0x87881a97561b227d357b1bb116e2055a3e0f0a737bf6286225bbce35c0949f9a_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7146,7 +7146,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1581307536000,
-    "txId": undefined,
+    "txId": "0x87881a97561b227d357b1bb116e2055a3e0f0a737bf6286225bbce35c0949f9a_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7172,7 +7172,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1581303942000,
-    "txId": undefined,
+    "txId": "0xe90946d40d418c4cd5fd682fda4ee44f9bc5ccd289fbfe4a2e35633ae5f215b6_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7198,7 +7198,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1581303942000,
-    "txId": undefined,
+    "txId": "0xe90946d40d418c4cd5fd682fda4ee44f9bc5ccd289fbfe4a2e35633ae5f215b6_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7237,7 +7237,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1580765354000,
-    "txId": undefined,
+    "txId": "0x474d24f13396b4cfafde97760743f2902e6f44e361ab42094c4453361490a403_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7250,7 +7250,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1580764646000,
-    "txId": undefined,
+    "txId": "0xd62e37c90a05c451f3b823d62c74351a31be03d5b469efaddde7df4abcc1ed33_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7315,7 +7315,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1580303707000,
-    "txId": undefined,
+    "txId": "0x73648337df6cb03497f4e5afd20b6c5adc5259da3cc4a1bf56d974f8ba6bb42d_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7341,7 +7341,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1580302147000,
-    "txId": undefined,
+    "txId": "0xe8b343525b360cced616ee795c44b68091d952c8ac6cc51b812be1b6c808621a_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7354,7 +7354,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1579967588000,
-    "txId": undefined,
+    "txId": "0x3c0ece47e8c78d31240f76fdf9c29e05a02d5d760f5cb6634845c3bfcee4ac63_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7380,7 +7380,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1579967490000,
-    "txId": undefined,
+    "txId": "0x366c34555ed220b0c23dcf36d3b36dd7a394a51d75de5d2eba6e29b764cef17a_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7436,7 +7436,7 @@
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
-    "_id": "0x9a8b790c8b2064461d1fcca2191be29ad69842ad35c03e28de4bfa4d373cf3f6_INTERNAL_ERC20",
+    "_id": "0x9a8b790c8b2064461d1fcca2191be29ad69842ad35c03e28de4bfa4d373cf3f6_INTERNAL_WETH",
     "assetId": "ethereum:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:WETH",
     "balance": "0.000005585665682408",
     "balanceN": 0.000005585665682408,
@@ -7497,7 +7497,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1579526812000,
-    "txId": undefined,
+    "txId": "0x92e6c86838b4b925dedb4dedd70d75acb16a3b985654e14e5c9fde4da53ed384_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7523,7 +7523,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1579526812000,
-    "txId": undefined,
+    "txId": "0x92e6c86838b4b925dedb4dedd70d75acb16a3b985654e14e5c9fde4da53ed384_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7562,7 +7562,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1579522935000,
-    "txId": undefined,
+    "txId": "0xfd4957b358b3e0f6b6e91b23376db1c223c690194a735f0c7252b7684263ca9b_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7640,7 +7640,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1579196055000,
-    "txId": undefined,
+    "txId": "0xfa5ba1e4530bf343b8e99c448a75df29726b29fc596d47d3efd0eeffffd3b461_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7692,7 +7692,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1579091245000,
-    "txId": undefined,
+    "txId": "0x9b701502dae9ae1552f3513cd2fca0039d54bc7145d951aca312d20b83a36638_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7705,7 +7705,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1579091245000,
-    "txId": undefined,
+    "txId": "0x9b701502dae9ae1552f3513cd2fca0039d54bc7145d951aca312d20b83a36638_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7744,7 +7744,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1579088382000,
-    "txId": undefined,
+    "txId": "0xbe7dfde73319e520f3cce95eb8b83837195efa955477b3249f04538679d3bc4b_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7900,7 +7900,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1579086424000,
-    "txId": undefined,
+    "txId": "0xca120642c9e018dd41718429507cd98f2554f5b7e53cf4d1cec20620bac52470_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7913,7 +7913,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1579086424000,
-    "txId": undefined,
+    "txId": "0x3cceecabc0d14e4bcae9472c7b79177f1585efad77308e24d59459e059527fc2_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7926,7 +7926,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1579086424000,
-    "txId": undefined,
+    "txId": "0xc1f72196fede24965605a5ab1ffddcb6ce1e4b1c75768e381c5e0b6abfd56e97_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7939,7 +7939,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1579086424000,
-    "txId": undefined,
+    "txId": "0x81a5e0a61e91a9dac0a9fb17b8370c3b0ab7ef393cef9201f9bcc0a961997e43_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7952,7 +7952,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1579086424000,
-    "txId": undefined,
+    "txId": "0x011983c8ff3e8691b23fadc964eac279227ed568fe0f8feeb5f6cc236e796c91_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7965,7 +7965,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1579086424000,
-    "txId": undefined,
+    "txId": "0xca120642c9e018dd41718429507cd98f2554f5b7e53cf4d1cec20620bac52470_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7978,7 +7978,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1579086424000,
-    "txId": undefined,
+    "txId": "0x3cceecabc0d14e4bcae9472c7b79177f1585efad77308e24d59459e059527fc2_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -7991,7 +7991,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1579086424000,
-    "txId": undefined,
+    "txId": "0xc1f72196fede24965605a5ab1ffddcb6ce1e4b1c75768e381c5e0b6abfd56e97_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8004,7 +8004,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1579086424000,
-    "txId": undefined,
+    "txId": "0x011983c8ff3e8691b23fadc964eac279227ed568fe0f8feeb5f6cc236e796c91_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8017,7 +8017,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1579086424000,
-    "txId": undefined,
+    "txId": "0x81a5e0a61e91a9dac0a9fb17b8370c3b0ab7ef393cef9201f9bcc0a961997e43_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8043,7 +8043,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1578932942000,
-    "txId": undefined,
+    "txId": "0x42ecadbcf5f0ea762f1f16cebbc250f9bcfb55105c3b017066e0084ee037807f_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8069,7 +8069,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1578508884000,
-    "txId": undefined,
+    "txId": "0x9a6d211ca5fa6486d7e5ee24f9bb61161ff76179471dbf22482899210a7293fe_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8082,7 +8082,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1578508884000,
-    "txId": undefined,
+    "txId": "0x9a6d211ca5fa6486d7e5ee24f9bb61161ff76179471dbf22482899210a7293fe_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8121,7 +8121,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1578508514000,
-    "txId": undefined,
+    "txId": "0x6559f140525c71a2e90a39beadc116fb9ccc98e060ac0cd7a264f792c172e966_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8134,7 +8134,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1578508514000,
-    "txId": undefined,
+    "txId": "0x6559f140525c71a2e90a39beadc116fb9ccc98e060ac0cd7a264f792c172e966_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8160,7 +8160,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1578508441000,
-    "txId": undefined,
+    "txId": "0x9f13d283d973c4fd32400ed1777406a34f42bf568436e1216cb8025bdd3b970f_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8229,7 +8229,7 @@
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
-    "_id": "0xa4cdf7a50f0ab9f0a9ffd37c46f7915f2621eabdf5cda66a0340f70c535b6b49_INTERNAL_ERC20",
+    "_id": "0xa4cdf7a50f0ab9f0a9ffd37c46f7915f2621eabdf5cda66a0340f70c535b6b49_INTERNAL_WETH",
     "assetId": "ethereum:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:WETH",
     "balance": "10.000005585665682408",
     "balanceN": 10.000005585665683,
@@ -8251,7 +8251,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1576166915000,
-    "txId": undefined,
+    "txId": "0xe99fc1f4744dd98a8511bc7a788eff62af8b570241306000f3604f0d71453a82_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8264,7 +8264,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1576165469000,
-    "txId": undefined,
+    "txId": "0x3f771d69889c10733044c22a3ab49f7f385ef313ab31008e5e8f427f95050df6_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8277,7 +8277,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1576164393000,
-    "txId": undefined,
+    "txId": "0x3f9193c8eaecc78933c0b169087a37cdce4495c8d581a459f4b50fde80036a8f_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8303,7 +8303,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1576163914000,
-    "txId": undefined,
+    "txId": "0x82a579e3c97cda94260351690f9efb44fe306589caa9e25251fa13b727f98f6e_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8329,7 +8329,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1576159657000,
-    "txId": undefined,
+    "txId": "0x7df156cb2f2003b76787a9eef7ce1268d0935a66161c5aa659ae000a99b0af03_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8368,7 +8368,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1576071359000,
-    "txId": undefined,
+    "txId": "0x2cefeddd0f7726bc357c1c527369641ae7f7e0a28b243df0d61008f66440a54d_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8407,7 +8407,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1575988963000,
-    "txId": undefined,
+    "txId": "0x05bb83d8a260f4373d1449f92539069d1b28f9c706a4a6ff7e7e399e67a7820f_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8420,7 +8420,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1575987947000,
-    "txId": undefined,
+    "txId": "0xc32b2682370c6e06e1c8d1d9eb6015a354a5255dbde91c1c829a2cfbc775b812_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8433,7 +8433,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1575985343000,
-    "txId": undefined,
+    "txId": "0x86fad3a9f9ca85bf047fb0891d22d75e46cf7ae423a6de2b4e30fdad1e466212_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8446,7 +8446,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1575983248000,
-    "txId": undefined,
+    "txId": "0xc8c44279f711b505c15391a14e174040cf58e1373e6a4a25f34389f0acebc8a6_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8459,7 +8459,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1575980675000,
-    "txId": undefined,
+    "txId": "0x68e41ce7e52d07aeba15aaadbd9d83d5f67cca3e8e7ebf8839843d760826d9e7_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8485,7 +8485,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1575980265000,
-    "txId": undefined,
+    "txId": "0x2d3016f5c13f9baac6aaa3a769375ff962cc3b4e8f574f23921d63b81a82417a_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8498,7 +8498,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1575980187000,
-    "txId": undefined,
+    "txId": "0xbb4a62d920ae02d67e5f470a0ea5b10e48cd8fba059aff999585af8dedc3e27c_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8524,7 +8524,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1575980187000,
-    "txId": undefined,
+    "txId": "0xbb4a62d920ae02d67e5f470a0ea5b10e48cd8fba059aff999585af8dedc3e27c_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8550,7 +8550,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1575559001000,
-    "txId": undefined,
+    "txId": "0x40dbb9c5cf9a40040bc74287164d8d32f87ef0d6fc2f93c7a22fc6022e908c56_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8563,7 +8563,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1575558760000,
-    "txId": undefined,
+    "txId": "0xdd8d2c578a0b426bf934766fd1cef6296ef92ba88c90e0a8940dc87d78e7b807_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8589,7 +8589,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1575558760000,
-    "txId": undefined,
+    "txId": "0xdd8d2c578a0b426bf934766fd1cef6296ef92ba88c90e0a8940dc87d78e7b807_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8602,7 +8602,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1575557946000,
-    "txId": undefined,
+    "txId": "0x224adc42e791c6b5b3c0f3ad532f731bc22c2256c797f6703f0a6ab76edd6abb_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8628,7 +8628,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1575556864000,
-    "txId": undefined,
+    "txId": "0x19ef420367623dca51bddd5eb36c6b1f95682d9e5c2703df6e3cdbe056b89282_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8706,7 +8706,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1575382316000,
-    "txId": undefined,
+    "txId": "0x615ab4ccf057a454b25419c8fa409a7a30c4afcfe4551ff6768fd706a2563784_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8732,7 +8732,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1575378719000,
-    "txId": undefined,
+    "txId": "0x73284fd72c9a40bbc97f8ac1bcf51adf6fbac0e93fda38751e0a34f77b48fe78_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8758,7 +8758,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1575378719000,
-    "txId": undefined,
+    "txId": "0x73284fd72c9a40bbc97f8ac1bcf51adf6fbac0e93fda38751e0a34f77b48fe78_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8797,7 +8797,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1574984142000,
-    "txId": undefined,
+    "txId": "0x9ddad2b0405a5732b25e58a7666289404e8755cc473d36ae38732e34b9a673ac_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8853,7 +8853,7 @@
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
-    "_id": "0xc8450032fd44fef239634cbbc14196d3e3a40afaf2ebee9c4a70eb07365997b7_INTERNAL_ERC20",
+    "_id": "0xc8450032fd44fef239634cbbc14196d3e3a40afaf2ebee9c4a70eb07365997b7_INTERNAL_WETH",
     "assetId": "ethereum:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:WETH",
     "balance": "0.000001245291131715",
     "balanceN": 0.000001245291131715,
@@ -8875,7 +8875,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1574332584000,
-    "txId": undefined,
+    "txId": "0xd2bea2f38a85b0f8f34ed67850ebefae1caac02b8e5a6e3f9d6879bb7bc1191f_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8901,7 +8901,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1574332295000,
-    "txId": undefined,
+    "txId": "0xcd498c074d869518aa609a1902d7209e9b34e6416066f0ed1aaa70907d466205_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8927,7 +8927,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1574331905000,
-    "txId": undefined,
+    "txId": "0x7859bffe00f36d9bdb8982fba84a5614bc84dc517706b80b38904450edb54f6f_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8953,7 +8953,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1574331905000,
-    "txId": undefined,
+    "txId": "0x7859bffe00f36d9bdb8982fba84a5614bc84dc517706b80b38904450edb54f6f_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -8979,7 +8979,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1574331560000,
-    "txId": undefined,
+    "txId": "0x2109a443c92386c66521fb2573d5a9d7db392a58828e90c44421ec64c89cfd8d_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9005,7 +9005,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1574331560000,
-    "txId": undefined,
+    "txId": "0x2109a443c92386c66521fb2573d5a9d7db392a58828e90c44421ec64c89cfd8d_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9044,7 +9044,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1574110196000,
-    "txId": undefined,
+    "txId": "0xd8645f98ea81b76e6a6cb74f130a3721a1b1e314e80fb146f0d64bc9f4f40ff2_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9070,7 +9070,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1574102791000,
-    "txId": undefined,
+    "txId": "0xaa1848cdd32258158e3e3016678448a5907af77f5536a32ef1e515a42456a81b_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9083,7 +9083,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1574096160000,
-    "txId": undefined,
+    "txId": "0x5b7ea76aa06b159e34097238889ec075605c2992c9f14e8f5ce5f589b0bce2c4_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9174,7 +9174,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1572358633000,
-    "txId": undefined,
+    "txId": "0x6e37074e64e5a8815af8312636b3878488de32bafa7e4d71d715376bafc9f0ef_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9187,7 +9187,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1572358518000,
-    "txId": undefined,
+    "txId": "0x2578f9192e8e6afbd0c176fb5245c7ca3d4b346c6c7b92677645272db96d8eba_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9226,7 +9226,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1572357369000,
-    "txId": undefined,
+    "txId": "0xa68586eaedd9d796f7a4c6fd0fbeb54517b2db42648790f1d99a4d8c769421bd_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9239,7 +9239,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1572357141000,
-    "txId": undefined,
+    "txId": "0xdfff2f0be7fb6d4a4e41e4301b9918994aa8beec05142030610591806dde1d06_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9265,7 +9265,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1572357141000,
-    "txId": undefined,
+    "txId": "0xdfff2f0be7fb6d4a4e41e4301b9918994aa8beec05142030610591806dde1d06_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9382,7 +9382,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1570090338000,
-    "txId": undefined,
+    "txId": "0x09c8bc7e0eba6d2d4fb81067347f3cd03da09daea2ec1c9afe1f1f3c69edaad5_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9395,7 +9395,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1570090216000,
-    "txId": undefined,
+    "txId": "0xd8f8197a5e445fd8775b9bcfd8beb6660f5c9e1aeff5b506ef77cb8bd9d28663_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9434,7 +9434,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1570089590000,
-    "txId": undefined,
+    "txId": "0x5913b34d1a02fa8839bb737f4814fd71715ca01d55335dcd7d8736424e727643_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9447,7 +9447,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1570088704000,
-    "txId": undefined,
+    "txId": "0x6a786c2ee7978cb6ac9008562efa060c0a845f9a96060be342604c35325965e7_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9473,7 +9473,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1570088704000,
-    "txId": undefined,
+    "txId": "0x6a786c2ee7978cb6ac9008562efa060c0a845f9a96060be342604c35325965e7_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9486,7 +9486,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1569241963000,
-    "txId": undefined,
+    "txId": "0xb3374ec86970ee890c6a1c86b3b635ae8d1051e05119bdfdd2a110b758478a09_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9542,7 +9542,7 @@
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
-    "_id": "0xe110623cde55b797d246a02c5c001b5eaac082fdd74b65b8b3aa26e96a507124_INTERNAL_ERC20",
+    "_id": "0xe110623cde55b797d246a02c5c001b5eaac082fdd74b65b8b3aa26e96a507124_INTERNAL_WETH",
     "assetId": "ethereum:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:WETH",
     "balance": "0.000001245291131715",
     "balanceN": 0.000001245291131715,
@@ -9564,7 +9564,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1569160342000,
-    "txId": undefined,
+    "txId": "0xa0cba0b89b27477c1a479f8da1e8d8e3678971bd7322139b8b164be81e2e8d99_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9590,7 +9590,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1569160342000,
-    "txId": undefined,
+    "txId": "0xa0cba0b89b27477c1a479f8da1e8d8e3678971bd7322139b8b164be81e2e8d99_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9642,7 +9642,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1569159978000,
-    "txId": undefined,
+    "txId": "0xa8ffef6df9fd16c289ed6368023b436db8d236b3edf2c295eb3472d475d4bcd8_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9672,7 +9672,7 @@
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
-    "_id": "0x12e1d8dae58052edd079391c1094bc472d2fbf96cd17880a2b67bb4ac7de6bd0_INTERNAL_ERC20",
+    "_id": "0x12e1d8dae58052edd079391c1094bc472d2fbf96cd17880a2b67bb4ac7de6bd0_INTERNAL_WETH",
     "assetId": "ethereum:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:WETH",
     "balance": "31.383793662352745283",
     "balanceN": 31.383793662352744,
@@ -9694,7 +9694,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1569159648000,
-    "txId": undefined,
+    "txId": "0x7fd05af0d27c962d98450064f443f3d5a572c4038613e51f0fdb051065dac6c6_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9720,7 +9720,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1569158826000,
-    "txId": undefined,
+    "txId": "0x909abb524e5a22c23f666eb8fa231290362238c2e4ccc6aa73efa00a27366180_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9746,7 +9746,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1568724377000,
-    "txId": undefined,
+    "txId": "0x3005bcefd1a5b4dd7ff9d9c8f971d5d711dce89c58cbcbfc73fe8b8723563118_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9854,7 +9854,7 @@
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
-    "_id": "0x900653370f060cd4833b6dca066a31624ac8b338f16914a5922fd69dce52fadb_INTERNAL_ERC20",
+    "_id": "0x900653370f060cd4833b6dca066a31624ac8b338f16914a5922fd69dce52fadb_INTERNAL_WETH",
     "assetId": "ethereum:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:WETH",
     "balance": "32.000001245291131715",
     "balanceN": 32.00000124529113,
@@ -9876,7 +9876,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1566303258000,
-    "txId": undefined,
+    "txId": "0xbc8a90c05d44ab3d2543625badc20ff02c5157bf2e61dd1d7a760ae739270030_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9889,7 +9889,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1566303258000,
-    "txId": undefined,
+    "txId": "0x45d90dcfffd83ac48ad51e241fcea84b1f0088fe792895ef651d056b2661905c_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9902,7 +9902,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1566303255000,
-    "txId": undefined,
+    "txId": "0xa0282398d32f5bd124600c2b2b6a9b42e0b8832118235de03a6a2bd5b7bbb061_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9915,7 +9915,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1566303255000,
-    "txId": undefined,
+    "txId": "0xf887896c9edf884dcca268c138640ae03345a3f8462ab2fd390b2fb6b3a570ae_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9928,7 +9928,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1566303255000,
-    "txId": undefined,
+    "txId": "0xbbf67fb734f6f2e8d5faef2a66cf44b177ddbb97263f5396cd541ddc40ad1648_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9967,7 +9967,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1566303245000,
-    "txId": undefined,
+    "txId": "0xd9e24e99afd5489e1e6fd44766539a57c2d696de65e9b479d76e3ea5eaab0be0_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -9980,7 +9980,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1566255749000,
-    "txId": undefined,
+    "txId": "0x7c8d44696adc4c3293b2f912cb1c75dcf55b4b1d3b57e07d1026dd8abe39fbc0_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10045,7 +10045,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1565012836000,
-    "txId": undefined,
+    "txId": "0xa79a90247cb1bc8ac4d4f34076379fd2d06f950543bc4876e45ee1c300665c60_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10058,7 +10058,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1565012595000,
-    "txId": undefined,
+    "txId": "0x9bb7da00c19770c81634ca22b1c345bee10ef2d147a296d82676fedccaa44cb9_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10084,7 +10084,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1565012595000,
-    "txId": undefined,
+    "txId": "0x9bb7da00c19770c81634ca22b1c345bee10ef2d147a296d82676fedccaa44cb9_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10140,7 +10140,7 @@
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
-    "_id": "0x318428bbb5d8c5f3735142885b7f9ad4da2aae700316c2bbb161f8b82390d461_INTERNAL_ERC20",
+    "_id": "0x318428bbb5d8c5f3735142885b7f9ad4da2aae700316c2bbb161f8b82390d461_INTERNAL_WETH",
     "assetId": "ethereum:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:WETH",
     "balance": "32.000001807248591485",
     "balanceN": 32.000001807248594,
@@ -10175,7 +10175,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1563899527000,
-    "txId": undefined,
+    "txId": "0xb164a8d69cb8bceb9eb222cb29881f59a0fa6e72ebfef35044caa919b3fc390b_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10201,7 +10201,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1563899527000,
-    "txId": undefined,
+    "txId": "0xb164a8d69cb8bceb9eb222cb29881f59a0fa6e72ebfef35044caa919b3fc390b_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10227,7 +10227,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1563886469000,
-    "txId": undefined,
+    "txId": "0xc7cfdec83aafc4ab66ad388e1cc3d36743ff48da16dde761a6dc6febc3d5bc2c_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10348,7 +10348,7 @@
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
-    "_id": "0x39d12a6b07df109d22bfcc7b6d383f5b6d4fe5bf8964e6e319e8eee0cdf525b3_INTERNAL_ERC20",
+    "_id": "0x39d12a6b07df109d22bfcc7b6d383f5b6d4fe5bf8964e6e319e8eee0cdf525b3_INTERNAL_WETH",
     "assetId": "ethereum:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:WETH",
     "balance": "40.000001807248591485",
     "balanceN": 40.000001807248594,
@@ -10370,7 +10370,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1562683891000,
-    "txId": undefined,
+    "txId": "0xbcbeea11641736fad425ff5d77146f69b7e6babef3e8fddc19fef11294bee181_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10396,7 +10396,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1562683879000,
-    "txId": undefined,
+    "txId": "0xe312db1d0d38fd669d09e684453b8609315b841baef78d70aab88af50ab6eb8f_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10422,7 +10422,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1562600747000,
-    "txId": undefined,
+    "txId": "0xfa656dff9e44fdd627ef8028811148e2d4d58b109c7064b0f4edf80d592bf963_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10461,7 +10461,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1561484218000,
-    "txId": undefined,
+    "txId": "0x6ac59e077dac69c4618b9f30cc356dc2d66c6c5356d378f519ddf2cce6beb824_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10474,7 +10474,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1561483559000,
-    "txId": undefined,
+    "txId": "0xa061ec516c80ae6e09657176cba30a71e6da190845516a6a5e3f66e4dcb3df2b_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10487,7 +10487,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1561483289000,
-    "txId": undefined,
+    "txId": "0x996806685660213087176b2841d6ea310c74f9da233b4abf20346be9f6247bf1_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10500,7 +10500,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1561482425000,
-    "txId": undefined,
+    "txId": "0x36a1a39cf432d4fda49d872eaf6a69a604243fda7fd7abac8c49b72bb73e96ea_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10513,7 +10513,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1561482156000,
-    "txId": undefined,
+    "txId": "0x2ef543a9925ba35a3bf87e16d50f12587ceb04cd29059d82beb9ede9128f144f_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10526,7 +10526,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1561481902000,
-    "txId": undefined,
+    "txId": "0xbe422ca1532915684964a43661cb037bf8a64b82c75be2cdb6be347307545e7e_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10539,7 +10539,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1561481787000,
-    "txId": undefined,
+    "txId": "0x7b066392c24fef1ee77df3b452504861a15a9cbe40be9fd1e1030c5af6538c7f_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10578,7 +10578,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1561476714000,
-    "txId": undefined,
+    "txId": "0x2950dd159b0ef38daee7b75d6ad2a0b4561cd8d07cec78c0ea80ca0f6d0a5802_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10591,7 +10591,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1561476664000,
-    "txId": undefined,
+    "txId": "0xd31e4a25d870734fe72857b78c17754d0a77ce571f570894f56f2b232c5dcfba_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10621,7 +10621,7 @@
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
-    "_id": "0x9ea230aabcf75cec2b4653bcfa5b63a94da75aa12abb51eda508d3ea26e849da_INTERNAL_ERC20",
+    "_id": "0x9ea230aabcf75cec2b4653bcfa5b63a94da75aa12abb51eda508d3ea26e849da_INTERNAL_WETH",
     "assetId": "ethereum:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:WETH",
     "balance": "20.099999999999999999",
     "balanceN": 20.1,
@@ -10643,7 +10643,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1561476011000,
-    "txId": undefined,
+    "txId": "0x170e79331111aff6c5cc25a4ec17073f2c639518dea4d984c483a692ed973124_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10669,7 +10669,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1561475973000,
-    "txId": undefined,
+    "txId": "0x506c2b868d98e928b1a27c952cc033ff63c89a4aa3669fd5ed90cf500edabc34_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10682,7 +10682,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1561439700000,
-    "txId": undefined,
+    "txId": "0x0dae0e09c0005a9852608767af808d99a80727317e4c5d3f3c551e53cd928569_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10708,7 +10708,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1560872533000,
-    "txId": undefined,
+    "txId": "0xbf34eceee68c61bde8de2c61b747a28ca19b49e7a5ac9073f93d169e29bcda01_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10773,7 +10773,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1559325537000,
-    "txId": undefined,
+    "txId": "0x4fc4c2353ff63b624bb6648dfb918c44f13b260e0b39eac2b37a1f6b433ecfb1_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10786,7 +10786,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1559325338000,
-    "txId": undefined,
+    "txId": "0xab9db5b18c9bb6b586443fadf35b4dbaecdfcb987bf23f26fb1af47ac9859899_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10799,7 +10799,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1559325241000,
-    "txId": undefined,
+    "txId": "0x884c42249d4027e494165d3df167d4ffc8af3549511974acb30a053cfe634639_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10838,7 +10838,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1559324404000,
-    "txId": undefined,
+    "txId": "0xf5c1fb690c8a6aee10a4c2ecd57b444f1d0879a195123256cf35d9106c9abb0c_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10864,7 +10864,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1559324404000,
-    "txId": undefined,
+    "txId": "0xf5c1fb690c8a6aee10a4c2ecd57b444f1d0879a195123256cf35d9106c9abb0c_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10877,7 +10877,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1559324051000,
-    "txId": undefined,
+    "txId": "0x217aa28a3de70d562fb322d9504f8ae3927138d9298ec4d419b4156e25c0a9d0_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10903,7 +10903,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1559323250000,
-    "txId": undefined,
+    "txId": "0x6a0487d0569b4c96eedb64c2b45e79edd4171964d22cae425f77a30ffc5aaf4f_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10929,7 +10929,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1559323189000,
-    "txId": undefined,
+    "txId": "0xd4415fc75b239273f9fc8332d95e99956423c64328b1f7ab227cfc45c61f3bda_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -10942,7 +10942,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1559066178000,
-    "txId": undefined,
+    "txId": "0xe38777013a6816f61ac2955a1098f3243b5fe5468881d69ea45a1d4b564443d1_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11020,7 +11020,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1558539239000,
-    "txId": undefined,
+    "txId": "0x12ec1b38db818a7bc9b5f02202ecee107fc564c685dddedd4f59844de2379e9d_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11059,7 +11059,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1558537911000,
-    "txId": undefined,
+    "txId": "0x5095f1726e2a28ed61b56ce920125efa3a797910ae3755dff8d47cdb2a610268_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11085,7 +11085,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1558537911000,
-    "txId": undefined,
+    "txId": "0x5095f1726e2a28ed61b56ce920125efa3a797910ae3755dff8d47cdb2a610268_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11098,7 +11098,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1558377441000,
-    "txId": undefined,
+    "txId": "0xc8707b8706ef72b218ac63d6d48f738a45c1e9a56e64ef257d9a44388de38fad_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11137,7 +11137,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1557819776000,
-    "txId": undefined,
+    "txId": "0x8eb154d9605e81042ab47d84b20e076976bb4f526e49b54a14995fc159315768_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11293,7 +11293,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1557351920000,
-    "txId": undefined,
+    "txId": "0xab3945431bf5b128db0da39ee4156bc0eaeb9adca902dad2e886a3c04c762737_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11414,7 +11414,7 @@
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
-    "_id": "0x6ab6daff41109a24e5cde855adc6d74adee300fbc64a220c3c1bb65acd9645fa_INTERNAL_ERC20",
+    "_id": "0x6ab6daff41109a24e5cde855adc6d74adee300fbc64a220c3c1bb65acd9645fa_INTERNAL_WETH",
     "assetId": "ethereum:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:WETH",
     "balance": "10",
     "balanceN": 10,
@@ -11436,7 +11436,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1557123975000,
-    "txId": undefined,
+    "txId": "0xa7ab77957f363c11850b3bddb36709636ade888280adc53463afa487f82f5a4c_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11449,7 +11449,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1557123852000,
-    "txId": undefined,
+    "txId": "0xd8131f6d49c42f4075b6755ab688c72996c6a72b5a7667661c99633d5aa948f1_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11462,7 +11462,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1557123844000,
-    "txId": undefined,
+    "txId": "0x5a508763e20f24eadf126eece0258b23a25a8baf2445bb360824adc8ebcf9f8e_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11475,7 +11475,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1557123842000,
-    "txId": undefined,
+    "txId": "0x662ff5692cee0da7145727d4b1a81fabed14498799b46addf4ad3f4cdd0b400e_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11488,7 +11488,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1557123650000,
-    "txId": undefined,
+    "txId": "0x739e5a717d48a1de885d39daedce0b4e17f500dfff186ba47ca7ca9e1c371b4f_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11501,7 +11501,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1557123439000,
-    "txId": undefined,
+    "txId": "0xb534f8805e59815d6f76317681795c756a49963c9a1ee5d05527ea6f0ae23b4b_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11514,7 +11514,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1557122997000,
-    "txId": undefined,
+    "txId": "0xf76fd5bae2f6409254d19b9a484f64ccc8f2fac59bd2035014a935acbc2ad9f1_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11540,7 +11540,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1557122809000,
-    "txId": undefined,
+    "txId": "0xb402608b0fd6d775e6275e4c069898ce90f3ef49a0ea034f61b6538a148349e4_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11553,7 +11553,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1557079332000,
-    "txId": undefined,
+    "txId": "0x26e9439fbde2ba2d2f7e55f8057cc1cec4d9e103fe3016acf256ab2c3cf7e1ec_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11644,7 +11644,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1556356073000,
-    "txId": undefined,
+    "txId": "0x71a9baa95641c7a98e6f18a2646ed1c1d0d0476a7944f77a0850084ef3595a34_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11657,7 +11657,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1556352691000,
-    "txId": undefined,
+    "txId": "0x8a5a5d471df44ec666e6f082ce0c5d5fc4c2207676489386d4bdbf6bf7529a82_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11683,7 +11683,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1556351748000,
-    "txId": undefined,
+    "txId": "0xe8a8ea3a2f8b6955c601db14f6940144080aaa6af47de0ce52170024a16ca14b_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11696,7 +11696,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1556350088000,
-    "txId": undefined,
+    "txId": "0x3b558f005723a80849505753d1e5bbe077f0bc5891ddf8c199f58242280a9a3a_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11748,7 +11748,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1555576392000,
-    "txId": undefined,
+    "txId": "0x1fd2be795240265958b61ac17317d423018a48b3eb38187911fa55b48a3e4005_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11800,7 +11800,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1555248455000,
-    "txId": undefined,
+    "txId": "0x14fba9395af9906edfdb4257a7c00269746d0e1001f17d3d0c8e8ec9157bdfbe_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11830,7 +11830,7 @@
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
-    "_id": "0xc4784a2391cad0f9287dbd8a26fd5f2a314f3b5e0ab86885442228249c68a6d4_INTERNAL_ERC20",
+    "_id": "0xc4784a2391cad0f9287dbd8a26fd5f2a314f3b5e0ab86885442228249c68a6d4_INTERNAL_WETH",
     "assetId": "ethereum:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:WETH",
     "balance": "0",
     "balanceN": 0,
@@ -11852,7 +11852,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1555248254000,
-    "txId": undefined,
+    "txId": "0xaafc3c517b4ab9f8c7f8b456c58a83288343dcb9093d791094da58705c9ec483_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11878,7 +11878,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1555248254000,
-    "txId": undefined,
+    "txId": "0xaafc3c517b4ab9f8c7f8b456c58a83288343dcb9093d791094da58705c9ec483_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11891,7 +11891,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1554976220000,
-    "txId": undefined,
+    "txId": "0xaa038b39e46b4c9c3b1378b531f63ce2442e8c0ff066ae239d2a06a1be3122ad_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11904,7 +11904,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1554976210000,
-    "txId": undefined,
+    "txId": "0x007f8906d8bf69241beb4e5ba4c2605ffe84dd98d32af5460a5a57d8a2841284_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11930,7 +11930,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1554971891000,
-    "txId": undefined,
+    "txId": "0x5d5562dd63d47e527bf3d2400d463c09a4022884ea10dd727718e2215b9d7304_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -11956,7 +11956,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1554816501000,
-    "txId": undefined,
+    "txId": "0x43124873c953f4bf8579ddafb7601c25c2b78d64a6d3b99c1ccbf915e4e3d16e_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12025,7 +12025,7 @@
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
-    "_id": "0xbfb2e750b3b33f1d0ae56bffb312bb67a8838b4ca7772c223b01ff99060239fd_INTERNAL_ERC20",
+    "_id": "0xbfb2e750b3b33f1d0ae56bffb312bb67a8838b4ca7772c223b01ff99060239fd_INTERNAL_WETH",
     "assetId": "ethereum:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:WETH",
     "balance": "0",
     "balanceN": 0,
@@ -12047,7 +12047,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1554295370000,
-    "txId": undefined,
+    "txId": "0xb6e7db4a39a2ca1cd011d79301d81796a80ed7a18441e1fdfb71abe1591cbe41_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12086,7 +12086,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1554290198000,
-    "txId": undefined,
+    "txId": "0x7d1b936e0be6efea672f821120e8b998f7380fde38dfbee4a56a67797226125a_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12138,7 +12138,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1552573544000,
-    "txId": undefined,
+    "txId": "0x4799b88f0b6c8738c1f72fb54c0d5b9fcb5115fe2f47c0576e5ebbbe6b9c39de_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12203,7 +12203,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1551348739000,
-    "txId": undefined,
+    "txId": "0xa3f7e0192af79ebcefe54c4ba662b5d26da39b9a5e84b851eee0c044bf183239_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12216,7 +12216,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1550353661000,
-    "txId": undefined,
+    "txId": "0xa2b96dab700c4547683818b6fd1fe580382c2e8d8697966efe4f25522c633499_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12242,7 +12242,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1550353661000,
-    "txId": undefined,
+    "txId": "0xa2b96dab700c4547683818b6fd1fe580382c2e8d8697966efe4f25522c633499_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12281,7 +12281,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1550248174000,
-    "txId": undefined,
+    "txId": "0xf26563d29c69517a584efce13331a8e338c4fef4d92c611ae0eb3e1ad1b43580_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12320,7 +12320,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1548173010000,
-    "txId": undefined,
+    "txId": "0xb43c224da5c54ea25cd6c5fbddaff83aa4ff5aee2f80d62d509abecccd1d4763_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12398,7 +12398,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1548167188000,
-    "txId": undefined,
+    "txId": "0x802e3fa49c178ee1d626dcb17f7f6c9b14f8388f80f95bd52df6452304407d6c_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12437,7 +12437,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1547057525000,
-    "txId": undefined,
+    "txId": "0xc7ae0341a01440a6c81937f4d035afe6e4ecc31144a47862b90fff93eb18a072_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12450,7 +12450,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1546874315000,
-    "txId": undefined,
+    "txId": "0xfc7f43c2abd1ebbb104f6c42e5a51518f2a6c152fcc7030e2646d00f1350f830_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12476,7 +12476,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1545121677000,
-    "txId": undefined,
+    "txId": "0xcd58918a00d49424e85b78f5ff17247630db081404d4df8f558868b3fee1577b_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12619,7 +12619,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1541597711000,
-    "txId": undefined,
+    "txId": "0x7daa11b17dcbc96a61d074bbb3397a9542c939fc230c686a838536a410c183fe_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12723,7 +12723,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1538814198000,
-    "txId": undefined,
+    "txId": "0xfc4e703d15ea2602c9886fa0878cc68d4dd54d618a3b8daa944e2a458c46c3f9_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12827,7 +12827,7 @@
     "operation": "Withdraw",
     "platform": "ethereum",
     "timestamp": 1537026778000,
-    "txId": undefined,
+    "txId": "0xe67d7ec3a988d192e6b4b2baed860ec58c9fa60787f26a69a6b688f5da0b1b91_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12840,7 +12840,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1530032844000,
-    "txId": undefined,
+    "txId": "0xfad850b4508c51dbb107b79c397d70938ac81269a0c0cc112eb77b71dd90c573_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12853,7 +12853,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1515838659000,
-    "txId": undefined,
+    "txId": "0x1bc1565f8fd5ec1cd0325155bddc936a1a7945aa82a66c4504ec64609c1a6fdb_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12866,7 +12866,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1515838614000,
-    "txId": undefined,
+    "txId": "0x4570a500b6623987d88f196c28440e00c7e0325def08a88acdca20401b6f4bc5_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12879,7 +12879,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1515838536000,
-    "txId": undefined,
+    "txId": "0x1a090eee53ba9119670b0465854fa390631e90ad71337954ac539da5870e82f5_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12918,7 +12918,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1515836927000,
-    "txId": undefined,
+    "txId": "0x9dc2d9220e8bbdc638a2840d1996b6f3f8f48d0e1597e0644150479b0e920802_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12931,7 +12931,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1515836869000,
-    "txId": undefined,
+    "txId": "0x7032ccd39eae090e8a66f41e59b5effaa4db4b83cf3b7436aaab3e8ec73e56c3_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -12970,7 +12970,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1515370321000,
-    "txId": undefined,
+    "txId": "0x3a25ebdcd2c7e09968d1b65ca6d27baf7368209d2b075072223de7b576822209_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -13022,7 +13022,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1515330124000,
-    "txId": undefined,
+    "txId": "0x35b1d2ef648a40dfa7492dfd188c30257565a205b6559c18955e9598c23c70d8_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -13035,7 +13035,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1515330124000,
-    "txId": undefined,
+    "txId": "0xb84caf5c65b8975ec91b7955fee22a9385196b046c9597e4053dd3c78ffdbf7d_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -13113,7 +13113,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1511814690000,
-    "txId": undefined,
+    "txId": "0x3ed0901b17c4f6107c2ff43859ce50a66d0ca7ff78dd010a7df764ddef21d3c9_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {
@@ -13126,7 +13126,7 @@
     "operation": "Deposit",
     "platform": "ethereum",
     "timestamp": 1511302899000,
-    "txId": undefined,
+    "txId": "0x159bee633df089f99c55d7ebd0608655c613e3459b823db030a32abbc2b24b50_ERC20",
     "wallet": "0x003dc32fe920a4aaeed12dc87e145f030aa753f3",
   },
   {

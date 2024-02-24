@@ -1,14 +1,11 @@
 import { Visibility } from "@mui/icons-material"
 import { IconButton, Skeleton, Stack, TableCell, TableRow, Tooltip } from "@mui/material"
-import { useStore } from "@nanostores/react"
 import React from "react"
-import { PlatformAvatar } from "src/components/PlatformAvatar"
+import { PlatformBlock } from "src/components/PlatformBlock"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { Truncate } from "src/components/Truncate"
 import { useBoolean } from "src/hooks/useBoolean"
 import { FileImport } from "src/interfaces"
-import { PLATFORMS_META } from "src/settings"
-import { $platformMetaMap } from "src/stores/metadata-store"
 import { MonoFont } from "src/theme"
 import { formatFileSize, formatNumber } from "src/utils/formatting-utils"
 import { TableRowComponentProps } from "src/utils/table-utils"
@@ -20,8 +17,6 @@ export function FileImportTableRow(props: TableRowComponentProps<FileImport>) {
   const { name, meta, timestamp, lastModified, size } = row
   const platform = meta?.platform
 
-  const platformMetaMap = useStore($platformMetaMap)
-
   const { value: open, toggle: toggleOpen } = useBoolean(false)
 
   if (isTablet) {
@@ -32,16 +27,12 @@ export function FileImportTableRow(props: TableRowComponentProps<FileImport>) {
             <Stack gap={0.5}>
               <Stack direction="row" gap={1} alignItems="center" component="div">
                 {platform ? (
-                  <PlatformAvatar
-                    size="small"
-                    src={platformMetaMap[platform]?.image}
-                    alt={PLATFORMS_META[platform].name}
-                  />
+                  <PlatformBlock platform={platform} hideName />
                 ) : (
                   <Skeleton height={20} width={80} />
                 )}
                 <Tooltip title={name}>
-                  <Truncate sx={{maxWidth: 200}}>{name}</Truncate>
+                  <Truncate sx={{ maxWidth: 200 }}>{name}</Truncate>
                 </Tooltip>
               </Stack>
               <Stack
@@ -120,18 +111,7 @@ export function FileImportTableRow(props: TableRowComponentProps<FileImport>) {
           )}
         </TableCell>
         <TableCell>
-          {platform ? (
-            <Stack direction="row" gap={0.5} alignItems="center" component="div">
-              <PlatformAvatar
-                size="small"
-                src={platformMetaMap[platform]?.image}
-                alt={PLATFORMS_META[platform].name}
-              />
-              {/* <span>{PLATFORMS_META[platform].name}</span> */}
-            </Stack>
-          ) : (
-            <Skeleton></Skeleton>
-          )}
+          {platform ? <PlatformBlock platform={platform} hideName /> : <Skeleton></Skeleton>}
         </TableCell>
         <TableCell>
           <Tooltip title={name}>

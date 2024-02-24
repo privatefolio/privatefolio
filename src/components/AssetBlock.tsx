@@ -1,6 +1,6 @@
-import { Stack } from "@mui/material"
+import { Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React from "react"
+import React, { ReactNode } from "react"
 import { $assetMetaMap } from "src/stores/metadata-store"
 import { getAssetTicker } from "src/utils/assets-utils"
 
@@ -9,16 +9,17 @@ import { Truncate } from "./Truncate"
 
 type AssetBlockProps = {
   asset?: string
+  secondary?: ReactNode
 } & Omit<AssetAvatarProps, "alt" | "src">
 
 export function AssetBlock(props: AssetBlockProps) {
   const assetMap = useStore($assetMetaMap)
-  const { asset, ...rest } = props
+  const { asset, secondary, ...rest } = props
 
   return (
     <Stack
       direction="row"
-      gap={0.75}
+      gap={props.size === "small" ? 0.75 : 1}
       alignItems="center"
       component="div"
       color={asset ? undefined : "text.secondary"}
@@ -29,7 +30,14 @@ export function AssetBlock(props: AssetBlockProps) {
         alt={asset ? getAssetTicker(asset) : undefined}
         {...rest}
       />
-      <Truncate>{getAssetTicker(asset)}</Truncate>
+      <Stack>
+        <Truncate>{getAssetTicker(asset)}</Truncate>
+        {secondary && (
+          <Typography color="text.secondary" variant="caption" fontWeight={300} letterSpacing={0.5}>
+            {secondary}
+          </Typography>
+        )}
+      </Stack>
     </Stack>
   )
 }

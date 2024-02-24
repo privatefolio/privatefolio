@@ -1,27 +1,20 @@
 import { ArrowRightAltRounded, CloseRounded } from "@mui/icons-material"
-import {
-  Avatar,
-  Button,
-  Drawer,
-  DrawerProps,
-  IconButton,
-  Skeleton,
-  Stack,
-  Typography,
-} from "@mui/material"
+import { Button, Drawer, DrawerProps, IconButton, Skeleton, Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AmountBlock } from "src/components/AmountBlock"
+import { AppLink } from "src/components/AppLink"
+import { AssetBlock } from "src/components/AssetBlock"
 import { ExternalLink } from "src/components/ExternalLink"
+import { IdentifierBlock } from "src/components/IdentifierBlock"
+import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { EtherscanTransaction, Transaction } from "src/interfaces"
-import { PLATFORMS_META } from "src/settings"
 import { $activeAccount, $activeIndex } from "src/stores/account-store"
 import { PopoverToggleProps } from "src/stores/app-store"
-import { $platformMetaMap } from "src/stores/metadata-store"
 import { MonoFont } from "src/theme"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { formatHex, getExplorerLink } from "src/utils/utils"
@@ -36,7 +29,6 @@ type TransactionDrawerProps = DrawerProps &
 export function TransactionDrawer(props: TransactionDrawerProps) {
   const { open, toggleOpen, tx, relativeTime, ...rest } = props
   const activeIndex = useStore($activeIndex)
-  const platformMetaMap = useStore($platformMetaMap)
 
   const {
     incoming,
@@ -52,10 +44,11 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
     feeAsset,
     _id,
     txHash,
-    ...txMeta
+    // ...txMeta
   } = tx
 
   const method = (tx as EtherscanTransaction).method
+  const contractAddress = (tx as EtherscanTransaction).contractAddress
 
   const [logsNumber, setLogsNumber] = useState<number | null>(null)
 
@@ -75,7 +68,12 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
         paddingY={1}
         gap={2}
         // show={open}
-        sx={(theme) => ({ minWidth: 358, overflowX: "hidden", ...theme.typography.body2 })}
+        sx={(theme) => ({
+          maxWidth: 358,
+          minWidth: 358,
+          overflowX: "hidden",
+          ...theme.typography.body2,
+        })}
       >
         <Stack marginBottom={2} direction="row" justifyContent="space-between" alignItems="center">
           <Typography variant="subtitle1" letterSpacing="0.025rem">
@@ -86,60 +84,87 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
           </IconButton>
         </Stack>
         <div>
+          <SectionTitle>Identifier</SectionTitle>
+          <IdentifierBlock id={_id} />
+        </div>
+        <div>
+          <SectionTitle>Timestamp</SectionTitle>
+          <TimestampBlock timestamp={timestamp} relative={relativeTime} />
+        </div>
+        <div>
           <SectionTitle>Platform</SectionTitle>
-          <Stack direction="row" gap={0.5} alignItems="center" component="div">
-            <Avatar
-              src={platformMetaMap[platform]?.image}
-              sx={{
-                borderRadius: "2px",
-                height: 16,
-                width: 16,
-              }}
-              alt={PLATFORMS_META[platform].name}
-            />
-            <span>{PLATFORMS_META[platform].name}</span>
-          </Stack>
+          <PlatformBlock platform={platform} />
         </div>
         <div>
           <SectionTitle>Wallet</SectionTitle>
-          {wallet}
+          <IdentifierBlock id={wallet} />
         </div>
         <div>
           <SectionTitle>Type</SectionTitle>
           <ActionBlock action={type} />
         </div>
-        {method && (
+        {incomingAsset && (
           <div>
-            <SectionTitle>Smart Contract Method</SectionTitle>
-            <ActionBlock action={method} />
-          </div>
-        )}
-        <div>
-          <SectionTitle>Timestamp</SectionTitle>
-          <TimestampBlock timestamp={timestamp} relative={relativeTime} />
-        </div>
-        {feeAsset && (
-          <div>
-            <SectionTitle>Fee</SectionTitle>
-            <AmountBlock
-              colorized
-              amount={fee}
-              showTicker
-              showSign
-              currencyTicker={getAssetTicker(feeAsset)}
-            />
+            <SectionTitle>Incoming</SectionTitle>
+            <Stack direction="row" alignItems="center" gap={1}>
+              <AmountBlock
+                colorized
+                amount={incoming}
+                showSign
+                currencyTicker={getAssetTicker(incomingAsset)}
+              />
+              <Button
+                size="small"
+                component={AppLink}
+                to={`../asset/${encodeURI(incomingAsset)}`}
+                sx={{ paddingX: 2 }}
+              >
+                <AssetBlock asset={incomingAsset} />
+              </Button>
+            </Stack>
+            <Stack direction="row" gap={1}></Stack>
           </div>
         )}
         {outgoingAsset && (
           <div>
             <SectionTitle>Outgoing</SectionTitle>
-            <AmountBlock
-              colorized
-              amount={outgoing ? `-${outgoing}` : outgoing}
-              showTicker
-              showSign
-              currencyTicker={getAssetTicker(outgoingAsset)}
-            />
+            <Stack direction="row" alignItems="center" gap={1}>
+              <AmountBlock
+                colorized
+                amount={outgoing ? `-${outgoing}` : outgoing}
+                showSign
+                currencyTicker={getAssetTicker(outgoingAsset)}
+              />
+              <Button
+                size="small"
+                component={AppLink}
+                to={`../asset/${encodeURI(outgoingAsset)}`}
+                sx={{ paddingX: 2 }}
+              >
+                <AssetBlock asset={outgoingAsset} />
+              </Button>
+            </Stack>
+          </div>
+        )}
+        {feeAsset && (
+          <div>
+            <SectionTitle>Fee</SectionTitle>
+            <Stack direction="row" alignItems="center" gap={1}>
+              <AmountBlock
+                colorized
+                amount={fee}
+                showSign
+                currencyTicker={getAssetTicker(feeAsset)}
+              />
+              <Button
+                size="small"
+                component={AppLink}
+                to={`../asset/${encodeURI(feeAsset)}`}
+                sx={{ paddingX: 2 }}
+              >
+                <AssetBlock asset={feeAsset} />
+              </Button>
+            </Stack>
           </div>
         )}
         {price && (
@@ -152,38 +177,40 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
             />
           </div>
         )}
-        {incomingAsset && (
+        {contractAddress && (
           <div>
-            <SectionTitle>Incoming</SectionTitle>
-            <AmountBlock
-              colorized
-              amount={incoming}
-              showTicker
-              showSign
-              currencyTicker={getAssetTicker(incomingAsset)}
-            />
+            <SectionTitle>Smart Contract</SectionTitle>
+            <IdentifierBlock id={contractAddress} />
+          </div>
+        )}
+        {method && (
+          <div>
+            <SectionTitle>Smart Contract Method</SectionTitle>
+            <ActionBlock action={method} />
           </div>
         )}
         <div>
           <SectionTitle>Audit logs</SectionTitle>
-          {logsNumber === null ? (
-            <Skeleton height={20} width={80} />
-          ) : (
-            <>
-              {logsNumber}
-              <Button
-                size="small"
-                color="secondary"
-                component={Link}
-                to={`/u/${activeIndex}/audit-logs?txId=${_id}`}
-                sx={{ marginLeft: 2 }}
-                // onClick={toggleOpen}
-                endIcon={<ArrowRightAltRounded fontSize="inherit" />}
-              >
-                Inspect
-              </Button>
-            </>
-          )}
+          <Stack direction="row" alignItems="center" gap={1}>
+            {logsNumber === null ? (
+              <Skeleton height={20} width={80} />
+            ) : (
+              <>
+                {logsNumber}
+                <Button
+                  size="small"
+                  color="secondary"
+                  component={Link}
+                  to={`/u/${activeIndex}/audit-logs?txId=${_id}`}
+                  sx={{ paddingX: 2 }}
+                  // onClick={toggleOpen}
+                  endIcon={<ArrowRightAltRounded fontSize="inherit" />}
+                >
+                  Inspect
+                </Button>
+              </>
+            )}
+          </Stack>
         </div>
         {txHash && (
           <div>

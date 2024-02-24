@@ -1,16 +1,13 @@
 import { proxy } from "comlink"
-import { BlockTag, getAddress } from "ethers"
+import { getAddress } from "ethers"
 import { validateOperation } from "src/api/database-utils"
 import { ProgressCallback } from "src/stores/task-store"
 
-import { AuditLog, AuditLogOperation, Connection, Transaction } from "../../../interfaces"
+import { AuditLogOperation, Connection, SyncResult } from "../../../interfaces"
 import { hashString, noop } from "../../../utils/utils"
 import { getAccount } from "../../database"
 import { getValue, setValue } from "../kv-api"
-import { FullEtherscanProvider } from "./etherscan-rpc"
-import { parseNormal } from "./integrations/etherscan"
-import { parseERC20 } from "./integrations/etherscan-erc20"
-import { parseInternal } from "./integrations/etherscan-internal"
+import { syncEtherscan } from "./integrations/etherscan-connector"
 
 export async function addConnection(
   connection: Omit<Connection, "_id" | "_rev" | "timestamp" | "syncedAt">,
@@ -138,118 +135,32 @@ export async function syncConnection(
   progress: ProgressCallback = noop,
   connection: Connection,
   accountName: string,
-  since?: BlockTag
+  since?: string
 ) {
-  const account = getAccount(accountName)
-  const rpcProvider = new FullEtherscanProvider()
+  let result: SyncResult
 
   if (since === undefined) {
-    since = (await getValue<BlockTag>(connection._id, "0", accountName)) as string
+    since = (await getValue<string>(connection._id, "0", accountName)) as string
   }
-  progress([0, `Starting from block number ${since}`])
 
-  const logMap: Record<string, AuditLog> = {}
-  const txMap: Record<string, Transaction> = {}
-  const assetMap: Record<string, boolean> = {}
-  const walletMap: Record<string, boolean> = {}
-  const operationMap: Partial<Record<AuditLogOperation, boolean>> = {}
+  if (connection.platform === "ethereum") {
+    result = await syncEtherscan(progress, connection, since)
+  } else {
+    throw new Error(`Unsupported platform: ${connection.platform}`)
+  }
 
-  // normal transactions
-  const normal = await rpcProvider.getTransactions(connection.address, since)
-
-  progress([0, `Fetching normal transactions`])
-  progress([10, `Parsing ${normal.length} normal transactions`])
-  normal.forEach((row, index) => {
-    try {
-      if (index !== 0 && (index + 1) % 1000 === 0) {
-        progress([(index * 15) / normal.length, `Parsing row ${index + 1}`])
-      }
-      const { logs, txns = [] } = parseNormal(row, index, connection)
-
-      // if (logs.length === 0) throw new Error(JSON.stringify(row, null, 2))
-
-      for (const log of logs) {
-        logMap[log._id] = log
-        assetMap[log.assetId] = true
-        walletMap[log.wallet] = true
-        operationMap[log.operation] = true
-      }
-
-      for (const transaction of txns) {
-        txMap[transaction._id] = transaction
-      }
-    } catch (error) {
-      progress([0, `Error parsing row ${index + 1}: ${String(error)}`])
-    }
-  })
-  // internal transactions
-  const internal = await rpcProvider.getInternalTransactions(connection.address, since)
-
-  progress([25, `Fetching internal transactions`])
-  progress([35, `Parsing ${internal.length} internal transactions`])
-  internal.forEach((row, index) => {
-    try {
-      if (index !== 0 && (index + 1) % 1000 === 0) {
-        progress([35 + (index * 15) / internal.length, `Parsing row ${index + 1}`])
-      }
-      const { logs, txns = [] } = parseInternal(row, index, connection)
-
-      // if (logs.length === 0) throw new Error(JSON.stringify(row, null, 2))
-
-      for (const log of logs) {
-        logMap[log._id] = log
-        assetMap[log.assetId] = true
-        walletMap[log.wallet] = true
-        operationMap[log.operation] = true
-      }
-
-      for (const transaction of txns) {
-        txMap[transaction._id] = transaction
-      }
-    } catch (error) {
-      progress([0, `Error parsing row ${index + 1}: ${String(error)}`])
-    }
-  })
-
-  // erc20 transactions
-  const erc20 = await rpcProvider.getErc20Transactions(connection.address, since)
-
-  progress([50, `Fetching erc20 transactions`])
-  progress([60, `Parsing ${erc20.length} erc20 transactions`])
-  erc20.forEach((row, index) => {
-    try {
-      if (index !== 0 && (index + 1) % 1000 === 0) {
-        progress([60 + (index * 15) / erc20.length, `Parsing row ${index + 1}`])
-      }
-      const { logs, txns = [] } = parseERC20(row, index, connection)
-
-      // if (logs.length === 0) throw new Error(JSON.stringify(row, null, 2))
-
-      for (const log of logs) {
-        logMap[log._id] = log
-        assetMap[log.assetId] = true
-        walletMap[log.wallet] = true
-        operationMap[log.operation] = true
-      }
-
-      for (const transaction of txns) {
-        txMap[transaction._id] = transaction
-      }
-    } catch (error) {
-      progress([0, `Error parsing row ${index + 1}: ${String(error)}`])
-    }
-  })
+  const account = getAccount(accountName)
 
   // save logs
-  const logIds = Object.keys(logMap).map((x) => ({ id: x }))
+  const logIds = Object.keys(result.logMap).map((x) => ({ id: x }))
   // TODO bug: bulkDocs hangs if docs.length === 0
   if (logIds.length > 0) {
-    progress([80, `Saving ${logIds.length} audit logs to disk`])
+    progress([60, `Saving ${logIds.length} audit logs to disk`])
     const { results: logDocs } = await account.auditLogsDB.bulkGet({ docs: logIds })
 
     const logUpdates = await account.auditLogsDB.bulkDocs(
       logDocs.map((doc) => ({
-        ...logMap[doc.id],
+        ...result.logMap[doc.id],
         _id: doc.id,
         _rev: "ok" in doc.docs[0] ? doc.docs[0].ok._rev : undefined,
       }))
@@ -258,14 +169,14 @@ export async function syncConnection(
   }
 
   // save transactions
-  const txIds = Object.keys(txMap).map((x) => ({ id: x }))
+  const txIds = Object.keys(result.txMap).map((x) => ({ id: x }))
   // TODO bug: bulkDocs hangs if docs.length === 0
   if (txIds.length > 0) {
-    progress([90, `Saving ${txIds.length} transactions to disk`])
+    progress([70, `Saving ${txIds.length} transactions to disk`])
     const { results: txDocs } = await account.transactionsDB.bulkGet({ docs: txIds })
     const txUpdates = await account.transactionsDB.bulkDocs(
       txDocs.map((doc) => ({
-        ...txMap[doc.id],
+        ...result.txMap[doc.id],
         _id: doc.id,
         _rev: "ok" in doc.docs[0] ? doc.docs[0].ok._rev : undefined,
       }))
@@ -275,23 +186,15 @@ export async function syncConnection(
 
   // save metadata
   const metadata: Connection["meta"] = {
-    assetIds: Object.keys(assetMap),
+    assetIds: Object.keys(result.assetMap),
     logs: logIds.length,
-    operations: Object.keys(operationMap) as AuditLogOperation[],
-    rows: normal.length + internal.length + erc20.length,
+    operations: Object.keys(result.operationMap) as AuditLogOperation[],
+    rows: result.rows,
     transactions: txIds.length,
-    wallets: Object.keys(walletMap),
+    wallets: Object.keys(result.walletMap),
   }
 
-  // set cursor
-  if (normal.length > 0) {
-    const newCursor = String(Number(normal[normal.length - 1].blockNumber) + 1)
-
-    progress([95, `Setting cursor to block number ${newCursor}`])
-    await setValue(connection._id, newCursor, accountName)
-  }
-
-  if (connection.meta && since !== 0) {
+  if (connection.meta && since !== "0") {
     connection.meta = {
       assetIds: [...new Set(connection.meta.assetIds.concat(metadata.assetIds))],
       logs: connection.meta.logs + metadata.logs,
@@ -305,7 +208,14 @@ export async function syncConnection(
   }
   connection.syncedAt = new Date().getTime()
 
-  progress([99, `Saving metadata`])
+  progress([80, `Saving metadata`])
   await account.connectionsDB.put(connection)
+
+  // set cursor
+  if (result.rows > 0) {
+    progress([90, `Setting cursor to block number ${result.newCursor}`])
+    await setValue(connection._id, result.newCursor, accountName)
+  }
+
   return connection
 }

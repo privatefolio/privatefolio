@@ -47,7 +47,7 @@ export function parser(
   if (tokenValue === "0") {
     return { logs: [] }
   }
-  if (contractAddress in spamTokens) {
+  if (contractAddress in spamTokens || symbol.includes("http")) {
     return { logs: [] }
   }
   // ----------------------------------------------------------------- Derive
@@ -91,6 +91,7 @@ export function parser(
       operation,
       platform,
       timestamp,
+      txId,
       wallet,
     },
   ]

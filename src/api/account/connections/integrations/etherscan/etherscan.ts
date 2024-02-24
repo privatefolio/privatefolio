@@ -79,6 +79,23 @@ export function parseNormal(
         txId,
         wallet,
       })
+
+      // Fix for WETH: wrapping does not appear
+      if (operation === "Withdraw" && to === "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2") {
+        logs.push({
+          _id: `${txId}_WETH_${index}`,
+          assetId: "ethereum:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:WETH",
+          change: outgoing as string,
+          changeN: parseFloat(outgoing as string),
+          importId: connection._id,
+          importIndex: index + 0.1,
+          operation: "Deposit",
+          platform,
+          timestamp,
+          txId,
+          wallet,
+        })
+      }
     }
   }
 
@@ -128,6 +145,14 @@ export function parseNormal(
     txHash,
     type,
     wallet,
+  }
+
+  // Fix for WETH
+  if (logs.length === 3) {
+    tx.type = "Wrap"
+    tx.incomingAsset = logs[1].assetId
+    tx.incoming = logs[1].change
+    tx.incomingN = logs[1].changeN
   }
 
   return {

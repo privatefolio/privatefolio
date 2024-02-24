@@ -200,9 +200,7 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
               <Paper
                 variant="outlined"
                 sx={{
-                  background: stickyVersion
-                    ? "var(--mui-palette-background-paperSolid)"
-                    : undefined,
+                  background: stickyVersion ? "var(--mui-palette-background-paper)" : undefined,
                   overflowX: { lg: "unset", xs: "auto" },
                 }}
               >

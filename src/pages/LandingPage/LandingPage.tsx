@@ -67,6 +67,7 @@ export default function LandingPage({ show }: { show: boolean }) {
               },
               background:
                 "linear-gradient(0deg, var(--mui-palette-accent-dark) 0%, var(--mui-palette-accent-main) 100%)",
+              color: "var(--mui-palette-common-white)",
               marginTop: 2,
             }}
             endIcon={<ArrowRightAltRounded />}

@@ -75,10 +75,10 @@ export function parser(csvRow: string, index: number, fileImportId: string): Par
       wallet,
     })
 
-    // Fix for WETH: withdrawals do not appear in the erc20 export
+    // Fix for WETH: unwrapping does not appear in the erc20 export
     if (from === "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2") {
       logs.push({
-        _id: `${txId}_ERC20_${index}`,
+        _id: `${txId}_WETH_${index}`,
         assetId: "ethereum:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2:WETH",
         change: `-${valueIn}`,
         changeN: parseFloat(`-${valueIn}`),
@@ -107,12 +107,12 @@ export function parser(csvRow: string, index: number, fileImportId: string): Par
     wallet,
   }
 
-  // WETH
+  // Fix for WETH
   if (logs.length === 2) {
     tx.type = "Unwrap"
     tx.outgoingAsset = logs[1].assetId
-    tx.outgoing = valueIn
-    tx.outgoingN = parseFloat(valueIn)
+    tx.outgoing = logs[0].change
+    tx.outgoingN = logs[0].changeN
   }
 
   return { logs, txns: [tx] }

@@ -5,9 +5,7 @@ import { AmountBlock } from "src/components/AmountBlock"
 import { AppLink } from "src/components/AppLink"
 import { AssetBlock } from "src/components/AssetBlock"
 import { $baseCurrency } from "src/stores/account-settings-store"
-import { getAssetTicker } from "src/utils/assets-utils"
 
-import { AssetAvatar } from "../../components/AssetAvatar"
 import { Balance } from "../../interfaces"
 import { $assetMetaMap } from "../../stores/metadata-store"
 import { TableRowComponentProps } from "../../utils/table-utils"
@@ -33,26 +31,11 @@ export function BalanceTableRow(props: TableRowComponentProps<Balance>) {
         <TableCell sx={{ width: "100%" }} variant="clickable">
           <AppLink to={`./asset/${encodeURI(assetId)}`}>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <Stack direction="row" gap={1} alignItems="center" component="div">
-                <AssetAvatar
-                  size="medium"
-                  src={assetMap[assetId]?.image}
-                  alt={getAssetTicker(assetId)}
-                />
-                <Stack>
-                  <Typography variant="body1">
-                    <span>{getAssetTicker(assetId)}</span>
-                  </Typography>
-                  <Typography
-                    color="text.secondary"
-                    variant="caption"
-                    fontWeight={300}
-                    letterSpacing={0.5}
-                  >
-                    <AmountBlock amount={balance} />
-                  </Typography>
-                </Stack>
-              </Stack>
+              <AssetBlock
+                asset={assetId}
+                size="medium"
+                secondary={<AmountBlock amount={balance} />}
+              />
               <Stack alignItems="flex-end">
                 <Typography variant="body1">
                   <AmountBlock

@@ -26,7 +26,6 @@ export function AuditLogTable(props: AuditLogsTableProps) {
     async (filters, rowsPerPage, page, order) => {
       if (txId) {
         const auditLogs = await clancy.findAuditLogsForTxId(txId, $activeAccount.get())
-        // auditLogs.sort((a, b) => (b.importIndex > a.importIndex ? -1 : 1))
         return [auditLogs, auditLogs.length]
       }
 
@@ -105,6 +104,10 @@ export function AuditLogTable(props: AuditLogsTableProps) {
         numeric: true,
         sx: { width: "50%" },
       },
+      {
+        label: "",
+        sx: { maxWidth: 44, minWidth: 44, width: 44 },
+      },
     ],
     [assetId, txId]
   )
@@ -112,7 +115,6 @@ export function AuditLogTable(props: AuditLogsTableProps) {
   return (
     <>
       {txId && (
-        // TODO this should me a separate component using memory table
         <Box
           sx={{
             marginBottom: 1,

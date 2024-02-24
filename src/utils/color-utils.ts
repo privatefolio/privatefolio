@@ -22,7 +22,7 @@ const colorArray = [
   colors.indigo[500],
   colors.lightBlue[500],
   colors.lightGreen[500],
-  colors.lime[500],
+  // colors.lime[500],
   colors.orange[500],
   colors.pink[500],
   colors.purple[400],
