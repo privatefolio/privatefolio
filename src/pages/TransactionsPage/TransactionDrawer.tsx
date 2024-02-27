@@ -29,7 +29,6 @@ const updateTransactionDebounced = debounce((
   id: string,
   update: Partial<Transaction>,
 ) => {
-  console.log('updating')
   clancy.updateTransaction(accountName, id, update)
 }, DEFAULT_DEBOUNCE_DURATION)
 
@@ -85,7 +84,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
 
   const currency = useStore($baseCurrency)
 
-  const [textInput, setTextInput] = useState(tx.notes);
+  const [textInput, setTextInput] = useState(tx.notes||"");
 
 
 

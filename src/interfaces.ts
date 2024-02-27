@@ -63,7 +63,7 @@ export interface Transaction {
   txHash?: string
   type: TransactionType
   wallet: string
-  notes: string
+  notes?: string
 }
 
 export interface EtherscanTransaction extends Transaction {
