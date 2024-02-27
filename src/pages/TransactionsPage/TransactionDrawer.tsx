@@ -1,8 +1,10 @@
 import { ArrowRightAltRounded, CloseRounded } from "@mui/icons-material"
-import { Button, Drawer, DrawerProps, IconButton, Skeleton, Stack, Typography } from "@mui/material"
+import { Box, Button, Drawer, DrawerProps, IconButton, Skeleton, Stack, TextField, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
+import { debounce } from "lodash-es"
 import React, { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
+import { getAssetPriceMap } from "src/api/core/daily-prices-api"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AmountBlock } from "src/components/AmountBlock"
 import { AppLink } from "src/components/AppLink"
@@ -12,13 +14,24 @@ import { IdentifierBlock } from "src/components/IdentifierBlock"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TimestampBlock } from "src/components/TimestampBlock"
-import { EtherscanTransaction, Transaction } from "src/interfaces"
+import { EtherscanTransaction, Transaction, Balance, ChartData } from "src/interfaces"
+import { DEFAULT_DEBOUNCE_DURATION } from "src/settings"
+import { $baseCurrency } from "src/stores/account-settings-store"
 import { $activeAccount, $activeIndex } from "src/stores/account-store"
 import { PopoverToggleProps } from "src/stores/app-store"
 import { MonoFont } from "src/theme"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { formatHex, getExplorerLink } from "src/utils/utils"
 import { clancy } from "src/workers/remotes"
+
+const updateTransactionDebounced = debounce((
+  accountName: string,
+  id: string,
+  update: Partial<Transaction>,
+) => {
+  console.log('updating')
+  clancy.updateTransaction(accountName, id, update)
+}, DEFAULT_DEBOUNCE_DURATION)
 
 type TransactionDrawerProps = DrawerProps &
   PopoverToggleProps & {
@@ -32,6 +45,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
 
   const {
     incoming,
+    incomingN,
     incomingAsset,
     type,
     timestamp,
@@ -39,8 +53,10 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
     wallet,
     price,
     outgoing,
+    outgoingN,
     outgoingAsset,
     fee,
+    feeN,
     feeAsset,
     _id,
     txHash,
@@ -52,13 +68,33 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
 
   const [logsNumber, setLogsNumber] = useState<number | null>(null)
 
+  const [priceMap, setPriceMap] = useState<Record<string, ChartData>>()
+
   useEffect(() => {
     if (!open) return
 
     clancy.findAuditLogsForTxId(_id, $activeAccount.get()).then((logs) => {
       setLogsNumber(logs.length)
     })
+
+    clancy.getAssetPriceMap(timestamp).then(priceMap => {
+      setPriceMap(priceMap)
+    })
+
   }, [_id, open])
+
+  const currency = useStore($baseCurrency)
+
+  const [textInput, setTextInput] = useState(tx.notes);
+
+
+
+  const handleTextInputChange = event => {
+    setTextInput(event.target.value);
+    updateTransactionDebounced($activeAccount.get(), _id, {
+      notes: event.target.value
+    })
+  };
 
   return (
     <Drawer open={open} onClose={toggleOpen} {...rest}>
@@ -122,7 +158,27 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
                 <AssetBlock asset={incomingAsset} />
               </Button>
             </Stack>
-            <Stack direction="row" gap={1}></Stack>
+            {
+              !!(priceMap && incomingN && priceMap[incomingAsset]?.value) && (
+
+                <Typography
+                  color="text.secondary"
+                  variant="caption"
+                  fontWeight={300}
+                  letterSpacing={0.5}
+                >
+                  ({" "}
+                  <AmountBlock
+                    amount={priceMap[incomingAsset]?.value * incomingN}
+                    currencySymbol={currency.symbol}
+                    currencyTicker={currency.name}
+                    significantDigits={currency.maxDigits}
+                  />
+                  )
+                </Typography>
+              )
+            }
+
           </div>
         )}
         {outgoingAsset && (
@@ -144,6 +200,26 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
                 <AssetBlock asset={outgoingAsset} />
               </Button>
             </Stack>
+            {
+              !!(priceMap && outgoingN && priceMap[outgoingAsset]?.value) && (
+
+                <Typography
+                  color="text.secondary"
+                  variant="caption"
+                  fontWeight={300}
+                  letterSpacing={0.5}
+                >
+                  ({" "}
+                  <AmountBlock
+                    amount={priceMap[outgoingAsset]?.value * outgoingN}
+                    currencySymbol={currency.symbol}
+                    currencyTicker={currency.name}
+                    significantDigits={currency.maxDigits}
+                  />
+                  )
+                </Typography>
+              )
+            }
           </div>
         )}
         {feeAsset && (
@@ -165,6 +241,26 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
                 <AssetBlock asset={feeAsset} />
               </Button>
             </Stack>
+            {
+              !!(priceMap && feeN && priceMap[feeAsset]?.value) && (
+
+                <Typography
+                  color="text.secondary"
+                  variant="caption"
+                  fontWeight={300}
+                  letterSpacing={0.5}
+                >
+                  ({" "}
+                  <AmountBlock
+                    amount={priceMap[feeAsset]?.value * feeN}
+                    currencySymbol={currency.symbol}
+                    currencyTicker={currency.name}
+                    significantDigits={currency.maxDigits}
+                  />
+                  )
+                </Typography>
+              )
+            }
           </div>
         )}
         {price && (
@@ -222,6 +318,17 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
         )}
         {/* <pre>{JSON.stringify(txMeta, null, 2)}</pre> */}
         {/* <pre>{JSON.stringify(tx, null, 2)}</pre> */}
+        <div>
+          <SectionTitle>Notes</SectionTitle>
+          <TextField
+            multiline
+            onChange={handleTextInputChange}
+            defaultValue={textInput}
+            minRows={3}
+            fullWidth
+            placeholder="Write a custom note..."
+          />
+        </div>
       </Stack>
     </Drawer>
   )

@@ -1,5 +1,5 @@
-import { AddRounded, RemoveRounded, Visibility } from "@mui/icons-material"
-import { IconButton, Avatar, Stack, TableCell, TableRow, Tooltip, Box } from "@mui/material"
+import { AddRounded, RemoveRounded, Visibility, ArrowRightAltRounded } from "@mui/icons-material"
+import { IconButton, Avatar, Stack, TableCell, TableRow, Tooltip, Box, Button } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React from "react"
 import { ActionBlock } from "src/components/ActionBlock"
@@ -68,13 +68,23 @@ export function AuditLogTableRow(props: TableRowComponentProps<AuditLog>) {
                     currencyTicker={getAssetTicker(assetId)}
                   />
                   {showAssetColumn && (
-                      <AssetBlock asset={assetId} size="medium" />
+                    <AssetBlock asset={assetId} size="medium" />
                   )}
                 </Stack>
               </Stack>
+              <Button size="small" color="primary" onClick={toggleOpen}>
+                Inspect details <ArrowRightAltRounded />
+              </Button>
             </Stack>
           </TableCell>
         </TableRow>
+        <AuditLogDrawer
+          key={row._id}
+          open={open}
+          toggleOpen={toggleOpen}
+          auditLog={row}
+          relativeTime={relativeTime}
+        />
         {/* {open && (
           <TableRow className={open ? "TableRow-open-bottom" : undefined} sx={{ height: 200 }}>
             <TableCell colSpan={2}>File Import</TableCell>

@@ -1,6 +1,6 @@
 import { Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Navigate, useParams, useSearchParams } from "react-router-dom"
 import { NavTab } from "src/components/NavTab"
 import { Tabs } from "src/components/Tabs"
@@ -15,6 +15,12 @@ import { AuditLogTable } from "../AuditLogsPage/AuditLogTable"
 import { TransactionTable } from "../TransactionsPage/TransactionTable"
 import { BalanceChart } from "./BalanceChart"
 import { PriceChart } from "./PriceChart"
+import { clancy } from "src/workers/remotes"
+import { Balance } from "src/interfaces"
+import { $activeAccount } from "src/stores/account-store"
+import { AmountBlock } from "src/components/AmountBlock"
+import { $baseCurrency } from "src/stores/account-settings-store"
+import { SectionTitle } from "src/components/SectionTitle"
 
 export default function AssetPage({ show }: { show: boolean }) {
   const params = useParams()
@@ -29,25 +35,70 @@ export default function AssetPage({ show }: { show: boolean }) {
     return <Navigate to=".." replace={true} />
   }
 
+  const [queryTime, setQueryTime] = useState<number | null>(null)
+  const [rows, setRows] = useState<Balance[]>([])
+  
+  const activeAccount = useStore($activeAccount)
+  const currency = useStore($baseCurrency)
+
+  useEffect(() => {
+    function fetchData() {
+      const start = Date.now()
+      clancy.getBalancesAt(undefined, activeAccount, false).then((balances) => {
+        // fetch no longer accurate
+        if (activeAccount !== $activeAccount.get()) return
+        setQueryTime(Date.now() - start)
+        setRows(balances)
+      })
+    }
+
+    fetchData()
+  }, [])
+
+  console.log(rows)
+
+  const row = rows.find((obj) => {
+    return obj.assetId === assetId;
+  })
+
+  console.log(row)
   return (
     <StaggeredList component="main" gap={2} show={show}>
       <BackButton to=".." sx={{ marginLeft: 1 }}>
         Home
       </BackButton>
-      <Stack direction="row" gap={1} alignItems="center" component="div" sx={{ marginX: 2 }}>
-        <AssetAvatar size="large" src={assetMap[assetId]?.image} alt={getAssetTicker(assetId)} />
+      <Stack direction="row" alignItems="center" width="100%" justifyContent="space-between">
+        <Stack direction="row" gap={1} component="div" sx={{ marginX: 2 }}>
+          <AssetAvatar size="large" src={assetMap[assetId]?.image} alt={getAssetTicker(assetId)} />
+          <Stack>
+            <Typography variant="h6" fontFamily={SerifFont} sx={{ marginBottom: -0.5 }}>
+              <span>{getAssetTicker(assetId)}</span>
+            </Typography>
+            <Typography
+              color="text.secondary"
+              variant="subtitle2"
+              fontWeight={300}
+              letterSpacing={0.5}
+            >
+              {assetMap[assetId]?.name}
+            </Typography>
+          </Stack>
+        </Stack>
         <Stack>
-          <Typography variant="h6" fontFamily={SerifFont} sx={{ marginBottom: -0.5 }}>
-            <span>{getAssetTicker(assetId)}</span>
-          </Typography>
-          <Typography
-            color="text.secondary"
-            variant="subtitle2"
-            fontWeight={300}
-            letterSpacing={0.5}
-          >
-            {assetMap[assetId]?.name}
-          </Typography>
+        <SectionTitle>Balance</SectionTitle>
+        <AmountBlock
+              amount={row?.balanceN}
+              currencyTicker={getAssetTicker(assetId)}
+            />
+        </Stack>
+        <Stack>
+        <SectionTitle>Value</SectionTitle>
+        <AmountBlock
+          amount={row?.value}
+          currencySymbol={currency.symbol}
+          currencyTicker={currency.name}
+          significantDigits={currency.maxDigits}
+        />
         </Stack>
       </Stack>
       <Stack>

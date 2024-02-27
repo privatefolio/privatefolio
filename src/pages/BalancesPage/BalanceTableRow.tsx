@@ -21,8 +21,6 @@ export function BalanceTableRow(props: TableRowComponentProps<Balance>) {
   } = props
   const { assetId, balance, price, value } = row
 
-  const assetMap = useStore($assetMetaMap)
-
   const currency = useStore($baseCurrency)
 
   if (isTablet) {
