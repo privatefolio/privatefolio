@@ -42,7 +42,7 @@ export interface FinishedTask extends Omit<Task, "function"> {
 export const $taskHistory = atom<FinishedTask[]>([])
 export const $taskQueue = atom<Task[]>([])
 export const $pendingTask = atom<Task | undefined>()
-export const $progressHistory = map<Record<string, Record<number, ProgressUpdate>>>({})
+export const $progressHistory = map<Record<string, Record<string, ProgressUpdate>>>({})
 
 // logAtoms({ $pendingTask, $taskHistory, $taskQueue })
 
@@ -75,7 +75,7 @@ async function processQueue() {
       const startTime = Date.now()
       task.startedAt = startTime
       task.abortController = new AbortController()
-      $progressHistory.setKey(task.id, [])
+      $progressHistory.setKey(task.id, {})
       $pendingTask.set(task)
       let errorMessage: string | undefined
 

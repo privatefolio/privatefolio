@@ -17,9 +17,10 @@ export function LinearProgressWithLabel(props: LinearProgressProps & { value?: n
       </Box>
       {typeof props.value === "number" && (
         <Box sx={{ minWidth: 40, textAlign: "right" }}>
-          <Typography variant="body2" color="text.secondary">{`${
-            Math.floor(props.value * 10 ** decimals) / 10 ** decimals
-          }%`}</Typography>
+          <Typography variant="body2" color="text.secondary">{`${(
+            Math.floor(props.value * 10 ** decimals) /
+            10 ** decimals
+          ).toFixed(0)}%`}</Typography>
         </Box>
       )}
     </Box>

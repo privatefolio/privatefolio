@@ -43,7 +43,9 @@ export function TaskDetailsDialog({ taskId, ...props }: DialogProps & { taskId: 
   const updates = Object.keys(updateMap)
   const completed = task && "completedAt" in task && task.completedAt
 
-  const progressPercent = useMemo(() => {
+  const latestPercentRef = useRef<number>(0)
+
+  const progressPercent = useMemo<number>(() => {
     if (completed && !task.abortController?.signal.aborted && !task?.errorMessage) {
       return 100
     }
@@ -53,7 +55,14 @@ export function TaskDetailsDialog({ taskId, ...props }: DialogProps & { taskId: 
     }
 
     const lastUpdate = updates[updates.length - 1]
-    return updateMap[lastUpdate][0] || 0
+
+    const newValue = updateMap[lastUpdate][0]
+
+    if (typeof newValue === "number") {
+      latestPercentRef.current = newValue
+    }
+
+    return latestPercentRef.current
   }, [completed, task, updateMap, updates])
 
   const detailsRef = useRef<HTMLDivElement>(null)
@@ -154,18 +163,21 @@ export function TaskDetailsDialog({ taskId, ...props }: DialogProps & { taskId: 
                     Starting task...
                   </div>
                 )}
-                {updates.map((update, index) => (
-                  <div key={index}>
-                    <TimeLabel timestamp={parseInt(update)} debugMode={debugMode} />{" "}
-                    {!updateMap[update][1].includes("Error") ? (
-                      `${updateMap[update][1]}...`
-                    ) : (
-                      <Typography variant="inherit" color="error" component="span">
-                        {updateMap[update][1]}
-                      </Typography>
-                    )}
-                  </div>
-                ))}
+                {updates.map(
+                  (update, index) =>
+                    typeof updateMap[update][1] === "string" && (
+                      <div key={index}>
+                        <TimeLabel timestamp={parseInt(update)} debugMode={debugMode} />{" "}
+                        {!updateMap[update][1]?.includes("Error") ? (
+                          `${updateMap[update][1]}...`
+                        ) : (
+                          <Typography variant="inherit" color="error" component="span">
+                            {updateMap[update][1]}
+                          </Typography>
+                        )}
+                      </div>
+                    )
+                )}
                 {completed && (
                   <div>
                     {task.errorMessage ? (

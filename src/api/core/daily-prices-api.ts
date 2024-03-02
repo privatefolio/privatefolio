@@ -124,94 +124,110 @@ export async function fetchDailyPrices(
   const now = Date.now()
   const today: Timestamp = now - (now % 86400000)
 
+  const promises: (() => Promise<void>)[] = []
+
   for (let i = 1; i <= assetIds.length; i++) {
-    const assetId = assetIds[i - 1]
+    // eslint-disable-next-line no-loop-func
+    promises.push(async () => {
+      const assetId = assetIds[i - 1]
 
-    if (signal?.aborted) {
-      throw new Error(signal.reason)
-    }
+      if (signal?.aborted) {
+        throw new Error(signal.reason)
+      }
 
-    const platformId = getAssetPlatform(assetId)
+      const platformId = getAssetPlatform(assetId)
 
-    const priceApi = PRICE_APIS[platformId]
-    const priceMapper = PRICE_MAPPER[platformId]
-    const pairMapper = PAIR_MAPPER[platformId]
+      const priceApi = PRICE_APIS[platformId]
+      const priceMapper = PRICE_MAPPER[platformId]
+      const pairMapper = PAIR_MAPPER[platformId]
 
-    if (!priceApi || !priceMapper || !pairMapper) {
-      throw new Error(`Price API "${platformId}" is not supported`)
-    }
+      if (!priceApi || !priceMapper || !pairMapper) {
+        throw new Error(`Price API "${platformId}" is not supported`)
+      }
 
-    try {
-      let since: Timestamp | undefined = await getPriceCursor(assetId)
-      let until: Timestamp | undefined = today
+      try {
+        let since: Timestamp | undefined = await getPriceCursor(assetId)
+        let until: Timestamp | undefined = today
 
-      if (!since) since = today - 86400000 * PRICE_API_PAGINATION
+        if (!since) since = today - 86400000 * PRICE_API_PAGINATION
 
-      while (true) {
-        const pair = pairMapper(assetId)
+        while (true) {
+          const pair = pairMapper(assetId)
 
-        const results = await priceApi({
-          limit: PRICE_API_PAGINATION,
-          pair,
-          since,
-          timeInterval: "1d" as ResolutionString,
-          until,
-        })
-
-        if (results.length === 0) {
-          progress([(i * 100) / assetIds.length, `Skipped ${getAssetTicker(assetId)}: no results`])
-          break
-        }
-
-        const docIds: Array<{ id: string }> = []
-
-        const documentMap = results.reduce((acc, result) => {
-          const price = priceMapper(result)
-          const timestamp = (price.time as number) * 1000
-          const _id = `${assetId}-${timestamp}`
-
-          acc[_id] = {
-            _id,
-            assetId,
+          const results = await priceApi({
+            limit: PRICE_API_PAGINATION,
             pair,
-            price,
-            timestamp,
+            since,
+            timeInterval: "1d" as ResolutionString,
+            until,
+          })
+
+          if (results.length === 0) {
+            progress([undefined, `Skipped ${getAssetTicker(assetId)}: no results`])
+            break
           }
 
-          docIds.push({ id: _id })
-          return acc
-        }, {} as Record<string, SavedPrice>)
+          const docIds: Array<{ id: string }> = []
 
-        const { results: docsWithRevision } = await core.dailyPricesDB.bulkGet({ docs: docIds })
+          const documentMap = results.reduce((acc, result) => {
+            const price = priceMapper(result)
+            const timestamp = (price.time as number) * 1000
+            const _id = `${assetId}-${timestamp}`
 
-        const docs: SavedPrice[] = docsWithRevision.map((x) => ({
-          ...documentMap[x.id],
-          _rev: "ok" in x.docs[0] ? x.docs[0].ok._rev : undefined,
-        }))
+            acc[_id] = {
+              _id,
+              assetId,
+              pair,
+              price,
+              timestamp,
+            }
 
-        const updates = await core.dailyPricesDB.bulkDocs(docs)
-        validateOperation(updates)
+            docIds.push({ id: _id })
+            return acc
+          }, {} as Record<string, SavedPrice>)
 
-        const start = (priceMapper(results[0]).time as number) * 1000
-        const end = (priceMapper(results[results.length - 1]).time as number) * 1000
+          const { results: docsWithRevision } = await core.dailyPricesDB.bulkGet({ docs: docIds })
 
-        progress([
-          (i * 100) / assetIds.length,
-          `Fetched ${getAssetTicker(assetId)} from ${formatDate(start)} to ${formatDate(end)}`,
-        ])
+          const docs: SavedPrice[] = docsWithRevision.map((x) => ({
+            ...documentMap[x.id],
+            _rev: "ok" in x.docs[0] ? x.docs[0].ok._rev : undefined,
+          }))
 
-        if (results.length !== PRICE_API_PAGINATION) {
-          // reached listing date (genesis)
-          break
+          const updates = await core.dailyPricesDB.bulkDocs(docs)
+          validateOperation(updates)
+
+          const start = (priceMapper(results[0]).time as number) * 1000
+          const end = (priceMapper(results[results.length - 1]).time as number) * 1000
+
+          progress([
+            undefined,
+            `Fetched ${getAssetTicker(assetId)} from ${formatDate(start)} to ${formatDate(end)}`,
+          ])
+
+          if (results.length !== PRICE_API_PAGINATION) {
+            // reached listing date (genesis)
+            break
+          }
+
+          until = start - 86400000
+          since = start - 86400000 * PRICE_API_PAGINATION
         }
-
-        until = start - 86400000
-        since = start - 86400000 * PRICE_API_PAGINATION
+      } catch (error) {
+        progress([undefined, `Skipped ${getAssetTicker(assetId)}: ${error}`])
       }
-    } catch (error) {
-      progress([(i * 100) / assetIds.length, `Skipped ${getAssetTicker(assetId)}: ${error}`])
-    }
+    })
   }
+
+  let progressCount = 0
+
+  await Promise.all(
+    promises.map((fetchFn) =>
+      fetchFn().then(() => {
+        progressCount += 1
+        progress([(progressCount / assetIds.length) * 100])
+      })
+    )
+  )
 }
 
 export function subscribeToDailyPrices(callback: () => void) {
