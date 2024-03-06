@@ -1,7 +1,7 @@
 import { ArrowRightAltRounded, CloseRounded } from "@mui/icons-material"
 import { Button, Drawer, DrawerProps, IconButton, Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React, { useState, useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AmountBlock } from "src/components/AmountBlock"
@@ -12,11 +12,11 @@ import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { AuditLog, ChartData } from "src/interfaces"
+import { $baseCurrency } from "src/stores/account-settings-store"
 import { $activeIndex } from "src/stores/account-store"
 import { PopoverToggleProps } from "src/stores/app-store"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { clancy } from "src/workers/remotes"
-import { $baseCurrency } from "src/stores/account-settings-store"
 
 type AuditLogDrawerProps = DrawerProps &
   PopoverToggleProps & {
@@ -52,10 +52,9 @@ export function AuditLogDrawer(props: AuditLogDrawerProps) {
   useEffect(() => {
     if (!open) return
 
-    clancy.getAssetPriceMap(timestamp).then(priceMap => {
+    clancy.getAssetPriceMap(timestamp).then((priceMap) => {
       setPriceMap(priceMap)
     })
-
   }, [_id, open])
 
   return (
@@ -120,36 +119,28 @@ export function AuditLogDrawer(props: AuditLogDrawerProps) {
             </Button>
           </Stack>
           <Stack direction="row" gap={1}></Stack>
-          {
-            !!(priceMap && changeN && priceMap[assetId]?.value) && (
-
-              <Typography
-                color="text.secondary"
-                variant="caption"
-                fontWeight={300}
-                letterSpacing={0.5}
-              >
-                ({" "}
-                <AmountBlock
-                  amount={priceMap[assetId]?.value * changeN}
-                  currencySymbol={currency.symbol}
-                  currencyTicker={currency.name}
-                  significantDigits={currency.maxDigits}
-                />
-                )
-              </Typography>
-            )
-          }
-
+          {!!(priceMap && changeN && priceMap[assetId]?.value) && (
+            <Typography
+              color="text.secondary"
+              variant="caption"
+              fontWeight={300}
+              letterSpacing={0.5}
+            >
+              ({" "}
+              <AmountBlock
+                amount={priceMap[assetId]?.value * changeN}
+                currencySymbol={currency.symbol}
+                currencyTicker={currency.id}
+                significantDigits={currency.maxDigits}
+              />
+              )
+            </Typography>
+          )}
         </div>
         <div>
           <SectionTitle>New balance</SectionTitle>
           <Stack direction="row" alignItems="center" gap={1}>
-            <AmountBlock
-              colorized
-              amount={balance}
-              currencyTicker={getAssetTicker(assetId)}
-            />
+            <AmountBlock colorized amount={balance} currencyTicker={getAssetTicker(assetId)} />
             <Button
               size="small"
               component={AppLink}
@@ -160,25 +151,23 @@ export function AuditLogDrawer(props: AuditLogDrawerProps) {
             </Button>
           </Stack>
           <Stack direction="row" gap={1}></Stack>
-          {
-            !!(priceMap && balanceN && priceMap[assetId]?.value) && (
-              <Typography
-                color="text.secondary"
-                variant="caption"
-                fontWeight={300}
-                letterSpacing={0.5}
-              >
-                ({" "}
-                <AmountBlock
-                  amount={priceMap[assetId]?.value * balanceN}
-                  currencySymbol={currency.symbol}
-                  currencyTicker={currency.name}
-                  significantDigits={currency.maxDigits}
-                />
-                )
-              </Typography>
-            )
-          }
+          {!!(priceMap && balanceN && priceMap[assetId]?.value) && (
+            <Typography
+              color="text.secondary"
+              variant="caption"
+              fontWeight={300}
+              letterSpacing={0.5}
+            >
+              ({" "}
+              <AmountBlock
+                amount={priceMap[assetId]?.value * balanceN}
+                currencySymbol={currency.symbol}
+                currencyTicker={currency.id}
+                significantDigits={currency.maxDigits}
+              />
+              )
+            </Typography>
+          )}
         </div>
         {txId && (
           <div>

@@ -1,10 +1,17 @@
+/* eslint-disable react-hooks/rules-of-hooks */ // TODO
 import { Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { Navigate, useParams, useSearchParams } from "react-router-dom"
+import { AmountBlock } from "src/components/AmountBlock"
 import { NavTab } from "src/components/NavTab"
+import { SectionTitle } from "src/components/SectionTitle"
 import { Tabs } from "src/components/Tabs"
+import { Balance } from "src/interfaces"
+import { $baseCurrency } from "src/stores/account-settings-store"
+import { $activeAccount } from "src/stores/account-store"
 import { getAssetTicker } from "src/utils/assets-utils"
+import { clancy } from "src/workers/remotes"
 
 import { AssetAvatar } from "../../components/AssetAvatar"
 import { BackButton } from "../../components/BackButton"
@@ -15,12 +22,6 @@ import { AuditLogTable } from "../AuditLogsPage/AuditLogTable"
 import { TransactionTable } from "../TransactionsPage/TransactionTable"
 import { BalanceChart } from "./BalanceChart"
 import { PriceChart } from "./PriceChart"
-import { clancy } from "src/workers/remotes"
-import { Balance } from "src/interfaces"
-import { $activeAccount } from "src/stores/account-store"
-import { AmountBlock } from "src/components/AmountBlock"
-import { $baseCurrency } from "src/stores/account-settings-store"
-import { SectionTitle } from "src/components/SectionTitle"
 
 export default function AssetPage({ show }: { show: boolean }) {
   const params = useParams()
@@ -37,7 +38,7 @@ export default function AssetPage({ show }: { show: boolean }) {
 
   const [queryTime, setQueryTime] = useState<number | null>(null)
   const [rows, setRows] = useState<Balance[]>([])
-  
+
   const activeAccount = useStore($activeAccount)
   const currency = useStore($baseCurrency)
 
@@ -58,7 +59,7 @@ export default function AssetPage({ show }: { show: boolean }) {
   console.log(rows)
 
   const row = rows.find((obj) => {
-    return obj.assetId === assetId;
+    return obj.assetId === assetId
   })
 
   console.log(row)
@@ -85,20 +86,17 @@ export default function AssetPage({ show }: { show: boolean }) {
           </Stack>
         </Stack>
         <Stack>
-        <SectionTitle>Balance</SectionTitle>
-        <AmountBlock
-              amount={row?.balanceN}
-              currencyTicker={getAssetTicker(assetId)}
-            />
+          <SectionTitle>Balance</SectionTitle>
+          <AmountBlock amount={row?.balanceN} currencyTicker={getAssetTicker(assetId)} />
         </Stack>
         <Stack>
-        <SectionTitle>Value</SectionTitle>
-        <AmountBlock
-          amount={row?.value}
-          currencySymbol={currency.symbol}
-          currencyTicker={currency.name}
-          significantDigits={currency.maxDigits}
-        />
+          <SectionTitle>Value</SectionTitle>
+          <AmountBlock
+            amount={row?.value}
+            currencySymbol={currency.symbol}
+            currencyTicker={currency.id}
+            significantDigits={currency.maxDigits}
+          />
         </Stack>
       </Stack>
       <Stack>

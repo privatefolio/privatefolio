@@ -16,7 +16,6 @@ import { formatDate, formatHour } from "src/utils/formatting-utils"
 import { $debugMode, $telemetry, AppVerProps, PopoverToggleProps } from "../../stores/app-store"
 import { MonoFont } from "../../theme"
 import { SectionTitle } from "../SectionTitle"
-import { StaggeredList } from "../StaggeredList"
 import { ReducedMotion } from "./ReducedMotion"
 import { ThemeMode } from "./ThemeMode"
 
@@ -58,19 +57,24 @@ export const SettingsDrawerContents = ({
   const telemetry = useStore($telemetry)
 
   return (
-    <StaggeredList
+    <Stack
       paddingX={2}
       paddingY={1}
       gap={4}
-      show={open}
-      secondary
+      // show={open}
+      // secondary
       sx={{ overflowX: "hidden" }}
     >
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Typography variant="subtitle1" letterSpacing="0.025rem">
           Settings
         </Typography>
-        <IconButton onClick={toggleOpen} edge="end" color="secondary">
+        <IconButton
+          onClick={toggleOpen}
+          edge="end"
+          color="secondary"
+          sx={{ display: { sm: "block", xs: "none" } }}
+        >
           <CloseRounded fontSize="small" />
         </IconButton>
       </Stack>
@@ -231,6 +235,6 @@ export const SettingsDrawerContents = ({
           <OpenInNew fontSize="inherit" />
         </MenuItem>
       </div>
-    </StaggeredList>
+    </Stack>
   )
 }

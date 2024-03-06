@@ -163,9 +163,9 @@ export async function findTransactions(request: FindTransactionsRequest = {}, ac
   const selector: PouchDB.Find.Selector = !preferredFilter
     ? { timestamp: { $exists: true } }
     : {
-      [preferredFilter]: filters[preferredFilter],
-      timestamp: { $exists: true },
-    }
+        [preferredFilter]: filters[preferredFilter],
+        timestamp: { $exists: true },
+      }
 
   if (preferredFilter) {
     _filterOrder.forEach((filter) => {
@@ -224,7 +224,7 @@ export function subscribeToTransactions(callback: () => void, accountName: strin
   return proxy(() => {
     try {
       changesSub.cancel()
-    } catch { }
+    } catch {}
   })
 }
 
@@ -273,7 +273,7 @@ export async function autoMergeTransactions(
 export async function updateTransaction(
   accountName: string,
   id: string,
-  update: Partial<Transaction>,
+  update: Partial<Transaction>
 ) {
   const account = getAccount(accountName)
   const existing = await account.transactionsDB.get(id)

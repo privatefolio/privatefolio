@@ -7,7 +7,6 @@ import { AssetBlock } from "src/components/AssetBlock"
 import { $baseCurrency } from "src/stores/account-settings-store"
 
 import { Balance } from "../../interfaces"
-import { $assetMetaMap } from "../../stores/metadata-store"
 import { TableRowComponentProps } from "../../utils/table-utils"
 
 export function BalanceTableRow(props: TableRowComponentProps<Balance>) {
@@ -39,7 +38,7 @@ export function BalanceTableRow(props: TableRowComponentProps<Balance>) {
                   <AmountBlock
                     amount={value}
                     currencySymbol={currency.symbol}
-                    currencyTicker={currency.name}
+                    currencyTicker={currency.id}
                     significantDigits={currency.significantDigits}
                   />
                 </Typography>
@@ -52,7 +51,7 @@ export function BalanceTableRow(props: TableRowComponentProps<Balance>) {
                   <AmountBlock
                     amount={price?.value}
                     currencySymbol={currency.symbol}
-                    currencyTicker={currency.name}
+                    currencyTicker={currency.id}
                     significantDigits={currency.maxDigits}
                   />
                 </Typography>
@@ -78,7 +77,7 @@ export function BalanceTableRow(props: TableRowComponentProps<Balance>) {
         <AmountBlock
           amount={price?.value}
           currencySymbol={currency.symbol}
-          currencyTicker={currency.name}
+          currencyTicker={currency.id}
           significantDigits={currency.maxDigits}
         />
       </TableCell>
@@ -86,7 +85,7 @@ export function BalanceTableRow(props: TableRowComponentProps<Balance>) {
         <AmountBlock
           amount={value}
           currencySymbol={currency.symbol}
-          currencyTicker={currency.name}
+          currencyTicker={currency.id}
           significantDigits={currency.maxDigits}
         />
       </TableCell>

@@ -242,12 +242,12 @@ export const theme: CssVarsThemeOptions = {
       },
       styleOverrides: {
         paperAnchorLeft: {
-          // borderBottomRightRadius: 16,
-          // borderLeft: "none",
-          // borderTopRightRadius: 16,
-          border: 0,
-          borderRadius: 16,
-          left: 8,
+          borderBottom: "none",
+          borderBottomRightRadius: 16,
+          borderLeft: "none",
+          borderTop: "none",
+          borderTopRightRadius: 16,
+          left: 0,
         },
         paperAnchorRight: {
           borderBottom: "none",
@@ -350,6 +350,11 @@ export const theme: CssVarsThemeOptions = {
     MuiSkeleton: {
       defaultProps: {
         animation: "wave",
+      },
+    },
+    MuiSwipeableDrawer: {
+      defaultProps: {
+        elevation: 2,
       },
     },
     MuiSwitch: {

@@ -4,6 +4,7 @@ import { AppBar, Button, Container, Grid, Stack, Toolbar } from "@mui/material"
 import React from "react"
 import { Link } from "react-router-dom"
 
+import { CurrencySelector } from "../CurrencySelector"
 import { TaskDropdown } from "../Tasks/TaskDropdown"
 import { AccountPicker } from "./AccountPicker"
 import { Logo } from "./Logo"
@@ -57,7 +58,10 @@ export function Header() {
               justifyContent="flex-end"
             >
               <TaskDropdown />
-              <SettingsDrawer />
+              <CurrencySelector />
+              <Grid item sx={{ display: { sm: "block", xs: "none" } }}>
+                <SettingsDrawer />
+              </Grid>
               <AccountPicker />
             </Grid>
           </Grid>
