@@ -1,6 +1,5 @@
-import { AddRounded, RemoveRounded, Visibility, ArrowRightAltRounded } from "@mui/icons-material"
-import { IconButton, Avatar, Stack, TableCell, TableRow, Tooltip, Box, Button } from "@mui/material"
-import { useStore } from "@nanostores/react"
+import { AddRounded, ArrowRightAltRounded, RemoveRounded, Visibility } from "@mui/icons-material"
+import { Box, Button, IconButton, Stack, TableCell, TableRow, Tooltip } from "@mui/material"
 import React from "react"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AmountBlock } from "src/components/AmountBlock"
@@ -45,11 +44,23 @@ export function AuditLogTableRow(props: TableRowComponentProps<AuditLog>) {
           {...rest}
         >
           <TableCell sx={{ width: "100%" }}>
-            <Stack direction="column" justifyContent="space-between" alignItems="flex-start" gap={1}>
+            <Stack
+              direction="column"
+              justifyContent="space-between"
+              alignItems="flex-start"
+              gap={1}
+            >
               <Box sx={{ color: "text.secondary" }}>
                 <TimestampBlock timestamp={timestamp} relative={relativeTime} />
               </Box>
-              <Stack direction="row" gap={4} paddingY={1} sx={{ fontSize: "18px", width: "100%" }} justifyContent="space-between" alignItems="center">
+              <Stack
+                direction="row"
+                gap={4}
+                paddingY={1}
+                sx={{ fontSize: "18px", width: "100%" }}
+                justifyContent="space-between"
+                alignItems="center"
+              >
                 {operation === "Funding Fee" ? (
                   <ActionBlock
                     action={operation}
@@ -60,16 +71,20 @@ export function AuditLogTableRow(props: TableRowComponentProps<AuditLog>) {
                 ) : (
                   <ActionBlock action={operation} size="medium" />
                 )}
-                <Stack direction="row" gap={1} paddingY={1} sx={{ fontSize: "18px" }} alignItems="center">
+                <Stack
+                  direction="row"
+                  gap={1}
+                  paddingY={1}
+                  sx={{ fontSize: "18px" }}
+                  alignItems="center"
+                >
                   <AmountBlock
                     amount={change}
                     showSign
                     colorized
                     currencyTicker={getAssetTicker(assetId)}
                   />
-                  {showAssetColumn && (
-                    <AssetBlock asset={assetId} size="medium" />
-                  )}
+                  {showAssetColumn && <AssetBlock asset={assetId} size="medium" />}
                 </Stack>
               </Stack>
               <Button size="small" color="primary" onClick={toggleOpen}>

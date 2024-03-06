@@ -8,8 +8,25 @@ export function NavMenuItem({
   ...props
 }: MenuItemProps<typeof NavLink> & { avatar?: React.ReactNode; label: string; value: string }) {
   return (
-    <MenuItem sx={{ minWidth: 240 }} component={NavLink} LinkComponent={NavLink} {...props}>
-      {avatar && <ListItemAvatar sx={{ marginRight: 2, minWidth: 0 }}>{avatar}</ListItemAvatar>}
+    <MenuItem
+      sx={{ alignContent: "center", minWidth: 240 }}
+      component={NavLink}
+      LinkComponent={NavLink}
+      {...props}
+    >
+      {avatar && (
+        <ListItemAvatar
+          sx={{
+            alignItems: "center",
+            display: "flex",
+            justifyContent: "center",
+            marginRight: 2,
+            minWidth: 0,
+          }}
+        >
+          {avatar}
+        </ListItemAvatar>
+      )}
       <ListItemText primary={label} />
     </MenuItem>
   )

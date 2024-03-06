@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */ // TODO
 import { Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
@@ -93,9 +94,9 @@ export default function AssetPage({ show }: { show: boolean }) {
           <AmountBlock
             amount={row?.value}
             currencySymbol={currency.symbol}
-            currencyTicker={currency.name}
             significantDigits={currency.maxDigits}
             maxDigits={currency.maxDigits}
+            currencyTicker={currency.id}
           />
         </Stack>
       </Stack>

@@ -38,7 +38,7 @@ export function BalanceTableRow(props: TableRowComponentProps<Balance>) {
                   <AmountBlock
                     amount={value}
                     currencySymbol={currency.symbol}
-                    currencyTicker={currency.name}
+                    currencyTicker={currency.id}
                     significantDigits={currency.significantDigits}
                     maxDigits={currency.maxDigits}
                   />
@@ -52,7 +52,7 @@ export function BalanceTableRow(props: TableRowComponentProps<Balance>) {
                   <AmountBlock
                     amount={price?.value}
                     currencySymbol={currency.symbol}
-                    currencyTicker={currency.name}
+                    currencyTicker={currency.id}
                     significantDigits={currency.maxDigits}
                     maxDigits={currency.maxDigits}
                   />
@@ -79,7 +79,7 @@ export function BalanceTableRow(props: TableRowComponentProps<Balance>) {
         <AmountBlock
           amount={price?.value}
           currencySymbol={currency.symbol}
-          currencyTicker={currency.name}
+          currencyTicker={currency.id}
           significantDigits={currency.maxDigits}
           maxDigits={currency.maxDigits}
         />
@@ -88,7 +88,7 @@ export function BalanceTableRow(props: TableRowComponentProps<Balance>) {
         <AmountBlock
           amount={value}
           currencySymbol={currency.symbol}
-          currencyTicker={currency.name}
+          currencyTicker={currency.id}
           significantDigits={currency.maxDigits}
           maxDigits={currency.maxDigits}
         />

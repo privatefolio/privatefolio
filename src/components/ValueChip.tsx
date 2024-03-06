@@ -35,7 +35,7 @@ export function ValueChip(props: ValueChipProps) {
         <AmountBlock
           amount={value}
           currencySymbol={currency.symbol}
-          currencyTicker={currency.name}
+          currencyTicker={currency.id}
           significantDigits={currency.maxDigits}
           maxDigits={currency.maxDigits}
         />

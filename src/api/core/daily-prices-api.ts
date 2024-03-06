@@ -59,8 +59,6 @@ export async function getPricesForAsset(assetId: string, timestamp?: Timestamp) 
 export async function getAssetPriceMap(timestamp: Timestamp) {
   await indexDailyPrices()
 
-  console.log('timestamp', timestamp)
-
   const day: Timestamp = timestamp - (timestamp % 86400000)
 
   const _req: PouchDB.Find.FindRequest<SavedPrice> = {

@@ -1,12 +1,13 @@
 import { MenuRounded } from "@mui/icons-material"
-import { Box, IconButton, InputBase, Select, tabsClasses, Tooltip } from "@mui/material"
+import { Box, Drawer, IconButton, tabsClasses, Tooltip } from "@mui/material"
 import React from "react"
 import { useLocation } from "react-router-dom"
+import { APP_VERSION, GIT_HASH } from "src/env"
 import { useBoolean } from "src/hooks/useBoolean"
 
-import { NavMenuItem } from "../NavMenuItem"
 import { NavTab } from "../NavTab"
 import { Tabs } from "../Tabs"
+import { MenuDrawerContents } from "./MenuDrawerContents"
 
 export function NavigationMenu() {
   const location = useLocation()
@@ -21,35 +22,31 @@ export function NavigationMenu() {
   return (
     <>
       <Box sx={{ display: { sm: "none" } }}>
-        <Select
-          open={open}
-          onClose={toggleOpen}
-          onOpen={toggleOpen}
-          value={overriddenPathname || ""}
-          IconComponent={() => false}
-          input={
-            <InputBase sx={{ height: 36, position: "absolute", visibility: "hidden", width: 30 }} />
-          }
-        >
-          <NavMenuItem value="" to={`/u/${accountIndex}/`} label="Home" />
-          <NavMenuItem value="assets" to={`/u/${accountIndex}/assets`} label="Assets" />
-          <NavMenuItem
-            value="transactions"
-            to={`/u/${accountIndex}/transactions`}
-            label="Transactions"
-          />
-          <NavMenuItem value="audit-logs" to={`/u/${accountIndex}/audit-logs`} label="Audit logs" />
-          <NavMenuItem
-            value="import-data"
-            to={`/u/${accountIndex}/import-data`}
-            label="Import data"
-          />
-        </Select>
         <Tooltip title="Navigation menu">
           <IconButton edge="start" onClick={toggleOpen} color="secondary">
             <MenuRounded fontSize="small" />
           </IconButton>
         </Tooltip>
+        <Drawer
+          keepMounted
+          open={open}
+          anchor="left"
+          // transitionDuration={500}
+          // TODO this should have a delay
+          onClose={toggleOpen}
+          sx={{
+            "& .MuiPaper-root": {
+              width: "calc(100% - 80px)",
+            },
+          }}
+        >
+          <MenuDrawerContents
+            open={open}
+            toggleOpen={toggleOpen}
+            appVer={APP_VERSION}
+            gitHash={GIT_HASH}
+          />
+        </Drawer>
       </Box>
       <Tabs
         value={overriddenPathname}

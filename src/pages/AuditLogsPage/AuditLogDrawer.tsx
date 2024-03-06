@@ -126,14 +126,12 @@ export function AuditLogDrawer(props: AuditLogDrawerProps) {
               fontWeight={300}
               letterSpacing={0.5}
             >
-              (
               <AmountBlock
                 amount={priceMap[assetId]?.value * changeN}
                 currencySymbol={currency.symbol}
-                currencyTicker={currency.name}
+                currencyTicker={currency.id}
                 significantDigits={currency.maxDigits}
               />
-              )
             </Typography>
           )}
         </div>
@@ -158,14 +156,12 @@ export function AuditLogDrawer(props: AuditLogDrawerProps) {
               fontWeight={300}
               letterSpacing={0.5}
             >
-              (
               <AmountBlock
                 amount={priceMap[assetId]?.value * balanceN}
                 currencySymbol={currency.symbol}
-                currencyTicker={currency.name}
+                currencyTicker={currency.id}
                 significantDigits={currency.maxDigits}
               />
-              )
             </Typography>
           )}
         </div>
