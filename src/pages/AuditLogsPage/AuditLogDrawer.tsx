@@ -11,6 +11,7 @@ import { IdentifierBlock } from "src/components/IdentifierBlock"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TimestampBlock } from "src/components/TimestampBlock"
+import { ValueChip } from "src/components/ValueChip"
 import { AuditLog, ChartData } from "src/interfaces"
 import { $baseCurrency } from "src/stores/account-settings-store"
 import { $activeIndex } from "src/stores/account-store"
@@ -102,68 +103,57 @@ export function AuditLogDrawer(props: AuditLogDrawerProps) {
         </div>
         <div>
           <SectionTitle>Change</SectionTitle>
-          <Stack direction="row" alignItems="center" gap={1}>
+          <Stack direction="row" alignItems="center" gap={0.25}>
             <AmountBlock
               colorized
               amount={change}
               showSign
               currencyTicker={getAssetTicker(assetId)}
+              variant="body1"
             />
             <Button
               size="small"
               component={AppLink}
               to={`../asset/${encodeURI(assetId)}`}
-              sx={{ paddingX: 2 }}
+              sx={{ fontSize: "0.9rem", paddingX: 1 }}
             >
-              <AssetBlock asset={assetId} />
+              <AssetBlock asset={assetId} size="small" />
             </Button>
+            <ValueChip
+              value={
+                priceMap && changeN && priceMap[assetId]?.value
+                  ? priceMap[assetId].value * changeN
+                  : undefined
+              }
+            />
           </Stack>
-          <Stack direction="row" gap={1}></Stack>
-          {!!(priceMap && changeN && priceMap[assetId]?.value) && (
-            <Typography
-              color="text.secondary"
-              variant="caption"
-              fontWeight={300}
-              letterSpacing={0.5}
-            >
-              <AmountBlock
-                amount={priceMap[assetId]?.value * changeN}
-                currencySymbol={currency.symbol}
-                currencyTicker={currency.id}
-                significantDigits={currency.maxDigits}
-              />
-            </Typography>
-          )}
         </div>
         <div>
           <SectionTitle>New balance</SectionTitle>
-          <Stack direction="row" alignItems="center" gap={1}>
-            <AmountBlock colorized amount={balance} currencyTicker={getAssetTicker(assetId)} />
+          <Stack direction="row" alignItems="center" gap={0.25}>
+            <AmountBlock
+              colorized
+              amount={balance}
+              currencyTicker={getAssetTicker(assetId)}
+              showSign
+              variant="body1"
+            />
             <Button
               size="small"
               component={AppLink}
               to={`../asset/${encodeURI(assetId)}`}
-              sx={{ paddingX: 2 }}
+              sx={{ fontSize: "0.9rem", padding: 1 }}
             >
-              <AssetBlock asset={assetId} />
+              <AssetBlock asset={assetId} size="small" />
             </Button>
+            <ValueChip
+              value={
+                priceMap && balanceN && priceMap[assetId]?.value
+                  ? priceMap[assetId].value * balanceN
+                  : undefined
+              }
+            />
           </Stack>
-          <Stack direction="row" gap={1}></Stack>
-          {!!(priceMap && balanceN && priceMap[assetId]?.value) && (
-            <Typography
-              color="text.secondary"
-              variant="caption"
-              fontWeight={300}
-              letterSpacing={0.5}
-            >
-              <AmountBlock
-                amount={priceMap[assetId]?.value * balanceN}
-                currencySymbol={currency.symbol}
-                currencyTicker={currency.id}
-                significantDigits={currency.maxDigits}
-              />
-            </Typography>
-          )}
         </div>
         {txId && (
           <div>
