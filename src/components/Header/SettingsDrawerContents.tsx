@@ -1,7 +1,6 @@
-import { CloseRounded, GitHub, OpenInNew, Telegram, Twitter } from "@mui/icons-material"
+import { GitHub, OpenInNew, Telegram, Twitter } from "@mui/icons-material"
 import {
   FormControlLabel,
-  IconButton,
   Link as MuiLink,
   MenuItem,
   Stack,
@@ -13,7 +12,7 @@ import React from "react"
 import { GIT_DATE } from "src/env"
 import { formatDate, formatHour } from "src/utils/formatting-utils"
 
-import { $debugMode, $telemetry, AppVerProps, PopoverToggleProps } from "../../stores/app-store"
+import { $debugMode, $telemetry, AppVerProps } from "../../stores/app-store"
 import { MonoFont } from "../../theme"
 import { SectionTitle } from "../SectionTitle"
 import { ReducedMotion } from "./ReducedMotion"
@@ -45,14 +44,9 @@ const CustomLink = ({ children, ...rest }: any) => (
   </MenuItem>
 )
 
-type MenuContentsProps = AppVerProps & PopoverToggleProps
+type MenuContentsProps = AppVerProps
 
-export const SettingsDrawerContents = ({
-  appVer,
-  gitHash,
-  open,
-  toggleOpen,
-}: MenuContentsProps) => {
+export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) => {
   const debugMode = useStore($debugMode)
   const telemetry = useStore($telemetry)
 
@@ -65,19 +59,6 @@ export const SettingsDrawerContents = ({
       // secondary
       sx={{ overflowX: "hidden" }}
     >
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
-        <Typography variant="subtitle1" letterSpacing="0.025rem">
-          Settings
-        </Typography>
-        <IconButton
-          onClick={toggleOpen}
-          edge="end"
-          color="secondary"
-          sx={{ display: { sm: "block", xs: "none" } }}
-        >
-          <CloseRounded fontSize="small" />
-        </IconButton>
-      </Stack>
       <div>
         <SectionTitle>Theme</SectionTitle>
         <ThemeMode />

@@ -9,7 +9,7 @@ import { useBoolean } from "src/hooks/useBoolean"
 
 import { AppVerProps, PopoverToggleProps } from "../../stores/app-store"
 import { NavMenuItem } from "../NavMenuItem"
-import { SettingsMenuDrawer } from "./SettingsMenuDrawer"
+import { SettingsMenuDrawer } from "./SettingsDrawerMobile"
 
 type MenuContentsProps = AppVerProps & PopoverToggleProps
 

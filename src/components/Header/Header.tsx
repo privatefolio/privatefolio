@@ -1,15 +1,15 @@
 "use client"
 
-import { AppBar, Button, Container, Grid, Stack, Toolbar } from "@mui/material"
+import { AppBar, Box, Button, Container, Grid, Stack, Toolbar } from "@mui/material"
 import React from "react"
 import { Link } from "react-router-dom"
 
-import { CurrencySelector } from "../CurrencySelector"
 import { TaskDropdown } from "../Tasks/TaskDropdown"
 import { AccountPicker } from "./AccountPicker"
+import { AccountPickerDrawer } from "./AccountPickerDrawer"
 import { Logo } from "./Logo"
 import { NavigationMenu } from "./NavigationMenu"
-import { SettingsDrawer } from "./SettingsDrawer"
+import { SettingsDrawer } from "./SettingsDrawerDesktop"
 
 export function Header() {
   return (
@@ -58,11 +58,16 @@ export function Header() {
               justifyContent="flex-end"
             >
               <TaskDropdown />
-              <CurrencySelector />
-              <Grid item sx={{ display: { sm: "block", xs: "none" } }}>
+              {/* <CurrencySelector /> */}
+              <Box sx={{ display: { sm: "block", xs: "none" } }}>
                 <SettingsDrawer />
-              </Grid>
-              <AccountPicker />
+              </Box>
+              <Box sx={{ display: { sm: "block", xs: "none" } }}>
+                <AccountPicker />
+              </Box>
+              <Box sx={{ display: { sm: "none", xs: "block" } }}>
+                <AccountPickerDrawer />
+              </Box>
             </Grid>
           </Grid>
         </Container>

@@ -1,4 +1,4 @@
-import { styled, SwipeableDrawer } from "@mui/material"
+import { styled, SwipeableDrawer, Typography } from "@mui/material"
 import { grey } from "@mui/material/colors"
 import React from "react"
 import { APP_VERSION, GIT_HASH } from "src/env"
@@ -35,12 +35,15 @@ export function SettingsMenuDrawer(props: PopoverToggleProps) {
         }}
       >
         <Puller />
-        <SettingsDrawerContents
-          open={open}
-          toggleOpen={toggleOpen}
-          appVer={APP_VERSION}
-          gitHash={GIT_HASH}
-        />
+        <Typography
+          variant="subtitle1"
+          letterSpacing="0.025rem"
+          align="center"
+          sx={{ paddingTop: "1rem" }}
+        >
+          Settings
+        </Typography>
+        <SettingsDrawerContents appVer={APP_VERSION} gitHash={GIT_HASH} />
       </SwipeableDrawer>
     </>
   )
