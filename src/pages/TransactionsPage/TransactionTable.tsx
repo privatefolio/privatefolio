@@ -1,6 +1,7 @@
-import { Box } from "@mui/material"
-import React, { useCallback, useMemo } from "react"
+import { Box, Stack } from "@mui/material"
+import React, { useCallback, useMemo, useState } from "react"
 import { FilterChip } from "src/components/FilterChip"
+import { Subheading } from "src/components/Subheading"
 import { $activeAccount } from "src/stores/account-store"
 import { stringToColor } from "src/utils/color-utils"
 
@@ -12,6 +13,7 @@ import {
 import { Transaction } from "../../interfaces"
 import { HeadCell } from "../../utils/table-utils"
 import { clancy } from "../../workers/remotes"
+import { ExportTransactionsToCsvOptions } from "./ExportTransactionsToCsvOptions"
 import { TransactionTableRow } from "./TransactionTableRow"
 
 interface TransactionsTableProps extends Pick<RemoteTableProps<Transaction>, "defaultRowsPerPage"> {
@@ -21,6 +23,8 @@ interface TransactionsTableProps extends Pick<RemoteTableProps<Transaction>, "de
 
 export function TransactionTable(props: TransactionsTableProps) {
   const { assetId, id, ...rest } = props
+
+  const [transactionsFiltered, setTransactionsFiltered] = useState<Transaction[]>([])
 
   const queryFn: QueryFunction<Transaction> = useCallback(
     async (filters, rowsPerPage, page, order) => {
@@ -45,6 +49,8 @@ export function TransactionTable(props: TransactionsTableProps) {
         },
         $activeAccount.get()
       )
+
+      setTransactionsFiltered(transactions)
 
       return [
         transactions,
@@ -136,6 +142,10 @@ export function TransactionTable(props: TransactionsTableProps) {
 
   return (
     <>
+      <Stack direction="row" justifyContent="space-between">
+        <Subheading>Transactions</Subheading>
+        <ExportTransactionsToCsvOptions transactionsFiltered={transactionsFiltered} />
+      </Stack>
       {id && (
         <Box
           sx={{

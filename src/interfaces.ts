@@ -52,6 +52,7 @@ export interface Transaction {
   incoming?: string
   incomingAsset?: string
   incomingN?: number
+  notes?: string
   outgoing?: string
   outgoingAsset?: string
   outgoingN?: number
@@ -63,7 +64,6 @@ export interface Transaction {
   txHash?: string
   type: TransactionType
   wallet: string
-  notes?: string
 }
 
 export interface EtherscanTransaction extends Transaction {
