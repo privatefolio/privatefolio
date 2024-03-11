@@ -39,14 +39,7 @@ export function ExportTransactionsToCsvOptions(props: filteredData) {
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
       >
-        <MenuItem
-          dense
-          onClick={() => {
-            handleClose()
-          }}
-        >
-          <GetAllTransactions />
-        </MenuItem>
+        <GetAllTransactions handleClose={handleClose} />
         <MenuItem
           dense
           onClick={() => {

@@ -39,14 +39,7 @@ export function ExportToCsvOptions(props: filteredData) {
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
       >
-        <MenuItem
-          dense
-          onClick={() => {
-            handleClose()
-          }}
-        >
-          <GetAllAuditLogs />
-        </MenuItem>
+        <GetAllAuditLogs handleClose={handleClose} />
         <MenuItem
           dense
           onClick={() => {
