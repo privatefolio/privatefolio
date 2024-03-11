@@ -1,6 +1,7 @@
 import ExitToAppRoundedIcon from "@mui/icons-material/ExitToAppRounded"
-import { CircularProgress, ListItemIcon, ListItemText, MenuItem, Stack } from "@mui/material"
+import { ListItemIcon, ListItemText, MenuItem, Stack } from "@mui/material"
 import React, { useState } from "react"
+import { CircularSpinner } from "src/components/CircularSpinner"
 import ExportToCsv, { CsvData } from "src/components/ExportToCsv"
 import { $activeAccount } from "src/stores/account-store"
 import { formatDateWithHour } from "src/utils/formatting-utils"
@@ -20,7 +21,7 @@ export function GetAllAuditLogs(props: handleClose) {
       <MenuItem dense disabled>
         <Stack direction="row">
           <ListItemIcon>
-            <CircularProgress size="1rem" />
+            <CircularSpinner size={18} />
           </ListItemIcon>
           <ListItemText>Generating...</ListItemText>
         </Stack>
@@ -49,8 +50,6 @@ export function GetAllAuditLogs(props: handleClose) {
               x.balance,
               x.txId,
             ])
-
-            // setTimeout(() => {
             setData([
               [
                 "Identifier",
@@ -65,7 +64,6 @@ export function GetAllAuditLogs(props: handleClose) {
               ...rows,
             ])
             setLoading(false)
-            // }, 11115000)
           })
         }}
       >

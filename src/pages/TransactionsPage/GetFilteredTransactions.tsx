@@ -48,7 +48,7 @@ export function GetFilteredTransactions(props: filteredData) {
     <ExportToCsv
       data={data}
       filename="transactions.csv"
-      text="Export to csv. current transactions"
+      text="Download csv. with current transactions"
     />
   )
 }

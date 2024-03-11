@@ -37,6 +37,10 @@ export function GetFilteredAuditLogs(props: filteredData) {
   ]
 
   return (
-    <ExportToCsv data={data} filename="audit-logs.csv" text="Export to csv. current audit logs" />
+    <ExportToCsv
+      data={data}
+      filename="audit-logs.csv"
+      text="Download csv. with current audit logs"
+    />
   )
 }

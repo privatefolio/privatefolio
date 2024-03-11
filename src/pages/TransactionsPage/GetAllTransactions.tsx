@@ -1,6 +1,7 @@
 import ExitToAppRoundedIcon from "@mui/icons-material/ExitToAppRounded"
-import { CircularProgress, ListItemIcon, ListItemText, MenuItem, Stack } from "@mui/material"
+import { ListItemIcon, ListItemText, MenuItem, Stack } from "@mui/material"
 import React, { useState } from "react"
+import { CircularSpinner } from "src/components/CircularSpinner"
 import ExportToCsv, { CsvData } from "src/components/ExportToCsv"
 import { EtherscanTransaction } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
@@ -21,7 +22,7 @@ export function GetAllTransactions(props: handleClose) {
       <MenuItem dense disabled>
         <Stack direction="row">
           <ListItemIcon>
-            <CircularProgress size="1rem" />
+            <CircularSpinner size={18} />
           </ListItemIcon>
           <ListItemText>Generating...</ListItemText>
         </Stack>
@@ -136,7 +137,7 @@ export function GetAllTransactions(props: handleClose) {
           <ExportToCsv
             data={data}
             filename="transactions.csv"
-            text="Export to csv. all transactions"
+            text="Download csv. with all transactions"
           />
         </MenuItem>
       </>
