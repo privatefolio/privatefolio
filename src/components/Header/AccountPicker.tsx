@@ -1,32 +1,26 @@
 import { Add } from "@mui/icons-material"
 import {
   Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   IconButton,
   InputBase,
   ListItemAvatar,
   ListItemText,
   MenuItem,
   Select,
-  TextField,
   Tooltip,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { proxy } from "comlink"
-import React, { useCallback, useEffect, useState } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import React, { useEffect } from "react"
+import { useLocation } from "react-router-dom"
 import { useBoolean } from "src/hooks/useBoolean"
 import { $accountReset, $accounts, $activeAccount } from "src/stores/account-store"
 import { computeMetadata, computeMetadataDebounced } from "src/stores/metadata-store"
 import { clancy } from "src/workers/remotes"
 
 import { AccountAvatar } from "../AccountAvatar"
+import { AddAccount } from "../AddAccount"
 import { NavMenuItem } from "../NavMenuItem"
-import { SectionTitle } from "../SectionTitle"
 
 export function AccountPicker() {
   const accounts = useStore($accounts)
@@ -53,34 +47,6 @@ export function AccountPicker() {
   }, [accountReset, activeAccount])
 
   const { value: modalOpen, toggle: toggleModalOpen } = useBoolean(false)
-  const [name, setName] = useState("")
-  const [error, setError] = useState("")
-
-  const navigate = useNavigate()
-
-  const handleSubmit = useCallback(() => {
-    const nameTrimmed = name.trim()
-    if (nameTrimmed === "") {
-      setError("This field cannot be empty")
-      return
-    }
-
-    const exists = accounts.find((x) => x === nameTrimmed)
-    if (exists) {
-      setError("This name is already being used")
-      return
-    }
-
-    $accounts.set([...accounts, nameTrimmed])
-    toggleModalOpen()
-    setError("")
-    setName("")
-    navigate(`/u/${accounts.length}/import-data`)
-    // HACK: this is a hack to make sure the active account is set after the navigation
-    setTimeout(() => {
-      $activeAccount.set(nameTrimmed)
-    }, 0)
-  }, [accounts, name, toggleModalOpen, navigate])
 
   return (
     <Box>
@@ -186,36 +152,7 @@ export function AccountPicker() {
           </Stack>
         </Drawer>
       </Portal> */}
-      <Dialog open={modalOpen} onClose={toggleModalOpen}>
-        <form onSubmit={handleSubmit}>
-          <DialogTitle>
-            <span>Add Account</span>
-          </DialogTitle>
-          <DialogContent sx={{ minWidth: 320 }}>
-            <div>
-              <SectionTitle>Name *</SectionTitle>
-              <TextField
-                autoFocus
-                variant="outlined"
-                fullWidth
-                size="small"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                error={!!error}
-                helperText={error}
-              />
-            </div>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={toggleModalOpen} color="secondary" sx={{ paddingX: 2 }}>
-              Cancel
-            </Button>
-            <Button type="submit" color="primary" sx={{ paddingX: 2 }}>
-              Create
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
+      <AddAccount modalOpen={modalOpen} toggleModalOpen={toggleModalOpen} />
     </Box>
   )
 }
