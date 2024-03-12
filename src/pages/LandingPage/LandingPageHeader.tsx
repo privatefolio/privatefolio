@@ -14,7 +14,11 @@ export default function LandingPageHeader() {
       <AppBar
         position="static"
         elevation={0}
-        sx={{ background: "none !important", border: "none" }}
+        sx={{
+          background: "none !important",
+          border: "none",
+          color: "var(--mui-palette-primary-main) !important",
+        }}
       >
         <Toolbar disableGutters>
           <Container

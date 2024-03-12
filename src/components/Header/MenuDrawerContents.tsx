@@ -1,14 +1,15 @@
-import { CloseRounded, Settings, StorageRounded, SwapHoriz } from "@mui/icons-material"
+import { Settings, StorageRounded, SwapHoriz } from "@mui/icons-material"
 import AttachFileRoundedIcon from "@mui/icons-material/AttachFileRounded"
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
 import WebAssetRoundedIcon from "@mui/icons-material/WebAssetRounded"
-import { Button, IconButton, Stack, Typography } from "@mui/material"
+import { Button, Stack, Typography } from "@mui/material"
 import React from "react"
-import { useLocation } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { useBoolean } from "src/hooks/useBoolean"
 
 import { AppVerProps, PopoverToggleProps } from "../../stores/app-store"
 import { NavMenuItem } from "../NavMenuItem"
+import { Logo } from "./Logo"
 import { SettingsMenuDrawer } from "./SettingsDrawerMobile"
 
 type MenuContentsProps = AppVerProps & PopoverToggleProps
@@ -33,10 +34,20 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
         justifyContent="space-between"
       >
         <Stack>
-          <Stack direction="row" justifyContent="flex-end">
-            <IconButton onClick={toggleOpen} edge="end" color="secondary">
-              <CloseRounded fontSize="small" />
-            </IconButton>
+          <Stack direction="row" justifyContent="flex-between" paddingBottom={4}>
+            <Button
+              to="/"
+              aria-label="Visit Homepage"
+              component={Link}
+              sx={{
+                borderRadius: 8,
+                marginLeft: -1,
+                padding: 1,
+                textTransform: "none",
+              }}
+            >
+              <Logo />
+            </Button>
           </Stack>
           <NavMenuItem
             value=""
