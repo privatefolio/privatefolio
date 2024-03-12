@@ -4,6 +4,7 @@ import { useStore } from "@nanostores/react"
 import { proxy } from "comlink"
 import { debounce } from "lodash-es"
 import React, { useEffect, useMemo, useState } from "react"
+import { InformativeRowHiddenBalances } from "src/components/InformativeRowHiddenBalances"
 import { DEFAULT_DEBOUNCE_DURATION } from "src/settings"
 import { $hideSmallBalances, $hideSmallBalancesMap } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
@@ -23,19 +24,32 @@ import { BalanceTableRow } from "./BalanceTableRow"
 export default function BalancesPage({ show }: { show: boolean }) {
   const [queryTime, setQueryTime] = useState<number | null>(null)
   const [rows, setRows] = useState<Balance[]>([])
+  const [hiddenBalances, setHiddenBalances] = useState<number>(0)
 
   const hideSmallBalances = useStore($hideSmallBalances)
   const inspectTime = useStore($inspectTime)
   const activeAccount = useStore($activeAccount)
 
+  // if (hideSmallBalances) {
+  //   return balances.filter((x) => x.value && (x.value > 0.1 || x.value < -0.1))
+  // }
+
   useEffect(() => {
     function fetchData() {
       const start = Date.now()
-      clancy.getBalancesAt(inspectTime, activeAccount, hideSmallBalances).then((balances) => {
+      clancy.getBalancesAt(inspectTime, activeAccount).then((allBalances) => {
         // fetch no longer accurate
         if (activeAccount !== $activeAccount.get()) return
         setQueryTime(Date.now() - start)
-        setRows(balances)
+
+        const visibleBalances = hideSmallBalances
+          ? allBalances.filter((x) => x.value && (x.value > 0.1 || x.value < -0.1))
+          : allBalances
+
+        setRows(visibleBalances)
+        setHiddenBalances(allBalances.length - visibleBalances.length)
+
+        console.log("Balances", allBalances)
       })
     }
 
@@ -93,7 +107,7 @@ export default function BalancesPage({ show }: { show: boolean }) {
 
   return (
     <StaggeredList component="main" gap={4} show={show}>
-      {queryTime !== null && rows.length === 0 ? null : (
+      {queryTime !== null && rows.length === 0 && hiddenBalances === 0 ? null : (
         <div>
           <Subheading>
             <span>Net worth</span>
@@ -137,8 +151,14 @@ export default function BalancesPage({ show }: { show: boolean }) {
           headCells={headCells}
           TableRowComponent={BalanceTableRow}
           rows={rows}
+          rowCount={rows.length + hiddenBalances}
           defaultRowsPerPage={10}
           queryTime={queryTime}
+          extraRow={
+            hiddenBalances ? (
+              <InformativeRowHiddenBalances hiddenBalancesN={hiddenBalances} />
+            ) : undefined
+          }
         />
       </div>
     </StaggeredList>

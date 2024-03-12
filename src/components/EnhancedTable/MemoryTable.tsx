@@ -69,9 +69,11 @@ export type MemoryTableProps<T extends BaseType> = {
    */
   defaultRowsPerPage?: number
   emptyContent?: JSX.Element
+  extraRow?: JSX.Element
   headCells: HeadCell<T>[]
   initOrderBy: keyof T
   queryTime?: number | null
+  rowCount?: number
   rows: T[]
 }
 
@@ -85,6 +87,8 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
     initOrderBy,
     queryTime,
     emptyContent = <NoDataButton />,
+    extraRow,
+    rowCount = rows.length,
   } = props
 
   const [order, setOrder] = useState<Order>("desc")
@@ -171,7 +175,7 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
   const stickyVersion = rowsPerPage > 20
 
   const isLoading = queryTime === null
-  const isEmpty = rows.length === 0
+  const isEmpty = rowCount === 0
 
   return (
     <>
@@ -264,6 +268,13 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
                   <TableRow>
                     <TableCell colSpan={headCells.length} variant="clickable">
                       {addNewRow}
+                    </TableCell>
+                  </TableRow>
+                )}
+                {!isLoading && extraRow && !isEmpty && (
+                  <TableRow>
+                    <TableCell colSpan={headCells.length} variant="clickable">
+                      {extraRow}
                     </TableCell>
                   </TableRow>
                 )}
