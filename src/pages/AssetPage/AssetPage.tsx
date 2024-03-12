@@ -43,7 +43,7 @@ export default function AssetPage({ show }: { show: boolean }) {
 
   useEffect(() => {
     function fetchData() {
-      clancy.getBalancesAt(undefined, activeAccount, false).then((balances) => {
+      clancy.getBalancesAt(undefined, activeAccount).then((balances) => {
         // fetch no longer accurate
         if (activeAccount !== $activeAccount.get()) return
         setRows(balances)
