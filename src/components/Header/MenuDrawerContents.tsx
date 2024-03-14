@@ -1,9 +1,10 @@
 import { Settings, StorageRounded, SwapHoriz } from "@mui/icons-material"
 import AttachFileRoundedIcon from "@mui/icons-material/AttachFileRounded"
+import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded"
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
 import WebAssetRoundedIcon from "@mui/icons-material/WebAssetRounded"
-import { Button, Stack, Typography } from "@mui/material"
-import React from "react"
+import { Button, Stack, Typography, useMediaQuery } from "@mui/material"
+import React, { useEffect, useState } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { useBoolean } from "src/hooks/useBoolean"
 
@@ -14,9 +15,42 @@ import { SettingsMenuDrawer } from "./SettingsDrawerMobile"
 
 type MenuContentsProps = AppVerProps & PopoverToggleProps
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>
+  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>
+}
+
 export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuContentsProps) => {
   // const debugMode = useStore($debugMode)
   // const telemetry = useStore($telemetry)
+
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null)
+  const isInstalled = useMediaQuery("(display-mode: standalone)")
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault()
+      setInstallPrompt(e as BeforeInstallPromptEvent)
+    }
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
+
+    return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
+  }, [])
+
+  const promptInstall = () => {
+    if (installPrompt) {
+      installPrompt.prompt()
+      installPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === "accepted") {
+          console.log("User accepted the install prompt")
+        } else {
+          console.log("User dismissed the install prompt")
+        }
+        setInstallPrompt(null)
+      })
+    }
+  }
 
   const location = useLocation()
   const { pathname } = location
@@ -86,21 +120,23 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
           />
         </Stack>
         <Stack>
-          {/* <Button
+          <Button
             color="secondary"
             sx={{
               direction: "row",
               justifyContent: "flex-start",
               transition: "transform 0.33s",
+              visibility: isInstalled ? "hidden" : "visible",
             }}
+            onClick={promptInstall}
           >
             <Stack display="contents">
               <DownloadRoundedIcon />
               <Typography variant="subtitle1" letterSpacing="0.025rem" paddingLeft="0.3rem">
-                Download the app
+                Install app
               </Typography>
             </Stack>
-          </Button> */}
+          </Button>
           <Button
             color="secondary"
             onClick={() => {

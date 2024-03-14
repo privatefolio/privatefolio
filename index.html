@@ -16,8 +16,8 @@
   <div id="root"></div>
   <script type="module" src="/src/main.tsx">
     if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/service-worker.js").then((swReg) => {
-    console.log("Service worker Registered")
+      navigator.serviceWorker.register("/service-worker.js").then((swReg) => {
+      console.log("Service worker Registered")
   })
 } else {
   console.warn("Service workers aren't supported in this browser.")
