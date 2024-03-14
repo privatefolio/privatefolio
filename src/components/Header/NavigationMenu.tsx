@@ -1,5 +1,5 @@
 import { MenuRounded } from "@mui/icons-material"
-import { Box, Drawer, IconButton, tabsClasses, Tooltip } from "@mui/material"
+import { Box, IconButton, SwipeableDrawer, tabsClasses, Tooltip } from "@mui/material"
 import React from "react"
 import { useLocation } from "react-router-dom"
 import { APP_VERSION, GIT_HASH } from "src/env"
@@ -27,13 +27,15 @@ export function NavigationMenu() {
             <MenuRounded fontSize="small" />
           </IconButton>
         </Tooltip>
-        <Drawer
+        <SwipeableDrawer
           keepMounted
           open={open}
           anchor="left"
           // transitionDuration={500}
           // TODO this should have a delay
+          onOpen={toggleOpen}
           onClose={toggleOpen}
+          disableSwipeToOpen
           sx={{
             "& .MuiPaper-root": {
               width: "calc(100% - 80px)",
@@ -46,7 +48,7 @@ export function NavigationMenu() {
             appVer={APP_VERSION}
             gitHash={GIT_HASH}
           />
-        </Drawer>
+        </SwipeableDrawer>
       </Box>
       <Tabs
         value={overriddenPathname}

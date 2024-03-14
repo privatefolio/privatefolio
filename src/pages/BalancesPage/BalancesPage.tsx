@@ -48,8 +48,6 @@ export default function BalancesPage({ show }: { show: boolean }) {
 
         setRows(visibleBalances)
         setHiddenBalances(allBalances.length - visibleBalances.length)
-
-        console.log("Balances", allBalances)
       })
     }
 
