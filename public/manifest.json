@@ -1,0 +1,16 @@
+{
+    "scope": "/",
+    "id": "privatefolio_0.0.1",
+    "start_url": "/",
+    "display": "standalone",
+    "name": "Privatefolio",
+    "short_name": "Privatefolio",
+    "description": "Your crypto portfolio analytics",
+    "icons": [
+        {
+            "src": "/favicon.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        }
+    ]
+}

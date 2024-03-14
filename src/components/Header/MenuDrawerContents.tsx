@@ -85,34 +85,51 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
             avatar={<AttachFileRoundedIcon />}
           />
         </Stack>
-        <Button
-          color="secondary"
-          onClick={() => {
-            toggleOpen()
-            toggleOpenSettings()
-          }}
-          sx={{
-            direction: "row",
-            justifyContent: "flex-start",
-            marginRight: -1,
-            transition: "transform 0.33s",
-          }}
-        >
-          <Stack display="contents">
-            <Settings
-              fontSize="small"
-              sx={{
-                "&:hover": {
-                  transform: "rotate(-30deg)",
-                },
-                transition: "transform 0.33s",
-              }}
-            />
-            <Typography variant="subtitle1" letterSpacing="0.025rem" paddingLeft="0.5rem">
-              Settings
-            </Typography>
-          </Stack>
-        </Button>
+        <Stack>
+          {/* <Button
+            color="secondary"
+            sx={{
+              direction: "row",
+              justifyContent: "flex-start",
+              transition: "transform 0.33s",
+            }}
+          >
+            <Stack display="contents">
+              <DownloadRoundedIcon />
+              <Typography variant="subtitle1" letterSpacing="0.025rem" paddingLeft="0.3rem">
+                Download the app
+              </Typography>
+            </Stack>
+          </Button> */}
+          <Button
+            color="secondary"
+            onClick={() => {
+              toggleOpen()
+              toggleOpenSettings()
+            }}
+            sx={{
+              direction: "row",
+              justifyContent: "flex-start",
+              marginRight: -1,
+              transition: "transform 0.33s",
+            }}
+          >
+            <Stack display="contents">
+              <Settings
+                fontSize="small"
+                sx={{
+                  "&:hover": {
+                    transform: "rotate(-30deg)",
+                  },
+                  transition: "transform 0.33s",
+                }}
+              />
+              <Typography variant="subtitle1" letterSpacing="0.025rem" paddingLeft="0.5rem">
+                Settings
+              </Typography>
+            </Stack>
+          </Button>
+        </Stack>
         <SettingsMenuDrawer open={openSettings} toggleOpen={toggleOpenSettings} />
       </Stack>
     </>
