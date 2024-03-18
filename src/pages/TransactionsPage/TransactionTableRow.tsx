@@ -43,7 +43,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
     return (
       <>
         <TableRow hover>
-          <TableCell sx={{ width: "100%" }}>
+          <TableCell colSpan={99}>
             <Stack
               direction="column"
               justifyContent="space-between"
