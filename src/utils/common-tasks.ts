@@ -1,4 +1,7 @@
-import { exportTransactionsToCsv } from "src/api/account/file-imports/csv-export-utils"
+import {
+  exportAuditLogsToCsv,
+  exportTransactionsToCsv,
+} from "src/api/account/file-imports/csv-export-utils"
 import { AuditLog, Connection } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 
@@ -261,6 +264,27 @@ export function enqueueExportAllTransactions() {
       downloadCsv(data, "transactions.csv")
     },
     name: "Export all transactions",
+    priority: TaskPriority.Low,
+  })
+}
+
+export function enqueueExportAllAuditLogs() {
+  const taskQueue = $taskQueue.get()
+
+  const existing = taskQueue.find((task) => task.name === "Export all audit logs")
+
+  if (existing) return
+
+  enqueueTask({
+    abortable: true,
+    description: "Export all audit logs.",
+    determinate: true,
+    function: async () => {
+      const auditLogs = await clancy.findAuditLogs({}, $activeAccount.get())
+      const data = exportAuditLogsToCsv(auditLogs)
+      downloadCsv(data, "audit-logs.csv")
+    },
+    name: "Export all audit logs",
     priority: TaskPriority.Low,
   })
 }

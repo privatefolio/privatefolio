@@ -13,8 +13,8 @@ import {
 import { AuditLog } from "../../interfaces"
 import { HeadCell } from "../../utils/table-utils"
 import { clancy } from "../../workers/remotes"
+import { AuditLogActions } from "./AuditLogActions"
 import { AuditLogTableRow } from "./AuditLogTableRow"
-import { ExportToCsvOptions } from "./ExportToCsvOptions"
 
 interface AuditLogsTableProps extends Pick<RemoteTableProps<AuditLog>, "defaultRowsPerPage"> {
   assetId?: string
@@ -24,7 +24,7 @@ interface AuditLogsTableProps extends Pick<RemoteTableProps<AuditLog>, "defaultR
 export function AuditLogTable(props: AuditLogsTableProps) {
   const { assetId, txId, ...rest } = props
 
-  const [auditLogsFiltered, setAuditLogsFiltered] = useState<AuditLog[]>([])
+  const [tableData, setTableData] = useState<AuditLog[]>([])
 
   const queryFn: QueryFunction<AuditLog> = useCallback(
     async (filters, rowsPerPage, page, order) => {
@@ -43,7 +43,7 @@ export function AuditLogTable(props: AuditLogsTableProps) {
         $activeAccount.get()
       )
 
-      setAuditLogsFiltered(auditLogs)
+      setTableData(auditLogs)
 
       return [
         auditLogs,
@@ -121,11 +121,8 @@ export function AuditLogTable(props: AuditLogsTableProps) {
   return (
     <>
       <Stack direction="row" justifyContent="space-between">
-        <Subheading>
-          <span>Audit logs</span>
-          {/* <AuditLogActions /> */}
-        </Subheading>
-        <ExportToCsvOptions auditLogsFiltered={auditLogsFiltered} />
+        <Subheading>Audit logs</Subheading>
+        <AuditLogActions tableData={tableData} />
       </Stack>
       {txId && (
         <Box
