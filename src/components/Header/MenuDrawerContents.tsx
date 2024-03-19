@@ -2,16 +2,21 @@ import { Settings, StorageRounded, SwapHoriz } from "@mui/icons-material"
 import AttachFileRoundedIcon from "@mui/icons-material/AttachFileRounded"
 import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded"
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded"
+import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore"
 import WebAssetRoundedIcon from "@mui/icons-material/WebAssetRounded"
 import { Button, Stack, Typography, useMediaQuery } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { useBoolean } from "src/hooks/useBoolean"
+import { $activeAccount } from "src/stores/account-store"
 
 import { AppVerProps, PopoverToggleProps } from "../../stores/app-store"
+import { AccountAvatar } from "../AccountAvatar"
 import { NavMenuItem } from "../NavMenuItem"
+import { AccountPicker } from "./AccountPicker"
 import { Logo } from "./Logo"
-import { SettingsMenuDrawer } from "./SettingsDrawerMobile"
+import { SettingsDrawer } from "./SettingsDrawer"
 
 type MenuContentsProps = AppVerProps & PopoverToggleProps
 
@@ -57,6 +62,8 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
   const accountIndex = pathname.split("/")[2]
 
   const { value: openSettings, toggle: toggleOpenSettings } = useBoolean(false)
+  const { value: openAccountPicker, toggle: toggleOpenAccountPicker } = useBoolean(false)
+  const activeAccount = useStore($activeAccount)
 
   return (
     <>
@@ -64,7 +71,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
         paddingX={2}
         paddingY={1}
         gap={1}
-        sx={{ height: "100%", overflowX: "hidden" }}
+        sx={{ height: "100%", overflowX: "hidden", width: "100%" }}
         justifyContent="space-between"
       >
         <Stack>
@@ -75,7 +82,8 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
               component={Link}
               sx={{
                 borderRadius: 8,
-                marginLeft: -1,
+                marginLeft: 1.5,
+                // marginLeft: -1,
                 padding: 1,
                 textTransform: "none",
               }}
@@ -83,12 +91,44 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
               <Logo />
             </Button>
           </Stack>
+          <Stack marginBottom={4}>
+            <Button
+              onClick={toggleOpenAccountPicker}
+              size="small"
+              variant="outlined"
+              color={"secondary"}
+              sx={{
+                justifyContent: "space-between",
+                padding: "6px 16px",
+              }}
+            >
+              <Stack direction="row">
+                <AccountAvatar alt={activeAccount} size="small" sx={{ alignSelf: "center" }} />
+
+                <Typography
+                  variant="subtitle1"
+                  letterSpacing="0.025rem"
+                  paddingLeft="1rem"
+                  alignSelf="center"
+                >
+                  {activeAccount}
+                </Typography>
+              </Stack>
+              <UnfoldMoreIcon color="secondary" />
+            </Button>
+            <AccountPicker
+              open={openAccountPicker}
+              toggleOpen={toggleOpenAccountPicker}
+              toggleOpenMenuDrawer={toggleOpen}
+            />
+          </Stack>
           <NavMenuItem
             value=""
             to={`/u/${accountIndex}/`}
             label="Home"
             onClick={toggleOpen}
             avatar={<HomeRoundedIcon />}
+            sx={{ borderRadius: 0.5 }}
           />
           <NavMenuItem
             value="assets"
@@ -96,6 +136,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
             label="Assets"
             onClick={toggleOpen}
             avatar={<WebAssetRoundedIcon />}
+            sx={{ borderRadius: 0.5 }}
           />
           <NavMenuItem
             value="transactions"
@@ -103,6 +144,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
             label="Transactions"
             onClick={toggleOpen}
             avatar={<SwapHoriz />}
+            sx={{ borderRadius: 0.5 }}
           />
           <NavMenuItem
             value="audit-logs"
@@ -110,6 +152,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
             label="Audit logs"
             onClick={toggleOpen}
             avatar={<StorageRounded />}
+            sx={{ borderRadius: 0.5 }}
           />
           <NavMenuItem
             value="import-data"
@@ -117,16 +160,22 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
             label="Import data"
             onClick={toggleOpen}
             avatar={<AttachFileRoundedIcon />}
+            sx={{ borderRadius: 0.5 }}
           />
         </Stack>
         <Stack>
           <Button
-            color="secondary"
             sx={{
+              "&:hover": {
+                color: "text.primary",
+              },
+              borderRadius: 0.5,
+              color: "text.secondary",
               direction: "row",
               display: isInstalled ? "none" : "inline-flex",
               justifyContent: "flex-start",
               transition: "transform 0.33s",
+              width: "100%",
             }}
             onClick={promptInstall}
           >
@@ -138,16 +187,21 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
             </Stack>
           </Button>
           <Button
-            color="secondary"
             onClick={() => {
               toggleOpen()
               toggleOpenSettings()
             }}
             sx={{
+              "&:hover": {
+                color: "text.primary",
+              },
+              borderRadius: 0.5,
+              color: "text.secondary",
               direction: "row",
               justifyContent: "flex-start",
               marginRight: -1,
               transition: "transform 0.33s",
+              width: "100%",
             }}
           >
             <Stack display="contents">
@@ -165,8 +219,8 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
               </Typography>
             </Stack>
           </Button>
+          <SettingsDrawer open={openSettings} toggleOpen={toggleOpenSettings} />
         </Stack>
-        <SettingsMenuDrawer open={openSettings} toggleOpen={toggleOpenSettings} />
       </Stack>
     </>
   )

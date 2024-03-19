@@ -55,7 +55,7 @@ export default function App() {
   }, [])
 
   return (
-    <>
+    <Box sx={{ flex: 1 }}>
       <Box
         sx={{
           "html[data-mui-color-scheme='dark'] &": {
@@ -136,6 +136,6 @@ export default function App() {
           </a.div>
         ))}
       </Container>
-    </>
+    </Box>
   )
 }
