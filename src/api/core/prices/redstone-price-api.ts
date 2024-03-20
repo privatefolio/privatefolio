@@ -59,7 +59,7 @@ export async function queryPrices(request: QueryRequest) {
     const res = await fetch(apiUrl)
 
     // if its an error, html will be returned
-    if (res.headers["Content-Type"] === "text/html") {
+    if (res.headers.get("content-type")?.includes("text/html")) {
       const data = await res.text()
       throw new Error(data)
     }
