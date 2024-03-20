@@ -1,10 +1,10 @@
 import { getPair, mapToChartData, queryPrices } from "src/api/core/prices/binance-price-api"
-import { DISALLOW_BINANCE_PRICE_API } from "src/env"
+import { GITHUB_CI } from "src/env"
 import { ResolutionString } from "src/interfaces"
 import { expect, it } from "vitest"
 
 it("should fetch BTC prices within a range", async (test) => {
-  if (DISALLOW_BINANCE_PRICE_API) {
+  if (GITHUB_CI) {
     test.skip()
   }
   // act
@@ -50,7 +50,7 @@ it("should fetch BTC prices within a range", async (test) => {
 })
 
 it("should throw an error", async (test) => {
-  if (DISALLOW_BINANCE_PRICE_API) {
+  if (GITHUB_CI) {
     test.skip()
   }
   // act
@@ -65,7 +65,7 @@ it("should throw an error", async (test) => {
 })
 
 it("should fetch ETH prices within a range", async (test) => {
-  if (DISALLOW_BINANCE_PRICE_API) {
+  if (GITHUB_CI) {
     test.skip()
   }
   // act

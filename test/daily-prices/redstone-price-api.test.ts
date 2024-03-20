@@ -1,4 +1,5 @@
 import { getPair, mapToChartData, queryPrices } from "src/api/core/prices/redstone-price-api"
+import { GITHUB_CI } from "src/env"
 import { ResolutionString } from "src/interfaces"
 import { PLATFORMS_META } from "src/settings"
 import { expect, it } from "vitest"
@@ -31,7 +32,20 @@ it("should fetch WETH prices within a range", async () => {
   `)
 })
 
-it("should fetch WETH prices within a small range", async () => {
+it("should return 0 for non-supported", async () => {
+  // act
+  const results = await queryPrices({
+    pair: "EFJA",
+    timeInterval: "1d" as ResolutionString,
+  })
+  // assert
+  expect(results.length).toBe(0)
+})
+
+it("should fetch WETH prices within a small range", async (test) => {
+  if (GITHUB_CI) {
+    test.skip()
+  }
   // act
   const result = await queryPrices({
     limit: 1,
@@ -49,14 +63,4 @@ it("should fetch WETH prices within a small range", async () => {
       },
     ]
   `)
-})
-
-it("should return 0 for non-supported", async () => {
-  // act
-  const results = await queryPrices({
-    pair: "EFJA",
-    timeInterval: "1d" as ResolutionString,
-  })
-  // assert
-  expect(results.length).toBe(0)
 })

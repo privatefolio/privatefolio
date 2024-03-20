@@ -4,7 +4,7 @@ import { join } from "path"
 import { addFileImport } from "src/api/account/file-imports/file-imports-api"
 import { fetchDailyPrices, getPricesForAsset } from "src/api/core/daily-prices-api"
 import { resetAccount } from "src/api/database"
-import { DISALLOW_BINANCE_PRICE_API } from "src/env"
+import { GITHUB_CI } from "src/env"
 import { ProgressUpdate } from "src/stores/task-store"
 import { formatDate } from "src/utils/formatting-utils"
 import { beforeAll, expect, it } from "vitest"
@@ -31,7 +31,7 @@ it("should fetch no prices", async () => {
 })
 
 it("should fetch BTC prices using Binance", async (test) => {
-  if (DISALLOW_BINANCE_PRICE_API) {
+  if (GITHUB_CI) {
     test.skip()
   }
   // arrange

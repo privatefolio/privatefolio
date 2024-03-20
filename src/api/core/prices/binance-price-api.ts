@@ -1,5 +1,5 @@
 import { UTCTimestamp } from "lightweight-charts"
-import { DISALLOW_BINANCE_PRICE_API } from "src/env"
+import { GITHUB_CI } from "src/env"
 import { getAssetTicker } from "src/utils/assets-utils"
 
 import {
@@ -33,7 +33,7 @@ function getInterval(timeInterval: ResolutionString) {
 }
 
 export async function queryPrices(request: QueryRequest) {
-  if (DISALLOW_BINANCE_PRICE_API) {
+  if (GITHUB_CI) {
     throw new Error("Binance price API is disabled")
   }
 

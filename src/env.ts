@@ -1,4 +1,4 @@
-export const DISALLOW_BINANCE_PRICE_API = import.meta.env.DISALLOW_BINANCE_PRICE_API === "true"
+export const GITHUB_CI = import.meta.env.GITHUB_CI === "true"
 export const APP_VERSION = import.meta.env.VITE_APP_VERSION?.replaceAll('"', "")
 export const GIT_HASH = import.meta.env.VITE_GIT_HASH
 export const GIT_DATE = import.meta.env.VITE_GIT_DATE

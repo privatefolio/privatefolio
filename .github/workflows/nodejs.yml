@@ -33,7 +33,7 @@ jobs:
     - run: yarn install
     
     - name: Test
-      run: DISALLOW_BINANCE_PRICE_API=true yarn vitest run --coverage --watch false --reporter verbose
+      run: GITHUB_CI=true yarn vitest run --coverage --watch false --reporter verbose
 
     - name: Build
       run: yarn build
