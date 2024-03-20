@@ -57,6 +57,13 @@ export async function queryPrices(request: QueryRequest) {
 
   try {
     const res = await fetch(apiUrl)
+
+    // if its an error, html will be returned
+    if (res.headers["Content-Type"] === "text/html") {
+      const data = await res.text()
+      throw new Error(data)
+    }
+
     const data = await res.json()
 
     return data as PriceData[]
