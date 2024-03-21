@@ -1,18 +1,8 @@
 import { DarkModeOutlined, LightMode, SettingsBrightness } from "@mui/icons-material"
-import { Tab, Tabs, tabsClasses, useColorScheme, useTheme } from "@mui/material"
-import React, { useEffect } from "react"
-
-import { bgColor } from "../../theme"
+import { Tab, Tabs, tabsClasses, useColorScheme } from "@mui/material"
+import React from "react"
 
 export function ThemeMode() {
-  const theme = useTheme()
-
-  useEffect(() => {
-    document
-      .querySelector('meta[name="theme-color"]')
-      ?.setAttribute("content", theme.palette.background.default)
-  }, [theme.palette.background.default])
-
   const { mode = "system", setMode } = useColorScheme()
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     const newMode = newValue === 0 ? "light" : newValue === 1 ? "system" : "dark"
@@ -21,7 +11,6 @@ export function ThemeMode() {
 
   return (
     <>
-      <meta name="theme-color" content={bgColor} />
       <Tabs
         variant="fullWidth"
         // textColor="inherit"

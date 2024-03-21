@@ -10,7 +10,6 @@ export default function LandingPageHeader() {
 
   return (
     <>
-      <meta name="theme-color" content={"rgb(40, 40, 40)"} />
       <AppBar
         position="static"
         elevation={0}

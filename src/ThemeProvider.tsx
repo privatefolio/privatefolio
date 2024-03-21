@@ -10,6 +10,7 @@ import { Globals, useReducedMotion } from "@react-spring/web"
 import { merge } from "lodash-es"
 import React, { PropsWithChildren, useEffect, useMemo } from "react"
 
+import { NavigationBarTheme } from "./components/NavigationBarTheme"
 import { $reducedMotion } from "./stores/app-store"
 import { theme } from "./theme"
 
@@ -82,6 +83,7 @@ export function ThemeProvider({ children }: PropsWithChildren) {
     <>
       <CssVarsProvider defaultMode="system" theme={extendedTheme} disableTransitionOnChange>
         <CssBaseline enableColorScheme />
+        <NavigationBarTheme />
         {children}
       </CssVarsProvider>
     </>
