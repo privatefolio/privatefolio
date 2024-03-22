@@ -2,7 +2,7 @@ import Big from "big.js"
 import {
   AuditLog,
   AuditLogOperation,
-  Connection,
+  EtherscanConnection,
   ParserResult,
   Transaction,
   TransactionType,
@@ -14,7 +14,7 @@ import { BlockRewardTransaction } from "../etherscan-rpc"
 export function parseBlockReward(
   row: BlockRewardTransaction,
   index: number,
-  connection: Connection
+  connection: EtherscanConnection
 ): ParserResult {
   // ----------------------------------------------------------------- Parse
   const { platform, address } = connection

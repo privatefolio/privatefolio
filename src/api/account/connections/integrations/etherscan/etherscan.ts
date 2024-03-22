@@ -2,7 +2,7 @@ import Big from "big.js"
 import {
   AuditLog,
   AuditLogOperation,
-  Connection,
+  EtherscanConnection,
   EtherscanTransaction,
   ParserResult,
   TransactionType,
@@ -15,7 +15,7 @@ import { NormalTransaction } from "../etherscan-rpc"
 export function parseNormal(
   row: NormalTransaction,
   index: number,
-  connection: Connection
+  connection: EtherscanConnection
 ): ParserResult {
   // ----------------------------------------------------------------- Parse
   const { platform, address } = connection

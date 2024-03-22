@@ -2,7 +2,7 @@ import Big from "big.js"
 import {
   AuditLog,
   AuditLogOperation,
-  Connection,
+  EtherscanConnection,
   EtherscanTransaction,
   ParserResult,
   TransactionType,
@@ -14,7 +14,7 @@ import { Erc20Transaction } from "../etherscan-rpc"
 export function parseERC20(
   row: Erc20Transaction,
   index: number,
-  connection: Connection
+  connection: EtherscanConnection
 ): ParserResult {
   // ----------------------------------------------------------------- Parse
   const { platform, address } = connection

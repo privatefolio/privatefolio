@@ -2,7 +2,7 @@ import Big from "big.js"
 import {
   AuditLog,
   AuditLogOperation,
-  Connection,
+  EtherscanConnection,
   ParserResult,
   Transaction,
   TransactionType,
@@ -14,7 +14,7 @@ import { StakingWithdrawalTransaction } from "../etherscan-rpc"
 export function parseStakingWithdrawal(
   row: StakingWithdrawalTransaction,
   index: number,
-  connection: Connection
+  connection: EtherscanConnection
 ): ParserResult {
   // ----------------------------------------------------------------- Parse
   const { platform, address } = connection
