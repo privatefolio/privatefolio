@@ -13,6 +13,7 @@ import {
 } from "@mui/material"
 import { isAddress } from "ethers"
 import React, { useCallback, useEffect, useState } from "react"
+import { BinanceInput } from "src/components/BinanceInput"
 import { $activeAccount } from "src/stores/account-store"
 import { enqueueSyncConnection, handleAuditLogChange } from "src/utils/common-tasks"
 import { clancy } from "src/workers/remotes"
@@ -28,11 +29,15 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
 
   const [label, setLabel] = useState("")
   const [address, setAddress] = useState("")
+  const [key, Setkey] = useState("")
+  const [secret, setSecret] = useState("")
   const [platform, setPlatform] = useState<PlatformId>("ethereum")
 
   useEffect(() => {
     setLoading(false)
     setAddress("")
+    Setkey("")
+    setSecret("")
     setPlatform("ethereum")
   }, [open])
 
@@ -40,13 +45,17 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
     (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault()
 
-      const isValidAddress = address && isAddress(address)
-      if (!isValidAddress) return
+      if (platform === "ethereum") {
+        const isValidAddress = address && isAddress(address)
+        if (!isValidAddress) return
+      } else {
+        if (key.length === 0 || secret.length === 0) return
+      }
 
       setLoading(true)
 
       clancy
-        .addConnection({ address, label, platform }, $activeAccount.get())
+        .addConnection({ address, key, label, platform, secret }, $activeAccount.get())
         .then((connection) => {
           toggleOpen()
           enqueueSyncConnection(connection)
@@ -56,7 +65,7 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
           setLoading(false)
         })
     },
-    [address, platform, label, toggleOpen]
+    [address, key, secret, platform, label, toggleOpen]
   )
 
   return (
@@ -87,19 +96,50 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
               ))}
             </Select>
           </div>
-          <div>
-            <SectionTitle>Address *</SectionTitle>
-            <AddressInput
-              autoComplete="off"
-              autoFocus
-              value={address}
-              onChange={setAddress}
-              variant="outlined"
-              fullWidth
-              size="small"
-              required
-            />
-          </div>
+          {platform === "ethereum" ? (
+            <div>
+              <SectionTitle>Address *</SectionTitle>
+              <AddressInput
+                autoComplete="off"
+                autoFocus
+                value={address}
+                onChange={setAddress}
+                variant="outlined"
+                fullWidth
+                size="small"
+                required
+              />
+            </div>
+          ) : (
+            <>
+              <div>
+                <SectionTitle>API key *</SectionTitle>
+                <BinanceInput
+                  autoComplete="off"
+                  autoFocus
+                  value={key}
+                  onChange={Setkey}
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  required
+                />
+              </div>
+              <div>
+                <SectionTitle>Secret *</SectionTitle>
+                <BinanceInput
+                  autoComplete="off"
+                  autoFocus
+                  value={secret}
+                  onChange={setSecret}
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  required
+                />
+              </div>
+            </>
+          )}
           <div>
             <SectionTitle>Label</SectionTitle>
             <TextField
@@ -111,6 +151,7 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
               onChange={(event) => setLabel(event.target.value)}
             />
           </div>
+
           <div>
             <LoadingButton variant="contained" type="submit" loading={loading}>
               Add connection

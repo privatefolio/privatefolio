@@ -3,19 +3,28 @@ import { getAddress } from "ethers"
 import { validateOperation } from "src/api/database-utils"
 import { ProgressCallback } from "src/stores/task-store"
 
-import { AuditLogOperation, Connection, SyncResult } from "../../../interfaces"
+import {
+  AuditLogOperation,
+  BinanceConnection,
+  Connection,
+  EtherscanConnection,
+  SyncResult,
+} from "../../../interfaces"
 import { hashString, noop } from "../../../utils/utils"
 import { getAccount } from "../../database"
 import { getValue, setValue } from "../kv-api"
+import { syncBinance } from "./integrations/binance/binance-coonector"
 import { syncEtherscan } from "./integrations/etherscan-connector"
 
 export async function addConnection(
   connection: Omit<Connection, "_id" | "_rev" | "timestamp" | "syncedAt">,
   accountName: string
 ) {
-  let { address, platform, label } = connection
+  let { address, platform, label, key, secret } = connection
 
-  address = getAddress(address)
+  if (address) {
+    address = getAddress(address)
+  }
   const account = getAccount(accountName)
 
   const timestamp = new Date().getTime()
@@ -26,6 +35,8 @@ export async function addConnection(
     _id,
     _rev: undefined as any,
     address,
+    key,
+    secret,
     timestamp,
   })
 
@@ -144,7 +155,9 @@ export async function syncConnection(
   }
 
   if (connection.platform === "ethereum") {
-    result = await syncEtherscan(progress, connection, since)
+    result = await syncEtherscan(progress, connection as EtherscanConnection, since)
+  } else if (connection.platform === "binance") {
+    result = await syncBinance(progress, connection as BinanceConnection, since)
   } else {
     throw new Error(`Unsupported platform: ${connection.platform}`)
   }

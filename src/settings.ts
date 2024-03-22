@@ -79,6 +79,7 @@ export const PLATFORMS_META: Record<PlatformId, PlatformMeta> = {
 }
 
 export const CONNECTIONS = {
+  binance: "Binance",
   ethereum: "Ethereum",
 } as const
 

@@ -303,7 +303,7 @@ export const DEFAULT_POLLING_INTERVAL = 2_000
 export interface Connection {
   _id: string
   _rev: string
-  address: string
+  address?: string
   label: string
   meta?: {
     assetIds: string[]
@@ -319,6 +319,16 @@ export interface Connection {
    * createdAt
    */
   timestamp: Timestamp
+  key?: string
+  secret?: string
+}
+
+export type EtherscanConnection = Connection & {
+  address: string
+}
+export type BinanceConnection = Connection & {
+  key: string
+  secret: string
 }
 
 export type ParserResult = { logs: AuditLog[]; txns?: Transaction[] }

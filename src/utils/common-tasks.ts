@@ -256,6 +256,7 @@ export function enqueueSyncConnection(connection: Connection) {
     determinate: true,
     function: async (progress) => {
       await clancy.syncConnection(progress, connection, $activeAccount.get())
+      handleAuditLogChange()
     },
     name: "Sync connection",
     priority: TaskPriority.High,

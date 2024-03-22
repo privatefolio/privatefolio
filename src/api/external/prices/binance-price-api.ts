@@ -27,6 +27,7 @@ function getInterval(timeInterval: ResolutionString) {
   return timeInterval
 }
 
+// https://binance-docs.github.io/apidocs/spot/en/#kline-candlestick-data
 export async function queryPrices(request: QueryRequest) {
   if (GITHUB_CI) {
     throw new Error("Binance price API is disabled")

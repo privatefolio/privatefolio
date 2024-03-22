@@ -1,4 +1,4 @@
-import { Connection, SyncResult } from "src/interfaces"
+import { EtherscanConnection, SyncResult } from "src/interfaces"
 import { ProgressCallback } from "src/stores/task-store"
 import { noop } from "src/utils/utils"
 
@@ -19,7 +19,7 @@ const parserList = [
 
 export async function syncEtherscan(
   progress: ProgressCallback = noop,
-  connection: Connection,
+  connection: EtherscanConnection,
   since: string
 ) {
   const rpcProvider = new FullEtherscanProvider()
