@@ -14,6 +14,9 @@ export function parser(csvRow: string, index: number, fileImportId: string): Par
   const regex = /(".*?"|[^",]+)(?=\s*,|\s*$)/g
   let columns: string[] = csvRow.match(regex) || []
 
+  if (columns.length !== 14) {
+    throw new Error("Invalid number of columns")
+  }
   // Remove quotes from the extracted columns
   columns = columns.map((column) => column.replace(/^"|"$/g, ""))
   //
@@ -37,6 +40,10 @@ export function parser(csvRow: string, index: number, fileImportId: string): Par
   const incomingN = parseFloat(incoming)
   const outgoingN = parseFloat(outgoing)
   const feeN = parseFloat(fee)
+
+  if (!incoming && !outgoing && !fee) {
+    throw new Error("Invalid transaction")
+  }
 
   const txns: EtherscanTransaction[] = [
     {

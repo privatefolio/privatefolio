@@ -17,7 +17,7 @@ export async function parseCsv(
   getParserContext: ParserContextFn
 ) {
   // Parse CSV
-  const rows = text.trim().split("\n")
+  const rows = text.trim().split(/\r?\n(?=(?:[^"]*"[^"]*")*[^"]*$)/)
 
   const header = rows[0]
     .replace("ï»¿", "") // mexc

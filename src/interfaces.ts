@@ -70,7 +70,7 @@ export interface Transaction {
 export interface EtherscanTransaction extends Transaction {
   contractAddress?: string
   failed?: boolean
-  from?: string // TODO
+  // from?: string // TODO
   method?: string
   txHash: string
 }
