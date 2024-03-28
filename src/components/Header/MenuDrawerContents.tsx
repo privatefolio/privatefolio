@@ -128,7 +128,13 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
             label="Home"
             onClick={toggleOpen}
             avatar={<HomeRoundedIcon />}
-            sx={{ borderRadius: 0.5 }}
+            sx={{
+              "&:hover": {
+                color: "text.primary",
+              },
+              borderRadius: 0.5,
+              color: "text.secondary",
+            }}
           />
           <NavMenuItem
             value="assets"
@@ -136,7 +142,13 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
             label="Assets"
             onClick={toggleOpen}
             avatar={<WebAssetRoundedIcon />}
-            sx={{ borderRadius: 0.5 }}
+            sx={{
+              "&:hover": {
+                color: "text.primary",
+              },
+              borderRadius: 0.5,
+              color: "text.secondary",
+            }}
           />
           <NavMenuItem
             value="transactions"
@@ -144,7 +156,13 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
             label="Transactions"
             onClick={toggleOpen}
             avatar={<SwapHoriz />}
-            sx={{ borderRadius: 0.5 }}
+            sx={{
+              "&:hover": {
+                color: "text.primary",
+              },
+              borderRadius: 0.5,
+              color: "text.secondary",
+            }}
           />
           <NavMenuItem
             value="audit-logs"
@@ -152,7 +170,13 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
             label="Audit logs"
             onClick={toggleOpen}
             avatar={<StorageRounded />}
-            sx={{ borderRadius: 0.5 }}
+            sx={{
+              "&:hover": {
+                color: "text.primary",
+              },
+              borderRadius: 0.5,
+              color: "text.secondary",
+            }}
           />
           <NavMenuItem
             value="import-data"
@@ -160,7 +184,13 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
             label="Import data"
             onClick={toggleOpen}
             avatar={<AttachFileRoundedIcon />}
-            sx={{ borderRadius: 0.5 }}
+            sx={{
+              "&:hover": {
+                color: "text.primary",
+              },
+              borderRadius: 0.5,
+              color: "text.secondary",
+            }}
           />
         </Stack>
         <Stack>
