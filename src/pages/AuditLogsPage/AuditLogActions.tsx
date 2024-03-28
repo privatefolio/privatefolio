@@ -42,7 +42,7 @@ export function AuditLogActions(props: AuditLogsActionsProps) {
           dense
           onClick={() => {
             const data = exportAuditLogsToCsv(tableData)
-            downloadCsv(data, "audit-logs.csv")
+            downloadCsv(data, `${$activeAccount.get()}-audit-logs.csv`)
             handleClose()
           }}
         >

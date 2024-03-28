@@ -308,7 +308,7 @@ export function enqueueExportAllAuditLogs() {
     function: async () => {
       const auditLogs = await clancy.findAuditLogs({}, $activeAccount.get())
       const data = exportAuditLogsToCsv(auditLogs)
-      downloadCsv(data, "audit-logs.csv")
+      downloadCsv(data, `${$activeAccount.get()}-audit-logs.csv`)
     },
     name: "Export all audit logs",
     priority: TaskPriority.Low,

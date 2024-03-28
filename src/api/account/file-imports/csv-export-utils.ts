@@ -1,5 +1,5 @@
 import { AuditLog, CsvData, EtherscanTransaction, Transaction } from "src/interfaces"
-import { formatDateWithHour, toUTCString } from "src/utils/formatting-utils"
+import { toUTCString } from "src/utils/formatting-utils"
 
 const HEADER = [
   "Timestamp",
@@ -19,14 +19,13 @@ const HEADER = [
 ]
 
 const HeaderAuditLogs = [
-  "Identifier",
   "Timestamp",
   "Platform",
   "Wallet",
   "Operation",
   "Change",
+  "Asset",
   "New Balance",
-  "Transaction ID",
 ]
 
 export function exportTransactionsToCsv(transactions: Transaction[]): CsvData {
@@ -53,18 +52,14 @@ export function exportTransactionsToCsv(transactions: Transaction[]): CsvData {
 }
 
 export function exportAuditLogsToCsv(auditLogs: AuditLog[]): CsvData {
-  const rows: CsvData = auditLogs.map((tx) => [
-    tx._id,
-    formatDateWithHour(tx.timestamp, {
-      timeZone: "UTC",
-      timeZoneName: "short",
-    }),
-    tx.platform,
-    tx.wallet,
-    tx.operation,
-    tx.change,
-    tx.balance,
-    tx.txId,
+  const rows: CsvData = auditLogs.map((logs) => [
+    toUTCString(logs.timestamp),
+    logs.platform,
+    logs.wallet,
+    logs.operation,
+    logs.change,
+    logs.assetId,
+    logs.balance,
   ])
 
   const data: CsvData = [HeaderAuditLogs, ...rows]
