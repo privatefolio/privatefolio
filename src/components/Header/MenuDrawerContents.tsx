@@ -60,6 +60,9 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
   const location = useLocation()
   const { pathname } = location
   const accountIndex = pathname.split("/")[2]
+  const appPath = pathname.split("/").slice(3).join("/")
+
+  const overriddenPathname = appPath.includes("asset/") ? "" : appPath
 
   const { value: openSettings, toggle: toggleOpenSettings } = useBoolean(false)
   const { value: openAccountPicker, toggle: toggleOpenAccountPicker } = useBoolean(false)
@@ -132,8 +135,9 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
               "&:hover": {
                 color: "text.primary",
               },
+              bgcolor: overriddenPathname === "" ? "rgb(120, 120, 120,0.25)" : "none",
               borderRadius: 0.5,
-              color: "text.secondary",
+              color: overriddenPathname === "" ? "text.primary" : "text.secondary",
             }}
           />
           <NavMenuItem
@@ -146,8 +150,9 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
               "&:hover": {
                 color: "text.primary",
               },
+              bgcolor: overriddenPathname === "assets" ? "rgb(120, 120, 120,0.25)" : "none",
               borderRadius: 0.5,
-              color: "text.secondary",
+              color: overriddenPathname === "assets" ? "text.primary" : "text.secondary",
             }}
           />
           <NavMenuItem
@@ -160,8 +165,9 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
               "&:hover": {
                 color: "text.primary",
               },
+              bgcolor: overriddenPathname === "transactions" ? "rgb(120, 120, 120,0.25)" : "none",
               borderRadius: 0.5,
-              color: "text.secondary",
+              color: overriddenPathname === "transactions" ? "text.primary" : "text.secondary",
             }}
           />
           <NavMenuItem
@@ -174,8 +180,9 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
               "&:hover": {
                 color: "text.primary",
               },
+              bgcolor: overriddenPathname === "audit-logs" ? "rgb(120, 120, 120,0.25)" : "none",
               borderRadius: 0.5,
-              color: "text.secondary",
+              color: overriddenPathname === "audit-logs" ? "text.primary" : "text.secondary",
             }}
           />
           <NavMenuItem
@@ -188,8 +195,9 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
               "&:hover": {
                 color: "text.primary",
               },
+              bgcolor: overriddenPathname === "import-data" ? "rgb(120, 120, 120,0.25)" : "none",
               borderRadius: 0.5,
-              color: "text.secondary",
+              color: overriddenPathname === "import-data" ? "text.primary" : "text.secondary",
             }}
           />
         </Stack>
