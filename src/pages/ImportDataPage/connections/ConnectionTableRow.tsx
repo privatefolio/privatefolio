@@ -1,10 +1,6 @@
-import { HighlightOffRounded, MoreHoriz, RestartAltRounded, SyncRounded } from "@mui/icons-material"
+import { Visibility } from "@mui/icons-material"
 import {
   IconButton,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
   Skeleton,
   Stack,
   TableCell,
@@ -12,19 +8,17 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material"
-import React, { useState } from "react"
+import React from "react"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { Truncate } from "src/components/Truncate"
-import { useConfirm } from "src/hooks/useConfirm"
+import { useBoolean } from "src/hooks/useBoolean"
 import { Connection } from "src/interfaces"
-import { $activeAccount } from "src/stores/account-store"
-import { enqueueTask, TaskPriority } from "src/stores/task-store"
 import { MonoFont } from "src/theme"
-import { enqueueSyncConnection, handleAuditLogChange } from "src/utils/common-tasks"
 import { formatNumber } from "src/utils/formatting-utils"
 import { TableRowComponentProps } from "src/utils/table-utils"
-import { clancy } from "src/workers/remotes"
+
+import { ConnectionInspectDrawer } from "./ConnectionInspectDrawer"
 
 export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
   const {
@@ -36,94 +30,103 @@ export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
     ...rest
   } = props
   const { address, timestamp, syncedAt, platform, label, meta } = row
-
-  const confirm = useConfirm()
-
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const open = Boolean(anchorEl)
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
+  const { value: open, toggle: toggleOpen } = useBoolean(false)
 
   return (
-    <TableRow hover {...rest}>
-      <TableCell sx={{ maxWidth: 180, minWidth: 180, width: 180 }}>
-        <TimestampBlock timestamp={timestamp} relative={relativeTime} />
-      </TableCell>
-      <TableCell sx={{ maxWidth: 180, minWidth: 180, width: 180 }}>
-        {!syncedAt ? (
-          <Typography color="text.secondary" component="span" variant="inherit">
-            Not synced
-          </Typography>
-        ) : (
-          <TimestampBlock timestamp={syncedAt} relative={relativeTime} />
-        )}
-      </TableCell>
-      <TableCell sx={{ fontFamily: MonoFont, maxWidth: 420, minWidth: 300, width: 420 }}>
-        <Stack spacing={1} direction="row">
-          {platform ? <PlatformBlock platform={platform} hideName /> : <Skeleton></Skeleton>}
-          <Tooltip title={address}>
-            <Truncate>{address}</Truncate>
-          </Tooltip>
-          <Typography color="text.secondary" component="span" variant="inherit">
-            {" "}
-            {label}
-          </Typography>
-        </Stack>
-      </TableCell>
-      {/* <TableCell sx={{ fontFamily: MonoFont, maxWidth: 400, minWidth: 400, width: 400 }}>
+    <>
+      <TableRow hover {...rest}>
+        <TableCell sx={{ maxWidth: 180, minWidth: 180, width: 180 }}>
+          <TimestampBlock timestamp={timestamp} relative={relativeTime} />
+        </TableCell>
+        <TableCell sx={{ maxWidth: 180, minWidth: 180, width: 180 }}>
+          {!syncedAt ? (
+            <Typography color="text.secondary" component="span" variant="inherit">
+              Not synced
+            </Typography>
+          ) : (
+            <TimestampBlock timestamp={syncedAt} relative={relativeTime} />
+          )}
+        </TableCell>
+        <TableCell sx={{ fontFamily: MonoFont, maxWidth: 420, minWidth: 300, width: 420 }}>
+          <Stack spacing={1} direction="row">
+            {platform ? <PlatformBlock platform={platform} hideName /> : <Skeleton></Skeleton>}
+            <Tooltip title={address}>
+              <Truncate>{address}</Truncate>
+            </Tooltip>
+            <Typography color="text.secondary" component="span" variant="inherit">
+              {" "}
+              {label}
+            </Typography>
+          </Stack>
+        </TableCell>
+        {/* <TableCell sx={{ fontFamily: MonoFont, maxWidth: 400, minWidth: 400, width: 400 }}>
         <Tooltip title={address}>
           <Truncate>{address}</Truncate>
         </Tooltip>
       </TableCell> */}
-      {/* <TableCell sx={{ maxWidth: 180, minWidth: 180, width: 180 }}>
+        {/* <TableCell sx={{ maxWidth: 180, minWidth: 180, width: 180 }}>
         <TimestampCell timestamp={lastModified} relative={relativeTime} />
       </TableCell> */}
-      <TableCell
-        sx={{ fontFamily: MonoFont, maxWidth: 128, minWidth: 128, width: 128 }}
-        align="right"
-      >
-        {!meta ? (
-          <Skeleton></Skeleton>
-        ) : (
-          <>
-            {meta.logs === meta.rows ? (
-              <span>{formatNumber(meta.logs)}</span>
-            ) : (
-              <Tooltip
-                title={`${formatNumber(meta.logs)} audit logs extracted from ${formatNumber(
-                  meta.rows
-                )} entries`}
-              >
+        <TableCell
+          sx={{ fontFamily: MonoFont, maxWidth: 128, minWidth: 128, width: 128 }}
+          align="right"
+        >
+          {!meta ? (
+            <Skeleton></Skeleton>
+          ) : (
+            <>
+              {meta.logs === meta.rows ? (
                 <span>{formatNumber(meta.logs)}</span>
+              ) : (
+                <Tooltip
+                  title={`${formatNumber(meta.logs)} audit logs extracted from ${formatNumber(
+                    meta.rows
+                  )} entries`}
+                >
+                  <span>{formatNumber(meta.logs)}</span>
+                </Tooltip>
+              )}
+            </>
+          )}
+        </TableCell>
+        <TableCell
+          sx={{ fontFamily: MonoFont, maxWidth: 120, minWidth: 120, width: 120 }}
+          align="right"
+        >
+          {!meta ? (
+            <Skeleton></Skeleton>
+          ) : (
+            <>
+              <Tooltip
+                title={`${formatNumber(
+                  meta.transactions
+                )} transactions extracted from ${formatNumber(meta.rows)} entries`}
+              >
+                <span>{formatNumber(meta.transactions)}</span>
               </Tooltip>
-            )}
-          </>
-        )}
-      </TableCell>
-      <TableCell
-        sx={{ fontFamily: MonoFont, maxWidth: 120, minWidth: 120, width: 120 }}
-        align="right"
-      >
-        {!meta ? (
-          <Skeleton></Skeleton>
-        ) : (
-          <>
-            <Tooltip
-              title={`${formatNumber(meta.transactions)} transactions extracted from ${formatNumber(
-                meta.rows
-              )} entries`}
+            </>
+          )}
+        </TableCell>
+        <TableCell>
+          <Tooltip title="Inspect">
+            <IconButton
+              size="small"
+              color="secondary"
+              sx={{
+                ".MuiTableRow-root:hover &": {
+                  visibility: "visible",
+                },
+                height: 28,
+                marginLeft: -1,
+                marginY: -0.25,
+                visibility: "hidden",
+              }}
+              onClick={toggleOpen}
             >
-              <span>{formatNumber(meta.transactions)}</span>
-            </Tooltip>
-          </>
-        )}
-      </TableCell>
-      <TableCell>
-        <IconButton
+              <Visibility fontSize="inherit" />
+            </IconButton>
+          </Tooltip>
+          {/* <IconButton
           size="small"
           color="secondary"
           onClick={handleClick}
@@ -215,8 +218,16 @@ export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
             </ListItemIcon>
             <ListItemText>Remove connection</ListItemText>
           </MenuItem>
-        </Menu>
-      </TableCell>
-    </TableRow>
+        </Menu> */}
+        </TableCell>
+      </TableRow>
+      <ConnectionInspectDrawer
+        key={row._id}
+        open={open}
+        toggleOpen={toggleOpen}
+        connection={row}
+        relativeTime={relativeTime}
+      />
+    </>
   )
 }
