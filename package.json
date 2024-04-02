@@ -40,6 +40,7 @@
     "ethers": "^6.9.0",
     "events": "^3.3.0",
     "exponential-backoff": "^3.1.1",
+    "jszip": "^3.10.1",
     "lightweight-charts": "^4.1.1",
     "lodash-es": "^4.17.21",
     "nanostores": "^0.9.5",

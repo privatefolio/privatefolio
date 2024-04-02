@@ -5,7 +5,7 @@ import React, { useCallback, useRef, useState } from "react"
 import { ConfirmDialogContextType, useConfirm } from "src/hooks/useConfirm"
 import { ParserContextFn } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
-import { formatCamelCase } from "src/utils/utils"
+import { extractFromZip, formatCamelCase } from "src/utils/utils"
 
 import { enqueueTask, TaskPriority } from "../stores/task-store"
 import { handleAuditLogChange } from "../utils/common-tasks"
@@ -37,23 +37,28 @@ export function FileDrop(props: ButtonProps) {
 
   const handleFileUpload = useCallback(
     async (file: File) => {
-      enqueueTask({
-        description: `Importing "${file.name}".`,
-        determinate: true,
-        function: async (progress) => {
-          const { metadata } = await clancy.addFileImport(
-            file,
-            progress,
-            $activeAccount.get(),
-            proxy(createParserContextFn(confirm, file))
-          )
-          if (metadata.logs > 0) {
-            handleAuditLogChange()
-          }
-        },
-        name: `Import file`,
-        priority: TaskPriority.VeryHigh,
-      })
+      const csvFiles =
+        file.type === "application/x-zip-compressed" ? await extractFromZip(file) : [file]
+
+      for (const csvFile of csvFiles) {
+        enqueueTask({
+          description: `Importing "${csvFile.name}".`,
+          determinate: true,
+          function: async (progress) => {
+            const { metadata } = await clancy.addFileImport(
+              csvFile,
+              progress,
+              $activeAccount.get(),
+              proxy(createParserContextFn(confirm, csvFile))
+            )
+            if (metadata.logs > 0) {
+              handleAuditLogChange()
+            }
+          },
+          name: `Import file`,
+          priority: TaskPriority.VeryHigh,
+        })
+      }
     },
     [confirm]
   )
@@ -177,7 +182,7 @@ export function FileDrop(props: ButtonProps) {
         ref={fileInputRef}
         onChange={handleFileSelect}
         style={{ display: "none" }}
-        accept=".csv"
+        accept=".csv, .zip"
         multiple
       />
     </Button>

@@ -1,3 +1,4 @@
+import JSZip from "jszip"
 import {
   exportAuditLogsToCsv,
   exportTransactionsToCsv,
@@ -9,7 +10,7 @@ import { $activeAccount } from "src/stores/account-store"
 import { $filterOptionsMap, computeMetadata } from "../stores/metadata-store"
 import { $taskQueue, enqueueTask, TaskPriority } from "../stores/task-store"
 import { clancy } from "../workers/remotes"
-import { downloadCsv } from "./utils"
+import { createCsvString, downloadCsv, downloadFile } from "./utils"
 
 export function handleAuditLogChange(_auditLog?: AuditLog) {
   // TODO invalidate balancesCursor based on auditLog.timestamp
@@ -311,6 +312,36 @@ export function enqueueExportAllAuditLogs() {
       downloadCsv(data, `${$activeAccount.get()}-audit-logs.csv`)
     },
     name: "Export all audit logs",
+    priority: TaskPriority.Low,
+  })
+}
+
+export function enqueueExportAppData() {
+  const taskQueue = $taskQueue.get()
+
+  const existing = taskQueue.find((task) => task.name === "Export app data")
+
+  if (existing) return
+
+  enqueueTask({
+    abortable: true,
+    description: "Export app data",
+    determinate: true,
+    function: async () => {
+      const auditLogs = await clancy.findAuditLogs({}, $activeAccount.get())
+      const auditLogsFile = createCsvString(exportAuditLogsToCsv(auditLogs))
+      const txns = await clancy.findTransactions({}, $activeAccount.get())
+      const txnsFile = createCsvString(exportTransactionsToCsv(txns))
+
+      const zip = new JSZip()
+      zip.file(`${$activeAccount.get()}-audit-logs.csv`, auditLogsFile)
+      zip.file(`${$activeAccount.get()}-transactions.csv`, txnsFile)
+
+      zip.generateAsync({ type: "blob" }).then(function (blob) {
+        downloadFile(blob, `${$activeAccount.get()}-data.zip`)
+      })
+    },
+    name: "Export app data",
     priority: TaskPriority.Low,
   })
 }

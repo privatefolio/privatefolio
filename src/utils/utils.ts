@@ -1,3 +1,4 @@
+import JSZip from "jszip"
 import { CsvData } from "src/interfaces"
 
 /**
@@ -91,7 +92,7 @@ export function formatCamelCase(str: string) {
     .trim()
 }
 
-function createCsvString(data: CsvData) {
+export function createCsvString(data: CsvData) {
   return data
     .map((row) =>
       row
@@ -101,8 +102,7 @@ function createCsvString(data: CsvData) {
     .join("\n")
 }
 
-export function downloadCsv(data: CsvData, filename: string) {
-  const blob = new Blob([createCsvString(data)], { type: "text/csv;charset=utf-8;" })
+export function downloadFile(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob)
   const link = document.createElement("a")
   link.href = url
@@ -111,4 +111,26 @@ export function downloadCsv(data: CsvData, filename: string) {
   link.click()
   document.body.removeChild(link) // Clean up
   URL.revokeObjectURL(url) // Free up resources
+}
+
+export function downloadCsv(data: CsvData, filename: string) {
+  const blob = new Blob([createCsvString(data)], { type: "text/csv;charset=utf-8;" })
+  downloadFile(blob, filename)
+}
+
+export async function extractFromZip(file: File) {
+  const csvFiles: File[] = []
+
+  const zip = await JSZip.loadAsync(file)
+  for (const csvFilename of Object.keys(zip.files)) {
+    const buffer = await zip.files[csvFilename].async("arraybuffer")
+    csvFiles.push(
+      new File([buffer], csvFilename, {
+        lastModified: file.lastModified,
+        type: "text/csv",
+      })
+    )
+  }
+
+  return csvFiles
 }

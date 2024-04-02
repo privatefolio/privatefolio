@@ -1,5 +1,6 @@
 import {
   CalculateOutlined,
+  DownloadRounded,
   MemoryRounded,
   MoreHoriz,
   PersonRemoveRounded,
@@ -13,6 +14,7 @@ import { $accountReset, $accounts, $activeAccount } from "src/stores/account-sto
 import { useConfirm } from "../../hooks/useConfirm"
 import { enqueueTask, TaskPriority } from "../../stores/task-store"
 import {
+  enqueueExportAppData,
   enqueueIndexDatabase,
   enqueueRecomputeBalances,
   enqueueRecomputeNetworth,
@@ -49,6 +51,18 @@ export function ImportDataActions() {
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
       >
+        <MenuItem
+          dense
+          onClick={() => {
+            enqueueExportAppData()
+            handleClose()
+          }}
+        >
+          <ListItemIcon>
+            <DownloadRounded fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Export app data</ListItemText>
+        </MenuItem>
         <MenuItem
           dense
           onClick={() => {
