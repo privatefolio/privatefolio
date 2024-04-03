@@ -1,6 +1,7 @@
 import PouchDB from "pouchdb"
 import PouchDBFind from "pouchdb-find"
 
+// import replicationStream from "pouchdb-replication-stream"
 import {
   Asset,
   AuditLog,
@@ -38,6 +39,8 @@ if (testEnvironment) {
 //   }
 // }
 PouchDB.plugin(PouchDBFind)
+// console.log("🚀 ~ replicationStream:", replicationStream)
+// PouchDB.plugin(replicationStream.plugin)
 
 export const Pouch = PouchDB
 

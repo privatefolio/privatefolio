@@ -48,6 +48,7 @@
     "pouchdb": "^8.0.1",
     "pouchdb-browser": "^8.0.1",
     "pouchdb-find": "^8.0.1",
+    "pouchdb-replication-stream": "^1.2.9",
     "react": "^18.2.0",
     "react-csv": "^2.2.2",
     "react-dom": "18.2.0",

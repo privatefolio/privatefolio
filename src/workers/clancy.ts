@@ -3,6 +3,7 @@ import "./comlink-setup"
 import { expose } from "comlink"
 
 import * as auditLogs from "../api/account/audit-logs-api"
+import * as backup from "../api/account/backup-and-restore-api"
 import * as balances from "../api/account/balances-api"
 import * as connections from "../api/account/connections/connections-api"
 import * as fileImports from "../api/account/file-imports/file-imports-api"
@@ -26,6 +27,7 @@ const worker = {
   ...kv,
   ...portfolio,
   ...assets,
+  ...backup,
 }
 
 export type Clancy = typeof worker
