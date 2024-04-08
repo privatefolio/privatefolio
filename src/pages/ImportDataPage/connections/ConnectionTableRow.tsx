@@ -226,16 +226,17 @@ export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
             dense
             onClick={async () => {
               enqueueTask({
+                abortable: true,
                 description: `Reset "${row.address}"`,
                 determinate: true,
-                function: async (progress) => {
+                function: async (progress, signal) => {
                   await clancy.resetConnection(row, progress, $activeAccount.get())
-                  await clancy.syncConnection(progress, row, $activeAccount.get(), "0")
+                  await clancy.syncConnection(progress, row, $activeAccount.get(), "0", signal)
                 },
                 name: `Reset connection`,
                 priority: TaskPriority.High,
               })
-              handleAuditLogChange()
+              // handleAuditLogChange()
               handleClose()
             }}
           >

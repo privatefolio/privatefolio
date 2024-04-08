@@ -1,61 +1,101 @@
-import { BinanceConnection } from "src/interfaces"
+import { BinanceConnection, SyncResult } from "src/interfaces"
 import { ProgressCallback } from "src/stores/task-store"
 import { noop } from "src/utils/utils"
 
-const testEnvironment = process.env.NODE_ENV === "test"
+import {
+  BinanceTrade,
+  getBinanceDeposit,
+  getBinanceSymbols,
+  getBinanceTradesForSymbol,
+  getBinanceWithdraw,
+} from "./binance-account-api"
+import { parseDeposit } from "./binance-deposit"
+import { parseTrade } from "./binance-trades"
+import { parseWithdraw } from "./binance-withdraw"
 
-async function generateSignature(data: Uint8Array, secret: Uint8Array) {
-  if (testEnvironment) {
-    const crypto = await import("crypto")
-    return crypto.createHmac("sha256", secret).update(data).digest("hex")
-  }
-
-  const cryptoKey = await self.crypto.subtle.importKey(
-    "raw",
-    secret,
-    { hash: "SHA-256", name: "HMAC" },
-    false,
-    ["sign"]
-  )
-  const signature = await self.crypto.subtle.sign("HMAC", cryptoKey, data)
-  const byteArray = new Uint8Array(signature)
-  const hexParts: string[] = []
-  byteArray.forEach((byte) => {
-    const hex = byte.toString(16).padStart(2, "0")
-    hexParts.push(hex)
-  })
-
-  const finalSignature = hexParts.join("")
-  return finalSignature
-}
+// const parserList = [parseDeposit, parseWithdraw]
+const parserList = [parseDeposit, parseWithdraw, parseTrade]
 
 export async function syncBinance(
   progress: ProgressCallback = noop,
   connection: BinanceConnection,
-  since: string
-) {
-  const timestamp = Date.now()
-  console.log("🚀 ~ timestamp:", timestamp)
-  const queryString = `timestamp=${timestamp}`
+  since: string,
+  signal?: AbortSignal
+): Promise<SyncResult> {
+  progress([0, `Starting from block number ${since}`])
 
-  const encoder = new TextEncoder()
-  const encodedData = encoder.encode(queryString)
-  const encodedSecret = encoder.encode(connection.secret)
+  const result: SyncResult = {
+    assetMap: {},
+    logMap: {},
+    newCursor: since,
+    operationMap: {},
+    rows: 0,
+    txMap: {},
+    walletMap: {},
+  }
 
-  const signature = await generateSignature(encodedData, encodedSecret)
-  console.log("🚀 ~ signature:", signature)
+  progress([0, `Fetching deposits`])
+  const deposit = await getBinanceDeposit(connection)
+  progress([10, `Fetching withdrawals`])
+  const withdraw = await getBinanceWithdraw(connection)
+  progress([20, `Fetching symbols`])
+  const symbols = await getBinanceSymbols(connection)
+  progress([30, `Fetched ${symbols.length} symbols`])
+  let trades: BinanceTrade[] = []
 
-  const BASE_URL = "https://api.binance.com"
-  const endpoint = "/sapi/v1/capital/deposit/hisrec"
-  const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
+  for (let i = 0; i < symbols.length; i++) {
+    const symbol = symbols[i]
+    if (signal?.aborted) {
+      throw new Error(signal.reason)
+    }
+    try {
+      progress([(30 / symbols.length) * i + 30, `Fetching trade history for ${symbol}`])
+      const x = await getBinanceTradesForSymbol(connection, symbol)
+      trades = trades.concat(x)
+    } catch (err) {
+      progress([undefined, `Skipping ${symbol}. Error: ${String(err)}`])
+    }
+  }
 
-  console.log("🚀 ~ url:", url)
-  const res = await fetch(url, {
-    headers: {
-      "X-MBX-APIKEY": connection.key,
-    },
+  console.log("Trades: ", trades)
+
+  // const transactionArrays = [deposit, withdraw]
+  const transactionArrays = [deposit, withdraw, trades]
+  let blockNumber = 0
+
+  progress([50, "Parsing all transactions"])
+  transactionArrays.forEach((txArray, arrayIndex) => {
+    const parse = parserList[arrayIndex]
+    result.rows += txArray.length
+
+    txArray.forEach((row, rowIndex) => {
+      try {
+        const { logs, txns = [] } = parse(row, rowIndex, connection)
+
+        // if (logs.length === 0) throw new Error(JSON.stringify(row, null, 2))
+
+        for (const log of logs) {
+          result.logMap[log._id] = log
+          result.assetMap[log.assetId] = true
+          result.walletMap[log.wallet] = true
+          result.operationMap[log.operation] = true
+        }
+
+        for (const transaction of txns) {
+          result.txMap[transaction._id] = transaction
+        }
+      } catch (error) {
+        progress([undefined, `Error parsing row ${rowIndex + 1}: ${String(error)}`])
+      }
+    })
+
+    const lastBlock = txArray[txArray.length - 1]?.blockNumber
+
+    if (lastBlock && Number(lastBlock) > blockNumber) {
+      blockNumber = Number(lastBlock)
+    }
   })
-  const data = await res.json()
-  console.log(data)
-  return data
+
+  result.newCursor = String(blockNumber + 1)
+  return result
 }

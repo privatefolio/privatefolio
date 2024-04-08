@@ -252,11 +252,12 @@ export function enqueueRefreshNetworth() {
 
 export function enqueueSyncConnection(connection: Connection) {
   enqueueTask({
+    abortable: true,
     description: `Sync "${connection.address}"`,
     determinate: true,
-    function: async (progress) => {
-      await clancy.syncConnection(progress, connection, $activeAccount.get())
-      handleAuditLogChange()
+    function: async (progress, signal) => {
+      await clancy.syncConnection(progress, connection, $activeAccount.get(), undefined, signal)
+      // handleAuditLogChange()
     },
     name: "Sync connection",
     priority: TaskPriority.High,

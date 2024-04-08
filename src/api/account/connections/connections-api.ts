@@ -146,7 +146,8 @@ export async function syncConnection(
   progress: ProgressCallback = noop,
   connection: Connection,
   accountName: string,
-  since?: string
+  since?: string,
+  signal?: AbortSignal
 ) {
   let result: SyncResult
 
@@ -157,7 +158,7 @@ export async function syncConnection(
   if (connection.platform === "ethereum") {
     result = await syncEtherscan(progress, connection as EtherscanConnection, since)
   } else if (connection.platform === "binance") {
-    result = await syncBinance(progress, connection as BinanceConnection, since)
+    result = await syncBinance(progress, connection as BinanceConnection, since, signal)
   } else {
     throw new Error(`Unsupported platform: ${connection.platform}`)
   }
