@@ -26,7 +26,7 @@ export function parseDeposit(
     throw new Error(`Invalid timestamp: ${insertTime}`)
   }
   const assetId = `binance:${coin}`
-  const txId = `${connection._id}_${txHash}_ERC20_${index}`
+  const txId = `${connection._id}_${txHash}_Binance_deposit_${index}`
   const operation: AuditLogOperation = "Deposit"
   const type: TransactionType = "Deposit"
   const importId = connection._id

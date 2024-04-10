@@ -81,6 +81,9 @@ export async function fetchAssetInfos(
   await Promise.all(
     promises.map((fetchFn) =>
       fetchFn().then(() => {
+        if (signal?.aborted) {
+          throw new Error(signal.reason)
+        }
         progressCount += 1
         progress([(progressCount / assetIds.length) * 100])
       })

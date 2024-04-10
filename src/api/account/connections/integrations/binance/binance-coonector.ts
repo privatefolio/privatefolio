@@ -1,6 +1,6 @@
 import { BinanceConnection, SyncResult } from "src/interfaces"
 import { ProgressCallback } from "src/stores/task-store"
-import { noop } from "src/utils/utils"
+import { noop, wait } from "src/utils/utils"
 
 import {
   BinanceTrade,
@@ -13,7 +13,6 @@ import { parseDeposit } from "./binance-deposit"
 import { parseTrade } from "./binance-trades"
 import { parseWithdraw } from "./binance-withdraw"
 
-// const parserList = [parseDeposit, parseWithdraw]
 const parserList = [parseDeposit, parseWithdraw, parseTrade]
 
 export async function syncBinance(
@@ -41,29 +40,71 @@ export async function syncBinance(
   progress([20, `Fetching symbols`])
   const symbols = await getBinanceSymbols(connection)
   progress([30, `Fetched ${symbols.length} symbols`])
-  let trades: BinanceTrade[] = []
 
-  for (let i = 0; i < symbols.length; i++) {
-    const symbol = symbols[i]
-    if (signal?.aborted) {
-      throw new Error(signal.reason)
-    }
-    try {
-      progress([(30 / symbols.length) * i + 30, `Fetching trade history for ${symbol}`])
-      const x = await getBinanceTradesForSymbol(connection, symbol)
-      trades = trades.concat(x)
-    } catch (err) {
-      progress([undefined, `Skipping ${symbol}. Error: ${String(err)}`])
+  // const promises: (() => Promise<void>)[] = []
+
+  // for (let i = 0; i < symbols.length; i++) {
+  //   const symbol = symbols[i]
+  //   // eslint-disable-next-line no-loop-func
+  //   promises.push(async () => {
+  //     try {
+  //       progress([undefined, `Fetching trade history for ${symbol}`])
+  //       const x = await getBinanceTradesForSymbol(connection, symbol)
+  //       allTrades = allTrades.concat(x)
+  //     } catch (err) {
+  //       progress([undefined, `Skipping ${symbol}. Error: ${String(err)}`])
+  //     }
+  //   })
+  // }
+
+  // await Promise.all(
+  //   promises.map((fetchFn) =>
+  //     fetchFn().then(() => {
+  //       if (signal?.aborted) {
+  //         throw new Error(signal.reason)
+  //       }
+  //       progressCount += 1
+  //       progress([(progressCount / symbols.length) * 100])
+  //     })
+  //   )
+  // )
+  let allTrades: BinanceTrade[] = []
+  let progressCount = 0
+
+  for (let i = 0; i < symbols.length; i += 10) {
+    const batch = symbols.slice(i, i + 10)
+
+    await Promise.all(
+      // eslint-disable-next-line no-loop-func
+      batch.map(async (symbol) => {
+        try {
+          if (signal?.aborted) {
+            throw new Error(signal.reason)
+          }
+          progress([undefined, `Fetching trade history for ${symbol.symbol}`])
+          const tradesForSymbol = await getBinanceTradesForSymbol(connection, symbol, progress)
+          allTrades = allTrades.concat(tradesForSymbol)
+        } catch (err) {
+          if (String(err).includes("429")) {
+            throw err
+          }
+          progress([undefined, `Skipping ${symbol}. Error: ${String(err)}`])
+        }
+      })
+    )
+
+    progressCount += batch.length
+    progress([30 + (progressCount / symbols.length) * 30])
+
+    if (i + 10 < symbols.length) {
+      await wait(200 * 4)
     }
   }
-
-  console.log("Trades: ", trades)
-
-  // const transactionArrays = [deposit, withdraw]
-  const transactionArrays = [deposit, withdraw, trades]
+  console.log("Trades: ", allTrades)
+  const transactionArrays = [deposit, withdraw, allTrades]
   let blockNumber = 0
 
-  progress([50, "Parsing all transactions"])
+  progress([60, "Parsing all transactions"])
   transactionArrays.forEach((txArray, arrayIndex) => {
     const parse = parserList[arrayIndex]
     result.rows += txArray.length
@@ -97,5 +138,6 @@ export async function syncBinance(
   })
 
   result.newCursor = String(blockNumber + 1)
+  console.log("🚀 ~ result:", result)
   return result
 }

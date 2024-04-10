@@ -14,7 +14,19 @@ export function parseTrade(
   connection: BinanceConnection
 ): ParserResult {
   const { platform, address } = connection
-  const { symbol, id, price, qty, quoteQty, commission, commissionAsset, time, isBuyer } = row
+  const {
+    symbol,
+    id,
+    price,
+    qty,
+    quoteQty,
+    commission,
+    commissionAsset,
+    time,
+    isBuyer,
+    baseAsset,
+    quoteAsset,
+  } = row
 
   const wallet = `Binance Spot`
 
@@ -34,16 +46,16 @@ export function parseTrade(
   if (isBuyer) {
     incoming = qty
     incomingN = parseFloat(incoming)
-    incomingAsset = `binance:${commissionAsset}`
+    incomingAsset = `binance:${baseAsset}`
     outgoing = quoteQty
     outgoingN = parseFloat(outgoing)
-    outgoingAsset = `binance:${symbol.replace(commissionAsset, "")}`
+    outgoingAsset = `binance:${quoteAsset}`
     logs = [
       {
         _id: `${txId}_SELL`,
         assetId: outgoingAsset,
         change: `-${outgoing}` as string,
-        changeN: parseFloat(outgoing),
+        changeN: outgoingN,
         importId,
         importIndex,
         operation: "Sell",
@@ -53,23 +65,10 @@ export function parseTrade(
         wallet,
       },
       {
-        _id: `${txId}_FEE`,
-        assetId: `binance:${commissionAsset}`,
-        change: `-${commission}` as string,
-        changeN: parseFloat(commission),
-        importId,
-        importIndex,
-        operation: "Fee",
-        platform,
-        timestamp,
-        txId,
-        wallet,
-      },
-      {
         _id: `${txId}_BUY`,
         assetId: incomingAsset,
         change: incoming,
-        changeN: parseFloat(incoming),
+        changeN: incomingN,
         importId,
         importIndex,
         operation: "Buy",
@@ -82,16 +81,16 @@ export function parseTrade(
   } else {
     incoming = quoteQty
     incomingN = parseFloat(incoming)
-    incomingAsset = `binance:${commissionAsset}`
+    incomingAsset = `binance:${quoteAsset}`
     outgoing = qty
     outgoingN = parseFloat(outgoing)
-    outgoingAsset = `binance:${symbol.replace(commissionAsset, "")}`
+    outgoingAsset = `binance:${baseAsset}`
     logs = [
       {
         _id: `${txId}_SELL`,
         assetId: outgoingAsset,
         change: `-${outgoing}` as string,
-        changeN: parseFloat(outgoing),
+        changeN: outgoingN,
         importId,
         importIndex,
         operation: "Sell",
@@ -101,23 +100,10 @@ export function parseTrade(
         wallet,
       },
       {
-        _id: `${txId}_FEE`,
-        assetId: `binance:${commissionAsset}`,
-        change: `-${commission}` as string,
-        changeN: parseFloat(commission),
-        importId,
-        importIndex,
-        operation: "Fee",
-        platform,
-        timestamp,
-        txId,
-        wallet,
-      },
-      {
         _id: `${txId}_BUY`,
         assetId: incomingAsset,
         change: incoming,
-        changeN: parseFloat(incoming),
+        changeN: incomingN,
         importId,
         importIndex,
         operation: "Buy",
@@ -129,11 +115,27 @@ export function parseTrade(
     ]
   }
 
+  if (commission) {
+    logs.push({
+      _id: `${txId}_FEE`,
+      assetId: `binance:${commissionAsset}`,
+      change: `-${commission}` as string,
+      changeN: parseFloat(commission),
+      importId,
+      importIndex,
+      operation: "Fee",
+      platform,
+      timestamp,
+      txId,
+      wallet,
+    })
+  }
+
   const tx: Transaction = {
     _id: txId,
-    fee: commission,
-    feeAsset: `binance:${commissionAsset}`,
-    feeN: parseFloat(commission),
+    fee: commission === "0" ? undefined : commission,
+    feeAsset: commission === "0" ? undefined : `binance:${commissionAsset}`,
+    feeN: commission === "0" ? undefined : parseFloat(commission),
     importId,
     importIndex,
     incoming: incoming === "0" ? undefined : incoming,

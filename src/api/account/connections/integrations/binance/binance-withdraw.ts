@@ -39,7 +39,7 @@ export function parseWithdraw(
   }
 
   const assetId = `binance:${coin}`
-  const txId = `${connection._id}_${txHash}_ERC20_${index}`
+  const txId = `${connection._id}_${txHash}_Binance_withdraw_${index}`
   const operation: AuditLogOperation = "Withdraw"
   const type: TransactionType = "Withdraw"
   const importId = connection._id

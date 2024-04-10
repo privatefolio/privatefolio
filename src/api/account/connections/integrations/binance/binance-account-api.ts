@@ -1,4 +1,5 @@
 import { BinanceConnection } from "src/interfaces"
+import { ProgressCallback } from "src/stores/task-store"
 
 const testEnvironment = process.env.NODE_ENV === "test"
 
@@ -72,6 +73,8 @@ export interface BinanceTrade {
   qty: string
   quoteQty: string
   commission: string
+  quoteAsset: string
+  baseAsset: string
   commissionAsset: string
   time: number
   isBuyer: boolean
@@ -80,6 +83,13 @@ export interface BinanceTrade {
   blockNumber: string
 }
 
+export interface BinancePair {
+  symbol: string
+  baseAsset: string
+  quoteAsset: string
+}
+
+// https://binance-docs.github.io/apidocs/spot/en/#deposit-history-supporting-network-user_data
 export async function getBinanceDeposit(
   connection: BinanceConnection
 ): Promise<Array<BinanceDeposit>> {
@@ -107,6 +117,7 @@ export async function getBinanceDeposit(
   return data
 }
 
+// https://binance-docs.github.io/apidocs/spot/en/#withdraw-history-supporting-network-user_data
 export async function getBinanceWithdraw(
   connection: BinanceConnection
 ): Promise<Array<BinanceWithdraw>> {
@@ -134,9 +145,12 @@ export async function getBinanceWithdraw(
   return data
 }
 
-export async function getBinanceSymbols(connection: BinanceConnection): Promise<Array<string>> {
+// https://binance-docs.github.io/apidocs/spot/en/#exchange-information
+export async function getBinanceSymbols(
+  connection: BinanceConnection
+): Promise<Array<BinancePair>> {
   const BASE_URL = "http://localhost:8080/api.binance.com"
-  const endpoint = "/api/v1/exchangeInfo"
+  const endpoint = "/api/v3/exchangeInfo"
   const url = `${BASE_URL}${endpoint}`
 
   console.log("🚀 ~ url:", url)
@@ -146,16 +160,22 @@ export async function getBinanceSymbols(connection: BinanceConnection): Promise<
     },
   })
   const data = await res.json()
-  const symbols = data.symbols.map((symbol) => symbol.symbol)
+  const symbols: BinancePair[] = data.symbols.map((x) => ({
+    baseAsset: x.baseAsset,
+    quoteAsset: x.quoteAsset,
+    symbol: x.symbol,
+  }))
   return symbols
 }
 
+// https://binance-docs.github.io/apidocs/spot/en/#account-trade-list-user_data
 export async function getBinanceTradesForSymbol(
   connection: BinanceConnection,
-  symbol: string
+  symbol: BinancePair,
+  progress: ProgressCallback
 ): Promise<Array<BinanceTrade>> {
   const timestamp = Date.now()
-  const queryString = `symbol=${symbol}&timestamp=${timestamp}`
+  const queryString = `symbol=${symbol.symbol}&timestamp=${timestamp}`
 
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
@@ -174,5 +194,15 @@ export async function getBinanceTradesForSymbol(
     },
   })
   const data: BinanceTrade[] = await res.json()
-  return data
+
+  progress([undefined, `Weight used: ${res.headers.get("X-Mbx-Used-Weight")}`])
+  // check if status is 429
+  if (res.status === 429) {
+    // wait()
+    throw new Error("429: Rate limited")
+
+    // return getBinanceTradesForSymbol(connection, symbol)
+  }
+
+  return data.map((x) => ({ ...x, baseAsset: symbol.baseAsset, quoteAsset: symbol.quoteAsset }))
 }
