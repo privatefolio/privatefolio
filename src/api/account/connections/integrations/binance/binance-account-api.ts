@@ -91,10 +91,12 @@ export interface BinancePair {
 
 // https://binance-docs.github.io/apidocs/spot/en/#deposit-history-supporting-network-user_data
 export async function getBinanceDeposit(
-  connection: BinanceConnection
+  connection: BinanceConnection,
+  startTime: number,
+  endTime: number
 ): Promise<Array<BinanceDeposit>> {
   const timestamp = Date.now()
-  const queryString = `timestamp=${timestamp}&startTime=1512079200000&endTime=1517436000000`
+  const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
 
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
@@ -113,8 +115,13 @@ export async function getBinanceDeposit(
       "X-MBX-APIKEY": connection.key,
     },
   })
-  const data: BinanceDeposit[] = await res.json()
-  return data
+  const data = await res.json()
+
+  if (res.status !== 200) {
+    throw new Error(`Binance: ${data.msg}`)
+  }
+
+  return data as BinanceDeposit[]
 }
 
 // https://binance-docs.github.io/apidocs/spot/en/#withdraw-history-supporting-network-user_data
