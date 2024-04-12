@@ -1,5 +1,6 @@
 import { BinanceConnection } from "src/interfaces"
 import { ProgressCallback } from "src/stores/task-store"
+import { formatDate } from "src/utils/formatting-utils"
 
 const testEnvironment = process.env.NODE_ENV === "test"
 
@@ -32,9 +33,9 @@ async function generateSignature(data: Uint8Array, secret: Uint8Array) {
 
 export interface BinanceDeposit {
   address: string
-  blockNumber: string
   addressTag: string
   amount: string
+  blockNumber: string
   coin: string
   confirmTimes: string
   id: string
@@ -47,46 +48,45 @@ export interface BinanceDeposit {
   walletType: number
 }
 export interface BinanceWithdraw {
-  id: string
-  blockNumber: string
-  amount: string
-  transactionFee: string
-  coin: string
-  status: number
   address: string
-  txId: string
+  amount: string
   applyTime: string
-  network: string
-  transferType: number
-  info: string
-  confirmNo: number
-  walletType: number
-  txKey: string
+  blockNumber: string
+  coin: string
   completeTime: string
+  confirmNo: number
+  id: string
+  info: string
+  network: string
+  status: number
+  transactionFee: string
+  transferType: number
+  txId: string
+  txKey: string
+  walletType: number
 }
 export interface BinanceTrade {
-  symbol: string
+  baseAsset: string
+  blockNumber: string
+  commission: string
+  commissionAsset: string
   id: number
+  isBestMatch: boolean
+  isBuyer: boolean
+  isMaker: boolean
   orderId: number
   orderListId: number
   price: string
   qty: string
+  quoteAsset: string
   quoteQty: string
-  commission: string
-  quoteAsset: string
-  baseAsset: string
-  commissionAsset: string
-  time: number
-  isBuyer: boolean
-  isMaker: boolean
-  isBestMatch: boolean
-  blockNumber: string
-}
-
-export interface BinancePair {
   symbol: string
+  time: number
+}
+export interface BinancePair {
   baseAsset: string
   quoteAsset: string
+  symbol: string
 }
 
 // https://binance-docs.github.io/apidocs/spot/en/#deposit-history-supporting-network-user_data
@@ -126,10 +126,13 @@ export async function getBinanceDeposit(
 
 // https://binance-docs.github.io/apidocs/spot/en/#withdraw-history-supporting-network-user_data
 export async function getBinanceWithdraw(
-  connection: BinanceConnection
+  connection: BinanceConnection,
+  startTime: number,
+  endTime: number,
+  progress: ProgressCallback
 ): Promise<Array<BinanceWithdraw>> {
   const timestamp = Date.now()
-  const queryString = `timestamp=${timestamp}&startTime=1512079200000&endTime=1517436000000`
+  const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
 
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
@@ -148,6 +151,12 @@ export async function getBinanceWithdraw(
       "X-MBX-APIKEY": connection.key,
     },
   })
+  progress([
+    undefined,
+    `Fetched withdrawals history for ${formatDate(startTime)} to ${formatDate(
+      endTime
+    )} - Weight used: ${res.headers.get("X-Sapi-Used-Uid-Weight-1s")}`,
+  ])
   const data: BinanceWithdraw[] = await res.json()
   return data
 }

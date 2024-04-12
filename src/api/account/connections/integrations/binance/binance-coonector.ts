@@ -1,19 +1,22 @@
 import { BinanceConnection, SyncResult } from "src/interfaces"
 import { ProgressCallback } from "src/stores/task-store"
 import { formatDate } from "src/utils/formatting-utils"
-import { noop } from "src/utils/utils"
+import { noop, wait } from "src/utils/utils"
 
 import {
   BinanceDeposit,
+  BinanceTrade,
+  BinanceWithdraw,
   getBinanceDeposit,
   getBinanceSymbols,
+  getBinanceTradesForSymbol,
   getBinanceWithdraw,
 } from "./binance-account-api"
 import { parseDeposit } from "./binance-deposit"
+import { parseTrade } from "./binance-trades"
 import { parseWithdraw } from "./binance-withdraw"
 
-// const parserList = [parseDeposit, parseWithdraw, parseTrade]
-const parserList = [parseDeposit, parseWithdraw]
+const parserList = [parseDeposit, parseWithdraw, parseTrade]
 
 export async function syncBinance(
   progress: ProgressCallback = noop,
@@ -36,13 +39,13 @@ export async function syncBinance(
   progress([0, `Fetching deposits`])
   const currentTime = Date.now()
   let allDeposits: BinanceDeposit[] = []
-  const promises: (() => Promise<void>)[] = []
+  const promisesDeposits: (() => Promise<void>)[] = []
   const ninetyDays = 7_776_000_000
   const genesis = 1498867200000
 
   for (let startTime = genesis; startTime <= currentTime; startTime += ninetyDays) {
     // eslint-disable-next-line no-loop-func
-    promises.push(async () => {
+    promisesDeposits.push(async () => {
       const endTime = startTime + ninetyDays
       try {
         if (signal?.aborted) {
@@ -64,7 +67,7 @@ export async function syncBinance(
   }
 
   await Promise.all(
-    promises.map((fetchFn) =>
+    promisesDeposits.map((fetchFn) =>
       fetchFn().then(() => {
         if (signal?.aborted) {
           throw new Error(signal.reason)
@@ -72,14 +75,56 @@ export async function syncBinance(
       })
     )
   )
-
   progress([10, `Fetched ${allDeposits.length} deposits`])
   progress([10, `Fetching withdrawals`])
-  const withdraw = await getBinanceWithdraw(connection)
-  progress([20, `Fetched ${withdraw.length} withdrawals`])
+
+  const promisesWithdrawals: (() => Promise<void>)[] = []
+  let allWithdrawals: BinanceWithdraw[] = []
+  for (let startTime = genesis; startTime <= currentTime; startTime += ninetyDays) {
+    // eslint-disable-next-line no-loop-func
+    promisesWithdrawals.push(async () => {
+      const endTime = startTime + ninetyDays
+      try {
+        if (signal?.aborted) {
+          throw new Error(signal.reason)
+        }
+        progress([
+          undefined,
+          `Fetching withdrawals history for ${formatDate(startTime)} to ${formatDate(endTime)}`,
+        ])
+        const x = await getBinanceWithdraw(connection, startTime, endTime, progress)
+        allWithdrawals = allWithdrawals.concat(x)
+      } catch (err) {
+        progress([
+          undefined,
+          `Skipping ${formatDate(startTime)}-${formatDate(endTime)}. Error: ${String(err)}`,
+        ])
+      }
+    })
+  }
+
+  for (let page = 0; page < promisesWithdrawals.length / 10; page++) {
+    const batch = promisesWithdrawals.slice(page * 10, page * 10 + 10)
+
+    if (page !== 0) {
+      await wait(1_000)
+    }
+    await Promise.all(
+      batch.map((fetchFn) =>
+        fetchFn().then(() => {
+          if (signal?.aborted) {
+            throw new Error(signal.reason)
+          }
+        })
+      )
+    )
+  }
+  console.log("Withdrawels: ", allWithdrawals)
+  progress([20, `Fetched ${allWithdrawals.length} withdrawals`])
   progress([20, `Fetching symbols`])
   const symbols = await getBinanceSymbols(connection)
   progress([30, `Fetched ${symbols.length} symbols`])
+  progress([30, `Fetching trade history`])
 
   // const promises: (() => Promise<void>)[] = []
 
@@ -108,44 +153,43 @@ export async function syncBinance(
   //     })
   //   )
   // )
-  // let allTrades: BinanceTrade[] = []
-  // let progressCount = 0
+  let allTrades: BinanceTrade[] = []
+  let progressCount = 0
 
-  // for (let i = 0; i < symbols.length; i += 10) {
-  //   const batch = symbols.slice(i, i + 10)
+  for (let i = 0; i < symbols.length; i += 10) {
+    const batch = symbols.slice(i, i + 10)
 
-  //   await Promise.all(
-  //     // eslint-disable-next-line no-loop-func
-  //     batch.map(async (symbol) => {
-  //       try {
-  //         if (signal?.aborted) {
-  //           throw new Error(signal.reason)
-  //         }
-  //         progress([undefined, `Fetching trade history for ${symbol.symbol}`])
-  //         const tradesForSymbol = await getBinanceTradesForSymbol(connection, symbol, progress)
-  //         allTrades = allTrades.concat(tradesForSymbol)
-  //       } catch (err) {
-  //         if (String(err).includes("429")) {
-  //           throw err
-  //         }
-  //         progress([undefined, `Skipping ${symbol}. Error: ${String(err)}`])
-  //       }
-  //     })
-  //   )
+    await Promise.all(
+      // eslint-disable-next-line no-loop-func
+      batch.map(async (symbol) => {
+        try {
+          if (signal?.aborted) {
+            throw new Error(signal.reason)
+          }
+          progress([undefined, `Fetching trade history for ${symbol.symbol}`])
+          const tradesForSymbol = await getBinanceTradesForSymbol(connection, symbol, progress)
+          allTrades = allTrades.concat(tradesForSymbol)
+        } catch (err) {
+          if (String(err).includes("429")) {
+            throw err
+          }
+          progress([undefined, `Skipping ${symbol}. Error: ${String(err)}`])
+        }
+      })
+    )
 
-  //   progressCount += batch.length
-  //   progress([30 + (progressCount / symbols.length) * 30])
+    progressCount += batch.length
+    progress([30 + (progressCount / symbols.length) * 50])
 
-  //   if (i + 10 < symbols.length) {
-  //     await wait(200 * 4)
-  //   }
-  // }
-  // console.log("Trades: ", allTrades)
-  // const transactionArrays = [deposit, withdraw, allTrades]
-  const transactionArrays = [allDeposits, withdraw]
+    if (i + 10 < symbols.length) {
+      await wait(200 * 4)
+    }
+  }
+  console.log("Trades: ", allTrades)
+  const transactionArrays = [allDeposits, allWithdrawals, allTrades]
   let blockNumber = 0
 
-  progress([60, "Parsing all transactions"])
+  progress([80, "Parsing all transactions"])
   transactionArrays.forEach((txArray, arrayIndex) => {
     const parse = parserList[arrayIndex]
     result.rows += txArray.length
