@@ -5,18 +5,22 @@ import { noop, wait } from "src/utils/utils"
 
 import {
   BinanceDeposit,
+  BinanceReward,
   BinanceTrade,
   BinanceWithdraw,
   getBinanceDeposit,
+  getBinanceFlexibleRewards,
+  getBinanceLockedRewards,
   getBinanceSymbols,
   getBinanceTradesForSymbol,
   getBinanceWithdraw,
 } from "./binance-account-api"
 import { parseDeposit } from "./binance-deposit"
+import { parseReward } from "./binance-rewards"
 import { parseTrade } from "./binance-trades"
 import { parseWithdraw } from "./binance-withdraw"
 
-const parserList = [parseDeposit, parseWithdraw, parseTrade]
+const parserList = [parseDeposit, parseWithdraw, parseTrade, parseReward]
 
 export async function syncBinance(
   progress: ProgressCallback = noop,
@@ -75,6 +79,7 @@ export async function syncBinance(
       })
     )
   )
+  console.log("Deposits: ", allDeposits)
   progress([10, `Fetched ${allDeposits.length} deposits`])
   progress([10, `Fetching withdrawals`])
 
@@ -125,7 +130,6 @@ export async function syncBinance(
   const symbols = await getBinanceSymbols(connection)
   progress([30, `Fetched ${symbols.length} symbols`])
   progress([30, `Fetching trade history`])
-
   // const promises: (() => Promise<void>)[] = []
 
   // for (let i = 0; i < symbols.length; i++) {
@@ -153,6 +157,7 @@ export async function syncBinance(
   //     })
   //   )
   // )
+
   let allTrades: BinanceTrade[] = []
   let progressCount = 0
 
@@ -179,17 +184,82 @@ export async function syncBinance(
     )
 
     progressCount += batch.length
-    progress([30 + (progressCount / symbols.length) * 50])
+    progress([30 + (progressCount / symbols.length) * 40])
 
     if (i + 10 < symbols.length) {
       await wait(200 * 4)
     }
   }
   console.log("Trades: ", allTrades)
-  const transactionArrays = [allDeposits, allWithdrawals, allTrades]
-  let blockNumber = 0
+  progress([70, `Fetched ${allTrades.length} trades`])
+  progress([70, `Fetching rewards`])
+  let allRewards: BinanceReward[] = []
+  const promisesRewards: (() => Promise<void>)[] = []
+  for (let startTime = genesis; startTime <= currentTime; startTime += ninetyDays) {
+    // eslint-disable-next-line no-loop-func
+    promisesRewards.push(async () => {
+      const endTime = startTime + ninetyDays
+      try {
+        if (signal?.aborted) {
+          throw new Error(signal.reason)
+        }
+        progress([
+          undefined,
+          `Fetching deposit history for ${formatDate(startTime)} to ${formatDate(endTime)}`,
+        ])
+        const flexibleReward = await getBinanceFlexibleRewards(
+          connection,
+          startTime,
+          endTime,
+          progress,
+          "REWARDS"
+        )
+        const flexibleBonus = await getBinanceFlexibleRewards(
+          connection,
+          startTime,
+          endTime,
+          progress,
+          "BONUS"
+        )
+        const flexibleRealtime = await getBinanceFlexibleRewards(
+          connection,
+          startTime,
+          endTime,
+          progress,
+          "REALTIME"
+        )
+        const lockedReward = await getBinanceLockedRewards(connection, startTime, endTime, progress)
+        allRewards = allRewards.concat(
+          lockedReward,
+          flexibleReward,
+          flexibleBonus,
+          flexibleRealtime
+        )
+      } catch (err) {
+        progress([
+          undefined,
+          `Skipping ${formatDate(startTime)}-${formatDate(endTime)}. Error: ${String(err)}`,
+        ])
+      }
+    })
+  }
 
-  progress([80, "Parsing all transactions"])
+  await Promise.all(
+    promisesRewards.map((fetchFn) =>
+      fetchFn().then(() => {
+        if (signal?.aborted) {
+          throw new Error(signal.reason)
+        }
+      })
+    )
+  )
+  console.log("Rewards: ", allRewards)
+  progress([75, `Fetched ${allRewards.length} rewards`])
+
+  const transactionArrays = [allDeposits, allWithdrawals, allTrades, allRewards]
+
+  let blockNumber = 0
+  progress([75, "Parsing all transactions"])
   transactionArrays.forEach((txArray, arrayIndex) => {
     const parse = parserList[arrayIndex]
     result.rows += txArray.length

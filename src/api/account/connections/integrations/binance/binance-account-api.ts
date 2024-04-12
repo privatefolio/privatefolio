@@ -88,6 +88,31 @@ export interface BinancePair {
   quoteAsset: string
   symbol: string
 }
+export interface BinanceFlexibleReward {
+  asset: string
+  projectId: string
+  rewards: string
+  time: number
+  type: string
+}
+export interface BinanceLockedReward {
+  amount: string
+  asset: string
+  lockPeriod: string
+  positionId: string
+  time: number
+}
+export interface BinanceReward {
+  amount?: string
+  asset: string
+  blockNumber: string
+  lockPeriod?: string
+  positionId?: string
+  projectId?: string
+  rewards?: string
+  time: number
+  type?: string
+}
 
 // https://binance-docs.github.io/apidocs/spot/en/#deposit-history-supporting-network-user_data
 export async function getBinanceDeposit(
@@ -221,4 +246,77 @@ export async function getBinanceTradesForSymbol(
   }
 
   return data.map((x) => ({ ...x, baseAsset: symbol.baseAsset, quoteAsset: symbol.quoteAsset }))
+}
+
+export async function getBinanceFlexibleRewards(
+  connection: BinanceConnection,
+  startTime: number,
+  endTime: number,
+  progress: ProgressCallback,
+  type: string
+): Promise<Array<BinanceReward>> {
+  const timestamp = Date.now()
+  const queryString = `timestamp=${timestamp}&type=${type}&startTime=${startTime}&endTime=${endTime}`
+
+  const encoder = new TextEncoder()
+  const encodedData = encoder.encode(queryString)
+  const encodedSecret = encoder.encode(connection.secret)
+
+  const signature = await generateSignature(encodedData, encodedSecret)
+  console.log("🚀 ~ signature:", signature)
+
+  const BASE_URL = "http://localhost:8080/api.binance.com"
+  const endpoint = "/sapi/v1/simple-earn/flexible/history/rewardsRecord"
+  const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
+
+  console.log("🚀 ~ url:", url)
+  const res = await fetch(url, {
+    headers: {
+      "X-MBX-APIKEY": connection.key,
+    },
+  })
+  progress([
+    undefined,
+    `Fetched flexible rewards - ${type} from ${formatDate(startTime)} to ${formatDate(
+      endTime
+    )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
+  ])
+  const data = await res.json()
+  return data.rows as BinanceReward[]
+}
+
+export async function getBinanceLockedRewards(
+  connection: BinanceConnection,
+  startTime: number,
+  endTime: number,
+  progress: ProgressCallback
+): Promise<Array<BinanceReward>> {
+  const timestamp = Date.now()
+  const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
+
+  const encoder = new TextEncoder()
+  const encodedData = encoder.encode(queryString)
+  const encodedSecret = encoder.encode(connection.secret)
+
+  const signature = await generateSignature(encodedData, encodedSecret)
+  console.log("🚀 ~ signature:", signature)
+
+  const BASE_URL = "http://localhost:8080/api.binance.com"
+  const endpoint = "/sapi/v1/simple-earn/locked/history/rewardsRecord"
+  const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
+
+  console.log("🚀 ~ url:", url)
+  const res = await fetch(url, {
+    headers: {
+      "X-MBX-APIKEY": connection.key,
+    },
+  })
+  progress([
+    undefined,
+    `Fetched locked rewards from ${formatDate(startTime)} to ${formatDate(
+      endTime
+    )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
+  ])
+  const data = await res.json()
+  return data.rows as BinanceReward[]
 }
