@@ -87,6 +87,9 @@ export type AuditLogOperation =
   | "Transfer"
   | "Smart Contract"
   | "Reward"
+  | "Loan"
+  | "Loan Repayment"
+  | "Liquidation Repayment"
 
 export interface Exchange {
   coingeckoId: string

@@ -88,20 +88,6 @@ export interface BinancePair {
   quoteAsset: string
   symbol: string
 }
-export interface BinanceFlexibleReward {
-  asset: string
-  projectId: string
-  rewards: string
-  time: number
-  type: string
-}
-export interface BinanceLockedReward {
-  amount: string
-  asset: string
-  lockPeriod: string
-  positionId: string
-  time: number
-}
 export interface BinanceReward {
   amount?: string
   asset: string
@@ -112,6 +98,63 @@ export interface BinanceReward {
   rewards?: string
   time: number
   type?: string
+}
+
+export interface BinanceMarginLoanRepayment {
+  amount: string
+  asset: string
+  blockNumber: string
+  interest: string
+  isolatedSymbol: string
+  principal: string
+  status: string
+  timestamp: number
+  txId: number
+}
+
+export interface BinanceMarginTrade {
+  baseAsset: string
+  blockNumber: string
+  commission: string
+  commissionAsset: string
+  id: number
+  isBestMatch: boolean
+  isBuyer: boolean
+  isIsolated: boolean
+  isMaker: boolean
+  orderId: number
+  price: string
+  qty: string
+  quoteAsset: string
+  symbol: string
+  time: number
+}
+
+export interface BinanceMarginTransfer {
+  amount: string
+  asset: string
+  blockNumber: string
+  fromSymbol: string
+  status: string
+  timestamp: number
+  toSymbol: string
+  transFrom: string
+  transTo: string
+  txId: number
+  type: string
+}
+export interface BinanceMarginLiquidation {
+  avgPrice: string
+  blockNumber: string
+  executedQty: string
+  isIsolated: boolean
+  orderId: number
+  price: string
+  qty: string
+  side: string
+  symbol: string
+  timeInForce: string
+  updatedTime: number
 }
 
 // https://binance-docs.github.io/apidocs/spot/en/#deposit-history-supporting-network-user_data
@@ -319,4 +362,165 @@ export async function getBinanceLockedRewards(
   ])
   const data = await res.json()
   return data.rows as BinanceReward[]
+}
+
+export async function getBinanceMarginLoanRepayment(
+  connection: BinanceConnection,
+  startTime: number,
+  endTime: number,
+  type: string,
+  progress: ProgressCallback
+): Promise<Array<BinanceMarginLoanRepayment>> {
+  const timestamp = Date.now()
+  const queryString = `timestamp=${timestamp}&type=${type}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
+
+  const encoder = new TextEncoder()
+  const encodedData = encoder.encode(queryString)
+  const encodedSecret = encoder.encode(connection.secret)
+
+  const signature = await generateSignature(encodedData, encodedSecret)
+  console.log("🚀 ~ signature:", signature)
+
+  const BASE_URL = "http://localhost:8080/api.binance.com"
+  const endpoint = "/sapi/v1/margin/borrow-repay"
+  const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
+
+  console.log("🚀 ~ url:", url)
+  const res = await fetch(url, {
+    headers: {
+      "X-MBX-APIKEY": connection.key,
+    },
+  })
+  progress([
+    undefined,
+    `Fetched margin account rewards from ${formatDate(startTime)} to ${formatDate(
+      endTime
+    )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
+  ])
+  const data = await res.json()
+  if (res.status !== 200) {
+    throw new Error(`Binance: ${data.msg}`)
+  }
+  return data.rows as BinanceMarginLoanRepayment[]
+}
+
+export async function getBinanceMarginTrades(
+  connection: BinanceConnection,
+  symbol: BinancePair,
+  isIsolated: boolean,
+  progress: ProgressCallback
+): Promise<Array<BinanceMarginTrade>> {
+  const timestamp = Date.now()
+  const queryString = `symbol=${symbol.symbol}&isIsolated=${isIsolated}&timestamp=${timestamp}`
+
+  const encoder = new TextEncoder()
+  const encodedData = encoder.encode(queryString)
+  const encodedSecret = encoder.encode(connection.secret)
+
+  const signature = await generateSignature(encodedData, encodedSecret)
+  console.log("🚀 ~ signature:", signature)
+
+  const BASE_URL = "http://localhost:8080/api.binance.com"
+  const endpoint = "/sapi/v1/margin/myTrades"
+  const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
+
+  console.log("🚀 ~ url:", url)
+  const res = await fetch(url, {
+    headers: {
+      "X-MBX-APIKEY": connection.key,
+    },
+  })
+  progress([
+    undefined,
+    `Fetched margin account rewards for ${symbol.symbol} - Weight used: ${res.headers.get(
+      "X-Sapi-Used-Ip-Weight-1m"
+    )}`,
+  ])
+  const data = await res.json()
+  if (res.status !== 200) {
+    throw new Error(data.msg)
+  }
+  return data.map((x) => ({
+    ...x,
+    baseAsset: symbol.baseAsset,
+    quoteAsset: symbol.quoteAsset,
+  })) as BinanceMarginTrade[]
+}
+
+export async function getBinanceMarginTransfer(
+  connection: BinanceConnection,
+  startTime: number,
+  endTime: number,
+  progress: ProgressCallback
+): Promise<Array<BinanceMarginTransfer>> {
+  const timestamp = Date.now()
+  const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
+
+  const encoder = new TextEncoder()
+  const encodedData = encoder.encode(queryString)
+  const encodedSecret = encoder.encode(connection.secret)
+
+  const signature = await generateSignature(encodedData, encodedSecret)
+  console.log("🚀 ~ signature:", signature)
+
+  const BASE_URL = "http://localhost:8080/api.binance.com"
+  const endpoint = "/sapi/v1/margin/transfer"
+  const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
+
+  console.log("🚀 ~ url:", url)
+  const res = await fetch(url, {
+    headers: {
+      "X-MBX-APIKEY": connection.key,
+    },
+  })
+  progress([
+    undefined,
+    `Fetched margin transfers from ${formatDate(startTime)} to ${formatDate(
+      endTime
+    )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
+  ])
+  const data = await res.json()
+  if (res.status !== 200) {
+    throw new Error(`Binance: ${data.msg}`)
+  }
+  return data.rows as BinanceMarginTransfer[]
+}
+
+export async function getBinanceMarginLiquidation(
+  connection: BinanceConnection,
+  startTime: number,
+  endTime: number,
+  progress: ProgressCallback
+): Promise<Array<BinanceMarginLiquidation>> {
+  const timestamp = Date.now()
+  const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
+
+  const encoder = new TextEncoder()
+  const encodedData = encoder.encode(queryString)
+  const encodedSecret = encoder.encode(connection.secret)
+
+  const signature = await generateSignature(encodedData, encodedSecret)
+  console.log("🚀 ~ signature:", signature)
+
+  const BASE_URL = "http://localhost:8080/api.binance.com"
+  const endpoint = "/sapi/v1/margin/forceLiquidationRec"
+  const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
+
+  console.log("🚀 ~ url:", url)
+  const res = await fetch(url, {
+    headers: {
+      "X-MBX-APIKEY": connection.key,
+    },
+  })
+  progress([
+    undefined,
+    `Fetched margin liquidation record from ${formatDate(startTime)} to ${formatDate(
+      endTime
+    )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
+  ])
+  const data = await res.json()
+  if (res.status !== 200) {
+    throw new Error(`Binance: ${data.msg}`)
+  }
+  return data.rows as BinanceMarginLiquidation[]
 }

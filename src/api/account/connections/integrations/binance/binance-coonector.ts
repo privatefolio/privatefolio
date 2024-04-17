@@ -5,22 +5,44 @@ import { noop, wait } from "src/utils/utils"
 
 import {
   BinanceDeposit,
+  BinanceMarginLiquidation,
+  BinanceMarginLoanRepayment,
+  BinanceMarginTrade,
+  BinanceMarginTransfer,
   BinanceReward,
   BinanceTrade,
   BinanceWithdraw,
   getBinanceDeposit,
   getBinanceFlexibleRewards,
   getBinanceLockedRewards,
+  getBinanceMarginLiquidation,
+  getBinanceMarginLoanRepayment,
+  getBinanceMarginTrades,
+  getBinanceMarginTransfer,
   getBinanceSymbols,
   getBinanceTradesForSymbol,
   getBinanceWithdraw,
 } from "./binance-account-api"
 import { parseDeposit } from "./binance-deposit"
+import { parseLoan, parseRepayment } from "./binance-margin/binance-margin-borrow-repay"
+import { parseMarginTrade } from "./binance-margin/binance-margin-trades"
+import { parseMarginTransfer } from "./binance-margin/binance-margin-transfer"
+import { parseMarginLiquidation } from "./binance-margin/binance-margine-liquidation"
 import { parseReward } from "./binance-rewards"
 import { parseTrade } from "./binance-trades"
 import { parseWithdraw } from "./binance-withdraw"
 
-const parserList = [parseDeposit, parseWithdraw, parseTrade, parseReward]
+const parserList = [
+  parseDeposit,
+  parseWithdraw,
+  parseTrade,
+  parseReward,
+  parseLoan,
+  parseRepayment,
+  parseMarginTrade,
+  parseMarginTransfer,
+  parseMarginLiquidation,
+]
 
 export async function syncBinance(
   progress: ProgressCallback = noop,
@@ -157,8 +179,8 @@ export async function syncBinance(
   //     })
   //   )
   // )
-
   let allTrades: BinanceTrade[] = []
+  let marginTrades: BinanceMarginTrade[] = []
   let progressCount = 0
 
   for (let i = 0; i < symbols.length; i += 10) {
@@ -174,6 +196,19 @@ export async function syncBinance(
           progress([undefined, `Fetching trade history for ${symbol.symbol}`])
           const tradesForSymbol = await getBinanceTradesForSymbol(connection, symbol, progress)
           allTrades = allTrades.concat(tradesForSymbol)
+          const marginCrossTrades = await getBinanceMarginTrades(
+            connection,
+            symbol,
+            false,
+            progress
+          )
+          const marginIsolatedTrades = await getBinanceMarginTrades(
+            connection,
+            symbol,
+            true,
+            progress
+          )
+          marginTrades = marginTrades.concat(marginIsolatedTrades, marginCrossTrades)
         } catch (err) {
           if (String(err).includes("429")) {
             throw err
@@ -185,7 +220,6 @@ export async function syncBinance(
 
     progressCount += batch.length
     progress([30 + (progressCount / symbols.length) * 40])
-
     if (i + 10 < symbols.length) {
       await wait(200 * 4)
     }
@@ -256,7 +290,120 @@ export async function syncBinance(
   console.log("Rewards: ", allRewards)
   progress([75, `Fetched ${allRewards.length} rewards`])
 
-  const transactionArrays = [allDeposits, allWithdrawals, allTrades, allRewards]
+  let loans: BinanceMarginLoanRepayment[] = []
+  let repayments: BinanceMarginLoanRepayment[] = []
+  const promisesMargin: (() => Promise<void>)[] = []
+  const sevenDays = 604_800_000
+
+  for (let startTime = genesis; startTime <= currentTime; startTime += sevenDays) {
+    // eslint-disable-next-line no-loop-func
+    promisesMargin.push(async () => {
+      const endTime = startTime + sevenDays
+      try {
+        if (signal?.aborted) {
+          throw new Error(signal.reason)
+        }
+        progress([
+          undefined,
+          `Fetching margin for ${formatDate(startTime)} to ${formatDate(endTime)}`,
+        ])
+        const borrow = await getBinanceMarginLoanRepayment(
+          connection,
+          startTime,
+          endTime,
+          "BORROW",
+          progress
+        )
+        const repay = await getBinanceMarginLoanRepayment(
+          connection,
+          startTime,
+          endTime,
+          "REPAY",
+          progress
+        )
+        loans = loans.concat(borrow)
+        repayments = repayments.concat(repay)
+      } catch (err) {
+        progress([
+          undefined,
+          `Skipping ${formatDate(startTime)}-${formatDate(endTime)}. Error: ${String(err)}`,
+        ])
+      }
+    })
+  }
+
+  await Promise.all(
+    promisesMargin.map((fetchFn) =>
+      fetchFn().then(() => {
+        if (signal?.aborted) {
+          throw new Error(signal.reason)
+        }
+      })
+    )
+  )
+  console.log("Loans: ", loans)
+  console.log("Repayments: ", repayments)
+  progress([10, `Fetched ${loans.length} loans and ${repayments.length} repayments`])
+  let marginTransfers: BinanceMarginTransfer[] = []
+  let marginLiquidations: BinanceMarginLiquidation[] = []
+  const promisesMarginTransfer: (() => Promise<void>)[] = []
+  const thirtyDays = 2_592_000_000
+
+  for (let startTime = genesis; startTime <= currentTime; startTime += thirtyDays) {
+    // eslint-disable-next-line no-loop-func
+    promisesMarginTransfer.push(async () => {
+      const endTime = startTime + thirtyDays > currentTime ? currentTime : startTime + thirtyDays
+      try {
+        if (signal?.aborted) {
+          throw new Error(signal.reason)
+        }
+        progress([
+          undefined,
+          `Fetching margin transfers and liquidation for ${formatDate(startTime)} to ${formatDate(
+            endTime
+          )}`,
+        ])
+        const transfers = await getBinanceMarginTransfer(connection, startTime, endTime, progress)
+        const liquidations = await getBinanceMarginLiquidation(
+          connection,
+          startTime,
+          endTime,
+          progress
+        )
+        marginTransfers = marginTransfers.concat(transfers)
+        marginLiquidations = marginLiquidations.concat(liquidations)
+      } catch (err) {
+        progress([
+          undefined,
+          `Skipping ${formatDate(startTime)}-${formatDate(endTime)}. Error: ${String(err)}`,
+        ])
+      }
+    })
+  }
+
+  await Promise.all(
+    promisesMarginTransfer.map((fetchFn) =>
+      fetchFn().then(() => {
+        if (signal?.aborted) {
+          throw new Error(signal.reason)
+        }
+      })
+    )
+  )
+  console.log("Margin Transfers: ", marginTransfers)
+  console.log("Margin Liquidations: ", marginLiquidations)
+
+  const transactionArrays = [
+    allDeposits,
+    allWithdrawals,
+    allTrades,
+    allRewards,
+    loans,
+    repayments,
+    marginTrades,
+    marginTransfers,
+    marginLiquidations,
+  ]
 
   let blockNumber = 0
   progress([75, "Parsing all transactions"])

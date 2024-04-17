@@ -13,7 +13,7 @@ export function parseReward(
   index: number,
   connection: BinanceConnection
 ): ParserResult {
-  const { platform, address } = connection
+  const { platform } = connection
   const { amount, rewards, asset, lockPeriod, positionId, projectId, time } = row
   const wallet = `Binance Spot`
   const timestamp = new Date(Number(time)).getTime()
