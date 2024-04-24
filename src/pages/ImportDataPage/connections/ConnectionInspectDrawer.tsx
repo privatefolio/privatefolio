@@ -31,7 +31,7 @@ type ConnectionInspectDrawerProps = DrawerProps &
 
 export function ConnectionInspectDrawer(props: ConnectionInspectDrawerProps) {
   const { open, toggleOpen, connection, relativeTime, ...rest } = props
-  const { _id, address, timestamp, syncedAt, platform, label, meta } = connection
+  const { _id, address, timestamp, syncedAt, platform, label, meta, key } = connection
   const confirm = useConfirm()
   const [loadingRemove, setLoadingRemove] = useState(false)
   const [loadingReset, setLoadingReset] = useState(false)
@@ -57,13 +57,25 @@ export function ConnectionInspectDrawer(props: ConnectionInspectDrawerProps) {
           <SectionTitle>Identifier</SectionTitle>
           <IdentifierBlock id={_id} />
         </div>
-        <div>
-          <SectionTitle>Address</SectionTitle>
-          <Stack gap={0.5} alignItems="flex-start">
-            <IdentifierBlock id={address} />
-            <Typography variant="caption">{label ? `${label}` : null}</Typography>
-          </Stack>
-        </div>
+
+        {platform === "binance" ? (
+          <div>
+            <SectionTitle>Key</SectionTitle>
+            <Stack gap={0.5} alignItems="flex-start">
+              <IdentifierBlock id={key as string} />
+              <Typography variant="caption">{label ? `${label}` : null}</Typography>
+            </Stack>
+          </div>
+        ) : (
+          <div>
+            <SectionTitle>Address</SectionTitle>
+            <Stack gap={0.5} alignItems="flex-start">
+              <IdentifierBlock id={address as string} />
+              <Typography variant="caption">{label ? `${label}` : null}</Typography>
+            </Stack>
+          </div>
+        )}
+
         <div>
           <SectionTitle>Created</SectionTitle>
           {timestamp ? (
