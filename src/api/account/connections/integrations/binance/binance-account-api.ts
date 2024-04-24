@@ -157,6 +157,72 @@ export interface BinanceMarginLiquidation {
   updatedTime: number
 }
 
+export interface BinanceFuturesUSDTrades {
+  baseAsset: string
+  blockNumber: number
+  buyer: boolean
+  commission: string
+  commissionAsset: string
+  id: number
+  maker: boolean
+  orderId: number
+  positionSide: string
+  price: string
+  qty: string
+  quoteAsset: string
+  quoteQty: string
+  realizedPnl: string
+  side: string
+  symbol: string
+  time: number
+}
+
+export interface BinanceFuturesCOINTrades {
+  baseAsset: string
+  baseQty: string
+  blockNumber: number
+  buyer: boolean
+  commission: string
+  commissionAsset: string
+  id: number
+  maker: boolean
+  marginAsset: string
+  orderId: number
+  pair: string
+  positionSide: string
+  price: string
+  qty: string
+  quoteAsset: string
+  realizedPnl: string
+  side: string
+  symbol: string
+  time: number
+}
+
+export interface BinanceFuturesCOINIncome {
+  asset: string
+  blockNumber: number
+  income: string
+  incomeType: string
+  info: string
+  symbol: string
+  time: number
+  tradeId: string
+  tranId: number
+}
+
+export interface BinanceFuturesUSDIncome {
+  asset: string
+  blockNumber: number
+  income: string
+  incomeType: string
+  info: string
+  symbol: string
+  time: number
+  tradeId: number
+  tranId: string
+}
+
 // https://binance-docs.github.io/apidocs/spot/en/#deposit-history-supporting-network-user_data
 export async function getBinanceDeposit(
   connection: BinanceConnection,
@@ -165,19 +231,15 @@ export async function getBinanceDeposit(
 ): Promise<Array<BinanceDeposit>> {
   const timestamp = Date.now()
   const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
-
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
   const encodedSecret = encoder.encode(connection.secret)
 
   const signature = await generateSignature(encodedData, encodedSecret)
-  console.log("🚀 ~ signature:", signature)
-
   const BASE_URL = "http://localhost:8080/api.binance.com"
   const endpoint = "/sapi/v1/capital/deposit/hisrec"
   const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
 
-  console.log("🚀 ~ url:", url)
   const res = await fetch(url, {
     headers: {
       "X-MBX-APIKEY": connection.key,
@@ -201,19 +263,15 @@ export async function getBinanceWithdraw(
 ): Promise<Array<BinanceWithdraw>> {
   const timestamp = Date.now()
   const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
-
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
   const encodedSecret = encoder.encode(connection.secret)
-
   const signature = await generateSignature(encodedData, encodedSecret)
-  console.log("🚀 ~ signature:", signature)
 
   const BASE_URL = "http://localhost:8080/api.binance.com"
   const endpoint = "/sapi/v1/capital/withdraw/history"
   const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
 
-  console.log("🚀 ~ url:", url)
   const res = await fetch(url, {
     headers: {
       "X-MBX-APIKEY": connection.key,
@@ -237,7 +295,6 @@ export async function getBinanceSymbols(
   const endpoint = "/api/v3/exchangeInfo"
   const url = `${BASE_URL}${endpoint}`
 
-  console.log("🚀 ~ url:", url)
   const res = await fetch(url, {
     headers: {
       "X-MBX-APIKEY": connection.key,
@@ -260,18 +317,15 @@ export async function getBinanceTradesForSymbol(
 ): Promise<Array<BinanceTrade>> {
   const timestamp = Date.now()
   const queryString = `symbol=${symbol.symbol}&timestamp=${timestamp}`
-
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
   const encodedSecret = encoder.encode(connection.secret)
   const signature = await generateSignature(encodedData, encodedSecret)
-  console.log("🚀 ~ signature:", signature)
 
   const BASE_URL = "http://localhost:8080/api.binance.com"
   const endpoint = "/api/v3/myTrades"
   const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
 
-  console.log("🚀 ~ url:", url)
   const res = await fetch(url, {
     headers: {
       "X-MBX-APIKEY": connection.key,
@@ -291,6 +345,7 @@ export async function getBinanceTradesForSymbol(
   return data.map((x) => ({ ...x, baseAsset: symbol.baseAsset, quoteAsset: symbol.quoteAsset }))
 }
 
+// https://binance-docs.github.io/apidocs/spot/en/#get-flexible-rewards-history-user_data
 export async function getBinanceFlexibleRewards(
   connection: BinanceConnection,
   startTime: number,
@@ -300,19 +355,15 @@ export async function getBinanceFlexibleRewards(
 ): Promise<Array<BinanceReward>> {
   const timestamp = Date.now()
   const queryString = `timestamp=${timestamp}&type=${type}&startTime=${startTime}&endTime=${endTime}`
-
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
   const encodedSecret = encoder.encode(connection.secret)
-
   const signature = await generateSignature(encodedData, encodedSecret)
-  console.log("🚀 ~ signature:", signature)
 
   const BASE_URL = "http://localhost:8080/api.binance.com"
   const endpoint = "/sapi/v1/simple-earn/flexible/history/rewardsRecord"
   const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
 
-  console.log("🚀 ~ url:", url)
   const res = await fetch(url, {
     headers: {
       "X-MBX-APIKEY": connection.key,
@@ -328,6 +379,7 @@ export async function getBinanceFlexibleRewards(
   return data.rows as BinanceReward[]
 }
 
+// https://binance-docs.github.io/apidocs/spot/en/#get-locked-rewards-history-user_data
 export async function getBinanceLockedRewards(
   connection: BinanceConnection,
   startTime: number,
@@ -336,19 +388,15 @@ export async function getBinanceLockedRewards(
 ): Promise<Array<BinanceReward>> {
   const timestamp = Date.now()
   const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
-
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
   const encodedSecret = encoder.encode(connection.secret)
-
   const signature = await generateSignature(encodedData, encodedSecret)
-  console.log("🚀 ~ signature:", signature)
 
   const BASE_URL = "http://localhost:8080/api.binance.com"
   const endpoint = "/sapi/v1/simple-earn/locked/history/rewardsRecord"
   const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
 
-  console.log("🚀 ~ url:", url)
   const res = await fetch(url, {
     headers: {
       "X-MBX-APIKEY": connection.key,
@@ -364,6 +412,7 @@ export async function getBinanceLockedRewards(
   return data.rows as BinanceReward[]
 }
 
+// https://binance-docs.github.io/apidocs/spot/en/#query-borrow-repay-records-in-margin-account-user_data
 export async function getBinanceMarginLoanRepayment(
   connection: BinanceConnection,
   startTime: number,
@@ -373,19 +422,15 @@ export async function getBinanceMarginLoanRepayment(
 ): Promise<Array<BinanceMarginLoanRepayment>> {
   const timestamp = Date.now()
   const queryString = `timestamp=${timestamp}&type=${type}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
-
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
   const encodedSecret = encoder.encode(connection.secret)
-
   const signature = await generateSignature(encodedData, encodedSecret)
-  console.log("🚀 ~ signature:", signature)
 
   const BASE_URL = "http://localhost:8080/api.binance.com"
   const endpoint = "/sapi/v1/margin/borrow-repay"
   const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
 
-  console.log("🚀 ~ url:", url)
   const res = await fetch(url, {
     headers: {
       "X-MBX-APIKEY": connection.key,
@@ -404,6 +449,7 @@ export async function getBinanceMarginLoanRepayment(
   return data.rows as BinanceMarginLoanRepayment[]
 }
 
+// https://binance-docs.github.io/apidocs/spot/en/#query-margin-account-39-s-trade-list-user_data
 export async function getBinanceMarginTrades(
   connection: BinanceConnection,
   symbol: BinancePair,
@@ -412,19 +458,15 @@ export async function getBinanceMarginTrades(
 ): Promise<Array<BinanceMarginTrade>> {
   const timestamp = Date.now()
   const queryString = `symbol=${symbol.symbol}&isIsolated=${isIsolated}&timestamp=${timestamp}`
-
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
   const encodedSecret = encoder.encode(connection.secret)
-
   const signature = await generateSignature(encodedData, encodedSecret)
-  console.log("🚀 ~ signature:", signature)
 
   const BASE_URL = "http://localhost:8080/api.binance.com"
   const endpoint = "/sapi/v1/margin/myTrades"
   const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
 
-  console.log("🚀 ~ url:", url)
   const res = await fetch(url, {
     headers: {
       "X-MBX-APIKEY": connection.key,
@@ -447,6 +489,7 @@ export async function getBinanceMarginTrades(
   })) as BinanceMarginTrade[]
 }
 
+// https://binance-docs.github.io/apidocs/spot/en/#get-cross-margin-transfer-history-user_data
 export async function getBinanceMarginTransfer(
   connection: BinanceConnection,
   startTime: number,
@@ -455,19 +498,15 @@ export async function getBinanceMarginTransfer(
 ): Promise<Array<BinanceMarginTransfer>> {
   const timestamp = Date.now()
   const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
-
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
   const encodedSecret = encoder.encode(connection.secret)
-
   const signature = await generateSignature(encodedData, encodedSecret)
-  console.log("🚀 ~ signature:", signature)
 
   const BASE_URL = "http://localhost:8080/api.binance.com"
   const endpoint = "/sapi/v1/margin/transfer"
   const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
 
-  console.log("🚀 ~ url:", url)
   const res = await fetch(url, {
     headers: {
       "X-MBX-APIKEY": connection.key,
@@ -486,6 +525,7 @@ export async function getBinanceMarginTransfer(
   return data.rows as BinanceMarginTransfer[]
 }
 
+// https://binance-docs.github.io/apidocs/spot/en/#get-force-liquidation-record-user_data
 export async function getBinanceMarginLiquidation(
   connection: BinanceConnection,
   startTime: number,
@@ -494,19 +534,15 @@ export async function getBinanceMarginLiquidation(
 ): Promise<Array<BinanceMarginLiquidation>> {
   const timestamp = Date.now()
   const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
-
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
   const encodedSecret = encoder.encode(connection.secret)
-
   const signature = await generateSignature(encodedData, encodedSecret)
-  console.log("🚀 ~ signature:", signature)
 
   const BASE_URL = "http://localhost:8080/api.binance.com"
   const endpoint = "/sapi/v1/margin/forceLiquidationRec"
   const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
 
-  console.log("🚀 ~ url:", url)
   const res = await fetch(url, {
     headers: {
       "X-MBX-APIKEY": connection.key,
@@ -523,4 +559,201 @@ export async function getBinanceMarginLiquidation(
     throw new Error(`Binance: ${data.msg}`)
   }
   return data.rows as BinanceMarginLiquidation[]
+}
+
+// https://binance-docs.github.io/apidocs/futures/en/#exchange-information
+export async function getBinanceFuturesUSDSymbols(
+  connection: BinanceConnection
+): Promise<Array<BinancePair>> {
+  const BASE_URL = "https://fapi.binance.com"
+  const endpoint = "/fapi/v1/exchangeInfo"
+  const url = `${BASE_URL}${endpoint}`
+
+  const res = await fetch(url, {
+    headers: {
+      "X-MBX-APIKEY": connection.key,
+    },
+  })
+  const data = await res.json()
+  const symbols: BinancePair[] = data.symbols.map((x) => ({
+    baseAsset: x.baseAsset,
+    quoteAsset: x.quoteAsset,
+    symbol: x.symbol,
+  }))
+  return symbols
+}
+
+// https://binance-docs.github.io/apidocs/futures/en/#account-trade-list-user_data
+export async function getBinanceFuturesUSDTrades(
+  connection: BinanceConnection,
+  symbol: BinancePair,
+  startTime: number,
+  endTime: number,
+  progress: ProgressCallback
+): Promise<Array<BinanceFuturesUSDTrades>> {
+  const timestamp = Date.now()
+  const queryString = `symbol=${symbol.symbol}&timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
+  const encoder = new TextEncoder()
+  const encodedData = encoder.encode(queryString)
+  const encodedSecret = encoder.encode(connection.secret)
+  const signature = await generateSignature(encodedData, encodedSecret)
+
+  const BASE_URL = "https://fapi.binance.com"
+  const endpoint = "/fapi/v1/userTrades"
+  const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
+
+  const res = await fetch(url, {
+    headers: {
+      "X-MBX-APIKEY": connection.key,
+    },
+  })
+  const data = await res.json()
+
+  progress([undefined, `Weight used: ${res.headers.get("X-Mbx-Used-Weight-1m")}`])
+  // check if status is 429
+  if (res.status !== 200) {
+    throw new Error(`Binance: ${data.msg}`)
+  }
+
+  return data.map((x) => ({
+    ...x,
+    baseAsset: symbol.baseAsset,
+    quoteAsset: symbol.quoteAsset,
+  })) as BinanceFuturesUSDTrades[]
+}
+
+// https://binance-docs.github.io/apidocs/delivery/en/#exchange-information
+export async function getBinanceFuturesCOINSymbols(
+  connection: BinanceConnection
+): Promise<Array<BinancePair>> {
+  const BASE_URL = "https://dapi.binance.com"
+  const endpoint = "/dapi/v1/exchangeInfo"
+  const url = `${BASE_URL}${endpoint}`
+
+  const res = await fetch(url, {
+    headers: {
+      "X-MBX-APIKEY": connection.key,
+    },
+  })
+  const data = await res.json()
+  const symbols: BinancePair[] = data.symbols.map((x) => ({
+    baseAsset: x.baseAsset,
+    quoteAsset: x.quoteAsset,
+    symbol: x.pair,
+  }))
+  return symbols
+}
+
+// https://binance-docs.github.io/apidocs/delivery/en/#account-trade-list-user_data
+export async function getBinanceFuturesCOINTrades(
+  connection: BinanceConnection,
+  symbol: BinancePair,
+  startTime: number,
+  endTime: number,
+  progress: ProgressCallback
+): Promise<Array<BinanceFuturesCOINTrades>> {
+  const timestamp = Date.now()
+  const queryString = `pair=${symbol.symbol}&timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
+
+  const encoder = new TextEncoder()
+  const encodedData = encoder.encode(queryString)
+  const encodedSecret = encoder.encode(connection.secret)
+  const signature = await generateSignature(encodedData, encodedSecret)
+
+  const BASE_URL = "https://dapi.binance.com"
+  const endpoint = "/dapi/v1/userTrades"
+  const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
+
+  const res = await fetch(url, {
+    headers: {
+      "X-MBX-APIKEY": connection.key,
+    },
+  })
+  const data = await res.json()
+
+  progress([undefined, `Weight used: ${res.headers.get("X-Mbx-Used-Weight-1m")}`])
+  // check if status is 429
+  if (res.status !== 200) {
+    throw new Error(`Binance: ${data.msg}`)
+  }
+
+  return data.map((x) => ({
+    ...x,
+    baseAsset: symbol.baseAsset,
+    quoteAsset: symbol.quoteAsset,
+  })) as BinanceFuturesCOINTrades[]
+}
+
+// https://binance-docs.github.io/apidocs/delivery/en/#get-income-history-user_data
+export async function getBinanceFuturesCOINIncome(
+  connection: BinanceConnection,
+  startTime: number,
+  endTime: number,
+  progress: ProgressCallback
+): Promise<Array<BinanceFuturesCOINIncome>> {
+  const timestamp = Date.now()
+  const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
+
+  const encoder = new TextEncoder()
+  const encodedData = encoder.encode(queryString)
+  const encodedSecret = encoder.encode(connection.secret)
+  const signature = await generateSignature(encodedData, encodedSecret)
+
+  const BASE_URL = "https://dapi.binance.com"
+  const endpoint = "/dapi/v1/income"
+  const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
+
+  const res = await fetch(url, {
+    headers: {
+      "X-MBX-APIKEY": connection.key,
+    },
+  })
+  const data = await res.json()
+
+  progress([undefined, `Weight used: ${res.headers.get("X-Mbx-Used-Weight-1m")}`])
+  if (res.status !== 200) {
+    throw new Error(`Binance: ${data.msg}`)
+  }
+
+  return data as BinanceFuturesCOINIncome[]
+}
+
+// https://binance-docs.github.io/apidocs/futures/en/#get-income-history-user_data
+export async function getBinanceFuturesUSDIncome(
+  connection: BinanceConnection,
+  startTime: number,
+  endTime: number,
+  progress: ProgressCallback
+): Promise<Array<BinanceFuturesUSDIncome>> {
+  const timestamp = Date.now()
+  const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
+
+  const encoder = new TextEncoder()
+  const encodedData = encoder.encode(queryString)
+  const encodedSecret = encoder.encode(connection.secret)
+  const signature = await generateSignature(encodedData, encodedSecret)
+
+  const BASE_URL = "https://fapi.binance.com"
+  const endpoint = "/fapi/v1/income"
+  const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
+
+  const res = await fetch(url, {
+    headers: {
+      "X-MBX-APIKEY": connection.key,
+    },
+  })
+  const data = await res.json()
+
+  progress([
+    undefined,
+    `For ${formatDate(startTime)} - ${formatDate(endTime)} - Weight used: ${res.headers.get(
+      "X-Mbx-Used-Weight-1m"
+    )}`,
+  ])
+  // check if status is 429
+  if (res.status !== 200) {
+    throw new Error(`Binance: ${data.msg}`)
+  }
+
+  return data as BinanceFuturesUSDIncome[]
 }
