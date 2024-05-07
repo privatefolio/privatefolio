@@ -20,7 +20,7 @@ export async function addConnection(
   connection: Omit<Connection, "_id" | "_rev" | "timestamp" | "syncedAt">,
   accountName: string
 ) {
-  let { address, platform, label, key, secret } = connection
+  let { address, platform, label, key, secret, binanceWallets } = connection
 
   if (address) {
     address = getAddress(address)
@@ -35,6 +35,7 @@ export async function addConnection(
     _id,
     _rev: undefined as any,
     address,
+    binanceWallets,
     key,
     secret,
     timestamp,
@@ -146,6 +147,7 @@ export async function syncConnection(
   progress: ProgressCallback = noop,
   connection: Connection,
   accountName: string,
+  debugMode: boolean,
   since?: string,
   signal?: AbortSignal
 ) {
@@ -158,7 +160,7 @@ export async function syncConnection(
   if (connection.platform === "ethereum") {
     result = await syncEtherscan(progress, connection as EtherscanConnection, since)
   } else if (connection.platform === "binance") {
-    result = await syncBinance(progress, connection as BinanceConnection, since, signal)
+    result = await syncBinance(progress, connection as BinanceConnection, debugMode, since, signal)
   } else {
     throw new Error(`Unsupported platform: ${connection.platform}`)
   }

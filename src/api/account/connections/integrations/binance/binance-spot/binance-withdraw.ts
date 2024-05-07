@@ -6,38 +6,51 @@ import {
   Transaction,
   TransactionType,
 } from "src/interfaces"
+import { asUTC } from "src/utils/formatting-utils"
 
-import { BinanceDeposit } from "./binance-account-api"
+import { BinanceWithdraw } from "../binance-account-api"
 
-export function parseDeposit(
-  row: BinanceDeposit,
+export function parseWithdraw(
+  row: BinanceWithdraw,
   index: number,
   connection: BinanceConnection
 ): ParserResult {
   const { platform, address } = connection
-  const { amount, coin, insertTime, txId: txHash } = row
+  const {
+    address: depositAddres,
+    transactionFee,
+    amount,
+    coin,
+    applyTime,
+    network,
+    transferType,
+    walletType,
+    completeTime,
+    txId: txHash,
+  } = row
 
   const wallet = `Binance Spot`
   if (amount === "0") {
     return { logs: [] }
   }
-  const timestamp = new Date(Number(insertTime)).getTime()
+  const timestamp = asUTC(new Date(completeTime))
   if (isNaN(timestamp)) {
-    throw new Error(`Invalid timestamp: ${insertTime}`)
+    throw new Error(`Invalid timestamp: ${completeTime}`)
   }
+
   const assetId = `binance:${coin}`
-  const txId = `${connection._id}_${txHash}_Binance_deposit_${index}`
-  const operation: AuditLogOperation = "Deposit"
-  const type: TransactionType = "Deposit"
+  const txId = `${connection._id}_${txHash}_Binance_withdraw_${index}`
+  const operation: AuditLogOperation = "Withdraw"
+  const type: TransactionType = "Withdraw"
   const importId = connection._id
   const importIndex = index
 
-  let outgoing: string | undefined, outgoingAsset: string | undefined, outgoingN: number | undefined
+  let incoming: string | undefined, incomingAsset: string | undefined, incomingN: number | undefined
 
-  const incoming = amount
-  const incomingN = parseFloat(incoming)
-  const incomingAsset = assetId
-  const change = incoming as string
+  const outgoing = (parseFloat(amount) + parseFloat(transactionFee)).toString()
+  const outgoingN = parseFloat(outgoing)
+  const outgoingAsset = assetId
+  const change = `-${outgoing}` as string
   const changeN = parseFloat(change)
   const logs: AuditLog[] = [
     {

@@ -6,7 +6,7 @@ import {
   TransactionType,
 } from "src/interfaces"
 
-import { BinanceTrade } from "./binance-account-api"
+import { BinanceTrade } from "../binance-account-api"
 
 export function parseTrade(
   row: BinanceTrade,

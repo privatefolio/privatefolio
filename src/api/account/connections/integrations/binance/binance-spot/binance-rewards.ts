@@ -6,7 +6,7 @@ import {
   TransactionType,
 } from "src/interfaces"
 
-import { BinanceReward } from "./binance-account-api"
+import { BinanceReward } from "../binance-account-api"
 
 export function parseReward(
   row: BinanceReward,

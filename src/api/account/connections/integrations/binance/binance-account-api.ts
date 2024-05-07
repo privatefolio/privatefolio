@@ -227,7 +227,9 @@ export interface BinanceFuturesUSDIncome {
 export async function getBinanceDeposit(
   connection: BinanceConnection,
   startTime: number,
-  endTime: number
+  endTime: number,
+  progress: ProgressCallback,
+  debugMode: boolean
 ): Promise<Array<BinanceDeposit>> {
   const timestamp = Date.now()
   const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
@@ -245,6 +247,14 @@ export async function getBinanceDeposit(
       "X-MBX-APIKEY": connection.key,
     },
   })
+  if (debugMode) {
+    progress([
+      undefined,
+      `Fetched deposit history for ${formatDate(startTime)} to ${formatDate(
+        endTime
+      )} - Weight used: ${res.headers.get("X-Sapi-Used-Uid-Weight-1s")}`,
+    ])
+  }
   const data = await res.json()
 
   if (res.status !== 200) {
@@ -259,7 +269,8 @@ export async function getBinanceWithdraw(
   connection: BinanceConnection,
   startTime: number,
   endTime: number,
-  progress: ProgressCallback
+  progress: ProgressCallback,
+  debugMode: boolean
 ): Promise<Array<BinanceWithdraw>> {
   const timestamp = Date.now()
   const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
@@ -277,12 +288,14 @@ export async function getBinanceWithdraw(
       "X-MBX-APIKEY": connection.key,
     },
   })
-  progress([
-    undefined,
-    `Fetched withdrawals history for ${formatDate(startTime)} to ${formatDate(
-      endTime
-    )} - Weight used: ${res.headers.get("X-Sapi-Used-Uid-Weight-1s")}`,
-  ])
+  if (debugMode) {
+    progress([
+      undefined,
+      `Fetched withdrawals history for ${formatDate(startTime)} to ${formatDate(
+        endTime
+      )} - Weight used: ${res.headers.get("X-Sapi-Used-Uid-Weight-1s")}`,
+    ])
+  }
   const data: BinanceWithdraw[] = await res.json()
   return data
 }
@@ -313,7 +326,8 @@ export async function getBinanceSymbols(
 export async function getBinanceTradesForSymbol(
   connection: BinanceConnection,
   symbol: BinancePair,
-  progress: ProgressCallback
+  progress: ProgressCallback,
+  debugMode: boolean
 ): Promise<Array<BinanceTrade>> {
   const timestamp = Date.now()
   const queryString = `symbol=${symbol.symbol}&timestamp=${timestamp}`
@@ -332,8 +346,14 @@ export async function getBinanceTradesForSymbol(
     },
   })
   const data: BinanceTrade[] = await res.json()
-
-  progress([undefined, `Weight used: ${res.headers.get("X-Mbx-Used-Weight")}`])
+  if (debugMode) {
+    progress([
+      undefined,
+      `Fetched trade history for ${symbol.symbol} - Weight used: ${res.headers.get(
+        "X-Mbx-Used-Weight"
+      )}`,
+    ])
+  }
   // check if status is 429
   if (res.status === 429) {
     // wait()
@@ -351,6 +371,7 @@ export async function getBinanceFlexibleRewards(
   startTime: number,
   endTime: number,
   progress: ProgressCallback,
+  debugMode: boolean,
   type: string
 ): Promise<Array<BinanceReward>> {
   const timestamp = Date.now()
@@ -369,12 +390,14 @@ export async function getBinanceFlexibleRewards(
       "X-MBX-APIKEY": connection.key,
     },
   })
-  progress([
-    undefined,
-    `Fetched flexible rewards - ${type} from ${formatDate(startTime)} to ${formatDate(
-      endTime
-    )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
-  ])
+  if (debugMode) {
+    progress([
+      undefined,
+      `Fetched flexible rewards - ${type} from ${formatDate(startTime)} to ${formatDate(
+        endTime
+      )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
+    ])
+  }
   const data = await res.json()
   return data.rows as BinanceReward[]
 }
@@ -384,7 +407,8 @@ export async function getBinanceLockedRewards(
   connection: BinanceConnection,
   startTime: number,
   endTime: number,
-  progress: ProgressCallback
+  progress: ProgressCallback,
+  debugMode: boolean
 ): Promise<Array<BinanceReward>> {
   const timestamp = Date.now()
   const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
@@ -402,12 +426,14 @@ export async function getBinanceLockedRewards(
       "X-MBX-APIKEY": connection.key,
     },
   })
-  progress([
-    undefined,
-    `Fetched locked rewards from ${formatDate(startTime)} to ${formatDate(
-      endTime
-    )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
-  ])
+  if (debugMode) {
+    progress([
+      undefined,
+      `Fetched locked rewards from ${formatDate(startTime)} to ${formatDate(
+        endTime
+      )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
+    ])
+  }
   const data = await res.json()
   return data.rows as BinanceReward[]
 }
@@ -418,7 +444,8 @@ export async function getBinanceMarginLoanRepayment(
   startTime: number,
   endTime: number,
   type: string,
-  progress: ProgressCallback
+  progress: ProgressCallback,
+  debugMode: boolean
 ): Promise<Array<BinanceMarginLoanRepayment>> {
   const timestamp = Date.now()
   const queryString = `timestamp=${timestamp}&type=${type}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
@@ -436,12 +463,14 @@ export async function getBinanceMarginLoanRepayment(
       "X-MBX-APIKEY": connection.key,
     },
   })
-  progress([
-    undefined,
-    `Fetched margin account rewards from ${formatDate(startTime)} to ${formatDate(
-      endTime
-    )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
-  ])
+  if (debugMode) {
+    progress([
+      undefined,
+      `Fetched margin loans and repayments from ${formatDate(startTime)} to ${formatDate(
+        endTime
+      )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
+    ])
+  }
   const data = await res.json()
   if (res.status !== 200) {
     throw new Error(`Binance: ${data.msg}`)
@@ -454,7 +483,8 @@ export async function getBinanceMarginTrades(
   connection: BinanceConnection,
   symbol: BinancePair,
   isIsolated: boolean,
-  progress: ProgressCallback
+  progress: ProgressCallback,
+  debugMode: boolean
 ): Promise<Array<BinanceMarginTrade>> {
   const timestamp = Date.now()
   const queryString = `symbol=${symbol.symbol}&isIsolated=${isIsolated}&timestamp=${timestamp}`
@@ -472,12 +502,14 @@ export async function getBinanceMarginTrades(
       "X-MBX-APIKEY": connection.key,
     },
   })
-  progress([
-    undefined,
-    `Fetched margin account rewards for ${symbol.symbol} - Weight used: ${res.headers.get(
-      "X-Sapi-Used-Ip-Weight-1m"
-    )}`,
-  ])
+  if (debugMode) {
+    progress([
+      undefined,
+      `Fetched margin trades for ${symbol.symbol} - Weight used: ${res.headers.get(
+        "X-Sapi-Used-Ip-Weight-1m"
+      )}`,
+    ])
+  }
   const data = await res.json()
   if (res.status !== 200) {
     throw new Error(data.msg)
@@ -494,7 +526,8 @@ export async function getBinanceMarginTransfer(
   connection: BinanceConnection,
   startTime: number,
   endTime: number,
-  progress: ProgressCallback
+  progress: ProgressCallback,
+  debugMode: boolean
 ): Promise<Array<BinanceMarginTransfer>> {
   const timestamp = Date.now()
   const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
@@ -512,12 +545,14 @@ export async function getBinanceMarginTransfer(
       "X-MBX-APIKEY": connection.key,
     },
   })
-  progress([
-    undefined,
-    `Fetched margin transfers from ${formatDate(startTime)} to ${formatDate(
-      endTime
-    )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
-  ])
+  if (debugMode) {
+    progress([
+      undefined,
+      `Fetched margin transfers from ${formatDate(startTime)} to ${formatDate(
+        endTime
+      )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
+    ])
+  }
   const data = await res.json()
   if (res.status !== 200) {
     throw new Error(`Binance: ${data.msg}`)
@@ -530,7 +565,8 @@ export async function getBinanceMarginLiquidation(
   connection: BinanceConnection,
   startTime: number,
   endTime: number,
-  progress: ProgressCallback
+  progress: ProgressCallback,
+  debugMode: boolean
 ): Promise<Array<BinanceMarginLiquidation>> {
   const timestamp = Date.now()
   const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
@@ -548,12 +584,14 @@ export async function getBinanceMarginLiquidation(
       "X-MBX-APIKEY": connection.key,
     },
   })
-  progress([
-    undefined,
-    `Fetched margin liquidation record from ${formatDate(startTime)} to ${formatDate(
-      endTime
-    )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
-  ])
+  if (debugMode) {
+    progress([
+      undefined,
+      `Fetched margin liquidation record from ${formatDate(startTime)} to ${formatDate(
+        endTime
+      )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
+    ])
+  }
   const data = await res.json()
   if (res.status !== 200) {
     throw new Error(`Binance: ${data.msg}`)
@@ -589,7 +627,8 @@ export async function getBinanceFuturesUSDTrades(
   symbol: BinancePair,
   startTime: number,
   endTime: number,
-  progress: ProgressCallback
+  progress: ProgressCallback,
+  debugMode: boolean
 ): Promise<Array<BinanceFuturesUSDTrades>> {
   const timestamp = Date.now()
   const queryString = `symbol=${symbol.symbol}&timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
@@ -608,8 +647,14 @@ export async function getBinanceFuturesUSDTrades(
     },
   })
   const data = await res.json()
-
-  progress([undefined, `Weight used: ${res.headers.get("X-Mbx-Used-Weight-1m")}`])
+  if (debugMode) {
+    progress([
+      undefined,
+      `Fetched futures USD-M trade history for ${symbol.symbol}, from ${formatDate(
+        startTime
+      )} to ${formatDate(endTime)} - Weight used: ${res.headers.get("X-Mbx-Used-Weight-1m")}`,
+    ])
+  }
   // check if status is 429
   if (res.status !== 200) {
     throw new Error(`Binance: ${data.msg}`)
@@ -650,7 +695,8 @@ export async function getBinanceFuturesCOINTrades(
   symbol: BinancePair,
   startTime: number,
   endTime: number,
-  progress: ProgressCallback
+  progress: ProgressCallback,
+  debugMode: boolean
 ): Promise<Array<BinanceFuturesCOINTrades>> {
   const timestamp = Date.now()
   const queryString = `pair=${symbol.symbol}&timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
@@ -670,8 +716,14 @@ export async function getBinanceFuturesCOINTrades(
     },
   })
   const data = await res.json()
-
-  progress([undefined, `Weight used: ${res.headers.get("X-Mbx-Used-Weight-1m")}`])
+  if (debugMode) {
+    progress([
+      undefined,
+      `Fetched futures Coin-M trade history for ${symbol.symbol} - Weight used: ${res.headers.get(
+        "X-Mbx-Used-Weight-1m"
+      )}`,
+    ])
+  }
   // check if status is 429
   if (res.status !== 200) {
     throw new Error(`Binance: ${data.msg}`)
@@ -689,7 +741,8 @@ export async function getBinanceFuturesCOINIncome(
   connection: BinanceConnection,
   startTime: number,
   endTime: number,
-  progress: ProgressCallback
+  progress: ProgressCallback,
+  debugMode: boolean
 ): Promise<Array<BinanceFuturesCOINIncome>> {
   const timestamp = Date.now()
   const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
@@ -709,8 +762,14 @@ export async function getBinanceFuturesCOINIncome(
     },
   })
   const data = await res.json()
-
-  progress([undefined, `Weight used: ${res.headers.get("X-Mbx-Used-Weight-1m")}`])
+  if (debugMode) {
+    progress([
+      undefined,
+      `Fetched Futures Coin-M income history from ${formatDate(startTime)} to ${formatDate(
+        endTime
+      )} - Weight used: ${res.headers.get("X-Mbx-Used-Weight-1m")}`,
+    ])
+  }
   if (res.status !== 200) {
     throw new Error(`Binance: ${data.msg}`)
   }
@@ -723,7 +782,8 @@ export async function getBinanceFuturesUSDIncome(
   connection: BinanceConnection,
   startTime: number,
   endTime: number,
-  progress: ProgressCallback
+  progress: ProgressCallback,
+  debugMode: boolean
 ): Promise<Array<BinanceFuturesUSDIncome>> {
   const timestamp = Date.now()
   const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
@@ -743,13 +803,14 @@ export async function getBinanceFuturesUSDIncome(
     },
   })
   const data = await res.json()
-
-  progress([
-    undefined,
-    `For ${formatDate(startTime)} - ${formatDate(endTime)} - Weight used: ${res.headers.get(
-      "X-Mbx-Used-Weight-1m"
-    )}`,
-  ])
+  if (debugMode) {
+    progress([
+      undefined,
+      `Fetched futures USD-M income history from ${formatDate(startTime)} to ${formatDate(
+        endTime
+      )} - Weight used: ${res.headers.get("X-Mbx-Used-Weight-1m")}`,
+    ])
+  }
   // check if status is 429
   if (res.status !== 200) {
     throw new Error(`Binance: ${data.msg}`)

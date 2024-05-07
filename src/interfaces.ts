@@ -318,6 +318,14 @@ export interface Connection {
   _id: string
   _rev: string
   address?: string
+  binanceWallets?: {
+    coin: boolean
+    cross: boolean
+    isolated: boolean
+    spot: boolean
+    usd: boolean
+  }
+  key?: string
   label: string
   meta?: {
     assetIds: string[]
@@ -328,13 +336,12 @@ export interface Connection {
     wallets: string[]
   }
   platform: PlatformId
+  secret?: string
   syncedAt?: number
   /**
    * createdAt
    */
   timestamp: Timestamp
-  key?: string
-  secret?: string
 }
 
 export type EtherscanConnection = Connection & {

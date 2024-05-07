@@ -1,8 +1,12 @@
 import { CloseRounded } from "@mui/icons-material"
 import { LoadingButton } from "@mui/lab"
 import {
+  Checkbox,
   Drawer,
   DrawerProps,
+  FormControl,
+  FormControlLabel,
+  FormHelperText,
   IconButton,
   ListItemText,
   MenuItem,
@@ -41,6 +45,23 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
     setPlatform("ethereum")
   }, [open])
 
+  const [state, setState] = React.useState({
+    coin: false,
+    cross: false,
+    isolated: false,
+    spot: true,
+    usd: false,
+  })
+  const handleChange = (event) => {
+    setState({
+      ...state,
+      [event.target.name]: event.target.checked,
+    })
+  }
+  const { spot, cross, isolated, coin, usd } = state
+  const binanceWallets = { coin, cross, isolated, spot, usd }
+  const error = [spot, cross, isolated, coin, usd].filter((v) => v).length === 0
+
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault()
@@ -49,13 +70,16 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
         const isValidAddress = address && isAddress(address)
         if (!isValidAddress) return
       } else {
-        if (key.length === 0 || secret.length === 0) return
+        if (key.length === 0 || secret.length === 0 || error) return
       }
 
       setLoading(true)
 
       clancy
-        .addConnection({ address, key, label, platform, secret }, $activeAccount.get())
+        .addConnection(
+          { address, binanceWallets, key, label, platform, secret },
+          $activeAccount.get()
+        )
         .then((connection) => {
           toggleOpen()
           enqueueSyncConnection(connection)
@@ -65,7 +89,7 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
           setLoading(false)
         })
     },
-    [address, key, secret, platform, label, toggleOpen]
+    [address, binanceWallets, key, secret, platform, label, toggleOpen]
   )
 
   return (
@@ -138,6 +162,64 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
                   required
                 />
               </div>
+              <FormControl sx={{ color: "var(--mui-palette-text-secondary)" }} error={error}>
+                <SectionTitle>Wallets </SectionTitle>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={spot}
+                      color="secondary"
+                      name="spot"
+                      onChange={handleChange}
+                    />
+                  }
+                  label="Spot"
+                />
+                <FormControlLabel
+                  sx={{ display: "none" }}
+                  control={
+                    <Checkbox
+                      checked={cross}
+                      color="secondary"
+                      name="cross"
+                      onChange={handleChange}
+                    />
+                  }
+                  label="Cross Margin"
+                />
+                <FormControlLabel
+                  sx={{ display: "none" }}
+                  control={
+                    <Checkbox
+                      checked={isolated}
+                      color="secondary"
+                      name="isolated"
+                      onChange={handleChange}
+                    />
+                  }
+                  label="Isolated Margin"
+                />
+                <FormControlLabel
+                  sx={{ display: "none" }}
+                  control={
+                    <Checkbox
+                      checked={coin}
+                      color="secondary"
+                      name="coin"
+                      onChange={handleChange}
+                    />
+                  }
+                  label="Coin-M Futures"
+                />
+                <FormControlLabel
+                  sx={{ display: "none" }}
+                  control={
+                    <Checkbox checked={usd} color="secondary" name="usd" onChange={handleChange} />
+                  }
+                  label="USD-M Futures"
+                />
+                {error ? <FormHelperText>You need to choose at least one</FormHelperText> : null}
+              </FormControl>
             </>
           )}
           <div>
