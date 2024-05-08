@@ -65,11 +65,7 @@ export function timeQueue<T extends (...args: never[]) => void>(
 export const EMPTY_OBJECT = Object.freeze({})
 
 export const SITE_DOMAIN = "https://privatefolio.app"
-
-export const isServerSide = typeof window === "undefined"
-export const isProduction = isServerSide
-  ? false
-  : Boolean(window.location.toString().includes(SITE_DOMAIN))
+export const isProduction = Boolean(window.location.toString().includes(SITE_DOMAIN))
 
 export function getExplorerLink(networkIndex: number, addr: string, type: string) {
   if (networkIndex === 0) return `https://etherscan.io/${type}/${addr}`

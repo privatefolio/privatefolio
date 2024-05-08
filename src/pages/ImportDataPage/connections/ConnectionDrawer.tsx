@@ -20,6 +20,7 @@ import React, { useCallback, useEffect, useState } from "react"
 import { BinanceInput } from "src/components/BinanceInput"
 import { $activeAccount } from "src/stores/account-store"
 import { enqueueSyncConnection, handleAuditLogChange } from "src/utils/common-tasks"
+import { isProduction } from "src/utils/utils"
 import { clancy } from "src/workers/remotes"
 
 import { AddressInput } from "../../../components/AddressInput"
@@ -114,7 +115,7 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
               onChange={(event) => setPlatform(event.target.value as PlatformId)}
             >
               {Object.keys(CONNECTIONS).map((x) =>
-                PLATFORMS_META[x].name === "Binance" && window.location.hostname !== "localhost" ? (
+                PLATFORMS_META[x].name === "Binance" && !isProduction ? (
                   <MenuItem key={x} value={x} disabled>
                     <ListItemText primary={PLATFORMS_META[x].name} />
                   </MenuItem>
