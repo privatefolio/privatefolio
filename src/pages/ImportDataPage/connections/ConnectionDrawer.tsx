@@ -113,11 +113,17 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
               value={platform}
               onChange={(event) => setPlatform(event.target.value as PlatformId)}
             >
-              {Object.keys(CONNECTIONS).map((x) => (
-                <MenuItem key={x} value={x}>
-                  <ListItemText primary={PLATFORMS_META[x].name} />
-                </MenuItem>
-              ))}
+              {Object.keys(CONNECTIONS).map((x) =>
+                PLATFORMS_META[x].name === "Binance" && window.location.hostname !== "localhost" ? (
+                  <MenuItem key={x} value={x} disabled>
+                    <ListItemText primary={PLATFORMS_META[x].name} />
+                  </MenuItem>
+                ) : (
+                  <MenuItem key={x} value={x}>
+                    <ListItemText primary={PLATFORMS_META[x].name} />
+                  </MenuItem>
+                )
+              )}
             </Select>
           </div>
           {platform === "ethereum" ? (

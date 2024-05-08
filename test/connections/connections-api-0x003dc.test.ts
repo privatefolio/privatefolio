@@ -4,6 +4,7 @@ import { addConnection, syncConnection } from "src/api/account/connections/conne
 import { autoMergeTransactions, findTransactions } from "src/api/account/transactions-api"
 import { resetAccount } from "src/api/database"
 import { Connection } from "src/interfaces"
+import { $debugMode } from "src/stores/app-store"
 import { ProgressUpdate } from "src/stores/task-store"
 import {
   normalizeTransaction,
@@ -42,7 +43,7 @@ describe("should import 0x003dc via connection", () => {
     // arrange
     const updates: ProgressUpdate[] = []
     // act
-    await syncConnection((state) => updates.push(state), connection, accountName)
+    await syncConnection((state) => updates.push(state), connection, accountName, $debugMode.get())
     // assert
     // assert
     expect(updates.join("\n")).toMatchInlineSnapshot(`

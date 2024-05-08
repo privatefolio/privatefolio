@@ -4,6 +4,7 @@ import { addConnection, syncConnection } from "src/api/account/connections/conne
 import { findTransactions } from "src/api/account/transactions-api"
 import { resetAccount } from "src/api/database"
 import { Connection } from "src/interfaces"
+import { $debugMode } from "src/stores/app-store"
 import { ProgressUpdate } from "src/stores/task-store"
 import { normalizeTransaction, sanitizeAuditLog, sanitizeBalance } from "src/utils/test-utils"
 import { beforeAll, describe, expect, it } from "vitest"
@@ -35,7 +36,7 @@ describe.skip("should import 0xf98 via connection", () => {
 
   it.sequential("should sync connection", async () => {
     // act
-    await syncConnection(undefined, connection, accountName)
+    await syncConnection(undefined, connection, accountName, $debugMode.get())
     // assert
   })
 

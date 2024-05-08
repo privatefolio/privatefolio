@@ -22,10 +22,8 @@ export async function binanceSpotAccount(
   debugMode: boolean,
   signal?: AbortSignal
 ) {
-  // const genesis = 1498867200000
-  // const currentTime = Date.now()
-  const genesis = 1696122000000
-  const currentTime = 1698804000000
+  const genesis = 1498867200000
+  const currentTime = Date.now()
   const ninetyDays = 7_776_000_000
 
   progress([0, `Fetching deposits`])
