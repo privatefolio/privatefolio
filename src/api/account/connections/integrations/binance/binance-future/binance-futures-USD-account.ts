@@ -10,20 +10,21 @@ import {
   getBinanceFuturesUSDSymbols,
   getBinanceFuturesUSDTrades,
 } from "../binance-account-api"
+import { sevenDays } from "../binance-settings"
 
 export async function binanceFuturesUSDAccount(
   progress: ProgressCallback = noop,
   connection: BinanceConnection,
   debugMode: boolean,
   since: string,
+  until: string,
   signal?: AbortSignal
 ) {
   progress([0, `Starting from block number ${since}`])
   // const genesis = 1498867200000
   // const currentTime = Date.now()
-  const genesis = 1696122000000
-  const currentTime = 1698804000000
-  const sevenDays = 604_800_000
+  const genesis = since !== "0" ? parseFloat(since) : 1498867200000
+  const currentTime = parseFloat(until)
 
   progress([0, `Fetching Futures symbols`])
   const symbols = await getBinanceFuturesUSDSymbols(connection)

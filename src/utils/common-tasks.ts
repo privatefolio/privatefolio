@@ -263,6 +263,7 @@ export function enqueueSyncConnection(connection: Connection) {
         $activeAccount.get(),
         $debugMode.get(),
         undefined,
+        undefined,
         signal
       )
       handleAuditLogChange()

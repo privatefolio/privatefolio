@@ -55,9 +55,13 @@ export async function syncBinance(
   connection: BinanceConnection,
   debugMode: boolean,
   since: string,
+  until: string,
   signal?: AbortSignal
 ): Promise<SyncResult> {
-  progress([0, `Starting from block number ${since}`])
+  progress([0, `Starting from timestamp ${since}`])
+  if (until === undefined) {
+    until = String(Date.now())
+  }
   const wallets = connection.binanceWallets
 
   const result: SyncResult = {
@@ -91,7 +95,7 @@ export async function syncBinance(
 
   if (wallets?.spot) {
     progress([undefined, `Fetching data from Binance Spot`])
-    const result = await binanceSpotAccount(progress, connection, debugMode, signal)
+    const result = await binanceSpotAccount(progress, connection, debugMode, since, until, signal)
     deposits = result.deposits
     withdraws = result.withdraws
     trades = result.trades
@@ -101,7 +105,14 @@ export async function syncBinance(
 
   if (wallets?.cross) {
     progress([undefined, `Fetching data from Binance Cross Margin`])
-    const result = await binanceCrossMarginAccount(progress, connection, debugMode, since, signal)
+    const result = await binanceCrossMarginAccount(
+      progress,
+      connection,
+      debugMode,
+      since,
+      until,
+      signal
+    )
     crossLoans = result.loans
     crossRepayments = result.repayments
     crossTrades = result.trades
@@ -117,6 +128,7 @@ export async function syncBinance(
       connection,
       debugMode,
       since,
+      until,
       signal
     )
     isolatedLoans = result.loans
@@ -129,7 +141,14 @@ export async function syncBinance(
 
   if (wallets?.coin) {
     progress([undefined, `Fetching data from Binance Coin-M Futures`])
-    const result = await binanceFuturesCOINAccount(progress, connection, debugMode, since, signal)
+    const result = await binanceFuturesCOINAccount(
+      progress,
+      connection,
+      debugMode,
+      since,
+      until,
+      signal
+    )
     futuresCOINTrades = result.trades
     futuresCOINIncome = result.incomes
     progress([undefined, `Fetched data from Binance Coin-M Futures`])
@@ -137,7 +156,14 @@ export async function syncBinance(
 
   if (wallets?.usd) {
     progress([undefined, `Fetching data from Binance USD-M Futures`])
-    const result = await binanceFuturesUSDAccount(progress, connection, debugMode, since, signal)
+    const result = await binanceFuturesUSDAccount(
+      progress,
+      connection,
+      debugMode,
+      since,
+      until,
+      signal
+    )
     futuresUSDTrades = result.trades
     futuresUSDIncome = result.incomes
     progress([undefined, `Fetched data from Binance USD-M Futures`])
@@ -165,7 +191,6 @@ export async function syncBinance(
     futuresUSDIncome,
   ]
 
-  let blockNumber = 0
   progress([98, "Parsing all transactions"])
   transactionArrays.forEach((txArray, arrayIndex) => {
     const parse = parserList[arrayIndex]
@@ -191,15 +216,9 @@ export async function syncBinance(
         progress([undefined, `Error parsing row ${rowIndex + 1}: ${String(error)}`])
       }
     })
-
-    const lastBlock = txArray[txArray.length - 1]?.blockNumber
-
-    if (lastBlock && Number(lastBlock) > blockNumber) {
-      blockNumber = Number(lastBlock)
-    }
   })
 
-  result.newCursor = String(blockNumber + 1)
+  result.newCursor = String(parseFloat(until) + 1)
   console.log("🚀 ~ result:", result)
   return result
 }

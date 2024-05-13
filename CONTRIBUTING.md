@@ -17,3 +17,10 @@ yarn install
 ```sh
 yarn dev
 ```
+
+## Testing
+
+```sh
+yarn test
+yarn test test/fisier.test.ts
+```

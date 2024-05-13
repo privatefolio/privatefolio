@@ -15,16 +15,18 @@ import {
   getBinanceTradesForSymbol,
   getBinanceWithdraw,
 } from "../binance-account-api"
+import { ninetyDays } from "../binance-settings"
 
 export async function binanceSpotAccount(
   progress: ProgressCallback = noop,
   connection: BinanceConnection,
   debugMode: boolean,
+  since: string,
+  until: string,
   signal?: AbortSignal
 ) {
-  const genesis = 1498867200000
-  const currentTime = Date.now()
-  const ninetyDays = 7_776_000_000
+  const genesis = since !== "0" ? parseFloat(since) : 1498867200000
+  const currentTime = parseFloat(until)
 
   progress([0, `Fetching deposits`])
   let deposits: BinanceDeposit[] = []
@@ -114,6 +116,7 @@ export async function binanceSpotAccount(
 
   progress([30, `Fetching symbols`])
   const symbols = await getBinanceSymbols(connection)
+  // const symbols = ["ETHUSD"]
   progress([35, `Fetched ${symbols.length} symbols`])
 
   progress([35, `Fetching spot trade history`])
@@ -149,7 +152,7 @@ export async function binanceSpotAccount(
     progressCount += batch.length
     progress([35 + (progressCount / symbols.length) * 55])
     if (i + 10 < symbols.length) {
-      await wait(200 * 4)
+      await wait(200 * 10)
     }
   }
   console.log("Spot trades: ", trades)

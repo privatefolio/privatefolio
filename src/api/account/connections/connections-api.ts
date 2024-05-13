@@ -14,7 +14,7 @@ import {
 import { hashString, noop } from "../../../utils/utils"
 import { getAccount } from "../../database"
 import { getValue, setValue } from "../kv-api"
-import { syncBinance } from "./integrations/binance/binance-coonector"
+import { syncBinance } from "./integrations/binance/binance-connector"
 import { syncEtherscan } from "./integrations/etherscan-connector"
 
 export async function addConnection(
@@ -29,7 +29,7 @@ export async function addConnection(
   const account = getAccount(accountName)
 
   const timestamp = new Date().getTime()
-  const _id = hashString(`con_${platform}_${address}_${label}`)
+  const _id = hashString(`con_${platform}_${address || key}_${label}`)
 
   await account.connectionsDB.put<Connection>({
     ...connection,
@@ -150,6 +150,7 @@ export async function syncConnection(
   accountName: string,
   debugMode: boolean,
   since?: string,
+  until?: string,
   signal?: AbortSignal
 ) {
   let result: SyncResult
@@ -157,13 +158,23 @@ export async function syncConnection(
   if (since === undefined) {
     since = (await getValue<string>(connection._id, "0", accountName)) as string
   }
+  if (until === undefined) {
+    until = String(Date.now())
+  }
 
   if (connection.platform === "ethereum") {
-    result = await syncEtherscan(progress, connection as EtherscanConnection, since)
+    result = await syncEtherscan(progress, connection as EtherscanConnection, since, until)
   } else if (isEvmPlatform(connection.platform)) {
-    result = await syncEtherscan(progress, connection as EtherscanConnection, since)
+    result = await syncEtherscan(progress, connection as EtherscanConnection, since, until)
   } else if (connection.platform === "binance") {
-    result = await syncBinance(progress, connection as BinanceConnection, debugMode, since, signal)
+    result = await syncBinance(
+      progress,
+      connection as BinanceConnection,
+      debugMode,
+      since,
+      until,
+      signal
+    )
   } else {
     throw new Error(`Unsupported platform: ${connection.platform}`)
   }
@@ -232,7 +243,7 @@ export async function syncConnection(
 
   // set cursor
   if (result.rows > 0) {
-    progress([90, `Setting cursor to block number ${result.newCursor}`])
+    progress([90, `Setting cursor to ${result.newCursor}`])
     await setValue(connection._id, result.newCursor, accountName)
   }
 

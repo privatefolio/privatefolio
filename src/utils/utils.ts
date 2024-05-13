@@ -69,6 +69,8 @@ export const isServer = typeof window === "undefined"
 export const isProduction = isServer
   ? false
   : Boolean(window.location.toString().includes(SITE_DOMAIN))
+export const isNode = typeof process !== "undefined" && process.versions && process.versions.node
+export const isWebWorker = isServer && !isNode
 
 export function getExplorerLink(networkIndex: number, addr: string, type: string) {
   if (networkIndex === 0) return `https://etherscan.io/${type}/${addr}`
