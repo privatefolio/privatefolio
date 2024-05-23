@@ -9,13 +9,15 @@ import { PlatformId } from "src/settings"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
 
+import { extractColumnsFromRow } from "../csv-utils"
+
 export const Identifier = "mexc"
 export const platform: PlatformId = "mexc"
 
 export const HEADER = "Pairs,Time,Side,Filled Price,Executed Amount,Total,Fee,Role"
 
 export function parser(csvRow: string, index: number, fileImportId: string): ParserResult {
-  const columns = csvRow.split(",")
+  const columns = extractColumnsFromRow(csvRow, 8)
   //
   const marketPair = columns[0]
   const assetId = `mexc:${marketPair.split("_")[0]}`

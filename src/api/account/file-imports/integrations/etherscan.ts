@@ -8,6 +8,8 @@ import {
 import { PlatformId, PLATFORMS_META } from "src/settings"
 import { asUTC } from "src/utils/formatting-utils"
 
+import { extractColumnsFromRow } from "../csv-utils"
+
 export const Identifier = "etherscan"
 export const platform: PlatformId = "ethereum" // FIXME: this should work for all EVM chains
 
@@ -16,9 +18,7 @@ export const HEADER =
 
 export function parser(csvRow: string, index: number, fileImportId: string): ParserResult {
   // ----------------------------------------------------------------- Parse
-  const columns = csvRow
-    .split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
-    .map((column) => column.replaceAll('"', ""))
+  const columns = extractColumnsFromRow(csvRow, 16)
   //
   const txHash = columns[0]
   // const blockNumber = columns[1]

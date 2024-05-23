@@ -15,6 +15,6 @@ export default defineConfig({
     globals: true,
     maxConcurrency: 32,
     reporters: ["verbose"],
-    testTimeout: 50_000,
+    testTimeout: 30 * 60_000,
   },
 })

@@ -3,14 +3,18 @@ import { PlatformId } from "src/settings"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
 
+import { extractColumnsFromRow } from "../csv-utils"
+
 export const Identifier = "binance-spot-history"
 export const platform: PlatformId = "binance"
 
 export const HEADER = '"Date(UTC)","Pair","Side","Price","Executed","Amount","Fee"'
 
+/**
+ * @deprecated do not use!
+ */
 export function parser(csvRow: string, index: number, fileImportId: string): ParserResult {
-  const row = csvRow.replaceAll('"', "")
-  const columns = row.split(",")
+  const columns = extractColumnsFromRow(csvRow, 7)
   //
   const utcTime = columns[0]
   // const pair = columns[1]

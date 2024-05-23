@@ -25,7 +25,7 @@ import { clancy } from "src/workers/remotes"
 
 import { AddressInput } from "../../../components/AddressInput"
 import { SectionTitle } from "../../../components/SectionTitle"
-import { PlatformId } from "../../../interfaces"
+import { BinanceConnectionOptions, PlatformId } from "../../../interfaces"
 import { CONNECTIONS, PLATFORMS_META } from "../../../settings"
 import { PopoverToggleProps } from "../../../stores/app-store"
 
@@ -59,9 +59,10 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
       [event.target.name]: event.target.checked,
     })
   }
-  const { spot, cross, isolated, coin, usd } = state
+  const { coin, cross, isolated, spot, usd } = state
   const binanceWallets = { coin, cross, isolated, spot, usd }
   const error = [spot, cross, isolated, coin, usd].filter((v) => v).length === 0
+  const options: BinanceConnectionOptions = { wallets: binanceWallets }
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
@@ -77,10 +78,7 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
       setLoading(true)
 
       clancy
-        .addConnection(
-          { address, binanceWallets, key, label, platform, secret },
-          $activeAccount.get()
-        )
+        .addConnection({ address, key, label, options, platform, secret }, $activeAccount.get())
         .then((connection) => {
           toggleOpen()
           enqueueSyncConnection(connection)

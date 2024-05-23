@@ -21,7 +21,7 @@ export async function addConnection(
   connection: Omit<Connection, "_id" | "_rev" | "timestamp" | "syncedAt">,
   accountName: string
 ) {
-  let { address, platform, label, key, secret, binanceWallets } = connection
+  let { address, platform, label, key, secret, options } = connection
 
   if (address) {
     address = getAddress(address)
@@ -36,8 +36,8 @@ export async function addConnection(
     _id,
     _rev: undefined as any,
     address,
-    binanceWallets,
     key,
+    options,
     secret,
     timestamp,
   })

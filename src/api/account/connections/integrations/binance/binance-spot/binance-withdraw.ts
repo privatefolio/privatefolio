@@ -1,3 +1,4 @@
+import Big from "big.js"
 import {
   AuditLog,
   AuditLogOperation,
@@ -15,27 +16,16 @@ export function parseWithdraw(
   index: number,
   connection: BinanceConnection
 ): ParserResult {
-  const { platform, address } = connection
-  const {
-    address: depositAddres,
-    transactionFee,
-    amount,
-    coin,
-    applyTime,
-    network,
-    transferType,
-    walletType,
-    completeTime,
-    txId: txHash,
-  } = row
+  const { platform } = connection
+  const { address, transactionFee, amount, coin, completeTime, applyTime, txId: txHash } = row
 
   const wallet = `Binance Spot`
   if (amount === "0") {
     return { logs: [] }
   }
-  const timestamp = asUTC(new Date(completeTime))
+  const timestamp = asUTC(new Date(applyTime))
   if (isNaN(timestamp)) {
-    throw new Error(`Invalid timestamp: ${completeTime}`)
+    throw new Error(`Invalid timestamp: ${applyTime}`)
   }
 
   const assetId = `binance:${coin}`
@@ -45,13 +35,14 @@ export function parseWithdraw(
   const importId = connection._id
   const importIndex = index
 
-  let incoming: string | undefined, incomingAsset: string | undefined, incomingN: number | undefined
+  const amountBN = new Big(amount)
+  const feeBN = new Big(transactionFee)
 
-  const outgoing = (parseFloat(amount) + parseFloat(transactionFee)).toString()
-  const outgoingN = parseFloat(outgoing)
+  const outgoing = amountBN.plus(feeBN).toFixed()
+  const outgoingN = amountBN.plus(feeBN).toNumber()
   const outgoingAsset = assetId
-  const change = `-${outgoing}` as string
-  const changeN = parseFloat(change)
+  const change = `-${outgoing}`
+  const changeN = -outgoingN
   const logs: AuditLog[] = [
     {
       _id: `${txId}_TRANSFER_${index}`,
@@ -72,9 +63,9 @@ export function parseWithdraw(
     _id: txId,
     importId,
     importIndex,
-    incoming: incoming === "0" ? undefined : incoming,
-    incomingAsset: incoming === "0" ? undefined : incomingAsset,
-    incomingN: incoming === "0" ? undefined : incomingN,
+    incoming: undefined,
+    incomingAsset: undefined,
+    incomingN: undefined,
     outgoing: outgoing === "0" ? undefined : outgoing,
     outgoingAsset: outgoing === "0" ? undefined : outgoingAsset,
     outgoingN: outgoing === "0" ? undefined : outgoingN,

@@ -1,12 +1,14 @@
-import { Link } from "@mui/material"
-import Box from "@mui/material/Box"
-import Button from "@mui/material/Button"
-import Paper from "@mui/material/Paper"
-import Step from "@mui/material/Step"
-import StepContent from "@mui/material/StepContent"
-import StepLabel from "@mui/material/StepLabel"
-import Stepper from "@mui/material/Stepper"
-import Typography from "@mui/material/Typography"
+import {
+  Box,
+  Button,
+  Link,
+  Paper,
+  Step,
+  StepContent,
+  StepLabel,
+  Stepper,
+  Typography,
+} from "@mui/material"
 import * as React from "react"
 import { ExternalLink } from "src/components/ExternalLink"
 
@@ -14,84 +16,45 @@ const steps = [
   {
     description: (
       <>
-        Visit Etherscan mouseover the More navigation button and click on{" "}
-        <ExternalLink href="https://etherscan.io/exportData">CSV Export</ExternalLink>.
+        Get in the account whose data you want to export. Afterwards open the Navigation Menu and
+        click on{" "}
+        <ExternalLink href="https://privatefolio.app/u/0/transactions">Transactions</ExternalLink>.
         <br />
         <br />
-        <a href="/app-data/help/etherscan/step1.png" target="_blank" rel="noreferrer">
+        <a href="/app-data/help/privatefolio/Step1.png" target="_blank" rel="noreferrer">
           <img
-            height={217}
+            height={201}
             width={433}
-            src="/app-data/help/etherscan/step1.png"
+            src="/app-data/help/privatefolio/Step1.png"
             alt="Step visualization"
           />
         </a>
       </>
     ),
-    label: "Visit the csv export page",
+    label: "Visit the Transactions page",
   },
   {
     description: (
       <>
-        Input the address of your wallet, select a broad time range and click on <u>Download</u>
-        .
+        Click on Actions. You can select <u>Export all transactions</u> if you want to export all
+        the transactions from this account.
         <br />
         <br />
-        <a href="/app-data/help/etherscan/step2.png" target="_blank" rel="noreferrer">
+        <a href="/app-data/help/privatefolio/Step2.png" target="_blank" rel="noreferrer">
           <img
-            height={249}
+            height={201}
             width={433}
-            src="/app-data/help/etherscan/step2.png"
+            src="/app-data/help/privatefolio/Step2.png"
             alt="Step visualization"
           />
         </a>
       </>
     ),
-    label: "Export normal transactions",
-  },
-  {
-    description: (
-      <>
-        Change export type to <i>Internal Transactions</i>, input the address of your wallet, select
-        a broad time range and click on <u>Download</u>
-        .
-        <br />
-        <br />
-        <a href="/app-data/help/etherscan/step3.png" target="_blank" rel="noreferrer">
-          <img
-            height={249}
-            width={433}
-            src="/app-data/help/etherscan/step3.png"
-            alt="Step visualization"
-          />
-        </a>
-      </>
-    ),
-    label: "Export internal transactions",
-  },
-  {
-    description: (
-      <>
-        Change export type to <i>ERC20 Transactions</i>, input the address of your wallet, select a
-        broad time range and click on <u>Download</u>
-        .
-        <br />
-        <br />
-        <a href="/app-data/help/etherscan/step4.png" target="_blank" rel="noreferrer">
-          <img
-            height={249}
-            width={433}
-            src="/app-data/help/etherscan/step4.png"
-            alt="Step visualization"
-          />
-        </a>
-      </>
-    ),
-    label: "Export ERC20 transactions",
+    label: "Export all the transactions",
   },
 ]
 
-export function EtherscanHelp() {
+export function PrivatefolioHelp() {
   const [activeStep, setActiveStep] = React.useState(0)
 
   const handleNext = () => {
@@ -105,7 +68,6 @@ export function EtherscanHelp() {
   const handleReset = () => {
     setActiveStep(0)
   }
-
   return (
     <>
       <Paper sx={{ padding: 2 }}>

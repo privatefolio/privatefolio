@@ -3,14 +3,15 @@ import { PlatformId } from "src/settings"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
 
+import { extractColumnsFromRow } from "../csv-utils"
+
 export const Identifier = "coinmama"
 export const platform: PlatformId = "coinmama"
 
 export const HEADER = "Transaction, Type,	Amount,	Date Created,	Status"
 
 export function parser(csvRow: string, index: number, fileImportId: string): ParserResult {
-  const row = csvRow.replaceAll('"', "")
-  const columns = row.split(",")
+  const columns = extractColumnsFromRow(csvRow, 5)
   //
   const transaction = columns[0].replaceAll(
     "Buy (Credit or Debit Card)",

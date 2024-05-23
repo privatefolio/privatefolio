@@ -1,7 +1,10 @@
-import { AuditLogOperation, BinanceAuditLog, ParserResult } from "src/interfaces"
+import Big from "big.js"
+import { AuditLog, AuditLogOperation, ParserResult, Transaction } from "src/interfaces"
 import { PlatformId } from "src/settings"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
+
+import { extractColumnsFromRow } from "../csv-utils"
 
 export const Identifier = "binance-account-statement"
 export const platform: PlatformId = "binance"
@@ -12,8 +15,7 @@ export const HEADERS = [
 ]
 
 export function parser(csvRow: string, index: number, fileImportId: string): ParserResult {
-  const row = csvRow.replaceAll('"', "")
-  const columns = row.split(",")
+  const columns = extractColumnsFromRow(csvRow, 7)
   //
   const userId = columns[0]
   const utcTime = columns[1]
@@ -38,7 +40,7 @@ export function parser(csvRow: string, index: number, fileImportId: string): Par
     operation = "Transfer"
   }
   const coin = columns[4]
-  const change = columns[5]
+  const change = new Big(columns[5])
   const remark = columns[6]
   //
   if (remark === "Duplicate") {
@@ -48,27 +50,63 @@ export function parser(csvRow: string, index: number, fileImportId: string): Par
   const hash = hashString(`${index}_${csvRow}`)
   const _id = `${fileImportId}_${hash}`
   const timestamp = asUTC(new Date(utcTime))
-  const changeN = parseFloat(change)
+  const changeN = change.toNumber()
   const assetId = `binance:${coin}`
   const wallet = `Binance ${account}`
 
-  const log: BinanceAuditLog = {
+  const log: AuditLog = {
     _id,
-    account,
+    // account,
     assetId,
-    change,
+    change: change.toFixed(),
     changeN,
-    coin,
+    // coin,
     importId: fileImportId,
     importIndex: index,
     operation,
     platform,
-    remark,
+    // remark,
     timestamp,
-    userId,
-    utcTime,
+    // userId,
+    // utcTime,
     wallet,
   }
 
-  return { logs: [log] }
+  let txns: Transaction[] = []
+  if (operation === "Deposit" || operation === "Reward") {
+    txns = [
+      {
+        _id,
+        importId: fileImportId,
+        importIndex: index,
+        incoming: change.toFixed(),
+        incomingAsset: assetId,
+        incomingN: changeN,
+        platform,
+        timestamp,
+        type: operation,
+        wallet,
+      },
+    ]
+  }
+
+  if (operation === "Withdraw") {
+    txns = [
+      {
+        _id,
+        importId: fileImportId,
+        importIndex: index,
+        outgoing: change.mul(-1).toFixed(),
+        outgoingAsset: assetId,
+        outgoingN: -changeN,
+        platform,
+        timestamp,
+        type: "Withdraw",
+        wallet,
+      },
+    ]
+  }
+  console.log("🚀 ~ parser ~ txns:", txns.length)
+
+  return { logs: [log], txns }
 }

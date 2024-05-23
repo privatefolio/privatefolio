@@ -1,3 +1,4 @@
+import Big from "big.js"
 import {
   AuditLog,
   BinanceConnection,
@@ -13,21 +14,9 @@ export function parseTrade(
   index: number,
   connection: BinanceConnection
 ): ParserResult {
-  const { platform, address } = connection
-  const {
-    symbol,
-    id,
-    price,
-    qty,
-    quoteQty,
-    commission,
-    commissionAsset,
-    time,
-    isBuyer,
-    baseAsset,
-    quoteAsset,
-  } = row
-
+  const { platform } = connection
+  const { id, qty, quoteQty, commission, commissionAsset, time, isBuyer, baseAsset, quoteAsset } =
+    row
   const wallet = `Binance Spot`
 
   const timestamp = new Date(Number(time)).getTime()
@@ -39,23 +28,27 @@ export function parseTrade(
   const importId = connection._id
   const importIndex = index
 
+  const feeBN = new Big(commission)
+  const qtyBN = new Big(qty)
+  const quoteQtyBN = new Big(quoteQty)
+
   let incoming: string | undefined, incomingAsset: string | undefined, incomingN: number | undefined
   let outgoing: string | undefined, outgoingAsset: string | undefined, outgoingN: number | undefined
   let logs: AuditLog[]
 
   if (isBuyer) {
-    incoming = qty
-    incomingN = parseFloat(incoming)
+    incoming = qtyBN.toFixed()
+    incomingN = qtyBN.toNumber()
     incomingAsset = `binance:${baseAsset}`
-    outgoing = quoteQty
-    outgoingN = parseFloat(outgoing)
+    outgoing = quoteQtyBN.toFixed()
+    outgoingN = quoteQtyBN.toNumber()
     outgoingAsset = `binance:${quoteAsset}`
     logs = [
       {
         _id: `${txId}_SELL`,
         assetId: outgoingAsset,
-        change: `-${outgoing}` as string,
-        changeN: outgoingN,
+        change: `-${outgoing}`,
+        changeN: -outgoingN,
         importId,
         importIndex,
         operation: "Sell",
@@ -79,18 +72,18 @@ export function parseTrade(
       },
     ]
   } else {
-    incoming = quoteQty
-    incomingN = parseFloat(incoming)
+    incoming = quoteQtyBN.toFixed()
+    incomingN = quoteQtyBN.toNumber()
     incomingAsset = `binance:${quoteAsset}`
-    outgoing = qty
-    outgoingN = parseFloat(outgoing)
+    outgoing = qtyBN.toFixed()
+    outgoingN = qtyBN.toNumber()
     outgoingAsset = `binance:${baseAsset}`
     logs = [
       {
         _id: `${txId}_SELL`,
         assetId: outgoingAsset,
-        change: `-${outgoing}` as string,
-        changeN: outgoingN,
+        change: `-${outgoing}`,
+        changeN: -outgoingN,
         importId,
         importIndex,
         operation: "Sell",
@@ -119,8 +112,8 @@ export function parseTrade(
     logs.push({
       _id: `${txId}_FEE`,
       assetId: `binance:${commissionAsset}`,
-      change: `-${commission}` as string,
-      changeN: parseFloat(commission),
+      change: `-${feeBN.toFixed()}`,
+      changeN: -feeBN.toNumber(),
       importId,
       importIndex,
       operation: "Fee",
@@ -130,12 +123,13 @@ export function parseTrade(
       wallet,
     })
   }
-
+  const priceN = incomingN / outgoingN
+  const price = priceN.toString()
   const tx: Transaction = {
     _id: txId,
-    fee: commission === "0" ? undefined : commission,
+    fee: commission === "0" ? undefined : feeBN.toFixed(),
     feeAsset: commission === "0" ? undefined : `binance:${commissionAsset}`,
-    feeN: commission === "0" ? undefined : parseFloat(commission),
+    feeN: commission === "0" ? undefined : feeBN.toNumber(),
     importId,
     importIndex,
     incoming: incoming === "0" ? undefined : incoming,
@@ -145,6 +139,8 @@ export function parseTrade(
     outgoingAsset: outgoing === "0" ? undefined : outgoingAsset,
     outgoingN: outgoing === "0" ? undefined : outgoingN,
     platform,
+    price,
+    priceN,
     timestamp,
     type,
     wallet,

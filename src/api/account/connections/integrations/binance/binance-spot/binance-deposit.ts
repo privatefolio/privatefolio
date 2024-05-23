@@ -1,3 +1,4 @@
+import Big from "big.js"
 import {
   AuditLog,
   AuditLogOperation,
@@ -14,7 +15,7 @@ export function parseDeposit(
   index: number,
   connection: BinanceConnection
 ): ParserResult {
-  const { platform, address } = connection
+  const { platform } = connection
   const { amount, coin, insertTime, txId: txHash } = row
 
   const wallet = `Binance Spot`
@@ -32,13 +33,13 @@ export function parseDeposit(
   const importId = connection._id
   const importIndex = index
 
-  let outgoing: string | undefined, outgoingAsset: string | undefined, outgoingN: number | undefined
-
-  const incoming = amount
-  const incomingN = parseFloat(incoming)
+  const amountBN = new Big(amount)
+  const incoming = amountBN.toFixed()
+  const incomingN = amountBN.toNumber()
   const incomingAsset = assetId
-  const change = incoming as string
-  const changeN = parseFloat(change)
+
+  const change = incoming
+  const changeN = incomingN
   const logs: AuditLog[] = [
     {
       _id: `${txId}_TRANSFER_${index}`,
@@ -62,9 +63,9 @@ export function parseDeposit(
     incoming: incoming === "0" ? undefined : incoming,
     incomingAsset: incoming === "0" ? undefined : incomingAsset,
     incomingN: incoming === "0" ? undefined : incomingN,
-    outgoing: outgoing === "0" ? undefined : outgoing,
-    outgoingAsset: outgoing === "0" ? undefined : outgoingAsset,
-    outgoingN: outgoing === "0" ? undefined : outgoingN,
+    outgoing: undefined,
+    outgoingAsset: undefined,
+    outgoingN: undefined,
     platform,
     timestamp,
     txHash,

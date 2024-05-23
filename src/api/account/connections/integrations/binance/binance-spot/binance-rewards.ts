@@ -1,3 +1,4 @@
+import Big from "big.js"
 import {
   AuditLog,
   BinanceConnection,
@@ -14,7 +15,7 @@ export function parseReward(
   connection: BinanceConnection
 ): ParserResult {
   const { platform } = connection
-  const { amount, rewards, asset, lockPeriod, positionId, projectId, time } = row
+  const { amount, rewards, asset, positionId, projectId, time } = row
   const wallet = `Binance Spot`
   const timestamp = new Date(Number(time)).getTime()
   if (isNaN(timestamp)) {
@@ -25,14 +26,17 @@ export function parseReward(
   const importId = connection._id
   const importIndex = index
 
-  let incoming: string | undefined, incomingN: number | undefined
+  let amountBN: Big
   if (amount) {
-    incoming = amount
-    incomingN = parseFloat(incoming)
+    amountBN = new Big(amount)
   } else if (rewards) {
-    incoming = rewards
-    incomingN = parseFloat(incoming)
+    amountBN = new Big(rewards)
+  } else {
+    throw new Error("This should never happen.")
   }
+
+  const incoming = amountBN.toFixed()
+  const incomingN = amountBN.toNumber()
   const incomingAsset = `binance:${asset}`
   const logs: AuditLog[] = [
     {

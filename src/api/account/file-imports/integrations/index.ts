@@ -3,6 +3,7 @@ import { ParserId, PlatformId } from "src/settings"
 
 import * as binance from "./binance"
 import * as binanceSpot from "./binance-spot-history"
+import * as blockpit from "./blockpit"
 import * as coinmama from "./coinmama"
 import * as etherscan from "./etherscan"
 import * as etherscanErc20 from "./etherscan-erc20"
@@ -20,6 +21,7 @@ export const HEADER_MATCHER: Record<string, ParserId> = {
   [etherscan.HEADER]: etherscan.Identifier,
   [etherscanInternal.HEADER]: etherscanInternal.Identifier,
   [etherscanErc20.HEADER]: etherscanErc20.Identifier,
+  [blockpit.HEADER]: blockpit.Identifier,
 }
 
 export const PARSER_MATCHER: Record<ParserId, CsvParser> = {
@@ -31,6 +33,7 @@ export const PARSER_MATCHER: Record<ParserId, CsvParser> = {
   [etherscanErc20.Identifier]: etherscanErc20.parser,
   [privatefolioTxns.Identifier]: privatefolioTxns.parser,
   [binanceSpot.Identifier]: binanceSpot.parser,
+  [blockpit.Identifier]: blockpit.parser,
 }
 
 export const PLATFORM_MATCHER: Record<ParserId, PlatformId> = {
@@ -42,4 +45,5 @@ export const PLATFORM_MATCHER: Record<ParserId, PlatformId> = {
   [etherscanErc20.Identifier]: etherscanErc20.platform,
   [privatefolioTxns.Identifier]: privatefolioTxns.platform,
   [binanceSpot.Identifier]: binanceSpot.platform,
+  [blockpit.Identifier]: blockpit.platform,
 }

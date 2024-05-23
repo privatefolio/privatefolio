@@ -83,9 +83,10 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
   const [textInput, setTextInput] = useState(tx.notes || "")
 
   const handleTextInputChange = (event) => {
-    setTextInput(event.target.value)
+    const newValue = event.target.value.replace("\n", "")
+    setTextInput(newValue)
     updateTransactionDebounced($activeAccount.get(), _id, {
-      notes: event.target.value,
+      notes: newValue,
     })
   }
 
@@ -280,7 +281,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
             autoComplete="off"
             multiline
             onChange={handleTextInputChange}
-            defaultValue={textInput}
+            value={textInput}
             minRows={3}
             fullWidth
             placeholder="Write a custom note..."

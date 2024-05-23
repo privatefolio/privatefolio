@@ -1,5 +1,6 @@
 import { OhlcData, SingleValueData, UTCTimestamp } from "lightweight-charts"
 
+import { BinancePair } from "./api/account/connections/integrations/binance/binance-account-api"
 import {
   Erc20Transaction,
   InternalTransaction,
@@ -314,17 +315,20 @@ export type QueryRequest = {
 }
 export const DEFAULT_POLLING_INTERVAL = 2_000
 
-export interface Connection {
-  _id: string
-  _rev: string
-  address?: string
-  binanceWallets?: {
+export type BinanceConnectionOptions = {
+  symbols?: BinancePair[]
+  wallets?: {
     coin: boolean
     cross: boolean
     isolated: boolean
     spot: boolean
     usd: boolean
   }
+}
+export interface Connection {
+  _id: string
+  _rev: string
+  address?: string
   key?: string
   label: string
   meta?: {
@@ -335,6 +339,7 @@ export interface Connection {
     transactions: number
     wallets: string[]
   }
+  options?: BinanceConnectionOptions
   platform: PlatformId
   secret?: string
   syncedAt?: number

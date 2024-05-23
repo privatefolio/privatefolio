@@ -3,6 +3,8 @@ import { PlatformId } from "src/settings"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
 
+import { extractColumnsFromRow } from "../csv-utils"
+
 export const Identifier = "privatefolio"
 export const platform: PlatformId = "ethereum" // FIXME: this should work for all EVM chains
 
@@ -10,15 +12,7 @@ export const HEADER =
   '"Timestamp","Platform","Wallet","Type","Incoming","Incoming Asset","Outgoing","Outgoing Asset","Fee","Fee Asset","Smart Contract","Smart Contract Method","Blockchain Tx","Notes"'
 
 export function parser(csvRow: string, index: number, fileImportId: string): ParserResult {
-  // A regex that matches content inside quotes or non-comma characters, accounting for commas within quotes
-  const regex = /(".*?"|[^",]+)(?=\s*,|\s*$)/g
-  let columns: string[] = csvRow.match(regex) || []
-
-  if (columns.length !== 14) {
-    throw new Error("Invalid number of columns")
-  }
-  // Remove quotes from the extracted columns
-  columns = columns.map((column) => column.replace(/^"|"$/g, ""))
+  const columns = extractColumnsFromRow(csvRow, 14)
   //
   const timestamp = asUTC(new Date(columns[0]))
   const platform = columns[1] as PlatformId

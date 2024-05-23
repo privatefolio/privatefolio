@@ -6,7 +6,7 @@ import {
   Transaction,
 } from "src/interfaces"
 import { ProgressCallback } from "src/stores/task-store"
-import { extractTransactions, groupTransactions } from "src/utils/extract-utils"
+import { extractTransactions } from "src/utils/extract-utils"
 
 import { HEADER_MATCHER, PARSER_MATCHER, PLATFORM_MATCHER } from "./integrations"
 
@@ -66,12 +66,8 @@ export async function parseCsv(
   })
 
   progress([50, `Extracting transactions`])
-  if (transactions.length === 0) {
-    // warn: this fn mutates logs
-    transactions = extractTransactions(logs, _fileImportId, parserId)
-  } else {
-    transactions = groupTransactions(transactions, _fileImportId, parserId)
-  }
+  transactions = transactions.concat(extractTransactions(logs, _fileImportId, parserId))
+  // transactions = groupTransactions(transactions, _fileImportId, parserId)
 
   const metadata: FileImport["meta"] = {
     assetIds: Object.keys(assetMap),
@@ -85,4 +81,24 @@ export async function parseCsv(
   }
 
   return { logs, metadata, transactions }
+}
+
+export function extractColumnsFromRow(row: string, colNumber: number): string[] {
+  // A regex that matches content inside quotes or non-comma/non-semicolon characters,
+  // accounting for commas or semicolons within quotes
+  let columns: string[] = row.match(/(".*?"|[^",;]+)(?=\s*[;,]|\s*$)/g) || []
+
+  if (columns.length !== colNumber) {
+    columns = row.split(";")
+  }
+
+  // Remove quotes from the extracted columns
+  columns = columns.map((column) => column.replace(/^"|"$/g, ""))
+
+  if (columns.length !== colNumber) {
+    console.log(columns)
+    throw new Error(`Invalid number of columns: expected ${colNumber}, received ${columns.length}`)
+  }
+
+  return columns
 }

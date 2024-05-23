@@ -9,6 +9,8 @@ import {
 import { PlatformId } from "src/settings"
 import { asUTC } from "src/utils/formatting-utils"
 import { isSpamToken } from "src/utils/integrations/etherscan-utils"
+
+import { extractColumnsFromRow } from "../csv-utils"
 export const Identifier = "etherscan-erc20"
 export const platform: PlatformId = "ethereum"
 
@@ -29,9 +31,7 @@ export function parser(
   if (!isAddress(userAddress)) {
     throw new Error("'userAddress' is not valid.")
   }
-  const columns = csvRow
-    .split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
-    .map((column) => column.replaceAll('"', ""))
+  const columns = extractColumnsFromRow(csvRow, 11)
   //
   const txHash = columns[0]
   // const blockNumber = columns[1]

@@ -44,6 +44,25 @@ export function asUTC(date: Date): Timestamp {
   )
 }
 
+export function parseEuropeanDateString(date: string) {
+  const [datePart, timePart] = date.split(" ")
+  const [day, month, year] = datePart.split(".")
+  const [hours, minutes, seconds] = timePart.split(":")
+
+  const utcDate = new Date(
+    Date.UTC(
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      Number(hours) - 1,
+      Number(minutes),
+      Number(seconds)
+    )
+  )
+
+  return utcDate.getTime()
+}
+
 export function toUTCString(timestamp: number): string {
   return new Date(timestamp).toISOString().replace(/T/, " ").replace(/\..+/, "")
 }

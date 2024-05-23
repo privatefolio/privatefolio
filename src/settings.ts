@@ -16,6 +16,7 @@ export const PARSER_IDS = [
   "etherscan-internal",
   "mexc",
   "privatefolio",
+  "blockpit",
 ] as const
 
 export type ParserId = (typeof PARSER_IDS)[number]
@@ -35,6 +36,7 @@ export const PARSERS_META: Record<ParserId, ParserMeta> = {
   "binance-spot-history": {
     name: "Binance Spot History",
   },
+  blockpit: { name: "Blockpit" },
   coinmama: { name: "Coinmama" },
   etherscan: { name: "Etherscan" },
   "etherscan-erc20": { name: "Etherscan ERC-20" },
@@ -45,6 +47,7 @@ export const PARSERS_META: Record<ParserId, ParserMeta> = {
 
 export const PLATFORM_IDS = [
   "binance",
+  "blockpit",
   "coinmama",
   "ethereum",
   "eip155-137",
@@ -52,6 +55,7 @@ export const PLATFORM_IDS = [
   "eip155-42161",
   "coinbase",
   "mexc",
+  "privatefolio",
 ] as const
 
 export type PlatformId = (typeof PLATFORM_IDS)[number]
@@ -68,6 +72,7 @@ export const PLATFORMS_META: Record<PlatformId, PlatformMeta> = {
     logoUrl: "https://assets.coingecko.com/markets/images/52/small/binance.jpg?1519353250",
     name: "Binance",
   },
+  blockpit: { logoUrl: "/app-data/integrations/blockpit.png", name: "Blockpit" },
   coinbase: { logoUrl: "", name: "Coinbase" },
   coinmama: { logoUrl: "", name: "Coinmama" },
   "eip155-137": {
@@ -95,6 +100,7 @@ export const PLATFORMS_META: Record<PlatformId, PlatformMeta> = {
     nativeAssetId: "ethereum:0x0000000000000000000000000000000000000000:ETH",
   },
   mexc: { logoUrl: "", name: "MEXC Global" },
+  privatefolio: { logoUrl: "/privatefolio.svg", name: "Privatefolio" },
 }
 
 export const CONNECTIONS: PlatformId[] = ["eip155-42161", "eip155-8453", "ethereum", "binance"]

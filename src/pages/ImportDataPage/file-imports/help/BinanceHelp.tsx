@@ -18,6 +18,7 @@ const steps = [
         <ExternalLink href="https://www.binance.com/en/my/wallet/history/all-crypto">
           Transaction History
         </ExternalLink>
+        .
         <br />
         <br />
         <a

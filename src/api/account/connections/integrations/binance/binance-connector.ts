@@ -62,7 +62,8 @@ export async function syncBinance(
   if (until === undefined) {
     until = String(Date.now())
   }
-  const wallets = connection.binanceWallets
+  const wallets = connection.options?.wallets
+  console.log("Wallets: ", wallets)
 
   const result: SyncResult = {
     assetMap: {},
@@ -219,6 +220,5 @@ export async function syncBinance(
   })
 
   result.newCursor = String(parseFloat(until) + 1)
-  console.log("🚀 ~ result:", result)
   return result
 }

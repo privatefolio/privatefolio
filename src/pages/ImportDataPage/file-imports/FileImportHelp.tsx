@@ -19,10 +19,12 @@ import { ParserId, PARSERS_META } from "src/settings"
 import { BinanceHelp } from "./help/BinanceHelp"
 import { BinanceSpotHelp } from "./help/BinanceSpotHelp"
 import { EtherscanHelp } from "./help/EtherscanHelp"
+import { PrivatefolioHelp } from "./help/PrivatefolioHelp"
 
 const DOCUMENTED_PARSERS: ParserId[] = [
   "etherscan",
   "binance-account-statement",
+  "privatefolio",
   // "binance-spot-history",
 ]
 
@@ -80,6 +82,7 @@ export function FileImportHelp() {
             {tab === "binance-account-statement" && <BinanceHelp />}
             {tab === "binance-spot-history" && <BinanceSpotHelp />}
             {tab === "etherscan" && <EtherscanHelp />}
+            {tab === "privatefolio" && <PrivatefolioHelp />}
           </div>
         </DialogContent>
         <DialogActions>

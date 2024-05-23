@@ -8,6 +8,8 @@ import {
 import { PlatformId, PLATFORMS_META } from "src/settings"
 import { asUTC } from "src/utils/formatting-utils"
 
+import { extractColumnsFromRow } from "../csv-utils"
+
 export const Identifier = "etherscan-internal"
 export const platform: PlatformId = "ethereum"
 
@@ -17,9 +19,7 @@ export const HEADER =
   '"Txhash","Blockno","UnixTimestamp","DateTime (UTC)","ParentTxFrom","ParentTxTo","ParentTxETH_Value","From","TxTo","ContractAddress","Value_IN(ETH)","Value_OUT(ETH)","CurrentValue","Historical $Price/Eth","Status","ErrCode","Type"'
 
 export function parser(csvRow: string, index: number, fileImportId: string): ParserResult {
-  const columns = csvRow
-    .split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
-    .map((column) => column.replaceAll('"', ""))
+  const columns = extractColumnsFromRow(csvRow, 16) // FIXME one header has 16 columns, the other has 17
   //
   const txHash = columns[0]
   // const blockNumber = columns[1]

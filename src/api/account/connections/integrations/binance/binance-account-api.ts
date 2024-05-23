@@ -314,6 +314,8 @@ export async function getBinanceTradesForSymbol(
   connection: BinanceConnection,
   symbol: BinancePair,
   progress: ProgressCallback,
+  since: number,
+  until: number,
   debugMode: boolean
 ): Promise<Array<BinanceTrade>> {
   const timestamp = Date.now()
@@ -352,7 +354,9 @@ export async function getBinanceTradesForSymbol(
     // return getBinanceTradesForSymbol(connection, symbol)
   }
 
-  return data.map((x) => ({ ...x, baseAsset: symbol.baseAsset, quoteAsset: symbol.quoteAsset }))
+  return data
+    .map((x) => ({ ...x, baseAsset: symbol.baseAsset, quoteAsset: symbol.quoteAsset }))
+    .filter((x) => x.time > since && x.time < until)
 }
 
 // https://binance-docs.github.io/apidocs/spot/en/#get-flexible-rewards-history-user_data

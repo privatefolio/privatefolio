@@ -20,46 +20,64 @@ export function trimAuditLogId(fullId: string, platform: PlatformId): string {
   return trimmedId
 }
 
-export function sanitizeAuditLog(auditLog: AuditLog): Partial<AuditLog> {
+export function sanitizeAuditLog(auditLog: AuditLog) {
   const {
     _rev,
     _id: fullId,
     importId: _importId,
     importIndex: _importIndex,
+    platform,
+    timestamp,
     txId: fullTxId,
+    balance, // FIXME - this should not be excluded
+    balanceN, // FIXME - this should not be excluded
     ...rest
   } = auditLog
 
-  const _id = trimAuditLogId(fullId, auditLog.platform)
-  const txId = fullTxId ? trimTxId(fullTxId, auditLog.platform) : undefined
+  const _id = platform === "binance" ? "" : trimAuditLogId(fullId, auditLog.platform)
+  const txId =
+    platform === "binance" ? "" : fullTxId ? trimTxId(fullTxId, auditLog.platform) : undefined
+  let time = timestamp
+  if (platform === "binance") {
+    time = (timestamp / 1000) | 0
+  }
 
   return {
     _id,
+    platform,
+    timestamp: time,
     txId,
     ...rest,
   }
 }
 
-export function normalizeTransaction(
-  transaction: Transaction | EtherscanTransaction
-): Partial<Transaction> {
+export function normalizeTransaction(transaction: Transaction | EtherscanTransaction) {
   // const { ...rest } = transaction as EtherscanTransaction
   return sanitizeTransaction(transaction)
 }
 
-export function sanitizeTransaction(transaction: Transaction): Partial<Transaction> {
+export function sanitizeTransaction(transaction: Transaction) {
   const {
     _rev,
     _id: _fullId,
     importId: _importId,
     importIndex: _importIndex,
+    platform,
+    timestamp,
+    txHash,
     ...rest
   } = transaction
 
-  const _id = trimTxId(transaction._id, transaction.platform)
+  const _id = platform === "ethereum" ? trimTxId(transaction._id, transaction.platform) : ""
+  let time = timestamp
+  if (platform === "binance") {
+    time = (timestamp / 1000) | 0
+  }
 
   return {
     _id,
+    platform,
+    timestamp: time,
     ...rest,
   }
 }
@@ -69,11 +87,40 @@ export function sanitizeBalance(balance: BalanceMap): Partial<BalanceMap> {
   return rest
 }
 
-export function sortTransactions(a: Transaction, b: Transaction) {
+/**
+ * FIXME this should not be needed
+ */
+export function sortTransactions(
+  a: Pick<Transaction, "timestamp" | "platform" | "_id" | "priceN" | "outgoingN">,
+  b: Pick<Transaction, "timestamp" | "platform" | "_id" | "priceN" | "outgoingN">
+) {
+  let delta = b.timestamp - a.timestamp
+
+  if (delta === 0 && a.platform === "ethereum") {
+    return trimTxId(a._id, a.platform).localeCompare(trimTxId(b._id, b.platform))
+  }
+
+  if (delta === 0 && a.platform === "binance") {
+    delta = (a.priceN || 0) - (b.priceN || 0)
+    if (delta === 0) {
+      return (a.outgoingN || 0) - (b.outgoingN || 0)
+    }
+  }
+
+  return delta
+}
+
+/**
+ * FIXME this should not be needed, resolve it in findAuditLogs
+ */
+export function sortAuditLogs(
+  a: Pick<AuditLog, "timestamp" | "changeN">,
+  b: Pick<AuditLog, "timestamp" | "changeN">
+) {
   const delta = b.timestamp - a.timestamp
 
   if (delta === 0) {
-    return trimTxId(a._id, a.platform).localeCompare(trimTxId(b._id, b.platform))
+    return a.changeN - b.changeN
   }
 
   return delta
