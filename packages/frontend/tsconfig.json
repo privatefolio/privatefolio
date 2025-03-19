@@ -1,0 +1,48 @@
+// https://www.npmjs.com/package/@tsconfig/vite-react
+{
+  "compilerOptions": {
+    /* Enable latest features */
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "useDefineForClassFields": true,
+    // "allowJs": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "skipLibCheck": true,
+    "strict": true,
+    "noImplicitAny": false,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    // "noFallthroughCasesInSwitch": true,
+
+    /* Old config */
+    // "forceConsistentCasingInFileNames": true,
+    // "esModuleInterop": true,
+    // "allowSyntheticDefaultImports": true,
+    // "moduleResolution": "Node",
+    // "incremental": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["./src/*"]
+    },
+  },
+
+  "references": [
+    { "path": "../backend/tsconfig.lib.json" }
+  ],
+  // "include": [
+  //   "**/*.ts",
+  //   "**/*.tsx",
+  // ],
+  // "exclude": ["./node_modules/**/*"]
+}

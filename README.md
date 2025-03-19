@@ -1,6 +1,16 @@
 # Privatefolio
 
-The Free* and Open-source Portfolio Tracker - All your crypto assets in one place
+The Free\* and Open-source Portfolio Tracker - All your crypto assets in one place
+
+## Features
+
+- **Transaction Management**: Track all your cryptocurrency transactions in one place
+- **Multi-chain Support**: Support for multiple blockchains and platforms
+- **Portfolio Analytics**: View detailed analytics about your portfolio performance
+- **Search Functionality**:
+  - Search for assets, transactions, and actions
+  - Search transactions by transaction hash (just paste a transaction hash into the search bar)
+- **Price History**: View historical price data for your assets
 
 ## License
 

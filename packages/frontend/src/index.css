@@ -1,0 +1,121 @@
+/* @import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,200;8..144,300;8..144,400;8..144,500;8..144,700&family=Roboto+Mono:wght@200;300;400&family=Roboto+Serif:opsz,wght@8..144,300;8..144,500&display=block'); */
+/* @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400&family=Roboto+Flex:opsz,wght@8..144,200;8..144,300;8..144,400;8..144,500;8..144,700&family=Roboto+Mono:wght@200;300;400&family=Roboto+Serif:opsz,wght@8..144,300;8..144,500&family=Space+Mono&display=swap'); */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400&family=Roboto+Flex:opsz,wght,GRAD@8..144,100..1000,150&family=Roboto+Serif:opsz,wght@8..144,300;8..144,500&display=block');
+/* @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400&family=Roboto+Flex:opsz,wght@8..144,200;8..144,300;8..144,400;8..144,500;8..144,700&family=Roboto+Serif:opsz,wght@8..144,300;8..144,400;8..144,500&display=swap'); */
+
+/* ::selection {
+  color: var(--mui-palette-background-default);
+  background: var(--mui-palette-primary-main);
+} */
+
+:root {
+  --priv-border-radius: 16px;
+  /* Change in theme.ts too */
+}
+
+body {
+  background: rgb(40, 40, 40);
+}
+
+html {
+  /* scrollbar-width: thin; */
+  /* scrollbar-color: rgba(205, 205, 205) green; */
+  /* scrollbar-gutter: stable; */
+  -webkit-tap-highlight-color: transparent;
+  /* overflow-y: scroll !important; */
+  overflow-y: scroll; 
+}
+
+/* Scrollbar */
+::-webkit-scrollbar-corner {
+  background: transparent;
+  border-color: transparent;
+}
+
+/* Scrollbar for body  */
+body::-webkit-scrollbar,
+body::-webkit-scrollbar-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 0px;
+}
+
+/* html[data-mui-color-scheme="light"] body::-webkit-scrollbar {
+  background: rgb(255, 255, 255);
+}
+
+html[data-mui-color-scheme="dark"] body::-webkit-scrollbar {
+  background: rgba(40, 40, 40);
+} */
+
+/* Scrollbar for the rest of the app  */
+::-webkit-scrollbar {
+  background: transparent;
+}
+
+::-webkit-scrollbar,
+::-webkit-scrollbar-thumb {
+  width: 8px;
+  height: 8px;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  /* background: rgba(0, 0, 0, 0.15); */
+  background: rgba(205, 205, 205);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  /* background: rgba(0, 0, 0, 0.25); */
+  background: rgba(185, 185, 185);
+}
+
+html[data-mui-color-scheme="dark"] ::-webkit-scrollbar-thumb {
+  /* background: rgba(255, 255, 255, 0.15); */
+  background: rgba(85, 85, 85);
+}
+
+html[data-mui-color-scheme="dark"] ::-webkit-scrollbar-thumb:hover {
+  /* background: rgba(255, 255, 255, 0.25); */
+  background: rgba(95, 95, 95);
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+@keyframes loadingLogoAnim {
+  0% {
+    stroke-dasharray: 500%;
+    stroke-dashoffset: 0%;
+  }
+
+  40% {
+    fill-opacity: 0;
+  }
+
+  50% {
+    stroke-dashoffset: 500%;
+    fill-opacity: 0;
+  }
+
+  65% {
+    fill-opacity: 0;
+  }
+
+  100% {
+    stroke-dasharray: 500%;
+    stroke-dashoffset: 0%;
+  }
+}
+
+.loading-indicator-active path {
+  animation: loadingLogoAnim 2.5s infinite;
+}
+
+.loading-indicator-inactive path {
+  animation: loadingLogoAnim 2.5s;
+}

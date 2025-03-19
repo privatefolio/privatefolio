@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "build",
+    // "rootDir": "src",
+    "declaration": true,
+    "declarationMap": true, // important for 'Go to Source' to work
+    "sourceMap": true,
+    "noEmit": false,
+    "composite": true
+  },
+  "include": ["src", "src/config/spam-tokens.json"]
+  // old config (before composite: true)
+  // "include": [
+  //   "src/api/api.ts",
+  //   "src/backend-relayer.ts",
+  //   "src/api/external",
+  //   "src/utils",
+  //   //
+  // ]
+}

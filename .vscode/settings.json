@@ -1,5 +1,22 @@
 {
+  "[typescript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  // "[json]": {
+  //   "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  // },
+  "prettier.prettierPath": "./packages/frontend/node_modules/prettier",
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
   "search.exclude": {
-    "public/app-data/assets/**/*": true
+    // "**/packages/*/build": true,
+    "public/app-data/assets/**/*": true,
+    "/**/*.snap": true
+  },
+  "files.exclude": {
+    // "**/packages/*/build": true,
   }
 }

@@ -1,0 +1,13 @@
+import { app } from "electron"
+import path from "path"
+
+export const isProduction = app.isPackaged
+export const hasDevFlag = process.argv.includes("--dev")
+export const isDevelopment = !isProduction || hasDevFlag
+
+export const isWindows = process.platform === "win32"
+
+export function getLogsPath() {
+  const date = new Date().toISOString().split("T")[0]
+  return path.join(app.getPath("userData"), `logs/debug-${date}.log`)
+}

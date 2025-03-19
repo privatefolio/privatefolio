@@ -1,29 +1,16 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-# build output
-dist/
 
+# server running dir
+data/
 
+# build
+build/
 # dependencies
 node_modules/
-/.pnp
-.pnp.js
-
 # testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
+coverage/
 # private test data
 test/private/
-
-# misc
-.DS_Store
-*.pem
 
 # logs
 npm-debug.log*
@@ -31,22 +18,17 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-
 # environment variables
 # .env
 # .env.production
 .env*.local
-
-# vercel
-.vercel
+.env
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
 
-.env
+.million/
 
-# pouchdb local server
-local-db/
-log.txt
-config.json
+# electron output
+out/
+resources/

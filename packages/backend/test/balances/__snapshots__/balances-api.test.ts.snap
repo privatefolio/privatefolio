@@ -1,0 +1,152 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`should fetch historical balances 2`] = `
+[
+  {
+    "coinmama:BTC": "0.035979259",
+    "timestamp": 1504224000000,
+  },
+  {
+    "coinmama:BTC": "0.035979259",
+    "timestamp": 1504310400000,
+  },
+  {
+    "coinmama:BTC": "0.035979259",
+    "timestamp": 1504396800000,
+  },
+  {
+    "coinmama:BTC": "0.035979259",
+    "timestamp": 1504483200000,
+  },
+  {
+    "coinmama:BTC": "0.035979259",
+    "timestamp": 1504569600000,
+  },
+  {
+    "coinmama:BTC": "0.035979259",
+    "timestamp": 1504656000000,
+  },
+  {
+    "coinmama:BTC": "0.072958518",
+    "timestamp": 1504742400000,
+  },
+  {
+    "coinmama:BTC": "0.072958518",
+    "timestamp": 1504828800000,
+  },
+  {
+    "coinmama:BTC": "0.072958518",
+    "timestamp": 1504915200000,
+  },
+  {
+    "coinmama:BTC": "0.072958518",
+    "timestamp": 1505001600000,
+  },
+  {
+    "coinmama:BTC": "0.072958518",
+    "timestamp": 1505088000000,
+  },
+  {
+    "coinmama:BTC": "0.072958518",
+    "timestamp": 1505174400000,
+  },
+  {
+    "coinmama:BTC": "0.072958518",
+    "timestamp": 1505260800000,
+  },
+  {
+    "coinmama:BTC": "0.072958518",
+    "timestamp": 1505347200000,
+  },
+]
+`;
+
+exports[`should fetch latest balances with price data 1`] = `
+[
+  {
+    "assetId": "coinmama:BTC",
+    "balance": "0.072958518",
+    "balanceN": 0.072958518,
+    "id": "1505347200000_coinmama:BTC",
+    "price": {
+      "close": 3250.4,
+      "high": 3923,
+      "low": 3230.05,
+      "open": 3855.61,
+      "time": 1505347200,
+      "value": 3250.4,
+      "volume": 36363.92501211,
+    },
+    "value": 237.1443669072,
+  },
+]
+`;
+
+exports[`should fetch latest balances without price data 1`] = `
+[
+  {
+    "assetId": "coinmama:BTC",
+    "balance": "0.072958518",
+    "balanceN": 0.072958518,
+    "id": "1505347200000_coinmama:BTC",
+    "price": undefined,
+    "value": undefined,
+  },
+]
+`;
+
+exports[`should have balances computed 1`] = `
+[
+  {
+    "assetId": "coinmama:BTC",
+    "balance": "0.072958518",
+    "change": "0.036979259",
+    "fileImportId": "2702913076",
+    "id": "2702913076_3604660326_0",
+    "importIndex": 0,
+    "operation": "Buy with Credit Card",
+    "platform": "coinmama",
+    "timestamp": 1504789876000,
+    "wallet": "Coinmama Spot",
+  },
+  {
+    "assetId": "coinmama:BTC",
+    "balance": "0.035979259",
+    "change": "0.035979259",
+    "fileImportId": "2702913076",
+    "id": "2702913076_1607323056_0",
+    "importIndex": 1,
+    "operation": "Buy with Credit Card",
+    "platform": "coinmama",
+    "timestamp": 1504267876000,
+    "wallet": "Coinmama Spot",
+  },
+]
+`;
+
+exports[`should not have balances computed 1`] = `
+[
+  {
+    "assetId": "coinmama:BTC",
+    "change": "0.036979259",
+    "fileImportId": "2702913076",
+    "id": "2702913076_3604660326_0",
+    "importIndex": 0,
+    "operation": "Buy with Credit Card",
+    "platform": "coinmama",
+    "timestamp": 1504789876000,
+    "wallet": "Coinmama Spot",
+  },
+  {
+    "assetId": "coinmama:BTC",
+    "change": "0.035979259",
+    "fileImportId": "2702913076",
+    "id": "2702913076_1607323056_0",
+    "importIndex": 1,
+    "operation": "Buy with Credit Card",
+    "platform": "coinmama",
+    "timestamp": 1504267876000,
+    "wallet": "Coinmama Spot",
+  },
+]
+`;

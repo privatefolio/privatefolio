@@ -1,0 +1,53 @@
+{
+  "env": {
+    "browser": true,
+    "node": true,
+    "es2020": true
+  },
+  "extends": [
+    "standard",
+    "eslint:recommended",
+    "prettier",
+    "plugin:prettier/recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "ignorePatterns": [
+    "build/**/*",
+    "package-lock.json"
+  ],
+  "plugins": [
+    "prettier",
+    "@typescript-eslint",
+    "sort-keys-fix",
+    "simple-import-sort",
+    "unused-imports"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "rules": {
+    "prettier/prettier": "warn",
+    "sort-vars": "warn",
+    "@typescript-eslint/member-ordering": [
+      "warn",
+      {
+        "default": {
+          "order": "alphabetically"
+        }
+      }
+    ],
+    "@typescript-eslint/no-var-requires": "off",
+    "sort-keys-fix/sort-keys-fix": "warn",
+    "simple-import-sort/imports": "warn",
+    "simple-import-sort/exports": "warn",
+    "@typescript-eslint/no-unused-vars": "off",
+    "unused-imports/no-unused-imports": "warn",
+    "unused-imports/no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "varsIgnorePattern": "^_",
+        "args": "after-used",
+        "argsIgnorePattern": "^_"
+      }
+    ]
+  }
+}
