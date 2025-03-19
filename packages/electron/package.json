@@ -35,8 +35,8 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "eslint-plugin-vitest": "^0.5.4",
     "prettier": "^3.2.5",
-    "privatefolio-backend": "^0.3.0",
-    "privatefolio-frontend": "^0.3.0",
+    "privatefolio-backend": "^2.0.0-alpha.0",
+    "privatefolio-frontend": "^2.0.0-alpha.0",
     "typescript": "^5.4.5"
   },
   "keywords": [],
@@ -76,5 +76,5 @@
     "prepackage:mac": "bash ./prebuild-bin.sh",
     "prepackage:win": "bash ./prebuild-bin.sh"
   },
-  "version": "0.3.0"
+  "version": "2.0.0-alpha.0"
 }
