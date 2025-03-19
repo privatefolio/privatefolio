@@ -414,8 +414,8 @@ describe("should import 0x003dc via files", () => {
       )
     }
     expect(trades.length).toMatchInlineSnapshot(`125`)
-    for (let i = 0; i < trades.length; i += 10) {
-      await expect(trades.slice(i, i + 10)).toMatchFileSnapshot(
+    for (let i = 0; i < trades.length; i += 5) {
+      await expect(trades.slice(i, i + 5)).toMatchFileSnapshot(
         `../__snapshots__/0x003dc/trades-${i}.ts.snap`
       )
     }
