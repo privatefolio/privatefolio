@@ -3,6 +3,14 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-alpha.0 - 2025/03/19
+
+### 💡 Feature updates
+
+- Migrate database engine from no-sql (PouchDB) to sql (SQLite).
+- Implement client-server architecture (prerequisite for Cloud deployments), unfortunately this breaks full in-browser support (for the time being).
+- Package the app & server as a desktop application that can run in the background (Windows, Linux & macOS).
+
 ## v0.2.0 - 2024/03/10
 
 ### 💡 Feature updates
