@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain, Menu, Tray } from "electron"
 import Logger from "electron-log/main"
+import Store from "electron-store"
 import path from "path"
 
 import { TITLE_BAR_OPTS } from "./api"
@@ -7,6 +8,19 @@ import { getAutoLaunchEnabled, toggleAutoLaunch } from "./auto-launch"
 import * as backendManager from "./backend-manager"
 import { configureIpcMain } from "./ipc-main"
 import { getLogsPath, hasDevFlag, isProduction, isWindows } from "./utils"
+
+interface WindowState {
+  height: number
+  isFullScreen: boolean
+  isMaximized: boolean
+  width: number
+}
+
+interface StoreType {
+  windowState: WindowState
+}
+
+const store = new Store<StoreType>()
 
 Logger.transports.file.resolvePathFn = getLogsPath
 Logger.initialize({ spyRendererConsole: false })
@@ -49,9 +63,17 @@ let tray: Tray | null = null
 
 function createWindow() {
   console.log("Creating main window")
+  // Get saved window state
+  const windowState = store.get("windowState", {
+    height: 900,
+    isFullScreen: false,
+    isMaximized: false,
+    width: 1600,
+  })
+
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    height: 900,
+    height: windowState.height,
     icon: appIconPath,
     minHeight: 480,
     minWidth: 480,
@@ -62,8 +84,16 @@ function createWindow() {
       additionalArguments: isProduction ? ["--production"] : [],
       preload: path.join(__dirname, "./preload.js"),
     },
-    width: 1600,
+    width: windowState.width,
   })
+
+  // Restore maximized/fullscreen state
+  if (windowState.isMaximized) {
+    mainWindow.maximize()
+  }
+  if (windowState.isFullScreen) {
+    mainWindow.setFullScreen(true)
+  }
 
   // Load the web app.
   if (isProduction) {
@@ -84,6 +114,25 @@ function createWindow() {
   if (!isProduction || hasDevFlag) {
     mainWindow.webContents.openDevTools()
   }
+
+  // Save window state on changes
+  const saveWindowState = () => {
+    if (!mainWindow.isMinimized()) {
+      const bounds = mainWindow.getBounds()
+      store.set("windowState", {
+        ...bounds,
+        isFullScreen: mainWindow.isFullScreen(),
+        isMaximized: mainWindow.isMaximized(),
+      })
+    }
+  }
+
+  mainWindow.on("resize", saveWindowState)
+  mainWindow.on("move", saveWindowState)
+  mainWindow.on("maximize", saveWindowState)
+  mainWindow.on("unmaximize", saveWindowState)
+  mainWindow.on("enter-full-screen", saveWindowState)
+  mainWindow.on("leave-full-screen", saveWindowState)
 
   mainWindow.on("close", async (event) => {
     if (!isQuitting) {

@@ -7,7 +7,7 @@ import { defineConfig, loadEnv } from "vite"
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd())
   if (!env.VITE_POSTHOG_KEY) {
-    throw new Error("Missing VITE_POSTHOG_KEY. Aborting build.")
+    console.warn("⚠️ Warning: Missing VITE_POSTHOG_KEY!!!")
   }
 
   return {

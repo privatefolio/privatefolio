@@ -88,6 +88,12 @@ yarn workspace privatefolio-frontend add react
 yarn workspace privatefolio-frontend remove react
 ```
 
+Alternative:
+
+1. Manually add the dependency to the package.json file.
+2. Run `yarn clean` in the root directory.
+3. Run `yarn` in the root directory.
+
 ### NPM utils
 
 ```sh
