@@ -7,6 +7,9 @@ on:
 permissions:
   contents: write
 
+env:
+  VITE_POSTHOG_KEY: ${{ secrets.VITE_POSTHOG_KEY }}
+
 jobs:
   build-and-release:
     strategy:
