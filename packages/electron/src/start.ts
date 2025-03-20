@@ -3,6 +3,7 @@ import Logger from "electron-log/main"
 import path from "path"
 
 import { TITLE_BAR_OPTS } from "./api"
+import { getAutoLaunchEnabled, toggleAutoLaunch } from "./auto-launch"
 import * as backendManager from "./backend-manager"
 import { configureIpcMain } from "./ipc-main"
 import { getLogsPath, hasDevFlag, isProduction, isWindows } from "./utils"
@@ -111,10 +112,8 @@ function createWindow() {
 async function updateTrayMenu(mainWindow: BrowserWindow | null) {
   if (!mainWindow) return
 
-  const loginItemSettings = app.getLoginItemSettings()
-
   const isVisible = mainWindow.isVisible()
-  const isAutoLaunchEnabled = loginItemSettings.openAtLogin
+  const isAutoLaunchEnabled = await getAutoLaunchEnabled()
 
   console.log("Updating tray menu for", isVisible ? "visible" : "hidden", "window")
 
@@ -137,31 +136,18 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
           label: "Show Privatefolio",
         },
     {
-      click: function () {
-        app.setLoginItemSettings({
-          args: ["--hidden"],
-          enabled: !isAutoLaunchEnabled,
-          openAtLogin: !isAutoLaunchEnabled,
-          path: app.getPath("exe"),
-        })
+      checked: isAutoLaunchEnabled,
+      click: async function () {
+        const newEnabled = await toggleAutoLaunch()
         console.log(
-          isAutoLaunchEnabled ? "App removed from startup" : "App added to startup",
+          newEnabled ? "App added to startup" : "App removed from startup",
           app.getPath("exe")
         )
         updateTrayMenu(mainWindow)
       },
-      label: isAutoLaunchEnabled ? "Remove app from startup" : "Add app to startup",
+      label: "Auto-start on login",
+      type: "checkbox",
     },
-    // TODO9: fix startup on linux
-    // {
-    //   checked: !app.getLoginItemSettings().openAtLogin,
-    //   click: (checkBox: Electron.MenuItem): void => {
-    //     app.setLoginItemSettings({ openAtLogin: checkBox.checked })
-    //   },
-    //   label: "Auto-start on login",
-    //   type: "checkbox",
-    //   // visible: process.platform !== "linux",
-    // },
     { type: "separator" },
     {
       click: function () {

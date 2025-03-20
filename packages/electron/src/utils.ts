@@ -6,6 +6,7 @@ export const hasDevFlag = process.argv.includes("--dev")
 export const isDevelopment = !isProduction || hasDevFlag
 
 export const isWindows = process.platform === "win32"
+export const isLinux = process.platform === "linux"
 
 export function getLogsPath() {
   const date = new Date().toISOString().split("T")[0]
