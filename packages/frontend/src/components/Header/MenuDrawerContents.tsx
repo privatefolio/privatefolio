@@ -11,6 +11,7 @@ import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
 import { $activeAccount } from "src/stores/account-store"
+import { isProduction } from "src/utils/utils"
 
 import { AppVerProps, PopoverToggleProps } from "../../stores/app-store"
 import { TransactionIcon } from "../icons"
@@ -98,14 +99,16 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
               </Button>
             </Tooltip> */}
           {/* </Stack> */}
-          <NavMenuItem
-            value=""
-            to={`/u/${accountIndex}/`}
-            label="Home"
-            aria-label="Visit Home"
-            onClick={toggleOpen}
-            avatar={<HomeRounded fontSize="small" />}
-          />
+          {!isProduction && (
+            <NavMenuItem
+              value=""
+              to={`/u/${accountIndex}/`}
+              label="Home"
+              aria-label="Visit Home"
+              onClick={toggleOpen}
+              avatar={<HomeRounded fontSize="small" />}
+            />
+          )}
           <NavMenuItem
             value="trades"
             to={`/u/${accountIndex}/trades`}

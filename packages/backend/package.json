@@ -8,9 +8,9 @@
     "email": "hello@danielconstantin.net"
   },
   "scripts": {
-    "start": "APP_VERSION=`npm pkg get version` GIT_HASH=`git rev-parse HEAD` GIT_DATE=`git show -s --format=%cI $(git rev-parse HEAD)` bun src/start.ts",
+    "start": "APP_VERSION=`npm pkg get version --json` GIT_HASH=`git rev-parse HEAD` GIT_DATE=`git show -s --format=%cI $(git rev-parse HEAD)` bun src/start.ts",
     "prestart:watch": "KILL_PORT=4001 bun src/kill-process-on-port.ts",
-    "start:watch": "APP_VERSION=`npm pkg get version` GIT_HASH=`git rev-parse HEAD` GIT_DATE=`git show -s --format=%cI $(git rev-parse HEAD)` bun --watch --no-clear-screen src/start.ts",
+    "start:watch": "APP_VERSION=`npm pkg get version --json` GIT_HASH=`git rev-parse HEAD` GIT_DATE=`git show -s --format=%cI $(git rev-parse HEAD)` bun --watch --no-clear-screen src/start.ts",
     "dev": "concurrently \"yarn build:watch\" \"yarn start:watch\" --kill-others --prefix \"{command} {time}\" --prefix-colors \"cyan,yellow\" --prefix-length 30 --timestampFormat \"[HH:mm:ss]\"",
     "ping": "bun src/ping.ts",
     "lint": "eslint .",

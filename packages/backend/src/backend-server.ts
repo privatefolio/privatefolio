@@ -8,6 +8,7 @@ import {
   FunctionInvocation,
   FunctionReference,
 } from "./backend-comms"
+import { APP_VERSION } from "./server-env"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type BackendApiShape = { [key: string]: (...params: any[]) => Promise<unknown> }
@@ -49,7 +50,7 @@ export class BackendServer<T extends BackendApiShape> {
               digest: process.env.GIT_HASH?.slice(0, 7),
               homepage: "https://privatefolio.app",
               name: "Privatefolio Backend",
-              version: `v${process.env.APP_VERSION.split("\n")[0].replaceAll('"', "")}`,
+              version: APP_VERSION,
             }),
             { status: 200 }
           )

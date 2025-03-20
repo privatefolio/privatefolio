@@ -26,23 +26,32 @@ import { isProduction } from "src/utils/environment-utils"
 const LOCAL_SERVER_URL = isProduction ? "localhost:5001" : "localhost:4001"
 const REMOTE_SERVER_URL = (user: User) => `cloud.privatefolio.app:${50000 + user.id}`
 
-export const LOCAL_RPC = createBackendRelayer<Api>(`ws://${LOCAL_SERVER_URL}`, (status) => {
-  $connectionStatus.set(status)
-})
+export const LOCAL_RPC = createBackendRelayer<Api>(
+  `ws://${LOCAL_SERVER_URL}`,
+  (status) => {
+    $connectionStatus.set(status)
+  },
+  !isProduction
+)
 
 export const $rpc = computed([$isCloudAccount, $user], (isCloudAccount, user) => {
   // if (!activeAccount) return
 
   if (isCloudAccount) {
-    return createBackendRelayer<Api>(`ws://${REMOTE_SERVER_URL(user as User)}`, (status) => {
-      $connectionStatus.set(status)
-    })
+    return createBackendRelayer<Api>(
+      `ws://${REMOTE_SERVER_URL(user as User)}`,
+      (status) => {
+        $connectionStatus.set(status)
+      },
+      !isProduction
+    )
   } else {
     return LOCAL_RPC
   }
 })
 
 $rpc.subscribe((rpc) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).rpc = rpc
 })
 

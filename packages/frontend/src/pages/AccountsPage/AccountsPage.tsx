@@ -44,6 +44,7 @@ export default function AccountsPage() {
           background: "none !important",
           border: "none",
           color: "var(--mui-palette-primary-main) !important",
+          visibility: "hidden",
           // zIndex: 1001,
         }}
       >

@@ -31,6 +31,8 @@ export const isElectron = Boolean(window.electron)
 export const isWindows = window.electron && window.electron.platform === "win32"
 export const isProductionElectron = window.electron?.isProduction
 
+console.log("Electron env:", isElectron)
+
 export const stickyHeader = false // isWindows
 
 export const { openLogsDir, readLogs, openDevTools } = window.electron || {}

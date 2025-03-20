@@ -2,7 +2,7 @@
 
 import { BackendResponse, FunctionReference } from "./backend-comms"
 import { ConnectionStatusCallback } from "./interfaces"
-import { isProduction, noop } from "./utils/utils"
+import { noop } from "./utils/utils"
 
 class BackendRelayer {
   private socket: WebSocket
@@ -10,9 +10,11 @@ class BackendRelayer {
   private pendingRequests: { [id: number]: (value: unknown) => void } = {}
   // eslint-disable-next-line @typescript-eslint/ban-types
   private functionRegistry: { [id: string]: Function } = {}
+  private logResponses: boolean
 
-  constructor(address: string, onStatusChange: ConnectionStatusCallback) {
+  constructor(address: string, onStatusChange: ConnectionStatusCallback, logResponses: boolean) {
     this.socket = this.connect(address, onStatusChange)
+    this.logResponses = logResponses
   }
 
   private connect(address: string, onStatusChange: ConnectionStatusCallback): WebSocket {
@@ -23,7 +25,7 @@ class BackendRelayer {
       try {
         const response = JSON.parse(event.data) as BackendResponse
         const { id, result, error, stackTrace, functionId, params } = response
-        if (!isProduction) {
+        if (this.logResponses) {
           console.log("RPC: New response", response)
         }
 
@@ -130,9 +132,10 @@ class BackendRelayer {
 
 export function createBackendRelayer<T extends object>(
   address: string,
-  onStatusChange: ConnectionStatusCallback = noop
+  onStatusChange: ConnectionStatusCallback = noop,
+  logResponses = true
 ): T & BackendRelayer {
-  const relayer = new BackendRelayer(address, onStatusChange)
+  const relayer = new BackendRelayer(address, onStatusChange, logResponses)
 
   return new Proxy(relayer, {
     get: (target, property) => {

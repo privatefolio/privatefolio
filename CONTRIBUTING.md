@@ -57,6 +57,7 @@ yarn build-bin:mac
 ```
 
 Run `./packages/electron/out/make/squirrel.windows/x64/Privatefolio-0.2.0\ Setup.exe`.
+Run `sudo dpkg -i ./packages/electron/out/make/deb/x64/privatefolio_0.2.0_amd64.deb`.
 
 ## Create a release
 
