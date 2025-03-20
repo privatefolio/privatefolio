@@ -2,7 +2,7 @@
 
 import { BackendResponse, FunctionReference } from "./backend-comms"
 import { ConnectionStatusCallback } from "./interfaces"
-import { noop } from "./utils/utils"
+import { isProduction, noop } from "./utils/utils"
 
 class BackendRelayer {
   private socket: WebSocket
@@ -23,7 +23,9 @@ class BackendRelayer {
       try {
         const response = JSON.parse(event.data) as BackendResponse
         const { id, result, error, stackTrace, functionId, params } = response
-        console.log("RPC: New response", response)
+        if (!isProduction) {
+          console.log("RPC: New response", response)
+        }
 
         if (functionId) {
           if (!this.functionRegistry[functionId])

@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 501 501">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 -40 581 581">
 	<style>
+    :root {
+      filter: drop-shadow(0px 0px 20px #000)
+    }
     path {
-      fill: #000;
+      fill: #fff;
     }
 
-    @media (prefers-color-scheme: dark) {
+    @media (prefers-color-scheme: light) {
+      :root {
+        filter: drop-shadow(0px 0px 20px #fff)
+      }
       path {
-        fill: #fff;
+        fill: #000;
       }
     }
   </style>

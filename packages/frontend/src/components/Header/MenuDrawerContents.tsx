@@ -1,13 +1,12 @@
 import {
   CloudRounded,
-  DownloadRounded,
   HomeRounded,
   ReceiptLong,
   SdStorageRounded,
   ShowChartRounded,
   Workspaces,
 } from "@mui/icons-material"
-import { Chip, ListItemAvatar, ListItemText, MenuItem, Stack, useMediaQuery } from "@mui/material"
+import { Stack, useMediaQuery } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
@@ -43,6 +42,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
     return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
   }, [])
 
+  // TODO2
   const promptInstall = () => {
     if (installPrompt) {
       installPrompt.prompt()
@@ -156,7 +156,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
           />
         </Stack>
         <Stack>
-          <MenuItem
+          {/* <MenuItem
             sx={{
               "&:hover": {
                 color: "text.primary",
@@ -188,7 +188,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
                 </Stack>
               }
             />
-          </MenuItem>
+          </MenuItem> */}
           {/* <MenuItem
             onClick={() => {
               toggleOpen()

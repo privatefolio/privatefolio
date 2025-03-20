@@ -38,7 +38,15 @@ export const { openLogsDir, readLogs, openDevTools } = window.electron || {}
 // Initialize logger
 ;(() => {
   if (isElectron) {
+    const originalConsole = console
     Object.assign(console, Logger.scope("Renderer"))
     Logger.errorHandler.startCatching()
+    // if the window is closing, stop catching
+    window.addEventListener("beforeunload", () => {
+      try {
+        Logger.errorHandler.stopCatching()
+        Object.assign(console, originalConsole)
+      } catch {}
+    })
   }
 })()

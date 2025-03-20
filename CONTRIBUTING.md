@@ -107,8 +107,12 @@ yarn cache clean # Clean the cache
 
 Logs can be found at:
 
-1. Squirrel logs: `C:\Users\daniel\AppData\Local\SquirrelTemp`
-2. Electron logs: `C:\Users\daniel\AppData\Roaming\Privatefolio\logs`
+1. Windows:
+   - Squirrel logs: `C:\Users\daniel\AppData\Local\SquirrelTemp`
+   - Electron logs: `C:\Users\daniel\AppData\Roaming\Privatefolio\logs`
+
+2. Linux:
+   - Electron logs: `~/.config/Privatefolio/logs`
 
 You can also package the app without building the binaries:
 

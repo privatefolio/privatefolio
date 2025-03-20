@@ -2,7 +2,7 @@ import { ChildProcess, exec, spawn } from "child_process"
 import { app } from "electron"
 import path from "path"
 
-import { isDevelopment, isProduction, isWindows } from "./utils"
+import { isProduction, isWindows } from "./utils"
 
 let backendProcess: ChildProcess | null = null
 let isStarted = false
@@ -171,11 +171,6 @@ async function killProcessOnPort(): Promise<void> {
  * Checks if the backend is running
  */
 export function isRunning(): boolean {
-  // In development mode, we assume the backend is running via lerna
-  if (isDevelopment) {
-    return true
-  }
-
   return isStarted && backendProcess !== null
 }
 

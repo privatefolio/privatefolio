@@ -84,7 +84,7 @@ function createWindow() {
     mainWindow.webContents.openDevTools()
   }
 
-  mainWindow.on("close", (event) => {
+  mainWindow.on("close", async (event) => {
     if (!isQuitting) {
       console.log("Minimizing window to Tray")
       event.preventDefault()
@@ -93,11 +93,16 @@ function createWindow() {
       return false
     } else {
       console.log("Closing app...")
-      // disable logging to avoid errors
+      // Give a small delay to ensure logs are written
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      // disable logging to avoid EPIPE errors
       Logger.errorHandler.stopCatching()
       Logger.eventLogger.stopLogging()
       Logger.transports.file.level = false
       Logger.transports.console.level = false
+      // Clear any pending console operations
+      process.stdout.destroy()
+      process.stderr.destroy()
     }
   })
   return mainWindow
@@ -147,6 +152,15 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
       },
       label: isAutoLaunchEnabled ? "Remove app from startup" : "Add app to startup",
     },
+    // {
+    //   checked: !app.getLoginItemSettings().openAtLogin,
+    //   click: (checkBox: Electron.MenuItem): void => {
+    //     app.setLoginItemSettings({ openAtLogin: checkBox.checked })
+    //   },
+    //   label: "Auto-start on login",
+    //   type: "checkbox",
+    //   // visible: process.platform !== "linux",
+    // },
     { type: "separator" },
     {
       click: function () {
@@ -236,7 +250,21 @@ if (!gotTheLock) {
     // If the backend is running, stop it gracefully
     if (backendManager.isRunning()) {
       event.preventDefault()
-      await backendManager.stop()
+      try {
+        await backendManager.stop()
+        // Give a small delay to ensure logs are written
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        // Disable logging
+        Logger.errorHandler.stopCatching()
+        Logger.eventLogger.stopLogging()
+        Logger.transports.file.level = false
+        Logger.transports.console.level = false
+        // Clear any pending console operations
+        process.stdout.destroy()
+        process.stderr.destroy()
+      } catch (error) {
+        console.error("Error during shutdown:", error)
+      }
       app.quit()
     }
   })
