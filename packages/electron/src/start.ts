@@ -22,6 +22,8 @@ interface StoreType {
 
 const store = new Store<StoreType>()
 
+const startMinimized = process.argv.includes("--hidden")
+
 Logger.transports.file.resolvePathFn = getLogsPath
 Logger.initialize({ spyRendererConsole: false })
 Logger.errorHandler.startCatching()
@@ -88,10 +90,10 @@ function createWindow() {
   })
 
   // Restore maximized/fullscreen state
-  if (windowState.isMaximized) {
+  if (windowState.isMaximized && !startMinimized) {
     mainWindow.maximize()
   }
-  if (windowState.isFullScreen) {
+  if (windowState.isFullScreen && !startMinimized) {
     mainWindow.setFullScreen(true)
   }
 
@@ -253,7 +255,7 @@ if (!gotTheLock) {
     if (mainWindow) {
       updateTrayMenu(mainWindow)
     }
-    if (!process.argv.includes("--hidden")) {
+    if (!startMinimized) {
       console.log("Showing main window")
       mainWindow.show()
       // force focus
