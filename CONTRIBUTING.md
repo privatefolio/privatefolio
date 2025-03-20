@@ -112,14 +112,18 @@ yarn cache clean # Clean the cache
 
 ### Electron
 
-Logs can be found at:
+Data is persisted in the following directories:
 
 1. Windows:
    - Squirrel logs: `C:\Users\daniel\AppData\Local\SquirrelTemp`
    - Electron logs: `C:\Users\daniel\AppData\Roaming\Privatefolio\logs`
+   - User data: `C:\Users\daniel\AppData\Roaming\Privatefolio\data`
+   - App config: `C:\Users\daniel\AppData\Roaming\Privatefolio\config.json`
 
 2. Linux:
    - Electron logs: `~/.config/Privatefolio/logs`
+   - User data: `~/.config/Privatefolio/data`
+   - App config: `~/.config/Privatefolio/config.json`
 
 You can also package the app without building the binaries:
 
