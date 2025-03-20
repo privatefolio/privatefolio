@@ -109,10 +109,10 @@ export const PLATFORMS_META: Record<PlatformId, PlatformMeta> = {
     logoUrl: "https://assets.coingecko.com/markets/images/52/small/binance.jpg?1519353250",
     name: "Binance",
   },
-  blockpit: { logoUrl: "/app-data/integrations/blockpit.png", name: "Blockpit" },
-  "cex-io": { logoUrl: "/app-data/integrations/cex-io.png", name: "CEX" },
+  blockpit: { logoUrl: "./app-data/integrations/blockpit.png", name: "Blockpit" },
+  "cex-io": { logoUrl: "./app-data/integrations/cex-io.png", name: "CEX" },
   coinbase: { logoUrl: "", name: "Coinbase" },
-  coinmama: { logoUrl: "/app-data/integrations/coinmama.png", name: "Coinmama" },
+  coinmama: { logoUrl: "./app-data/integrations/coinmama.png", name: "Coinmama" },
   "eip155-10": {
     coingeckoId: "optimism",
     logoUrl: "https://icons.llamao.fi/icons/chains/rsz_optimism.jpg",
@@ -208,15 +208,15 @@ export type PriceApiMeta = {
 
 export const PRICE_APIS_META: Record<PriceApiId, PriceApiMeta> = {
   binance: {
-    logoUrl: "/app-data/integrations/binance.svg",
+    logoUrl: "./app-data/integrations/binance.svg",
     name: "Binance",
   },
   coinbase: {
-    logoUrl: "/app-data/integrations/coinbase.svg",
+    logoUrl: "./app-data/integrations/coinbase.svg",
     name: "Coinbase",
   },
   "defi-llama": {
-    logoUrl: "/app-data/integrations/defi-llama.png",
+    logoUrl: "./app-data/integrations/defi-llama.png",
     name: "DefiLlama",
   },
 }

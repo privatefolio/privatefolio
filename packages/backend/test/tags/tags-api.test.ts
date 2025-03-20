@@ -107,9 +107,8 @@ describe("tags", () => {
     const tagNames = ["bridge", "crosschain"]
 
     // act
-    await Promise.all(
-      tagNames.map((tagName) => assignTagToAuditLog(accountName, auditLogId, tagName))
-    )
+    await assignTagToAuditLog(accountName, auditLogId, tagNames[0])
+    await assignTagToAuditLog(accountName, auditLogId, tagNames[1])
     const tags = await getTagsForAuditLog(accountName, auditLogId)
 
     // assert

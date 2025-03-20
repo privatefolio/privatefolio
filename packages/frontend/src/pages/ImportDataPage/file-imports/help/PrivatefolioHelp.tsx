@@ -21,11 +21,11 @@ const steps = [
         <ExternalLink href="https://privatefolio.app/u/0/transactions">Transactions</ExternalLink>.
         <br />
         <br />
-        <a href="/app-data/help/privatefolio/Step1.png" target="_blank" rel="noreferrer">
+        <a href="./app-data/help/privatefolio/Step1.png" target="_blank" rel="noreferrer">
           <img
             height={201}
             width={433}
-            src="/app-data/help/privatefolio/Step1.png"
+            src="./app-data/help/privatefolio/Step1.png"
             alt="Step visualization"
           />
         </a>
@@ -40,11 +40,11 @@ const steps = [
         the transactions from this account.
         <br />
         <br />
-        <a href="/app-data/help/privatefolio/Step2.png" target="_blank" rel="noreferrer">
+        <a href="./app-data/help/privatefolio/Step2.png" target="_blank" rel="noreferrer">
           <img
             height={201}
             width={433}
-            src="/app-data/help/privatefolio/Step2.png"
+            src="./app-data/help/privatefolio/Step2.png"
             alt="Step visualization"
           />
         </a>

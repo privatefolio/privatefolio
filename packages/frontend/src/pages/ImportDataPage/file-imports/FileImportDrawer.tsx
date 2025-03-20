@@ -115,7 +115,7 @@ export function FileImportDrawer(props: FileImportDrawerProps) {
               <Stack direction="row" alignItems={"center"} gap={0.5}>
                 <PlatformAvatar
                   size="small"
-                  src={`/app-data/integrations/${parserId.split("-")[0].toLowerCase()}.svg`}
+                  src={`./app-data/integrations/${parserId.split("-")[0].toLowerCase()}.svg`}
                   alt={parserId}
                 />
                 {PARSERS_META[parserId].name}

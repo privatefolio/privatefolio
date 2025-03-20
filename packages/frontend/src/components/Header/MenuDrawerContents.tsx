@@ -99,24 +99,24 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
               </Button>
             </Tooltip> */}
           {/* </Stack> */}
+          <NavMenuItem
+            value=""
+            to={`/u/${accountIndex}/`}
+            label="Home"
+            aria-label="Visit Home"
+            onClick={toggleOpen}
+            avatar={<HomeRounded fontSize="small" />}
+          />
           {!isProduction && (
             <NavMenuItem
-              value=""
-              to={`/u/${accountIndex}/`}
-              label="Home"
-              aria-label="Visit Home"
+              value="trades"
+              to={`/u/${accountIndex}/trades`}
+              label="Trades"
+              aria-label="Visit Trades"
               onClick={toggleOpen}
-              avatar={<HomeRounded fontSize="small" />}
+              avatar={<ShowChartRounded fontSize="small" />}
             />
           )}
-          <NavMenuItem
-            value="trades"
-            to={`/u/${accountIndex}/trades`}
-            label="Trades"
-            aria-label="Visit Trades"
-            onClick={toggleOpen}
-            avatar={<ShowChartRounded fontSize="small" />}
-          />
           <NavMenuItem
             value="transactions"
             to={`/u/${accountIndex}/transactions`}

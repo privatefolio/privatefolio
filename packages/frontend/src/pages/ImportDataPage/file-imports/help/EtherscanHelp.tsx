@@ -18,11 +18,11 @@ const steps = [
         <ExternalLink href="https://etherscan.io/exportData">CSV Export</ExternalLink>.
         <br />
         <br />
-        <a href="/app-data/help/etherscan/step1.png" target="_blank" rel="noreferrer">
+        <a href="./app-data/help/etherscan/step1.png" target="_blank" rel="noreferrer">
           <img
             height={217}
             width={433}
-            src="/app-data/help/etherscan/step1.png"
+            src="./app-data/help/etherscan/step1.png"
             alt="Step visualization"
           />
         </a>
@@ -37,11 +37,11 @@ const steps = [
         .
         <br />
         <br />
-        <a href="/app-data/help/etherscan/step2.png" target="_blank" rel="noreferrer">
+        <a href="./app-data/help/etherscan/step2.png" target="_blank" rel="noreferrer">
           <img
             height={249}
             width={433}
-            src="/app-data/help/etherscan/step2.png"
+            src="./app-data/help/etherscan/step2.png"
             alt="Step visualization"
           />
         </a>
@@ -57,11 +57,11 @@ const steps = [
         .
         <br />
         <br />
-        <a href="/app-data/help/etherscan/step3.png" target="_blank" rel="noreferrer">
+        <a href="./app-data/help/etherscan/step3.png" target="_blank" rel="noreferrer">
           <img
             height={249}
             width={433}
-            src="/app-data/help/etherscan/step3.png"
+            src="./app-data/help/etherscan/step3.png"
             alt="Step visualization"
           />
         </a>
@@ -77,11 +77,11 @@ const steps = [
         .
         <br />
         <br />
-        <a href="/app-data/help/etherscan/step4.png" target="_blank" rel="noreferrer">
+        <a href="./app-data/help/etherscan/step4.png" target="_blank" rel="noreferrer">
           <img
             height={249}
             width={433}
-            src="/app-data/help/etherscan/step4.png"
+            src="./app-data/help/etherscan/step4.png"
             alt="Step visualization"
           />
         </a>

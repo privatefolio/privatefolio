@@ -152,6 +152,7 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
       },
       label: isAutoLaunchEnabled ? "Remove app from startup" : "Add app to startup",
     },
+    // TODO9: fix startup on linux
     // {
     //   checked: !app.getLoginItemSettings().openAtLogin,
     //   click: (checkBox: Electron.MenuItem): void => {
