@@ -132,9 +132,8 @@ describe("tags", () => {
     const tagNames = ["swap", "liquidity"]
 
     // act
-    await Promise.all(
-      tagNames.map((tagName) => assignTagToTransaction(accountName, transactionId, tagName))
-    )
+    await assignTagToTransaction(accountName, transactionId, tagNames[0])
+    await assignTagToTransaction(accountName, transactionId, tagNames[1])
     const tags = await getTagsForTransaction(accountName, transactionId)
 
     // assert
