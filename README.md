@@ -1,16 +1,34 @@
-# Privatefolio
+<!-- markdownlint-disable MD033 -->
+<!-- markdownlint-disable MD041 -->
 
-The Free\* and Open-source Portfolio Tracker - All your crypto assets in one place
+<p align="center">
+  <img src="https://github.com/privatefolio/privatefolio/blob/main/packages/electron/src/app-icon.png?raw=true" alt="Privatefolio Logo" width="100">
+</p>
+
+<h1 align="center">Privatefolio</h1>
+
+<p align="center">
+  The Free* and Open-source Portfolio Tracker - All your crypto assets in one place
+</p>
 
 ## Installation
 
-Go to the [releases page](https://github.com/privatefolio/privatefolio/releases) and download the latest version for your platform. Each release contains the binaries for Windows, Linux and macOS under the Assets dropdown.
+Go to [GitHub releases](https://github.com/privatefolio/privatefolio/releases) and download the latest version for your platform. Each release contains the binaries for Windows, Linux and macOS under the Assets dropdown.
 
 On Windows, you can run the `Privatefolio-<version>.Setup.exe` executable directly.
 
 On Linux, you can run `sudo dpkg -i privatefolio_<version>_amd64.deb` to install the package.
 
 ## Features
+
+<table>
+<tr>
+<td width="250">
+<div style="width: 250px; height: 450px; overflow: hidden;">
+<img src="https://github.com/privatefolio/privatefolio/blob/main/packages/frontend/public/landing/mobile-demo.png?raw=true" alt="Privatefolio screenshot" style="width: 250px; height: 450px; object-fit: cover; object-position: top; mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 90%);">
+</div>
+</td>
+<td>
 
 - **Transaction Management**: Track all your cryptocurrency transactions in one place
 - **Multi-chain Support**: Support for multiple blockchains and platforms
@@ -19,6 +37,10 @@ On Linux, you can run `sudo dpkg -i privatefolio_<version>_amd64.deb` to install
   - Search for assets, transactions, and actions
   - Search transactions by transaction hash (just paste a transaction hash into the search bar)
 - **Price History**: View historical price data for your assets
+
+</td>
+</tr>
+</table>
 
 ## License
 
