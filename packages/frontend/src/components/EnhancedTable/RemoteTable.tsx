@@ -19,7 +19,7 @@ import React, {
 import { useSearchParams } from "react-router-dom"
 import { $showRelativeTime } from "src/stores/account-settings-store"
 import { $debugMode } from "src/stores/app-store"
-import { sleep } from "src/utils/utils"
+import { isDevelopment, sleep } from "src/utils/utils"
 
 import {
   $inMemoryDataQueryTime,
@@ -206,10 +206,14 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
   const isFirstLoading = queryTime === null
   const isEmpty = rows.length === 0 && Object.keys(activeFilters).length === 0
 
-  console.time("RemoteTable Render Time")
+  if (isDevelopment) {
+    console.time("RemoteTable Render Time")
+  }
 
   useEffect(() => {
-    console.timeEnd("RemoteTable Render Time")
+    if (isDevelopment) {
+      console.timeEnd("RemoteTable Render Time")
+    }
   })
 
   return (

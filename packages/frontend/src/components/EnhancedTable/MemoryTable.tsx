@@ -17,6 +17,7 @@ import React, {
 } from "react"
 import { $showRelativeTime } from "src/stores/account-settings-store"
 import { $debugMode } from "src/stores/app-store"
+import { isDevelopment } from "src/utils/environment-utils"
 
 import { TableFooter } from "../../components/TableFooter"
 import {
@@ -197,10 +198,14 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
   const isLoading = queryTime === null
   const isEmpty = rowCount === 0
 
-  console.time("MemoryTable Render Time")
+  if (isDevelopment) {
+    console.time("MemoryTable Render Time")
+  }
 
   useEffect(() => {
-    console.timeEnd("MemoryTable Render Time")
+    if (isDevelopment) {
+      console.timeEnd("MemoryTable Render Time")
+    }
   })
 
   return (

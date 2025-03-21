@@ -8,6 +8,7 @@ export const isProductionWeb = isServer
   : Boolean(window.location.toString().includes(SITE_DOMAIN))
 
 export const isProduction = isProductionWeb || isProductionElectron
+export const isDevelopment = !isProduction
 
 // export const isNode = typeof process !== "undefined" && process.versions && process.versions.node
 // export const isWebWorker = isServer && !isNode
