@@ -3,6 +3,7 @@ import { IconButton, TableCell, TableRow, Tooltip, Typography } from "@mui/mater
 import { useStore } from "@nanostores/react"
 import { formatDistance } from "date-fns"
 import React, { useEffect, useState } from "react"
+import { ActionBlock } from "src/components/ActionBlock"
 import { AmountBlock } from "src/components/AmountBlock"
 import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { TagList } from "src/components/TagList"
@@ -24,17 +25,7 @@ export function TradeTableRow({
   isTablet,
   relativeTime,
 }: TableRowComponentProps<Trade>) {
-  const {
-    createdAt,
-    duration,
-    isOpen,
-    assetId,
-    amount,
-    soldAssets,
-    soldAmounts,
-    feeAssets,
-    feeAmounts,
-  } = row
+  const { createdAt, duration, isOpen, assetId, amount, tradeType, cost, fees, profit } = row
 
   const { value: open, toggle: toggleOpen } = useBoolean(false)
   const [priceMap, setPriceMap] = useState<Record<string, ChartData>>()
@@ -71,7 +62,7 @@ export function TradeTableRow({
             </Typography>
 
             <Typography variant="body2">
-              <strong>Status:</strong> {isOpen ? "Open" : "Closed"}
+              <strong>Direction:</strong> <ActionBlock action={tradeType} />
             </Typography>
 
             {duration || isOpen ? (
@@ -85,21 +76,24 @@ export function TradeTableRow({
               </Typography>
             ) : null}
 
-            {soldAssets && soldAssets.length > 0 ? (
+            {cost && cost.length > 0 ? (
               <Typography variant="body2">
                 <strong>Cost:</strong>{" "}
-                {soldAssets
-                  .map((asset, index) => `${soldAmounts[index]} ${asset.split(":").pop()}`)
-                  .join(", ")}
+                {cost.map(([asset, amount]) => `${amount} ${asset.split(":").pop()}`).join(", ")}
               </Typography>
             ) : null}
 
-            {feeAssets && feeAssets.length > 0 ? (
+            {fees && fees.length > 0 ? (
               <Typography variant="body2">
                 <strong>Fees:</strong>{" "}
-                {feeAssets
-                  .map((asset, index) => `${feeAmounts[index]} ${asset.split(":").pop()}`)
-                  .join(", ")}
+                {fees.map(([asset, amount]) => `${amount} ${asset.split(":").pop()}`).join(", ")}
+              </Typography>
+            ) : null}
+
+            {profit && profit.length > 0 ? (
+              <Typography variant="body2">
+                <strong>Profit:</strong>{" "}
+                {profit.map(([asset, amount]) => `${amount} ${asset.split(":").pop()}`).join(", ")}
               </Typography>
             ) : null}
 
@@ -131,7 +125,6 @@ export function TradeTableRow({
         <TableCell>
           <TimestampBlock timestamp={createdAt} relative={relativeTime} />
         </TableCell>
-
         <TableCell>
           {!duration
             ? isOpen
@@ -139,37 +132,33 @@ export function TradeTableRow({
               : "N/A"
             : formatDistance(0, duration, { includeSeconds: true })}
         </TableCell>
-
         <TableCell>
-          <MyAssetBlock id={assetId} />
+          <ActionBlock action={tradeType} />
         </TableCell>
-
         <TableCell variant="clickable" align="right">
           <AmountBlock amount={amount} currencyTicker={getAssetTicker(assetId)} />
         </TableCell>
-
-        <TableCell>{isOpen ? "Open" : "Closed"}</TableCell>
-
         <TableCell>
-          {soldAssets && soldAssets.length > 0
-            ? soldAssets
-                .map((asset, index) => `${soldAmounts[index]} ${asset.split(":").pop()}`)
-                .join(", ")
-            : "Unknown"}
+          <MyAssetBlock id={assetId} />
         </TableCell>
-
         <TableCell>
-          {feeAssets && feeAssets.length > 0
-            ? feeAssets
-                .map((asset, index) => `${feeAmounts[index]} ${asset.split(":").pop()}`)
-                .join(", ")
+          {cost && cost.length > 0
+            ? cost.map(([asset, amount]) => `${amount} ${asset.split(":").pop()}`).join(", ")
             : "None"}
         </TableCell>
-
+        <TableCell>
+          {fees && fees.length > 0
+            ? fees.map(([asset, amount]) => `${amount} ${asset.split(":").pop()}`).join(", ")
+            : "None"}
+        </TableCell>
+        <TableCell>
+          {profit && profit.length > 0
+            ? profit.map(([asset, amount]) => `${amount} ${asset.split(":").pop()}`).join(", ")
+            : "None"}
+        </TableCell>
         <TableCell>
           <TagList itemId={row.id} itemType="trade" />
         </TableCell>
-
         <TableCell variant="actionList">
           <Tooltip title="Inspect">
             <IconButton size="small" color="secondary" onClick={toggleOpen}>
@@ -178,7 +167,6 @@ export function TradeTableRow({
           </Tooltip>
         </TableCell>
       </TableRow>
-
       <TradeDrawer
         key={row.id}
         open={open}

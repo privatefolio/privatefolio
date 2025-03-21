@@ -1,11 +1,14 @@
 import Big from "big.js"
 import {
   AuditLog,
+  AuditLogOperation,
   EventCause,
   ProgressCallback,
   SqlParam,
   SubscriptionChannel,
   Trade,
+  TRADE_TYPES,
+  TradeType,
 } from "src/interfaces"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { sql } from "src/utils/sql-utils"
@@ -16,9 +19,9 @@ import { Account, getAccount } from "../accounts-api"
 import { getAuditLogs } from "./audit-logs-api"
 import { getValue, setValue } from "./kv-api"
 import { enqueueTask } from "./server-tasks-api"
-import { getTransactionsByTxHash } from "./transactions-api"
+import { getTransaction } from "./transactions-api"
 
-const TRADES_SCHEMA_VERSION = 1
+const TRADES_SCHEMA_VERSION = 3
 
 async function initializeTradesSchema(account: Account): Promise<void> {
   const currentVersion = await getValue(account.name, "trades_schema_version", "0")
@@ -41,6 +44,7 @@ CREATE TABLE trades (
   closedAt INTEGER,
   duration INTEGER,
   isOpen BOOLEAN NOT NULL DEFAULT 1,
+  tradeType VARCHAR NOT NULL,
   cost JSON,
   fees JSON,
   profit JSON,
@@ -115,11 +119,12 @@ export async function getTrades(
         closedAt: row[5],
         duration: row[6],
         isOpen: Boolean(row[7]),
-        cost: JSON.parse(String(row[8] || "[]")),
-        fees: JSON.parse(String(row[9] || "[]")),
-        profit: JSON.parse(String(row[10] || "[]")),
-        txIds: row[11] ? String(row[11]).split(",") : undefined,
-        auditLogIds: row[12] ? String(row[12]).split(",") : undefined,
+        tradeType: row[8] as TradeType,
+        cost: JSON.parse(String(row[9] || "[]")),
+        fees: JSON.parse(String(row[10] || "[]")),
+        profit: JSON.parse(String(row[11] || "[]")),
+        txIds: row[12] ? String(row[12]).split(",") : undefined,
+        auditLogIds: row[13] ? String(row[13]).split(",") : undefined,
       }
       /* eslint-enable */
       transformNullsToUndefined(value)
@@ -141,9 +146,9 @@ export async function upsertTrades(accountName: string, trades: Trade[]): Promis
   try {
     await account.executeMany(
       `INSERT OR REPLACE INTO trades (
-        id, assetId, amount, balance, createdAt, closedAt, duration, isOpen, 
+        id, assetId, amount, balance, createdAt, closedAt, duration, isOpen, tradeType,
         cost, fees, profit
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       trades.map((trade) => [
         trade.id,
         trade.assetId,
@@ -153,6 +158,7 @@ export async function upsertTrades(accountName: string, trades: Trade[]): Promis
         trade.closedAt || null,
         trade.duration || null,
         trade.isOpen ? 1 : 0,
+        trade.tradeType,
         JSON.stringify(trade.cost || []),
         JSON.stringify(trade.fees || []),
         JSON.stringify(trade.profit || []),
@@ -259,21 +265,54 @@ export async function computeTrades(
   const tradeAuditLogs: [string, string][] = []
   const tradeTransactions: [string, string][] = []
 
+  async function processTransactionForTrade(
+    trade: Trade,
+    txId: string,
+    assetId: string,
+    operation: AuditLogOperation
+  ): Promise<void> {
+    const tx = await getTransaction(accountName, txId)
+
+    if (!tx) {
+      throw new Error(`Transaction with id ${txId} not found`)
+    }
+
+    if (tx.outgoingAsset && tx.outgoing) {
+      // Add outgoing as cost if it's a different asset OR if it's the same asset in a deposit
+      if (tx.outgoingAsset !== assetId || operation === "Deposit") {
+        trade.cost.push([tx.outgoingAsset, tx.outgoing])
+      }
+    }
+
+    if (tx.incomingAsset && tx.incoming) {
+      // Add incoming as profit if it's a different asset OR if it's the same asset in a withdraw
+      if (tx.incomingAsset !== assetId || operation === "Withdraw") {
+        trade.profit.push([tx.incomingAsset, tx.incoming])
+      }
+    }
+
+    if (tx.feeAsset && tx.fee) {
+      trade.fees.push([tx.feeAsset, tx.fee])
+    }
+
+    tradeTransactions.push([trade.id, tx.id])
+  }
+
   for (const [assetId, logs] of Object.entries(assetGroups)) {
     let currentTrade: Trade | null = null
     let balance = new Big(0)
 
     for (const log of logs) {
       const change = new Big(log.change)
-
       balance = balance.plus(change)
 
       // If balance is becoming non-zero from zero, start a new trade
-      if (balance.gt(0) && currentTrade === null) {
+      if (!balance.eq(0) && currentTrade === null) {
         const tradeId = `trade_${hashString(`${assetId}_${log.timestamp}`)}`
+        const tradeType = balance.gt(0) ? TRADE_TYPES[0] : TRADE_TYPES[1] // "Long" or "Short"
 
         currentTrade = {
-          amount: balance.toNumber(),
+          amount: balance.abs().toNumber(),
           assetId,
           balance: balance.toNumber(),
           cost: [],
@@ -282,30 +321,14 @@ export async function computeTrades(
           id: tradeId,
           isOpen: true,
           profit: [],
+          tradeType,
         }
 
         tradeAuditLogs.push([tradeId, log.id])
-        if (log.txId) tradeTransactions.push([tradeId, log.txId])
-
-        // If this is a buy/deposit operation, track what was sold
-        if (change.gt(0) && log.txId) {
-          const transactions = await getTransactionsByTxHash(accountName, log.txId)
-
-          for (const tx of transactions) {
-            if (tx.outgoingAsset && tx.outgoingAsset !== assetId) {
-              currentTrade.cost.push([tx.outgoingAsset, tx.outgoing])
-            }
-
-            if (tx.incomingAsset && tx.incomingAsset !== assetId) {
-              currentTrade.profit.push([tx.incomingAsset, tx.incoming])
-            }
-
-            if (tx.feeAsset && tx.fee) {
-              currentTrade.fees.push([tx.feeAsset, tx.fee])
-            }
-
-            tradeTransactions.push([currentTrade.id, tx.id])
-          }
+        if (log.txId) {
+          tradeTransactions.push([tradeId, log.txId])
+          // Track transactions for cost/profit/fees
+          await processTransactionForTrade(currentTrade, log.txId, assetId, log.operation)
         }
       }
       // If we have an active trade, update it
@@ -326,36 +349,45 @@ export async function computeTrades(
         // Add the transaction relationship if txId exists
         if (log.txId) {
           tradeTransactions.push([currentTrade.id, log.txId])
-
-          // Update cost and fees if this is a transaction
-          const transactions = await getTransactionsByTxHash(accountName, log.txId)
-
-          for (const tx of transactions) {
-            if (tx.outgoingAsset && tx.outgoingAsset !== assetId) {
-              currentTrade.cost.push([tx.outgoingAsset, tx.outgoing])
-            }
-
-            if (tx.incomingAsset && tx.incomingAsset !== assetId) {
-              currentTrade.profit.push([tx.incomingAsset, tx.incoming])
-            }
-
-            if (tx.feeAsset && tx.fee) {
-              currentTrade.fees.push([tx.feeAsset, tx.fee])
-            }
-
-            // Add transaction relationship
-            tradeTransactions.push([currentTrade.id, tx.id])
-          }
+          // Update cost, profit and fees if this is a transaction
+          await processTransactionForTrade(currentTrade, log.txId, assetId, log.operation)
         }
 
-        // If balance reaches zero or becomes negative, close the trade
-        if (balance.lte(0)) {
+        // Check if we need to close the current trade and start a new one
+        if (
+          (currentTrade.tradeType === TRADE_TYPES[0] && balance.lt(0)) || // Long position going negative
+          (currentTrade.tradeType === TRADE_TYPES[1] && balance.gt(0)) || // Short position going positive
+          balance.eq(0) // Position fully closed
+        ) {
+          // Close current trade
           currentTrade.isOpen = false
           currentTrade.closedAt = log.timestamp
           currentTrade.duration = log.timestamp - currentTrade.createdAt
-
           trades.push(currentTrade)
-          currentTrade = null
+
+          // If balance is non-zero, start a new trade in the opposite direction
+          if (!balance.eq(0)) {
+            const newTradeId = `trade_${hashString(`${assetId}_${log.timestamp}`)}`
+            const newTradeType = balance.gt(0) ? TRADE_TYPES[0] : TRADE_TYPES[1] // "Long" or "Short"
+
+            currentTrade = {
+              amount: balance.abs().toNumber(),
+              assetId,
+              balance: balance.toNumber(),
+              cost: [],
+              createdAt: log.timestamp,
+              fees: [],
+              id: newTradeId,
+              isOpen: true,
+              profit: [],
+              tradeType: newTradeType,
+            }
+
+            tradeAuditLogs.push([newTradeId, log.id])
+            if (log.txId) tradeTransactions.push([newTradeId, log.txId])
+          } else {
+            currentTrade = null
+          }
         }
       }
     }

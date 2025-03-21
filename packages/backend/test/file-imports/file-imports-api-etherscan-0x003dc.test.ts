@@ -412,7 +412,7 @@ describe("should import 0x003dc via files", () => {
         `../__snapshots__/0x003dc/balances-${i}.ts.snap`
       )
     }
-    expect(trades.length).toMatchInlineSnapshot(`125`)
+    expect(trades.length).toMatchInlineSnapshot(`129`)
     for (let i = 0; i < trades.length; i += 5) {
       await expect(trades.slice(i, i + 5)).toMatchFileSnapshot(
         `../__snapshots__/0x003dc/trades-${i}.ts.snap`

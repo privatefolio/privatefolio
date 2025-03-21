@@ -55,6 +55,8 @@ describe("trades-api", () => {
 
     const transactions: Transaction[] = [
       {
+        fee: "0.001",
+        feeAsset: "ethereum:ETH",
         id: "tx1",
         importIndex: 1,
         incoming: "1.5",
@@ -66,6 +68,8 @@ describe("trades-api", () => {
         wallet: "0x123",
       },
       {
+        fee: "0.001",
+        feeAsset: "ethereum:ETH",
         id: "tx2",
         importIndex: 2,
         metadata: { txHash: "0xabc2" },
@@ -77,6 +81,8 @@ describe("trades-api", () => {
         wallet: "0x123",
       },
       {
+        fee: "0.001",
+        feeAsset: "ethereum:ETH",
         id: "tx3",
         importIndex: 3,
         metadata: { txHash: "0xabc3" },
@@ -87,14 +93,27 @@ describe("trades-api", () => {
         type: "Withdraw",
         wallet: "0x123",
       },
+      {
+        fee: "0.001",
+        feeAsset: "ethereum:ETH",
+        id: "tx1-usdt",
+        importIndex: 1,
+        metadata: { txHash: "0xabc1" },
+        outgoing: "2250",
+        outgoingAsset: "ethereum:USDT",
+        platform: "ethereum" as PlatformId,
+        timestamp: 1600000000000,
+        type: "Deposit",
+        wallet: "0x123",
+      },
     ]
 
     // Mock the getAuditLogs and getTransactionsByTxHash functions
     vi.spyOn(auditLogsApi, "getAuditLogs").mockResolvedValue(auditLogs)
 
-    vi.spyOn(transactionsApi, "getTransactionsByTxHash").mockImplementation((accountName, txId) => {
+    vi.spyOn(transactionsApi, "getTransaction").mockImplementation((accountName, txId) => {
       const tx = transactions.find((t) => t.id === txId)
-      return Promise.resolve(tx ? [tx] : [])
+      return Promise.resolve(tx)
     })
 
     const updates: ProgressUpdate[] = []
@@ -133,10 +152,24 @@ describe("trades-api", () => {
           "cost": [],
           "createdAt": 1600000000000,
           "duration": 200000000,
-          "fees": [],
+          "fees": [
+            [
+              "ethereum:ETH",
+              "0.001",
+            ],
+            [
+              "ethereum:ETH",
+              "0.001",
+            ],
+            [
+              "ethereum:ETH",
+              "0.001",
+            ],
+          ],
           "id": "trade_2097354210",
           "isOpen": false,
           "profit": [],
+          "tradeType": "Long",
           "txIds": [
             "tx1",
             "tx2",

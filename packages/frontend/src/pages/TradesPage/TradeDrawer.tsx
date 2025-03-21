@@ -40,10 +40,9 @@ export function TradeDrawer(props: TradeDrawerProps) {
     closedAt,
     duration,
     isOpen,
-    soldAssets,
-    soldAmounts,
-    feeAssets,
-    feeAmounts,
+    cost,
+    fees,
+    profit,
   } = trade
 
   const [tags, setTags] = useState<Tag[]>([])
@@ -139,14 +138,14 @@ export function TradeDrawer(props: TradeDrawerProps) {
           </div>
         )}
 
-        {soldAssets && soldAssets.length > 0 && (
+        {cost && cost.length > 0 && (
           <div>
             <SectionTitle>Cost</SectionTitle>
             <Stack direction="column" gap={1}>
-              {soldAssets.map((asset, index) => (
-                <Stack key={asset} direction="row" alignItems="center" gap={0.25}>
+              {cost.map(([asset, assetAmount], index) => (
+                <Stack key={`${asset}-${index}`} direction="row" alignItems="center" gap={0.25}>
                   <AmountBlock
-                    amount={soldAmounts[index]}
+                    amount={assetAmount}
                     currencyTicker={getAssetTicker(asset)}
                     variant="body2"
                   />
@@ -161,7 +160,7 @@ export function TradeDrawer(props: TradeDrawerProps) {
                   <ValueChip
                     value={
                       priceMap && priceMap[asset]?.value
-                        ? priceMap[asset].value * Number(soldAmounts[index])
+                        ? priceMap[asset].value * Number(assetAmount)
                         : undefined
                     }
                   />
@@ -171,14 +170,14 @@ export function TradeDrawer(props: TradeDrawerProps) {
           </div>
         )}
 
-        {feeAssets && feeAssets.length > 0 && (
+        {fees && fees.length > 0 && (
           <div>
             <SectionTitle>Fees</SectionTitle>
             <Stack direction="column" gap={1}>
-              {feeAssets.map((asset, index) => (
-                <Stack key={asset} direction="row" alignItems="center" gap={0.25}>
+              {fees.map(([asset, assetAmount], index) => (
+                <Stack key={`${asset}-${index}`} direction="row" alignItems="center" gap={0.25}>
                   <AmountBlock
-                    amount={feeAmounts[index]}
+                    amount={assetAmount}
                     currencyTicker={getAssetTicker(asset)}
                     variant="body2"
                   />
@@ -193,7 +192,39 @@ export function TradeDrawer(props: TradeDrawerProps) {
                   <ValueChip
                     value={
                       priceMap && priceMap[asset]?.value
-                        ? priceMap[asset].value * Number(feeAmounts[index])
+                        ? priceMap[asset].value * Number(assetAmount)
+                        : undefined
+                    }
+                  />
+                </Stack>
+              ))}
+            </Stack>
+          </div>
+        )}
+
+        {profit && profit.length > 0 && (
+          <div>
+            <SectionTitle>Profit</SectionTitle>
+            <Stack direction="column" gap={1}>
+              {profit.map(([asset, assetAmount], index) => (
+                <Stack key={`${asset}-${index}`} direction="row" alignItems="center" gap={0.25}>
+                  <AmountBlock
+                    amount={assetAmount}
+                    currencyTicker={getAssetTicker(asset)}
+                    variant="body2"
+                  />
+                  <Button
+                    size="small"
+                    component={AppLink}
+                    to={`../asset/${encodeURI(asset)}`}
+                    sx={{ fontSize: "0.8rem", padding: 0.5 }}
+                  >
+                    <AssetBlock assetId={asset} size="small" />
+                  </Button>
+                  <ValueChip
+                    value={
+                      priceMap && priceMap[asset]?.value
+                        ? priceMap[asset].value * Number(assetAmount)
                         : undefined
                     }
                   />

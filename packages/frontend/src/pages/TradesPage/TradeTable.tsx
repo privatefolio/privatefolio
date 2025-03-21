@@ -17,11 +17,12 @@ import { TradeTableRow } from "./TradeTableRow"
 
 interface TradesTableProps extends Pick<RemoteTableProps<Trade>, "defaultRowsPerPage"> {
   assetId?: string
+  tableType: "active" | "closed"
   tableDataRef?: MutableRefObject<Trade[]>
 }
 
 export function TradeTable(props: TradesTableProps) {
-  const { assetId, tableDataRef, ...rest } = props
+  const { assetId, tableType, tableDataRef, ...rest } = props
 
   const accountName = useStore($activeAccount)
   const [refresh, setRefresh] = useState(0)
@@ -63,6 +64,9 @@ export function TradeTable(props: TradesTableProps) {
         filterConditions.push(`assetId = '${assetId}'`)
       }
 
+      // Add active/closed condition
+      filterConditions.push(`isOpen = ${tableType === "active" ? 1 : 0}`)
+
       // Construct the filterQuery
       let filterQuery = ""
       if (filterConditions.length > 0) {
@@ -85,7 +89,7 @@ export function TradeTable(props: TradesTableProps) {
         () => rpc.countTrades(accountName, `SELECT COUNT (*) FROM trades ${filterQuery}`),
       ]
     },
-    [accountName, assetId, refresh, tableDataRef, rpc]
+    [accountName, assetId, refresh, tableDataRef, rpc, tableType]
   )
 
   const headCells = useMemo<HeadCell<Trade>[]>(
@@ -105,9 +109,9 @@ export function TradeTable(props: TradesTableProps) {
       },
       {
         filterable: true,
-        key: "assetId",
-        label: "Asset",
-        sx: { maxWidth: 140, minWidth: 140, width: 140 },
+        key: "tradeType",
+        label: "Type",
+        sx: { maxWidth: 100, minWidth: 100, width: 100 },
       },
       {
         key: "amount",
@@ -116,18 +120,24 @@ export function TradeTable(props: TradesTableProps) {
         sx: { maxWidth: 120, minWidth: 120, width: 120 },
       },
       {
-        key: "isOpen",
-        label: "Status",
-        sx: { maxWidth: 100, minWidth: 100, width: 100 },
+        filterable: true,
+        key: "assetId",
+        label: "Asset",
+        sx: { maxWidth: 140, minWidth: 140, width: 140 },
       },
       {
-        key: "soldAssets",
+        key: "cost",
         label: "Cost",
         sx: { maxWidth: 220, minWidth: 220, width: 220 },
       },
       {
-        key: "feeAssets",
+        key: "fees",
         label: "Fees",
+        sx: { maxWidth: 220, minWidth: 220, width: 220 },
+      },
+      {
+        key: "profit",
+        label: "Profit",
         sx: { maxWidth: 220, minWidth: 220, width: 220 },
       },
       {

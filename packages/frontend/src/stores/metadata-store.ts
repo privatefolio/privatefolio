@@ -2,7 +2,7 @@ import { atom, keepMount, map } from "nanostores"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { logAtoms } from "src/utils/browser-utils"
 
-import { FilterOptionsMap, MyAsset, Platform, TRANSACTIONS_TYPES } from "../interfaces"
+import { FilterOptionsMap, MyAsset, Platform, TRADE_TYPES, TRANSACTIONS_TYPES } from "../interfaces"
 import { RPC } from "../workers/remotes"
 
 export type FilterKey = keyof FilterOptionsMap
@@ -76,6 +76,7 @@ export async function fetchInMemoryData(rpc: RPC, accountName: string) {
     outgoingAsset: assetIds,
     platform: platformIds,
     tags: tagIds,
+    tradeType: TRADE_TYPES,
     trigger: triggers,
     type: TRANSACTIONS_TYPES,
     wallet,
@@ -103,10 +104,11 @@ export const FILTER_LABEL_MAP: Record<FilterKey | DirectFilterKey, string> = {
   platform: "Platform",
   tags: "Tags",
   tradeId: "Trade Id",
+  tradeType: "Trade Type",
   trigger: "Trigger",
   txHash: "Tx Hash",
   txId: "Transaction Id",
-  type: "Type",
+  type: "Transaction Type",
   wallet: "Wallet",
 }
 

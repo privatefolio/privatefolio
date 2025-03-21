@@ -5,8 +5,10 @@ import {
   DataObjectRounded,
   DoneRounded,
   FolderOutlined,
+  NorthEastRounded,
   QuestionMarkRounded,
   RemoveRounded,
+  SouthEastRounded,
   SvgIconComponent,
   SwapHoriz,
 } from "@mui/icons-material"
@@ -34,8 +36,10 @@ type ActionBlockProps = {
 const colorMap: Partial<Record<Action, string>> = {
   Buy: greenColor,
   Fee: redColor,
+  Long: greenColor,
   Reward: greenColor,
   Sell: redColor,
+  Short: redColor,
   Swap: blue[500],
 }
 
@@ -46,11 +50,13 @@ const iconMap: Partial<Record<Action, SvgIconComponent>> = {
   Deposit: AddRounded,
   Fee: RemoveRounded,
   "File Import": FolderOutlined,
+  Long: NorthEastRounded,
   Metadata: DataObjectRounded,
   Mint: SwapHoriz,
   "Price API": CurrencyExchangeRounded,
   Reward: AddRounded,
   Sell: RemoveRounded,
+  Short: SouthEastRounded,
   Swap: SwapHoriz,
   Unknown: QuestionMarkRounded,
   Unwrap: SwapHoriz,

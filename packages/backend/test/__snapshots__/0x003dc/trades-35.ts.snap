@@ -9,13 +9,37 @@
     ],
     "balance": 0,
     "closedAt": 1575378719000,
-    "cost": [],
+    "cost": [
+      [
+        "ethereum:0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359:SAI",
+        "2520.991104865915373718",
+      ],
+    ],
     "createdAt": 1574331905000,
     "duration": 1046814000,
-    "fees": [],
+    "fees": [
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.00174723",
+      ],
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.0003467723875",
+      ],
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.0007738778",
+      ],
+    ],
     "id": "trade_2605725337",
     "isOpen": false,
-    "profit": [],
+    "profit": [
+      [
+        "ethereum:0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643:cDAI",
+        "41035.42403614",
+      ],
+    ],
+    "tradeType": "Long",
     "txIds": [
       "4118854677_0x73284fd72c9a40bbc97f8ac1bcf51adf6fbac0e93fda38751e0a34f77b48fe78_MERGED",
       "4118854677_0x7859bffe00f36d9bdb8982fba84a5614bc84dc517706b80b38904450edb54f6f_MERGED",
@@ -35,6 +59,7 @@
     "id": "trade_4187757205",
     "isOpen": true,
     "profit": [],
+    "tradeType": "Long",
     "txIds": [
       "4118854677_0x9ddad2b0405a5732b25e58a7666289404e8755cc473d36ae38732e34b9a673ac_ERC20_118",
     ],
@@ -48,13 +73,33 @@
     ],
     "balance": 0,
     "closedAt": 1575980187000,
-    "cost": [],
+    "cost": [
+      [
+        "ethereum:0x6B175474E89094C44Da98b954EedeAC495271d0F:DAI",
+        "820.991104865915373718",
+      ],
+    ],
     "createdAt": 1575378719000,
     "duration": 601468000,
-    "fees": [],
+    "fees": [
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.0007738778",
+      ],
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.000788688",
+      ],
+    ],
     "id": "trade_2155091429",
     "isOpen": false,
-    "profit": [],
+    "profit": [
+      [
+        "ethereum:0x6B175474E89094C44Da98b954EedeAC495271d0F:DAI",
+        "821.373092771901057349",
+      ],
+    ],
+    "tradeType": "Long",
     "txIds": [
       "4118854677_0x73284fd72c9a40bbc97f8ac1bcf51adf6fbac0e93fda38751e0a34f77b48fe78_MERGED",
       "4118854677_0xbb4a62d920ae02d67e5f470a0ea5b10e48cd8fba059aff999585af8dedc3e27c_MERGED",
@@ -72,10 +117,16 @@
     "cost": [],
     "createdAt": 1575382316000,
     "duration": 174548000,
-    "fees": [],
+    "fees": [
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.00018649",
+      ],
+    ],
     "id": "trade_3637533554",
     "isOpen": false,
     "profit": [],
+    "tradeType": "Long",
     "txIds": [
       "4118854677_0x19ef420367623dca51bddd5eb36c6b1f95682d9e5c2703df6e3cdbe056b89282_MERGED",
       "4118854677_0x615ab4ccf057a454b25419c8fa409a7a30c4afcfe4551ff6768fd706a2563784_ERC20_121",
@@ -93,10 +144,21 @@
     "cost": [],
     "createdAt": 1575557946000,
     "duration": 814000,
-    "fees": [],
+    "fees": [
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.00101768",
+      ],
+    ],
     "id": "trade_3701224793",
     "isOpen": false,
-    "profit": [],
+    "profit": [
+      [
+        "ethereum:0x6B175474E89094C44Da98b954EedeAC495271d0F:DAI",
+        "994.96892911",
+      ],
+    ],
+    "tradeType": "Long",
     "txIds": [
       "4118854677_0x224adc42e791c6b5b3c0f3ad532f731bc22c2256c797f6703f0a6ab76edd6abb_ERC20_123",
       "4118854677_0xdd8d2c578a0b426bf934766fd1cef6296ef92ba88c90e0a8940dc87d78e7b807_MERGED",
