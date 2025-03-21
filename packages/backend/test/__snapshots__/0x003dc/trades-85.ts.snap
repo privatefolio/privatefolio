@@ -1,5 +1,127 @@
 [
   {
+    "amount": 2.150945835565699,
+    "assetId": "ethereum:0x7deB5e830be29F91E298ba5FF1356BB7f8146998:aMKR",
+    "auditLogIds": [
+      "4118854677_0x60506e013981710b3c78e2b0403f121ddf242d63bcd951e1cf07e2738e208310_ERC20_298_TRANSFER_298",
+      "4118854677_0xb702dd98b0854aca3d965adf8c370d4f4bbacd296701cb2ae3ac168dae78af37_ERC20_380_TRANSFER_380",
+    ],
+    "balance": -0.004492007388551107,
+    "closedAt": 1616206082000,
+    "cost": [
+      [
+        "ethereum:0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2:MKR",
+        "2.150945835565699062",
+      ],
+    ],
+    "createdAt": 1604425440000,
+    "duration": 11780642000,
+    "fees": [
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.0041321112",
+      ],
+    ],
+    "id": "trade_361758743",
+    "isOpen": false,
+    "profit": [],
+    "tradeType": "Long",
+    "txIds": [
+      "4118854677_0x60506e013981710b3c78e2b0403f121ddf242d63bcd951e1cf07e2738e208310_MERGED",
+      "4118854677_0xb702dd98b0854aca3d965adf8c370d4f4bbacd296701cb2ae3ac168dae78af37_ERC20_380",
+    ],
+  },
+  {
+    "amount": 6022.107825046159,
+    "assetId": "ethereum:0x6B175474E89094C44Da98b954EedeAC495271d0F:DAI",
+    "auditLogIds": [
+      "4118854677_0x1897af65b4a406a72304f2bdbbac91b26a31aadc28959876b29c23499a2d69ab_ERC20_377_TRANSFER_377",
+      "4118854677_0x1897af65b4a406a72304f2bdbbac91b26a31aadc28959876b29c23499a2d69ab_ERC20_378_TRANSFER_378",
+      "4118854677_0x28151dcb1b136eefbafb21d711608af0a6abb5ed3af5d4c53a4f64a4c8ff0093_ERC20_376_TRANSFER_376",
+      "4118854677_0x3a95be2e17bfa7d3792a66d2b3273991954e78d2bd60ec8d88e0a1b6685b07cc_ERC20_374_TRANSFER_374",
+      "4118854677_0x567db34211fe6f32e75bcc527b4274011bf3f155331fedf2921c2f59dfed5c15_ERC20_302_TRANSFER_302",
+      "4118854677_0x93068e64fc011575876deb2d197d51387748806a74a5677244e35201e9c316bf_ERC20_408_TRANSFER_408",
+      "4118854677_0x96ac753f41f8a43421175a5879c5cf8abd77e7b3da3fe4149e117016549afa7e_ERC20_383_TRANSFER_383",
+      "4118854677_0xbc95894d61b1d41059adc0c159eed813c64eb8cce63885ce54b4882c138ec0b7_ERC20_384_TRANSFER_384",
+      "4118854677_0xdc7199e38395dc144448b61359b5b0cb9bce700c4991709127aea27640c5982a_ERC20_301_TRANSFER_301",
+      "4118854677_0xde97734a7335de2531b499f9923923a7f00d074d11c15e470c9a611c7949af78_ERC20_300_TRANSFER_300",
+      "4118854677_0xf4b565653a614b817f902dc53e5c11583474e6822ef841c5bec76821f477dadd_ERC20_411_TRANSFER_411",
+    ],
+    "balance": 0,
+    "closedAt": 1616212467000,
+    "cost": [
+      [
+        "ethereum:0xD533a949740bb3306d119CC777fa900bA034cd52:CRV",
+        "201.881729038643104531",
+      ],
+      [
+        "ethereum:0xc5bDdf9843308380375a611c18B50Fb9341f502A:yveCRV-DAO",
+        "666.736107396461758394",
+      ],
+      [
+        "ethereum:0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2:MKR",
+        "2.155437842954250169",
+      ],
+      [
+        "ethereum:0x6c3F90f043a72FA612cbac8115EE7e52BDe6E490:3Crv",
+        "136.00132335571359964",
+      ],
+    ],
+    "createdAt": 1604429019000,
+    "duration": 11783448000,
+    "fees": [
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.0121828747",
+      ],
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.00282216",
+      ],
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.018326061",
+      ],
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.021999584",
+      ],
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.01667928",
+      ],
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.019467174232808253",
+      ],
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.01309254",
+      ],
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.004482082",
+      ],
+    ],
+    "id": "trade_1426743361",
+    "isOpen": false,
+    "profit": [],
+    "tradeType": "Long",
+    "txIds": [
+      "4118854677_0x1897af65b4a406a72304f2bdbbac91b26a31aadc28959876b29c23499a2d69ab_ERC20_377",
+      "4118854677_0x1897af65b4a406a72304f2bdbbac91b26a31aadc28959876b29c23499a2d69ab_ERC20_378",
+      "4118854677_0x28151dcb1b136eefbafb21d711608af0a6abb5ed3af5d4c53a4f64a4c8ff0093_MERGED",
+      "4118854677_0x3a95be2e17bfa7d3792a66d2b3273991954e78d2bd60ec8d88e0a1b6685b07cc_MERGED",
+      "4118854677_0x567db34211fe6f32e75bcc527b4274011bf3f155331fedf2921c2f59dfed5c15_MERGED",
+      "4118854677_0x93068e64fc011575876deb2d197d51387748806a74a5677244e35201e9c316bf_MERGED",
+      "4118854677_0x96ac753f41f8a43421175a5879c5cf8abd77e7b3da3fe4149e117016549afa7e_MERGED",
+      "4118854677_0xbc95894d61b1d41059adc0c159eed813c64eb8cce63885ce54b4882c138ec0b7_MERGED",
+      "4118854677_0xdc7199e38395dc144448b61359b5b0cb9bce700c4991709127aea27640c5982a_ERC20_301",
+      "4118854677_0xde97734a7335de2531b499f9923923a7f00d074d11c15e470c9a611c7949af78_MERGED",
+      "4118854677_0xf4b565653a614b817f902dc53e5c11583474e6822ef841c5bec76821f477dadd_MERGED",
+    ],
+  },
+  {
     "amount": 1.2853117351540768,
     "assetId": "ethereum:0xc00e94Cb662C3520282E6f5717214004A7f26888:COMP",
     "auditLogIds": [
@@ -12,13 +134,32 @@
     ],
     "balance": 0,
     "closedAt": 1616213202000,
-    "cost": [],
+    "cost": [
+      [
+        "ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
+        "2511.22",
+      ],
+    ],
     "createdAt": 1604478992000,
     "duration": 11734210000,
-    "fees": [],
+    "fees": [
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.0039955196",
+      ],
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.0236925",
+      ],
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.004767282",
+      ],
+    ],
     "id": "trade_1533516200",
     "isOpen": false,
     "profit": [],
+    "tradeType": "Long",
     "txIds": [
       "4118854677_0x12f8e6d3edf3dcc8e1951944508050e2770e6618442631a53bda671788b263ad_ERC20_304",
       "4118854677_0x4d9e790b7883c7d78d4354756639facf7330c587a55dc1f2364f679322f02cca_MERGED",
@@ -35,77 +176,46 @@
       "4118854677_0x05c2f7cf8acd4204c498ea22efa173c4394dd70946cbf21ed3c40d7ad54bd797_ERC20_306_TRANSFER_306",
     ],
     "balance": 5000,
-    "cost": [],
+    "cost": [
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "0.191765996095361798",
+      ],
+    ],
     "createdAt": 1604626308000,
-    "fees": [],
+    "fees": [
+      [
+        "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "-0.004002225",
+      ],
+    ],
     "id": "trade_3424440640",
     "isOpen": true,
     "profit": [],
+    "tradeType": "Long",
     "txIds": [
       "4118854677_0x05c2f7cf8acd4204c498ea22efa173c4394dd70946cbf21ed3c40d7ad54bd797_MERGED",
     ],
   },
   {
-    "amount": 666.7361073964618,
-    "assetId": "ethereum:0xc5bDdf9843308380375a611c18B50Fb9341f502A:yveCRV-DAO",
+    "amount": 166.73610739646176,
+    "assetId": "ethereum:0xD533a949740bb3306d119CC777fa900bA034cd52:CRV",
     "auditLogIds": [
-      "4118854677_0x28151dcb1b136eefbafb21d711608af0a6abb5ed3af5d4c53a4f64a4c8ff0093_ERC20_375_TRANSFER_375",
-      "4118854677_0xb9c45a687505defc549030b729855ab4b0dc6f047e001a1611e147b4f39e1624_ERC20_311_TRANSFER_311",
+      "4118854677_0xb9c45a687505defc549030b729855ab4b0dc6f047e001a1611e147b4f39e1624_ERC20_309_TRANSFER_309",
+      "4118854677_0xb9c45a687505defc549030b729855ab4b0dc6f047e001a1611e147b4f39e1624_ERC20_310_TRANSFER_310",
     ],
     "balance": 0,
-    "closedAt": 1616205337000,
+    "closedAt": 1605881987000,
     "cost": [],
     "createdAt": 1605881987000,
-    "duration": 10323350000,
     "fees": [],
-    "id": "trade_3584569035",
+    "id": "trade_1186041057",
     "isOpen": false,
     "profit": [],
+    "tradeType": "Short",
     "txIds": [
-      "4118854677_0x28151dcb1b136eefbafb21d711608af0a6abb5ed3af5d4c53a4f64a4c8ff0093_MERGED",
-      "4118854677_0xb9c45a687505defc549030b729855ab4b0dc6f047e001a1611e147b4f39e1624_ERC20_311",
-    ],
-  },
-  {
-    "amount": 0.33333333,
-    "assetId": "ethereum:0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599:WBTC",
-    "auditLogIds": [
-      "4118854677_0x2c636c80d4a19e291285c82f680f92e9dbeea3a7200049bb0ead7cb25f461f93_ERC20_312_TRANSFER_312",
-      "4118854677_0x789b45fc79a11c0a37895a39d3b33c4d6d52490a62cb20cec49731fc3cd4fc90_ERC20_314_TRANSFER_314",
-    ],
-    "balance": 0,
-    "closedAt": 1605910365000,
-    "cost": [],
-    "createdAt": 1605905339000,
-    "duration": 5026000,
-    "fees": [],
-    "id": "trade_756518007",
-    "isOpen": false,
-    "profit": [],
-    "txIds": [
-      "4118854677_0x2c636c80d4a19e291285c82f680f92e9dbeea3a7200049bb0ead7cb25f461f93_ERC20_312",
-      "4118854677_0x789b45fc79a11c0a37895a39d3b33c4d6d52490a62cb20cec49731fc3cd4fc90_MERGED",
-    ],
-  },
-  {
-    "amount": 2511.22,
-    "assetId": "ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
-    "auditLogIds": [
-      "4118854677_0x4d9e790b7883c7d78d4354756639facf7330c587a55dc1f2364f679322f02cca_ERC20_317_TRANSFER_317",
-      "4118854677_0xfd187c7ae91d9e23ec9c85ce485e3519f23099866d943d93a7cadd5815154308_ERC20_313_TRANSFER_313",
-    ],
-    "balance": 0,
-    "closedAt": 1605912885000,
-    "cost": [],
-    "createdAt": 1605905577000,
-    "duration": 7308000,
-    "fees": [],
-    "id": "trade_2692361425",
-    "isOpen": false,
-    "profit": [],
-    "txIds": [
-      "4118854677_0x4d9e790b7883c7d78d4354756639facf7330c587a55dc1f2364f679322f02cca_MERGED",
-      "4118854677_0xfd187c7ae91d9e23ec9c85ce485e3519f23099866d943d93a7cadd5815154308_ERC20_313",
+      "4118854677_0xb9c45a687505defc549030b729855ab4b0dc6f047e001a1611e147b4f39e1624_ERC20_309",
+      "4118854677_0xb9c45a687505defc549030b729855ab4b0dc6f047e001a1611e147b4f39e1624_ERC20_310",
     ],
   },
 ]

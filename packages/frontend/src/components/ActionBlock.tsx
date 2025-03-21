@@ -1,21 +1,23 @@
 import {
   AddRounded,
   DoneRounded,
+  NorthEastRounded,
   QuestionMarkRounded,
   RemoveRounded,
+  SouthEastRounded,
   SvgIconComponent,
   SwapHoriz,
 } from "@mui/icons-material"
 import { alpha, Chip, ChipProps, Stack, Tooltip } from "@mui/material"
 import { blue, grey } from "@mui/material/colors"
 import React from "react"
-import { AuditLogOperation, TransactionType } from "src/interfaces"
+import { AuditLogOperation, TradeType, TransactionType } from "src/interfaces"
 import { chipBgOpacity } from "src/theme"
 import { greenColor, redColor } from "src/utils/color-utils"
 
 import { Truncate } from "./Truncate"
 
-type Action = AuditLogOperation | TransactionType
+type Action = AuditLogOperation | TransactionType | TradeType
 
 type ActionBlockProps = {
   IconComponent?: SvgIconComponent
@@ -26,8 +28,10 @@ type ActionBlockProps = {
 const colorMap: Partial<Record<Action, string>> = {
   Buy: greenColor,
   Fee: redColor,
+  Long: greenColor,
   Reward: greenColor,
   Sell: redColor,
+  Short: redColor,
   Swap: blue[500],
 }
 
@@ -36,9 +40,11 @@ const iconMap: Partial<Record<Action, SvgIconComponent>> = {
   Buy: AddRounded,
   Deposit: AddRounded,
   Fee: RemoveRounded,
+  Long: NorthEastRounded,
   Mint: SwapHoriz,
   Reward: AddRounded,
   Sell: RemoveRounded,
+  Short: SouthEastRounded,
   Swap: SwapHoriz,
   Unknown: QuestionMarkRounded,
   Unwrap: SwapHoriz,

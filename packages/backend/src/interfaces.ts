@@ -24,6 +24,13 @@ export const TRANSACTIONS_TYPES = [
 ] as const
 export type TransactionType = (typeof TRANSACTIONS_TYPES)[number]
 
+export const TRADE_TYPES = [
+  "Long",
+  "Short",
+  // "Borrow"
+] as const
+export type TradeType = (typeof TRADE_TYPES)[number]
+
 // type ExchangeId = "mexc" | "binance"
 
 /**
@@ -221,6 +228,7 @@ export interface Trade {
   isOpen: boolean
   profit: [string, string][] // Array of [assetId, amount] pairs
   tags?: number[]
+  tradeType: TradeType
   txIds?: string[]
 }
 
@@ -636,6 +644,7 @@ export type FilterOptionsMap = {
   outgoingAsset: string[]
   platform: string[]
   tags: number[]
+  tradeType: readonly TradeType[]
   type: readonly TransactionType[]
   wallet: string[]
 }

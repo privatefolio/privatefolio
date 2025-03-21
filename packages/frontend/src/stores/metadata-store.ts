@@ -2,7 +2,7 @@ import { atom, keepMount, map } from "nanostores"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { logAtoms } from "src/utils/browser-utils"
 
-import { Asset, FilterOptionsMap, PlatformId, TRANSACTIONS_TYPES } from "../interfaces"
+import { Asset, FilterOptionsMap, PlatformId, TRADE_TYPES, TRANSACTIONS_TYPES } from "../interfaces"
 import { PLATFORMS_META } from "../settings"
 import { $rpc } from "../workers/remotes"
 import { $activeAccount } from "./account-store"
@@ -68,6 +68,7 @@ export async function fetchInMemoryData() {
     outgoingAsset: assetIds,
     platform,
     tags: tagIds,
+    tradeType: TRADE_TYPES,
     type: TRANSACTIONS_TYPES,
     wallet,
   }
@@ -92,9 +93,10 @@ export const FILTER_LABEL_MAP: Record<FilterKey | DirectFilterKey, string> = {
   platform: "Platform",
   tags: "Tags",
   tradeId: "Trade Id",
+  tradeType: "Trade Type",
   txHash: "Tx Hash",
   txId: "Transaction Id",
-  type: "Type",
+  type: "Transaction Type",
   wallet: "Wallet",
 }
 

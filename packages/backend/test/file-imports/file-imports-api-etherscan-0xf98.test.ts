@@ -9,7 +9,11 @@ import {
   importFile,
 } from "src/api/account/file-imports/file-imports-api"
 import { computeTrades, getTrades, getTradesFullQuery } from "src/api/account/trades-api"
-import { countTransactions, getTransactions } from "src/api/account/transactions-api"
+import {
+  autoMergeTransactions,
+  countTransactions,
+  getTransactions,
+} from "src/api/account/transactions-api"
 import { recreateAccount } from "src/api/accounts-api"
 import { ProgressUpdate } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
@@ -172,6 +176,22 @@ describe("0xf98 file import", () => {
     `)
   })
 
+  it.sequential("should merge transactions", async () => {
+    // arrange
+    const updates: ProgressUpdate[] = []
+    // act
+    await autoMergeTransactions(accountName, async (state) => updates.push(state))
+    // assert
+    expect(updates.join("\n")).toMatchInlineSnapshot(`
+      "0,Fetching all transactions
+      25,Processing 17 (EVM) transactions
+      50,Saving 1 merged transactions
+      70,Updating the audit logs of 1 merged transactions
+      90,Deleting 2 deduplicated transactions
+      100,Done"
+    `)
+  })
+
   it.sequential("should compute trades from imported data", async () => {
     // act
     const updates: ProgressUpdate[] = []
@@ -201,7 +221,7 @@ describe("0xf98 file import", () => {
     const balances = await getBalances(accountName)
     const trades = await getTrades(accountName, await getTradesFullQuery())
     // assert
-    expect(transactions.length).toMatchInlineSnapshot(`17`)
+    expect(transactions.length).toMatchInlineSnapshot(`16`)
     await expect(transactions.map(normalizeTransaction)).toMatchFileSnapshot(
       "../__snapshots__/0xf98/transactions.ts.snap"
     )
@@ -243,7 +263,7 @@ describe("0xf98 file import", () => {
       0,Removing 16 audit logs
       25,Setting balances cursor to Sep 08, 2017
       25,Setting networth cursor to Sep 08, 2017
-      50,Removing 9 transactions
+      50,Removing 8 transactions
       100,Removed file import with id 1151263496"
     `)
     expect(remainingAuditLogs).toMatchInlineSnapshot(`0`)
