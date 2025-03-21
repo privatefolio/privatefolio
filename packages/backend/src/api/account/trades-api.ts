@@ -12,21 +12,87 @@ import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { hashString, noop } from "src/utils/utils"
 
-import { getAccount } from "../accounts-api"
+import { Account, getAccount } from "../accounts-api"
 import { getAuditLogs } from "./audit-logs-api"
+import { getValue, setValue } from "./kv-api"
 import { enqueueTask } from "./server-tasks-api"
 import { getTransactionsByTxHash } from "./transactions-api"
+
+const TRADES_SCHEMA_VERSION = 1
+
+async function initializeTradesSchema(account: Account): Promise<void> {
+  const currentVersion = await getValue(account.name, "trades_schema_version", "0")
+
+  if (Number(currentVersion) !== TRADES_SCHEMA_VERSION) {
+    // Drop existing tables if they exist
+    await account.execute("DROP TABLE IF EXISTS trade_tags")
+    await account.execute("DROP TABLE IF EXISTS trade_transactions")
+    await account.execute("DROP TABLE IF EXISTS trade_audit_logs")
+    await account.execute("DROP TABLE IF EXISTS trades")
+
+    // Create tables with new schema
+    await account.execute(sql`
+CREATE TABLE trades (
+  id VARCHAR PRIMARY KEY,
+  assetId VARCHAR NOT NULL,
+  amount FLOAT NOT NULL,
+  balance FLOAT NOT NULL,
+  createdAt INTEGER NOT NULL,
+  closedAt INTEGER,
+  duration INTEGER,
+  isOpen BOOLEAN NOT NULL DEFAULT 1,
+  cost JSON,
+  fees JSON,
+  profit JSON,
+  FOREIGN KEY (assetId) REFERENCES assets(id)
+);
+`)
+
+    await account.execute(sql`
+CREATE TABLE trade_audit_logs (
+  trade_id VARCHAR NOT NULL,
+  audit_log_id VARCHAR NOT NULL,
+  PRIMARY KEY (trade_id, audit_log_id),
+  FOREIGN KEY (trade_id) REFERENCES trades(id),
+  FOREIGN KEY (audit_log_id) REFERENCES audit_logs(id)
+);
+`)
+
+    await account.execute(sql`
+CREATE TABLE trade_transactions (
+  trade_id VARCHAR NOT NULL,
+  transaction_id VARCHAR NOT NULL,
+  PRIMARY KEY (trade_id, transaction_id),
+  FOREIGN KEY (trade_id) REFERENCES trades(id),
+  FOREIGN KEY (transaction_id) REFERENCES transactions(id)
+);
+`)
+
+    await account.execute(sql`
+CREATE TABLE trade_tags (
+  trade_id VARCHAR NOT NULL,
+  tag_id INTEGER NOT NULL,
+  PRIMARY KEY (trade_id, tag_id),
+  FOREIGN KEY (trade_id) REFERENCES trades(id),
+  FOREIGN KEY (tag_id) REFERENCES tags(id)
+);
+`)
+
+    // Update schema version
+    await setValue("trades_schema_version", TRADES_SCHEMA_VERSION.toString(), account.name)
+  }
+}
 
 export const getTradesFullQuery = async () => sql`
 SELECT
   trades.*,
-  GROUP_CONCAT(trade_transactions.transaction_id) as txIds,
-  GROUP_CONCAT(trade_audit_logs.audit_log_id) as auditLogIds
+  GROUP_CONCAT(DISTINCT trade_transactions.transaction_id) as txIds,
+  GROUP_CONCAT(DISTINCT trade_audit_logs.audit_log_id) as auditLogIds
 FROM trades
 LEFT JOIN trade_transactions ON trades.id = trade_transactions.trade_id
 LEFT JOIN trade_audit_logs ON trades.id = trade_audit_logs.trade_id
 GROUP BY trades.id
-ORDER BY trades.createdAt DESC
+ORDER BY trades.createdAt ASC
 `
 
 export async function getTrades(
@@ -49,12 +115,11 @@ export async function getTrades(
         closedAt: row[5],
         duration: row[6],
         isOpen: Boolean(row[7]),
-        soldAssets: JSON.parse(String(row[8] || "[]")),
-        soldAmounts: JSON.parse(String(row[9] || "[]")),
-        feeAssets: JSON.parse(String(row[10] || "[]")),
-        feeAmounts: JSON.parse(String(row[11] || "[]")),
-        txIds: row[12] ? String(row[12]).split(",") : undefined,
-        auditLogIds: row[13] ? String(row[13]).split(",") : undefined,
+        cost: JSON.parse(String(row[8] || "[]")),
+        fees: JSON.parse(String(row[9] || "[]")),
+        profit: JSON.parse(String(row[10] || "[]")),
+        txIds: row[11] ? String(row[11]).split(",") : undefined,
+        auditLogIds: row[12] ? String(row[12]).split(",") : undefined,
       }
       /* eslint-enable */
       transformNullsToUndefined(value)
@@ -77,8 +142,8 @@ export async function upsertTrades(accountName: string, trades: Trade[]): Promis
     await account.executeMany(
       `INSERT OR REPLACE INTO trades (
         id, assetId, amount, balance, createdAt, closedAt, duration, isOpen, 
-        soldAssets, soldAmounts, feeAssets, feeAmounts
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        cost, fees, profit
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       trades.map((trade) => [
         trade.id,
         trade.assetId,
@@ -88,10 +153,9 @@ export async function upsertTrades(accountName: string, trades: Trade[]): Promis
         trade.closedAt || null,
         trade.duration || null,
         trade.isOpen ? 1 : 0,
-        JSON.stringify(trade.soldAssets || []),
-        JSON.stringify(trade.soldAmounts || []),
-        JSON.stringify(trade.feeAssets || []),
-        JSON.stringify(trade.feeAmounts || []),
+        JSON.stringify(trade.cost || []),
+        JSON.stringify(trade.fees || []),
+        JSON.stringify(trade.profit || []),
       ])
     )
 
@@ -157,16 +221,17 @@ export async function computeTrades(
 ): Promise<void> {
   const account = await getAccount(accountName)
 
-  // Clear existing trades and relationships
+  // Initialize schema if needed
+  await initializeTradesSchema(account)
+
   await account.execute("DELETE FROM trade_audit_logs")
   await account.execute("DELETE FROM trade_transactions")
   await account.execute("DELETE FROM trades")
 
-  // Get all audit logs ordered by timestamp
   await progress([0, "Fetching audit logs"])
   const auditLogs = await getAuditLogs(
     accountName,
-    "SELECT * FROM audit_logs ORDER BY timestamp ASC, id ASC"
+    "SELECT * FROM audit_logs ORDER BY timestamp ASC, changeN ASC, id ASC"
   )
 
   if (auditLogs.length === 0) {
@@ -176,7 +241,6 @@ export async function computeTrades(
 
   await progress([10, `Processing ${auditLogs.length} audit logs`])
 
-  // Group audit logs by asset only (assetId already includes platform)
   const assetGroups: Record<string, AuditLog[]> = {}
 
   auditLogs.forEach((log) => {
@@ -192,88 +256,54 @@ export async function computeTrades(
   const trades: Trade[] = []
   let processedGroups = 0
 
-  // Track audit log relationships for bulk insert
   const tradeAuditLogs: [string, string][] = []
-  // Track transaction relationships for bulk insert
   const tradeTransactions: [string, string][] = []
 
-  // Process each asset group to find trade periods
   for (const [assetId, logs] of Object.entries(assetGroups)) {
-    // Sort logs by timestamp to ensure chronological processing
-    logs.sort((a, b) => a.timestamp - b.timestamp)
-
     let currentTrade: Trade | null = null
     let balance = new Big(0)
 
     for (const log of logs) {
       const change = new Big(log.change)
 
-      // Calculate the new balance by adding the change
       balance = balance.plus(change)
 
       // If balance is becoming non-zero from zero, start a new trade
       if (balance.gt(0) && currentTrade === null) {
-        const tradeId = hashString(`trade_${assetId}_${log.timestamp}_${log.id}`)
+        const tradeId = `trade_${hashString(`${assetId}_${log.timestamp}`)}`
 
         currentTrade = {
           amount: balance.toNumber(),
           assetId,
           balance: balance.toNumber(),
+          cost: [],
           createdAt: log.timestamp,
-          feeAmounts: [],
-          feeAssets: [],
+          fees: [],
           id: tradeId,
           isOpen: true,
-          soldAmounts: [],
-          soldAssets: [],
+          profit: [],
         }
 
-        // Add to the relationship mapping for bulk insert
         tradeAuditLogs.push([tradeId, log.id])
-
-        // Add transaction relationship if txId exists
-        if (log.txId) {
-          tradeTransactions.push([tradeId, log.txId])
-        }
+        if (log.txId) tradeTransactions.push([tradeId, log.txId])
 
         // If this is a buy/deposit operation, track what was sold
         if (change.gt(0) && log.txId) {
           const transactions = await getTransactionsByTxHash(accountName, log.txId)
 
           for (const tx of transactions) {
-            if (tx.outgoingAsset && tx.outgoingAsset !== assetId && tx.outgoing) {
-              // Add the sold asset if it doesn't exist in the array
-              const soldAssetIndex = currentTrade.soldAssets.indexOf(tx.outgoingAsset)
-              if (soldAssetIndex === -1) {
-                currentTrade.soldAssets.push(tx.outgoingAsset)
-                currentTrade.soldAmounts.push(tx.outgoing)
-              } else {
-                // Add to the existing amount using Big.js
-                currentTrade.soldAmounts[soldAssetIndex] = new Big(
-                  currentTrade.soldAmounts[soldAssetIndex]
-                )
-                  .plus(new Big(tx.outgoing))
-                  .toString()
-              }
+            if (tx.outgoingAsset && tx.outgoingAsset !== assetId) {
+              currentTrade.cost.push([tx.outgoingAsset, tx.outgoing])
+            }
+
+            if (tx.incomingAsset && tx.incomingAsset !== assetId) {
+              currentTrade.profit.push([tx.incomingAsset, tx.incoming])
             }
 
             if (tx.feeAsset && tx.fee) {
-              // Add the fee asset if it doesn't exist in the array
-              const feeAssetIndex = currentTrade.feeAssets.indexOf(tx.feeAsset)
-              if (feeAssetIndex === -1) {
-                currentTrade.feeAssets.push(tx.feeAsset)
-                currentTrade.feeAmounts.push(tx.fee)
-              } else {
-                // Add to the existing fee using Big.js
-                currentTrade.feeAmounts[feeAssetIndex] = new Big(
-                  currentTrade.feeAmounts[feeAssetIndex]
-                )
-                  .plus(new Big(tx.fee))
-                  .toString()
-              }
+              currentTrade.fees.push([tx.feeAsset, tx.fee])
             }
 
-            // Add transaction relationship
             tradeTransactions.push([currentTrade.id, tx.id])
           }
         }
@@ -297,38 +327,20 @@ export async function computeTrades(
         if (log.txId) {
           tradeTransactions.push([currentTrade.id, log.txId])
 
-          // Update sold assets and fees if this is a transaction
+          // Update cost and fees if this is a transaction
           const transactions = await getTransactionsByTxHash(accountName, log.txId)
 
           for (const tx of transactions) {
-            if (tx.outgoingAsset && tx.outgoingAsset !== assetId && tx.outgoing) {
-              const soldAssetIndex = currentTrade.soldAssets.indexOf(tx.outgoingAsset)
-              if (soldAssetIndex === -1) {
-                currentTrade.soldAssets.push(tx.outgoingAsset)
-                currentTrade.soldAmounts.push(tx.outgoing)
-              } else {
-                // Add to the existing amount using Big.js
-                currentTrade.soldAmounts[soldAssetIndex] = new Big(
-                  currentTrade.soldAmounts[soldAssetIndex]
-                )
-                  .plus(new Big(tx.outgoing))
-                  .toString()
-              }
+            if (tx.outgoingAsset && tx.outgoingAsset !== assetId) {
+              currentTrade.cost.push([tx.outgoingAsset, tx.outgoing])
+            }
+
+            if (tx.incomingAsset && tx.incomingAsset !== assetId) {
+              currentTrade.profit.push([tx.incomingAsset, tx.incoming])
             }
 
             if (tx.feeAsset && tx.fee) {
-              const feeAssetIndex = currentTrade.feeAssets.indexOf(tx.feeAsset)
-              if (feeAssetIndex === -1) {
-                currentTrade.feeAssets.push(tx.feeAsset)
-                currentTrade.feeAmounts.push(tx.fee)
-              } else {
-                // Add to the existing fee using Big.js
-                currentTrade.feeAmounts[feeAssetIndex] = new Big(
-                  currentTrade.feeAmounts[feeAssetIndex]
-                )
-                  .plus(new Big(tx.fee))
-                  .toString()
-              }
+              currentTrade.fees.push([tx.feeAsset, tx.fee])
             }
 
             // Add transaction relationship

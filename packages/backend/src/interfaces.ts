@@ -215,14 +215,13 @@ export interface Trade {
   auditLogIds?: string[]
   balance: number
   closedAt?: Timestamp
+  cost: [string, string][] // Array of [assetId, amount] pairs
   createdAt: Timestamp
   duration?: number
-  feeAmounts: string[]
-  feeAssets: string[]
+  fees: [string, string][] // Array of [assetId, amount] pairs
   id: string
   isOpen: boolean
-  soldAmounts: string[]
-  soldAssets: string[]
+  profit: [string, string][] // Array of [assetId, amount] pairs
   tags?: number[]
   txIds?: string[]
 }
