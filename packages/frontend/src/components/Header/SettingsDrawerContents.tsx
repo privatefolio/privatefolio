@@ -77,7 +77,7 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
           <Telegram fontSize="small" />
           <span>Telegram</span>
         </CustomLink> */}
-        <CustomLink target="_blank" href="https://discord.gg/Es69upwBqW" role="listitem">
+        <CustomLink target="_blank" href="https://discord.gg/YHHu9nK8VD" role="listitem">
           <DiscordIcon />
           <span>Discord</span>
         </CustomLink>

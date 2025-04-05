@@ -11,6 +11,26 @@
   The Free* and Open-source Portfolio Tracker - All your crypto assets in one place
 </p>
 
+<div align="center">
+
+[![X Follow](https://img.shields.io/twitter/follow/PrivatefolioApp)](https://twitter.com/PrivatefolioApp)
+[![Discord](https://img.shields.io/discord/123456789012345678.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/YHHu9nK8VD)
+
+</div>
+
+<div align="center">
+
+[![Github downloads](https://img.shields.io/github/downloads/privatefolio/privatefolio/total.svg?style=flat)](https://GitHub.com/privatefolio/privatefolio/releases/)
+![Visitors](https://api.visitorbadge.io/api/visitors?path=privatefolio%2Fprivatefolio%20&style=flat)
+[![GitHub last commit](https://img.shields.io/github/last-commit/privatefolio/privatefolio?style=flat)](https://github.com/privatefolio/privatefolio/commits/main)
+[![GitHub commits](https://img.shields.io/github/commit-activity/t/privatefolio/privatefolio)](https://GitHub.com/privatefolio/privatefolio/commit/)
+[![GitHub contributors](https://img.shields.io/github/contributors/privatefolio/privatefolio.svg?style=flat)](https://github.com/privatefolio/privatefolio/graphs/contributors)
+[![GitHub forks](https://img.shields.io/github/forks/privatefolio/privatefolio?style=flat)](https://github.com/privatefolio/privatefolio/forks)
+[![GitHub stars](https://img.shields.io/github/stars/privatefolio/privatefolio?style=flat)](https://github.com/privatefolio/privatefolio/stargazers)
+
+</div>
+
+
 ## Installation
 
 Go to [GitHub releases](https://github.com/privatefolio/privatefolio/releases) and download the latest version for your platform. Each release contains the binaries for Windows, Linux and macOS under the Assets dropdown.
@@ -54,3 +74,30 @@ This project is licensed under the **AGPLv3** (GNU Affero General Public License
 - **Freedom to Distribute Modified Versions**: You are allowed to distribute your modified versions, including for profit. However, if you run a modified version of the software on a server and allow others to interact with it, you must provide the source code of the modified version to those users.
 
 See the [LICENSE](LICENSE) file for more details.
+
+### For Developers
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-20232A.svg?style=flat&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Electron](https://img.shields.io/badge/Electron-2B2E3A?style=flat&logo=electron&logoColor=9FEAF9)](https://electronjs.org/)
+[![Lerna](https://img.shields.io/badge/Lerna-blueviolet?style=flat&logo=lerna&logoColor=white)](https://lerna.js.org/)
+[![Prettier](https://img.shields.io/badge/Prettier-1A2C34?style=flat&logo=prettier&logoColor=F7BA3E)](https://prettier.io/)
+
+Privatefolio is built with modern technologies like TypeScript, React, Bun, and Electron. Contributions are welcome to improve the project further.
+
+For detailed setup instructions, including prerequisites, installation, and testing, please refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+
+### How to Contribute
+
+1. Fork the repository and clone it locally.
+2. Install dependencies using `yarn` and build the project using `yarn build`.
+3. Use `yarn dev` to start the development environment.
+4. When you are ready, commit your changes and submit a pull request.
+
+### Key Technologies
+
+- **Frontend:** React, Vite, Material-UI
+- **Backend:** Node.js, Bun runtime, SQLite
+- **Desktop App:** Electron
+
+Feel free to open issues for bugs or feature requests!
