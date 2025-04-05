@@ -14,7 +14,7 @@
 <div align="center">
 
 [![X Follow](https://img.shields.io/twitter/follow/PrivatefolioApp)](https://twitter.com/PrivatefolioApp)
-[![Discord](https://img.shields.io/discord/1200080531581321246.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/YHHu9nK8VD)
+[![Discord](https://img.shields.io/discord/1200080531581321246?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/YHHu9nK8VD)
 
 </div>
 
