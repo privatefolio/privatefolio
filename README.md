@@ -14,7 +14,7 @@
 <div align="center">
 
 [![X Follow](https://img.shields.io/twitter/follow/PrivatefolioApp)](https://twitter.com/PrivatefolioApp)
-[![Discord](https://img.shields.io/discord/123456789012345678.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/YHHu9nK8VD)
+[![Discord](https://img.shields.io/discord/1200080531581321246.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/YHHu9nK8VD)
 
 </div>
 
@@ -75,7 +75,7 @@ This project is licensed under the **AGPLv3** (GNU Affero General Public License
 
 See the [LICENSE](LICENSE) file for more details.
 
-### For Developers
+## For Developers
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)](https://typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-20232A.svg?style=flat&logo=react&logoColor=61DAFB)](https://reactjs.org/)
