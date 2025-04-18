@@ -1,6 +1,3 @@
-<!-- markdownlint-disable MD033 -->
-<!-- markdownlint-disable MD041 -->
-
 <p align="center">
   <img src="https://github.com/privatefolio/privatefolio/blob/main/packages/electron/src/app-icon.png?raw=true" alt="Privatefolio Logo" width="100">
 </p>
@@ -29,7 +26,6 @@
 [![GitHub stars](https://img.shields.io/github/stars/privatefolio/privatefolio?style=flat)](https://github.com/privatefolio/privatefolio/stargazers)
 
 </div>
-
 
 ## Installation
 

@@ -1,5 +1,7 @@
 # Contributing
 
+Before jumping in consider getting familiar with the [ARCHITECTURE.md](./docs//ARCHITECTURE.md) docs.
+
 ## Prerequisites
 
 ```sh
