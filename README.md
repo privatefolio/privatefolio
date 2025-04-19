@@ -90,10 +90,13 @@ For detailed setup instructions, including prerequisites, installation, and test
 3. Use `yarn dev` to start the development environment.
 4. When you are ready, commit your changes and submit a pull request.
 
+For Docker setup and deployment, see the [Docker documentation](docs/DOCKER.md).
+
 ### Key Technologies
 
 - **Frontend:** React, Vite, Material-UI
 - **Backend:** Node.js, Bun runtime, SQLite
 - **Desktop App:** Electron
+- **Deployment:** Docker
 
 Feel free to open issues for bugs or feature requests!

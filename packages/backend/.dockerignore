@@ -1,0 +1,24 @@
+# Git
+.git
+.gitignore
+
+# Node.js
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Build files
+build
+dist
+
+# Data directories
+data
+
+# Development files
+.vscode
+.idea
+*.env
+*.log
+coverage
+.DS_Store

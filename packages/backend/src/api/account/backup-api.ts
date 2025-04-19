@@ -5,7 +5,7 @@ import { ProgressCallback, ServerFile, TaskPriority, TaskTrigger } from "src/int
 import { FILES_LOCATION } from "src/settings"
 import { createCsvString, noop } from "src/utils/utils"
 
-import { Account, getAccount, recreateAccount } from "../accounts-api"
+import { Account, getAccount, resetAccount } from "../accounts-api"
 import { extractColumnsFromRow } from "./file-imports/csv-utils"
 import { patchServerFile, upsertServerFile } from "./server-files-api"
 import { enqueueTask } from "./server-tasks-api"
@@ -104,7 +104,7 @@ export async function restoreAccount(
   signal?: AbortSignal
 ) {
   await progress([0, "Resetting the account"])
-  await recreateAccount(accountName)
+  await resetAccount(accountName)
   const account = await getAccount(accountName)
 
   const zip = new JSZip()

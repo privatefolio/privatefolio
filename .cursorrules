@@ -1,4 +1,12 @@
-Always read the CONTRIBUTING.md file before writing code or answering questions.
-Always read the README.md file before writing code or answering questions.
-Sometimes look for information in the docs folder.
+Always read these files:
+- [CONTRIBUTING.md](../CONTRIBUTING.md)
+- [README.md](../README.md)
+- [ARCHITECTURE.md](../docs/ARCHITECTURE.md)
+- [TESTING.md](../docs/TESTING.md)
+- [DOCKER.md](../docs/DOCKER.md)
+- [DESIGN.md](../docs/DESIGN.md)
+- [DATABASE_INFO.md](../docs/DATABASE_INFO.md)
+- [ELECTRON_SETUP.md](../docs/ELECTRON_SETUP.md)
+Always write tests for new code and ensure all tests pass.
+Don't forget this is a monorepo. Use `lerna run --scope [project-name]` to run commands.
 If I ever write "ack" reply with "ack".

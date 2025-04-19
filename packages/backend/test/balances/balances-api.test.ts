@@ -10,7 +10,6 @@ import {
 import { fetchDailyPrices } from "src/api/account/daily-prices-api"
 import { importFile } from "src/api/account/file-imports/file-imports-api"
 import { getValue } from "src/api/account/kv-api"
-import { recreateAccount } from "src/api/accounts-api"
 import { ProgressUpdate, Timestamp } from "src/interfaces"
 import { beforeAll, expect, it, vi } from "vitest"
 
@@ -28,8 +27,6 @@ vi.mock("fs/promises", () => ({
 }))
 
 beforeAll(async () => {
-  //
-  await recreateAccount(accountName)
   //
   const fileName = "coinmama.csv"
   const filePath = join("test/files", fileName)

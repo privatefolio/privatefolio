@@ -1,9 +1,9 @@
 import fs from "fs"
 import { join } from "path"
 import { importFile, subscribeToFileImports } from "src/api/account/file-imports/file-imports-api"
-import { getAccount, recreateAccount } from "src/api/accounts-api"
+import { getAccount } from "src/api/accounts-api"
 import { EventCause, FileImport, SubscriptionChannel } from "src/interfaces"
-import { beforeAll, expect, it, vi } from "vitest"
+import { expect, it, vi } from "vitest"
 
 const accountName = Math.random().toString(36).substring(7)
 
@@ -17,11 +17,6 @@ vi.mock("fs/promises", () => ({
   ...fs.promises,
   readFile: mocks.readFile,
 }))
-
-beforeAll(async () => {
-  //
-  await recreateAccount(accountName)
-})
 
 it("should add a file import", async () => {
   // arrange

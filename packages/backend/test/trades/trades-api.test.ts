@@ -7,7 +7,6 @@ import {
   getTradeTransactions,
 } from "src/api/account/trades-api"
 import * as transactionsApi from "src/api/account/transactions-api"
-import { recreateAccount } from "src/api/accounts-api"
 import {
   AuditLog,
   AuditLogOperation,
@@ -15,13 +14,9 @@ import {
   ProgressUpdate,
   Transaction,
 } from "src/interfaces"
-import { beforeAll, describe, expect, it, vi } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 
 const accountName = Math.random().toString(36).substring(7)
-
-beforeAll(async () => {
-  await recreateAccount(accountName)
-})
 
 describe("trades-api", () => {
   it("should have no trades initially", async () => {

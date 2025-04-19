@@ -10,10 +10,9 @@ import {
 } from "src/api/account/file-imports/file-imports-api"
 import { computeTrades, getTrades, getTradesFullQuery } from "src/api/account/trades-api"
 import { countTransactions, getTransactions } from "src/api/account/transactions-api"
-import { recreateAccount } from "src/api/accounts-api"
 import { ProgressUpdate } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
-import { beforeAll, describe, expect, it, vi } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 
 const accountName = Math.random().toString(36).substring(7)
 
@@ -27,11 +26,6 @@ vi.mock("fs/promises", () => ({
   ...fs.promises,
   readFile: mocks.readFile,
 }))
-
-beforeAll(async () => {
-  //
-  await recreateAccount(accountName)
-})
 
 describe("0xf98 file import", () => {
   it("should add a file import", async () => {

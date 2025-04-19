@@ -2,16 +2,11 @@ import { getAuditLogs } from "src/api/account/audit-logs-api"
 import { computeBalances, getBalances } from "src/api/account/balances-api"
 import { syncConnection, upsertConnection } from "src/api/account/connections/connections-api"
 import { autoMergeTransactions, getTransactions } from "src/api/account/transactions-api"
-import { recreateAccount } from "src/api/accounts-api"
 import { Connection, ProgressUpdate } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
-import { beforeAll, describe, expect, it } from "vitest"
+import { describe, expect, it } from "vitest"
 
 const accountName = Math.random().toString(36).substring(7)
-
-beforeAll(async () => {
-  await recreateAccount(accountName)
-})
 
 let connection: Connection
 

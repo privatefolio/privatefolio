@@ -4,7 +4,6 @@ import { computeBalances } from "src/api/account/balances-api"
 import { fetchDailyPrices } from "src/api/account/daily-prices-api"
 import { importFile } from "src/api/account/file-imports/file-imports-api"
 import { computeNetworth, getNetworth } from "src/api/account/networth-api"
-import { recreateAccount } from "src/api/accounts-api"
 import { ProgressUpdate } from "src/interfaces"
 import { GITHUB_CI } from "src/server-env"
 import { beforeAll, expect, it, vi } from "vitest"
@@ -23,8 +22,6 @@ vi.mock("fs/promises", () => ({
 }))
 
 beforeAll(async () => {
-  //
-  await recreateAccount(accountName)
   //
   const fileName = "coinmama.csv"
   const filePath = join("test/files", fileName)

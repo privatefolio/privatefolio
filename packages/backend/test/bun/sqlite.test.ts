@@ -12,7 +12,7 @@ import {
 import { computeNetworth, getNetworth } from "src/api/account/networth-api"
 import { upsertServerTask } from "src/api/account/server-tasks-api"
 import { countTransactions, getTransactions } from "src/api/account/transactions-api"
-import { getAccount, recreateAccount } from "src/api/accounts-api"
+import { getAccount, resetAccount } from "src/api/accounts-api"
 import { ProgressUpdate, TaskPriority } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
 import { sleep } from "src/utils/utils"
@@ -27,12 +27,6 @@ mock.module("fs/promises", () => ({
   ...fs.promises,
   readFile: mocks.readFile,
 }))
-
-// TODO8 remove this from everywhere
-// beforeAll(async () => {
-//   //
-//   await recreateAccount(accountName)
-// })
 
 describe("0xf98 file import", () => {
   it("should add a file import", async () => {
@@ -199,7 +193,7 @@ describe("0xf98 file import", () => {
     let sqliteSequence = await account.execute(`SELECT * FROM sqlite_sequence`)
     expect(sqliteSequence).toEqual([["server_tasks", 2]])
     // act
-    await recreateAccount(accountName)
+    await resetAccount(accountName)
     // assert
     account = await getAccount(accountName)
     await sleep(100) // wait for the init_db task to be created

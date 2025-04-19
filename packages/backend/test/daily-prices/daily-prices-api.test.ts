@@ -2,7 +2,6 @@ import fs from "fs"
 import { join } from "path"
 import { fetchDailyPrices, getPricesForAsset } from "src/api/account/daily-prices-api"
 import { importFile } from "src/api/account/file-imports/file-imports-api"
-import { recreateAccount } from "src/api/accounts-api"
 import { ProgressUpdate } from "src/interfaces"
 import { GITHUB_CI } from "src/server-env"
 import { formatDate } from "src/utils/formatting-utils"
@@ -22,8 +21,6 @@ vi.mock("fs/promises", () => ({
 }))
 
 beforeAll(async () => {
-  //
-  await recreateAccount(accountName)
   //
   const fileName = "coinmama.csv"
   const filePath = join("test/files", fileName)

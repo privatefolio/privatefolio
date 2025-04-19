@@ -148,12 +148,17 @@ export async function deleteAccount(accountName: string, keepAccount = false) {
   }
 }
 
-export async function recreateAccount(accountName: string) {
-  // TODO8 document difference betweent reset and recreate
-  await deleteAccount(accountName)
-  await getAccount(accountName, true)
-}
-
+/**
+ * Resets an account while preserving the account object reference.
+ *
+ * This function:
+ * 1. Clears the task queue and aborts any pending tasks
+ * 2. Preserves the account reference in the accounts object
+ * 3. Deletes the database file and logs (with keepAccount=true)
+ * 4. Creates a new database connection
+ * 5. Updates the existing account object with the new database connection
+ * 6. Emits Reset events for all subscription channels
+ */
 export async function resetAccount(accountName: string) {
   const account = await getAccount(accountName)
 

@@ -5,7 +5,7 @@ import { backupAccount } from "src/api/account/backup-api"
 import { computeBalances, getBalances } from "src/api/account/balances-api"
 import { importFile } from "src/api/account/file-imports/file-imports-api"
 import { getTransactions } from "src/api/account/transactions-api"
-import { recreateAccount } from "src/api/accounts-api"
+import { resetAccount } from "src/api/accounts-api"
 import { ProgressUpdate } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
 import { beforeAll, describe, expect, it, vi } from "vitest"
@@ -24,7 +24,7 @@ vi.mock("fs/promises", () => ({
 }))
 
 beforeAll(async () => {
-  await recreateAccount(accountName)
+  await resetAccount(accountName)
 })
 
 describe.todo("should backup and restore", () => {

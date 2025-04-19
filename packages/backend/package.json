@@ -21,7 +21,9 @@
     "check-types": "tsc --noEmit",
     "test": "BUN_SQL=false vitest",
     "test:bun": "BUN_SQL=true bun test test/bun/**",
-    "test:ci": "GITHUB_CI=true BUN_SQL=false vitest run --watch false --reporter verbose && BUN_SQL=true yarn test:bun"
+    "test:ci": "GITHUB_CI=true BUN_SQL=false vitest run --watch false --reporter verbose && BUN_SQL=true yarn test:bun",
+    "docker:build": "docker build -t privatefolio -f Dockerfile ../..",
+    "docker:run": "docker run -d -p 4001:4001 -v privatefolio-data:/app/data --name privatefolio privatefolio"
   },
   "dependencies": {
     "big.js": "^6.2.1",
