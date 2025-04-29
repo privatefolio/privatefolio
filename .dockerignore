@@ -8,9 +8,9 @@ node_modules
 *.log
 
 # Build files
-build
-dist
-test
+**build
+**dist
+**test
 
 # Data directories
 data
