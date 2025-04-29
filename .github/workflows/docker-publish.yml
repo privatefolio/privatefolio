@@ -52,8 +52,15 @@ jobs:
         run: yarn docker:build
 
       - name: Push all tags
+        shell: bash
         run: |
-          for tag in ${{ steps.meta.outputs.tags }}; do
+          # stash the (newline- or space-separated) tags into one var
+          tags="${{ steps.meta.outputs.tags }}"
+          echo "Will push these tags:"
+          echo "$tags"
+
+          # loop over them (unquoted expansion splits on whitespace)
+          for tag in $tags; do
             echo "Pushing $tag"
             docker push "$tag"
           done
