@@ -1,7 +1,7 @@
-# 1) Builder: use Alpine + Yarn (needs Node) to install prod deps
-FROM oven/bun:1-alpine AS builder
+# 1) Backend Builder: use Alpine + Yarn (needs Node) to install prod deps
+FROM oven/bun:1-alpine AS backend-builder
 
-# install Node.js & Yarn so you can still use yarn install
+# Install Node.js & Yarn so you can use yarn install
 RUN apk add --no-cache nodejs npm \
  && npm install -g yarn
 
@@ -9,19 +9,46 @@ WORKDIR /app
 COPY package.json yarn.lock lerna.json ./
 COPY packages/backend/package.json ./packages/backend/
 
-# Install dependencies using Yarn (including devDependencies for TS runtime)
+# Install dependencies using Yarn
 RUN yarn install --production --frozen-lockfile
 
 # Copy the entire monorepo source code
 COPY . .
 
-# 2) Runtime: only Bun, your prod-deps & source
+# 2) Frontend Builder: use Alpine + Yarn (needs Node) to bundle the frontend
+FROM oven/bun:1-alpine AS frontend-builder
+
+# Install Node.js & Yarn so you can use yarn install
+RUN apk add --no-cache nodejs npm \
+ && npm install -g yarn
+
+WORKDIR /app
+COPY package.json yarn.lock lerna.json ./
+COPY packages/backend/package.json ./packages/backend/
+COPY packages/frontend/package.json ./packages/frontend/
+
+# Install dependencies using Yarn
+RUN yarn install --frozen-lockfile
+
+# Copy the entire monorepo source code
+COPY . .
+
+# Define build arguments
+ARG APP_VERSION_ARG=unknown
+ARG GIT_HASH_ARG=unknown
+ARG GIT_DATE_ARG=unknown
+
+RUN yarn workspace privatefolio-backend build
+RUN NODE_ENV=production VITE_APP_VERSION=$APP_VERSION_ARG VITE_GIT_HASH=$GIT_HASH_ARG VITE_GIT_DATE=$GIT_DATE_ARG yarn workspace privatefolio-frontend build:custom
+
+# 3) Runtime: only Bun, prod-deps, source code & frontend bundle
 FROM oven/bun:1-alpine AS runtime
 
 WORKDIR /app
 
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/packages/backend ./packages/backend
+COPY --from=backend-builder /app/node_modules ./node_modules
+COPY --from=backend-builder /app/packages/backend ./packages/backend
+COPY --from=frontend-builder /app/packages/frontend/build ./packages/frontend/build
 
 RUN mkdir -p /app/data/{databases,logs,files}
 
@@ -29,7 +56,7 @@ WORKDIR /app/packages/backend
 
 # Define build arguments
 ARG PORT_ARG=5555
-ARG APP_VERSION_ARG='{"privatefolio-backend":"unknown"}'
+ARG APP_VERSION_ARG=unknown
 ARG GIT_HASH_ARG=unknown
 ARG GIT_DATE_ARG=unknown
 

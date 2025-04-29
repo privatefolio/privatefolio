@@ -10,7 +10,7 @@ Privatefolio is a free, open-source cryptocurrency portfolio tracker built as a 
 
 - **`packages/frontend`** — v2.0.0-alpha.5
   - **Description & Key Tech:** React-based UI that provides the user interface using Material-UI, Vite, and TypeScript.
-  - **Core Features & Tools:** 
+  - **Core Features & Tools:**
     - Interactive portfolio visualization with lightweight-charts
     - Command palette (kbar) and comprehensive search functionality
     - WebWorker-based SQLite integration for client-side data processing
@@ -39,7 +39,7 @@ Privatefolio is a free, open-source cryptocurrency portfolio tracker built as a 
 - **Integration:** Packages share common TypeScript interfaces and utilities, with backend exposing APIs consumed by frontend.
 
 ## Deployment
-- **Frontend:** 
+- **Frontend:**
   - Compiled with Vite for optimal bundle size and performance
   - Can be deployed as a static site or packaged within Electron
 

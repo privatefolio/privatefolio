@@ -1,13 +1,9 @@
 import { isProductionElectron } from "./electron-utils"
 
-export const SITE_DOMAIN = "https://privatefolio.app"
-
 export const isServer = typeof window === "undefined"
-export const isProductionWeb = isServer
-  ? false
-  : Boolean(window.location.toString().includes(SITE_DOMAIN))
-
-export const isProduction = isProductionWeb || isProductionElectron
+// https://vite.dev/guide/env-and-mode.html#built-in-constants
+export const isProductionBuild = import.meta.env.PROD
+export const isProduction = isProductionBuild || isProductionElectron
 
 // export const isNode = typeof process !== "undefined" && process.versions && process.versions.node
 // export const isWebWorker = isServer && !isNode

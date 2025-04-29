@@ -10,8 +10,12 @@ export default defineConfig(({ mode }) => {
     console.warn("⚠️ Warning: Missing VITE_POSTHOG_KEY!!!")
   }
 
+  if (env.VITE_TARGET) {
+    console.warn("⚠️ Building for target:", env.VITE_TARGET)
+  }
+
   return {
-    base: "./", // for electron to load the app correctly in production
+    base: env.VITE_TARGET === "electron" ? "./" : "/",
     build: {
       outDir: "build",
     },

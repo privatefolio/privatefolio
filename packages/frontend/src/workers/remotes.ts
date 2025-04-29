@@ -23,7 +23,7 @@ import { isProduction } from "src/utils/environment-utils"
 
 // export const clancy = wrap(clancyWorker) as Clancy
 
-const LOCAL_SERVER_URL = isProduction ? "localhost:5001" : "localhost:4001"
+const LOCAL_SERVER_URL = isProduction ? "localhost:5555" : "localhost:4001"
 const REMOTE_SERVER_URL = (user: User) => `cloud.privatefolio.app:${50000 + user.id}`
 
 export const LOCAL_RPC = createBackendRelayer<Api>(

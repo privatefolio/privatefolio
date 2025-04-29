@@ -6,7 +6,7 @@ import { isProduction, isWindows } from "./utils"
 
 let backendProcess: ChildProcess | null = null
 let isStarted = false
-const port = isProduction ? 5001 : 4001
+const port = isProduction ? 5555 : 4001
 
 console.log(
   `BackendManager: Using backend port: ${port} (${isProduction ? "production" : "development"} mode)`

@@ -1,5 +1,7 @@
 import { Server } from "bun"
 import chalk from "chalk"
+import { access } from "fs/promises"
+import { join } from "path"
 
 import { handleDownload, handlePreflight, handleUpload } from "./api/account/server-files-http-api"
 import {
@@ -42,7 +44,7 @@ export class BackendServer<T extends BackendApiShape> {
 
         if (server.upgrade(request)) return
 
-        if (pathname === "/")
+        if (pathname === "/info")
           return new Response(
             JSON.stringify({
               buildDate: process.env.GIT_DATE,
@@ -54,7 +56,17 @@ export class BackendServer<T extends BackendApiShape> {
             }),
             { status: 200 }
           )
-        return new Response("Not Found", { status: 404 })
+
+        try {
+          const overridden = pathname === "/" ? "/index.html" : pathname
+          const filePath = join(__dirname, "../../frontend/build", overridden)
+          const file = Bun.file(filePath)
+          await access(filePath)
+          return new Response(file)
+        } catch {
+          const filePath = join(__dirname, "../../frontend/build/index.html")
+          return new Response(Bun.file(filePath))
+        }
       },
       port,
       websocket: {

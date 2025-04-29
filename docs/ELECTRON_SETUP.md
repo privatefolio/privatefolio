@@ -122,7 +122,7 @@ The Electron app integrates with the Privatefolio backend server:
 3. The backend continues running when the app is minimized to tray
 4. The backend is gracefully stopped when the app is closed (in production)
 5. The frontend communicates with the backend via HTTP/WebSocket on localhost
-6. Different ports are used in development (4001) and production (5001)
+6. Different ports are used in development (4001) and production (5555)
 
 ### Development Setup
 
@@ -136,7 +136,7 @@ In development mode:
 In production mode:
 - The backend server is started by the Electron app itself
 - The backend process is managed by the BackendManager
-- The backend runs on port 5001
+- The backend runs on port 5555
 
 ### Backend API Access
 
