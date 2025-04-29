@@ -1,0 +1,31 @@
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'privatefolio'
+
+[build]
+  image = 'ghcr.io/privatefolio/privatefolio:main'
+
+[env]
+  PORT = '5555'
+
+[[mounts]]
+  source = 'privatefolio_data'
+  destination = '/data'
+
+[http_service]
+  internal_port = 5555
+  force_https = true
+  auto_stop_machines = 'off'
+  auto_start_machines = false
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type = 'connections'
+    hard_limit = 25
+    soft_limit = 20
+
+[[vm]]
+  size = 'shared-cpu-1x'
+  memory = "256mb"

@@ -1,6 +1,7 @@
 import { computed } from "nanostores"
 import type { Api } from "privatefolio-backend/build/src/api/api"
 import { createBackendRelayer } from "privatefolio-backend/build/src/backend-relayer"
+import { TARGET } from "src/env"
 import { $connectionStatus, $isCloudAccount } from "src/stores/account-store"
 import { $user, User } from "src/stores/cloud-account-store"
 import { isProduction } from "src/utils/environment-utils"
@@ -23,7 +24,11 @@ import { isProduction } from "src/utils/environment-utils"
 
 // export const clancy = wrap(clancyWorker) as Clancy
 
-const LOCAL_SERVER_URL = isProduction ? "localhost:5555" : "localhost:4001"
+const LOCAL_SERVER_URL = isProduction
+  ? TARGET === "electron"
+    ? "localhost:5555"
+    : window.location.hostname // self hosted
+  : "localhost:4001"
 const REMOTE_SERVER_URL = (user: User) => `cloud.privatefolio.app:${50000 + user.id}`
 
 export const LOCAL_RPC = createBackendRelayer<Api>(

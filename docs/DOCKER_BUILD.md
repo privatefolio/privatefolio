@@ -1,8 +1,8 @@
-# Docker Setup for Privatefolio Backend
+# Running Privatefolio using Docker
 
-This document explains how to use Docker to run the Privatefolio backend service.
+This document explains how to use Docker to run Privatefolio.
 The Docker image uses a multi-stage build process. It builds the frontend bundle and installs backend production dependencies.
-The final image utilizes Bun to run the backend TypeScript source code directly.
+The final image utilizes Bun to run the backend TypeScript source code directly and to serve the frontend bundle.
 
 ## Requirements
 
@@ -25,25 +25,12 @@ yarn docker:run
 yarn docker:remove
 ```
 
-Or from the packages/backend directory:
-
-```sh
-# Build the Docker image
-yarn docker:build
-
-# Build and run the Docker container
-yarn docker:run
-
-# Remove the Docker container
-yarn docker:remove
-```
-
 ### Using Docker Directly
 
-To build the image from the `packages/backend` directory:
+To build the image from the project root directory:
 
 ```sh
-docker build -t privatefolio -f Dockerfile ../..
+docker build -t privatefolio -f packages/backend/Dockerfile .
 ```
 
 To run the container:
