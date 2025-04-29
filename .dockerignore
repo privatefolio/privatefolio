@@ -4,13 +4,13 @@
 
 # Node.js
 node_modules
-npm-debug.log
-yarn-debug.log
-yarn-error.log
+**/node_modules
+*.log
 
 # Build files
 build
 dist
+test
 
 # Data directories
 data

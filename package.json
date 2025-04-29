@@ -34,7 +34,8 @@
     "build-bin:mac": "lerna run build-bin:mac",
     "new-version": "lerna version --force-publish",
     "docker:build": "yarn workspace privatefolio-backend docker:build",
-    "docker:run": "yarn workspace privatefolio-backend docker:run"
+    "docker:run": "yarn workspace privatefolio-backend docker:run",
+    "docker:remove": "yarn workspace privatefolio-backend docker:remove"
   },
   "devDependencies": {
     "lerna": "^8.1.3"
