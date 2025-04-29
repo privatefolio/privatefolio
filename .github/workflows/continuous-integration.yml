@@ -3,6 +3,8 @@ name: Continuous Integration
 on:
   push:
     branches: ["*"]
+  pull_request:
+    branches: [ "*" ]
 
 env:
   VITE_POSTHOG_KEY: ${{ secrets.VITE_POSTHOG_KEY }}
