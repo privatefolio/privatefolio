@@ -6,7 +6,13 @@ export const POSTHOG_KEY = import.meta.env.VITE_POSTHOG_KEY
 function extractVersion(version: string) {
   try {
     const raw = version.split("\n")[0]
-    return `v${raw.replaceAll('"', "").replaceAll("'", "")}`
+
+    if (raw === "{") {
+      const json = JSON.parse(version)
+      return json[Object.keys(json)[0]]
+    }
+
+    return raw.replaceAll('"', "").replaceAll("'", "")
   } catch {
     return "unknown"
   }
