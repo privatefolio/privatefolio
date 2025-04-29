@@ -4,7 +4,7 @@ import { createBackendRelayer } from "privatefolio-backend/build/src/backend-rel
 import { TARGET } from "src/env"
 import { $connectionStatus, $isCloudAccount } from "src/stores/account-store"
 import { $user, User } from "src/stores/cloud-account-store"
-import { isProduction } from "src/utils/environment-utils"
+import { isProduction, isSecure } from "src/utils/environment-utils"
 
 // WEBWORKER remote
 // import "./comlink-setup"
@@ -32,7 +32,7 @@ const LOCAL_SERVER_URL = isProduction
 const REMOTE_SERVER_URL = (user: User) => `cloud.privatefolio.app:${50000 + user.id}`
 
 export const LOCAL_RPC = createBackendRelayer<Api>(
-  `ws://${LOCAL_SERVER_URL}`,
+  `${isSecure ? "wss" : "ws"}://${LOCAL_SERVER_URL}`,
   (status) => {
     $connectionStatus.set(status)
   },
@@ -44,7 +44,7 @@ export const $rpc = computed([$isCloudAccount, $user], (isCloudAccount, user) =>
 
   if (isCloudAccount) {
     return createBackendRelayer<Api>(
-      `ws://${REMOTE_SERVER_URL(user as User)}`,
+      `wss://${REMOTE_SERVER_URL(user as User)}`,
       (status) => {
         $connectionStatus.set(status)
       },
@@ -56,7 +56,7 @@ export const $rpc = computed([$isCloudAccount, $user], (isCloudAccount, user) =>
 })
 
 $rpc.subscribe((rpc) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, prettier/prettier
   (window as any).rpc = rpc
 })
 
@@ -64,8 +64,8 @@ export const $rest = computed([$isCloudAccount, $user], (isCloudAccount, user) =
   // if (!activeAccount) return
 
   const address = isCloudAccount
-    ? `http://${REMOTE_SERVER_URL(user as User)}`
-    : `http://${LOCAL_SERVER_URL}`
+    ? `https://${REMOTE_SERVER_URL(user as User)}`
+    : `${isSecure ? "https" : "http"}://${LOCAL_SERVER_URL}`
 
   return address
 })
