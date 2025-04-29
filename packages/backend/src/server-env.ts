@@ -3,7 +3,8 @@ export const APP_VERSION = extractVersion(process.env.APP_VERSION)
 
 function extractVersion(version: string) {
   try {
-    return "v" + JSON.parse(version)["privatefolio-backend"]
+    const raw = version.split("\n")[0]
+    return `v${raw.replaceAll('"', "").replaceAll("'", "")}`
   } catch {
     return "unknown"
   }

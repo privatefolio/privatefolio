@@ -27,16 +27,22 @@ RUN mkdir -p /app/data/{databases,logs,files}
 
 WORKDIR /app/packages/backend
 
-# Set environment variables
-ENV PORT=4001 \
+# Define build arguments
+ARG PORT_ARG=5555
+ARG APP_VERSION_ARG='{"privatefolio-backend":"unknown"}'
+ARG GIT_HASH_ARG=unknown
+ARG GIT_DATE_ARG=unknown
+
+# Set environment variables using build arguments
+ENV PORT=$PORT_ARG \
     NODE_ENV=production \
     DATA_LOCATION=/app/data \
-    APP_VERSION='{"privatefolio-backend":"2.0.0-alpha.5"}' \
-    GIT_HASH=dockerized \
-    GIT_DATE="2023-06-01T12:00:00Z"
+    APP_VERSION=$APP_VERSION_ARG \
+    GIT_HASH=$GIT_HASH_ARG \
+    GIT_DATE=$GIT_DATE_ARG
 
 # Expose the port
-EXPOSE 4001
+EXPOSE $PORT
 
 # Set the default command to run when starting the container
 CMD ["bun", "run", "src/start.ts"]

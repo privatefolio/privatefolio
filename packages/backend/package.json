@@ -8,9 +8,9 @@
     "email": "hello@danielconstantin.net"
   },
   "scripts": {
-    "start": "APP_VERSION=`npm pkg get version --json` GIT_HASH=`git rev-parse HEAD` GIT_DATE=`git show -s --format=%cI $(git rev-parse HEAD)` bun src/start.ts",
+    "start": "APP_VERSION=`npm pkg get version` GIT_HASH=`git rev-parse HEAD` GIT_DATE=`git show -s --format=%cI $(git rev-parse HEAD)` bun src/start.ts",
     "prestart:watch": "KILL_PORT=4001 bun src/kill-process-on-port.ts",
-    "start:watch": "APP_VERSION=`npm pkg get version --json` GIT_HASH=`git rev-parse HEAD` GIT_DATE=`git show -s --format=%cI $(git rev-parse HEAD)` bun --watch --no-clear-screen src/start.ts",
+    "start:watch": "APP_VERSION=`npm pkg get version` GIT_HASH=`git rev-parse HEAD` GIT_DATE=`git show -s --format=%cI $(git rev-parse HEAD)` bun --watch --no-clear-screen src/start.ts",
     "dev": "concurrently \"yarn build:watch\" \"yarn start:watch\" --kill-others --prefix \"{command} {time}\" --prefix-colors \"cyan,yellow\" --prefix-length 30 --timestampFormat \"[HH:mm:ss]\"",
     "ping": "bun src/ping.ts",
     "lint": "eslint .",
@@ -22,8 +22,8 @@
     "test": "BUN_SQL=false vitest",
     "test:bun": "BUN_SQL=true bun test test/bun/**",
     "test:ci": "GITHUB_CI=true BUN_SQL=false vitest run --watch false --reporter verbose && BUN_SQL=true yarn test:bun",
-    "docker:build": "docker build -t privatefolio -f Dockerfile ../..",
-    "docker:run": "docker run -d -p 4001:4001 -v privatefolio-data:/app/data --name privatefolio privatefolio",
+    "docker:build": "docker build --build-arg PORT_ARG=${PORT:-5555} --build-arg APP_VERSION_ARG=\"`npm pkg get version`\" --build-arg GIT_HASH_ARG=`git rev-parse HEAD` --build-arg GIT_DATE_ARG=`git show -s --format=%cI $(git rev-parse HEAD)` -t privatefolio -f Dockerfile ../..",
+    "docker:run": "docker run -d -p ${PORT:-5555}:${PORT:-5555} -v privatefolio-data:/app/data --name privatefolio privatefolio",
     "docker:remove": "docker rm -f privatefolio"
   },
   "dependencies": {

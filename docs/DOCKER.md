@@ -48,7 +48,7 @@ docker build -t privatefolio -f Dockerfile ../..
 To run the container:
 
 ```sh
-docker run -d -p 4001:4001 -v privatefolio-data:/app/data --name privatefolio privatefolio
+docker run -d -p ${PORT:-5555}:${PORT:-5555} -v privatefolio-data:/app/data --name privatefolio privatefolio
 ```
 
 To stop the container:
@@ -68,21 +68,21 @@ docker pull ghcr.io/privatefolio/privatefolio:latest
 To run the pre-built image:
 
 ```sh
-docker run -d -p 4001:4001 -v privatefolio-data:/app/data --name privatefolio ghcr.io/privatefolio/privatefolio:latest
+docker run -d -p ${PORT:-5555}:${PORT:-5555} -v privatefolio-data:/app/data --name privatefolio ghcr.io/privatefolio/privatefolio:latest
 ```
 
 ## Configuration
 
 The backend service is configured with the following environment variables:
 
-- `PORT`: The port to run the server on (default: 4001)
+- `PORT`: The port to run the server on (default: 5555)
 - `NODE_ENV`: The environment to run in (default: production)
 - `DATA_LOCATION`: The directory to store data in (default: /app/data)
 
 You can customize these by passing them to the `docker run` command with the `-e` flag:
 
 ```sh
-docker run -d -p 4001:4001 -v privatefolio-data:/app/data -e PORT=5000 -e NODE_ENV=development --name privatefolio privatefolio
+docker run -d -p 5000:5000 -v privatefolio-data:/app/data -e PORT=5000 -e NODE_ENV=development --name privatefolio privatefolio
 ```
 
 ## Data Persistence
@@ -97,15 +97,15 @@ docker volume inspect privatefolio-data # View volume info
 
 ## Accessing the API
 
-The backend API will be available at:
+The backend API will be available at (defaulting to port 5555 if PORT is not set):
 
-- HTTP: `http://localhost:4001`
-- WebSocket: `ws://localhost:4001`
+- HTTP: `http://localhost:${PORT:-5555}`
+- WebSocket: `ws://localhost:${PORT:-5555}`
 
-You can check if the service is running by visiting `http://localhost:4001` in your browser or using curl:
+You can check if the service is running by visiting `http://localhost:${PORT:-5555}` in your browser or using curl:
 
 ```sh
-curl http://localhost:4001
+curl http://localhost:${PORT:-5555}
 ```
 
 ## Logs
@@ -129,4 +129,4 @@ A GitHub Actions workflow is set up to automatically build and publish Docker im
 Available image tags:
 - `latest`: Latest build from the main branch
 - `v*.*.*`: Tagged releases (e.g., v2.0.0-alpha.5)
-- `sha-******`: Short commit SHA for each build 
+- `sha-******`: Short commit SHA for each build

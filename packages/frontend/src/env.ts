@@ -5,7 +5,8 @@ export const POSTHOG_KEY = import.meta.env.VITE_POSTHOG_KEY
 
 function extractVersion(version: string) {
   try {
-    return "v" + JSON.parse(version)["privatefolio-frontend"]
+    const raw = version.split("\n")[0]
+    return `v${raw.replaceAll('"', "").replaceAll("'", "")}`
   } catch {
     return "unknown"
   }
