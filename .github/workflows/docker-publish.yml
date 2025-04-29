@@ -59,8 +59,9 @@ jobs:
           echo "Will push these tags:"
           echo "$tags"
 
-          # loop over them (unquoted expansion splits on whitespace)
           for tag in $tags; do
+            echo "Tagging local image as $tag"
+            docker tag privatefolio:latest "$tag"
             echo "Pushing $tag"
             docker push "$tag"
           done
