@@ -27,5 +27,5 @@ app = 'privatefolio'
     soft_limit = 20
 
 [[vm]]
-  size = 'shared-cpu-1x'
-  memory = "256mb"
+  size = 'shared-cpu-2x'
+  memory = "512mb"
