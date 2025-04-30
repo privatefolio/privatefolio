@@ -22,7 +22,7 @@
     "test": "BUN_SQL=false vitest",
     "test:bun": "BUN_SQL=true bun test test/bun/**",
     "test:ci": "GITHUB_CI=true BUN_SQL=false vitest run --watch false --reporter verbose && BUN_SQL=true yarn test:bun",
-    "docker:build": "docker build --build-arg PORT_ARG=${PORT:-5555} --build-arg APP_VERSION_ARG=\"`npm pkg get version`\" --build-arg GIT_HASH_ARG=`git rev-parse HEAD` --build-arg GIT_DATE_ARG=`git show -s --format=%cI $(git rev-parse HEAD)` -t privatefolio -f Dockerfile ../..",
+    "docker:build": "docker build --progress=plain --build-arg PORT_ARG=${PORT:-5555} --build-arg APP_VERSION_ARG=\"`npm pkg get version`\" --build-arg GIT_HASH_ARG=`git rev-parse HEAD` --build-arg GIT_DATE_ARG=`git show -s --format=%cI $(git rev-parse HEAD)` -t privatefolio -f Dockerfile ../..",
     "docker:run": "docker run -d -p ${PORT:-5555}:${PORT:-5555} -v privatefolio-data:/app/data --name privatefolio privatefolio",
     "docker:remove": "docker rm -f privatefolio"
   },
