@@ -12,7 +12,7 @@ app = 'privatefolio'
 
 [[mounts]]
   source = 'privatefolio_data'
-  destination = '/data'
+  destination = '/app/data'
 
 [http_service]
   internal_port = 5555
