@@ -17,7 +17,6 @@ data
 # Development files
 .vscode
 .idea
-*.env
 *.log
 coverage
 .DS_Store
