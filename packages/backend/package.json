@@ -1,6 +1,6 @@
 {
   "name": "privatefolio-backend",
-  "version": "2.0.0-alpha.5",
+  "version": "2.0.0-alpha.6",
   "private": false,
   "license": "AGPL-3.0",
   "author": {
@@ -28,16 +28,16 @@
   },
   "dependencies": {
     "big.js": "^6.2.1",
+    "chalk": "^5.3.0",
     "croner": "^9.0.0",
     "ethers": "^6.9.0",
     "exponential-backoff": "^3.1.1",
+    "jose": "^6.0.10",
     "jszip": "^3.10.1",
     "lodash-es": "^4.17.21",
     "mime-types": "^2.1.35",
     "sqlite": "^5.1.1",
-    "chalk": "^5.3.0",
-    "sqlite3": "^5.1.7",
-    "jose": "^6.0.10"
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "@types/big.js": "^6.2.2",
