@@ -7,6 +7,17 @@ const DATA_LOCATION =
 export const DATABASES_LOCATION = `${DATA_LOCATION}/databases`
 export const LOGS_LOCATION = `${DATA_LOCATION}/logs`
 export const FILES_LOCATION = `${DATA_LOCATION}/files`
+export const AUTH_DATA_DIR = `${DATA_LOCATION}/auth`
+export const SALT_FILE = `${AUTH_DATA_DIR}/.salt`
+export const HASH_FILE = `${AUTH_DATA_DIR}/.hash`
+export const JWT_SECRET_FILE = `${AUTH_DATA_DIR}/.jwtsecret`
+
+export const corsHeaders = {
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Max-Age": "86400", // Cache preflight for 1 day
+}
 
 export const GITHUB_CACHE_URL =
   "https://raw.githubusercontent.com/privatefolio/coingecko/refs/heads/main/public"

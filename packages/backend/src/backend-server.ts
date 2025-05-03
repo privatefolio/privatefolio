@@ -1,16 +1,26 @@
-import { Server } from "bun"
+import { Server, ServerWebSocket } from "bun"
 import chalk from "chalk"
 import { access } from "fs/promises"
 import { join } from "path"
 
 import { handleDownload, handlePreflight, handleUpload } from "./api/account/server-files-http-api"
 import {
+  handleLoginRequest,
+  handleSetupRequest,
+  handleStatusRequest,
+  handleVerifyAuthRequest,
+  isAuthSetupComplete,
+  readSecrets,
+} from "./api/auth-http-api"
+import {
   BackendRequest,
   BackendResponse,
   FunctionInvocation,
   FunctionReference,
 } from "./backend-comms"
+import { extractJwt, verifyJwt } from "./jwt-utils"
 import { APP_VERSION } from "./server-env"
+import { corsHeaders } from "./settings"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type BackendApiShape = { [key: string]: (...params: any[]) => Promise<unknown> }
@@ -37,14 +47,10 @@ export class BackendServer<T extends BackendApiShape> {
         const { method } = request
         const { pathname } = new URL(request.url)
 
+        // Public endpoints
         if (method === "OPTIONS") return await handlePreflight()
         if (pathname === "/ping") return new Response("pong", { status: 200 })
-        if (pathname === "/download") return await handleDownload(request)
-        if (pathname === "/upload") return await handleUpload(request)
-
-        if (server.upgrade(request)) return
-
-        if (pathname === "/info")
+        if (pathname === "/info") {
           return new Response(
             JSON.stringify({
               buildDate: process.env.GIT_DATE,
@@ -54,9 +60,57 @@ export class BackendServer<T extends BackendApiShape> {
               name: "Privatefolio Backend",
               version: APP_VERSION,
             }),
-            { status: 200 }
+            { headers: { "Content-Type": "application/json", ...corsHeaders }, status: 200 }
           )
+        }
+        if (pathname === "/api/setup-status") {
+          return handleStatusRequest()
+        }
+        if (pathname === "/api/setup" && method === "POST") {
+          return handleSetupRequest(request)
+        }
+        if (pathname === "/api/login" && method === "POST") {
+          return handleLoginRequest(request)
+        }
+        if (pathname === "/api/verify-auth" && method === "GET") {
+          return handleVerifyAuthRequest(request)
+        }
 
+        // Authentication guard
+        const setupCompleted = await isAuthSetupComplete()
+        const jwt = extractJwt(request)
+        let isAuthenticated = false
+
+        if (setupCompleted && jwt) {
+          const secrets = await readSecrets()
+          const payload = await verifyJwt(jwt, secrets.jwtSecret)
+          if (payload) {
+            isAuthenticated = true
+          } else {
+            console.warn("Received invalid or expired authentication token.")
+          }
+        }
+
+        const protectedRoutes = ["/download", "/upload"]
+        if (!isAuthenticated) {
+          if (protectedRoutes.includes(pathname)) {
+            console.warn(`Blocked unauthenticated request to ${pathname}.`)
+            return new Response("Unauthorized", { headers: corsHeaders, status: 401 })
+          }
+        }
+
+        // Protected routes
+        if (pathname === "/download") {
+          return await handleDownload(request)
+        }
+        if (pathname === "/upload") {
+          return await handleUpload(request)
+        }
+
+        // WebSocket upgrade check (protected)
+        if (server.upgrade(request, { data: { isAuthenticated } })) return
+
+        // Static file serving (public)
         try {
           const overridden = pathname === "/" ? "/index.html" : pathname
           const filePath = join(__dirname, "../../frontend/build", overridden)
@@ -73,7 +127,17 @@ export class BackendServer<T extends BackendApiShape> {
         close() {
           console.log("Connection closed.")
         },
-        message: async (socket, message) => {
+        message: async (
+          socket: ServerWebSocket<{ isAuthenticated?: boolean }>,
+          message: string
+        ) => {
+          const { isAuthenticated } = socket.data
+
+          if (!isAuthenticated) {
+            socket.close(1008, "Unauthorized")
+            return
+          }
+
           let response: BackendResponse
           let request: BackendRequest
 
@@ -141,8 +205,12 @@ export class BackendServer<T extends BackendApiShape> {
 
           socket.send(JSON.stringify(response))
         },
-        open() {
-          console.log("Connection opened.")
+        open(socket: ServerWebSocket<{ isAuthenticated?: boolean }>) {
+          if (!socket.data.isAuthenticated) {
+            socket.close(1008, "Unauthorized")
+            return
+          }
+          console.log("Connection opened. ")
         },
       },
     })

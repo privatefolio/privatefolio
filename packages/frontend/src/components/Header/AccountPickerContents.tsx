@@ -1,10 +1,11 @@
-import { Add, PersonRemoveRounded, RestartAltRounded } from "@mui/icons-material"
+import { Add, LockOutlined, PersonRemoveRounded, RestartAltRounded } from "@mui/icons-material"
 import { Divider, ListItemAvatar, ListItemText, MenuItem } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useState } from "react"
 import { useLocation } from "react-router-dom"
 import { useConfirm } from "src/hooks/useConfirm"
 import { $accounts, $activeAccount } from "src/stores/account-store"
+import { lockApp } from "src/stores/auth-store"
 import { $rpc } from "src/workers/remotes"
 
 import { AccountAvatar } from "../AccountAvatar"
@@ -118,6 +119,13 @@ export function AccountPickerContents(props: AccountPickerContentsProps) {
           <PersonRemoveRounded fontSize="small" />
         </ListItemAvatar>
         <ListItemText>{deleting ? "Deleting account..." : "Delete account"} </ListItemText>
+      </MenuItem>
+      <Divider />
+      <MenuItem aria-label="Lock app" onClick={lockApp}>
+        <ListItemAvatar>
+          <LockOutlined fontSize="small" />
+        </ListItemAvatar>
+        <ListItemText>Lock app</ListItemText>
       </MenuItem>
     </>
   )

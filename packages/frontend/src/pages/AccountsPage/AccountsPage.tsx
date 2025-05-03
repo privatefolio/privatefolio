@@ -1,12 +1,13 @@
-import { Add, Cloud, KeyboardBackspace } from "@mui/icons-material"
+import { Add, Cloud } from "@mui/icons-material"
 import { AppBar, Avatar, Button, Container, Fade, Stack, Toolbar, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { AccountAvatar, SIZE_MAP } from "src/components/AccountAvatar"
 import { AddAccountDialog } from "src/components/AccountPicker/AddAccountDialog"
 import { PrivateCloudDialog } from "src/components/AccountPicker/PrivateCloudDialog"
 import { CircularSpinner } from "src/components/CircularSpinner"
+import { Logo } from "src/components/Header/Logo"
 import { StaggeredList } from "src/components/StaggeredList"
 import { useBoolean } from "src/hooks/useBoolean"
 import { $accounts, $activeAccount, $activeIndex } from "src/stores/account-store"
@@ -34,6 +35,24 @@ export default function AccountsPage() {
     }
   }, [activeIndex])
 
+  const [showAppBar, setShowAppBar] = useState(false)
+  useEffect(() => {
+    const firstAccount = document.getElementById("account-0")
+    firstAccount?.focus()
+    const timeout = setTimeout(() => {
+      setShowAppBar(true)
+    }, 500)
+    return () => clearTimeout(timeout)
+  }, [])
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const firstAccount = document.getElementById("account-0")
+      firstAccount?.focus()
+    }, 50)
+    return () => clearTimeout(timeout)
+  }, [])
+
   return (
     <>
       <AppBar
@@ -44,55 +63,55 @@ export default function AccountsPage() {
           background: "none !important",
           border: "none",
           color: "var(--mui-palette-primary-main) !important",
-          visibility: "hidden",
-          // zIndex: 1001,
+          zIndex: 1001,
         }}
       >
-        <Toolbar disableGutters>
-          <Container
-            disableGutters
-            maxWidth="md"
-            sx={{ marginTop: -0.5, paddingX: { xs: 2 }, paddingY: 0, position: "relative" }}
-          >
-            <Stack
-              direction="row"
-              alignItems="center"
-              justifyContent="space-between"
-              sx={{
-                height: "100%",
-                paddingX: {
-                  sm: 2,
-                  xs: 1,
-                },
-                width: "100%",
-              }}
+        <Fade in={showAppBar} timeout={500}>
+          <Toolbar disableGutters>
+            <Container
+              disableGutters
+              maxWidth="md"
+              sx={{ marginTop: -0.5, paddingX: { xs: 2 }, paddingY: 0, position: "relative" }}
             >
-              <Button
-                size="small"
-                color="secondary"
-                variant="outlined"
-                startIcon={<KeyboardBackspace />}
-                href="https://www.privatefolio.app"
-                target="_blank"
+              <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+                sx={{
+                  height: "100%",
+                  paddingX: {
+                    sm: 2,
+                    xs: 1,
+                  },
+                  width: "100%",
+                }}
               >
-                About Privatefolio
-              </Button>
-              {!userLoading && (
-                <Fade in>
-                  <Button
-                    color="secondary"
-                    size="small"
-                    endIcon={<Cloud />}
-                    variant="outlined"
-                    onClick={user ? logout : toggleLoginOpen}
-                  >
-                    {user ? "Sign out from" : "Login to"} PrivateCloud
-                  </Button>
-                </Fade>
-              )}
-            </Stack>
-          </Container>
-        </Toolbar>
+                <Button
+                  size="small"
+                  variant="text"
+                  href="https://www.privatefolio.app"
+                  target="_blank"
+                  sx={{ marginX: -2, paddingX: 2 }}
+                >
+                  <Logo />
+                </Button>
+                {!userLoading && (
+                  <Fade in>
+                    <Button
+                      color="secondary"
+                      size="small"
+                      endIcon={<Cloud />}
+                      variant="outlined"
+                      onClick={user ? logout : toggleLoginOpen}
+                    >
+                      {user ? "Sign out from" : "Login to"} PrivateCloud
+                    </Button>
+                  </Fade>
+                )}
+              </Stack>
+            </Container>
+          </Toolbar>
+        </Fade>
       </AppBar>
       <Stack
         sx={{
@@ -124,6 +143,7 @@ export default function AccountsPage() {
               accounts.length > 0
                 ? {
                     "& .MuiButton-root .MuiTypography-root": { visibility: "hidden" },
+                    "& .MuiButton-root:focus .MuiTypography-root": { visibility: "visible" },
                     "& .MuiButton-root:hover .MuiTypography-root": { visibility: "visible" },
                   }
                 : {}
@@ -136,8 +156,9 @@ export default function AccountsPage() {
                 key={accountName}
                 sx={{ borderRadius: 0.25, padding: 2, width: 156 }}
                 to={`/u/${index}`}
-                aria-label={`Switch to account ${index}`}
-                autoFocus={index === 0}
+                aria-label={`Switch to account ${accountName}`}
+                autoFocus={index === 0} // Doesn't work
+                id={`account-${index}`}
               >
                 <Stack alignItems="center" gap={1}>
                   <AccountAvatar alt={accountName} size="xl" />
@@ -152,6 +173,7 @@ export default function AccountsPage() {
               size="large"
               sx={{ borderRadius: 0.25, padding: 2, width: 156 }}
               onClick={toggleAddAccount}
+              autoFocus={accounts.length === 0}
             >
               <Stack alignItems="center" gap={1}>
                 <Avatar

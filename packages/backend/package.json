@@ -19,7 +19,7 @@
     "build": "tsc --project tsconfig.lib.json && vite build",
     "build:watch": "tsc --project tsconfig.lib.json --watch --preserveWatchOutput",
     "check-types": "tsc --noEmit",
-    "test": "BUN_SQL=false vitest",
+    "test": "BUN_SQL=false vitest run --watch false",
     "test:bun": "BUN_SQL=true bun test test/bun/**",
     "test:ci": "GITHUB_CI=true BUN_SQL=false vitest run --watch false --reporter verbose && BUN_SQL=true yarn test:bun",
     "docker:build": "docker build --progress=plain --build-arg PORT_ARG=${PORT:-5555} --build-arg APP_VERSION_ARG=\"`npm pkg get version`\" --build-arg GIT_HASH_ARG=`git rev-parse HEAD` --build-arg GIT_DATE_ARG=`git show -s --format=%cI $(git rev-parse HEAD)` -t privatefolio -f Dockerfile ../..",
@@ -36,7 +36,8 @@
     "mime-types": "^2.1.35",
     "sqlite": "^5.1.1",
     "chalk": "^5.3.0",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "jose": "^6.0.10"
   },
   "devDependencies": {
     "@types/big.js": "^6.2.2",

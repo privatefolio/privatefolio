@@ -743,7 +743,10 @@ export type ProgressLog = [Timestamp, ProgressUpdate]
 
 export type SqlParam = boolean | string | number | null | Uint8Array
 
-export type ConnectionStatusCallback = (status: "closed" | "connected") => void
+export type ConnectionStatusCallback = (
+  status: "closed" | "connected",
+  errorMessage?: string
+) => void
 
 export type LabeledAddress = {
   id: string

@@ -1,11 +1,11 @@
-import { Stack, Typography } from "@mui/material"
+import { Stack, StackProps, Typography } from "@mui/material"
 import React from "react"
 
 import { SerifFont } from "../../theme"
 
-export function Logo() {
+export function Logo(props: StackProps) {
   return (
-    <Stack direction="row" gap={1} alignItems="center">
+    <Stack direction="row" gap={1} alignItems="center" {...props}>
       <Typography
         variant="h5"
         fontFamily={SerifFont}

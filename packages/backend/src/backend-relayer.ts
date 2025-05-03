@@ -18,7 +18,9 @@ class BackendRelayer {
   }
 
   private connect(address: string, onStatusChange: ConnectionStatusCallback): WebSocket {
-    console.log("BackendRelayer connecting", address)
+    const baseAddress = address.substring(0, address.indexOf("?"))
+
+    console.log("BackendRelayer connecting", baseAddress)
 
     const socket = new WebSocket(address)
     socket.addEventListener("message", (event) => {
@@ -75,18 +77,24 @@ class BackendRelayer {
     })
 
     socket.addEventListener("open", () => {
-      console.log("BackendRelayer connected", address)
+      console.log("BackendRelayer connected", baseAddress)
       onStatusChange("connected")
     })
-    socket.addEventListener("close", () => {
-      console.log("BackendRelayer closed", address)
-      onStatusChange("closed")
-      setTimeout(() => {
-        this.socket = this.connect(address, onStatusChange)
-      }, 1_000)
+    socket.addEventListener("close", (event) => {
+      let reason = event.reason || "unknown"
+      if (event.code === 1006 && reason === "unknown") {
+        reason = "Server offline."
+      }
+      console.log("⚠️ BackendRelayer closed:", event.code, reason, baseAddress)
+      onStatusChange("closed", `${event.code}: ${reason}`)
+      if (event.code !== 1008) {
+        setTimeout(() => {
+          this.socket = this.connect(address, onStatusChange)
+        }, 1_000)
+      }
     })
-    socket.addEventListener("error", (error) => {
-      console.error("BackendRelayer error:", error, address)
+    socket.addEventListener("error", (event) => {
+      console.error("BackendRelayer error:", event, baseAddress)
     })
 
     return socket

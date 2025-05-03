@@ -1,4 +1,4 @@
-import { Box, Paper, Stack } from "@mui/material"
+import { Box, CircularProgress, Paper, Stack } from "@mui/material"
 import Container from "@mui/material/Container"
 import { useStore } from "@nanostores/react"
 import { throttle } from "lodash-es"
@@ -16,43 +16,63 @@ import AccountsPage from "./pages/AccountsPage/AccountsPage"
 import AssetPage from "./pages/AssetPage/AssetPage"
 import AssetsPage from "./pages/AssetsPage/AssetsPage"
 import AuditLogsPage from "./pages/AuditLogsPage/AuditLogsPage"
+import AuthPage from "./pages/AuthPage"
 import HomePage from "./pages/HomePage/HomePage"
 import ImportDataPage from "./pages/ImportDataPage/ImportDataPage"
 import ServerPage from "./pages/ServerPage/ServerPage"
 import TradesPage from "./pages/TradesPage/TradesPage"
 import TransactionsPage from "./pages/TransactionsPage/TransactionsPage"
 import { SHORT_THROTTLE_DURATION } from "./settings"
-import { $accounts, $activeAccount, $connectionStatus } from "./stores/account-store"
-import { checkLogin } from "./stores/cloud-account-store"
+import {
+  $accounts,
+  $activeAccount,
+  $connectionErrorMessage,
+  $connectionStatus,
+} from "./stores/account-store"
+import { $auth, checkAuthentication } from "./stores/auth-store"
+import { checkLogin as checkCloudLogin } from "./stores/cloud-account-store"
+import { $infoBanner } from "./stores/info-banner-store"
 import { fetchInMemoryData } from "./stores/metadata-store"
 import { closeSubscription } from "./utils/browser-utils"
 import { noop, sleep } from "./utils/utils"
-import { $rpc, LOCAL_RPC } from "./workers/remotes"
+import { $localRpc, $rpc } from "./workers/remotes"
 
 export default function App() {
-  // useDemoAccount()
   const connectionStatus = useStore($connectionStatus)
+  const connectionErrorMessage = useStore($connectionErrorMessage)
+
+  const { checked: authChecked, needsSetup, isAuthenticated } = useStore($auth)
 
   useEffect(() => {
-    Promise.all([LOCAL_RPC.getAccountNames(), sleep(0)]).then(([accounts]) => {
+    $infoBanner.set(connectionErrorMessage ?? null)
+  }, [connectionErrorMessage])
+
+  useEffect(() => {
+    checkAuthentication()
+  }, [])
+
+  useEffect(() => {
+    if (!authChecked || needsSetup || !isAuthenticated) return
+
+    Promise.all([$localRpc.get().getAccountNames(), sleep(0)]).then(([accounts]) => {
       $accounts.set(accounts)
     })
 
-    const subscription = LOCAL_RPC.subscribeToAccounts(() => {
-      LOCAL_RPC.getAccountNames().then($accounts.set)
+    const subscription = $localRpc.get().subscribeToAccounts(() => {
+      $localRpc.get().getAccountNames().then($accounts.set)
     })
 
     return closeSubscription(subscription)
-  }, [connectionStatus])
+  }, [connectionStatus, authChecked, needsSetup, isAuthenticated])
 
   useEffect(() => {
-    checkLogin()
+    checkCloudLogin()
   }, [])
 
   const activeAccount = useStore($activeAccount)
 
   useEffect(() => {
-    if (!activeAccount) return
+    if (!activeAccount || !authChecked || needsSetup || !isAuthenticated) return
 
     fetchInMemoryData()
 
@@ -65,7 +85,21 @@ export default function App() {
     )
 
     return closeSubscription(subscription)
-  }, [activeAccount, connectionStatus])
+  }, [activeAccount, connectionStatus, authChecked, needsSetup, isAuthenticated])
+
+  if (!authChecked) {
+    return (
+      <Box
+        sx={{ alignItems: "center", display: "flex", height: "100vh", justifyContent: "center" }}
+      >
+        <CircularProgress />
+      </Box>
+    )
+  }
+
+  if (!isAuthenticated || needsSetup) {
+    return <AuthPage />
+  }
 
   return (
     <Stack direction="row">
@@ -151,7 +185,7 @@ export default function App() {
                 <Route path="server" element={<ServerPage show />} />
                 <Route path="*" element={<FourZeroFourPage show />} />
               </Route>
-              <Route path="*" element={<Navigate to="/" />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </ErrorBoundary>
           <InfoBanner />

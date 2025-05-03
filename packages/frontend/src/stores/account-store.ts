@@ -28,6 +28,7 @@ export const $activeIndex = computed(
 
 export const demoAccountName = "demo" // TODO8 move to server
 export const $connectionStatus = atom<"closed" | "connected">("closed")
+export const $connectionErrorMessage = atom<string | undefined>()
 
 logAtoms({
   $accounts,

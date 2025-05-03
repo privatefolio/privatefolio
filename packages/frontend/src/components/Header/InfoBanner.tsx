@@ -5,17 +5,19 @@ import { $infoBanner } from "src/stores/info-banner-store"
 
 export function InfoBanner() {
   const infoBanner = useStore($infoBanner)
-  const [showing, setShowing] = useState(infoBanner !== null)
+  const [showing, setShowing] = useState(false)
 
   useEffect(() => {
     if (infoBanner && !showing) {
-      setShowing(true)
+      setTimeout(() => {
+        setShowing(true)
+      }, 1_000)
     }
 
     if (!infoBanner && showing) {
-      // setTimeout(() => {
-      setShowing(false)
-      // }, 3_000)
+      setTimeout(() => {
+        setShowing(false)
+      }, 1_000)
     }
   }, [infoBanner, showing])
 
@@ -28,6 +30,7 @@ export function InfoBanner() {
           maxWidth: 1536 - 32,
           position: "fixed",
           width: "100%",
+          zIndex: "var(--mui-zIndex-tooltip)",
         }}
         alignItems="center"
       >

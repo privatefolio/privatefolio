@@ -2,17 +2,10 @@ import { createWriteStream } from "fs"
 import { access, mkdir, open, readFile, stat } from "fs/promises"
 import mime from "mime-types"
 import { join } from "path"
-import { FILES_LOCATION } from "src/settings"
+import { corsHeaders, FILES_LOCATION } from "src/settings"
 import { promisify } from "util"
 
 import { getServerFile, patchServerFile } from "./server-files-api"
-
-const corsHeaders = {
-  "Access-Control-Allow-Headers": "Content-Type", // Allowed headers
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS", // Allowed methods
-  "Access-Control-Allow-Origin": "http://localhost:4000", // Allow requests from this origin
-  "Access-Control-Max-Age": "86400", // Cache the preflight response for a day
-}
 
 export async function handlePreflight(): Promise<Response> {
   return new Response(null, {
