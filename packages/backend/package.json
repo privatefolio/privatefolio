@@ -8,10 +8,10 @@
     "email": "hello@danielconstantin.net"
   },
   "scripts": {
-    "start": "APP_VERSION=`npm pkg get version` GIT_HASH=`git rev-parse HEAD` GIT_DATE=`git show -s --format=%cI $(git rev-parse HEAD)` bun src/start.ts",
-    "prestart:watch": "KILL_PORT=4001 bun src/kill-process-on-port.ts",
-    "start:watch": "APP_VERSION=`npm pkg get version` GIT_HASH=`git rev-parse HEAD` GIT_DATE=`git show -s --format=%cI $(git rev-parse HEAD)` bun --watch --no-clear-screen src/start.ts",
-    "dev": "concurrently \"yarn build:watch\" \"yarn start:watch\" --kill-others --prefix \"{command} {time}\" --prefix-colors \"cyan,yellow\" --prefix-length 30 --timestampFormat \"[HH:mm:ss]\"",
+    "start": "bun ./scripts/start.sh",
+    "prestart:watch": "bun ./scripts/prestart-watch.sh",
+    "start:watch": "bun ./scripts/start-watch.sh",
+    "dev": "bun ./scripts/dev.sh",
     "ping": "bun src/ping.ts",
     "lint": "eslint .",
     "lint:fix": "yarn lint --fix",
@@ -19,9 +19,9 @@
     "build": "tsc --project tsconfig.lib.json && vite build",
     "build:watch": "tsc --project tsconfig.lib.json --watch --preserveWatchOutput",
     "check-types": "tsc --noEmit",
-    "test": "BUN_SQL=false vitest run --watch false",
-    "test:bun": "BUN_SQL=true bun test test/bun/**",
-    "test:ci": "GITHUB_CI=true BUN_SQL=false vitest run --watch false --reporter verbose && BUN_SQL=true yarn test:bun",
+    "test": "cross-env BUN_SQL=false vitest run --watch false",
+    "test:bun": "cross-env BUN_SQL=true bun test test/bun/**",
+    "test:ci": "cross-env GITHUB_CI=true BUN_SQL=false vitest run --watch false --reporter verbose && cross-env BUN_SQL=true yarn test:bun",
     "docker:build": "docker build --progress=plain --build-arg PORT_ARG=${PORT:-5555} --build-arg APP_VERSION_ARG=\"`npm pkg get version`\" --build-arg GIT_HASH_ARG=`git rev-parse HEAD` --build-arg GIT_DATE_ARG=`git show -s --format=%cI $(git rev-parse HEAD)` -t privatefolio -f Dockerfile ../..",
     "docker:run": "docker run -d -p ${PORT:-5555}:${PORT:-5555} -v privatefolio-data:/app/data --name privatefolio privatefolio",
     "docker:remove": "docker rm -f privatefolio"
@@ -40,6 +40,7 @@
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
+    "cross-env": "7.0.3",
     "@types/big.js": "^6.2.2",
     "@types/bun": "^1.1.6",
     "@types/chalk": "^2.2.0",

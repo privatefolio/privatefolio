@@ -6,12 +6,33 @@ Before jumping in consider getting familiar with the [ARCHITECTURE.md](./docs//A
 
 ```sh
 npm -v
-# 9.6.6
+# 11.3.0
 node -v
-# v20.2.0
-npm install -g yarn
+# v22.15.0
 yarn -v
 # 1.22.22
+python --version
+# 3.13.3
+bun -v
+# 1.2.12
+```
+
+It's recommended to install Node.js through NVM (Node Version Manager), and to install Yarn through NPM.
+
+```sh
+npm install -g npm # Upgrade NPM
+npm install -g yarn # Install Yarn
+```
+
+On Windows, get it from [coreybutler/nvm-windows](https://github.com/coreybutler/nvm-windows).
+On Linux, get it from [nvm-sh/nvm](https://github.com/nvm-sh/nvm).
+
+### Windows
+
+Install the latest version of [Python](https://www.python.org/downloads/) and add it to your PATH.
+
+```ps
+powershell -c "irm bun.sh/install.ps1|iex" # Install Bun
 ```
 
 ### Ubuntu
@@ -19,6 +40,7 @@ yarn -v
 ```sh
 sudo apt update && sudo apt -y upgrade
 sudo apt install libnss3-dev libatk1.0-0 libatk-bridge2.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 -y
+curl -fsSL https://bun.sh/install | bash # Install Bun
 ```
 
 ## Install

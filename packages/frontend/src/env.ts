@@ -8,7 +8,7 @@ function extractVersion(version: string) {
   try {
     const raw = version.split("\n")[0]
 
-    if (raw === "{") {
+    if (raw.startsWith("{")) {
       const json = JSON.parse(version)
       return json[Object.keys(json)[0]]
     }

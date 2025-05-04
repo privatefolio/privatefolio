@@ -118,8 +118,13 @@ export class BackendServer<T extends BackendApiShape> {
           await access(filePath)
           return new Response(file)
         } catch {
-          const filePath = join(__dirname, "../../frontend/build/index.html")
-          return new Response(Bun.file(filePath))
+          try {
+            const filePath = join(__dirname, "../../frontend/build/index.html")
+            await access(filePath)
+            return new Response(Bun.file(filePath))
+          } catch {
+            return new Response("Frontend bundle not found", { status: 404 })
+          }
         }
       },
       port,
@@ -219,7 +224,9 @@ export class BackendServer<T extends BackendApiShape> {
     console.log(
       chalk.green("➜ "),
       chalk.bold(`REST:`),
-      chalk.bold.blue(`             http://localhost:${this.server.port}`)
+      chalk.bold.blue(
+        `             http://localhost:${this.server.port}, http://localhost:${this.server.port}/info`
+      )
     )
     console.log(
       chalk.green("➜ "),
