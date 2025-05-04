@@ -114,7 +114,9 @@ function createWindow() {
 
   // Open the DevTools.
   if (!isProduction || hasDevFlag) {
-    mainWindow.webContents.openDevTools()
+    setTimeout(() => {
+      mainWindow.webContents.openDevTools()
+    }, 500)
   }
 
   // Save window state on changes

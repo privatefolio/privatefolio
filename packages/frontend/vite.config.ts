@@ -18,6 +18,7 @@ export default defineConfig(({ mode }) => {
     base: env.VITE_TARGET === "electron" ? "./" : "/",
     build: {
       outDir: "build",
+      sourcemap: true,
     },
     // https://github.com/pouchdb/pouchdb/issues/8516#issuecomment-1546129302
     define: { global: typeof window === "undefined" ? "self" : "window" },

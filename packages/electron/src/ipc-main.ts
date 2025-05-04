@@ -15,7 +15,9 @@ export function configureIpcMain(ipcMain: Electron.IpcMain, window: BrowserWindo
   ipcMain.on("open-logs-dir", handleOpenLogsDir)
   ipcMain.on("read-logs", handleReadLogs)
   ipcMain.on("open-dev-tools", (event) => {
-    window.webContents.openDevTools()
+    setTimeout(() => {
+      window.webContents.openDevTools()
+    }, 500)
     event.returnValue = true
   })
 
