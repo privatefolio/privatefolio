@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, Menu, Tray } from "electron"
 import Logger from "electron-log/main"
 import Store from "electron-store"
 import path from "path"
+import updateElectronApp from "update-electron-app"
 
 import { TITLE_BAR_OPTS } from "./api"
 import { getAutoLaunchEnabled, toggleAutoLaunch } from "./auto-launch"
@@ -33,6 +34,13 @@ Object.assign(console, Logger.scope("Main"))
 console.log("Starting app...")
 console.log("Logging to", getLogsPath())
 console.log("Dev flag", hasDevFlag)
+
+updateElectronApp({
+  logger: Logger,
+  notifyUser: true,
+  repo: "privatefolio/privatefolio",
+  updateInterval: "1 hour",
+})
 
 // Logs: C:\Users\daniel\AppData\Local\SquirrelTemp
 const squirrel = require("electron-squirrel-startup")

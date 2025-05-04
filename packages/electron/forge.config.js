@@ -75,6 +75,7 @@ module.exports = {
       //
     ],
     name: "Privatefolio",
+    osxSign: {}, // TODO9 Required for macOS auto-update
     win32metadata: {
       CompanyName: "hello@danielconstantin.net",
       FileDescription: "Privatefolio",
