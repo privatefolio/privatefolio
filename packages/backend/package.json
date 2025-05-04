@@ -1,6 +1,6 @@
 {
   "name": "privatefolio-backend",
-  "version": "2.0.0-alpha.6",
+  "version": "2.0.0-alpha.7",
   "private": false,
   "license": "AGPL-3.0",
   "author": {
@@ -40,7 +40,6 @@
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
-    "cross-env": "7.0.3",
     "@types/big.js": "^6.2.2",
     "@types/bun": "^1.1.6",
     "@types/chalk": "^2.2.0",
@@ -50,6 +49,7 @@
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "concurrently": "^9.0.1",
+    "cross-env": "7.0.3",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-standard": "^17.1.0",
