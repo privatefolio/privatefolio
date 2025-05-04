@@ -7,10 +7,6 @@ import {
 } from "./auto-launch-linux"
 import { isLinux } from "./utils"
 
-export function getAutoLaunchSettings() {
-  return app.getLoginItemSettings()
-}
-
 export async function toggleAutoLaunch() {
   if (isLinux) {
     const appName = app.getName()
@@ -26,7 +22,10 @@ export async function toggleAutoLaunch() {
     }
   }
 
-  const currentSettings = getAutoLaunchSettings()
+  const currentSettings = app.getLoginItemSettings({
+    args: ["--hidden"],
+    path: app.getPath("exe"),
+  })
   const newEnabled = !currentSettings.openAtLogin
 
   app.setLoginItemSettings({
@@ -43,5 +42,10 @@ export async function getAutoLaunchEnabled(): Promise<boolean> {
   if (isLinux) {
     return isAutoLaunchEnabledLinux(app.getName())
   }
-  return getAutoLaunchSettings().openAtLogin
+  const settings = app.getLoginItemSettings({
+    args: ["--hidden"],
+    path: app.getPath("exe"),
+  })
+
+  return settings.openAtLogin
 }
