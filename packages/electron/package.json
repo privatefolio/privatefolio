@@ -37,8 +37,8 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "eslint-plugin-vitest": "^0.5.4",
     "prettier": "^3.2.5",
-    "privatefolio-backend": "^2.0.0-alpha.7",
-    "privatefolio-frontend": "^2.0.0-alpha.7",
+    "privatefolio-backend": "^2.0.0-alpha.9",
+    "privatefolio-frontend": "^2.0.0-alpha.9",
     "typescript": "^5.4.5"
   },
   "keywords": [],
@@ -78,5 +78,5 @@
     "prepackage:mac": "bun ./prebuild-bin.sh",
     "prepackage:win": "bun ./prebuild-bin.sh"
   },
-  "version": "2.0.0-alpha.8"
+  "version": "2.0.0-alpha.9"
 }
