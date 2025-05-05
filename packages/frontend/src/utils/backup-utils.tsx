@@ -11,41 +11,43 @@ import { downloadFile } from "./utils"
 export async function handleBackupRequest() {
   enqueueSnackbar("Backup started", { persist: true, variant: "info" })
   const accountName = $activeAccount.get()
-  const fileRecord = await $rpc.get().backupAccount(accountName)
-  fileRecord
-    ? enqueueSnackbar(
-        <span>
-          The Backup is ready to download
-          <IconButton
-            aria-label="download"
-            color="inherit"
-            onClick={async () => {
-              const params = new URLSearchParams({
-                accountName: $activeAccount.get(),
-                fileId: fileRecord.id.toString(),
-              })
+  try {
+    const fileRecord = await $rpc.get().enqueueBackup(accountName, "user")
+    enqueueSnackbar(
+      <span>
+        The Backup is ready to download
+        <IconButton
+          aria-label="download"
+          color="inherit"
+          onClick={async () => {
+            const params = new URLSearchParams({
+              accountName: $activeAccount.get(),
+              fileId: fileRecord.id.toString(),
+            })
 
-              const response = await fetch(`${$rest.get()}/download?${params.toString()}`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem(JWT_LOCAL_STORAGE_KEY)}` },
-              })
+            const response = await fetch(`${$rest.get()}/download?${params.toString()}`, {
+              headers: { Authorization: `Bearer ${localStorage.getItem(JWT_LOCAL_STORAGE_KEY)}` },
+            })
 
-              const blob = await response.blob()
+            const blob = await response.blob()
 
-              downloadFile(blob, fileRecord.name)
-            }}
-          >
-            <DownloadRoundedIcon />
-          </IconButton>
-        </span>,
-        {
-          autoHideDuration: 50000,
-          variant: "success",
-        }
-      )
-    : enqueueSnackbar("An error occurred while creating the file", {
-        autoHideDuration: 10000,
-        variant: "error",
-      })
+            downloadFile(blob, fileRecord.name)
+          }}
+        >
+          <DownloadRoundedIcon />
+        </IconButton>
+      </span>,
+      {
+        autoHideDuration: null,
+        variant: "success",
+      }
+    )
+  } catch (error) {
+    enqueueSnackbar("An error occurred while creating the file", {
+      autoHideDuration: 10000,
+      variant: "error",
+    })
+  }
 }
 
 export async function handleRestoreRequest(file: File) {

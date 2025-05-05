@@ -10,7 +10,7 @@ import { extractColumnsFromRow } from "./file-imports/csv-utils"
 import { patchServerFile, upsertServerFile } from "./server-files-api"
 import { enqueueTask } from "./server-tasks-api"
 
-async function exportTableToCSV(account: Account, table: string) {
+async function exportTableToCSV(account: Account, table: string, progress: ProgressCallback) {
   const rows = await account.execute(`SELECT * FROM ${table}`)
 
   if (rows.length === 0) {
@@ -23,30 +23,41 @@ async function exportTableToCSV(account: Account, table: string) {
 
   const header = createCsvString([columnNames])
   const data = createCsvString(rows)
+  await progress([undefined, `Writing the csv for ${table}`])
   const csvContent = `${header}\n${data}`
 
   return csvContent
 }
 
-export async function backupAccount(accountName: string): Promise<ServerFile> {
+export async function backupAccount(
+  accountName: string,
+  progress: ProgressCallback = noop
+): Promise<ServerFile> {
   const account = await getAccount(accountName)
 
+  await progress([0, `Extracting the tables names from database`])
   const tables = await account.execute("SELECT name FROM sqlite_master WHERE type='table'")
-
   const tableNames = tables.map((row) => row[0] as string)
+  await progress([10, `Extracted the tables names from database`])
+
+  await progress([10, `Writing the zip file`])
   const zip = new JSZip()
 
   for (const tableName of tableNames) {
     if (tableName !== "sqlite_sequence") {
-      const csvContent = await exportTableToCSV(account, tableName)
+      await progress([undefined, `Writing the file for table ${tableName}`])
+      const csvContent = await exportTableToCSV(account, tableName, progress)
       zip.file(`${tableName}.csv`, csvContent)
     }
   }
+  await progress([60, `Wrote the zip file`])
 
   const bufferData = await zip.generateAsync({ type: "nodebuffer" })
   console.log("Buffer completed")
 
+  await progress([70, `Saving file with name ${accountName}-backup.zip`])
   const fileRecord = saveBackupFile(accountName, bufferData, `${accountName}-backup.zip`)
+  await progress([90, `Saved file with name ${accountName}-backup.zip `])
   return fileRecord
 }
 
@@ -112,19 +123,24 @@ export async function restoreAccount(
   progress: ProgressCallback = noop,
   signal?: AbortSignal
 ) {
-  await progress([0, "Resetting the account"])
+  await progress([0, "Restoring the account"])
   const account = await getAccount(accountName)
 
+  await progress([0, "Extracting the files from zip"])
   const file = Bun.file(join(FILES_LOCATION, accountName, fileRecord.id.toString()))
   const zip = new JSZip()
   const zipContents = await zip.loadAsync(await file.arrayBuffer(), { base64: true })
   let fileIndex = 0
   const files = Object.keys(zipContents.files).length
+  await progress([0, "Files extracted"])
 
   for (const fileName of Object.keys(zipContents.files)) {
     await progress([(100 / files) * fileIndex, `Restoring ${fileName}`])
+    if (fileName === "audit_logs.csv") {
+      continue
+    }
     if (fileName.endsWith(".csv")) {
-      // console.log(fileName, "started")
+      console.log(fileName, "started")
       const tableName = fileName.slice(0, -4)
       const zipFileEntry = zipContents.file(fileName)
       if (!zipFileEntry) {
@@ -151,16 +167,23 @@ export async function restoreAccount(
       }
 
       for (let i = 1; i < rows.length; i++) {
-        let rowContent = extractColumnsFromRow(rows[i], columns.length)
-        if (fileName.includes("server_tasks")) {
-          rowContent = rowContent.slice(1)
+        try {
+          console.log("🚀 ~ rows[i]:", typeof rows[i], rows[i])
+          let rowContent = extractColumnsFromRow(rows[i], columns.length)
+          if (fileName.includes("server_tasks")) {
+            rowContent = rowContent.slice(1)
+          }
+          await account.execute(
+            insertSQL,
+            rowContent.map((value) => value || null)
+          )
+        } catch (error) {
+          throw new Error(
+            `Could not parse row ${i} of ${fileName} with content ${rows[i]}, error: ${error.message}`
+          )
         }
-        await account.execute(
-          insertSQL,
-          rowContent.map((value) => value || null)
-        )
       }
-      // console.log(fileName, "finished")
+      console.log(fileName, "finished")
     } else {
       throw new Error(`The file ${fileName} is not csv.`)
     }
@@ -169,16 +192,20 @@ export async function restoreAccount(
   await progress([100, `Restore completed`])
 }
 
-export function enqueueBackup(accountName: string, trigger: TaskTrigger) {
-  return new Promise<string>(() => {
-    return enqueueTask(accountName, {
+export async function enqueueBackup(accountName: string, trigger: TaskTrigger) {
+  return new Promise<ServerFile>((resolve, reject) => {
+    enqueueTask(accountName, {
       description:
         "Backup account data, which can be used for restoring or migrating to another device.",
       determinate: true,
       function: async (progress) => {
-        // TODO9
-        // const file = await backupAccount(accountName)
-        // return file
+        try {
+          const fileRecord = await backupAccount(accountName, progress)
+          resolve(fileRecord)
+        } catch (error) {
+          reject(error)
+          throw error
+        }
       },
       name: "Backup",
       priority: TaskPriority.Low,
@@ -187,19 +214,15 @@ export function enqueueBackup(accountName: string, trigger: TaskTrigger) {
   })
 }
 
-export async function enqueueRestore(accountName: string, file: FileList, trigger: TaskTrigger) {
-  return new Promise<void>((resolve) => {
-    return enqueueTask(accountName, {
-      description: "Restore account data from a backup file.",
-      determinate: true,
-      function: async (progress) => {
-        // TODO9
-        // await restoreAccount(accountName, file, progress)
-        // resolve()
-      },
-      name: "Restore account",
-      priority: TaskPriority.Highest,
-      trigger,
-    })
+export async function enqueueRestore(accountName: string, trigger: TaskTrigger, file: ServerFile) {
+  return enqueueTask(accountName, {
+    description: "Restore account data.",
+    determinate: true,
+    function: async (progress) => {
+      await restoreAccount(accountName, file, progress)
+    },
+    name: "Restore account",
+    priority: TaskPriority.Highest,
+    trigger,
   })
 }

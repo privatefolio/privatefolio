@@ -48,10 +48,10 @@ export function ImportDataActions() {
         <MenuItem
           dense
           onClick={async () => {
-            const files = await requestFile([".zip"], false)
+            const file = await requestFile([".zip"], false)
             await $rpc.get().resetAccount($activeAccount.get())
-            const fileRecord = await handleRestoreRequest(files[0])
-            await $rpc.get().restoreAccount($activeAccount.get(), fileRecord)
+            const fileRecord = await handleRestoreRequest(file[0])
+            await $rpc.get().enqueueRestore($activeAccount.get(), "user", fileRecord)
             handleClose()
           }}
         >
