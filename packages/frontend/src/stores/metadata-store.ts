@@ -26,13 +26,14 @@ export async function fetchInMemoryData() {
   const accountName = $activeAccount.get()
 
   const start = Date.now()
-  const [assets, platform, wallet, operation, addressBook, tags] = await Promise.all([
+  const [assets, platform, wallet, operation, addressBook, tags, triggers] = await Promise.all([
     $rpc.get().getAssets(accountName),
     $rpc.get().getPlatforms(accountName),
     $rpc.get().getWallets(accountName),
     $rpc.get().getOperations(accountName),
     $rpc.get().getValue(accountName, "address_book", "{}"),
     $rpc.get().getTags(accountName),
+    $rpc.get().getTriggers(accountName),
   ])
 
   $inMemoryDataQueryTime.set(Date.now() - start)
@@ -61,6 +62,7 @@ export async function fetchInMemoryData() {
 
   const map: FilterOptionsMap = {
     assetId: assetIds,
+    createdBy: ["user", "system"],
     exchangeType: ["DEX", "CEX"],
     feeAsset: assetIds,
     incomingAsset: assetIds,
@@ -68,6 +70,7 @@ export async function fetchInMemoryData() {
     outgoingAsset: assetIds,
     platform,
     tags: tagIds,
+    trigger: triggers,
     type: TRANSACTIONS_TYPES,
     wallet,
   }
@@ -83,6 +86,7 @@ type DirectFilterKey = "id" | "txId" | "txHash" | "tradeId"
 // TODO0 this union type can be improved
 export const FILTER_LABEL_MAP: Record<FilterKey | DirectFilterKey, string> = {
   assetId: "Asset",
+  createdBy: "Created By",
   exchangeType: "Exchange Type",
   feeAsset: "Fee Asset",
   id: "Id",
@@ -92,6 +96,7 @@ export const FILTER_LABEL_MAP: Record<FilterKey | DirectFilterKey, string> = {
   platform: "Platform",
   tags: "Tags",
   tradeId: "Trade Id",
+  trigger: "Trigger",
   txHash: "Tx Hash",
   txId: "Transaction Id",
   type: "Type",
@@ -120,6 +125,11 @@ export function getFilterValueLabel(value: string | number | undefined) {
   if (value.includes(":")) {
     return getAssetTicker(value)
   }
+
+  if (value === "user") return "User"
+  if (value === "system") return "System"
+  if (value === "side-effect") return "Side-Effect"
+  if (value === "cron") return "Cron"
 
   if (value in $addressBook.get()) {
     return $addressBook.get()[value]

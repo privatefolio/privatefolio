@@ -142,6 +142,21 @@ function createProgressCallback(account: Account, taskId: number): ProgressCallb
   }
 }
 
+export async function getTriggers(
+  accountName: string,
+  query = "SELECT DISTINCT trigger FROM server_tasks ORDER BY trigger ASC",
+  params: SqlParam[] = []
+): Promise<string[]> {
+  const account = await getAccount(accountName)
+
+  try {
+    const result = await account.execute(query, params)
+    return result.map((row) => row[0] as string)
+  } catch (error) {
+    throw new Error(`Failed to query triggers: ${error}`)
+  }
+}
+
 async function processQueue(accountName: string) {
   const account = await ensureTaskQueue(accountName)
 

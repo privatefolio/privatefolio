@@ -43,12 +43,27 @@ export function ServerTasksTable() {
   const queryFn: QueryTableData<ServerTask> = useCallback(
     async (filters, rowsPerPage, page, order, signal) => {
       const _refresh = refresh // reference the dependency for eslint(react-hooks/exhaustive-deps)
+
+      const filterConditions: string[] = []
+
+      Object.keys(filters).forEach((key) => {
+        filterConditions.push(`${key} = '${filters[key]}'`)
+      })
+
+      let filterQuery = ""
+      if (filterConditions.length > 0) {
+        filterQuery = "WHERE " + filterConditions.join(" AND ")
+      }
+
       const orderQuery = `ORDER BY id ${order}`
       const limitQuery = `LIMIT ${rowsPerPage} OFFSET ${page * rowsPerPage}`
 
       const records = await $rpc
         .get()
-        .getServerTasks(accountName, `SELECT * FROM server_tasks ${orderQuery} ${limitQuery}`)
+        .getServerTasks(
+          accountName,
+          `SELECT * FROM server_tasks ${filterQuery} ${orderQuery} ${limitQuery}`
+        )
 
       if (signal?.aborted) throw new Error(signal.reason)
 
@@ -87,6 +102,7 @@ export function ServerTasksTable() {
         sortable: true,
       },
       {
+        filterable: true,
         key: "trigger",
         label: "Trigger",
         sortable: true,

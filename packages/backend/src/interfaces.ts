@@ -630,6 +630,7 @@ export type CsvData = (string | number | undefined | boolean | object)[][]
 
 export type FilterOptionsMap = {
   assetId: string[]
+  createdBy: string[]
   exchangeType: string[]
   feeAsset: string[]
   incomingAsset: string[]
@@ -637,6 +638,7 @@ export type FilterOptionsMap = {
   outgoingAsset: string[]
   platform: string[]
   tags: number[]
+  trigger: string[]
   type: readonly TransactionType[]
   wallet: string[]
 }
