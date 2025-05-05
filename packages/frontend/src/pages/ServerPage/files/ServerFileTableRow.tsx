@@ -6,6 +6,7 @@ import { TimestampBlock } from "src/components/TimestampBlock"
 import { Truncate } from "src/components/Truncate"
 import { ServerFile } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
+import { JWT_LOCAL_STORAGE_KEY } from "src/stores/auth-store"
 import { getFilterValueLabel } from "src/stores/metadata-store"
 import { MonoFont } from "src/theme"
 import { TableRowComponentProps } from "src/utils/table-utils"
@@ -90,7 +91,11 @@ export function ServerFileTableRow(props: TableRowComponentProps<ServerFile>) {
                       fileId: row.id.toString(),
                     })
 
-                    const response = await fetch(`${$rest.get()}/download?${params.toString()}`)
+                    const response = await fetch(`${$rest.get()}/download?${params.toString()}`, {
+                      headers: {
+                        Authorization: `Bearer ${localStorage.getItem(JWT_LOCAL_STORAGE_KEY)}`,
+                      },
+                    })
 
                     const blob = await response.blob()
 

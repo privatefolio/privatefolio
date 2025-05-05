@@ -4,6 +4,7 @@ import RestoreRoundedIcon from "@mui/icons-material/RestoreRounded"
 import { IconButton, ListItemAvatar, ListItemText, Menu, MenuItem, Tooltip } from "@mui/material"
 import React from "react"
 import { $activeAccount } from "src/stores/account-store"
+import { handleBackupRequest, handleRestoreRequest } from "src/utils/backup-utils"
 import { requestFile } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
@@ -58,8 +59,8 @@ export function ServerActions() {
         <MenuItem
           dense
           onClick={() => {
-            // $rpc.get().enqueueBackup($activeAccount.get(), "user")
             handleClose()
+            handleBackupRequest()
           }}
         >
           <ListItemAvatar>
@@ -71,8 +72,10 @@ export function ServerActions() {
           dense
           onClick={async () => {
             const files = await requestFile([".zip"], false)
+            await $rpc.get().resetAccount($activeAccount.get())
+            const fileRecord = await handleRestoreRequest(files[0])
+            await $rpc.get().restoreAccount($activeAccount.get(), fileRecord)
             handleClose()
-            // $rpc.get().enqueueRestore($activeAccount.get(), "user", files[0])
           }}
         >
           <ListItemAvatar>

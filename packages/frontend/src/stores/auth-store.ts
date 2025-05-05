@@ -50,9 +50,7 @@ export async function checkAuthentication() {
     }
 
     const verifyRes = await fetch(`${baseUrl}/api/verify-auth`, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
+      headers: { Authorization: `Bearer ${jwt}` },
     })
 
     const data = await verifyRes.json()

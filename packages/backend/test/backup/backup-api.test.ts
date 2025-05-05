@@ -1,14 +1,13 @@
 import fs from "fs"
 import { join } from "path"
 import { countAuditLogs, getAuditLogs } from "src/api/account/audit-logs-api"
-import { backupAccount } from "src/api/account/backup-api"
+import { backupAccount, restoreAccount } from "src/api/account/backup-api"
 import { computeBalances, getBalances } from "src/api/account/balances-api"
 import { importFile } from "src/api/account/file-imports/file-imports-api"
 import { getTransactions } from "src/api/account/transactions-api"
-import { resetAccount } from "src/api/accounts-api"
 import { ProgressUpdate } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
-import { beforeAll, describe, expect, it, vi } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 
 const accountName = Math.random().toString(36).substring(7)
 
@@ -22,10 +21,6 @@ vi.mock("fs/promises", () => ({
   ...fs.promises,
   readFile: mocks.readFile,
 }))
-
-beforeAll(async () => {
-  await resetAccount(accountName)
-})
 
 describe.todo("should backup and restore", () => {
   it("should add a file import", async () => {
@@ -113,7 +108,7 @@ describe.todo("should backup and restore", () => {
     const backupData = await backupAccount(accountName)
     const newAccountName = "my-new-account"
     // act
-    // await restoreAccount(newAccountName, backupData) TODO7
+    await restoreAccount(newAccountName, backupData)
     // assert
     const auditLogs = await getAuditLogs(newAccountName)
     const transactions = await getTransactions(newAccountName)

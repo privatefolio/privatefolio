@@ -4,8 +4,9 @@ import React, { useCallback, useRef, useState } from "react"
 import { ConfirmDialogContextType, useConfirm } from "src/hooks/useConfirm"
 import { ServerFile } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
+import { handleRestoreRequest } from "src/utils/backup-utils"
 import { formatCamelCase } from "src/utils/utils"
-import { $rest, $rpc } from "src/workers/remotes"
+import { $rpc } from "src/workers/remotes"
 
 import { AddressInputUncontrolled } from "./AddressInput"
 import { CircularSpinner } from "./CircularSpinner"
@@ -34,34 +35,7 @@ export function FileDrop(props: ButtonProps) {
 
   const handleFileUpload = useCallback(
     async (file: File) => {
-      const fileRecord = await $rpc.get().upsertServerFile($activeAccount.get(), {
-        createdBy: "user",
-        metadata: {
-          lastModified: file.lastModified,
-          size: file.size,
-          type: file.type,
-        },
-        name: file.name,
-        scheduledAt: Date.now(),
-        status: "scheduled",
-      })
-
-      const formData = new FormData()
-      formData.append("accountName", $activeAccount.get())
-      formData.append("file", file)
-      formData.append("fileId", fileRecord.id.toString())
-
-      const response = await fetch(`${$rest.get()}/upload`, {
-        body: formData,
-        method: "POST",
-      })
-
-      if (response.ok) {
-        console.log("File uploaded successfully")
-      } else {
-        const errorText = await response.text()
-        console.error("Error uploading file:", errorText)
-      }
+      const fileRecord = await handleRestoreRequest(file)
 
       const requirements = await $rpc
         .get()

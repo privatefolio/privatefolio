@@ -5,7 +5,7 @@ import { ProgressCallback, ServerFile, TaskPriority, TaskTrigger } from "src/int
 import { FILES_LOCATION } from "src/settings"
 import { createCsvString, noop } from "src/utils/utils"
 
-import { Account, getAccount, resetAccount } from "../accounts-api"
+import { Account, getAccount } from "../accounts-api"
 import { extractColumnsFromRow } from "./file-imports/csv-utils"
 import { patchServerFile, upsertServerFile } from "./server-files-api"
 import { enqueueTask } from "./server-tasks-api"
@@ -46,6 +46,15 @@ export async function backupAccount(accountName: string): Promise<ServerFile> {
   const bufferData = await zip.generateAsync({ type: "nodebuffer" })
   console.log("Buffer completed")
 
+  const fileRecord = saveBackupFile(accountName, bufferData, `${accountName}-backup.zip`)
+  return fileRecord
+}
+
+async function saveBackupFile(
+  accountName: string,
+  bufferData: Buffer,
+  name: string
+): Promise<ServerFile> {
   const fileRecord = await upsertServerFile(accountName, {
     createdBy: "system",
     metadata: {
@@ -53,7 +62,7 @@ export async function backupAccount(accountName: string): Promise<ServerFile> {
       size: bufferData.length,
       type: "application/zip",
     },
-    name: `${accountName}-backup.zip`,
+    name,
     scheduledAt: Date.now(),
     status: "scheduled",
   })
@@ -99,16 +108,16 @@ export async function backupAccount(accountName: string): Promise<ServerFile> {
 
 export async function restoreAccount(
   accountName: string,
-  file: string,
+  fileRecord: ServerFile,
   progress: ProgressCallback = noop,
   signal?: AbortSignal
 ) {
   await progress([0, "Resetting the account"])
-  await resetAccount(accountName)
   const account = await getAccount(accountName)
 
+  const file = Bun.file(join(FILES_LOCATION, accountName, fileRecord.id.toString()))
   const zip = new JSZip()
-  const zipContents = await zip.loadAsync(file, { base64: true })
+  const zipContents = await zip.loadAsync(await file.arrayBuffer(), { base64: true })
   let fileIndex = 0
   const files = Object.keys(zipContents.files).length
 
@@ -167,8 +176,9 @@ export function enqueueBackup(accountName: string, trigger: TaskTrigger) {
         "Backup account data, which can be used for restoring or migrating to another device.",
       determinate: true,
       function: async (progress) => {
-        const file = await backupAccount(accountName)
-        return file
+        // TODO9
+        // const file = await backupAccount(accountName)
+        // return file
       },
       name: "Backup",
       priority: TaskPriority.Low,
@@ -177,14 +187,15 @@ export function enqueueBackup(accountName: string, trigger: TaskTrigger) {
   })
 }
 
-export async function enqueueRestore(accountName: string, file: string, trigger: TaskTrigger) {
+export async function enqueueRestore(accountName: string, file: FileList, trigger: TaskTrigger) {
   return new Promise<void>((resolve) => {
     return enqueueTask(accountName, {
       description: "Restore account data from a backup file.",
       determinate: true,
       function: async (progress) => {
-        await restoreAccount(accountName, file, progress)
-        resolve()
+        // TODO9
+        // await restoreAccount(accountName, file, progress)
+        // resolve()
       },
       name: "Restore account",
       priority: TaskPriority.Highest,

@@ -1,4 +1,10 @@
-import { AttachMoneyRounded, CallMergeRounded, HomeRounded, SyncRounded } from "@mui/icons-material"
+import {
+  AttachMoneyRounded,
+  BackupRounded,
+  CallMergeRounded,
+  HomeRounded,
+  SyncRounded,
+} from "@mui/icons-material"
 import {
   Button,
   Dialog,
@@ -18,6 +24,7 @@ import { Transaction } from "src/interfaces"
 import { $activeAccount, $activeIndex } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
 import { $assetMap } from "src/stores/metadata-store"
+import { handleBackupRequest } from "src/utils/backup-utils"
 import { formatDateRelative, formatPrivatefolioTxId } from "src/utils/formatting-utils"
 import { normalizeTxHash } from "src/utils/parsing-utils"
 import { $rpc } from "src/workers/remotes"
@@ -163,6 +170,14 @@ export const SearchBar = () => {
         id: "action-auto-merge-txns",
         name: "Auto-merge transactions",
         perform: () => $rpc.get().enqueueAutoMerge($activeAccount.get(), "user"),
+        priority: 1,
+        section: "Actions",
+      },
+      {
+        icon: <BackupRounded fontSize="small" />,
+        id: "action-backup-account",
+        name: "Backup account",
+        perform: () => handleBackupRequest(),
         priority: 1,
         section: "Actions",
       },
