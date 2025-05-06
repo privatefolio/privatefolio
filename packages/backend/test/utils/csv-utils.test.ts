@@ -1,6 +1,54 @@
-import { extractColumnsFromRow } from "src/api/account/file-imports/csv-utils"
-import { createCsvString } from "src/utils/utils"
+import { createCsvString, extractColumnsFromRow } from "src/utils/csv-utils"
 import { expect, it } from "vitest"
+
+it("extractColumnsFromRow should work", async () => {
+  expect(
+    extractColumnsFromRow(
+      '"1700587343_0xb51ab18d174b930ed394203a7890c5aaa539f9ac33ddac82756af3a22e16d689_NORMAL_0_VALUE_0","ethereum:0x0000000000000000000000000000000000000000:ETH","0.055206971252564254","0.055206971252564255","0.055206971252564254","0.055206971252564255","1700587343","","0","Deposit","ethereum","1675502855000","1700587343_0xb51ab18d174b930ed394203a7890c5aaa539f9ac33ddac82756af3a22e16d689_NORMAL_0","0xfa42dC95E344f976d4B043Ca227c474470B670DC"'
+    )
+  ).toMatchInlineSnapshot(`
+    [
+      "1700587343_0xb51ab18d174b930ed394203a7890c5aaa539f9ac33ddac82756af3a22e16d689_NORMAL_0_VALUE_0",
+      "ethereum:0x0000000000000000000000000000000000000000:ETH",
+      "0.055206971252564254",
+      "0.055206971252564255",
+      "0.055206971252564254",
+      "0.055206971252564255",
+      "1700587343",
+      "",
+      "0",
+      "Deposit",
+      "ethereum",
+      "1675502855000",
+      "1700587343_0xb51ab18d174b930ed394203a7890c5aaa539f9ac33ddac82756af3a22e16d689_NORMAL_0",
+      "0xfa42dC95E344f976d4B043Ca227c474470B670DC",
+    ]
+  `)
+})
+it("extractColumnsFromRow should work", async () => {
+  expect(
+    extractColumnsFromRow(
+      // eslint-disable-next-line no-useless-escape
+      `"1700587343_0xb51ab18d174b930ed394203a7890c5aaa539f9ac33ddac82756af3a22e16d689_NORMAL_0_VALUE_0\",\"ethereum:0x0000000000000000000000000000000000000000:ETH\",\"0.055206971252564254\",\"0.055206971252564255\",\"0.055206971252564254\",\"0.055206971252564255\",\"1700587343\",\",\"0\",\"Deposit\",\"ethereum\",\"1675502855000\",\"1700587343_0xb51ab18d174b930ed394203a7890c5aaa539f9ac33ddac82756af3a22e16d689_NORMAL_0\",\"0xfa42dC95E344f976d4B043Ca227c474470B670DC"`
+    )
+  ).toMatchInlineSnapshot(`
+    [
+      "1700587343_0xb51ab18d174b930ed394203a7890c5aaa539f9ac33ddac82756af3a22e16d689_NORMAL_0_VALUE_0",
+      "ethereum:0x0000000000000000000000000000000000000000:ETH",
+      "0.055206971252564254",
+      "0.055206971252564255",
+      "0.055206971252564254",
+      "0.055206971252564255",
+      "1700587343",
+      ","0",
+      "Deposit",
+      "ethereum",
+      "1675502855000",
+      "1700587343_0xb51ab18d174b930ed394203a7890c5aaa539f9ac33ddac82756af3a22e16d689_NORMAL_0",
+      "0xfa42dC95E344f976d4B043Ca227c474470B670DC",
+    ]
+  `)
+})
 
 it("extractColumnsFromRow should work", async () => {
   expect(extractColumnsFromRow("hey,boo", 2)).toMatchInlineSnapshot(`
@@ -88,7 +136,7 @@ it("createCsvString should work", async () => {
   `)
 })
 
-it("extractColumnsFromRow should work", async () => {
+it("extractColumnsFromRow & createCsvString should work", async () => {
   const stringified = createCsvString([
     [
       {
@@ -132,4 +180,27 @@ it("extractColumnsFromRow should work", async () => {
       ],
     }
   `)
+})
+
+it("extractColumnsFromRow & createCsvString should work", async () => {
+  const obj = [
+    "1700587343_0xb51ab18d174b930ed394203a7890c5aaa539f9ac33ddac82756af3a22e16d689_NORMAL_0_VALUE_0",
+    "ethereum:0x0000000000000000000000000000000000000000:ETH",
+    "0.055206971252564254",
+    "0.055206971252564255",
+    "0.055206971252564254",
+    "0.055206971252564255",
+    "1700587343",
+    "",
+    "0",
+    "Deposit",
+    "ethereum",
+    "1675502855000",
+    "1700587343_0xb51ab18d174b930ed394203a7890c5aaa539f9ac33ddac82756af3a22e16d689_NORMAL_0",
+    "0xfa42dC95E344f976d4B043Ca227c474470B670DC",
+  ]
+
+  const stringified = createCsvString([obj])
+  const result = extractColumnsFromRow(stringified)
+  expect(result).toEqual(obj)
 })

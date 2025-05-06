@@ -1,5 +1,3 @@
-import { CsvData } from "src/interfaces"
-
 /**
  * Returns a hash code from a string
  * @param  {String} str The string to hash.
@@ -63,24 +61,3 @@ export function timeQueue<T extends (...args: never[]) => void>(
 }
 
 export * from "./environment-utils"
-
-export function createCsvString(data: CsvData, delimiter = ",") {
-  return data
-    .map((row) =>
-      row
-        .map((value) => {
-          let stringified: string
-
-          if (value === null) stringified = ""
-          else if (value === undefined) stringified = ""
-          else if (typeof value === "object") stringified = JSON.stringify(value)
-          else stringified = String(value)
-
-          stringified = stringified.replace(/"/g, '""') // Escape double quotes
-          stringified = stringified.replace(/,/g, "\\,") // Escape commas
-          return `"${stringified}"`
-        })
-        .join(delimiter)
-    )
-    .join("\n")
-}

@@ -1,13 +1,17 @@
 import {
+  HEADER_MATCHER,
+  PARSER_MATCHER,
+  PLATFORM_MATCHER,
+} from "src/api/account/file-imports/integrations/matchers"
+import {
   AuditLog,
   AuditLogOperation,
   FileImport,
   ProgressCallback,
   Transaction,
 } from "src/interfaces"
+import { splitRows } from "src/utils/csv-utils"
 import { extractTransactions } from "src/utils/extract-utils"
-
-import { HEADER_MATCHER, PARSER_MATCHER, PLATFORM_MATCHER } from "./integrations"
 
 export function sanitizeHeader(headerRow: string) {
   return headerRow
@@ -88,71 +92,4 @@ export async function parseCsv(
   }
 
   return { logs, metadata, transactions }
-}
-
-export function extractColumnsFromRow(row: string, colNumber?: number): string[] {
-  // A regex that matches content inside quotes or non-comma/non-semicolon characters,
-  // accounting for commas or semicolons within quotes
-  let columns: string[] = row.match(/(".*?"|[^",;]+)(?=\s*[;,]|\s*$)/g) || []
-
-  if (typeof colNumber === "number" && columns.length !== colNumber) {
-    columns = row.split(";")
-  }
-
-  // Remove quotes and handle escaped quotes
-  columns = columns.map((column) => {
-    if (column.startsWith('"') && column.endsWith('"')) {
-      // Remove surrounding quotes and replace escaped quotes ("" -> ")
-      column = column.slice(1, -1).replace(/""/g, '"')
-    }
-
-    // Remove escaped commas (\, -> ,)
-    column = column.replace(/\\,/g, ",")
-    return column
-  })
-
-  if (typeof colNumber === "number" && columns.length !== colNumber) {
-    console.log("Invalid number of columns:", columns.length, colNumber, ", columns:", columns)
-    throw new Error(`Invalid number of columns: expected ${colNumber}, received ${columns.length}`)
-  }
-
-  return columns
-}
-
-export function splitRows(text: string): string[] {
-  // OLD version which is slow
-  // return text.trim().split(/\r?\n(?=(?:[^"]*"[^"]*")*[^"]*$)/)
-
-  const rows = []
-  let currentRow = ""
-  let insideQuotes = false
-  let i = 0
-
-  while (i < text.length) {
-    const char = text[i]
-    const nextChar = text[i + 1]
-
-    if (char === '"') {
-      insideQuotes = !insideQuotes
-    }
-
-    if (!insideQuotes && char === "\n") {
-      rows.push(currentRow)
-      currentRow = ""
-    } else if (!insideQuotes && char === "\r" && nextChar === "\n") {
-      rows.push(currentRow)
-      currentRow = ""
-      i++ // Skip the '\n' in '\r\n'
-    } else {
-      currentRow += char
-    }
-
-    i++
-  }
-
-  if (currentRow) {
-    rows.push(currentRow)
-  }
-
-  return rows
 }

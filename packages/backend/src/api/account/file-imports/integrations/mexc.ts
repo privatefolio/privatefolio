@@ -6,10 +6,9 @@ import {
   TransactionSide,
 } from "src/interfaces"
 import { PlatformId } from "src/settings"
+import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
-
-import { extractColumnsFromRow } from "../csv-utils"
 
 export const Identifier = "mexc"
 export const platform: PlatformId = "mexc"

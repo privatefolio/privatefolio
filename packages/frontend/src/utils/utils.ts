@@ -1,4 +1,4 @@
-import { createCsvString } from "privatefolio-backend/build/src/utils/utils"
+import { createCsvString } from "privatefolio-backend/build/src/utils/csv-utils"
 
 import { CsvData, ProgressLog } from "../interfaces"
 

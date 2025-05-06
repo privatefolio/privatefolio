@@ -8,10 +8,9 @@ import {
 } from "src/interfaces"
 import { PlatformId } from "src/settings"
 import { formatAddress } from "src/utils/assets-utils"
+import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { asUTC } from "src/utils/formatting-utils"
 import { isSpamToken } from "src/utils/integrations/etherscan-utils"
-
-import { extractColumnsFromRow } from "../csv-utils"
 export const Identifier = "etherscan-erc20"
 export const platform: PlatformId = "ethereum"
 

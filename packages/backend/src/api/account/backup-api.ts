@@ -3,23 +3,23 @@ import JSZip from "jszip"
 import { join } from "path"
 import { ProgressCallback, ServerFile, TaskPriority, TaskTrigger } from "src/interfaces"
 import { FILES_LOCATION } from "src/settings"
-import { createCsvString, noop } from "src/utils/utils"
+import { createCsvString, extractColumnsFromRow } from "src/utils/csv-utils"
+import { noop } from "src/utils/utils"
 
 import { Account, getAccount } from "../accounts-api"
-import { extractColumnsFromRow } from "./file-imports/csv-utils"
 import { patchServerFile, upsertServerFile } from "./server-files-api"
 import { enqueueTask } from "./server-tasks-api"
 
 async function exportTableToCSV(account: Account, table: string, progress: ProgressCallback) {
-  const rows = await account.execute(`SELECT * FROM ${table}`)
+  const tableInfo = await account.execute(`PRAGMA table_info(${table})`)
+  const columnNames = tableInfo.map((columnInfo) => columnInfo[1])
+
+  const rows = await account.execute(`SELECT ${columnNames.join(", ")} FROM ${table}`)
 
   if (rows.length === 0) {
     // console.log(`Table ${table} is empty. No CSV created.`)
     return ""
   }
-  const tableInfo = await account.execute(`PRAGMA table_info(${table})`)
-
-  const columnNames = tableInfo.map((columnInfo) => columnInfo[1])
 
   const header = createCsvString([columnNames])
   const data = createCsvString(rows)
@@ -44,6 +44,7 @@ export async function backupAccount(
   const zip = new JSZip()
 
   for (const tableName of tableNames) {
+    // TODO9: are you sure?
     if (tableName !== "sqlite_sequence") {
       await progress([undefined, `Writing the file for table ${tableName}`])
       const csvContent = await exportTableToCSV(account, tableName, progress)
@@ -136,9 +137,6 @@ export async function restoreAccount(
 
   for (const fileName of Object.keys(zipContents.files)) {
     await progress([(100 / files) * fileIndex, `Restoring ${fileName}`])
-    if (fileName === "audit_logs.csv") {
-      continue
-    }
     if (fileName.endsWith(".csv")) {
       console.log(fileName, "started")
       const tableName = fileName.slice(0, -4)
