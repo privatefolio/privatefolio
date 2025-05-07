@@ -176,20 +176,24 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
     const controller = new AbortController()
 
     setLoading(true)
-    Promise.all([
-      queryFn(activeFilters, rowsPerPage, page, order, controller.signal),
-      sleep(10),
-    ]).then(([[rows, queryCount]]) => {
-      setLoading(false)
-      setRows(rows)
-      setQueryTime(Date.now() - start)
+    try {
+      Promise.all([
+        queryFn(activeFilters, rowsPerPage, page, order, controller.signal),
+        sleep(10),
+      ]).then(([[rows, queryCount]]) => {
+        setLoading(false)
+        setRows(rows)
+        setQueryTime(Date.now() - start)
 
-      if (typeof queryCount === "function") {
-        queryCount().then(setRowCount)
-      } else {
-        setRowCount(queryCount)
-      }
-    })
+        if (typeof queryCount === "function") {
+          queryCount().then(setRowCount)
+        } else {
+          setRowCount(queryCount)
+        }
+      })
+    } finally {
+      setLoading(false)
+    }
 
     return function cleanup() {
       controller.abort("Result no longer needed.")
