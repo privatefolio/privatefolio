@@ -7,7 +7,7 @@ import { AccountAvatar, SIZE_MAP } from "src/components/AccountAvatar"
 import { AddAccountDialog } from "src/components/AccountPicker/AddAccountDialog"
 import { PrivateCloudDialog } from "src/components/AccountPicker/PrivateCloudDialog"
 import { CircularSpinner } from "src/components/CircularSpinner"
-import { Logo } from "src/components/Header/Logo"
+import { LogoText } from "src/components/Header/LogoText"
 import { StaggeredList } from "src/components/StaggeredList"
 import { useBoolean } from "src/hooks/useBoolean"
 import { $accounts, $activeAccount, $activeIndex } from "src/stores/account-store"
@@ -93,7 +93,7 @@ export default function AccountsPage() {
                   target="_blank"
                   sx={{ marginX: -2, paddingX: 2 }}
                 >
-                  <Logo />
+                  <LogoText />
                 </Button>
                 {!userLoading && (
                   <Fade in>

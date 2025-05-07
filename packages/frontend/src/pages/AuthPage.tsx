@@ -14,9 +14,9 @@ import {
   Typography,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React, { useEffect, useState } from "react"
+import React, { FormEvent, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Logo } from "src/components/Header/Logo"
+import { LogoText } from "src/components/Header/LogoText"
 import { SectionTitle } from "src/components/SectionTitle"
 
 import { $auth, setPassword, unlockApp } from "../stores/auth-store"
@@ -54,11 +54,13 @@ export default function AuthPage() {
     event.preventDefault()
   }
 
-  const handleLogin = async () => {
+  const handleUnlock = async (event: FormEvent) => {
+    event.preventDefault()
     await unlockApp(password)
   }
 
-  const handleSetup = async () => {
+  const handleSetup = async (event: FormEvent) => {
+    event.preventDefault()
     setValidationError(null)
     if (!password) {
       setValidationError("Password cannot be empty.")
@@ -97,120 +99,103 @@ export default function AuthPage() {
   )
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 8 }}>
-      <Card variant="outlined">
-        <CardHeader title={<Logo justifyContent="center" sx={{ margin: 1 }} />} />
-        {needsSetup ? (
-          <>
-            <CardContent component={Stack} gap={2}>
-              <Typography variant="body2" align="center" color="text.secondary" marginBottom={2}>
-                Before you get started, set a password to secure the application. Once in a while,
-                or when you lock the app, you will be prompted to enter the password again.
-              </Typography>
-              {errorMessage && (
-                <Alert severity="error" variant="outlined">
-                  {errorMessage}
-                </Alert>
-              )}
-              {validationError && (
-                <Alert severity="error" variant="outlined">
-                  {validationError}
-                </Alert>
-              )}
-              <div>
-                <SectionTitle>Password</SectionTitle>
-                <TextField
-                  autoFocus
-                  required
-                  size="small"
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  fullWidth
-                  variant="outlined"
-                  value={password}
-                  onChange={handlePasswordChange}
-                  error={!!validationError || !!errorMessage}
-                  disabled={loading}
-                  InputProps={{
-                    endAdornment: passwordAdornment,
-                  }}
-                />
-              </div>
-              <div>
-                <SectionTitle>Confirm Password</SectionTitle>
-                <TextField
-                  required
-                  size="small"
-                  id="confirm-password"
-                  type={showPassword ? "text" : "password"}
-                  fullWidth
-                  variant="outlined"
-                  value={confirmPassword}
-                  onChange={handleConfirmPasswordChange}
-                  error={!!validationError || !!errorMessage}
-                  disabled={loading}
-                  InputProps={{
-                    endAdornment: passwordAdornment,
-                  }}
-                />
-              </div>
-            </CardContent>
-            <CardActions sx={{ justifyContent: "center", p: 2 }}>
-              <Button
-                onClick={handleSetup}
-                variant="contained"
-                disabled={loading || !password || !confirmPassword}
-                size="large"
-              >
-                {loading ? "Setting password..." : "Set password"}
-              </Button>
-            </CardActions>
-          </>
-        ) : (
-          <>
-            <CardContent component={Stack} gap={2}>
-              <Typography variant="body2" align="center" color="text.secondary" marginBottom={2}>
-                Please enter your password to access Privatefolio.
-              </Typography>
-              {errorMessage && (
-                <Alert severity="error" variant="outlined">
-                  {errorMessage}
-                </Alert>
-              )}
-              <div>
-                <SectionTitle>Password</SectionTitle>
-                <TextField
-                  autoFocus
-                  required
-                  size="small"
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  fullWidth
-                  variant="outlined"
-                  value={password}
-                  onChange={handlePasswordChange}
-                  onKeyPress={(e) => e.key === "Enter" && handleLogin()}
-                  error={!!errorMessage}
-                  disabled={loading}
-                  InputProps={{
-                    endAdornment: passwordAdornment,
-                  }}
-                />
-              </div>
-            </CardContent>
-            <CardActions sx={{ justifyContent: "center", p: 2 }}>
-              <Button
-                onClick={handleLogin}
-                variant="contained"
-                disabled={loading || !password}
-                size="large"
-              >
-                {loading ? "Logging in..." : "Login"}
-              </Button>
-            </CardActions>
-          </>
-        )}
-      </Card>
+    <Container maxWidth="xs" sx={{ marginTop: 8 }} disableGutters>
+      <form onSubmit={needsSetup ? handleSetup : handleUnlock}>
+        <Card variant="outlined">
+          <CardHeader title={<LogoText color="primary" />} />
+          {needsSetup ? (
+            <>
+              <CardContent component={Stack} gap={2}>
+                <Typography variant="body2" color="text.secondary">
+                  Before you get started, set a password to secure the application. Once in a while,
+                  or when you lock the app, you will be prompted to enter the password again.
+                </Typography>
+                <div>
+                  <SectionTitle>Password</SectionTitle>
+                  <TextField
+                    autoFocus
+                    required
+                    size="small"
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    fullWidth
+                    variant="outlined"
+                    value={password}
+                    onChange={handlePasswordChange}
+                    error={!!validationError || !!errorMessage}
+                    disabled={loading}
+                    InputProps={{
+                      endAdornment: passwordAdornment,
+                    }}
+                  />
+                </div>
+                <div>
+                  <SectionTitle>Confirm Password</SectionTitle>
+                  <TextField
+                    required
+                    size="small"
+                    id="confirm-password"
+                    type={showPassword ? "text" : "password"}
+                    fullWidth
+                    variant="outlined"
+                    value={confirmPassword}
+                    onChange={handleConfirmPasswordChange}
+                    error={!!validationError || !!errorMessage}
+                    disabled={loading}
+                    InputProps={{
+                      endAdornment: passwordAdornment,
+                    }}
+                  />
+                </div>
+                {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+                {validationError && <Alert severity="error">{validationError}</Alert>}
+              </CardContent>
+              <CardActions sx={{ paddingX: 3 }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={loading || !password || !confirmPassword}
+                >
+                  {loading ? "Setting password..." : "Set password"}
+                </Button>
+              </CardActions>
+            </>
+          ) : (
+            <>
+              <CardContent component={Stack} gap={2}>
+                <Typography variant="body2" color="text.secondary">
+                  Please enter your password to access Privatefolio.
+                </Typography>
+                <div>
+                  <SectionTitle>Password</SectionTitle>
+                  <TextField
+                    autoFocus
+                    required
+                    size="small"
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    fullWidth
+                    variant="outlined"
+                    value={password}
+                    onChange={handlePasswordChange}
+                    error={!!errorMessage}
+                    disabled={loading}
+                    InputProps={{
+                      endAdornment: passwordAdornment,
+                    }}
+                  />
+                </div>
+                {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+              </CardContent>
+              <CardActions sx={{ paddingX: 3 }}>
+                <Button type="submit" variant="contained" disabled={loading}>
+                  {loading ? "Unlocking..." : "Unlock"}
+                </Button>
+              </CardActions>
+            </>
+          )}
+        </Card>
+      </form>
     </Container>
   )
 }

@@ -209,6 +209,11 @@ export const theme: CssVarsThemeOptions = {
   //   },
   // },
   components: {
+    MuiAlert: {
+      defaultProps: {
+        variant: "outlined",
+      },
+    },
     MuiBackdrop: {
       styleOverrides: {
         root: {
@@ -269,6 +274,28 @@ export const theme: CssVarsThemeOptions = {
         },
       },
     },
+    MuiCardActions: {
+      styleOverrides: {
+        root: {
+          justifyContent: "flex-end",
+          padding: "0px 16px 16px 16px",
+        },
+      },
+    },
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
+          padding: "20px 24px",
+        },
+      },
+    },
+    MuiCardHeader: {
+      styleOverrides: {
+        root: {
+          padding: "16px 24px 0px 24px",
+        },
+      },
+    },
     MuiCheckbox: {
       styleOverrides: {
         root: {
@@ -299,6 +326,7 @@ export const theme: CssVarsThemeOptions = {
           transparent: "on",
         },
         fullScreen: true,
+        maxWidth: "sm",
       },
       styleOverrides: {
         container: {
@@ -315,7 +343,13 @@ export const theme: CssVarsThemeOptions = {
           "&:not(.MuiDialog-paperFullScreen)": {
             marginTop: 80,
           },
-          maxWidth: 800,
+        },
+      },
+    },
+    MuiDialogActions: {
+      styleOverrides: {
+        root: {
+          padding: "0px 16px 16px 16px",
         },
       },
     },

@@ -122,6 +122,7 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
                 name="accountName"
                 autoComplete="off"
                 autoFocus
+                required
                 variant="outlined"
                 fullWidth
                 size="small"
@@ -133,11 +134,11 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
             </div>
           </Stack>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ paddingX: 3 }}>
           <Button onClick={toggleOpen} color="secondary" sx={{ paddingX: 2 }}>
             Cancel
           </Button>
-          <Button type="submit" color="primary" sx={{ paddingX: 2 }} disabled={loading}>
+          <Button type="submit" color="primary" variant="contained" disabled={loading}>
             {loading ? "Creating..." : "Create"}
           </Button>
         </DialogActions>

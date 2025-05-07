@@ -6,10 +6,10 @@ import {
   ShowChartRounded,
   Workspaces,
 } from "@mui/icons-material"
-import { Stack, useMediaQuery } from "@mui/material"
+import { Button, Stack, useMediaQuery } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
-import { useLocation } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { $activeAccount } from "src/stores/account-store"
 import { isProduction } from "src/utils/utils"
 
@@ -17,6 +17,7 @@ import { AppVerProps, PopoverToggleProps } from "../../stores/app-store"
 import { TransactionIcon } from "../icons"
 import { NavMenuItem } from "../NavMenuItem"
 import { AccountPickerButton } from "./AccountPickerButton"
+import { LogoText } from "./LogoText"
 
 type MenuContentsProps = AppVerProps & PopoverToggleProps
 
@@ -77,27 +78,42 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
         justifyContent="space-between"
       >
         <Stack gap={0.25}>
+          <Button
+            size="small"
+            variant="text"
+            color="secondary"
+            to="/"
+            component={Link}
+            sx={{
+              borderRadius: 0.5,
+              justifyContent: "flex-start",
+              paddingX: 2,
+            }}
+            // sx={{ marginX: -2, paddingX: 2 }}
+          >
+            <LogoText />
+          </Button>
           {/* <Stack direction="row"> */}
           <AccountPickerButton onClose={toggleOpen} />
           {/* <Tooltip title="Create">
-              <Button
-                sx={{
-                  borderRadius: 0.5,
-                  gap: 0.5,
-                  justifyContent: "flex-start",
-                  marginY: 1.5,
-                  minWidth: "unset",
-                  paddingLeft: 2,
-                  paddingRight: 2,
-                  paddingY: 1,
-                  textTransform: "none",
-                  width: "fit-content",
-                }}
-                color="secondary"
-              >
-                <AddCircle />
-              </Button>
-            </Tooltip> */}
+            <Button
+              sx={{
+                borderRadius: 0.5,
+                gap: 0.5,
+                justifyContent: "flex-start",
+                marginY: 1.5,
+                minWidth: "unset",
+                paddingLeft: 2,
+                paddingRight: 2,
+                paddingY: 1,
+                textTransform: "none",
+                width: "fit-content",
+              }}
+              color="secondary"
+            >
+              <AddCircle />
+            </Button>
+          </Tooltip> */}
           {/* </Stack> */}
           <NavMenuItem
             value=""
