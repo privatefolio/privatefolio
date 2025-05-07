@@ -7,9 +7,8 @@ import {
 } from "src/interfaces"
 import { PlatformId, PLATFORMS_META, WETH_ASSET_ID } from "src/settings"
 import { formatAddress, getAssetContract } from "src/utils/assets-utils"
+import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { asUTC } from "src/utils/formatting-utils"
-
-import { extractColumnsFromRow } from "../csv-utils"
 
 export const Identifier = "etherscan"
 export const platform: PlatformId = "ethereum" // FIXME TODO7: this should work for all EVM chains

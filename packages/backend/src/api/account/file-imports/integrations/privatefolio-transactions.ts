@@ -1,9 +1,8 @@
 import { AuditLog, EtherscanTransaction, ParserResult, TransactionType } from "src/interfaces"
 import { PlatformId } from "src/settings"
+import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
-
-import { extractColumnsFromRow } from "../csv-utils"
 
 export const Identifier = "privatefolio"
 export const platform: PlatformId = "ethereum" // TODO8: this should work for all EVM chains

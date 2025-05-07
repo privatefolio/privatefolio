@@ -14,6 +14,7 @@ import {
   Timestamp,
 } from "src/interfaces"
 import { FILES_LOCATION } from "src/settings"
+import { splitRows } from "src/utils/csv-utils"
 import { formatDate } from "src/utils/formatting-utils"
 import { hashString, noop } from "src/utils/utils"
 
@@ -23,8 +24,8 @@ import { invalidateNetworth } from "../networth-api"
 import { getServerFile } from "../server-files-api"
 import { enqueueTask } from "../server-tasks-api"
 import { countTransactions, upsertTransactions } from "../transactions-api"
-import { parseCsv, sanitizeHeader, splitRows } from "./csv-utils"
-import { HEADER_MATCHER, PARSER_REQUIREMENTS } from "./integrations"
+import { HEADER_MATCHER, PARSER_REQUIREMENTS } from "./integrations/matchers"
+import { parseCsv, sanitizeHeader } from "./parse-csv"
 
 async function readFileImportText(accountName: string, fileRecord: ServerFile) {
   const filePath = join(FILES_LOCATION, accountName, String(fileRecord.id))

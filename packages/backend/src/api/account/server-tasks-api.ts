@@ -142,6 +142,21 @@ function createProgressCallback(account: Account, taskId: number): ProgressCallb
   }
 }
 
+export async function getTriggers(
+  accountName: string,
+  query = "SELECT DISTINCT trigger FROM server_tasks ORDER BY trigger ASC",
+  params: SqlParam[] = []
+): Promise<string[]> {
+  const account = await getAccount(accountName)
+
+  try {
+    const result = await account.execute(query, params)
+    return result.map((row) => row[0] as string)
+  } catch (error) {
+    throw new Error(`Failed to query triggers: ${error}`)
+  }
+}
+
 async function processQueue(accountName: string) {
   const account = await ensureTaskQueue(accountName)
 
@@ -267,7 +282,7 @@ export async function cancelTask(accountName: string, taskId: number) {
   const account = await ensureTaskQueue(accountName)
 
   if (account.pendingTask?.id === taskId) {
-    console.log("Aborting task with id:", account.pendingTask.id)
+    console.log(`[${accountName}]`, `Aborting task with id: ${account.pendingTask.id}`)
     account.pendingTask.abortController?.abort("Task aborted by user.")
   } else if (account.taskQueue.some((x) => x.id === taskId)) {
     account.taskQueue = account.taskQueue.filter((x) => x.id !== taskId)

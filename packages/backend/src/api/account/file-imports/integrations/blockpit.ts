@@ -1,10 +1,9 @@
 import Big from "big.js"
 import { AuditLog, ParserResult, Transaction } from "src/interfaces"
 import { PlatformId } from "src/settings"
+import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { parseEuropeanDateString } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
-
-import { extractColumnsFromRow } from "../csv-utils"
 
 export const Identifier = "blockpit"
 export const platform: PlatformId = "blockpit"

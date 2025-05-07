@@ -1,14 +1,13 @@
 import { CalculateOutlined, MoreHoriz, SyncRounded } from "@mui/icons-material"
 import BackupRoundedIcon from "@mui/icons-material/BackupRounded"
-import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded"
 import RestoreRoundedIcon from "@mui/icons-material/RestoreRounded"
 import { IconButton, ListItemAvatar, ListItemText, Menu, MenuItem, Tooltip } from "@mui/material"
-import { enqueueSnackbar } from "notistack"
 import React from "react"
 import { $activeAccount } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
-import { blobToBase64, downloadFile, requestFile } from "src/utils/utils"
-import { $rest, $rpc } from "src/workers/remotes"
+import { handleBackupRequest } from "src/utils/backup-utils"
+import { onRestoreRequest } from "src/utils/common-tasks"
+import { $rpc } from "src/workers/remotes"
 
 export function ImportDataActions() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
@@ -37,42 +36,8 @@ export function ImportDataActions() {
         <MenuItem
           dense
           onClick={async () => {
-            enqueueSnackbar("Backup started", { persist: true, variant: "info" })
+            handleBackupRequest()
             handleClose()
-            const accountName = $activeAccount.get()
-            const fileRecord = await $rpc.get().backupAccount(accountName)
-            fileRecord
-              ? enqueueSnackbar(
-                  <span>
-                    The Backup is ready to download
-                    <IconButton
-                      aria-label="download"
-                      color="inherit"
-                      onClick={async () => {
-                        const params = new URLSearchParams({
-                          accountName: $activeAccount.get(),
-                          fileId: fileRecord.id.toString(),
-                        })
-
-                        const response = await fetch(`${$rest.get()}/download?${params.toString()}`)
-
-                        const blob = await response.blob()
-
-                        downloadFile(blob, fileRecord.name)
-                      }}
-                    >
-                      <DownloadRoundedIcon />
-                    </IconButton>
-                  </span>,
-                  {
-                    autoHideDuration: 50000,
-                    variant: "success",
-                  }
-                )
-              : enqueueSnackbar("An error occurred while creating the file", {
-                  autoHideDuration: 10000,
-                  variant: "error",
-                })
           }}
         >
           <ListItemAvatar>
@@ -80,22 +45,7 @@ export function ImportDataActions() {
           </ListItemAvatar>
           <ListItemText>Backup</ListItemText>
         </MenuItem>
-        <MenuItem
-          dense
-          onClick={async () => {
-            const accountName = $activeAccount.get()
-            const files = await requestFile([".zip"], false)
-            handleClose()
-            try {
-              console.log("restore start")
-              // await $rpc.get().enqueueRestore(accountName, await blobToBase64(files[0]), "user")
-              await $rpc.get().restoreAccount(accountName, await blobToBase64(files[0]))
-              console.log("restore finish")
-            } catch (e) {
-              console.error(e)
-            }
-          }}
-        >
+        <MenuItem dense onClick={() => onRestoreRequest(handleClose)}>
           <ListItemAvatar>
             <RestoreRoundedIcon fontSize="small" />
           </ListItemAvatar>

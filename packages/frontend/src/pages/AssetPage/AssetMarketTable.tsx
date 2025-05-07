@@ -1,6 +1,6 @@
 import { Paper, Stack } from "@mui/material"
 import { isAddress } from "ethers"
-import { formatAddress } from "privatefolio-backend/src/utils/assets-utils"
+import { formatAddress } from "privatefolio-backend/build/src/utils/assets-utils"
 import React, { useMemo } from "react"
 import { CircularSpinner } from "src/components/CircularSpinner"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"

@@ -1,4 +1,4 @@
-import { CsvData } from "src/interfaces"
+import { ProgressLog } from "src/interfaces"
 
 /**
  * Returns a hash code from a string
@@ -64,23 +64,9 @@ export function timeQueue<T extends (...args: never[]) => void>(
 
 export * from "./environment-utils"
 
-export function createCsvString(data: CsvData, delimiter = ",") {
-  return data
-    .map((row) =>
-      row
-        .map((value) => {
-          let stringified: string
-
-          if (value === null) stringified = ""
-          else if (value === undefined) stringified = ""
-          else if (typeof value === "object") stringified = JSON.stringify(value)
-          else stringified = String(value)
-
-          stringified = stringified.replace(/"/g, '""') // Escape double quotes
-          stringified = stringified.replace(/,/g, "\\,") // Escape commas
-          return `"${stringified}"`
-        })
-        .join(delimiter)
-    )
-    .join("\n")
+export function parseProgressLog(logEntry: string): ProgressLog {
+  const isoDate = logEntry.slice(0, 24)
+  const timestamp = new Date(isoDate).getTime()
+  const progressUpdate = JSON.parse(logEntry.slice(25))
+  return [timestamp, progressUpdate] satisfies ProgressLog
 }

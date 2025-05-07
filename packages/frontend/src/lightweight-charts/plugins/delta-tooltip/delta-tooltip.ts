@@ -13,7 +13,7 @@ import {
   Time,
   WhitespaceData,
 } from "lightweight-charts"
-import { getDecimalPrecision } from "privatefolio-backend/src/utils/formatting-utils"
+import { getDecimalPrecision } from "privatefolio-backend/build/src/utils/formatting-utils"
 
 import { CommonTooltipOptions, lossColor, profitColor } from "../../../utils/chart-utils"
 import { formatNumber } from "../../../utils/formatting-utils"

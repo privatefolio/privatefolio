@@ -119,3 +119,42 @@ input[type=number]::-webkit-outer-spin-button {
 .loading-indicator-inactive path {
   animation: loadingLogoAnim 2.5s;
 }
+
+/* Notistack Customizations */
+.notistack-SnackbarContainer {
+  z-index: 3000 !important;
+  bottom: 48px !important;
+}
+
+.notistack-Snackbar .notistack-MuiContent {
+  box-shadow: var(--mui-shadows-8);
+  border-radius: var(--mui-shape-borderRadius);
+  background-color: var(--mui-palette-background-paper);
+  color: var(--mui-palette-text-primary);
+  border: 1px solid var(--mui-palette-divider);
+}
+
+.notistack-CollapseWrapper {
+  padding: 2px 0px !important;
+}
+
+/* html[data-mui-color-scheme="dark"] .notistack-MuiContent {
+  border-radius: var(--mui-shape-borderRadius);
+  box-shadow: var(--mui-shadows-20);
+  background-color: var(--mui-palette-background-paper);
+  color: var(--mui-palette-text-primary);
+  border: 1px solid var(--mui-palette-divider);
+} */
+
+.notistack-MuiContent-info #notistack-snackbar svg {
+  color: var(--mui-palette-info-main);
+}
+.notistack-MuiContent-success #notistack-snackbar svg {
+  color: var(--mui-palette-success-main);
+}
+.notistack-MuiContent-error #notistack-snackbar svg {
+  color: var(--mui-palette-error-main);
+}
+.notistack-MuiContent-warning #notistack-snackbar svg {
+  color: var(--mui-palette-warning-main);
+}

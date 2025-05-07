@@ -15,7 +15,7 @@ import {
   WhitespaceData,
 } from "lightweight-charts"
 import { throttle } from "lodash-es"
-import { getDecimalPrecision } from "privatefolio-backend/src/utils/formatting-utils"
+import { getDecimalPrecision } from "privatefolio-backend/build/src/utils/formatting-utils"
 
 import { formatNumber } from "../../../utils/formatting-utils"
 import { positionsLine } from "../../helpers/dimensions/positions"

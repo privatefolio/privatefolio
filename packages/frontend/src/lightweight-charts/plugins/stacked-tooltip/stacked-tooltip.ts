@@ -12,7 +12,7 @@ import {
   Time,
 } from "lightweight-charts"
 import { throttle } from "lodash-es"
-import { getDecimalPrecision } from "privatefolio-backend/src/utils/formatting-utils"
+import { getDecimalPrecision } from "privatefolio-backend/build/src/utils/formatting-utils"
 import { stringToColor } from "src/utils/color-utils"
 
 import { formatNumber } from "../../../utils/formatting-utils"

@@ -1,10 +1,10 @@
 import { AuditLog, ParserResult, Transaction, TransactionSide } from "src/interfaces"
 import { PlatformId } from "src/settings"
+import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
 
 import { BinancePair } from "../../connections/integrations/binance/binance-account-api"
-import { extractColumnsFromRow } from "../csv-utils"
 
 export const Identifier = "binance-spot-history"
 export const platform: PlatformId = "binance"

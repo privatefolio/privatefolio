@@ -13,7 +13,7 @@ import * as serverTasks from "./account/server-tasks-api"
 import * as tags from "./account/tags-api"
 import * as trades from "./account/trades-api"
 import * as transactions from "./account/transactions-api"
-import * as database from "./accounts-api"
+import * as accounts from "./accounts-api"
 
 export const api = {
   ...connections,
@@ -22,7 +22,7 @@ export const api = {
   ...networth,
   ...dailyPrices,
   ...fileImports,
-  ...database,
+  ...accounts,
   ...transactions,
   ...kv,
   ...portfolio,

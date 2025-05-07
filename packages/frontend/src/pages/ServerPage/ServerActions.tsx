@@ -1,10 +1,20 @@
 import { Bedtime, CalculateOutlined, MoreHoriz } from "@mui/icons-material"
 import BackupRoundedIcon from "@mui/icons-material/BackupRounded"
 import RestoreRoundedIcon from "@mui/icons-material/RestoreRounded"
-import { IconButton, ListItemAvatar, ListItemText, Menu, MenuItem, Tooltip } from "@mui/material"
+import {
+  Divider,
+  IconButton,
+  ListItemAvatar,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Tooltip,
+  Typography,
+} from "@mui/material"
 import React from "react"
 import { $activeAccount } from "src/stores/account-store"
-import { requestFile } from "src/utils/utils"
+import { handleBackupRequest } from "src/utils/backup-utils"
+import { onRestoreRequest } from "src/utils/common-tasks"
 import { $rpc } from "src/workers/remotes"
 
 export function ServerActions() {
@@ -34,32 +44,8 @@ export function ServerActions() {
         <MenuItem
           dense
           onClick={() => {
-            $rpc.get().enqueueSleep($activeAccount.get(), 1, 0.1)
             handleClose()
-          }}
-        >
-          <ListItemAvatar>
-            <Bedtime fontSize="small" />
-          </ListItemAvatar>
-          <ListItemText>Sleep 1s</ListItemText>
-        </MenuItem>
-        <MenuItem
-          dense
-          onClick={() => {
-            $rpc.get().enqueueSleep($activeAccount.get(), 10)
-            handleClose()
-          }}
-        >
-          <ListItemAvatar>
-            <Bedtime fontSize="small" />
-          </ListItemAvatar>
-          <ListItemText>Sleep 10s</ListItemText>
-        </MenuItem>
-        <MenuItem
-          dense
-          onClick={() => {
-            // $rpc.get().enqueueBackup($activeAccount.get(), "user")
-            handleClose()
+            handleBackupRequest()
           }}
         >
           <ListItemAvatar>
@@ -67,14 +53,7 @@ export function ServerActions() {
           </ListItemAvatar>
           <ListItemText>Backup</ListItemText>
         </MenuItem>
-        <MenuItem
-          dense
-          onClick={async () => {
-            const files = await requestFile([".zip"], false)
-            handleClose()
-            // $rpc.get().enqueueRestore($activeAccount.get(), "user", files[0])
-          }}
-        >
+        <MenuItem dense onClick={() => onRestoreRequest(handleClose)}>
           <ListItemAvatar>
             <RestoreRoundedIcon fontSize="small" />
           </ListItemAvatar>
@@ -103,6 +82,35 @@ export function ServerActions() {
             <CalculateOutlined fontSize="small" />
           </ListItemAvatar>
           <ListItemText>Recompute networth</ListItemText>
+        </MenuItem>{" "}
+        <Divider textAlign="center">
+          <Typography variant="caption" color="text.secondary">
+            DEBUG
+          </Typography>
+        </Divider>
+        <MenuItem
+          dense
+          onClick={() => {
+            $rpc.get().enqueueSleep($activeAccount.get(), 1, 0.1)
+            handleClose()
+          }}
+        >
+          <ListItemAvatar>
+            <Bedtime fontSize="small" />
+          </ListItemAvatar>
+          <ListItemText>Sleep 1s</ListItemText>
+        </MenuItem>
+        <MenuItem
+          dense
+          onClick={() => {
+            $rpc.get().enqueueSleep($activeAccount.get(), 10)
+            handleClose()
+          }}
+        >
+          <ListItemAvatar>
+            <Bedtime fontSize="small" />
+          </ListItemAvatar>
+          <ListItemText>Sleep 10s</ListItemText>
         </MenuItem>
       </Menu>
     </>

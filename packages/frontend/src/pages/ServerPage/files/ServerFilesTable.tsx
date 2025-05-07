@@ -43,18 +43,32 @@ export function ServerFilesTable() {
   const queryFn: QueryTableData<ServerFile> = useCallback(
     async (filters, rowsPerPage, page, order, signal) => {
       const _refresh = refresh // reference the dependency for eslint(react-hooks/exhaustive-deps)
+
+      const filterConditions: string[] = []
+
+      Object.keys(filters).forEach((key) => {
+        filterConditions.push(`${key} = '${filters[key]}'`)
+      })
+
+      let filterQuery = ""
+      if (filterConditions.length > 0) {
+        filterQuery = "WHERE " + filterConditions.join(" AND ")
+      }
+
       const orderQuery = `ORDER BY id ${order}`
       const limitQuery = `LIMIT ${rowsPerPage} OFFSET ${page * rowsPerPage}`
 
-      const records = await $rpc
-        .get()
-        .getServerFiles(accountName, `SELECT * FROM server_files ${orderQuery} ${limitQuery}`)
+      const query = `SELECT * FROM server_files ${filterQuery} ${orderQuery} ${limitQuery}`
+      const records = await $rpc.get().getServerFiles(accountName, query)
 
       if (signal?.aborted) throw new Error(signal.reason)
 
       return [
         records,
-        () => $rpc.get().countServerFiles(accountName, `SELECT COUNT (*) FROM server_tasks`),
+        () =>
+          $rpc
+            .get()
+            .countServerFiles(accountName, `SELECT COUNT (*) FROM server_files ${filterQuery}`),
       ]
     },
     [accountName, refresh]
@@ -87,10 +101,11 @@ export function ServerFilesTable() {
         sortable: true,
       },
       {
-        key: "description",
+        filterable: true,
+        key: "createdBy",
         label: "Created by",
         sortable: true,
-        sx: { maxWidth: 140, minWidth: 140, width: 140 },
+        sx: { maxWidth: 160, minWidth: 140, width: 160 },
       },
       {
         label: "Time",

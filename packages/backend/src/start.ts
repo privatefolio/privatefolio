@@ -12,13 +12,13 @@ const sideEffects: Record<string, () => void> = {}
 const cronJobs: Record<string, Cron> = {}
 
 async function setupSideEffects(accountName: string) {
-  console.log(`Setting up side-effects for ${accountName}.`)
+  console.log(`[${accountName}]`, `Setting up side-effects.`)
 
   const unsubscribe = await api.subscribeToAuditLogs(
     accountName,
     throttle(
       async (cause) => {
-        console.log(`Running side-effects for ${accountName} (audit log changes).`)
+        console.log(`[${accountName}]`, `Running side-effects (trigger by audit log changes).`)
         if (cause === EventCause.Updated) return
         if (cause === EventCause.Reset) return
 
@@ -52,7 +52,7 @@ async function setupSideEffects(accountName: string) {
   // TODO5 make this configurable
   // set up a cron job to refresh every 5 minutes
   const cronJob = new Cron("*/5 * * * *", async () => {
-    console.log(`Cron: Refreshing account ${accountName}`)
+    console.log(`[${accountName}]`, `Cron: Refreshing account.`)
     await api.enqueueRefreshBalances(accountName, "cron")
     await api.enqueueFetchPrices(accountName, "cron")
     await api.enqueueRefreshNetworth(accountName, "cron")
@@ -62,7 +62,7 @@ async function setupSideEffects(accountName: string) {
 
 await api.subscribeToAccounts(async (cause, accountName) => {
   if (cause === EventCause.Deleted) {
-    console.log(`Tearing down side-effects for ${accountName}.`)
+    console.log(`[${accountName}]`, `Tearing down side-effects.`)
     const unsubscribe = sideEffects[accountName]
     try {
       unsubscribe()
