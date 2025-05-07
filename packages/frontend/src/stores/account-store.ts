@@ -33,7 +33,6 @@ export const $connectionErrorMessage = atom<string | undefined>()
 logAtoms({
   $accounts,
   $activeAccount,
-  $activeIndex,
   $cloudAccounts,
   $connectionStatus,
   $isCloudAccount,
