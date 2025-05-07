@@ -1,5 +1,5 @@
 import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded"
-import { IconButton } from "@mui/material"
+import { IconButton, Tooltip } from "@mui/material"
 import { enqueueSnackbar } from "notistack"
 import React from "react"
 import { $activeAccount } from "src/stores/account-store"
@@ -9,34 +9,36 @@ import { $rest, $rpc } from "src/workers/remotes"
 import { downloadFile } from "./utils"
 
 export async function handleBackupRequest() {
-  enqueueSnackbar("Backup started", { persist: true, variant: "info" })
+  enqueueSnackbar("Backup queued", { persist: true, variant: "info" })
   const accountName = $activeAccount.get()
   try {
     const fileRecord = await $rpc.get().enqueueBackup(accountName, "user")
     enqueueSnackbar(
-      <span>
-        The Backup is ready to download
-        <IconButton
-          aria-label="download"
-          color="inherit"
-          onClick={async () => {
-            const params = new URLSearchParams({
-              accountName: $activeAccount.get(),
-              fileId: fileRecord.id.toString(),
-            })
+      <div>
+        <span>Backup ready for download</span>
+        <Tooltip title="Download">
+          <IconButton
+            aria-label="download"
+            color="inherit"
+            onClick={async () => {
+              const params = new URLSearchParams({
+                accountName: $activeAccount.get(),
+                fileId: fileRecord.id.toString(),
+              })
 
-            const response = await fetch(`${$rest.get()}/download?${params.toString()}`, {
-              headers: { Authorization: `Bearer ${localStorage.getItem(JWT_LOCAL_STORAGE_KEY)}` },
-            })
+              const response = await fetch(`${$rest.get()}/download?${params.toString()}`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem(JWT_LOCAL_STORAGE_KEY)}` },
+              })
 
-            const blob = await response.blob()
+              const blob = await response.blob()
 
-            downloadFile(blob, fileRecord.name)
-          }}
-        >
-          <DownloadRoundedIcon />
-        </IconButton>
-      </span>,
+              downloadFile(blob, fileRecord.name)
+            }}
+          >
+            <DownloadRoundedIcon />
+          </IconButton>
+        </Tooltip>
+      </div>,
       {
         autoHideDuration: null,
         variant: "success",
