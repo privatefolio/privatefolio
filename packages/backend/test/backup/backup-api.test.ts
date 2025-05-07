@@ -1,7 +1,7 @@
 import fs from "fs"
 import { join } from "path"
 import { countAuditLogs, getAuditLogs } from "src/api/account/audit-logs-api"
-import { backupAccount, restoreAccount } from "src/api/account/backup-api"
+import { backup, restore } from "src/api/account/backup-api"
 import { computeBalances, getBalances } from "src/api/account/balances-api"
 import { importFile } from "src/api/account/file-imports/file-imports-api"
 import { getTransactions } from "src/api/account/transactions-api"
@@ -105,10 +105,10 @@ describe.todo("should backup and restore", () => {
 
   it.sequential("should backup the account and restore it into a different account", async () => {
     // arrange
-    const backupData = await backupAccount(accountName)
+    const backupData = await backup(accountName)
     const newAccountName = "my-new-account"
     // act
-    await restoreAccount(newAccountName, backupData)
+    await restore(newAccountName, backupData)
     // assert
     const auditLogs = await getAuditLogs(newAccountName)
     const transactions = await getTransactions(newAccountName)

@@ -1,3 +1,5 @@
+import { ProgressLog } from "src/interfaces"
+
 /**
  * Returns a hash code from a string
  * @param  {String} str The string to hash.
@@ -61,3 +63,10 @@ export function timeQueue<T extends (...args: never[]) => void>(
 }
 
 export * from "./environment-utils"
+
+export function parseProgressLog(logEntry: string): ProgressLog {
+  const isoDate = logEntry.slice(0, 24)
+  const timestamp = new Date(isoDate).getTime()
+  const progressUpdate = JSON.parse(logEntry.slice(25))
+  return [timestamp, progressUpdate] satisfies ProgressLog
+}

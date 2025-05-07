@@ -5,8 +5,8 @@ import { IconButton, ListItemAvatar, ListItemText, Menu, MenuItem, Tooltip } fro
 import React from "react"
 import { $activeAccount } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
-import { handleBackupRequest, handleRestoreRequest } from "src/utils/backup-utils"
-import { requestFile } from "src/utils/utils"
+import { handleBackupRequest } from "src/utils/backup-utils"
+import { onRestoreRequest } from "src/utils/common-tasks"
 import { $rpc } from "src/workers/remotes"
 
 export function ImportDataActions() {
@@ -45,16 +45,7 @@ export function ImportDataActions() {
           </ListItemAvatar>
           <ListItemText>Backup</ListItemText>
         </MenuItem>
-        <MenuItem
-          dense
-          onClick={async () => {
-            const file = await requestFile([".zip"], false)
-            await $rpc.get().resetAccount($activeAccount.get())
-            const fileRecord = await handleRestoreRequest(file[0])
-            await $rpc.get().enqueueRestore($activeAccount.get(), "user", fileRecord)
-            handleClose()
-          }}
-        >
+        <MenuItem dense onClick={() => onRestoreRequest(handleClose)}>
           <ListItemAvatar>
             <RestoreRoundedIcon fontSize="small" />
           </ListItemAvatar>

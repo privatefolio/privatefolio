@@ -21,19 +21,19 @@ const appEventEmitter = new EventEmitter()
 
 const IN_MEMORY_DB = ":memory:"
 
-async function createDatabaseConnection(databaseName: string, createIfNeeded = false) {
+async function createDatabaseConnection(accountName: string, createIfNeeded = false) {
   const databaseFilePath = isTestEnvironment
     ? IN_MEMORY_DB
-    : join(DATABASES_LOCATION, `${databaseName}.sqlite`)
+    : join(DATABASES_LOCATION, `${accountName}.sqlite`)
 
   if (databaseFilePath !== IN_MEMORY_DB) {
     // ensure the file exists
     try {
       await access(databaseFilePath)
-      console.log("Database file already exists", databaseFilePath)
+      console.log(`[${accountName}]`, "Connecting to existing database", databaseFilePath)
     } catch {
-      console.log("Creating database file", databaseFilePath)
-      if (!createIfNeeded) throw new Error(`Account "${databaseName}" does not exist`)
+      console.log(`[${accountName}]`, "Creating database file", databaseFilePath)
+      if (!createIfNeeded) throw new Error(`Account "${accountName}" does not exist`)
       // ensure databases dir exists
       await mkdir(DATABASES_LOCATION, { recursive: true })
       await writeFile(databaseFilePath, "")
@@ -44,7 +44,7 @@ async function createDatabaseConnection(databaseName: string, createIfNeeded = f
 
   const journalMode = await db.execute(`PRAGMA journal_mode;`)
   if (isDevelopment) {
-    console.log("SQLite journal mode:", journalMode[0][0])
+    console.log(`[${accountName}]`, "SQLite journal mode:", journalMode[0][0])
   }
 
   return db
@@ -112,13 +112,20 @@ export async function getAccount(accountName: string, createIfNeeded = false): P
   return accounts[accountName]
 }
 
+export async function reconnectAccount(accountName: string) {
+  const account = await getAccount(accountName)
+  await account.close()
+  delete accounts[accountName]
+  return getAccount(accountName)
+}
+
 export async function createAccount(accountName: string) {
   await getAccount(accountName, true)
 }
 
 export async function deleteAccount(accountName: string, keepAccount = false) {
   const account = await getAccount(accountName)
-  // console.log("Deleting database", accountName)
+  console.log(`[${accountName}]`, "Deleting database.")
 
   const schema = await account.execute(
     "SELECT type, name FROM sqlite_master WHERE type IN ('table', 'index', 'trigger') AND name NOT IN ('sqlite_sequence', 'sqlite_master')"
@@ -140,7 +147,7 @@ export async function deleteAccount(accountName: string, keepAccount = false) {
   await rm(join(DATABASES_LOCATION, `${accountName}.sqlite`), { force: true, recursive: true })
   await rm(join(LOGS_LOCATION, accountName), { force: true, recursive: true })
 
-  // console.log("Deleted database", accountName)
+  console.log(`[${accountName}]`, "Deleted database.")
 
   if (!keepAccount) {
     delete accounts[accountName]
@@ -183,7 +190,7 @@ export async function resetAccount(accountName: string) {
 
 async function initializeDatabaseIfNeeded(
   account: DatabaseConnection,
-  _accountName: string
+  accountName: string
 ): Promise<boolean> {
   const tablesCount = (
     await account.execute(sql`
@@ -193,15 +200,15 @@ async function initializeDatabaseIfNeeded(
   )[0][0] as number
 
   if (tablesCount > 0) {
-    // console.log("Skipping database initialization", accountName)
+    console.log(`[${accountName}]`, "Skipping database initialization.")
     return false
   }
 
-  // console.log("Initializing database", accountName)
+  console.log(`[${accountName}]`, "Initializing database.")
   try {
     await account.execute(`PRAGMA journal_mode = WAL;`)
   } catch {
-    console.log("Failed to set journal mode to WAL")
+    console.log(`[${accountName}]`, "Failed to set journal mode to WAL")
   }
 
   await account.execute(sql`

@@ -153,7 +153,7 @@ export async function handleUpload(request: Request): Promise<Response> {
     })
   }
 
-  console.log(`Uploading file: ${fileRecord.name}`)
+  console.log(`[${accountName}]`, `Uploading file: ${fileRecord.name}`)
 
   await patchServerFile(accountName, fileRecord.id, {
     startedAt: Date.now(),
@@ -185,7 +185,10 @@ export async function handleUpload(request: Request): Promise<Response> {
     // Read all chunks of data from the stream
     while (!(result = await reader.read()).done) {
       const chunk = result.value
-      console.log(`Writing chunk of size ${chunk.byteLength} bytes of file ${fileRecord.name}`)
+      console.log(
+        `[${accountName}]`,
+        `Received chunk of size ${chunk.byteLength} bytes of file ${fileRecord.name}`
+      )
       // Write each chunk directly to the file
       writeStream.write(Buffer.from(chunk))
     }
@@ -212,7 +215,7 @@ export async function handleUpload(request: Request): Promise<Response> {
     })
   }
 
-  console.log(`File uploaded successfully: ${fileRecord.name}`)
+  console.log(`[${accountName}]`, `File uploaded successfully: ${fileRecord.name}`)
 
   return new Response("File uploaded successfully.", { headers: corsHeaders, status: 200 })
 }

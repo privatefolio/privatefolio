@@ -1,4 +1,9 @@
 import { AuditLog, TaskTrigger } from "src/interfaces"
+import { $activeAccount } from "src/stores/account-store"
+import { $rpc } from "src/workers/remotes"
+
+import { handleRestoreRequest } from "./backup-utils"
+import { requestFile } from "./utils"
 
 export function handleAuditLogChange(_auditLog?: AuditLog) {
   // TODO5 invalidate balancesCursor based on auditLog.timestamp
@@ -42,4 +47,12 @@ export function enqueueExportAllAuditLogs(accountName: string, trigger: TaskTrig
   //   priority: TaskPriority.Low,
   //   trigger,
   // })
+}
+
+export async function onRestoreRequest(handleClose: () => void) {
+  const file = await requestFile([".zip"], false)
+  handleClose()
+  await $rpc.get().resetAccount($activeAccount.get())
+  const fileRecord = await handleRestoreRequest(file[0])
+  await $rpc.get().enqueueRestore($activeAccount.get(), "user", fileRecord)
 }

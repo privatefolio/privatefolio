@@ -282,7 +282,7 @@ export async function cancelTask(accountName: string, taskId: number) {
   const account = await ensureTaskQueue(accountName)
 
   if (account.pendingTask?.id === taskId) {
-    console.log("Aborting task with id:", account.pendingTask.id)
+    console.log(`[${accountName}]`, `Aborting task with id: ${account.pendingTask.id}`)
     account.pendingTask.abortController?.abort("Task aborted by user.")
   } else if (account.taskQueue.some((x) => x.id === taskId)) {
     account.taskQueue = account.taskQueue.filter((x) => x.id !== taskId)

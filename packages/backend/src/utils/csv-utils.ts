@@ -22,7 +22,7 @@ export function extractColumnsFromRow(row: string, colNumber?: number): string[]
   })
 
   if (typeof colNumber === "number" && columns.length !== colNumber) {
-    console.log("Invalid number of columns:", columns.length, colNumber, ", columns:", columns)
+    // console.log("Invalid number of columns:", columns.length, colNumber, ", columns:", columns)
     throw new Error(`Invalid number of columns: expected ${colNumber}, received ${columns.length}`)
   }
 
