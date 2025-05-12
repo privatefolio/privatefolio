@@ -5,11 +5,34 @@ import { api } from "./api/api"
 import { BackendServer } from "./backend-server"
 import { EventCause } from "./interfaces"
 import { SHORT_THROTTLE_DURATION } from "./settings"
+import { getCronExpression } from "./utils/utils"
 
 const accountNames = await api.getAccountNames()
 
 const sideEffects: Record<string, () => void> = {}
 const cronJobs: Record<string, Cron> = {}
+const settingsSubscriptions: Record<string, () => void> = {}
+
+async function setupCronJob(accountName: string) {
+  if (cronJobs[accountName]) {
+    console.log(`[${accountName}]`, `Stopping existing cron job.`)
+    cronJobs[accountName].stop()
+  }
+
+  const { refreshInterval } = await api.getSettings(accountName)
+
+  console.log(`[${accountName}]`, `Setting up cron job with interval: ${refreshInterval} minutes.`)
+  const cronExpression = getCronExpression(refreshInterval)
+  console.log(`[${accountName}]`, `Cron expression: ${cronExpression}`)
+
+  const cronJob = new Cron(cronExpression, async () => {
+    console.log(`[${accountName}]`, `Cron: Refreshing account.`)
+    await api.enqueueRefreshBalances(accountName, "cron")
+    await api.enqueueFetchPrices(accountName, "cron")
+    await api.enqueueRefreshNetworth(accountName, "cron")
+  })
+  cronJobs[accountName] = cronJob
+}
 
 async function setupSideEffects(accountName: string) {
   console.log(`[${accountName}]`, `Setting up side-effects.`)
@@ -49,15 +72,14 @@ async function setupSideEffects(accountName: string) {
 
   sideEffects[accountName] = unsubscribe
 
-  // TODO5 make this configurable
-  // set up a cron job to refresh every 5 minutes
-  const cronJob = new Cron("*/5 * * * *", async () => {
-    console.log(`[${accountName}]`, `Cron: Refreshing account.`)
-    await api.enqueueRefreshBalances(accountName, "cron")
-    await api.enqueueFetchPrices(accountName, "cron")
-    await api.enqueueRefreshNetworth(accountName, "cron")
+  await setupCronJob(accountName)
+
+  const settingsUnsubscribe = await api.subscribeToSettings(accountName, async () => {
+    console.log(`[${accountName}]`, `Settings changed, refreshing cron job.`)
+    await setupCronJob(accountName)
   })
-  cronJobs[accountName] = cronJob
+
+  settingsSubscriptions[accountName] = settingsUnsubscribe
 }
 
 await api.subscribeToAccounts(async (cause, accountName) => {
@@ -70,6 +92,11 @@ await api.subscribeToAccounts(async (cause, accountName) => {
       if (cronJobs[accountName]) {
         cronJobs[accountName].stop()
         delete cronJobs[accountName]
+      }
+
+      if (settingsSubscriptions[accountName]) {
+        settingsSubscriptions[accountName]()
+        delete settingsSubscriptions[accountName]
       }
     } catch {}
   }

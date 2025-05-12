@@ -3,6 +3,7 @@ import {
   HomeRounded,
   ReceiptLong,
   SdStorageRounded,
+  SettingsRounded,
   ShowChartRounded,
   Workspaces,
 } from "@mui/icons-material"
@@ -172,6 +173,14 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
             aria-label="Visit Server"
             onClick={toggleOpen}
             avatar={<CloudRounded fontSize="small" />}
+          />
+          <NavMenuItem
+            value="settings"
+            to={`/u/${accountIndex}/settings`}
+            label="Settings"
+            aria-label="Visit Settings"
+            onClick={toggleOpen}
+            avatar={<SettingsRounded fontSize="small" />}
           />
         </Stack>
         <Stack>

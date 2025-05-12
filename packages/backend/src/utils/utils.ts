@@ -33,6 +33,36 @@ export async function sleep(interval: number) {
   return new Promise((resolve) => setTimeout(resolve, interval))
 }
 
+/**
+ * Converts a minutes interval to a valid cron expression that works for any interval
+ * @param {number} minutes - The interval in minutes
+ * @return {string} A valid cron expression
+ */
+export function getCronExpression(minutes: number): string {
+  if (minutes <= 0) {
+    throw new Error("Minutes must be greater than 0")
+  }
+
+  if (minutes <= 60) {
+    // If interval is 60 or less, we can use the standard minute syntax
+    return `*/${minutes} * * * *`
+  } else {
+    // For intervals > 60 minutes, we need to run at specific hours
+    // Calculate how many times per day and at which hours
+    const hoursPerDay = 24
+    const intervalsPerDay = Math.floor((hoursPerDay * 60) / minutes)
+
+    if (intervalsPerDay <= 1) {
+      // Run once per day at midnight
+      return `0 0 * * *`
+    } else {
+      // For intervals that result in multiple runs per day
+      const hourStep = Math.floor(hoursPerDay / intervalsPerDay)
+      return `0 0/${hourStep} * * *`
+    }
+  }
+}
+
 export function timeQueue<T extends (...args: never[]) => void>(
   this: unknown,
   func: T,

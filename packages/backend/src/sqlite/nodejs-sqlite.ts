@@ -20,26 +20,31 @@ export async function createQueryExecutor(databaseFilePath: string): Promise<Que
     query: string,
     params: SQLiteCompatibleType[] = []
   ): Promise<SQLiteCompatibleType[][]> {
-    const start = process.hrtime.bigint() // Start time in nanoseconds
+    try {
+      const start = process.hrtime.bigint() // Start time in nanoseconds
 
-    const rows: SQLiteCompatibleType[][] = []
-    const stmt = await db.prepare(query)
-    const result = await stmt.all(...params)
-    for (const row of result) {
-      rows.push(Object.values(row))
+      const rows: SQLiteCompatibleType[][] = []
+      const stmt = await db.prepare(query)
+      const result = await stmt.all(...params)
+      for (const row of result) {
+        rows.push(Object.values(row))
+      }
+      await stmt.finalize()
+
+      const end = process.hrtime.bigint() // End time in nanoseconds
+      const durationMs = Number(end - start) / 1_000_000 // Convert nanoseconds to milliseconds
+
+      if (isDevelopment) {
+        console.log(
+          `Query took ${durationMs.toFixed(3)}ms`,
+          query.slice(0, 80).replace(/\n/g, "").trim()
+        )
+      }
+      return rows
+    } catch (error) {
+      console.error(error)
+      throw new Error(`Failed to execute query: ${query}, error: ${error}`)
     }
-    await stmt.finalize()
-
-    const end = process.hrtime.bigint() // End time in nanoseconds
-    const durationMs = Number(end - start) / 1_000_000 // Convert nanoseconds to milliseconds
-
-    if (isDevelopment) {
-      console.log(
-        `Query took ${durationMs.toFixed(3)}ms`,
-        query.slice(0, 80).replace(/\n/g, "").trim()
-      )
-    }
-    return rows
   }
 
   async function executeManyFn(
