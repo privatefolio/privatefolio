@@ -34,13 +34,25 @@ export const $accounts = computed(
 )
 
 export const demoAccountName = "demo" // TODO8 move to server
-export const $connectionStatus = atom<"closed" | "connected">("closed")
-export const $connectionErrorMessage = atom<string | undefined>()
+
+export const $localConnectionStatus = atom<"closed" | "connected" | undefined>(undefined)
+export const $localConnectionStatusText = atom<string | undefined>()
+
+export const $cloudConnectionStatus = atom<"closed" | "connected" | undefined>(undefined)
+export const $cloudConnectionStatusText = atom<string | undefined>()
+
+export const $connectionStatus = computed(
+  [$isCloudAccount, $localConnectionStatus, $cloudConnectionStatus],
+  (isCloudAccount, localStatus, cloudStatus) => (isCloudAccount ? cloudStatus : localStatus)
+)
 
 logAtoms({
   $activeAccount,
   $cloudAccounts,
-  $connectionStatus,
+  $cloudConnectionStatus,
+  $cloudConnectionStatusText,
   $isCloudAccount,
   $localAccounts,
+  $localConnectionStatus,
+  $localConnectionStatusText,
 })

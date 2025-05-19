@@ -7,8 +7,8 @@ import { Navigate, Route, Routes } from "react-router-dom"
 
 import { AccountIndexRoute } from "./AccountIndexRoute"
 import { ErrorBoundary } from "./components/ErrorBoundary"
+import { ConnectionBanner } from "./components/Header/ConnectionBanner"
 import { Header } from "./components/Header/Header"
-import { InfoBanner } from "./components/Header/InfoBanner"
 import { MenuDrawerContents } from "./components/Header/MenuDrawerContents"
 import { APP_VERSION, GIT_HASH } from "./env"
 import FourZeroFourPage from "./pages/404"
@@ -28,27 +28,25 @@ import { SHORT_THROTTLE_DURATION } from "./settings"
 import {
   $activeAccount,
   $cloudAccounts,
-  $connectionErrorMessage,
+  $cloudConnectionStatus,
+  $cloudConnectionStatusText,
   $connectionStatus,
   $localAccounts,
+  $localConnectionStatus,
+  $localConnectionStatusText,
 } from "./stores/account-store"
 import { $cloudAuth, $localAuth, checkAuthentication } from "./stores/auth-store"
 import { checkCloudLogin } from "./stores/cloud-user-store"
-import { $infoBanner } from "./stores/info-banner-store"
 import { fetchInMemoryData } from "./stores/metadata-store"
 import { closeSubscription } from "./utils/browser-utils"
 import { noop } from "./utils/utils"
 import { $cloudRest, $cloudRpc, $localRest, $localRpc, $rpc } from "./workers/remotes"
 
 export default function App() {
-  const connectionStatus = useStore($connectionStatus)
-  const connectionErrorMessage = useStore($connectionErrorMessage)
-
   const { checked: authChecked, needsSetup, isAuthenticated } = useStore($localAuth)
 
-  useEffect(() => {
-    $infoBanner.set(connectionErrorMessage ?? null)
-  }, [connectionErrorMessage])
+  const localConnectionStatus = useStore($localConnectionStatus)
+  const connectionStatus = useStore($connectionStatus)
 
   useEffect(() => {
     checkAuthentication($localAuth, $localRest.get())
@@ -64,7 +62,7 @@ export default function App() {
     })
 
     return closeSubscription(subscription)
-  }, [connectionStatus, authChecked, needsSetup, isAuthenticated])
+  }, [localConnectionStatus, authChecked, needsSetup, isAuthenticated])
 
   const cloudRpc = useStore($cloudRpc)
   useEffect(() => {
@@ -211,7 +209,28 @@ export default function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </ErrorBoundary>
-          <InfoBanner />
+          <Stack
+            sx={{
+              bottom: 0,
+              left: 0,
+              position: "fixed",
+              width: "100%",
+              zIndex: "var(--mui-zIndex-tooltip)",
+            }}
+          >
+            <ConnectionBanner
+              key="local"
+              statusAtom={$localConnectionStatus}
+              statusTextAtom={$localConnectionStatusText}
+              prefix="Local connection"
+            />
+            <ConnectionBanner
+              key="cloud"
+              statusAtom={$cloudConnectionStatus}
+              statusTextAtom={$cloudConnectionStatusText}
+              prefix="Cloud connection"
+            />
+          </Stack>
         </Container>
       </Box>
     </Stack>

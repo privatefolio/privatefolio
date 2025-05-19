@@ -5,9 +5,11 @@ import { User } from "src/api/privatecloud-api"
 import { TARGET } from "src/env"
 import { ConnectionStatusCallback } from "src/interfaces"
 import {
-  $connectionErrorMessage,
-  $connectionStatus,
+  $cloudConnectionStatus,
+  $cloudConnectionStatusText,
   $isCloudAccount,
+  $localConnectionStatus,
+  $localConnectionStatusText,
 } from "src/stores/account-store"
 import { $cloudUser } from "src/stores/cloud-user-store"
 import { isProduction, isSecure } from "src/utils/environment-utils"
@@ -47,8 +49,8 @@ const createLocalStatusHandler = (): ConnectionStatusCallback => {
 
   return (status, errorMessage) => {
     if (connectionId === currentLocalConnectionId) {
-      $connectionStatus.set(status)
-      $connectionErrorMessage.set(errorMessage ? `Local server - ${errorMessage}` : undefined)
+      $localConnectionStatus.set(status)
+      $localConnectionStatusText.set(errorMessage ?? undefined)
     }
   }
 }
@@ -60,8 +62,8 @@ const createCloudStatusHandler = (): ConnectionStatusCallback => {
 
   return (status, errorMessage) => {
     if (connectionId === currentCloudConnectionId) {
-      $connectionStatus.set(status)
-      $connectionErrorMessage.set(errorMessage ? `Cloud server - ${errorMessage}` : undefined)
+      $cloudConnectionStatus.set(status)
+      $cloudConnectionStatusText.set(errorMessage ?? undefined)
     }
   }
 }

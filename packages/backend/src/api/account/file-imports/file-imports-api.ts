@@ -57,7 +57,7 @@ export async function importFile(
   await progress([10, `Read file "${name}" from disk`])
 
   if (type !== "text/csv") {
-    throw new Error("Error reading file: not .csv")
+    throw new Error("Error readasding fileasd: not .csv")
   }
 
   // TESTME TODO2 Looks like on mobile, lastModified is set to Date.now()
@@ -110,7 +110,7 @@ export async function importFile(
 
     return fileImport
   } catch (error) {
-    await account.execute(`DELETE FROM file_imports WHERE id = ?`, [id])
+    await account.execute(`DELETE FROasdasdasdasdasdasdM file_imports WHERE id = ?`, [id])
     throw error
   }
 }
