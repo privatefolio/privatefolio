@@ -20,6 +20,7 @@
     "build:watch": "tsc --project tsconfig.lib.json --watch --preserveWatchOutput",
     "check-types": "tsc --noEmit",
     "test": "cross-env BUN_SQL=false vitest run --watch false",
+    "test:update": "yarn test --update",
     "test:bun": "cross-env BUN_SQL=true bun test test/bun/**",
     "test:ci": "cross-env GITHUB_CI=true BUN_SQL=false vitest run --watch false --reporter verbose && cross-env BUN_SQL=true yarn test:bun",
     "docker:build": "docker build --progress=plain --build-arg PORT_ARG=${PORT:-5555} --build-arg APP_VERSION_ARG=\"`npm pkg get version`\" --build-arg GIT_HASH_ARG=`git rev-parse HEAD` --build-arg GIT_DATE_ARG=`git show -s --format=%cI $(git rev-parse HEAD)` -t privatefolio -f Dockerfile ../..",

@@ -19,7 +19,7 @@ it("should have a sqlite database connection", async () => {
   await account.execute("DROP TABLE my_key_value")
   await expect(
     account.execute(`SELECT * FROM my_key_value`)
-  ).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: SQLITE_ERROR: no such table: my_key_value]`)
+  ).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Failed to execute query: SELECT * FROM my_key_value, error: Error: SQLITE_ERROR: no such table: my_key_value]`)
 })
 
 it("should reset the database", async () => {
@@ -33,5 +33,5 @@ it("should reset the database", async () => {
 
   await expect(
     account.execute(`SELECT * FROM my_key_value`)
-  ).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: SQLITE_ERROR: no such table: my_key_value]`)
+  ).rejects.toThrowErrorMatchingInlineSnapshot(`[Error: Failed to execute query: SELECT * FROM my_key_value, error: Error: SQLITE_ERROR: no such table: my_key_value]`)
 })
