@@ -1,7 +1,10 @@
+import { Cloud } from "@mui/icons-material"
 import { Avatar, AvatarProps } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import { keccak256, toUtf8Bytes } from "ethers"
 import { memoize } from "lodash-es"
-import React from "react"
+import React, { useMemo } from "react"
+import { $cloudAccounts } from "src/stores/account-store"
 
 export interface AccountAvatarProps extends AvatarProps {
   alt?: string
@@ -23,8 +26,15 @@ export const SIZE_MAP = {
 // }
 
 export function AccountAvatar(props: AccountAvatarProps) {
-  const { alt = "", size = "small", sx, ...rest } = props
-  const colors = getGradientColors(stringToHex(alt))
+  const { alt: accountName = "", size = "small", sx, ...rest } = props
+  const colors = getGradientColors(stringToHex(accountName))
+
+  const cloudAccounts = useStore($cloudAccounts)
+
+  const isCloudAccount = useMemo(
+    () => cloudAccounts?.includes(accountName),
+    [cloudAccounts, accountName]
+  )
 
   return (
     <Avatar
@@ -40,12 +50,38 @@ export function AccountAvatar(props: AccountAvatarProps) {
         borderRadius: 0.25,
         color: "transparent",
         height: SIZE_MAP[size],
+        position: "relative",
         width: SIZE_MAP[size],
         ...sx,
       }}
       {...rest}
     >
-      {alt}
+      {accountName}
+      {isCloudAccount && size !== "xl" && (
+        <Cloud
+          sx={{
+            color: "var(--mui-palette-background-default)",
+            fontSize: 12,
+            left: "50%",
+            opacity: 1,
+            position: "absolute",
+            top: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
+        />
+      )}
+      {isCloudAccount && size === "xl" && (
+        <Cloud
+          sx={{
+            color: "var(--mui-palette-background-default)",
+            fontSize: 20,
+            opacity: 1,
+            position: "absolute",
+            right: 10,
+            top: 5,
+          }}
+        />
+      )}
     </Avatar>
   )
 }

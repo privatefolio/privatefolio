@@ -1,6 +1,6 @@
 import "./workers/remotes"
 
-import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
+import { CloseRounded } from "@mui/icons-material"
 import { IconButton } from "@mui/material"
 import { LocalizationProvider } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
@@ -28,10 +28,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <KBarProvider options={{ disableDocumentLock: true, toggleShortcut: "/" }}>
             <SnackbarProvider
               anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-              maxSnack={1}
+              maxSnack={3}
               action={(snackbarId) => (
-                <IconButton onClick={() => closeSnackbar(snackbarId)}>
-                  <CloseRoundedIcon />
+                <IconButton onClick={() => closeSnackbar(snackbarId)} size="small">
+                  <CloseRounded fontSize="small" />
                 </IconButton>
               )}
             >

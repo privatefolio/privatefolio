@@ -13,10 +13,11 @@ import { MenuDrawerContents } from "./components/Header/MenuDrawerContents"
 import { APP_VERSION, GIT_HASH } from "./env"
 import FourZeroFourPage from "./pages/404"
 import AccountsPage from "./pages/AccountsPage/AccountsPage"
+import AuthPage from "./pages/AccountsPage/AuthPage"
 import AssetPage from "./pages/AssetPage/AssetPage"
 import AssetsPage from "./pages/AssetsPage/AssetsPage"
 import AuditLogsPage from "./pages/AuditLogsPage/AuditLogsPage"
-import AuthPage from "./pages/AuthPage"
+import CloudUserPage from "./pages/CloudUserPage/CloudUserPage"
 import HomePage from "./pages/HomePage/HomePage"
 import ImportDataPage from "./pages/ImportDataPage/ImportDataPage"
 import ServerPage from "./pages/ServerPage/ServerPage"
@@ -25,46 +26,65 @@ import TradesPage from "./pages/TradesPage/TradesPage"
 import TransactionsPage from "./pages/TransactionsPage/TransactionsPage"
 import { SHORT_THROTTLE_DURATION } from "./settings"
 import {
-  $accounts,
   $activeAccount,
+  $cloudAccounts,
   $connectionErrorMessage,
   $connectionStatus,
+  $localAccounts,
 } from "./stores/account-store"
-import { $auth, checkAuthentication } from "./stores/auth-store"
-import { checkLogin as checkCloudLogin } from "./stores/cloud-account-store"
+import { $cloudAuth, $localAuth, checkAuthentication } from "./stores/auth-store"
+import { checkCloudLogin } from "./stores/cloud-user-store"
 import { $infoBanner } from "./stores/info-banner-store"
 import { fetchInMemoryData } from "./stores/metadata-store"
 import { closeSubscription } from "./utils/browser-utils"
-import { noop, sleep } from "./utils/utils"
-import { $localRpc, $rpc } from "./workers/remotes"
+import { noop } from "./utils/utils"
+import { $cloudRest, $cloudRpc, $localRest, $localRpc, $rpc } from "./workers/remotes"
 
 export default function App() {
   const connectionStatus = useStore($connectionStatus)
   const connectionErrorMessage = useStore($connectionErrorMessage)
 
-  const { checked: authChecked, needsSetup, isAuthenticated } = useStore($auth)
+  const { checked: authChecked, needsSetup, isAuthenticated } = useStore($localAuth)
 
   useEffect(() => {
     $infoBanner.set(connectionErrorMessage ?? null)
   }, [connectionErrorMessage])
 
   useEffect(() => {
-    checkAuthentication()
+    checkAuthentication($localAuth, $localRest.get())
   }, [])
 
   useEffect(() => {
     if (!authChecked || needsSetup || !isAuthenticated) return
 
-    Promise.all([$localRpc.get().getAccountNames(), sleep(0)]).then(([accounts]) => {
-      $accounts.set(accounts)
-    })
+    $localRpc.get().getAccountNames().then($localAccounts.set)
 
     const subscription = $localRpc.get().subscribeToAccounts(() => {
-      $localRpc.get().getAccountNames().then($accounts.set)
+      $localRpc.get().getAccountNames().then($localAccounts.set)
     })
 
     return closeSubscription(subscription)
   }, [connectionStatus, authChecked, needsSetup, isAuthenticated])
+
+  const cloudRpc = useStore($cloudRpc)
+  useEffect(() => {
+    if (!cloudRpc) return
+
+    cloudRpc.getAccountNames().then($cloudAccounts.set)
+
+    const subscription = cloudRpc.subscribeToAccounts(() => {
+      cloudRpc.getAccountNames().then($cloudAccounts.set)
+    })
+
+    return closeSubscription(subscription)
+  }, [cloudRpc])
+
+  const cloudRest = useStore($cloudRest)
+  useEffect(() => {
+    if (!cloudRest) return
+
+    checkAuthentication($cloudAuth, cloudRest)
+  }, [cloudRest])
 
   useEffect(() => {
     checkCloudLogin()
@@ -175,6 +195,7 @@ export default function App() {
           <ErrorBoundary>
             <Routes>
               <Route index element={<AccountsPage />} />
+              <Route path="/privatecloud" element={<CloudUserPage show />} />
               <Route path="/u/:accountIndex" element={<AccountIndexRoute />}>
                 <Route index element={<HomePage />} />
                 <Route path="assets" element={<AssetsPage show />} />

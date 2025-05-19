@@ -1,7 +1,7 @@
 import { useStore } from "@nanostores/react"
 import { useEffect } from "react"
 import { Timestamp } from "src/interfaces"
-import { $accounts, demoAccountName } from "src/stores/account-store"
+import { $localAccounts, demoAccountName } from "src/stores/account-store"
 import { $infoBanner } from "src/stores/info-banner-store"
 import { $rpc } from "src/workers/remotes"
 
@@ -28,7 +28,7 @@ async function setupDemoAccount() {
 }
 
 export function useDemoAccount() {
-  const accounts = useStore($accounts)
+  const accounts = useStore($localAccounts)
 
   useEffect(() => {
     if (!accounts) return

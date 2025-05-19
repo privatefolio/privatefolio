@@ -118,7 +118,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
           {/* </Stack> */}
           <NavMenuItem
             value=""
-            to={`/u/${accountIndex}/`}
+            to={`/u/${accountIndex}`}
             label="Home"
             aria-label="Visit Home"
             onClick={toggleOpen}

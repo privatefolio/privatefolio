@@ -1,7 +1,7 @@
 import { atom, computed } from "nanostores"
 import { logAtoms } from "src/utils/browser-utils"
 
-export const $accounts = atom<string[] | undefined>()
+export const $localAccounts = atom<string[] | undefined>()
 export const $cloudAccounts = atom<string[] | undefined>()
 export const $isCloudAccount = atom<boolean>(false)
 
@@ -14,7 +14,7 @@ export const $activeAccount = atom<string>("")
 
 // TODO9 remove this, it should be accountId instead
 export const $activeIndex = computed(
-  [$activeAccount, $accounts, $cloudAccounts],
+  [$activeAccount, $localAccounts, $cloudAccounts],
   (activeAccount, accounts, cloudAccounts) => {
     if (!accounts || !activeAccount) return
 
@@ -26,14 +26,21 @@ export const $activeIndex = computed(
   }
 )
 
+export const $accounts = computed(
+  [$localAccounts, $cloudAccounts],
+  (localAccounts, cloudAccounts) => {
+    return localAccounts?.concat(cloudAccounts || [])
+  }
+)
+
 export const demoAccountName = "demo" // TODO8 move to server
 export const $connectionStatus = atom<"closed" | "connected">("closed")
 export const $connectionErrorMessage = atom<string | undefined>()
 
 logAtoms({
-  $accounts,
   $activeAccount,
   $cloudAccounts,
   $connectionStatus,
   $isCloudAccount,
+  $localAccounts,
 })

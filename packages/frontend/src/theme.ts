@@ -274,6 +274,13 @@ export const theme: CssVarsThemeOptions = {
         },
       },
     },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "var(--mui-palette-background-paper) !important",
+        },
+      },
+    },
     MuiCardActions: {
       styleOverrides: {
         root: {
@@ -784,6 +791,9 @@ export const theme: CssVarsThemeOptions = {
       styleOverrides: {
         body1: {
           lineHeight: 1.25,
+        },
+        caption: {
+          lineHeight: 1.5,
         },
         h5: {
           lineHeight: 1.25,

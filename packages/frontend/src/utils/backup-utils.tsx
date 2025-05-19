@@ -3,7 +3,6 @@ import { IconButton, Tooltip } from "@mui/material"
 import { enqueueSnackbar } from "notistack"
 import React from "react"
 import { $activeAccount } from "src/stores/account-store"
-import { JWT_LOCAL_STORAGE_KEY } from "src/stores/auth-store"
 import { $rest, $rpc } from "src/workers/remotes"
 
 import { downloadFile } from "./utils"
@@ -26,8 +25,10 @@ export async function handleBackupRequest() {
                 fileId: fileRecord.id.toString(),
               })
 
-              const response = await fetch(`${$rest.get()}/download?${params.toString()}`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem(JWT_LOCAL_STORAGE_KEY)}` },
+              const { baseUrl, jwtKey } = $rest.get()
+
+              const response = await fetch(`${baseUrl}/download?${params.toString()}`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem(jwtKey)}` },
               })
 
               const blob = await response.blob()
@@ -45,10 +46,7 @@ export async function handleBackupRequest() {
       }
     )
   } catch (error) {
-    enqueueSnackbar("An error occurred while creating the file", {
-      autoHideDuration: 10000,
-      variant: "error",
-    })
+    enqueueSnackbar("An error occurred while creating the file", { variant: "error" })
   }
 }
 
@@ -70,9 +68,11 @@ export async function handleRestoreRequest(file: File) {
   formData.append("file", file)
   formData.append("fileId", fileRecord.id.toString())
 
-  const response = await fetch(`${$rest.get()}/upload`, {
+  const { baseUrl, jwtKey } = $rest.get()
+
+  const response = await fetch(`${baseUrl}/upload`, {
     body: formData,
-    headers: { Authorization: `Bearer ${localStorage.getItem(JWT_LOCAL_STORAGE_KEY)}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem(jwtKey)}` },
     method: "POST",
   })
 

@@ -12,8 +12,9 @@ import {
 import { useStore } from "@nanostores/react"
 import React, { FormEvent, useCallback, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { $accounts } from "src/stores/account-store"
-import { $rpc } from "src/workers/remotes"
+import { $accounts, $cloudAccounts, $localAccounts } from "src/stores/account-store"
+import { $cloudServerInfo } from "src/stores/cloud-user-store"
+import { $cloudRpc, $localRpc } from "src/workers/remotes"
 
 import { SectionTitle } from "../SectionTitle"
 import { Tabs } from "../Tabs"
@@ -32,6 +33,8 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
   const navigate = useNavigate()
 
   const [loading, setLoading] = useState(false)
+
+  const [accountType, setAccountType] = useState<"local" | "cloud">("local")
 
   const handleSubmit = useCallback(
     async (event: FormEvent) => {
@@ -53,8 +56,15 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
 
       setLoading(true)
       try {
-        await $rpc.get().createAccount(newAcc)
-        await $rpc.get().getAccountNames().then($accounts.set)
+        if (accountType === "local") {
+          await $localRpc.get().createAccount(newAcc)
+          await $localRpc.get().getAccountNames().then($localAccounts.set)
+        } else {
+          const cloudRpc = $cloudRpc.get()
+          if (!cloudRpc) throw new Error("RPC is not defined")
+          await cloudRpc.createAccount(newAcc)
+          await cloudRpc.getAccountNames().then($cloudAccounts.set)
+        }
         setLoading(false)
         toggleOpen()
         setError("")
@@ -66,10 +76,8 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
         setLoading(false)
       }
     },
-    [accounts, name, toggleOpen, navigate]
+    [accounts, name, accountType, toggleOpen, navigate]
   )
-
-  const [accountType, setAccountType] = useState<"local" | "cloud">("local")
 
   return (
     <Dialog open={open} onClose={toggleOpen}>
@@ -114,7 +122,7 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
               })}
             >
               <Tab label="Local" value="local" />
-              <Tab label="Cloud" value="cloud" />
+              <Tab label="Cloud" value="cloud" disabled={!$cloudServerInfo.get()?.id} />
             </Tabs>
             <div>
               <SectionTitle>Name</SectionTitle>

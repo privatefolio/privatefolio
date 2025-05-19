@@ -13,7 +13,7 @@ import {
   TextField,
 } from "@mui/material"
 import React, { FormEvent, useCallback, useEffect, useState } from "react"
-import { login, signUp } from "src/stores/cloud-account-store"
+import { handleLogin, handleSignUp } from "src/stores/cloud-user-store"
 
 import { LogoText } from "../Header/LogoText"
 import { SectionTitle } from "../SectionTitle"
@@ -24,7 +24,7 @@ interface AddAccountDialogProps {
   toggleOpen: () => void
 }
 
-export function PrivateCloudDialog(props: AddAccountDialogProps) {
+export function CloudLoginDialog(props: AddAccountDialogProps) {
   const { open, toggleOpen } = props
 
   const [form, setForm] = useState<"login" | "sign-up">("login")
@@ -60,9 +60,9 @@ export function PrivateCloudDialog(props: AddAccountDialogProps) {
       setLoading(true)
       try {
         if (form === "sign-up") {
-          await signUp(email, password)
+          await handleSignUp(email, password)
         } else {
-          await login(email, password)
+          await handleLogin(email, password)
         }
         setLoading(false)
         toggleOpen()

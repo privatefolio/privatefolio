@@ -1,24 +1,17 @@
-import { atom } from "nanostores"
+import { atom, WritableAtom } from "nanostores"
 import { logAtoms } from "src/utils/browser-utils"
 import { sleep } from "src/utils/utils"
-import { $rest } from "src/workers/remotes"
+import { RestConfig } from "src/workers/remotes"
 
-export const JWT_LOCAL_STORAGE_KEY = "privatefolio_jwt"
-
-interface AuthState {
-  /** Has the initial check been performed? */
+export interface AuthState {
   checked: boolean
-  /** Error message during login/setup */
   errorMessage?: string
-  /** Is the user currently authenticated with a valid JWT */
   isAuthenticated: boolean
-  /** Is there a login/setup attempt in progress? */
   loading: boolean
-  /** Does the backend require initial password setup? */
   needsSetup: boolean
 }
 
-export const $auth = atom<AuthState>({
+export const $localAuth = atom<AuthState>({
   checked: false,
   errorMessage: undefined,
   isAuthenticated: false,
@@ -26,26 +19,35 @@ export const $auth = atom<AuthState>({
   needsSetup: false,
 })
 
-logAtoms({ $auth })
+export const $cloudAuth = atom<AuthState>({
+  checked: false,
+  errorMessage: undefined,
+  isAuthenticated: false,
+  loading: false,
+  needsSetup: false,
+})
 
-export async function checkAuthentication() {
-  const baseUrl = $rest.get()
+logAtoms({ $cloudAuth, $localAuth })
+
+export async function checkAuthentication(atom: WritableAtom<AuthState>, api: RestConfig | null) {
+  if (!api) return
+  const { baseUrl, jwtKey } = api
 
   try {
     const statusRes = await fetch(`${baseUrl}/api/setup-status`)
     if (!statusRes.ok) {
-      $auth.set({ ...$auth.get(), errorMessage: "Failed to check setup status." })
+      atom.set({ ...atom.get(), errorMessage: "Failed to check setup status." })
     } else {
       const { needsSetup } = (await statusRes.json()) as { needsSetup: boolean }
       if (needsSetup) {
-        $auth.set({ ...$auth.get(), checked: true, loading: false, needsSetup })
+        atom.set({ ...atom.get(), checked: true, loading: false, needsSetup })
         return
       }
     }
 
-    const jwt = localStorage.getItem(JWT_LOCAL_STORAGE_KEY)
+    const jwt = localStorage.getItem(jwtKey)
     if (!jwt) {
-      $auth.set({ ...$auth.get(), checked: true })
+      atom.set({ ...atom.get(), checked: true })
       return
     }
 
@@ -55,14 +57,19 @@ export async function checkAuthentication() {
 
     const data = await verifyRes.json()
     if (data.valid) {
-      $auth.set({ ...$auth.get(), checked: true, isAuthenticated: true })
+      atom.set({ ...atom.get(), checked: true, isAuthenticated: true })
     } else {
-      $auth.set({ ...$auth.get(), checked: true, errorMessage: data.error, isAuthenticated: false })
+      atom.set({
+        ...atom.get(),
+        checked: true,
+        errorMessage: data.error,
+        isAuthenticated: false,
+      })
     }
   } catch (error) {
     console.error("⚠️ Authentication check failed:", error)
-    $auth.set({
-      ...$auth.get(),
+    atom.set({
+      ...atom.get(),
       checked: true,
       errorMessage: `Cannot connect to server at ${baseUrl}.`,
       isAuthenticated: false,
@@ -71,16 +78,18 @@ export async function checkAuthentication() {
   }
 }
 
-export function lockApp() {
+export function lockApp(atom: WritableAtom<AuthState>, api: RestConfig | null) {
+  if (!api) return
+  const { jwtKey } = api
+
   try {
-    localStorage.removeItem(JWT_LOCAL_STORAGE_KEY)
+    localStorage.removeItem(jwtKey)
   } catch (error) {
     console.error("Failed to remove JWT from localStorage:", error)
   }
   // Reset auth state, keeping setup status known
-  const currentState = $auth.get()
-  $auth.set({
-    ...currentState,
+  atom.set({
+    ...atom.get(),
     errorMessage: undefined,
     isAuthenticated: false,
     loading: false,
@@ -91,9 +100,14 @@ export function lockApp() {
  * Performs the initial password setup.
  * @param password The password to set.
  */
-export async function setPassword(password: string) {
-  const baseUrl = $rest.get()
-  $auth.set({ ...$auth.get(), loading: true })
+export async function setPassword(
+  password: string,
+  atom: WritableAtom<AuthState>,
+  api: RestConfig | null
+) {
+  if (!api) return
+  const { baseUrl } = api
+  atom.set({ ...atom.get(), loading: true })
 
   try {
     const response = await fetch(`${baseUrl}/api/setup`, {
@@ -103,8 +117,8 @@ export async function setPassword(password: string) {
     })
 
     if (response.status === 201) {
-      $auth.set({
-        ...$auth.get(),
+      atom.set({
+        ...atom.get(),
         errorMessage: undefined,
         loading: false,
         needsSetup: false,
@@ -114,13 +128,13 @@ export async function setPassword(password: string) {
         .json()
         .catch(() => ({ error: "Failed to parse error response" }))
       const errorMessage = errorData?.error || `HTTP error! status: ${response.status}`
-      $auth.set({ ...$auth.get(), errorMessage, loading: false })
+      atom.set({ ...atom.get(), errorMessage, loading: false })
     }
   } catch (error) {
     console.error("⚠️ Authentication setup failed:", error)
 
-    $auth.set({
-      ...$auth.get(),
+    atom.set({
+      ...atom.get(),
       errorMessage: `Cannot connect to server at ${baseUrl}.`,
       loading: false,
     })
@@ -131,10 +145,15 @@ export async function setPassword(password: string) {
  * Logs in the user by exchanging the password for a JWT.
  * @param password The user's password.
  */
-export async function unlockApp(password: string) {
-  const baseUrl = $rest.get()
+export async function unlockApp(
+  password: string,
+  atom: WritableAtom<AuthState>,
+  api: RestConfig | null
+) {
+  if (!api) return
+  const { baseUrl, jwtKey } = api
 
-  $auth.set({ ...$auth.get(), loading: true })
+  atom.set({ ...atom.get(), loading: true })
   try {
     const response = await fetch(`${baseUrl}/api/login`, {
       body: JSON.stringify({ password }),
@@ -146,9 +165,9 @@ export async function unlockApp(password: string) {
       const data = (await response.json()) as { token: string }
       if (!data.token) throw new Error("No token received from login endpoint.")
 
-      localStorage.setItem(JWT_LOCAL_STORAGE_KEY, data.token)
-      $auth.set({
-        ...$auth.get(),
+      localStorage.setItem(jwtKey, data.token)
+      atom.set({
+        ...atom.get(),
         errorMessage: undefined,
         isAuthenticated: true,
         loading: false,
@@ -164,10 +183,12 @@ export async function unlockApp(password: string) {
     console.error("Login request failed:", error)
 
     await sleep(1_000)
-    $auth.set({
-      ...$auth.get(),
+    atom.set({
+      ...atom.get(),
       errorMessage: error instanceof Error ? error.message : String(error),
       loading: false,
     })
+
+    throw error
   }
 }

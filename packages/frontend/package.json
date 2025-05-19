@@ -18,6 +18,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "md5": "^2.3.0",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@feathersjs/authentication-client": "^5.0.31",
@@ -59,6 +60,7 @@
     "wa-sqlite": "rhashimoto/wa-sqlite"
   },
   "devDependencies": {
+    "@types/md5": "^2.3.2",
     "@types/big.js": "^6.2.2",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^20.2.5",

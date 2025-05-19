@@ -18,11 +18,12 @@ import React, { FormEvent, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { LogoText } from "src/components/Header/LogoText"
 import { SectionTitle } from "src/components/SectionTitle"
+import { $localRest } from "src/workers/remotes"
 
-import { $auth, setPassword, unlockApp } from "../stores/auth-store"
+import { $localAuth, setPassword, unlockApp } from "../../stores/auth-store"
 
 export default function AuthPage() {
-  const { isAuthenticated, errorMessage, loading, checked, needsSetup } = useStore($auth)
+  const { isAuthenticated, errorMessage, loading, checked, needsSetup } = useStore($localAuth)
   const [password, setPasswordValue] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [validationError, setValidationError] = useState<string | null>(null)
@@ -56,7 +57,7 @@ export default function AuthPage() {
 
   const handleUnlock = async (event: FormEvent) => {
     event.preventDefault()
-    await unlockApp(password)
+    await unlockApp(password, $localAuth, $localRest.get())
   }
 
   const handleSetup = async (event: FormEvent) => {
@@ -75,8 +76,8 @@ export default function AuthPage() {
       return
     }
 
-    await setPassword(password)
-    await unlockApp(password)
+    await setPassword(password, $localAuth, $localRest.get())
+    await unlockApp(password, $localAuth, $localRest.get())
   }
 
   if (!checked) {

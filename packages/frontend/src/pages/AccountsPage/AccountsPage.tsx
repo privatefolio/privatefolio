@@ -1,17 +1,27 @@
 import { Add, Cloud } from "@mui/icons-material"
-import { AppBar, Avatar, Button, Container, Fade, Stack, Toolbar, Typography } from "@mui/material"
+import {
+  AppBar,
+  Avatar,
+  Button,
+  Container,
+  Fade,
+  Stack,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { AccountAvatar, SIZE_MAP } from "src/components/AccountAvatar"
 import { AddAccountDialog } from "src/components/AccountPicker/AddAccountDialog"
-import { PrivateCloudDialog } from "src/components/AccountPicker/PrivateCloudDialog"
+import { CloudLoginDialog } from "src/components/AccountPicker/CloudLoginDialog"
 import { CircularSpinner } from "src/components/CircularSpinner"
 import { LogoText } from "src/components/Header/LogoText"
 import { StaggeredList } from "src/components/StaggeredList"
 import { useBoolean } from "src/hooks/useBoolean"
 import { $accounts, $activeAccount, $activeIndex } from "src/stores/account-store"
-import { $user, $userLoading, logout } from "src/stores/cloud-account-store"
+import { $cloudUser } from "src/stores/cloud-user-store"
 import { SerifFont } from "src/theme"
 import { SPRING_CONFIGS } from "src/utils/utils"
 
@@ -26,8 +36,7 @@ export default function AccountsPage() {
   const { value: addAccountOpen, toggle: toggleAddAccount } = useBoolean(false)
   const { value: loginOpen, toggle: toggleLoginOpen } = useBoolean(false)
 
-  const user = useStore($user)
-  const userLoading = useStore($userLoading)
+  const user = useStore($cloudUser)
 
   useEffect(() => {
     if (activeIndex !== undefined) {
@@ -41,7 +50,7 @@ export default function AccountsPage() {
     firstAccount?.focus()
     const timeout = setTimeout(() => {
       setShowAppBar(true)
-    }, 500)
+    }, 250)
     return () => clearTimeout(timeout)
   }, [])
 
@@ -66,7 +75,7 @@ export default function AccountsPage() {
           zIndex: 1001,
         }}
       >
-        <Fade in={showAppBar} timeout={500}>
+        <Fade in={showAppBar} timeout={400}>
           <Toolbar disableGutters>
             <Container
               disableGutters
@@ -95,18 +104,30 @@ export default function AccountsPage() {
                 >
                   <LogoText />
                 </Button>
-                {!userLoading && (
-                  <Fade in>
+                {user !== undefined && !user && (
+                  <Button
+                    color="secondary"
+                    size="small"
+                    endIcon={<Cloud />}
+                    variant="outlined"
+                    onClick={toggleLoginOpen}
+                  >
+                    Login to PrivateCloud
+                  </Button>
+                )}
+                {user !== undefined && user && (
+                  <Tooltip title="View PrivateCloud account">
                     <Button
                       color="secondary"
                       size="small"
                       endIcon={<Cloud />}
                       variant="outlined"
-                      onClick={user ? logout : toggleLoginOpen}
+                      component={Link}
+                      to="/privatecloud"
                     >
-                      {user ? "Sign out from" : "Login to"} PrivateCloud
+                      {user.email}
                     </Button>
-                  </Fade>
+                  </Tooltip>
                 )}
               </Stack>
             </Container>
@@ -194,7 +215,7 @@ export default function AccountsPage() {
         )}
       </Stack>
       <AddAccountDialog open={addAccountOpen} toggleOpen={toggleAddAccount} />
-      <PrivateCloudDialog open={loginOpen} toggleOpen={toggleLoginOpen} />
+      <CloudLoginDialog open={loginOpen} toggleOpen={toggleLoginOpen} />
     </>
   )
 }

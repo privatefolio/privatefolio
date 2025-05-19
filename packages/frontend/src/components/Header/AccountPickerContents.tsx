@@ -5,8 +5,8 @@ import React, { useState } from "react"
 import { useLocation } from "react-router-dom"
 import { useConfirm } from "src/hooks/useConfirm"
 import { $accounts, $activeAccount } from "src/stores/account-store"
-import { lockApp } from "src/stores/auth-store"
-import { $rpc } from "src/workers/remotes"
+import { $localAuth, lockApp } from "src/stores/auth-store"
+import { $localRest, $rpc } from "src/workers/remotes"
 
 import { AccountAvatar } from "../AccountAvatar"
 import { NavMenuItem } from "../NavMenuItem"
@@ -121,7 +121,12 @@ export function AccountPickerContents(props: AccountPickerContentsProps) {
         <ListItemText>{deleting ? "Deleting account..." : "Delete account"} </ListItemText>
       </MenuItem>
       <Divider />
-      <MenuItem aria-label="Lock app" onClick={lockApp}>
+      <MenuItem
+        aria-label="Lock app"
+        onClick={() => {
+          lockApp($localAuth, $localRest.get())
+        }}
+      >
         <ListItemAvatar>
           <LockOutlined fontSize="small" />
         </ListItemAvatar>

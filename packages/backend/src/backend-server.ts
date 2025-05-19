@@ -139,6 +139,7 @@ export class BackendServer<T extends BackendApiShape> {
           const { isAuthenticated } = socket.data
 
           if (!isAuthenticated) {
+            console.warn("Connection denied: auth check failed.")
             socket.close(1008, "Unauthorized")
             return
           }

@@ -119,7 +119,7 @@ export const SearchBar = () => {
         icon: <HomeRounded fontSize="small" />,
         id: "page-home",
         name: "Home",
-        perform: () => navigate(`/u/${$activeIndex.get()}/`),
+        perform: () => navigate(`/u/${$activeIndex.get()}`),
         section: "Navigation",
       },
       {
@@ -147,10 +147,7 @@ export const SearchBar = () => {
             .get()
             .enqueueSyncAllConnections($activeAccount.get(), "user", $debugMode.get(), (error) => {
               if (error) {
-                enqueueSnackbar("Could not sync connection", {
-                  autoHideDuration: 10000,
-                  variant: "error",
-                })
+                enqueueSnackbar("Could not sync connection", {})
               }
             }),
         priority: 1,

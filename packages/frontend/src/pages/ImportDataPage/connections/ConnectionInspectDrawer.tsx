@@ -163,10 +163,7 @@ export function ConnectionInspectDrawer(props: ConnectionInspectDrawerProps) {
                       (error) => {
                         setLoadingSync(false)
                         if (error) {
-                          enqueueSnackbar("Could not sync connection", {
-                            autoHideDuration: 10000,
-                            variant: "error",
-                          })
+                          enqueueSnackbar("Could not sync connection", { variant: "error" })
                         }
                       }
                     )

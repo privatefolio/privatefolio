@@ -1,0 +1,612 @@
+import {
+  AddCircle,
+  Cancel,
+  Cloud,
+  KeyRounded,
+  PauseCircle,
+  PlayCircle,
+  RestartAlt,
+  Settings,
+} from "@mui/icons-material"
+import {
+  Avatar,
+  Badge,
+  Button,
+  ButtonGroup,
+  Card,
+  CardActions,
+  CardContent,
+  Checkbox,
+  CircularProgress,
+  Container,
+  Fade,
+  FormControlLabel,
+  Link,
+  Skeleton,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material"
+import { useStore } from "@nanostores/react"
+import md5 from "md5"
+import { enqueueSnackbar } from "notistack"
+import React, { useEffect, useMemo } from "react"
+import { useNavigate } from "react-router-dom"
+import { CloudInstanceStatus, getCheckoutLink, getPortalLink } from "src/api/privatecloud-api"
+import { BackButton } from "src/components/BackButton"
+import { LogoText } from "src/components/Header/LogoText"
+import { SectionTitle } from "src/components/SectionTitle"
+import { StaggeredList } from "src/components/StaggeredList"
+import { useConfirm } from "src/hooks/useConfirm"
+import { $cloudAuth, unlockApp } from "src/stores/auth-store"
+import {
+  $cloudPortalLink,
+  $cloudServerInfo,
+  $cloudServerMutating,
+  $cloudSubscription,
+  $cloudUser,
+  checkCloudInstance,
+  checkSubscription,
+  handleCreateServer,
+  handleLogout,
+  handlePauseServer,
+  handleRemoveServer,
+  handleRestartServer,
+  handleSetupServer,
+  handleUnpauseServer,
+} from "src/stores/cloud-user-store"
+import { formatDate } from "src/utils/formatting-utils"
+import { $cloudRest } from "src/workers/remotes"
+
+import { ServerStatusIcon } from "./ServerStatusIcon"
+
+export default function CloudUserPage({ show }: { show: boolean }) {
+  useEffect(() => {
+    document.title = "My PrivateCloud"
+  }, [])
+
+  const account = useStore($cloudUser)
+  const sub = useStore($cloudSubscription)
+  const serverInfo = useStore($cloudServerInfo)
+  const serverMutating = useStore($cloudServerMutating)
+
+  const auth = useStore($cloudAuth)
+
+  const serverStatus = useMemo(() => {
+    if (auth.needsSetup) return "needs setup"
+    if (auth.checked && !auth.needsSetup && !auth.isAuthenticated) return "needs login"
+    return serverInfo?.status || "unknown"
+  }, [auth, serverInfo])
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (!$cloudUser.get()) return
+      await Promise.all([checkSubscription(), checkCloudInstance()])
+    }, 5_000)
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [])
+
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (!account) {
+      navigate("/", { replace: true })
+    }
+  }, [account, navigate])
+
+  const portalLink = useStore($cloudPortalLink)
+
+  useEffect(() => {
+    if (account) {
+      getPortalLink()
+        .then((link) => {
+          $cloudPortalLink.set(link.url)
+        })
+        .catch((error) => {
+          console.error("Error fetching portal link:", error)
+          $cloudPortalLink.set(null)
+        })
+    }
+  }, [account])
+
+  const gravatar = useMemo(
+    () => (account?.email ? `https://www.gravatar.com/avatar/${md5(account.email)}` : undefined),
+    [account?.email]
+  )
+
+  const paymentPlan = useMemo<{
+    cancelAt?: Date
+    isPremium: boolean
+    loading?: boolean
+    name: string
+    priceText?: string
+    renewal?: Date
+  }>(() => {
+    if (sub === undefined) {
+      return { isPremium: false, loading: true, name: "Loading..." }
+    }
+    if (sub === null) {
+      return { isPremium: false, name: "Free" }
+    }
+
+    const item = sub.items.data[0]
+    if (!item) {
+      return { isPremium: false, name: "Free" }
+    }
+
+    const { plan } = item
+    const amount = plan.amount / 100
+    const currency = plan.currency.toUpperCase().replace("USD", "$")
+    const interval = plan.interval
+
+    const name = plan.nickname || "Premium"
+
+    const renewal = new Date(sub.billing_cycle_anchor * 1000)
+    renewal.setMonth(new Date(renewal).getMonth() + plan.interval_count)
+
+    return {
+      cancelAt: sub.cancel_at ? new Date(sub.cancel_at * 1000) : undefined,
+      isPremium: true,
+      name,
+      priceText: `${currency}${amount.toFixed(2)} per ${interval}`,
+      renewal,
+    }
+  }, [sub])
+
+  const confirm = useConfirm()
+
+  if (!account) {
+    return null
+  }
+
+  return (
+    <Container maxWidth="xs" sx={{ marginTop: 8 }} disableGutters>
+      <StaggeredList component="main" gap={1} show={show} tertiary>
+        <BackButton to=".." sx={{ marginLeft: 2 }}>
+          Back
+        </BackButton>
+        <Card variant="outlined">
+          <LogoText color="primary" sx={{ paddingTop: 2, paddingX: 3 }}>
+            PrivateCloud™
+          </LogoText>
+          <CardContent component={Stack} gap={3}>
+            <div>
+              <SectionTitle>Account</SectionTitle>
+              <Stack direction="row" alignItems="flex-start">
+                <Avatar src={gravatar}>{account.email[0].toUpperCase()}</Avatar>
+
+                <Stack marginLeft={2}>
+                  <Typography variant="caption" component="div">
+                    <Stack direction="row" gap={1}>
+                      <Typography variant="inherit" color="text.secondary">
+                        Email
+                      </Typography>
+                      <Typography variant="inherit">
+                        {account ? account.email : "Unknown"}
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" gap={1}>
+                      <Typography variant="inherit" color="text.secondary">
+                        User ID
+                      </Typography>{" "}
+                      <Typography variant="inherit">#{account.id}</Typography>
+                    </Stack>
+                    <Stack direction="row" gap={1}>
+                      <Typography variant="inherit" color="text.secondary">
+                        Plan
+                      </Typography>
+                      {paymentPlan.loading ? (
+                        <Stack>
+                          <Skeleton height={20} width={80} />
+                        </Stack>
+                      ) : (
+                        <>
+                          <Typography variant="inherit">
+                            {paymentPlan.name}
+                            {!paymentPlan.loading && !paymentPlan.isPremium && (
+                              <>
+                                {" "}
+                                -{" "}
+                                <Link
+                                  variant="inherit"
+                                  href="https://pay.privatefolio.app"
+                                  target="_blank"
+                                  onClick={async (e) => {
+                                    e.preventDefault()
+                                    const paymentLink = await getCheckoutLink()
+                                    window.open(paymentLink.url, "_blank")
+                                  }}
+                                >
+                                  Upgrade to Premium
+                                </Link>
+                              </>
+                            )}
+                          </Typography>
+                        </>
+                      )}
+                      <Typography
+                        variant="inherit"
+                        color="text.secondary"
+                        component="span"
+                        fontStyle="italic"
+                      >
+                        {paymentPlan.priceText}
+                      </Typography>
+                    </Stack>
+                    {paymentPlan.isPremium && (
+                      <Fade in>
+                        <Stack>
+                          {paymentPlan.cancelAt && (
+                            <Typography variant="inherit" color="text.secondary" fontStyle="italic">
+                              Your subscription will be canceled on{" "}
+                              {formatDate(paymentPlan.cancelAt)}.
+                            </Typography>
+                          )}
+                          {!paymentPlan.cancelAt && paymentPlan.renewal && (
+                            <Typography variant="inherit" color="text.secondary" fontStyle="italic">
+                              Your subscription renews on {formatDate(paymentPlan.renewal)}.
+                            </Typography>
+                          )}
+                        </Stack>
+                      </Fade>
+                    )}
+                  </Typography>
+                </Stack>
+              </Stack>
+            </div>
+
+            <div>
+              <SectionTitle>Cloud server</SectionTitle>
+              <Stack>
+                <Stack alignItems="flex-start">
+                  <Stack direction="row" alignItems="flex-start">
+                    <Badge
+                      overlap="circular"
+                      anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                      badgeContent={
+                        serverInfo && (
+                          <Fade in>
+                            <Stack
+                              sx={{
+                                backgroundColor: "var(--mui-palette-background-paper)",
+                                borderRadius: "50%",
+                              }}
+                              alignItems="center"
+                              justifyContent="center"
+                            >
+                              <ServerStatusIcon status={serverStatus} />
+                            </Stack>
+                          </Fade>
+                        )
+                      }
+                    >
+                      <Avatar>
+                        <Cloud color="primary" fontSize="small" />
+                      </Avatar>
+                      {serverInfo === undefined && (
+                        <CircularProgress
+                          size={40}
+                          sx={{
+                            left: 0,
+                            position: "absolute",
+                            top: 0,
+                          }}
+                        />
+                      )}
+                    </Badge>
+
+                    <Stack marginLeft={2}>
+                      {serverInfo === undefined ? (
+                        <Stack>
+                          <Skeleton height={18} width={80} />
+                          <Skeleton height={18} width={100} />
+                          <Skeleton height={18} width={100} />
+                          <Skeleton height={32} width={220} />
+                        </Stack>
+                      ) : (
+                        <>
+                          <Typography variant="caption" component="div">
+                            <Stack direction="row" gap={1}>
+                              <Typography variant="inherit" color="text.secondary">
+                                Status
+                              </Typography>
+                              <Typography variant="inherit" textTransform="capitalize">
+                                {serverStatus}
+                              </Typography>
+                              <Typography variant="inherit" component="span">
+                                {serverInfo?.statusText && (
+                                  <Typography
+                                    variant="inherit"
+                                    component="span"
+                                    color="text.secondary"
+                                    fontStyle="italic"
+                                  >
+                                    {serverInfo.statusText}
+                                  </Typography>
+                                )}
+                              </Typography>
+                            </Stack>
+                            <Stack direction="row" gap={1}>
+                              <Typography variant="inherit" component="span" color="text.secondary">
+                                Server ID
+                              </Typography>{" "}
+                              <Typography variant="inherit" component="span">
+                                {serverInfo ? serverInfo.id : "Unknown"}
+                              </Typography>
+                            </Stack>
+                            {serverInfo && (
+                              <Stack direction="row" gap={1}>
+                                <Typography
+                                  variant="inherit"
+                                  component="span"
+                                  color="text.secondary"
+                                >
+                                  Server limits
+                                </Typography>{" "}
+                                <Typography variant="inherit" component="span">
+                                  {serverInfo.limits.cpus}{" "}
+                                  <Typography
+                                    variant="inherit"
+                                    component="span"
+                                    color="text.secondary"
+                                    fontStyle="italic"
+                                  >
+                                    CPUs -{" "}
+                                  </Typography>
+                                  {serverInfo.limits.memory}{" "}
+                                  <Typography
+                                    variant="inherit"
+                                    component="span"
+                                    color="text.secondary"
+                                    fontStyle="italic"
+                                  >
+                                    RAM
+                                  </Typography>
+                                </Typography>
+                              </Stack>
+                            )}
+                          </Typography>
+                          <ButtonGroup
+                            size="small"
+                            variant="outlined"
+                            color="secondary"
+                            sx={{
+                              "& button": {
+                                // borderRadius: 0,
+                                paddingY: 1.5,
+                              },
+                              height: 32,
+                              paddingY: 0.5,
+                            }}
+                          >
+                            {serverStatus === "needs setup" && (
+                              <Button
+                                onClick={async () => {
+                                  const { confirmed, event } = await confirm({
+                                    confirmText: "Complete setup",
+                                    content: (
+                                      <Stack gap={0} maxWidth={420}>
+                                        <Typography variant="body2" color="text.secondary">
+                                          To complete the setup, please enter the password of your
+                                          PrivateCloud account.
+                                          <br />
+                                          <br />
+                                        </Typography>
+                                        <div>
+                                          <SectionTitle>Password</SectionTitle>
+                                          <TextField
+                                            name="password"
+                                            type="password"
+                                            autoComplete="current-password"
+                                            required
+                                            variant="outlined"
+                                            fullWidth
+                                            size="small"
+                                          />
+                                        </div>
+                                      </Stack>
+                                    ),
+                                    title: "Password required",
+                                  })
+
+                                  if (!event) return
+
+                                  const formData = new FormData(event.target as HTMLFormElement)
+                                  const password = formData.get("password") as string
+
+                                  if (confirmed) {
+                                    handleSetupServer(password)
+                                  }
+                                }}
+                                startIcon={<Settings />}
+                                disabled={serverMutating}
+                              >
+                                Setup
+                              </Button>
+                            )}
+                            {serverStatus === "needs login" && (
+                              <Button
+                                onClick={async () => {
+                                  const { confirmed, event } = await confirm({
+                                    confirmText: "Login",
+                                    content: (
+                                      <Stack gap={0} maxWidth={420}>
+                                        <Typography variant="body2" color="text.secondary">
+                                          To login to your server, please enter the password of your
+                                          PrivateCloud account.
+                                          <br />
+                                          <br />
+                                        </Typography>
+                                        <div>
+                                          <SectionTitle>Password</SectionTitle>
+                                          <TextField
+                                            name="password"
+                                            type="password"
+                                            autoComplete="current-password"
+                                            required
+                                            variant="outlined"
+                                            fullWidth
+                                            size="small"
+                                          />
+                                        </div>
+                                      </Stack>
+                                    ),
+                                    title: "Password required",
+                                  })
+
+                                  if (!event) return
+
+                                  const formData = new FormData(event.target as HTMLFormElement)
+                                  const password = formData.get("password") as string
+
+                                  if (confirmed) {
+                                    try {
+                                      await unlockApp(password, $cloudAuth, $cloudRest.get())
+                                    } catch (err) {
+                                      enqueueSnackbar(`Cloud server: ${(err as Error).message}`, {
+                                        variant: "error",
+                                      })
+                                    }
+                                  }
+                                }}
+                                startIcon={<KeyRounded />}
+                                disabled={serverMutating}
+                              >
+                                Login
+                              </Button>
+                            )}
+                            {serverInfo && serverInfo.status === "paused" && (
+                              <Button
+                                onClick={handleUnpauseServer}
+                                startIcon={<PlayCircle />}
+                                disabled={serverMutating}
+                              >
+                                Resume
+                              </Button>
+                            )}
+                            {serverInfo && serverInfo.status === "running" && (
+                              <Button
+                                onClick={handlePauseServer}
+                                startIcon={<PauseCircle />}
+                                disabled={serverMutating}
+                              >
+                                Pause
+                              </Button>
+                            )}
+                            {serverInfo !== null && (
+                              <Button
+                                onClick={handleRestartServer}
+                                startIcon={<RestartAlt />}
+                                disabled={
+                                  serverMutating ||
+                                  (!!serverInfo &&
+                                    (["restarting"] as CloudInstanceStatus[]).includes(
+                                      serverInfo.status
+                                    ))
+                                }
+                              >
+                                Restart
+                              </Button>
+                            )}
+                            {serverInfo === null && (
+                              <Button
+                                startIcon={<AddCircle />}
+                                onClick={handleCreateServer}
+                                disabled={serverMutating}
+                              >
+                                Create
+                              </Button>
+                            )}
+                            {serverInfo !== null && (
+                              <Button
+                                startIcon={<Cancel />}
+                                onClick={async () => {
+                                  const { confirmed, event } = await confirm({
+                                    confirmText: "Destroy",
+                                    content: (
+                                      <Stack gap={0}>
+                                        <Typography variant="body2" color="text.secondary">
+                                          Destroy the server instance, which allows you start again.
+                                          Optionally you can also remove all user data and start
+                                          fresh.
+                                          <br />
+                                          <br />
+                                          This action is permanent. Are you sure you wish to
+                                          continue?
+                                          <br />
+                                          <br />
+                                        </Typography>
+                                        <FormControlLabel
+                                          control={
+                                            <Checkbox
+                                              name="remove-data"
+                                              color="secondary"
+                                              sx={{ marginLeft: 0.5 }}
+                                            />
+                                          }
+                                          label="Remove user data"
+                                        />
+                                      </Stack>
+                                    ),
+                                    title: "Destroy server",
+                                    variant: "warning",
+                                  })
+
+                                  if (!event) return
+
+                                  const formData = new FormData(event.target as HTMLFormElement)
+                                  const removeData =
+                                    (formData.get("remove-data") as string) === "on"
+
+                                  if (confirmed) {
+                                    handleRemoveServer(removeData)
+                                  }
+                                }}
+                                disabled={serverMutating}
+                              >
+                                Destroy
+                              </Button>
+                            )}
+                          </ButtonGroup>
+                        </>
+                      )}
+                    </Stack>
+                  </Stack>
+                </Stack>
+              </Stack>
+            </div>
+
+            <Stack>
+              <SectionTitle>Help</SectionTitle>
+              <Link variant="body2" href="mailto:hello@danielconstantin.net">
+                Contact support
+              </Link>
+
+              {portalLink && (
+                <Fade in>
+                  <Link variant="body2" href={portalLink} target="_blank">
+                    Manage my subscription
+                  </Link>
+                </Fade>
+              )}
+              {serverInfo?.url && (
+                <Fade in>
+                  <Link variant="body2" href={serverInfo.url} target="_blank">
+                    Visit server link
+                  </Link>
+                </Fade>
+              )}
+            </Stack>
+          </CardContent>
+          <CardActions>
+            <Button onClick={handleLogout} color="primary" variant="contained">
+              Logout
+            </Button>
+          </CardActions>
+        </Card>
+      </StaggeredList>
+    </Container>
+  )
+}
