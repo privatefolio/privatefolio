@@ -21,7 +21,6 @@ import CloudUserPage from "./pages/CloudUserPage/CloudUserPage"
 import HomePage from "./pages/HomePage/HomePage"
 import ImportDataPage from "./pages/ImportDataPage/ImportDataPage"
 import ServerPage from "./pages/ServerPage/ServerPage"
-import SettingsPage from "./pages/SettingsPage/SettingsPage"
 import TradesPage from "./pages/TradesPage/TradesPage"
 import TransactionsPage from "./pages/TransactionsPage/TransactionsPage"
 import { SHORT_THROTTLE_DURATION } from "./settings"
@@ -203,7 +202,6 @@ export default function App() {
                 <Route path="audit-logs" element={<AuditLogsPage show />} />
                 <Route path="import-data" element={<ImportDataPage show />} />
                 <Route path="server" element={<ServerPage show />} />
-                <Route path="settings" element={<SettingsPage show />} />
                 <Route path="*" element={<FourZeroFourPage show />} />
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,3 +1,4 @@
+import { Settings } from "@mui/icons-material"
 import { Stack } from "@mui/material"
 import React from "react"
 import { useSearchParams } from "react-router-dom"
@@ -8,6 +9,7 @@ import { StaggeredList } from "../../components/StaggeredList"
 import { ServerFilesTable } from "./files/ServerFilesTable"
 import { ServerActions } from "./ServerActions"
 import { ServerInfo } from "./ServerInfo"
+import { ServerSettings } from "./ServerSettings"
 import { ServerTasksTable } from "./tasks/ServerTasksTable"
 
 const defaultTab = "tasks"
@@ -24,12 +26,14 @@ export default function ServerPage({ show }: { show: boolean }) {
             <NavTab value="tasks" to={"?tab=tasks"} label="Tasks" />
             <NavTab value="files" to={"?tab=files"} label="Files" />
             <NavTab value="info" to={"?tab=info"} label="Info" />
+            <NavTab value="settings" to={"?tab=settings"} label={<Settings />} />
           </Tabs>
           <ServerActions />
         </Stack>
         {tab === "tasks" && <ServerTasksTable />}
         {tab === "files" && <ServerFilesTable />}
         {tab === "info" && <ServerInfo />}
+        {tab === "settings" && <ServerSettings />}
       </Stack>
     </StaggeredList>
   )
