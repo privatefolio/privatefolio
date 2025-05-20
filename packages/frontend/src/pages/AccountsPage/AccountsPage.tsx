@@ -1,10 +1,11 @@
-import { Add, Cloud } from "@mui/icons-material"
+import { Add, Cloud, Settings } from "@mui/icons-material"
 import {
   AppBar,
   Avatar,
   Button,
   Container,
   Fade,
+  IconButton,
   Stack,
   Toolbar,
   Tooltip,
@@ -18,6 +19,7 @@ import { AddAccountDialog } from "src/components/AccountPicker/AddAccountDialog"
 import { CloudLoginDialog } from "src/components/AccountPicker/CloudLoginDialog"
 import { CircularSpinner } from "src/components/CircularSpinner"
 import { LogoText } from "src/components/Header/LogoText"
+import { SettingsDrawer } from "src/components/Header/SettingsDrawer"
 import { StaggeredList } from "src/components/StaggeredList"
 import { useBoolean } from "src/hooks/useBoolean"
 import { $accounts, $activeAccount, $activeIndex } from "src/stores/account-store"
@@ -62,6 +64,8 @@ export default function AccountsPage() {
     return () => clearTimeout(timeout)
   }, [])
 
+  const { value: openSettings, toggle: toggleSettingsOpen } = useBoolean(false)
+
   return (
     <>
       <AppBar
@@ -104,31 +108,52 @@ export default function AccountsPage() {
                 >
                   <LogoText />
                 </Button>
-                {user !== undefined && !user && (
-                  <Button
-                    color="secondary"
-                    size="small"
-                    endIcon={<Cloud />}
-                    variant="outlined"
-                    onClick={toggleLoginOpen}
-                  >
-                    Login to PrivateCloud
-                  </Button>
-                )}
-                {user !== undefined && user && (
-                  <Tooltip title="View PrivateCloud account">
+                <Stack direction="row" gap={1} alignItems="center">
+                  {user !== undefined && !user && (
                     <Button
                       color="secondary"
                       size="small"
                       endIcon={<Cloud />}
                       variant="outlined"
-                      component={Link}
-                      to="/privatecloud"
+                      onClick={toggleLoginOpen}
                     >
-                      {user.email}
+                      Login to PrivateCloud
                     </Button>
+                  )}
+                  {user !== undefined && user && (
+                    <Tooltip title="View PrivateCloud account">
+                      <Button
+                        color="secondary"
+                        size="small"
+                        endIcon={<Cloud />}
+                        variant="outlined"
+                        component={Link}
+                        to="/privatecloud"
+                      >
+                        {user.email}
+                      </Button>
+                    </Tooltip>
+                  )}
+                  <Tooltip title="Device Settings">
+                    <IconButton
+                      onClick={toggleSettingsOpen}
+                      color="secondary"
+                      aria-label="Open Settings"
+                      size="small"
+                    >
+                      <Settings
+                        sx={{
+                          "button:hover &": {
+                            transform: "rotate(-30deg)",
+                          },
+                          transition: "transform 0.33s",
+                        }}
+                        fontSize="small"
+                      />
+                    </IconButton>
                   </Tooltip>
-                )}
+                  <SettingsDrawer open={openSettings} toggleOpen={toggleSettingsOpen} />
+                </Stack>
               </Stack>
             </Container>
           </Toolbar>

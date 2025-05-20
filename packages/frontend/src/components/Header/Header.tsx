@@ -60,9 +60,7 @@ export function Header() {
               <CurrencySelector />
               <Tooltip title="Device Settings">
                 <IconButton
-                  onClick={() => {
-                    toggleSettingsOpen()
-                  }}
+                  onClick={toggleSettingsOpen}
                   color="secondary"
                   aria-label="Open Settings"
                 >

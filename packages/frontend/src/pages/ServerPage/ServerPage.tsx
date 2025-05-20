@@ -26,7 +26,7 @@ export default function ServerPage({ show }: { show: boolean }) {
             <NavTab value="tasks" to={"?tab=tasks"} label="Tasks" />
             <NavTab value="files" to={"?tab=files"} label="Files" />
             <NavTab value="info" to={"?tab=info"} label="Info" />
-            <NavTab value="settings" to={"?tab=settings"} label={<Settings />} />
+            <NavTab value="settings" to={"?tab=settings"} label={<Settings fontSize="small" />} />
           </Tabs>
           <ServerActions />
         </Stack>

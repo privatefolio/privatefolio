@@ -600,7 +600,6 @@ export const theme: CssVarsThemeOptions = {
         focusVisibleClassName: ".Mui-focusVisible",
       },
       styleOverrides: {
-        // TODO1 this needs work
         root: ({ theme }) => ({
           "& .MuiSwitch-switchBase": {
             "&.Mui-checked": {
@@ -640,6 +639,29 @@ export const theme: CssVarsThemeOptions = {
             borderRadius: 26 / 2,
             opacity: 1,
             transition: theme.transitions.create(["background-color"]),
+          },
+          "&.MuiSwitch-sizeSmall": {
+            "& .MuiSwitch-switchBase": {
+              "&.Mui-checked": {
+                // transform: translateX(width_root - width_thumb - 2 * margin_switchBase)
+                // transform: translateX(30 - 16 - 2*1) = translateX(12px)
+                transform: "translateX(12px)",
+              },
+              "&.Mui-focusVisible .MuiSwitch-thumb": {
+                border: "3px solid #fff",
+              },
+              margin: 2,
+              padding: 0,
+            },
+            "& .MuiSwitch-thumb": {
+              height: 14,
+              width: 14,
+            },
+            "& .MuiSwitch-track": {
+              borderRadius: 18 / 2,
+            },
+            height: 18,
+            width: 30,
           },
           height: 26,
           padding: 0,

@@ -98,13 +98,13 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
         <SectionTitle id="social-links" role="listitem">
           Developer tools
         </SectionTitle>
-        <Typography sx={{ opacity: 0.5 }} fontFamily={MonoFont} variant="body2">
+        <Typography color="text.secondary" fontFamily={MonoFont} variant="caption" component="p">
           App version: {appVer}
         </Typography>
-        <Typography sx={{ opacity: 0.5 }} fontFamily={MonoFont} variant="body2">
+        <Typography color="text.secondary" fontFamily={MonoFont} variant="caption" component="p">
           App digest: {gitHash.slice(0, 7)}
         </Typography>
-        <Typography sx={{ opacity: 0.5 }} fontFamily={MonoFont} variant="body2">
+        <Typography color="text.secondary" fontFamily={MonoFont} variant="caption" component="p">
           Build date: {formatDate(new Date(GIT_DATE))}
           {debugMode && ` at ${formatHour(new Date(GIT_DATE))}`}
         </Typography>
@@ -120,7 +120,7 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
             color: "text.secondary",
             display: "flex",
             justifyContent: "space-between",
-            marginTop: 3,
+            marginTop: 0.5,
             marginX: -1,
             minHeight: "auto !important",
             paddingX: 1,
@@ -134,7 +134,7 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
             <Switch
               color="secondary"
               sx={{ marginY: "-3px" }}
-              size="small" // TODO2 this is not implemented
+              size="small"
               checked={debugMode}
               onChange={(event) => {
                 localStorage.setItem(
@@ -172,7 +172,7 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
           control={
             <Switch
               color="secondary"
-              size="small" // TODO2 this is not implemented
+              size="small"
               sx={{ marginY: "-3px" }}
               checked={telemetry}
               onChange={(event) => {
