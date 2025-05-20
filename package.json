@@ -38,6 +38,7 @@
     "docker:remove": "yarn workspace privatefolio-backend docker:remove"
   },
   "devDependencies": {
+    "wrangler": "^3.90.0",
     "cross-env": "7.0.3",
     "lerna": "^8.1.3"
   }
