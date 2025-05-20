@@ -34,7 +34,7 @@ export async function start(): Promise<void> {
       // "app.asar.unpacked",
       "resources",
       "bun-sh",
-      isWindows ? "bun.exe" : "bun"
+      isWindows ? "privatefolio.exe" : "privatefolio"
     )
     console.log(`BackendManager: Using bun path: ${bunPath}`)
 
