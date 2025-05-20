@@ -41,11 +41,11 @@ jobs:
           sudo apt install -y mono-complete
           wine64 --version
           mono --version
-          yarn
+          yarn install --frozen-lockfile
 
       - name: Install Dependencies (macOS)
         if: matrix.os == 'macos-latest'
-        run: yarn
+        run: yarn install --frozen-lockfile
 
       - name: Build Binaries (Linux + Windows)
         if: matrix.os == 'ubuntu-latest'
