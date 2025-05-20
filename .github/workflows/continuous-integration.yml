@@ -67,4 +67,3 @@ jobs:
             **Branch**: `${{ github.ref_name }}`
             **Commit**: `${{ github.sha }}`
           color: 0xFF0000  # Red
-  

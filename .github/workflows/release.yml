@@ -1,4 +1,4 @@
-name: Release
+name: Release Apps
 
 on:
   push:
@@ -85,3 +85,27 @@ jobs:
           files: artifacts/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify Discord
+        if: success()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
+          status: "Success"
+          title: "Privatefolio - Release Apps Succeeded"
+          description: |
+            **Branch**: `${{ github.ref_name }}`
+            **Commit**: `${{ github.sha }}`
+          color: 0x00FF00  # Green
+
+      - name: Notify Discord
+        if: failure()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
+          status: "Failure"
+          title: "Privatefolio - Release Apps Failed"
+          description: |
+            **Branch**: `${{ github.ref_name }}`
+            **Commit**: `${{ github.sha }}`
+          color: 0xFF0000  # Red

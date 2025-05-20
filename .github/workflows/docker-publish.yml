@@ -1,4 +1,4 @@
-name: Build and Publish Docker Image
+name: Publish Server Image
 
 on:
   push:
@@ -11,7 +11,7 @@ env:
   VITE_POSTHOG_KEY: ${{ secrets.VITE_POSTHOG_KEY }}
 
 jobs:
-  build:
+  build-and-publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -65,3 +65,27 @@ jobs:
             echo "Pushing $tag"
             docker push "$tag"
           done
+
+      - name: Notify Discord
+        if: success()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
+          status: "Success"
+          title: "Privatefolio - Publish Image Succeeded"
+          description: |
+            **Branch**: `${{ github.ref_name }}`
+            **Commit**: `${{ github.sha }}`
+          color: 0x00FF00  # Green
+
+      - name: Notify Discord
+        if: failure()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
+          status: "Failure"
+          title: "Privatefolio - Publish Image Failed"
+          description: |
+            **Branch**: `${{ github.ref_name }}`
+            **Commit**: `${{ github.sha }}`
+          color: 0xFF0000  # Red
