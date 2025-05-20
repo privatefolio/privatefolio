@@ -126,9 +126,9 @@ export const $rest = computed(
   [$isCloudAccount, $localRest, $cloudRest],
   (isCloudAccount, localRest, cloudRest) => {
     if (isCloudAccount) {
-      return cloudRest ?? localRest
+      return cloudRest ?? (localRest as RestConfig)
     } else {
-      return localRest
+      return localRest as RestConfig
     }
   }
 )
