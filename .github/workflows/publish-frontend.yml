@@ -29,11 +29,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js and cache node_modules
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          cache: yarn
+
+      - name: Cache Yarn & workspace modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/yarn/v6
+            node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2

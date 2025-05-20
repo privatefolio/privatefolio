@@ -16,11 +16,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js and cache node_modules
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
-          cache: yarn
+
+      - name: Cache Yarn & workspace modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/yarn/v6
+            node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -29,22 +39,22 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build
-        run: yarn build
         if: always()
+        run: yarn build
 
       - name: Lint
-        run: yarn lint
         if: always()
+        run: yarn lint
 
       - name: Check types
-        run: yarn check-types
         if: always()
+        run: yarn check-types
 
       - name: Test
-        run: yarn test:ci
         if: always()
+        run: yarn test:ci
 
-      - name: Notify Discord
+      - name: Notify Discord on success
         if: success()
         uses: sarisia/actions-status-discord@v1
         with:
@@ -54,9 +64,9 @@ jobs:
           description: |
             **Branch**: `${{ github.ref_name }}`
             **Commit**: `${{ github.sha }}`
-          color: 0x00FF00  # Green
-  
-      - name: Notify Discord
+          color: 0x00FF00
+
+      - name: Notify Discord on failure
         if: failure()
         uses: sarisia/actions-status-discord@v1
         with:
@@ -66,4 +76,4 @@ jobs:
           description: |
             **Branch**: `${{ github.ref_name }}`
             **Commit**: `${{ github.sha }}`
-          color: 0xFF0000  # Red
+          color: 0xFF0000
