@@ -658,6 +658,7 @@ export enum SubscriptionChannel {
   AssetMetadata = "asset-metadata",
   Balances = "balances",
   Transactions = "transactions",
+  ServerLog = "server-logs",
   Tags = "tags",
   Trades = "trades",
 }

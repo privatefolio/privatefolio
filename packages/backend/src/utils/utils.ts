@@ -1,3 +1,4 @@
+import chalk from "chalk"
 import { ProgressLog } from "src/interfaces"
 
 /**
@@ -99,4 +100,8 @@ export function parseProgressLog(logEntry: string): ProgressLog {
   const timestamp = new Date(isoDate).getTime()
   const progressUpdate = JSON.parse(logEntry.slice(25))
   return [timestamp, progressUpdate] satisfies ProgressLog
+}
+
+export function getPrefix(accountName: string): string {
+  return chalk.bold.magenta(`[${accountName}]`)
 }

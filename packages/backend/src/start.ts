@@ -1,3 +1,5 @@
+import "./logger"
+
 import { Cron } from "croner"
 import { throttle } from "lodash-es"
 
@@ -5,7 +7,7 @@ import { api } from "./api/api"
 import { BackendServer } from "./backend-server"
 import { EventCause } from "./interfaces"
 import { SHORT_THROTTLE_DURATION } from "./settings"
-import { getCronExpression } from "./utils/utils"
+import { getCronExpression, getPrefix } from "./utils/utils"
 
 const accountNames = await api.getAccountNames()
 
@@ -15,18 +17,21 @@ const settingsSubscriptions: Record<string, () => void> = {}
 
 async function setupCronJob(accountName: string) {
   if (cronJobs[accountName]) {
-    console.log(`[${accountName}]`, `Stopping existing cron job.`)
+    console.log(getPrefix(accountName), `Stopping existing cron job.`)
     cronJobs[accountName].stop()
   }
 
   const { refreshInterval } = await api.getSettings(accountName)
 
-  console.log(`[${accountName}]`, `Setting up cron job with interval: ${refreshInterval} minutes.`)
+  console.log(
+    getPrefix(accountName),
+    `Setting up cron job with interval: ${refreshInterval} minutes.`
+  )
   const cronExpression = getCronExpression(refreshInterval)
-  console.log(`[${accountName}]`, `Cron expression: ${cronExpression}`)
+  console.log(getPrefix(accountName), `Cron expression: ${cronExpression}`)
 
   const cronJob = new Cron(cronExpression, async () => {
-    console.log(`[${accountName}]`, `Cron: Refreshing account.`)
+    console.log(getPrefix(accountName), `Cron: Refreshing account.`)
     await api.enqueueRefreshBalances(accountName, "cron")
     await api.enqueueFetchPrices(accountName, "cron")
     await api.enqueueRefreshNetworth(accountName, "cron")
@@ -35,13 +40,13 @@ async function setupCronJob(accountName: string) {
 }
 
 async function setupSideEffects(accountName: string) {
-  console.log(`[${accountName}]`, `Setting up side-effects.`)
+  console.log(getPrefix(accountName), `Setting up side-effects.`)
 
   const unsubscribe = await api.subscribeToAuditLogs(
     accountName,
     throttle(
       async (cause) => {
-        console.log(`[${accountName}]`, `Running side-effects (trigger by audit log changes).`)
+        console.log(getPrefix(accountName), `Running side-effects (trigger by audit log changes).`)
         if (cause === EventCause.Updated) return
         if (cause === EventCause.Reset) return
 
@@ -75,7 +80,7 @@ async function setupSideEffects(accountName: string) {
   await setupCronJob(accountName)
 
   const settingsUnsubscribe = await api.subscribeToSettings(accountName, async () => {
-    console.log(`[${accountName}]`, `Settings changed, refreshing cron job.`)
+    console.log(getPrefix(accountName), `Settings changed, refreshing cron job.`)
     await setupCronJob(accountName)
   })
 
@@ -84,7 +89,7 @@ async function setupSideEffects(accountName: string) {
 
 await api.subscribeToAccounts(async (cause, accountName) => {
   if (cause === EventCause.Deleted) {
-    console.log(`[${accountName}]`, `Tearing down side-effects.`)
+    console.log(getPrefix(accountName), `Tearing down side-effects.`)
     const unsubscribe = sideEffects[accountName]
     try {
       unsubscribe()

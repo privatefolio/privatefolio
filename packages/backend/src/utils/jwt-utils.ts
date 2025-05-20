@@ -1,6 +1,7 @@
 import * as jose from "jose"
 import { TextEncoder } from "util" // Node.js util for encoding secret
 
+// TODO7 move these to settings.ts
 const JWT_EXPIRATION = "30d" // Token expires in 30 days
 const JWT_ISSUER = "Privatefolio"
 const JWT_ALG = "HS256" // Algorithm (using HMAC with SHA-256)

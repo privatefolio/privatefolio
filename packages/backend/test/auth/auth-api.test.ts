@@ -13,7 +13,7 @@ import {
   storeSecrets,
   verifyPassword,
 } from "../../src/api/auth-http-api"
-import { extractJwt, generateJwt, verifyJwt } from "../../src/jwt-utils"
+import { extractJwt, generateJwt, verifyJwt } from "../../src/utils/jwt-utils"
 
 // Mock the fs/promises module
 vi.mock("fs/promises", () => ({

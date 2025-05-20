@@ -9,6 +9,7 @@ import * as kv from "./account/kv-api"
 import * as networth from "./account/networth-api"
 import * as portfolio from "./account/portfolio-api"
 import * as serverFiles from "./account/server-files-api"
+import * as serverLogs from "./account/server-logs-api"
 import * as serverTasks from "./account/server-tasks-api"
 import * as settings from "./account/settings-api"
 import * as tags from "./account/tags-api"
@@ -30,6 +31,7 @@ export const api = {
   ...assets,
   ...serverTasks,
   ...serverFiles,
+  ...serverLogs,
   ...backup,
   ...tags,
   ...trades,

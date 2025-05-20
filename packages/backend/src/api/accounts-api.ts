@@ -2,11 +2,11 @@ import EventEmitter from "events"
 import { access, mkdir, readdir, rm, stat, writeFile } from "fs/promises"
 import { join } from "path"
 import { EventCause, SubscriptionChannel, TaskPriority } from "src/interfaces"
-import { DATABASES_LOCATION, LOGS_LOCATION } from "src/settings"
+import { DATABASES_LOCATION, TASK_LOGS_LOCATION } from "src/settings"
 import { createSqliteDatabaseConnection } from "src/sqlite/sqlite"
 import { isDevelopment, isTestEnvironment } from "src/utils/environment-utils"
 import { sql } from "src/utils/sql-utils"
-import { sleep } from "src/utils/utils"
+import { getPrefix, sleep } from "src/utils/utils"
 
 import { getValue, setValue } from "./account/kv-api"
 import { enqueueTask, upsertServerTask } from "./account/server-tasks-api"
@@ -30,9 +30,9 @@ async function createDatabaseConnection(accountName: string, createIfNeeded = fa
     // ensure the file exists
     try {
       await access(databaseFilePath)
-      console.log(`[${accountName}]`, "Connecting to existing database", databaseFilePath)
+      console.log(getPrefix(accountName), "Connecting to existing database", databaseFilePath)
     } catch {
-      console.log(`[${accountName}]`, "Creating database file", databaseFilePath)
+      console.log(getPrefix(accountName), "Creating database file", databaseFilePath)
       if (!createIfNeeded) throw new Error(`Account "${accountName}" does not exist`)
       // ensure databases dir exists
       await mkdir(DATABASES_LOCATION, { recursive: true })
@@ -44,7 +44,7 @@ async function createDatabaseConnection(accountName: string, createIfNeeded = fa
 
   const journalMode = await db.execute(`PRAGMA journal_mode;`)
   if (isDevelopment) {
-    console.log(`[${accountName}]`, "SQLite journal mode:", journalMode[0][0])
+    console.log(getPrefix(accountName), "SQLite journal mode:", journalMode[0][0])
   }
 
   return db
@@ -125,7 +125,7 @@ export async function createAccount(accountName: string) {
 
 export async function deleteAccount(accountName: string, keepAccount = false) {
   const account = await getAccount(accountName)
-  console.log(`[${accountName}]`, "Deleting database.")
+  console.log(getPrefix(accountName), "Deleting database.")
 
   const schema = await account.execute(
     "SELECT type, name FROM sqlite_master WHERE type IN ('table', 'index', 'trigger') AND name NOT IN ('sqlite_sequence', 'sqlite_master')"
@@ -145,9 +145,9 @@ export async function deleteAccount(accountName: string, keepAccount = false) {
 
   // delete logs & database file
   await rm(join(DATABASES_LOCATION, `${accountName}.sqlite`), { force: true, recursive: true })
-  await rm(join(LOGS_LOCATION, accountName), { force: true, recursive: true })
+  await rm(join(TASK_LOGS_LOCATION, accountName), { force: true, recursive: true })
 
-  console.log(`[${accountName}]`, "Deleted database.")
+  console.log(getPrefix(accountName), "Deleted database.")
 
   if (!keepAccount) {
     delete accounts[accountName]
@@ -200,15 +200,15 @@ async function initializeDatabaseIfNeeded(
   )[0][0] as number
 
   if (tablesCount > 0) {
-    console.log(`[${accountName}]`, "Skipping database initialization.")
+    console.log(getPrefix(accountName), "Skipping database initialization.")
     return false
   }
 
-  console.log(`[${accountName}]`, "Initializing database.")
+  console.log(getPrefix(accountName), "Initializing database.")
   try {
     await account.execute(`PRAGMA journal_mode = WAL;`)
   } catch {
-    console.log(`[${accountName}]`, "Failed to set journal mode to WAL")
+    console.log(getPrefix(accountName), "Failed to set journal mode to WAL")
   }
 
   await account.execute(sql`

@@ -10,9 +10,9 @@ import {
   TaskCompletionCallback,
   TaskStatus,
 } from "src/interfaces"
-import { LOGS_LOCATION } from "src/settings"
+import { TASK_LOGS_LOCATION } from "src/settings"
 import { transformNullsToUndefined } from "src/utils/db-utils"
-import { sleep } from "src/utils/utils"
+import { getPrefix, sleep } from "src/utils/utils"
 
 import { Account, getAccount } from "../accounts-api"
 
@@ -126,13 +126,13 @@ export async function countServerTasks(
 }
 
 function createProgressCallback(account: Account, taskId: number): ProgressCallback {
-  const logFilePath = path.join(LOGS_LOCATION, account.name, `server_task_${taskId}.log`)
+  const logFilePath = path.join(TASK_LOGS_LOCATION, account.name, `server_task_${taskId}.log`)
 
   return async (update: ProgressUpdate) => {
     try {
       const logEntry = `${new Date().toISOString()} ${JSON.stringify(update)}\n`
       // save to file
-      await mkdir(path.join(LOGS_LOCATION, account.name), { recursive: true })
+      await mkdir(path.join(TASK_LOGS_LOCATION, account.name), { recursive: true })
       await appendFile(logFilePath, logEntry)
       // emit event
       account.eventEmitter.emit(SubscriptionChannel.ServerTaskProgress, taskId, logEntry)
@@ -282,7 +282,7 @@ export async function cancelTask(accountName: string, taskId: number) {
   const account = await ensureTaskQueue(accountName)
 
   if (account.pendingTask?.id === taskId) {
-    console.log(`[${accountName}]`, `Aborting task with id: ${account.pendingTask.id}`)
+    console.log(getPrefix(accountName), `Aborting task with id: ${account.pendingTask.id}`)
     account.pendingTask.abortController?.abort("Task aborted by user.")
   } else if (account.taskQueue.some((x) => x.id === taskId)) {
     account.taskQueue = account.taskQueue.filter((x) => x.id !== taskId)
@@ -302,7 +302,7 @@ export async function subscribeToServerTasks(accountName: string, callback: () =
 }
 
 export async function getServerTaskLog(accountName: string, taskId: number) {
-  const logFilePath = path.join(LOGS_LOCATION, accountName, `server_task_${taskId}.log`)
+  const logFilePath = path.join(TASK_LOGS_LOCATION, accountName, `server_task_${taskId}.log`)
 
   try {
     return readFile(logFilePath, "utf-8")

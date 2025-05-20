@@ -5,8 +5,9 @@ const DATA_LOCATION =
   isNode && process.env.DATA_LOCATION ? process.env.DATA_LOCATION : DEFAULT_DATA_LOCATION
 
 export const DATABASES_LOCATION = `${DATA_LOCATION}/databases`
-export const LOGS_LOCATION = `${DATA_LOCATION}/logs`
+export const TASK_LOGS_LOCATION = `${DATA_LOCATION}/logs`
 export const FILES_LOCATION = `${DATA_LOCATION}/files`
+export const SERVER_LOGS_LOCATION = `${DATA_LOCATION}/server-logs`
 export const AUTH_DATA_DIR = `${DATA_LOCATION}/auth`
 export const SALT_FILE = `${AUTH_DATA_DIR}/.salt`
 export const HASH_FILE = `${AUTH_DATA_DIR}/.hash`

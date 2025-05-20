@@ -13,7 +13,7 @@ import JSZip from "jszip"
 import { join } from "path"
 import type { NewServerTask, TaskStatus } from "src/interfaces"
 import { ProgressCallback, ServerFile, TaskPriority, TaskTrigger } from "src/interfaces"
-import { DATABASES_LOCATION, FILES_LOCATION, LOGS_LOCATION } from "src/settings"
+import { DATABASES_LOCATION, FILES_LOCATION, TASK_LOGS_LOCATION } from "src/settings"
 import { noop, parseProgressLog } from "src/utils/utils"
 
 import { getAccount, reconnectAccount } from "../accounts-api"
@@ -32,7 +32,7 @@ export async function backup(
 ): Promise<ServerFile> {
   const account = await getAccount(accountName)
   const userFilesDir = join(FILES_LOCATION, accountName)
-  const userLogsDir = join(LOGS_LOCATION, accountName)
+  const userLogsDir = join(TASK_LOGS_LOCATION, accountName)
 
   const backupFilename = `${accountName}-backup.sqlite`
   const backupPath = join(DATABASES_LOCATION, backupFilename)
@@ -357,7 +357,7 @@ export async function restore(
     const logsZipFolder = loadedZip.folder("logs")
     if (logsZipFolder) {
       await progress([65, "Restoring log files..."])
-      const liveUserLogsPath = join(LOGS_LOCATION, accountName)
+      const liveUserLogsPath = join(TASK_LOGS_LOCATION, accountName)
       await mkdir(liveUserLogsPath, { recursive: true }) // Ensure target directory exists
 
       const logZipEntries = []
@@ -507,7 +507,7 @@ export async function enqueueRestore(accountName: string, trigger: TaskTrigger, 
             const progressUpdateJsonString = JSON.stringify([undefined, progressLogMessage])
             const fullLogLine = `${completedAt.toISOString()} ${progressUpdateJsonString}\n`
 
-            const taskLogDir = join(LOGS_LOCATION, accountName)
+            const taskLogDir = join(TASK_LOGS_LOCATION, accountName)
             const taskLogFilePath = join(taskLogDir, `server_task_${backupTask.id}.log`)
 
             try {
@@ -552,7 +552,7 @@ export async function enqueueRestore(accountName: string, trigger: TaskTrigger, 
 
         try {
           const savedTask = await upsertServerTask(accountName, taskRecord)
-          const logDir = join(LOGS_LOCATION, accountName)
+          const logDir = join(TASK_LOGS_LOCATION, accountName)
           await mkdir(logDir, { recursive: true })
           const logFilePath = join(logDir, `server_task_${savedTask.id}.log`)
           await writeFile(logFilePath, savedLogs.join(""))

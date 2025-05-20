@@ -9,6 +9,7 @@ import { StaggeredList } from "../../components/StaggeredList"
 import { ServerFilesTable } from "./files/ServerFilesTable"
 import { ServerActions } from "./ServerActions"
 import { ServerInfo } from "./ServerInfo"
+import { ServerLogs } from "./ServerLogs"
 import { ServerSettings } from "./ServerSettings"
 import { ServerTasksTable } from "./tasks/ServerTasksTable"
 
@@ -25,6 +26,7 @@ export default function ServerPage({ show }: { show: boolean }) {
           <Tabs value={tab} defaultValue={defaultTab} largeSize>
             <NavTab value="tasks" to={"?tab=tasks"} label="Tasks" />
             <NavTab value="files" to={"?tab=files"} label="Files" />
+            <NavTab value="logs" to={"?tab=logs"} label="Logs" />
             <NavTab value="info" to={"?tab=info"} label="Info" />
             <NavTab value="settings" to={"?tab=settings"} label={<Settings fontSize="small" />} />
           </Tabs>
@@ -32,6 +34,7 @@ export default function ServerPage({ show }: { show: boolean }) {
         </Stack>
         {tab === "tasks" && <ServerTasksTable />}
         {tab === "files" && <ServerFilesTable />}
+        {tab === "logs" && <ServerLogs />}
         {tab === "info" && <ServerInfo />}
         {tab === "settings" && <ServerSettings />}
       </Stack>

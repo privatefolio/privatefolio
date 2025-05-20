@@ -18,9 +18,9 @@ import {
   FunctionInvocation,
   FunctionReference,
 } from "./backend-comms"
-import { extractJwt, verifyJwt } from "./jwt-utils"
 import { APP_VERSION } from "./server-env"
 import { corsHeaders } from "./settings"
+import { extractJwt, verifyJwt } from "./utils/jwt-utils"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type BackendApiShape = { [key: string]: (...params: any[]) => Promise<unknown> }
@@ -41,7 +41,7 @@ export class BackendServer<T extends BackendApiShape> {
   private server?: Server
 
   start(port: number) {
-    console.log(`Server starting on port ${port}.`)
+    // console.log(`Server starting on port ${port}.`)
     this.server = Bun.serve({
       async fetch(request, server) {
         const { method } = request
@@ -130,7 +130,7 @@ export class BackendServer<T extends BackendApiShape> {
       port,
       websocket: {
         close() {
-          console.log("Connection closed.")
+          // console.log("Connection closed.")
         },
         message: async (
           socket: ServerWebSocket<{ isAuthenticated?: boolean }>,
@@ -214,9 +214,9 @@ export class BackendServer<T extends BackendApiShape> {
         open(socket: ServerWebSocket<{ isAuthenticated?: boolean }>) {
           if (!socket.data.isAuthenticated) {
             socket.close(1008, "Unauthorized")
-            return
+            // return
           }
-          console.log("Connection opened. ")
+          // console.log("Connection opened. ")
         },
       },
     })

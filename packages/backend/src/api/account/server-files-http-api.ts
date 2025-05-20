@@ -3,6 +3,7 @@ import { access, mkdir, open, readFile, stat } from "fs/promises"
 import mime from "mime-types"
 import { join } from "path"
 import { corsHeaders, FILES_LOCATION } from "src/settings"
+import { getPrefix } from "src/utils/utils"
 import { promisify } from "util"
 
 import { getServerFile, patchServerFile } from "./server-files-api"
@@ -153,7 +154,7 @@ export async function handleUpload(request: Request): Promise<Response> {
     })
   }
 
-  console.log(`[${accountName}]`, `Uploading file: ${fileRecord.name}`)
+  console.log(getPrefix(accountName), `Uploading file: ${fileRecord.name}`)
 
   await patchServerFile(accountName, fileRecord.id, {
     startedAt: Date.now(),
@@ -186,7 +187,7 @@ export async function handleUpload(request: Request): Promise<Response> {
     while (!(result = await reader.read()).done) {
       const chunk = result.value
       console.log(
-        `[${accountName}]`,
+        getPrefix(accountName),
         `Received chunk of size ${chunk.byteLength} bytes of file ${fileRecord.name}`
       )
       // Write each chunk directly to the file
@@ -215,7 +216,7 @@ export async function handleUpload(request: Request): Promise<Response> {
     })
   }
 
-  console.log(`[${accountName}]`, `File uploaded successfully: ${fileRecord.name}`)
+  console.log(getPrefix(accountName), `File uploaded successfully: ${fileRecord.name}`)
 
   return new Response("File uploaded successfully.", { headers: corsHeaders, status: 200 })
 }
