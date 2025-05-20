@@ -8,10 +8,12 @@ export const isProductionBuild = import.meta.env.PROD
 export const isSecure = window.location.protocol === "https:"
 export const isProduction = isProductionBuild || isProductionElectron
 console.log(`Environment is ${isProduction ? "production" : "development"}`)
-export const isSelfHosted =
-  isProduction && TARGET !== "electron" && window.location.hostname !== "privatefolio.app"
-export const isWebDeployment =
-  isProduction && TARGET !== "electron" && window.location.hostname === "privatefolio.app"
+
+export const isOfficialUrl =
+  window.location.hostname === "privatefolio.app" || window.location.hostname.includes("pages.dev")
+
+export const isSelfHosted = isProduction && TARGET !== "electron" && !isOfficialUrl
+export const isWebDeployment = isProduction && TARGET !== "electron" && isOfficialUrl
 
 export const mode = isSelfHosted ? "self-hosted" : isWebDeployment ? "web" : "electron"
 console.log(`App mode is ${mode}`)
