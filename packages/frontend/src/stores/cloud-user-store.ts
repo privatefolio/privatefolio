@@ -16,6 +16,7 @@ import {
   User,
 } from "src/api/privatecloud-api"
 import { logAtoms } from "src/utils/browser-utils"
+import { isSelfHosted } from "src/utils/environment-utils"
 import { $cloudRest } from "src/workers/remotes"
 
 import { $cloudAuth, setPassword, unlockApp } from "./auth-store"
@@ -39,6 +40,7 @@ export const $cloudServerMutating = atom<boolean>(false)
 logAtoms({ $cloudInstance, $cloudServerInfo, $cloudSubscription, $cloudUser })
 
 export async function checkCloudLogin() {
+  if (isSelfHosted) return
   // console.log("PrivateCloud -", "checking auth")
   try {
     const user = await reAuthenticate()

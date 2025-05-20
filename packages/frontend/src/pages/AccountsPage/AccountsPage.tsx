@@ -25,7 +25,7 @@ import { useBoolean } from "src/hooks/useBoolean"
 import { $accounts, $activeAccount, $activeIndex } from "src/stores/account-store"
 import { $cloudUser } from "src/stores/cloud-user-store"
 import { SerifFont } from "src/theme"
-import { SPRING_CONFIGS } from "src/utils/utils"
+import { isSelfHosted, SPRING_CONFIGS } from "src/utils/utils"
 
 export default function AccountsPage() {
   useEffect(() => {
@@ -109,7 +109,7 @@ export default function AccountsPage() {
                   <LogoText />
                 </Button>
                 <Stack direction="row" gap={1} alignItems="center">
-                  {user !== undefined && !user && (
+                  {user !== undefined && !user && !isSelfHosted && (
                     <Button
                       color="secondary"
                       size="small"
@@ -120,7 +120,7 @@ export default function AccountsPage() {
                       Login to PrivateCloud
                     </Button>
                   )}
-                  {user !== undefined && user && (
+                  {user !== undefined && user && !isSelfHosted && (
                     <Tooltip title="View PrivateCloud account">
                       <Button
                         color="secondary"

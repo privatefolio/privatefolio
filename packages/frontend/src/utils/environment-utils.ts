@@ -1,3 +1,5 @@
+import { TARGET } from "src/env"
+
 import { isProductionElectron } from "./electron-utils"
 
 export const isServer = typeof window === "undefined"
@@ -5,6 +7,7 @@ export const isServer = typeof window === "undefined"
 export const isProductionBuild = import.meta.env.PROD
 export const isSecure = window.location.protocol === "https:"
 export const isProduction = isProductionBuild || isProductionElectron
+export const isSelfHosted = isProduction && TARGET !== "electron"
 
 // export const isNode = typeof process !== "undefined" && process.versions && process.versions.node
 // export const isWebWorker = isServer && !isNode
