@@ -1,9 +1,13 @@
-name: Publish Server Image
+name: Publish Backend
 
 on:
   push:
     branches: [ "main" ]
     tags: [ "*" ]
+
+permissions:
+    contents: read
+    packages: write
 
 env:
   REGISTRY: ghcr.io
@@ -13,10 +17,6 @@ env:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
