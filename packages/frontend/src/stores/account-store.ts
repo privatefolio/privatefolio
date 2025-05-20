@@ -3,7 +3,6 @@ import { logAtoms } from "src/utils/browser-utils"
 
 export const $localAccounts = atom<string[] | undefined>()
 export const $cloudAccounts = atom<string[] | undefined>()
-export const $isCloudAccount = atom<boolean>(false)
 
 /**
  * All child routes of `/u/:accountIndex`, should assume this store as initialized,
@@ -12,24 +11,31 @@ export const $isCloudAccount = atom<boolean>(false)
  */
 export const $activeAccount = atom<string>("")
 
-// TODO9 remove this, it should be accountId instead
-export const $activeIndex = computed(
-  [$activeAccount, $localAccounts, $cloudAccounts],
-  (activeAccount, accounts, cloudAccounts) => {
-    if (!accounts || !activeAccount) return
-
-    const allAccounts = accounts.concat(cloudAccounts || [])
-    const index = allAccounts.indexOf(activeAccount)
-    $isCloudAccount.set(index >= accounts.length)
-
-    return index === -1 ? undefined : index
-  }
-)
-
 export const $accounts = computed(
   [$localAccounts, $cloudAccounts],
   (localAccounts, cloudAccounts) => {
-    return localAccounts?.concat(cloudAccounts || [])
+    if (!localAccounts && !cloudAccounts) return undefined
+    return (localAccounts || []).concat(cloudAccounts || [])
+  }
+)
+
+// TODO9 remove this, it should be accountId instead
+export const $activeIndex = computed([$activeAccount, $accounts], (activeAccount, accounts) => {
+  if (!accounts || !activeAccount) return
+
+  const index = accounts.indexOf(activeAccount)
+
+  return index === -1 ? undefined : index
+})
+
+export const $isCloudAccount = computed(
+  [$activeIndex, $accounts, $localAccounts, $cloudAccounts],
+  (activeIndex, accounts, localAccounts, cloudAccounts) => {
+    if (!accounts || activeIndex === undefined) return false
+    if (!localAccounts) return true
+    if (!cloudAccounts) return false
+
+    return activeIndex >= (localAccounts?.length || 0)
   }
 )
 

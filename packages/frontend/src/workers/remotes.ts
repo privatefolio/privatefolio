@@ -13,7 +13,7 @@ import {
   $localConnectionStatusText,
 } from "src/stores/account-store"
 import { $cloudServerInfo, $cloudUser } from "src/stores/cloud-user-store"
-import { isProduction, isSecure } from "src/utils/environment-utils"
+import { hasLocalServer, isProduction, isSecure } from "src/utils/environment-utils"
 
 import { $localAuth } from "../stores/auth-store"
 
@@ -82,6 +82,8 @@ export type RestConfig = {
 }
 
 export const $localRest = computed([], () => {
+  if (!hasLocalServer) return null
+
   return {
     baseUrl: `${isSecure ? "https" : "http"}://${BASE_LOCAL_SERVER_URL}`,
     jwtKey: LOCAL_JWT_STORATE_KEY,
@@ -94,6 +96,8 @@ let latestLocalRpc: RPC | null = null
 let latestCloudRpc: RPC | null = null
 
 export const $localRpc = computed([$localAuth], () => {
+  if (!hasLocalServer) return null
+
   const newAddress = getWebSocketUrl(BASE_LOCAL_SERVER_URL, LOCAL_JWT_STORATE_KEY)
   if (latestLocalRpc && latestLocalRpc.address === newAddress) return latestLocalRpc
 
@@ -156,9 +160,9 @@ export const $rpc = computed(
   [$isCloudAccount, $localRpc, $cloudRpc],
   (isCloudAccount, localRpc, cloudRpc) => {
     if (isCloudAccount) {
-      return cloudRpc ?? localRpc
+      return cloudRpc ?? (localRpc as RPC)
     } else {
-      return localRpc
+      return localRpc as RPC
     }
   }
 )

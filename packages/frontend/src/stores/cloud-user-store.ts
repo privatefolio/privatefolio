@@ -39,7 +39,7 @@ export const $cloudServerMutating = atom<boolean>(false)
 
 logAtoms({ $cloudInstance, $cloudServerInfo, $cloudSubscription, $cloudUser })
 
-export async function checkCloudLogin() {
+export async function checkCloudUser() {
   if (isSelfHosted) return
   // console.log("PrivateCloud -", "checking auth")
   try {
@@ -48,7 +48,7 @@ export async function checkCloudLogin() {
     await Promise.all([checkSubscription(), checkCloudInstance()])
     await checkCloudServerInfo()
   } catch (e) {
-    console.error("Auth error:", e)
+    // console.error("Auth error:", e)
     $cloudUser.set(null)
   }
 }
@@ -183,7 +183,7 @@ export async function handleSetupServer(password: string) {
     enqueueSnackbar(`Cloud server: ${(err as Error).message}`, { variant: "error" })
   } finally {
     $cloudServerMutating.set(false)
-    await checkCloudLogin()
+    await checkCloudUser()
   }
 }
 

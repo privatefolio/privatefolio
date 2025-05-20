@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Dialog,
   DialogActions,
@@ -10,10 +11,11 @@ import {
   TextField,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React, { FormEvent, useCallback, useState } from "react"
+import React, { FormEvent, useCallback, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { $accounts, $cloudAccounts, $localAccounts } from "src/stores/account-store"
 import { $cloudInstance } from "src/stores/cloud-user-store"
+import { hasLocalServer, isSelfHosted } from "src/utils/environment-utils"
 import { $cloudRpc, $localRpc } from "src/workers/remotes"
 
 import { SectionTitle } from "../SectionTitle"
@@ -34,7 +36,9 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
 
   const [loading, setLoading] = useState(false)
 
-  const [accountType, setAccountType] = useState<"local" | "cloud">("local")
+  const [accountType, setAccountType] = useState<"local" | "cloud">(
+    hasLocalServer ? "local" : "cloud"
+  )
 
   const handleSubmit = useCallback(
     async (event: FormEvent) => {
@@ -57,8 +61,10 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
       setLoading(true)
       try {
         if (accountType === "local") {
-          await $localRpc.get().createAccount(newAcc)
-          await $localRpc.get().getAccountNames().then($localAccounts.set)
+          const localRpc = $localRpc.get()
+          if (!localRpc) throw new Error("RPC is not defined")
+          await localRpc.createAccount(newAcc)
+          await localRpc.getAccountNames().then($localAccounts.set)
         } else {
           const cloudRpc = $cloudRpc.get()
           if (!cloudRpc) throw new Error("RPC is not defined")
@@ -79,13 +85,42 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
     [accounts, name, accountType, toggleOpen, navigate]
   )
 
+  const cloudInstance = useStore($cloudInstance)
+
+  const errorComponent = useMemo(() => {
+    if (!hasLocalServer && accountType === "local") {
+      return (
+        <>
+          Local accounts are not available in the browser. Download our desktop app for Windows,
+          Mac, and Linux or {/* <MuiLink component={Link} to={"/privatecloud"}> */}
+          login to PrivateCloud
+          {/* </MuiLink> */}.
+        </>
+      )
+    }
+    if (isSelfHosted && accountType === "cloud") {
+      return <>Cloud accounts are incompatible with self-hosted deployments.</>
+    }
+
+    if (!cloudInstance && accountType === "cloud") {
+      return (
+        <>
+          {/* <MuiLink component={Link} to="/privatecloud"> */}
+          Login to PrivateCloud
+          {/* </MuiLink>{" "} */} to start using the cloud.
+        </>
+      )
+    }
+    return null
+  }, [accountType, cloudInstance])
+
   return (
     <Dialog open={open} onClose={toggleOpen}>
       <form onSubmit={handleSubmit}>
         <DialogTitle>
           <span>Add Account</span>
         </DialogTitle>
-        <DialogContent sx={{ minWidth: 320 }}>
+        <DialogContent sx={{ maxWidth: 360, minWidth: 360 }}>
           <Stack gap={2}>
             <Tabs
               variant="fullWidth"
@@ -122,7 +157,7 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
               })}
             >
               <Tab label="Local" value="local" />
-              <Tab label="Cloud" value="cloud" disabled={!$cloudInstance.get()?.id} />
+              <Tab label="Cloud" value="cloud" />
             </Tabs>
             <div>
               <SectionTitle>Name</SectionTitle>
@@ -140,13 +175,19 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
                 helperText={error}
               />
             </div>
+            {errorComponent && <Alert severity="error">{errorComponent}</Alert>}
           </Stack>
         </DialogContent>
         <DialogActions sx={{ paddingX: 3 }}>
           <Button onClick={toggleOpen} color="secondary" sx={{ paddingX: 2 }}>
             Cancel
           </Button>
-          <Button type="submit" color="primary" variant="contained" disabled={loading}>
+          <Button
+            type="submit"
+            color="primary"
+            variant="contained"
+            disabled={loading || !!errorComponent}
+          >
             {loading ? "Creating..." : "Create"}
           </Button>
         </DialogActions>

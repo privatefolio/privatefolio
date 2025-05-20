@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Paper, Stack } from "@mui/material"
+import { Box, Paper, Stack } from "@mui/material"
 import Container from "@mui/material/Container"
 import { useStore } from "@nanostores/react"
 import { throttle } from "lodash-es"
@@ -6,6 +6,7 @@ import React, { useEffect } from "react"
 import { Navigate, Route, Routes } from "react-router-dom"
 
 import { AccountIndexRoute } from "./AccountIndexRoute"
+import { CircularSpinner } from "./components/CircularSpinner"
 import { ErrorBoundary } from "./components/ErrorBoundary"
 import { ConnectionBanner } from "./components/Header/ConnectionBanner"
 import { Header } from "./components/Header/Header"
@@ -13,7 +14,7 @@ import { MenuDrawerContents } from "./components/Header/MenuDrawerContents"
 import { APP_VERSION, GIT_HASH } from "./env"
 import FourZeroFourPage from "./pages/404"
 import AccountsPage from "./pages/AccountsPage/AccountsPage"
-import AuthPage from "./pages/AccountsPage/AuthPage"
+import LocalAuthPage from "./pages/AccountsPage/LocalAuthPage"
 import AssetPage from "./pages/AssetPage/AssetPage"
 import AssetsPage from "./pages/AssetsPage/AssetsPage"
 import AuditLogsPage from "./pages/AuditLogsPage/AuditLogsPage"
@@ -35,40 +36,56 @@ import {
   $localConnectionStatusText,
 } from "./stores/account-store"
 import { checkLatestAppVersion } from "./stores/app-store"
-import { $cloudAuth, $localAuth, checkAuthentication } from "./stores/auth-store"
-import { $cloudInstance, $cloudUser, checkCloudLogin } from "./stores/cloud-user-store"
+import { $auth, $cloudAuth, $localAuth, checkAuthentication } from "./stores/auth-store"
+import { $cloudInstance, $cloudUser, checkCloudUser } from "./stores/cloud-user-store"
 import { fetchInMemoryData } from "./stores/metadata-store"
 import { closeSubscription } from "./utils/browser-utils"
-import { noop } from "./utils/utils"
+import { hasLocalServer, noop } from "./utils/utils"
 import { $cloudRest, $cloudRpc, $localRest, $localRpc, $rpc } from "./workers/remotes"
 
 export default function App() {
-  const { checked: authChecked, needsSetup, isAuthenticated } = useStore($localAuth)
-
+  const localAuth = useStore($localAuth)
   const localConnectionStatus = useStore($localConnectionStatus)
-  const connectionStatus = useStore($connectionStatus)
-  const cloudUser = useStore($cloudUser)
-  const cloudInstance = useStore($cloudInstance)
+  const localRest = useStore($localRest)
+  const localRpc = useStore($localRpc)
 
   useEffect(() => {
-    checkAuthentication($localAuth, $localRest.get())
-  }, [])
+    if (!localRest) return
+
+    checkAuthentication($localAuth, localRest)
+  }, [localRest])
 
   useEffect(() => {
-    if (!authChecked || needsSetup || !isAuthenticated) return
+    if (!localAuth.checked || localAuth.needsSetup || !localAuth.isAuthenticated || !localRpc) {
+      return
+    }
 
-    $localRpc.get().getAccountNames().then($localAccounts.set)
+    localRpc.getAccountNames().then($localAccounts.set)
 
-    const subscription = $localRpc.get().subscribeToAccounts(() => {
-      $localRpc.get().getAccountNames().then($localAccounts.set)
+    const subscription = localRpc.subscribeToAccounts(() => {
+      localRpc.getAccountNames().then($localAccounts.set)
     })
 
     return closeSubscription(subscription)
-  }, [localConnectionStatus, authChecked, needsSetup, isAuthenticated])
+  }, [localConnectionStatus, localAuth, localRpc])
 
+  const cloudAuth = useStore($cloudAuth)
+  const cloudUser = useStore($cloudUser)
+  const cloudConnectionStatus = useStore($cloudConnectionStatus)
+  const cloudInstance = useStore($cloudInstance)
+  const cloudRest = useStore($cloudRest)
   const cloudRpc = useStore($cloudRpc)
+
   useEffect(() => {
-    if (!cloudRpc) return
+    if (!cloudRest) return
+
+    checkAuthentication($cloudAuth, cloudRest)
+  }, [cloudRest])
+
+  useEffect(() => {
+    if (!cloudAuth.checked || cloudAuth.needsSetup || !cloudAuth.isAuthenticated || !cloudRpc) {
+      return
+    }
 
     cloudRpc.getAccountNames().then($cloudAccounts.set)
 
@@ -77,28 +94,26 @@ export default function App() {
     })
 
     return closeSubscription(subscription)
-  }, [cloudRpc])
-
-  const cloudRest = useStore($cloudRest)
-  useEffect(() => {
-    if (!cloudRest) return
-
-    checkAuthentication($cloudAuth, cloudRest)
-  }, [cloudRest])
+  }, [cloudConnectionStatus, cloudAuth, cloudRpc])
 
   useEffect(() => {
-    checkCloudLogin()
+    checkCloudUser()
     checkLatestAppVersion()
   }, [])
 
   const activeAccount = useStore($activeAccount)
+  const connectionStatus = useStore($connectionStatus)
+  const auth = useStore($auth)
+  const rpc = useStore($rpc)
 
   useEffect(() => {
-    if (!activeAccount || !authChecked || needsSetup || !isAuthenticated) return
+    if (!activeAccount || !auth.checked || auth.needsSetup || !auth.isAuthenticated || !rpc) {
+      return
+    }
 
     fetchInMemoryData()
 
-    const subscription = $rpc.get().subscribeToAssetMetadata(
+    const subscription = rpc.subscribeToAssetMetadata(
       activeAccount,
       throttle(fetchInMemoryData, SHORT_THROTTLE_DURATION, {
         leading: false,
@@ -107,20 +122,20 @@ export default function App() {
     )
 
     return closeSubscription(subscription)
-  }, [activeAccount, connectionStatus, authChecked, needsSetup, isAuthenticated])
+  }, [activeAccount, connectionStatus, auth, rpc])
 
-  if (!authChecked) {
+  if (hasLocalServer && !localAuth.checked) {
     return (
       <Box
         sx={{ alignItems: "center", display: "flex", height: "100vh", justifyContent: "center" }}
       >
-        <CircularProgress />
+        <CircularSpinner />
       </Box>
     )
   }
 
-  if (!isAuthenticated || needsSetup) {
-    return <AuthPage />
+  if (hasLocalServer && (!localAuth.isAuthenticated || localAuth.needsSetup)) {
+    return <LocalAuthPage />
   }
 
   return (
@@ -220,12 +235,14 @@ export default function App() {
               zIndex: "var(--mui-zIndex-tooltip)",
             }}
           >
-            <ConnectionBanner
-              key="local"
-              statusAtom={$localConnectionStatus}
-              statusTextAtom={$localConnectionStatusText}
-              prefix="Local connection"
-            />
+            {hasLocalServer && (
+              <ConnectionBanner
+                key="local"
+                statusAtom={$localConnectionStatus}
+                statusTextAtom={$localConnectionStatusText}
+                prefix="Local connection"
+              />
+            )}
             {cloudUser && cloudInstance && (
               <ConnectionBanner
                 key="cloud"

@@ -1,7 +1,9 @@
-import { atom, WritableAtom } from "nanostores"
+import { atom, computed, WritableAtom } from "nanostores"
 import { logAtoms } from "src/utils/browser-utils"
 import { sleep } from "src/utils/utils"
 import { RestConfig } from "src/workers/remotes"
+
+import { $isCloudAccount } from "./account-store"
 
 export interface AuthState {
   checked: boolean
@@ -27,7 +29,14 @@ export const $cloudAuth = atom<AuthState>({
   needsSetup: false,
 })
 
-logAtoms({ $cloudAuth, $localAuth })
+export const $auth = computed(
+  [$isCloudAccount, $localAuth, $cloudAuth],
+  (isCloudAccount, localAuth, cloudAuth) => {
+    return isCloudAccount ? cloudAuth : localAuth
+  }
+)
+
+logAtoms({ $auth, $cloudAuth, $localAuth })
 
 export async function checkAuthentication(atom: WritableAtom<AuthState>, api: RestConfig | null) {
   if (!api) return

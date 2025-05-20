@@ -22,7 +22,7 @@ import { $localRest } from "src/workers/remotes"
 
 import { $localAuth, setPassword, unlockApp } from "../../stores/auth-store"
 
-export default function AuthPage() {
+export default function LocalAuthPage() {
   const { isAuthenticated, errorMessage, loading, checked, needsSetup } = useStore($localAuth)
   const [password, setPasswordValue] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
