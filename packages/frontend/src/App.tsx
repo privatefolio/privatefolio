@@ -34,8 +34,9 @@ import {
   $localConnectionStatus,
   $localConnectionStatusText,
 } from "./stores/account-store"
+import { checkLatestAppVersion } from "./stores/app-store"
 import { $cloudAuth, $localAuth, checkAuthentication } from "./stores/auth-store"
-import { checkCloudLogin } from "./stores/cloud-user-store"
+import { $cloudInstance, $cloudUser, checkCloudLogin } from "./stores/cloud-user-store"
 import { fetchInMemoryData } from "./stores/metadata-store"
 import { closeSubscription } from "./utils/browser-utils"
 import { noop } from "./utils/utils"
@@ -46,6 +47,8 @@ export default function App() {
 
   const localConnectionStatus = useStore($localConnectionStatus)
   const connectionStatus = useStore($connectionStatus)
+  const cloudUser = useStore($cloudUser)
+  const cloudInstance = useStore($cloudInstance)
 
   useEffect(() => {
     checkAuthentication($localAuth, $localRest.get())
@@ -85,6 +88,7 @@ export default function App() {
 
   useEffect(() => {
     checkCloudLogin()
+    checkLatestAppVersion()
   }, [])
 
   const activeAccount = useStore($activeAccount)
@@ -222,12 +226,14 @@ export default function App() {
               statusTextAtom={$localConnectionStatusText}
               prefix="Local connection"
             />
-            <ConnectionBanner
-              key="cloud"
-              statusAtom={$cloudConnectionStatus}
-              statusTextAtom={$cloudConnectionStatusText}
-              prefix="Cloud connection"
-            />
+            {cloudUser && cloudInstance && (
+              <ConnectionBanner
+                key="cloud"
+                statusAtom={$cloudConnectionStatus}
+                statusTextAtom={$cloudConnectionStatusText}
+                prefix="Cloud connection"
+              />
+            )}
           </Stack>
         </Container>
       </Box>

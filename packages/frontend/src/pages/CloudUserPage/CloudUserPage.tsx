@@ -1,5 +1,6 @@
 import {
   AddCircle,
+  ArrowCircleDownRounded,
   Cancel,
   Cloud,
   KeyRounded,
@@ -17,7 +18,6 @@ import {
   CardActions,
   CardContent,
   Checkbox,
-  CircularProgress,
   Container,
   Fade,
   FormControlLabel,
@@ -34,18 +34,22 @@ import React, { useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { CloudInstanceStatus, getCheckoutLink, getPortalLink } from "src/api/privatecloud-api"
 import { BackButton } from "src/components/BackButton"
+import { CircularSpinner } from "src/components/CircularSpinner"
 import { LogoText } from "src/components/Header/LogoText"
 import { SectionTitle } from "src/components/SectionTitle"
 import { StaggeredList } from "src/components/StaggeredList"
 import { useConfirm } from "src/hooks/useConfirm"
+import { $latestVersion } from "src/stores/app-store"
 import { $cloudAuth, unlockApp } from "src/stores/auth-store"
 import {
+  $cloudInstance,
   $cloudPortalLink,
   $cloudServerInfo,
   $cloudServerMutating,
   $cloudSubscription,
   $cloudUser,
   checkCloudInstance,
+  checkCloudServerInfo,
   checkSubscription,
   handleCreateServer,
   handleLogout,
@@ -54,6 +58,7 @@ import {
   handleRestartServer,
   handleSetupServer,
   handleUnpauseServer,
+  handleUpdateServer,
 } from "src/stores/cloud-user-store"
 import { formatDate } from "src/utils/formatting-utils"
 import { $cloudRest } from "src/workers/remotes"
@@ -67,21 +72,25 @@ export default function CloudUserPage({ show }: { show: boolean }) {
 
   const account = useStore($cloudUser)
   const sub = useStore($cloudSubscription)
-  const serverInfo = useStore($cloudServerInfo)
+  const cloudInstance = useStore($cloudInstance)
   const serverMutating = useStore($cloudServerMutating)
-
+  const serverInfo = useStore($cloudServerInfo)
   const auth = useStore($cloudAuth)
+  const latestVersion = useStore($latestVersion)
 
   const serverStatus = useMemo(() => {
     if (auth.needsSetup) return "needs setup"
-    if (auth.checked && !auth.needsSetup && !auth.isAuthenticated) return "needs login"
-    return serverInfo?.status || "unknown"
-  }, [auth, serverInfo])
+    if (auth.checked && !auth.needsSetup && !auth.isAuthenticated && !auth.errorMessage) {
+      return "needs login"
+    }
+    if (serverMutating) return "pending"
+    return cloudInstance?.status || "unknown"
+  }, [auth, cloudInstance, serverMutating])
 
   useEffect(() => {
     const interval = setInterval(async () => {
       if (!$cloudUser.get()) return
-      await Promise.all([checkSubscription(), checkCloudInstance()])
+      await Promise.all([checkSubscription(), checkCloudInstance(), checkCloudServerInfo()])
     }, 5_000)
 
     return () => {
@@ -266,7 +275,7 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                       overlap="circular"
                       anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
                       badgeContent={
-                        serverInfo && (
+                        cloudInstance && (
                           <Fade in>
                             <Stack
                               sx={{
@@ -285,20 +294,24 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                       <Avatar>
                         <Cloud color="primary" fontSize="small" />
                       </Avatar>
-                      {serverInfo === undefined && (
-                        <CircularProgress
+                      {(cloudInstance === undefined ||
+                        serverStatus === "pending" ||
+                        serverStatus === "creating" ||
+                        serverStatus === "restarting") && (
+                        <CircularSpinner
                           size={40}
-                          sx={{
+                          rootSx={{
                             left: 0,
                             position: "absolute",
                             top: 0,
                           }}
+                          bgColor="transparent"
                         />
                       )}
                     </Badge>
 
                     <Stack marginLeft={2}>
-                      {serverInfo === undefined ? (
+                      {cloudInstance === undefined ? (
                         <Stack>
                           <Skeleton height={18} width={80} />
                           <Skeleton height={18} width={100} />
@@ -316,14 +329,14 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                                 {serverStatus}
                               </Typography>
                               <Typography variant="inherit" component="span">
-                                {serverInfo?.statusText && (
+                                {cloudInstance?.statusText && (
                                   <Typography
                                     variant="inherit"
                                     component="span"
                                     color="text.secondary"
                                     fontStyle="italic"
                                   >
-                                    {serverInfo.statusText}
+                                    {cloudInstance.statusText}
                                   </Typography>
                                 )}
                               </Typography>
@@ -333,10 +346,10 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                                 Server ID
                               </Typography>{" "}
                               <Typography variant="inherit" component="span">
-                                {serverInfo ? serverInfo.id : "Unknown"}
+                                {cloudInstance ? cloudInstance.id : "Unknown"}
                               </Typography>
                             </Stack>
-                            {serverInfo && (
+                            {cloudInstance && (
                               <Stack direction="row" gap={1}>
                                 <Typography
                                   variant="inherit"
@@ -346,7 +359,7 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                                   Server limits
                                 </Typography>{" "}
                                 <Typography variant="inherit" component="span">
-                                  {serverInfo.limits.cpus}{" "}
+                                  {cloudInstance.limits.cpus}{" "}
                                   <Typography
                                     variant="inherit"
                                     component="span"
@@ -355,7 +368,7 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                                   >
                                     CPUs -{" "}
                                   </Typography>
-                                  {serverInfo.limits.memory}{" "}
+                                  {cloudInstance.limits.memory}{" "}
                                   <Typography
                                     variant="inherit"
                                     component="span"
@@ -363,6 +376,29 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                                     fontStyle="italic"
                                   >
                                     RAM
+                                  </Typography>
+                                </Typography>
+                              </Stack>
+                            )}
+                            {serverInfo && (
+                              <Stack direction="row" gap={1}>
+                                <Typography
+                                  variant="inherit"
+                                  component="span"
+                                  color="text.secondary"
+                                >
+                                  Server version
+                                </Typography>{" "}
+                                <Typography variant="inherit" component="span">
+                                  {serverInfo.version}
+                                  <Typography
+                                    variant="inherit"
+                                    component="span"
+                                    color="text.secondary"
+                                    fontStyle="italic"
+                                  >
+                                    {" "}
+                                    {formatDate(new Date(serverInfo.buildDate))}
                                   </Typography>
                                 </Typography>
                               </Stack>
@@ -477,7 +513,18 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                                 Login
                               </Button>
                             )}
-                            {serverInfo && serverInfo.status === "paused" && (
+                            {latestVersion &&
+                              serverInfo &&
+                              serverInfo.version !== latestVersion && (
+                                <Button
+                                  onClick={handleUpdateServer}
+                                  startIcon={<ArrowCircleDownRounded />}
+                                  disabled={serverMutating}
+                                >
+                                  Update
+                                </Button>
+                              )}
+                            {cloudInstance && cloudInstance.status === "paused" && (
                               <Button
                                 onClick={handleUnpauseServer}
                                 startIcon={<PlayCircle />}
@@ -486,7 +533,7 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                                 Resume
                               </Button>
                             )}
-                            {serverInfo && serverInfo.status === "running" && (
+                            {cloudInstance && cloudInstance.status === "running" && (
                               <Button
                                 onClick={handlePauseServer}
                                 startIcon={<PauseCircle />}
@@ -495,22 +542,22 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                                 Pause
                               </Button>
                             )}
-                            {serverInfo !== null && (
+                            {cloudInstance !== null && (
                               <Button
                                 onClick={handleRestartServer}
                                 startIcon={<RestartAlt />}
                                 disabled={
                                   serverMutating ||
-                                  (!!serverInfo &&
+                                  (!!cloudInstance &&
                                     (["restarting"] as CloudInstanceStatus[]).includes(
-                                      serverInfo.status
+                                      cloudInstance.status
                                     ))
                                 }
                               >
                                 Restart
                               </Button>
                             )}
-                            {serverInfo === null && (
+                            {cloudInstance === null && (
                               <Button
                                 startIcon={<AddCircle />}
                                 onClick={handleCreateServer}
@@ -519,7 +566,7 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                                 Create
                               </Button>
                             )}
-                            {serverInfo !== null && (
+                            {cloudInstance !== null && (
                               <Button
                                 startIcon={<Cancel />}
                                 onClick={async () => {
@@ -591,9 +638,9 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                   </Link>
                 </Fade>
               )}
-              {serverInfo?.url && (
+              {cloudInstance?.url && (
                 <Fade in>
-                  <Link variant="body2" href={serverInfo.url} target="_blank">
+                  <Link variant="body2" href={cloudInstance.url} target="_blank">
                     Visit server link
                   </Link>
                 </Fade>

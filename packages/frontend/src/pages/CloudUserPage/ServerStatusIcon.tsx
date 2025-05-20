@@ -1,4 +1,4 @@
-import { BuildCircle, Error, Lock, PauseCircle, Pending, StopCircle } from "@mui/icons-material"
+import { BuildCircle, Error, Lock, PauseCircle, StopCircle } from "@mui/icons-material"
 import { Box, Stack } from "@mui/material"
 import React from "react"
 import { CloudInstanceStatus } from "src/api/privatecloud-api"
@@ -51,8 +51,9 @@ export function ServerStatusIcon({ status }: { status?: CloudInstanceStatus }) {
     return <Error sx={{ height: 20, width: 20 }} color="warning" />
   }
 
-  if (status === "restarting" || status === "creating") {
-    return <Pending sx={{ height: 20, width: 20 }} color="primary" />
+  if (status === "restarting" || status === "creating" || status === "pending") {
+    // <Pending sx={{ height: 20, width: 20 }} color="primary" />
+    return null
   }
 
   if (status === "stopped") {

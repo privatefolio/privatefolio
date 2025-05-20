@@ -13,7 +13,7 @@ import { useStore } from "@nanostores/react"
 import React, { FormEvent, useCallback, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { $accounts, $cloudAccounts, $localAccounts } from "src/stores/account-store"
-import { $cloudServerInfo } from "src/stores/cloud-user-store"
+import { $cloudInstance } from "src/stores/cloud-user-store"
 import { $cloudRpc, $localRpc } from "src/workers/remotes"
 
 import { SectionTitle } from "../SectionTitle"
@@ -122,7 +122,7 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
               })}
             >
               <Tab label="Local" value="local" />
-              <Tab label="Cloud" value="cloud" disabled={!$cloudServerInfo.get()?.id} />
+              <Tab label="Cloud" value="cloud" disabled={!$cloudInstance.get()?.id} />
             </Tabs>
             <div>
               <SectionTitle>Name</SectionTitle>

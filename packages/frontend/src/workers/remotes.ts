@@ -1,5 +1,6 @@
 import { computed } from "nanostores"
 import type { Api } from "privatefolio-backend/build/src/api/api"
+import type { IBackendRelayer } from "privatefolio-backend/build/src/backend-relayer"
 import { createBackendRelayer } from "privatefolio-backend/build/src/backend-relayer"
 import { User } from "src/api/privatecloud-api"
 import { TARGET } from "src/env"
@@ -11,7 +12,7 @@ import {
   $localConnectionStatus,
   $localConnectionStatusText,
 } from "src/stores/account-store"
-import { $cloudUser } from "src/stores/cloud-user-store"
+import { $cloudServerInfo, $cloudUser } from "src/stores/cloud-user-store"
 import { isProduction, isSecure } from "src/utils/environment-utils"
 
 import { $localAuth } from "../stores/auth-store"
@@ -49,8 +50,12 @@ const createLocalStatusHandler = (): ConnectionStatusCallback => {
 
   return (status, errorMessage) => {
     if (connectionId === currentLocalConnectionId) {
-      $localConnectionStatus.set(status)
-      $localConnectionStatusText.set(errorMessage ?? undefined)
+      if ($localConnectionStatus.get() !== status) {
+        $localConnectionStatus.set(status)
+      }
+      if ($localConnectionStatusText.get() !== errorMessage) {
+        $localConnectionStatusText.set(errorMessage)
+      }
     }
   }
 }
@@ -61,9 +66,12 @@ const createCloudStatusHandler = (): ConnectionStatusCallback => {
   const connectionId = ++currentCloudConnectionId
 
   return (status, errorMessage) => {
-    if (connectionId === currentCloudConnectionId) {
+    if (connectionId !== currentCloudConnectionId) return
+    if ($cloudConnectionStatus.get() !== status) {
       $cloudConnectionStatus.set(status)
-      $cloudConnectionStatusText.set(errorMessage ?? undefined)
+    }
+    if ($cloudConnectionStatusText.get() !== errorMessage) {
+      $cloudConnectionStatusText.set(errorMessage)
     }
   }
 }
@@ -80,17 +88,29 @@ export const $localRest = computed([], () => {
   } as RestConfig
 })
 
+type RPC = Api & IBackendRelayer
+
+let latestLocalRpc: RPC | null = null
+let latestCloudRpc: RPC | null = null
+
 export const $localRpc = computed([$localAuth], () => {
-  return createBackendRelayer<Api>(
-    getWebSocketUrl(BASE_LOCAL_SERVER_URL, LOCAL_JWT_STORATE_KEY),
+  const newAddress = getWebSocketUrl(BASE_LOCAL_SERVER_URL, LOCAL_JWT_STORATE_KEY)
+  if (latestLocalRpc && latestLocalRpc.address === newAddress) return latestLocalRpc
+
+  if (latestLocalRpc) latestLocalRpc.closeConnection()
+
+  latestLocalRpc = createBackendRelayer<Api>(
+    newAddress,
     createLocalStatusHandler(),
     !isProduction,
     "Local"
   )
+  return latestLocalRpc
 })
 
-export const $cloudRest = computed([$cloudUser], (cloudUser) => {
+export const $cloudRest = computed([$cloudUser, $cloudServerInfo], (cloudUser, cloudServerInfo) => {
   if (!cloudUser) return null
+  if (!cloudServerInfo) return null
 
   return {
     baseUrl: `https://${REMOTE_SERVER_URL(cloudUser)}`,
@@ -109,15 +129,27 @@ export const $rest = computed(
   }
 )
 
-export const $cloudRpc = computed([$cloudUser], (cloudUser) => {
+export const $cloudRpc = computed([$cloudUser, $cloudServerInfo], (cloudUser, cloudServerInfo) => {
+  if (latestCloudRpc && (!cloudUser || !cloudServerInfo)) {
+    latestCloudRpc.closeConnection()
+    latestCloudRpc = null
+    return null
+  }
   if (!cloudUser) return null
+  if (!cloudServerInfo) return null
 
-  return createBackendRelayer<Api>(
-    getWebSocketUrl(REMOTE_SERVER_URL(cloudUser), CLOUD_JWT_STORATE_KEY),
+  const newAddress = getWebSocketUrl(REMOTE_SERVER_URL(cloudUser), CLOUD_JWT_STORATE_KEY)
+  if (latestCloudRpc && latestCloudRpc.address === newAddress) return latestCloudRpc
+
+  if (latestCloudRpc) latestCloudRpc.closeConnection()
+
+  latestCloudRpc = createBackendRelayer<Api>(
+    newAddress,
     createCloudStatusHandler(),
     !isProduction,
     "Cloud"
   )
+  return latestCloudRpc
 })
 
 export const $rpc = computed(

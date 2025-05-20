@@ -4,6 +4,8 @@ import { BackendResponse, FunctionReference } from "./backend-comms"
 import { ConnectionStatusCallback } from "./interfaces"
 import { noop } from "./utils/utils"
 
+let instanceCounter = 0
+
 class BackendRelayer {
   private socket: WebSocket
   private requestIdCounter = 0
@@ -11,8 +13,10 @@ class BackendRelayer {
   // eslint-disable-next-line @typescript-eslint/ban-types
   private functionRegistry: { [id: string]: Function } = {}
   private logResponses: boolean
-  private address: string
+  public readonly address: string
   private logPrefix: string
+  private closedByUser = false
+  public readonly id: number
 
   constructor(
     address: string,
@@ -20,7 +24,8 @@ class BackendRelayer {
     logResponses: boolean,
     logPrefix: string
   ) {
-    this.logPrefix = logPrefix
+    this.id = ++instanceCounter
+    this.logPrefix = `BackendRelayer #${this.id} (${logPrefix})`
     this.logResponses = logResponses
     this.address = address
     this.socket = this.connect(address, onStatusChange)
@@ -29,7 +34,7 @@ class BackendRelayer {
   private connect(address: string, onStatusChange: ConnectionStatusCallback): WebSocket {
     const baseAddress = address.substring(0, address.indexOf("?"))
 
-    console.log(this.logPrefix, "BackendRelayer connecting", baseAddress)
+    console.log(this.logPrefix, "connecting", baseAddress)
 
     const socket = new WebSocket(address)
     socket.addEventListener("message", (event) => {
@@ -67,12 +72,14 @@ class BackendRelayer {
             let deserializedResult = result
             if (result && (result as FunctionReference).__isFunction) {
               deserializedResult = (...params: unknown[]) => {
-                this.socket.send(
-                  JSON.stringify({
-                    functionId: (result as FunctionReference).functionId,
-                    params,
-                  })
-                )
+                if (this.socket.readyState === WebSocket.OPEN) {
+                  this.socket.send(
+                    JSON.stringify({
+                      functionId: (result as FunctionReference).functionId,
+                      params,
+                    })
+                  )
+                }
               }
             }
 
@@ -81,12 +88,12 @@ class BackendRelayer {
           delete this.pendingRequests[id]
         }
       } catch (error) {
-        console.error(this.logPrefix, "BackendRelayer failure:", error)
+        console.error(this.logPrefix, "failure:", error)
       }
     })
 
     socket.addEventListener("open", () => {
-      console.log(this.logPrefix, "BackendRelayer connected", baseAddress)
+      console.log(this.logPrefix, "connected", baseAddress)
       onStatusChange("connected")
     })
     socket.addEventListener("close", (event) => {
@@ -94,8 +101,9 @@ class BackendRelayer {
       if (event.code === 1006 && reason === "unknown") {
         reason = "Server offline."
       }
-      console.log(this.logPrefix, "⚠️ BackendRelayer closed:", event.code, reason, baseAddress)
+      console.log(this.logPrefix, "closed:", event.code, reason, baseAddress)
       onStatusChange("closed", `${event.code}: ${reason}`)
+      if (this.closedByUser) return
       if (event.code !== 1008) {
         setTimeout(() => {
           this.socket = this.connect(address, onStatusChange)
@@ -103,7 +111,7 @@ class BackendRelayer {
       }
     })
     socket.addEventListener("error", (event) => {
-      console.error(this.logPrefix, "BackendRelayer error:", event, baseAddress)
+      console.error(this.logPrefix, "error:", event, baseAddress)
     })
 
     return socket
@@ -133,19 +141,36 @@ class BackendRelayer {
 
   public async ensureConnection(): Promise<void> {
     if (this.socket.readyState === WebSocket.OPEN) return
+    if (this.closedByUser) throw new Error("Connection closed by user")
 
     return new Promise((resolve) => {
       this.socket.addEventListener("open", () => resolve())
     })
   }
 
-  public async closeConnection(): Promise<void> {
-    return new Promise((resolve) => {
-      this.socket.close()
-      resolve()
-    })
+  public closeConnection() {
+    try {
+      this.closedByUser = true
+      if (
+        this.socket &&
+        this.socket.readyState !== WebSocket.CLOSING &&
+        this.socket.readyState !== WebSocket.CLOSED
+      ) {
+        this.socket.close(1000, "Client closed connection")
+      }
+
+      // Clean up pending requests to prevent memory leaks
+      Object.values(this.pendingRequests).forEach((reject) =>
+        reject(new Error("Connection closed"))
+      )
+      this.pendingRequests = {}
+    } catch {
+      // Ignore errors
+    }
   }
 }
+
+export type IBackendRelayer = InstanceType<typeof BackendRelayer>
 
 export function createBackendRelayer<T extends object>(
   address: string,

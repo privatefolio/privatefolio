@@ -10,10 +10,10 @@ function extractVersion(version: string) {
 
     if (raw.startsWith("{")) {
       const json = JSON.parse(version)
-      return json[Object.keys(json)[0]]
+      return "v" + json[Object.keys(json)[0]]
     }
 
-    return raw.replaceAll('"', "").replaceAll("'", "")
+    return "v" + raw.replaceAll('"', "").replaceAll("'", "")
   } catch {
     return "unknown"
   }

@@ -3,14 +3,24 @@ import {
   CircularProgress,
   circularProgressClasses,
   CircularProgressProps,
+  SxProps,
 } from "@mui/material"
 import React from "react"
 
-export function CircularSpinner(props: CircularProgressProps) {
-  const { sx, size = 40, variant = "indeterminate", ...rest } = props
+type CircularSpinnerProps = CircularProgressProps & { bgColor?: string; rootSx?: SxProps }
+
+export function CircularSpinner(props: CircularSpinnerProps) {
+  const {
+    rootSx = {},
+    sx,
+    size = 40,
+    variant = "indeterminate",
+    bgColor = "var(--mui-palette-LinearProgress-secondaryBg)",
+    ...rest
+  } = props
 
   return (
-    <Box sx={{ height: size, position: "relative", width: size }}>
+    <Box sx={{ height: size, position: "relative", width: size, ...rootSx }}>
       <CircularProgress
         size={size}
         thickness={4}
@@ -18,7 +28,7 @@ export function CircularSpinner(props: CircularProgressProps) {
         value={100}
         variant="determinate"
         sx={{
-          color: "var(--mui-palette-LinearProgress-secondaryBg)",
+          color: bgColor,
           left: 0,
           position: "absolute",
           top: 0,

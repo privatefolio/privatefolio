@@ -3,13 +3,13 @@ import { useStore } from "@nanostores/react"
 import type { ReadableAtom } from "nanostores"
 import React, { useEffect, useState } from "react"
 
-interface InfoBannerProps {
+interface ConnectionBannerProps {
   prefix?: string
   statusAtom: ReadableAtom<"closed" | "connected" | undefined>
   statusTextAtom: ReadableAtom<string | undefined>
 }
 
-export function ConnectionBanner({ statusAtom, statusTextAtom, prefix }: InfoBannerProps) {
+export function ConnectionBanner({ statusAtom, statusTextAtom, prefix }: ConnectionBannerProps) {
   const status = useStore(statusAtom)
   const statusText = useStore(statusTextAtom)
   const [showing, setShowing] = useState(false)
@@ -22,7 +22,7 @@ export function ConnectionBanner({ statusAtom, statusTextAtom, prefix }: InfoBan
       showTimerId = window.setTimeout(() => {
         setShowing(true)
       }, 0)
-    } else if (status === "connected" && showing) {
+    } else if (showing) {
       hideTimerId = window.setTimeout(() => {
         setShowing(false)
       }, 4_000)

@@ -222,6 +222,7 @@ export type CloudInstanceStatus =
   | "unknown"
   | "needs setup"
   | "needs login"
+  | "pending"
 
 export interface ResourceConfig {
   cpus: string
@@ -242,7 +243,14 @@ export interface CloudInstance extends CloudInstanceData {
 }
 
 export type CloudInstancePatch = {
-  action?: "restart" | "pause" | "unpause" | "stop" | "start" | "apply_subscription_limits"
+  action?:
+    | "restart"
+    | "pause"
+    | "unpause"
+    | "stop"
+    | "start"
+    | "apply_subscription_limits"
+    | "update"
 }
 
 export async function getCloudInstance(): Promise<CloudInstance | null> {
