@@ -13,9 +13,6 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: Production
-      url: https://privatefolio.app
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

@@ -90,7 +90,8 @@ export default function CloudUserPage({ show }: { show: boolean }) {
   useEffect(() => {
     const interval = setInterval(async () => {
       if (!$cloudUser.get()) return
-      await Promise.all([checkSubscription(), checkCloudInstance(), checkCloudServerInfo()])
+      await Promise.all([checkSubscription(), checkCloudInstance()])
+      await checkCloudServerInfo()
     }, 5_000)
 
     return () => {
@@ -524,7 +525,7 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                                   Update
                                 </Button>
                               )}
-                            {cloudInstance && cloudInstance.status === "paused" && (
+                            {cloudInstance && serverStatus === "paused" && (
                               <Button
                                 onClick={handleUnpauseServer}
                                 startIcon={<PlayCircle />}
@@ -533,7 +534,7 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                                 Resume
                               </Button>
                             )}
-                            {cloudInstance && cloudInstance.status === "running" && (
+                            {cloudInstance && serverStatus === "running" && (
                               <Button
                                 onClick={handlePauseServer}
                                 startIcon={<PauseCircle />}

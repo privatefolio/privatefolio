@@ -113,7 +113,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
                     )}
                   </Stack>
                 </Stack>
-                <TagList itemId={id} itemType="transaction"  />
+                <TagList itemId={id} itemType="transaction" />
               </Stack>
             </Stack>
           </TableCell>

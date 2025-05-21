@@ -13,6 +13,7 @@ import {
   TextField,
 } from "@mui/material"
 import React, { FormEvent, useCallback, useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { handleLogin, handleSignUp } from "src/stores/cloud-user-store"
 
 import { LogoText } from "../Header/LogoText"
@@ -41,6 +42,7 @@ export function CloudLoginDialog(props: AddAccountDialogProps) {
     event.preventDefault()
   }
 
+  const navigate = useNavigate()
   const handleSubmit = useCallback(
     async (event: FormEvent) => {
       event.preventDefault()
@@ -61,8 +63,10 @@ export function CloudLoginDialog(props: AddAccountDialogProps) {
       try {
         if (form === "sign-up") {
           await handleSignUp(email, password)
+          navigate("/privatecloud")
+          return
         } else {
-          await handleLogin(email, password)
+          await handleLogin(email, password, false)
         }
         setLoading(false)
         toggleOpen()
@@ -224,7 +228,7 @@ export function CloudLoginDialog(props: AddAccountDialogProps) {
             sx={{ paddingX: 2 }}
             disabled={loading}
           >
-            {form === "login" ? "Log in" : "Sign up"}
+            {form === "login" ? "Login" : "Sign up"}
           </Button>
         </DialogActions>
       </form>

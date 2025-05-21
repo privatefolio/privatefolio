@@ -22,7 +22,7 @@ export function ConnectionBanner({ statusAtom, statusTextAtom, prefix }: Connect
       showTimerId = window.setTimeout(() => {
         setShowing(true)
       }, 500)
-    } else if (showing) {
+    } else if (status !== "closed" && showing) {
       hideTimerId = window.setTimeout(() => {
         setShowing(false)
       }, 4_000)

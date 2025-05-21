@@ -29,7 +29,7 @@ interface ElectronAPI {
 export const setElectronMode = window.electron?.setMode
 export const isElectron = Boolean(window.electron)
 export const isWindows = window.electron && window.electron.platform === "win32"
-export const isProductionElectron = window.electron?.isProduction
+export const isProductionElectron = !!window.electron?.isProduction
 
 console.log(`Electron API ${isElectron ? "available" : "not available"}`)
 

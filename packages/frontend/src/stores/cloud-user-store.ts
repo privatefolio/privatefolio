@@ -1,5 +1,5 @@
 import { isEqual } from "lodash-es"
-import { atom } from "nanostores"
+import { atom, computed } from "nanostores"
 import { enqueueSnackbar } from "notistack"
 import {
   authenticate,
@@ -16,7 +16,8 @@ import {
   User,
 } from "src/api/privatecloud-api"
 import { logAtoms } from "src/utils/browser-utils"
-import { isSelfHosted } from "src/utils/environment-utils"
+import { cloudEnabled } from "src/utils/environment-utils"
+import { sleep } from "src/utils/utils"
 import { $cloudRest } from "src/workers/remotes"
 
 import { $cloudAuth, setPassword, unlockApp } from "./auth-store"
@@ -37,24 +38,29 @@ export const $cloudInstance = atom<CloudInstance | null | undefined>()
 export const $cloudServerInfo = atom<CloudServerInfo | null | undefined>()
 export const $cloudServerMutating = atom<boolean>(false)
 
-logAtoms({ $cloudInstance, $cloudServerInfo, $cloudSubscription, $cloudUser })
+export const $cloudAvailable = computed([$cloudUser, $cloudInstance], (user, instance) => {
+  return !!user && !!instance
+})
+
+export const $cloudRpcReady = computed([$cloudAuth], (auth) => {
+  return auth.checked && auth.isAuthenticated && !auth.needsSetup
+})
+
+logAtoms({ $cloudAvailable, $cloudInstance, $cloudServerInfo, $cloudSubscription, $cloudUser })
 
 export async function checkCloudUser() {
-  if (isSelfHosted) return
-  // console.log("PrivateCloud -", "checking auth")
+  if (!cloudEnabled) return
+  console.log("PrivateCloud -", "checking auth")
   try {
     const user = await reAuthenticate()
     $cloudUser.set(user)
-    await Promise.all([checkSubscription(), checkCloudInstance()])
-    await checkCloudServerInfo()
-  } catch (e) {
-    // console.error("Auth error:", e)
+  } catch {
     $cloudUser.set(null)
   }
 }
 
 export async function checkSubscription() {
-  // console.log("PrivateCloud -", "checking service subscription")
+  console.log("PrivateCloud -", "checking service subscription")
   return getSubscription()
     .then((sub) => {
       if (isEqual(sub, $cloudSubscription.get())) return
@@ -68,7 +74,7 @@ export async function checkSubscription() {
 }
 
 export async function checkCloudInstance() {
-  // console.log("PrivateCloud -", "checking cloud instance")
+  console.log("PrivateCloud -", "checking cloud instance")
   return getCloudInstance()
     .then($cloudInstance.set)
     .catch((err) => {
@@ -101,9 +107,36 @@ export async function checkCloudServerInfo() {
     })
 }
 
-export async function handleLogin(email: string, password: string) {
+export async function handleLogin(email: string, password: string, createInstance = false) {
   const user = await authenticate(email, password)
   $cloudUser.set(user)
+
+  if (createInstance) {
+    setTimeout(async () => {
+      await handleCreateServer()
+    }, 1_000)
+  }
+
+  setTimeout(
+    async () => {
+      const maxAttempts = 60
+      const interval = 1_000
+      let attempts = 0
+      while (attempts < maxAttempts) {
+        if (!$cloudInstance.get() || !$cloudRest.get()) {
+          console.log("PrivateCloud - waiting for cloud instance and rest config to be set...")
+          await sleep(interval)
+          attempts++
+          continue
+        }
+
+        console.log("PrivateCloud - unlocking instance...")
+        await unlockApp(password, $cloudAuth, $cloudRest.get())
+        break
+      }
+    },
+    createInstance ? 10_000 : 1_000
+  )
 }
 
 export async function handleLogout() {
@@ -113,7 +146,7 @@ export async function handleLogout() {
 
 export async function handleSignUp(email: string, password: string) {
   await createUser(email, password)
-  await handleLogin(email, password)
+  await handleLogin(email, password, true)
 }
 
 export async function handleCreateServer() {

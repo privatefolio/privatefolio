@@ -18,7 +18,7 @@ jobs:
   build-and-publish:
     runs-on: ubuntu-latest
     environment:
-      name: Production
+      name: production
       url: https://ghcr.io/privatefolio/privatefolio
     steps:
       - name: Checkout code

@@ -2,25 +2,27 @@ import { TARGET } from "src/env"
 
 import { isProductionElectron } from "./electron-utils"
 
-export const isServer = typeof window === "undefined"
 // https://vite.dev/guide/env-and-mode.html#built-in-constants
-export const isProductionBuild = import.meta.env.PROD
+const isProductionBuild = !!import.meta.env.PROD
 export const isSecure = window.location.protocol === "https:"
+// const isServer = typeof window === "undefined"
+// const isNode = typeof process !== "undefined" && process.versions && process.versions.node
+// const isWebWorker = isServer && !isNode
+// const isTestEnvironment = typeof process !== "undefined" && process.env.NODE_ENV === "test"
+
 export const isProduction = isProductionBuild || isProductionElectron
 console.log(`Environment is ${isProduction ? "production" : "development"}`)
 
-export const isOfficialUrl =
+const isOfficialUrl =
   window.location.hostname === "privatefolio.app" || window.location.hostname.includes("pages.dev")
+const isSelfHosted = isProduction && TARGET !== "electron" && !isOfficialUrl
+const isWebDeployment = isProduction && TARGET !== "electron" && isOfficialUrl
 
-export const isSelfHosted = isProduction && TARGET !== "electron" && !isOfficialUrl
-export const isWebDeployment = isProduction && TARGET !== "electron" && isOfficialUrl
+export const cloudEnabled = !isSelfHosted
+export const localServerEnabled = isSelfHosted || !isWebDeployment
 
-export const mode = isSelfHosted ? "self-hosted" : isWebDeployment ? "web" : "electron"
+const mode = isSelfHosted ? "self-hosted" : isWebDeployment ? "web" : "electron"
+
 console.log(`App mode is ${mode}`)
-
-export const hasLocalServer = isSelfHosted || !isWebDeployment
-console.log(`Local server ${hasLocalServer ? "available" : "not available"}`)
-
-// export const isNode = typeof process !== "undefined" && process.versions && process.versions.node
-// export const isWebWorker = isServer && !isNode
-// export const isTestEnvironment = typeof process !== "undefined" && process.env.NODE_ENV === "test"
+console.log(`Local server ${localServerEnabled ? "enabled" : "disabled"}`)
+console.log(`Cloud server ${cloudEnabled ? "enabled" : "disabled"}`)

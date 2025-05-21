@@ -37,10 +37,18 @@ import {
 } from "./stores/account-store"
 import { checkLatestAppVersion } from "./stores/app-store"
 import { $auth, $cloudAuth, $localAuth, checkAuthentication } from "./stores/auth-store"
-import { $cloudInstance, $cloudUser, checkCloudUser } from "./stores/cloud-user-store"
+import {
+  $cloudAvailable,
+  $cloudRpcReady,
+  $cloudUser,
+  checkCloudInstance,
+  checkCloudServerInfo,
+  checkCloudUser,
+  checkSubscription,
+} from "./stores/cloud-user-store"
 import { fetchInMemoryData } from "./stores/metadata-store"
 import { closeSubscription } from "./utils/browser-utils"
-import { hasLocalServer, noop } from "./utils/utils"
+import { localServerEnabled, noop } from "./utils/utils"
 import { $cloudRest, $cloudRpc, $localRest, $localRpc, $rpc } from "./workers/remotes"
 
 export default function App() {
@@ -69,10 +77,9 @@ export default function App() {
     return closeSubscription(subscription)
   }, [localConnectionStatus, localAuth, localRpc])
 
-  const cloudAuth = useStore($cloudAuth)
-  const cloudUser = useStore($cloudUser)
+  const cloudRpcReady = useStore($cloudRpcReady)
   const cloudConnectionStatus = useStore($cloudConnectionStatus)
-  const cloudInstance = useStore($cloudInstance)
+  const cloudAvailable = useStore($cloudAvailable)
   const cloudRest = useStore($cloudRest)
   const cloudRpc = useStore($cloudRpc)
 
@@ -83,9 +90,10 @@ export default function App() {
   }, [cloudRest])
 
   useEffect(() => {
-    if (!cloudAuth.checked || cloudAuth.needsSetup || !cloudAuth.isAuthenticated || !cloudRpc) {
-      return
+    if ((!cloudRpcReady || !cloudRpc) && $cloudAccounts.get() !== undefined) {
+      $cloudAccounts.set(undefined)
     }
+    if (!cloudRpcReady || !cloudRpc) return
 
     cloudRpc.getAccountNames().then($cloudAccounts.set)
 
@@ -94,12 +102,23 @@ export default function App() {
     })
 
     return closeSubscription(subscription)
-  }, [cloudConnectionStatus, cloudAuth, cloudRpc])
+  }, [cloudConnectionStatus, cloudRpcReady, cloudRpc])
 
   useEffect(() => {
     checkCloudUser()
     checkLatestAppVersion()
   }, [])
+
+  const cloudUser = useStore($cloudUser)
+
+  useEffect(() => {
+    if (!cloudUser) return
+
+    setTimeout(async () => {
+      await Promise.all([checkSubscription(), checkCloudInstance()])
+      await checkCloudServerInfo()
+    }, 0)
+  }, [cloudUser])
 
   const activeAccount = useStore($activeAccount)
   const connectionStatus = useStore($connectionStatus)
@@ -124,7 +143,7 @@ export default function App() {
     return closeSubscription(subscription)
   }, [activeAccount, connectionStatus, auth, rpc])
 
-  if (hasLocalServer && !localAuth.checked) {
+  if (localServerEnabled && !localAuth.checked) {
     return (
       <Box
         sx={{ alignItems: "center", display: "flex", height: "100vh", justifyContent: "center" }}
@@ -134,7 +153,7 @@ export default function App() {
     )
   }
 
-  if (hasLocalServer && (!localAuth.isAuthenticated || localAuth.needsSetup)) {
+  if (localServerEnabled && (!localAuth.isAuthenticated || localAuth.needsSetup)) {
     return <LocalAuthPage />
   }
 
@@ -235,7 +254,7 @@ export default function App() {
               zIndex: "var(--mui-zIndex-tooltip)",
             }}
           >
-            {hasLocalServer && (
+            {localServerEnabled && (
               <ConnectionBanner
                 key="local"
                 statusAtom={$localConnectionStatus}
@@ -243,7 +262,7 @@ export default function App() {
                 prefix="Local connection"
               />
             )}
-            {cloudUser && cloudInstance && (
+            {cloudAvailable && (
               <ConnectionBanner
                 key="cloud"
                 statusAtom={$cloudConnectionStatus}

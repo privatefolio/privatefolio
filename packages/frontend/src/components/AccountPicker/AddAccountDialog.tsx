@@ -14,8 +14,8 @@ import { useStore } from "@nanostores/react"
 import React, { FormEvent, useCallback, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { $accounts, $cloudAccounts, $localAccounts } from "src/stores/account-store"
-import { $cloudInstance } from "src/stores/cloud-user-store"
-import { hasLocalServer, isSelfHosted } from "src/utils/environment-utils"
+import { $cloudAvailable } from "src/stores/cloud-user-store"
+import { cloudEnabled, localServerEnabled } from "src/utils/environment-utils"
 import { $cloudRpc, $localRpc } from "src/workers/remotes"
 
 import { SectionTitle } from "../SectionTitle"
@@ -37,7 +37,7 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
   const [loading, setLoading] = useState(false)
 
   const [accountType, setAccountType] = useState<"local" | "cloud">(
-    hasLocalServer ? "local" : "cloud"
+    localServerEnabled ? "local" : "cloud"
   )
 
   const handleSubmit = useCallback(
@@ -85,10 +85,10 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
     [accounts, name, accountType, toggleOpen, navigate]
   )
 
-  const cloudInstance = useStore($cloudInstance)
+  const cloudAvailable = useStore($cloudAvailable)
 
   const errorComponent = useMemo(() => {
-    if (!hasLocalServer && accountType === "local") {
+    if (!localServerEnabled && accountType === "local") {
       return (
         <>
           Local accounts are not available in the browser. Download our desktop app for Windows,
@@ -98,11 +98,11 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
         </>
       )
     }
-    if (isSelfHosted && accountType === "cloud") {
+    if (!cloudEnabled && accountType === "cloud") {
       return <>Cloud accounts are incompatible with self-hosted deployments.</>
     }
 
-    if (!cloudInstance && accountType === "cloud") {
+    if (!cloudAvailable && accountType === "cloud") {
       return (
         <>
           {/* <MuiLink component={Link} to="/privatecloud"> */}
@@ -112,7 +112,7 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
       )
     }
     return null
-  }, [accountType, cloudInstance])
+  }, [accountType, cloudAvailable])
 
   return (
     <Dialog open={open} onClose={toggleOpen}>
