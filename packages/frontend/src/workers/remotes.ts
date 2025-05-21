@@ -12,13 +12,13 @@ import {
   $localConnectionStatus,
   $localConnectionStatusText,
 } from "src/stores/account-store"
-import { $cloudServerInfo, $cloudUser } from "src/stores/cloud-user-store"
-import { hasLocalServer, isProduction, isSecure } from "src/utils/environment-utils"
+import { $cloudRpcReady, $cloudServerInfo, $cloudUser } from "src/stores/cloud-user-store"
+import { isProduction, isSecure, localServerEnabled } from "src/utils/environment-utils"
 
 import { $localAuth } from "../stores/auth-store"
 
 const LOCAL_JWT_STORATE_KEY = "privatefolio_jwt"
-const CLOUD_JWT_STORATE_KEY = "privatecloud-jwt"
+const CLOUD_JWT_STORATE_KEY = "privatecloud_instance_jwt"
 
 const BASE_LOCAL_SERVER_URL = isProduction
   ? TARGET === "electron"
@@ -82,7 +82,7 @@ export type RestConfig = {
 }
 
 export const $localRest = computed([], () => {
-  if (!hasLocalServer) return null
+  if (!localServerEnabled) return null
 
   return {
     baseUrl: `${isSecure ? "https" : "http"}://${BASE_LOCAL_SERVER_URL}`,
@@ -96,7 +96,7 @@ let latestLocalRpc: RPC | null = null
 let latestCloudRpc: RPC | null = null
 
 export const $localRpc = computed([$localAuth], () => {
-  if (!hasLocalServer) return null
+  if (!localServerEnabled) return null
 
   const newAddress = getWebSocketUrl(BASE_LOCAL_SERVER_URL, LOCAL_JWT_STORATE_KEY)
   if (latestLocalRpc && latestLocalRpc.address === newAddress) return latestLocalRpc
@@ -133,14 +133,14 @@ export const $rest = computed(
   }
 )
 
-export const $cloudRpc = computed([$cloudUser, $cloudServerInfo], (cloudUser, cloudServerInfo) => {
-  if (latestCloudRpc && (!cloudUser || !cloudServerInfo)) {
+export const $cloudRpc = computed([$cloudUser, $cloudRpcReady], (cloudUser, cloudRpcReady) => {
+  if (latestCloudRpc && (!cloudUser || !cloudRpcReady)) {
     latestCloudRpc.closeConnection()
     latestCloudRpc = null
     return null
   }
   if (!cloudUser) return null
-  if (!cloudServerInfo) return null
+  if (!cloudRpcReady) return null
 
   const newAddress = getWebSocketUrl(REMOTE_SERVER_URL(cloudUser), CLOUD_JWT_STORATE_KEY)
   if (latestCloudRpc && latestCloudRpc.address === newAddress) return latestCloudRpc

@@ -4,7 +4,7 @@ import React from "react"
 import { SerifFont } from "../../theme"
 
 export function LogoText(props: TypographyProps) {
-  const { children = "Privatefolio2", ...rest } = props
+  const { children = "Privatefolio", ...rest } = props
 
   return (
     <Typography

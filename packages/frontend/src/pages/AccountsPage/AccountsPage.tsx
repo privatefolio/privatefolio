@@ -6,6 +6,7 @@ import {
   Container,
   Fade,
   IconButton,
+  Link as MuiLink,
   Stack,
   Toolbar,
   Tooltip,
@@ -23,9 +24,9 @@ import { SettingsDrawer } from "src/components/Header/SettingsDrawer"
 import { StaggeredList } from "src/components/StaggeredList"
 import { useBoolean } from "src/hooks/useBoolean"
 import { $accounts, $activeAccount, $activeIndex } from "src/stores/account-store"
-import { $cloudUser } from "src/stores/cloud-user-store"
+import { $cloudRpcReady, $cloudUser } from "src/stores/cloud-user-store"
 import { SerifFont } from "src/theme"
-import { isSelfHosted, SPRING_CONFIGS } from "src/utils/utils"
+import { cloudEnabled, localServerEnabled, SPRING_CONFIGS } from "src/utils/utils"
 
 export default function AccountsPage() {
   useEffect(() => {
@@ -38,7 +39,8 @@ export default function AccountsPage() {
   const { value: addAccountOpen, toggle: toggleAddAccount } = useBoolean(false)
   const { value: loginOpen, toggle: toggleLoginOpen } = useBoolean(false)
 
-  const user = useStore($cloudUser)
+  const cloudUser = useStore($cloudUser)
+  const cloudRpcReady = useStore($cloudRpcReady)
 
   useEffect(() => {
     if (activeIndex !== undefined) {
@@ -109,7 +111,7 @@ export default function AccountsPage() {
                   <LogoText />
                 </Button>
                 <Stack direction="row" gap={1} alignItems="center">
-                  {user !== undefined && !user && !isSelfHosted && (
+                  {cloudUser !== undefined && !cloudUser && cloudEnabled && (
                     <Button
                       color="secondary"
                       size="small"
@@ -120,7 +122,7 @@ export default function AccountsPage() {
                       Login to PrivateCloud
                     </Button>
                   )}
-                  {user !== undefined && user && !isSelfHosted && (
+                  {cloudUser !== undefined && cloudUser && cloudEnabled && (
                     <Tooltip title="View PrivateCloud account">
                       <Button
                         color="secondary"
@@ -130,7 +132,7 @@ export default function AccountsPage() {
                         component={Link}
                         to="/privatecloud"
                       >
-                        {user.email}
+                        {cloudUser.email}
                       </Button>
                     </Tooltip>
                   )}
@@ -172,7 +174,21 @@ export default function AccountsPage() {
         alignItems="center"
         justifyContent="center"
       >
-        {!accounts ? (
+        {!localServerEnabled && cloudUser === null ? (
+          <Fade in timeout={400}>
+            <Typography variant="caption" textAlign="center">
+              Login to PrivateCloud to get started.
+              <br />
+              <br />
+              Download the desktop app for Windows, Mac, and Linux <br /> to use the app locally,
+              without the cloud.
+            </Typography>
+          </Fade>
+        ) : !localServerEnabled && cloudUser && !cloudRpcReady ? (
+          <MuiLink component={Link} to="/privatecloud" variant="caption" textAlign="center">
+            Please configure your PrivateCloud instance
+          </MuiLink>
+        ) : !accounts ? (
           <Stack alignItems="center" justifyContent="center" gap={1}>
             <CircularSpinner />
           </Stack>
