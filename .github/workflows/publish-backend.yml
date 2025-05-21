@@ -74,7 +74,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
           status: "Success"
-          title: "Privatefolio - Publish Image Succeeded"
+          title: "Privatefolio - Publish Backend Succeeded"
           description: |
             **Branch**: `${{ github.ref_name }}`
             **Commit**: `${{ github.sha }}`
@@ -86,7 +86,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
           status: "Failure"
-          title: "Privatefolio - Publish Image Failed"
+          title: "Privatefolio - Publish Backend Failed"
           description: |
             **Branch**: `${{ github.ref_name }}`
             **Commit**: `${{ github.sha }}`

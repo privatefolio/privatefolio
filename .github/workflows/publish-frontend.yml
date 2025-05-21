@@ -61,3 +61,28 @@ jobs:
           accountId: 16ff1fe0e50ed7ac57810a024341b0a3
           command: pages deploy packages/frontend/build --project-name=privatefolio
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify Discord on success
+        if: success()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
+          status: "Success"
+          title: "Privatefolio - Publish Frontend Succeeded"
+          description: |
+            **Branch**: `${{ github.ref_name }}`
+            **Commit**: `${{ github.sha }}`
+          color: 0x00FF00 
+
+      - name: Notify Discord on failure
+        if: failure()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
+          status: "Failure"
+          title: "Privatefolio - Publish Frontend Failed"
+          description: |
+            **Branch**: `${{ github.ref_name }}`
+            **Commit**: `${{ github.sha }}`
+          color: 0xFF0000
+    

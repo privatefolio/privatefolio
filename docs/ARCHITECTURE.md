@@ -49,5 +49,5 @@ Privatefolio is a free, open-source cryptocurrency portfolio tracker built as a 
 
 - **Electron:**
   - Windows builds with Squirrel installer, Linux with DEB packages, macOS with DMG
-  - Automated release process via GitHub Actions triggered by version changes (`yarn new-version`)
+  - Automated deloyment process via GitHub Actions triggered by version changes (`yarn new-version`)
   - Binaries published to GitHub releases for user distribution
