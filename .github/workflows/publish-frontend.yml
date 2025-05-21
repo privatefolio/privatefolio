@@ -23,6 +23,7 @@ jobs:
           node-version: 20.x
 
       - name: Cache yarn downloads
+        id: cache
         uses: actions/cache@v4
         with:
           path: ~/.cache/yarn/v6
@@ -46,9 +47,13 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+      - name: Install dependencies (offline)
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: yarn install --frozen-lockfile --offline
 
+      - name: Install dependencies (online)
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
 
       - name: Build
         run: yarn build
