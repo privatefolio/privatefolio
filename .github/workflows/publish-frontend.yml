@@ -25,29 +25,15 @@ jobs:
         with:
           node-version: 20.x
 
-      - name: Cache Yarn download cache
+      - name: Cache dependencies
         uses: actions/cache@v4
         with:
-          path: ~/.cache/yarn/v6
-          key: ${{ runner.os }}-yarn-cache-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-cache-
-
-      - name: Cache root node_modules
-        uses: actions/cache@v4
-        with:
-          path: ./node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-
-      - name: Cache packages node_modules
-        uses: actions/cache@v4
-        with:
-          path: ./packages/**/node_modules
-          key: ${{ runner.os }}-packages-node-modules-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-packages-node-modules-
+          path: |
+            ~/.cache/yarn/v6
+            ./node_modules
+            ./packages/**/node_modules
+          key: ${{ runner.os }}-deps-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: ${{ runner.os }}-deps-
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
