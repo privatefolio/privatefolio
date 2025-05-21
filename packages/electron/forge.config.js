@@ -5,6 +5,7 @@ const deps = execSync("npm ls --omit=dev --parseable --depth=10")
   .trim()
   .split("\n")
   .filter((x) => x.includes("packages/electron/node_modules/"))
+  .filter((x) => !x.includes("@types"))
   .map((depPath) => depPath.split("packages/electron/node_modules/").pop())
 
 console.log("Dependencies to include:", deps)
