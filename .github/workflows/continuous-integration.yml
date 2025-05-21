@@ -17,8 +17,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -29,21 +27,21 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/yarn/v6
-          key: yarn-cache-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          key: yarn-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
           restore-keys: yarn-cache-${{ runner.os }}-
 
       - name: Cache node_modules (root)
         uses: actions/cache@v4
         with:
           path: ./node_modules
-          key: deps-root-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          key: deps-root-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
           restore-keys: deps-root-${{ runner.os }}-
 
       - name: Cache node_modules (packages)
         uses: actions/cache@v4
         with:
           path: ./packages/**/node_modules
-          key: deps-packages-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          key: deps-packages-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
           restore-keys: deps-packages-${{ runner.os }}-
 
       - name: Setup Bun
@@ -52,8 +50,6 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Debug step
-        run: git diff
 
       - name: Build
         if: always()
@@ -94,6 +90,3 @@ jobs:
             **Branch**: `${{ github.ref_name }}`
             **Commit**: `${{ github.sha }}`
           color: 0xFF0000
-
-      - name: Debug step
-        run: git diff
