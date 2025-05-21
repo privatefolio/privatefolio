@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: Production
+      url: https://ghcr.io/privatefolio/privatefolio
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
