@@ -28,7 +28,7 @@ jobs:
       - name: Cache Yarn download cache
         uses: actions/cache@v3
         with:
-          path: ${{ env.HOME }}/.cache/yarn/v6
+          path: ~/.cache/yarn/v6
           key: ${{ runner.os }}-yarn-cache-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-cache-
@@ -36,7 +36,7 @@ jobs:
       - name: Cache root node_modules
         uses: actions/cache@v3
         with:
-          path: node_modules
+          path: ./node_modules
           key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-modules-
@@ -44,7 +44,7 @@ jobs:
       - name: Cache packages node_modules
         uses: actions/cache@v3
         with:
-          path: packages/*/node_modules
+          path: ./packages/**/node_modules
           key: ${{ runner.os }}-packages-node-modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-packages-node-modules-
