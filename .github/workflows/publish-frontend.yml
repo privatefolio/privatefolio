@@ -15,10 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: Production
-      url: ${{ steps.publish.outputs.url }}
+      url: https://privatefolio.app
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -63,7 +65,7 @@ jobs:
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          # accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          accountId: 16ff1fe0e50ed7ac57810a024341b0a3
           command: pages deploy packages/frontend/build --project-name=privatefolio
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
