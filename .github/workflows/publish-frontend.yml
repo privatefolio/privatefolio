@@ -52,6 +52,9 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Debug step
+        run: git diff
+
       - name: Build
         run: yarn build
 
@@ -63,3 +66,6 @@ jobs:
           # accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy packages/frontend/build --project-name=privatefolio
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Debug step
+        run: git diff

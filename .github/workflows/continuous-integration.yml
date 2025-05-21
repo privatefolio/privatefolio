@@ -50,6 +50,9 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Debug step
+        run: git diff
+
       - name: Build
         if: always()
         run: yarn build
@@ -89,3 +92,6 @@ jobs:
             **Branch**: `${{ github.ref_name }}`
             **Commit**: `${{ github.sha }}`
           color: 0xFF0000
+
+      - name: Debug step
+        run: git diff
