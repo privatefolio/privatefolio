@@ -49,12 +49,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
-      - name: Install dependencies (offline)
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: yarn install --frozen-lockfile --offline
-
-      - name: Install dependencies (online)
-        if: steps.cache.outputs.cache-hit != 'true'
+      - name: Install dependencies
         run: yarn install --frozen-lockfile
 
       - name: Build
