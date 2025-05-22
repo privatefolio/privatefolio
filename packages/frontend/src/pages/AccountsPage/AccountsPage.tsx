@@ -2,6 +2,7 @@ import { Add, Cloud, Settings } from "@mui/icons-material"
 import {
   AppBar,
   Avatar,
+  Box,
   Button,
   Container,
   Fade,
@@ -11,6 +12,8 @@ import {
   Toolbar,
   Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
@@ -19,9 +22,11 @@ import { AccountAvatar, SIZE_MAP } from "src/components/AccountAvatar"
 import { AddAccountDialog } from "src/components/AccountPicker/AddAccountDialog"
 import { CloudLoginDialog } from "src/components/AccountPicker/CloudLoginDialog"
 import { CircularSpinner } from "src/components/CircularSpinner"
+import { Gravatar } from "src/components/Gravatar"
 import { LogoText } from "src/components/Header/LogoText"
 import { SettingsDrawer } from "src/components/Header/SettingsDrawer"
 import { StaggeredList } from "src/components/StaggeredList"
+import { Truncate } from "src/components/Truncate"
 import { useBoolean } from "src/hooks/useBoolean"
 import { $accounts, $activeAccount, $activeIndex } from "src/stores/account-store"
 import { $cloudRpcReady, $cloudUser } from "src/stores/cloud-user-store"
@@ -33,6 +38,7 @@ export default function AccountsPage() {
     document.title = `Accounts - Privatefolio`
   }, [])
 
+  const theme = useTheme()
   const accounts = useStore($accounts)
   const activeIndex = useStore($activeIndex)
 
@@ -68,6 +74,9 @@ export default function AccountsPage() {
 
   const { value: openSettings, toggle: toggleSettingsOpen } = useBoolean(false)
 
+  const isMobile = useMediaQuery("(max-width: 599px)")
+  const isDesktop = useMediaQuery("(min-width: 900px)")
+
   return (
     <>
       <AppBar
@@ -92,12 +101,10 @@ export default function AccountsPage() {
                 direction="row"
                 alignItems="center"
                 justifyContent="space-between"
+                gap={1}
                 sx={{
                   height: "100%",
-                  paddingX: {
-                    sm: 2,
-                    xs: 1,
-                  },
+
                   width: "100%",
                 }}
               >
@@ -127,12 +134,20 @@ export default function AccountsPage() {
                       <Button
                         color="secondary"
                         size="small"
-                        endIcon={<Cloud />}
+                        endIcon={
+                          cloudUser.email ? (
+                            <Gravatar email={cloudUser.email} sx={{ height: 18, width: 18 }} />
+                          ) : (
+                            <Cloud />
+                          )
+                        }
                         variant="outlined"
                         component={Link}
                         to="/privatecloud"
                       >
-                        {cloudUser.email}
+                        <Truncate sx={{ maxWidth: { sm: "unset", xs: 50 } }}>
+                          {cloudUser.email}
+                        </Truncate>
                       </Button>
                     </Tooltip>
                   )}
@@ -164,8 +179,9 @@ export default function AccountsPage() {
       <Stack
         sx={{
           background: "var(--mui-palette-background-default)",
-          height: "calc(100vh - 16px)",
+          height: { sm: "calc(100vh - 64px)", xs: "calc(100vh - 56px)" },
           left: 0,
+          marginTop: { sm: 8, xs: 7 },
           position: "fixed",
           top: 0,
           width: "100%",
@@ -184,7 +200,7 @@ export default function AccountsPage() {
               without the cloud.
             </Typography>
           </Fade>
-        ) : !localServerEnabled && cloudUser && !cloudRpcReady ? (
+        ) : !localServerEnabled && cloudUser && cloudRpcReady === false ? (
           <MuiLink component={Link} to="/privatecloud" variant="caption" textAlign="center">
             Please configure your PrivateCloud instance
           </MuiLink>
@@ -193,66 +209,77 @@ export default function AccountsPage() {
             <CircularSpinner />
           </Stack>
         ) : (
-          <StaggeredList
-            gap={2}
-            secondary
-            config={SPRING_CONFIGS.quick}
-            delay={0}
-            direction="row"
-            alignItems="flex-start"
-            justifyContent="center"
-            sx={
-              accounts.length > 0
-                ? {
+          <Box
+            sx={{
+              maxWidth: "calc(100% - 32px)",
+              overflowX: "auto",
+              overflowY: "auto",
+              paddingX: { sm: 0, xs: 1 },
+              paddingY: { sm: 1, xs: 0 },
+            }}
+          >
+            <StaggeredList
+              gap={2}
+              secondary
+              config={SPRING_CONFIGS.quick}
+              delay={0}
+              alignItems="flex-start"
+              justifyContent="center"
+              sx={{
+                flexDirection: { sm: "row", xs: "column" },
+                minWidth: "fit-content",
+                ...(accounts.length > 0 &&
+                  accounts.length < 6 &&
+                  isDesktop && {
                     "& .MuiButton-root .MuiTypography-root": { visibility: "hidden" },
                     "& .MuiButton-root:focus .MuiTypography-root": { visibility: "visible" },
                     "& .MuiButton-root:hover .MuiTypography-root": { visibility: "visible" },
-                  }
-                : {}
-            }
-          >
-            {accounts.map((accountName, index) => (
+                  }),
+              }}
+            >
+              {accounts.map((accountName, index) => (
+                <Button
+                  size="large"
+                  component={Link}
+                  key={accountName}
+                  sx={{ borderRadius: 0.25, padding: 2, width: 156 }}
+                  to={`/u/${index}`}
+                  aria-label={`Switch to account ${accountName}`}
+                  autoFocus={index === 0} // Doesn't work
+                  id={`account-${index}`}
+                >
+                  <Stack alignItems="center" gap={1}>
+                    <AccountAvatar alt={accountName} size="xl" />
+                    <Typography variant="h6" fontFamily={SerifFont}>
+                      {accountName}
+                    </Typography>
+                  </Stack>
+                </Button>
+              ))}
               <Button
+                aria-label="Add account"
                 size="large"
-                component={Link}
-                key={accountName}
                 sx={{ borderRadius: 0.25, padding: 2, width: 156 }}
-                to={`/u/${index}`}
-                aria-label={`Switch to account ${accountName}`}
-                autoFocus={index === 0} // Doesn't work
-                id={`account-${index}`}
+                onClick={toggleAddAccount}
+                autoFocus={accounts.length === 0}
               >
                 <Stack alignItems="center" gap={1}>
-                  <AccountAvatar alt={accountName} size="xl" />
-                  <Typography variant="h6" fontFamily={SerifFont}>
-                    {accountName}
+                  <Avatar
+                    sx={{
+                      height: SIZE_MAP.xl / 2,
+                      margin: `${SIZE_MAP.xl / 4}px`,
+                      width: SIZE_MAP.xl / 2,
+                    }}
+                  >
+                    <Add sx={{ fontSize: SIZE_MAP.xl / 3 }} />
+                  </Avatar>
+                  <Typography variant="h6" fontFamily={SerifFont} sx={{ marginX: -0.25 }}>
+                    Add account
                   </Typography>
                 </Stack>
               </Button>
-            ))}
-            <Button
-              aria-label="Add account"
-              size="large"
-              sx={{ borderRadius: 0.25, padding: 2, width: 156 }}
-              onClick={toggleAddAccount}
-              autoFocus={accounts.length === 0}
-            >
-              <Stack alignItems="center" gap={1}>
-                <Avatar
-                  sx={{
-                    height: SIZE_MAP.xl / 2,
-                    margin: `${SIZE_MAP.xl / 4}px`,
-                    width: SIZE_MAP.xl / 2,
-                  }}
-                >
-                  <Add sx={{ fontSize: SIZE_MAP.xl / 3 }} />
-                </Avatar>
-                <Typography variant="h6" fontFamily={SerifFont} sx={{ marginX: -0.25 }}>
-                  Add account
-                </Typography>
-              </Stack>
-            </Button>
-          </StaggeredList>
+            </StaggeredList>
+          </Box>
         )}
       </Stack>
       <AddAccountDialog open={addAccountOpen} toggleOpen={toggleAddAccount} />

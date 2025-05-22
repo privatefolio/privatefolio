@@ -28,13 +28,13 @@ import {
   Typography,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import md5 from "md5"
 import { enqueueSnackbar } from "notistack"
 import React, { useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { CloudInstanceStatus, getCheckoutLink, getPortalLink } from "src/api/privatecloud-api"
 import { BackButton } from "src/components/BackButton"
 import { CircularSpinner } from "src/components/CircularSpinner"
+import { Gravatar } from "src/components/Gravatar"
 import { LogoText } from "src/components/Header/LogoText"
 import { SectionTitle } from "src/components/SectionTitle"
 import { StaggeredList } from "src/components/StaggeredList"
@@ -121,11 +121,6 @@ export default function CloudUserPage({ show }: { show: boolean }) {
     }
   }, [account])
 
-  const gravatar = useMemo(
-    () => (account?.email ? `https://www.gravatar.com/avatar/${md5(account.email)}` : undefined),
-    [account?.email]
-  )
-
   const paymentPlan = useMemo<{
     cancelAt?: Date
     isPremium: boolean
@@ -185,8 +180,7 @@ export default function CloudUserPage({ show }: { show: boolean }) {
             <div>
               <SectionTitle>Account</SectionTitle>
               <Stack direction="row" alignItems="flex-start">
-                <Avatar src={gravatar}>{account.email[0].toUpperCase()}</Avatar>
-
+                <Gravatar email={account?.email} />
                 <Stack marginLeft={2}>
                   <Typography variant="caption" component="div">
                     <Stack direction="row" gap={1}>

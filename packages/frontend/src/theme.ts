@@ -73,6 +73,16 @@ declare module "@mui/material/LinearProgress" {
 }
 
 export const theme: CssVarsThemeOptions = {
+  // breakpoints: {
+  // default values
+  //   values: {
+  //     lg: 1200,
+  //     md: 900,
+  //     sm: 600,
+  //     xl: 1536,
+  //     xs: 0,
+  //   },
+  // },
   colorSchemes: {
     dark: {
       overlays: [

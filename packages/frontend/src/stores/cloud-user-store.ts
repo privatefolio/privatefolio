@@ -43,10 +43,18 @@ export const $cloudAvailable = computed([$cloudUser, $cloudInstance], (user, ins
 })
 
 export const $cloudRpcReady = computed([$cloudAuth], (auth) => {
+  if (!auth.checked) return undefined
   return auth.checked && auth.isAuthenticated && !auth.needsSetup
 })
 
-logAtoms({ $cloudAvailable, $cloudInstance, $cloudServerInfo, $cloudSubscription, $cloudUser })
+logAtoms({
+  $cloudAvailable,
+  $cloudInstance,
+  $cloudRpcReady,
+  $cloudServerInfo,
+  $cloudSubscription,
+  $cloudUser,
+})
 
 export async function checkCloudUser() {
   if (!cloudEnabled) return
