@@ -2,7 +2,6 @@ name: Publish Backend
 
 on:
   push:
-    branches: [ "main" ]
     tags: [ "*" ]
 
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
