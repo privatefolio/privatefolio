@@ -13,7 +13,6 @@ import {
   Tooltip,
   Typography,
   useMediaQuery,
-  useTheme,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
@@ -38,7 +37,6 @@ export default function AccountsPage() {
     document.title = `Accounts - Privatefolio`
   }, [])
 
-  const theme = useTheme()
   const accounts = useStore($accounts)
   const activeIndex = useStore($activeIndex)
 
@@ -74,7 +72,6 @@ export default function AccountsPage() {
 
   const { value: openSettings, toggle: toggleSettingsOpen } = useBoolean(false)
 
-  const isMobile = useMediaQuery("(max-width: 599px)")
   const isDesktop = useMediaQuery("(min-width: 900px)")
 
   return (
@@ -145,7 +142,7 @@ export default function AccountsPage() {
                         component={Link}
                         to="/privatecloud"
                       >
-                        <Truncate sx={{ maxWidth: { sm: "unset", xs: 50 } }}>
+                        <Truncate sx={{ maxWidth: { sm: "unset", xs: "15vw" } }}>
                           {cloudUser.email}
                         </Truncate>
                       </Button>
@@ -179,8 +176,9 @@ export default function AccountsPage() {
       <Stack
         sx={{
           background: "var(--mui-palette-background-default)",
-          height: { sm: "calc(100vh - 64px)", xs: "calc(100vh - 56px)" },
+          height: { sm: "calc(100vh - 64px - 24px)", xs: "calc(100vh - 56px - 24px)" },
           left: 0,
+          marginBottom: 3,
           marginTop: { sm: 8, xs: 7 },
           position: "fixed",
           top: 0,
@@ -212,8 +210,8 @@ export default function AccountsPage() {
           <Box
             sx={{
               maxWidth: "calc(100% - 32px)",
-              overflowX: "auto",
-              overflowY: "auto",
+              overflowX: { sm: "auto", xs: "hidden" },
+              overflowY: { sm: "hidden", xs: "auto" },
               paddingX: { sm: 0, xs: 1 },
               paddingY: { sm: 1, xs: 0 },
             }}

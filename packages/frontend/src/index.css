@@ -28,6 +28,7 @@ html {
 }
 
 /* Scrollbar */
+@media (hover: hover) and (pointer: fine) {
 ::-webkit-scrollbar-corner {
   background: transparent;
   border-color: transparent;
@@ -80,6 +81,8 @@ html[data-mui-color-scheme="dark"] ::-webkit-scrollbar-thumb:hover {
   /* background: rgba(255, 255, 255, 0.25); */
   background: rgba(95, 95, 95);
 }
+}
+
 
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {

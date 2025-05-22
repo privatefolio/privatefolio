@@ -1,6 +1,5 @@
 {
-    "theme_color": "rgb(200, 187, 155)",
-    "background_color": "rgb(200, 187, 155)",
+    "$schema": "https://json.schemastore.org/web-manifest-combined.json",
     "scope": "/",
     "id": "Privatefolio_2.0.0-alpha",
     "start_url": "/",
@@ -9,11 +8,6 @@
     "short_name": "Privatefolio",
     "description": "Your crypto portfolio analytics",
     "icons": [
-        {
-            "src": "/128x128.png",
-            "sizes": "128x128",
-            "type": "image/png"
-        },
         {
             "src": "/256x256.png",
             "sizes": "256x256",
