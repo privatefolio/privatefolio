@@ -34,6 +34,13 @@ export async function sleep(interval: number) {
   return new Promise((resolve) => setTimeout(resolve, interval))
 }
 
+export async function wasteCpuCycles(interval: number) {
+  const end = performance.now() + interval
+  while (performance.now() < end) {
+    Math.sqrt(Math.random())
+  }
+}
+
 /**
  * Converts a minutes interval to a valid cron expression that works for any interval
  * @param {number} minutes - The interval in minutes

@@ -11,7 +11,6 @@ import React, {
   MouseEvent,
   ReactNode,
   useCallback,
-  useEffect,
   useMemo,
   useState,
 } from "react"
@@ -197,11 +196,11 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
   const isLoading = queryTime === null
   const isEmpty = rowCount === 0
 
-  console.time("MemoryTable Render Time")
+  // console.time("MemoryTable Render Time")
 
-  useEffect(() => {
-    console.timeEnd("MemoryTable Render Time")
-  })
+  // useEffect(() => {
+  //   console.timeEnd("MemoryTable Render Time")
+  // })
 
   return (
     <>

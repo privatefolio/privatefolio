@@ -26,7 +26,8 @@ export const SIZE_MAP = {
 // }
 
 export function AccountAvatar(props: AccountAvatarProps) {
-  const { alt: accountName = "", size = "small", sx, ...rest } = props
+  const { alt = "", size = "small", sx, ...rest } = props
+  const accountName = typeof alt === "string" ? alt : ""
   const colors = getGradientColors(stringToHex(accountName))
 
   const cloudAccounts = useStore($cloudAccounts)

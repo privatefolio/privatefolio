@@ -11,7 +11,6 @@ import React, {
   memo,
   MouseEvent,
   useCallback,
-  useEffect,
   useLayoutEffect,
   useMemo,
   useState,
@@ -210,11 +209,11 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
   const isFirstLoading = queryTime === null
   const isEmpty = rows.length === 0 && Object.keys(activeFilters).length === 0
 
-  console.time("RemoteTable Render Time")
+  // console.time("RemoteTable Render Time")
 
-  useEffect(() => {
-    console.timeEnd("RemoteTable Render Time")
-  })
+  // useEffect(() => {
+  //   console.timeEnd("RemoteTable Render Time")
+  // })
 
   return (
     <>

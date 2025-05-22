@@ -16,9 +16,13 @@ export function logAtoms(atoms: { [key: string]: AnyStore }) {
 
 export function closeSubscription(subscription: Promise<() => void>) {
   function closeSub() {
-    subscription.then((unsubscribe) => {
-      unsubscribe()
-    })
+    subscription
+      .then((unsubscribe) => {
+        try {
+          unsubscribe()
+        } catch {}
+      })
+      .catch()
   }
 
   window.addEventListener("beforeunload", closeSub)
