@@ -16,7 +16,7 @@ import {
   User,
 } from "src/api/privatecloud-api"
 import { logAtoms } from "src/utils/browser-utils"
-import { cloudEnabled } from "src/utils/environment-utils"
+import { cloudEnabled, isProduction } from "src/utils/environment-utils"
 import { sleep } from "src/utils/utils"
 import { $cloudRest } from "src/workers/remotes"
 
@@ -58,7 +58,7 @@ logAtoms({
 
 export async function checkCloudUser() {
   if (!cloudEnabled) return
-  console.log("PrivateCloud -", "checking auth")
+  if (!isProduction) console.log("PrivateCloud -", "checking auth")
   try {
     const user = await reAuthenticate()
     $cloudUser.set(user)
@@ -68,7 +68,7 @@ export async function checkCloudUser() {
 }
 
 export async function checkSubscription() {
-  console.log("PrivateCloud -", "checking service subscription")
+  if (!isProduction) console.log("PrivateCloud -", "checking service subscription")
   return getSubscription()
     .then((sub) => {
       if (isEqual(sub, $cloudSubscription.get())) return
@@ -82,7 +82,7 @@ export async function checkSubscription() {
 }
 
 export async function checkCloudInstance() {
-  console.log("PrivateCloud -", "checking cloud instance")
+  if (!isProduction) console.log("PrivateCloud -", "checking cloud instance")
   return getCloudInstance()
     .then($cloudInstance.set)
     .catch((err) => {
@@ -132,13 +132,14 @@ export async function handleLogin(email: string, password: string, createInstanc
       let attempts = 0
       while (attempts < maxAttempts) {
         if (!$cloudInstance.get() || !$cloudRest.get()) {
-          console.log("PrivateCloud - waiting for cloud instance and rest config to be set...")
+          if (!isProduction)
+            console.log("PrivateCloud - waiting for cloud instance and rest config to be set...")
           await sleep(interval)
           attempts++
           continue
         }
 
-        console.log("PrivateCloud - unlocking instance...")
+        if (!isProduction) console.log("PrivateCloud - unlocking instance...")
         await unlockApp(password, $cloudAuth, $cloudRest.get())
         break
       }

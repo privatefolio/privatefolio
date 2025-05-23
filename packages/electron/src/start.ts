@@ -209,6 +209,12 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
       label: "Auto-start on login",
       type: "checkbox",
     },
+    {
+      click: function () {
+        mainWindow?.webContents.openDevTools()
+      },
+      label: "Open DevTools",
+    },
     { type: "separator" },
     {
       click: function () {
