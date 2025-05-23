@@ -1,5 +1,6 @@
 import { EventCause, SqlParam } from "src/interfaces"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { createSubscription } from "src/utils/sub-utils"
 
 import { AuditLog, AuditLogOperation, SubscriptionChannel } from "../../interfaces"
 import { getAccount } from "../accounts-api"
@@ -114,9 +115,7 @@ export async function subscribeToAuditLogs(
   accountName: string,
   callback: (cause: EventCause) => void
 ) {
-  const account = await getAccount(accountName)
-  account.eventEmitter.on(SubscriptionChannel.AuditLogs, callback)
-  return () => account.eventEmitter.off(SubscriptionChannel.AuditLogs, callback)
+  return createSubscription(accountName, SubscriptionChannel.AuditLogs, callback)
 }
 
 export async function getPlatforms(

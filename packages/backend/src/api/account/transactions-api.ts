@@ -10,6 +10,7 @@ import {
 import { isEvmPlatform } from "src/utils/assets-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { mergeTransactions } from "src/utils/integrations/etherscan-utils"
+import { createSubscription } from "src/utils/sub-utils"
 import { hashString, noop } from "src/utils/utils"
 
 import {
@@ -142,9 +143,7 @@ export async function subscribeToTransactions(
   accountName: string,
   callback: (cause: EventCause) => void
 ) {
-  const account = await getAccount(accountName)
-  account.eventEmitter.on(SubscriptionChannel.Transactions, callback)
-  return () => account.eventEmitter.off(SubscriptionChannel.Transactions, callback)
+  return createSubscription(accountName, SubscriptionChannel.Transactions, callback)
 }
 
 /**

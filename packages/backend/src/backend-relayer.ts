@@ -67,7 +67,7 @@ class BackendRelayer {
             const err = new Error(error)
             err.stack = stackTrace
             this.pendingRequests[id](Promise.reject(err))
-            console.error(this.logPrefix, err)
+            if (this.logResponses) console.error(this.logPrefix, err)
           } else {
             let deserializedResult = result
             if (result && (result as FunctionReference).__isFunction) {
@@ -88,7 +88,7 @@ class BackendRelayer {
           delete this.pendingRequests[id]
         }
       } catch (error) {
-        console.error(this.logPrefix, "failure:", error)
+        if (this.logResponses) console.error(this.logPrefix, "failure:", error)
       }
     })
 

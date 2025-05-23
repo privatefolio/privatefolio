@@ -15,7 +15,7 @@ import { enqueueSnackbar } from "notistack"
 import React, { MouseEvent, useEffect, useState } from "react"
 import { SectionTitle } from "src/components/SectionTitle"
 
-import { DEFAULT_CRON_REFRESH_INTERVAL } from "../../settings"
+import { DEFAULT_SERVER_REFRESH_INTERVAL } from "../../settings"
 import { $activeAccount } from "../../stores/account-store"
 import { $rpc } from "../../workers/remotes"
 
@@ -29,7 +29,7 @@ const REFRESH_INTERVALS = [
 
 export function ServerSettings() {
   const [isLoading, setIsLoading] = useState(true)
-  const [cronInterval, setCronInterval] = useState(DEFAULT_CRON_REFRESH_INTERVAL)
+  const [cronInterval, setCronInterval] = useState(DEFAULT_SERVER_REFRESH_INTERVAL)
   const [isCustomMode, setIsCustomMode] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
 
@@ -106,7 +106,7 @@ export function ServerSettings() {
             <SectionTitle>Refresh Interval</SectionTitle>
             <Tooltip
               title={`How often the server will automatically refresh balances, prices, and networth.
-                  Default is ${DEFAULT_CRON_REFRESH_INTERVAL} minutes.`}
+                  Default is ${DEFAULT_SERVER_REFRESH_INTERVAL} minutes.`}
             >
               <IconButton size="small" aria-label="Help with cron expressions" color="secondary">
                 <Info fontSize="small" />

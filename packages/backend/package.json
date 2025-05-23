@@ -12,7 +12,6 @@
     "prestart:watch": "bun ./scripts/prestart-watch.sh",
     "start:watch": "bun ./scripts/start-watch.sh",
     "dev": "bun ./scripts/dev.sh",
-    "ping": "bun src/ping.ts",
     "lint": "eslint .",
     "lint:fix": "yarn lint --fix",
     "prebuild": "rm -rf build",
@@ -30,6 +29,7 @@
   "dependencies": {
     "big.js": "^6.2.1",
     "chalk": "^5.3.0",
+    "comlink": "^4.4.2",
     "croner": "^9.0.0",
     "ethers": "^6.9.0",
     "exponential-backoff": "^3.1.1",

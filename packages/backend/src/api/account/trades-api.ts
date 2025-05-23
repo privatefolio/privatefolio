@@ -9,6 +9,7 @@ import {
 } from "src/interfaces"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { sql } from "src/utils/sql-utils"
+import { createSubscription } from "src/utils/sub-utils"
 import { hashString, noop } from "src/utils/utils"
 
 import { getAccount } from "../accounts-api"
@@ -147,9 +148,7 @@ export async function subscribeToTrades(
   accountName: string,
   callback: (cause: EventCause) => void
 ) {
-  const account = await getAccount(accountName)
-  account.eventEmitter.on(SubscriptionChannel.Trades, callback)
-  return () => account.eventEmitter.off(SubscriptionChannel.Trades, callback)
+  return createSubscription(accountName, SubscriptionChannel.Trades, callback)
 }
 
 export async function computeTrades(

@@ -1,5 +1,8 @@
+// import "./comlink-setup"
+
 import { Server, ServerWebSocket } from "bun"
 import chalk from "chalk"
+import { proxy } from "comlink"
 import { access } from "fs/promises"
 import { join } from "path"
 
@@ -20,27 +23,33 @@ import {
 } from "./backend-comms"
 import { APP_VERSION } from "./server-env"
 import { corsHeaders } from "./settings"
+import { isDevelopment } from "./utils/environment-utils"
 import { extractJwt, verifyJwt } from "./utils/jwt-utils"
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type BackendApiShape = { [key: string]: (...params: any[]) => Promise<unknown> }
+// Disallow functions because of bun worker bug
+export type Serializable = string | number | boolean | null | void | object | object[]
+
+export type BackendApiShape = { [key: string]: (...params: unknown[]) => Promise<Serializable> }
 
 export class BackendServer<T extends BackendApiShape> {
-  private apiMethods: T
-
+  private authDisabled: boolean
   close() {
     this.server?.stop()
   }
 
-  constructor(apiMethods: T) {
-    this.apiMethods = apiMethods
+  constructor(readApi: T, writeApi?: T, authDisabled = false) {
+    this.readApi = readApi
+    this.writeApi = writeApi
+    this.authDisabled = authDisabled
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
   private functionRegistry: { [id: string]: Function } = {}
+  private readApi: T
   private server?: Server
 
   start(port: number) {
+    const authDisabled = this.authDisabled
     // console.log(`Server starting on port ${port}.`)
     this.server = Bun.serve({
       async fetch(request, server) {
@@ -79,9 +88,10 @@ export class BackendServer<T extends BackendApiShape> {
         // Authentication guard
         const setupCompleted = await isAuthSetupComplete()
         const jwt = extractJwt(request)
-        let isAuthenticated = false
+        // eslint-disable-next-line no-unneeded-ternary
+        let isAuthenticated = authDisabled ? true : false
 
-        if (setupCompleted && jwt) {
+        if (setupCompleted && jwt && !authDisabled) {
           const secrets = await readSecrets()
           const payload = await verifyJwt(jwt, secrets.jwtSecret)
           if (payload) {
@@ -159,9 +169,12 @@ export class BackendServer<T extends BackendApiShape> {
             const { id, method, params, functionId } = request
             // console.log("New request", request)
 
+            const isReadMethod =
+              method.startsWith("get") || method.startsWith("count") || !this.writeApi
+
             const deserializedParams = params.map((param) => {
               if (typeof param === "object" && (param as FunctionReference).__isFunction) {
-                return (...args: unknown[]) => {
+                const callback = (...args: unknown[]) => {
                   socket.send(
                     JSON.stringify({
                       functionId: (param as FunctionReference).functionId,
@@ -169,6 +182,7 @@ export class BackendServer<T extends BackendApiShape> {
                     } as FunctionInvocation)
                   )
                 }
+                return isReadMethod ? callback : proxy(callback)
               }
               if (param === "undefined") return undefined
               return param
@@ -188,14 +202,28 @@ export class BackendServer<T extends BackendApiShape> {
               return
             }
 
-            if (this.apiMethods[method]) {
-              const result = await this.apiMethods[method](...deserializedParams)
+            if (!this.readApi[method]) {
+              response = { error: `API method not found: ${method}`, id, method }
+            } else if (isReadMethod) {
+              if (isDevelopment) {
+                console.log(`Forwarding method ${method} to ${chalk.bold.blue("readApi")}`)
+              }
+              const result = await this.readApi[method](...deserializedParams)
               response = { id, method, result }
             } else {
-              response = { error: `API method not found: ${method}`, id, method }
+              if (isDevelopment) {
+                console.log(`Forwarding method ${method} to ${chalk.bold.yellow("writeApi")}`)
+              }
+              const result = await this.writeApi[method](...deserializedParams)
+              response = { id, method, result }
             }
           } catch (error) {
-            console.error(error)
+            console.error(`Error executing request "${request.method}" ${String(error)}`)
+            if (error.message.includes("Worker has been terminated")) {
+              console.error("Shutting down server due to invalid worker state")
+              this.server?.stop()
+              return
+            }
             response = {
               error: `Could not execute request ${String(error)}`,
               id: request.id,
@@ -235,4 +263,6 @@ export class BackendServer<T extends BackendApiShape> {
       chalk.bold.blue(`         ws://localhost:${this.server.port}`)
     )
   }
+
+  private writeApi?: T
 }

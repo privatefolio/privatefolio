@@ -1,4 +1,5 @@
 import { formatDate } from "src/utils/formatting-utils"
+import { createSubscription } from "src/utils/sub-utils"
 import { noop } from "src/utils/utils"
 
 import {
@@ -179,7 +180,5 @@ export function enqueueRefreshNetworth(accountName: string, trigger: TaskTrigger
 }
 
 export async function subscribeToNetworth(accountName: string, callback: () => void) {
-  const account = await getAccount(accountName)
-  account.eventEmitter.on(SubscriptionChannel.Networth, callback)
-  return () => account.eventEmitter.off(SubscriptionChannel.Networth, callback)
+  return createSubscription(accountName, SubscriptionChannel.Networth, callback)
 }

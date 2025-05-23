@@ -16,6 +16,7 @@ import {
 import { FILES_LOCATION } from "src/settings"
 import { splitRows } from "src/utils/csv-utils"
 import { formatDate } from "src/utils/formatting-utils"
+import { createSubscription } from "src/utils/sub-utils"
 import { hashString, noop } from "src/utils/utils"
 
 import { countAuditLogs, upsertAuditLogs } from "../audit-logs-api"
@@ -207,9 +208,7 @@ export async function subscribeToFileImports(
   accountName: string,
   callback: (cause: EventCause, fileImport: FileImport) => void
 ) {
-  const account = await getAccount(accountName)
-  account.eventEmitter.on(SubscriptionChannel.FileImports, callback)
-  return () => account.eventEmitter.off(SubscriptionChannel.FileImports, callback)
+  return createSubscription(accountName, SubscriptionChannel.FileImports, callback)
 }
 
 export async function enqueueImportFile(

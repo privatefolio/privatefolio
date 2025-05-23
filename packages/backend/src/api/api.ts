@@ -1,3 +1,5 @@
+import { BackendApiShape } from "src/backend-server"
+
 import * as assets from "./account/assets-api"
 import * as auditLogs from "./account/audit-logs-api"
 import * as backup from "./account/backup-api"
@@ -36,6 +38,6 @@ export const api = {
   ...tags,
   ...trades,
   ...settings,
-}
+} satisfies BackendApiShape
 
 export type Api = typeof api

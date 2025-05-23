@@ -103,14 +103,14 @@ export function ServerActions() {
         <MenuItem
           dense
           onClick={() => {
-            $rpc.get().enqueueSleep($activeAccount.get(), 10)
+            $rpc.get().enqueueSleep($activeAccount.get(), 50, 10, true)
             handleClose()
           }}
         >
           <ListItemAvatar>
             <Bedtime fontSize="small" />
           </ListItemAvatar>
-          <ListItemText>Sleep 10s</ListItemText>
+          <ListItemText>Sleep 50s</ListItemText>
         </MenuItem>
       </Menu>
     </>

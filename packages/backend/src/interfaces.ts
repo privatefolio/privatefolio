@@ -645,6 +645,8 @@ export type FilterOptionsMap = {
 
 export type AssetId = string
 
+export type SubscriptionId = string
+
 export enum SubscriptionChannel {
   Accounts = "accounts",
   ServerTasks = "server-tasks",
@@ -661,6 +663,14 @@ export enum SubscriptionChannel {
   ServerLog = "server-logs",
   Tags = "tags",
   Trades = "trades",
+}
+
+export type SubscriptionListener = (...args: unknown[]) => void
+
+export interface Subscription {
+  accountName?: string
+  channel: SubscriptionChannel
+  listener: SubscriptionListener
 }
 
 export enum EventCause {

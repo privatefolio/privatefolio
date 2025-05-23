@@ -2,6 +2,7 @@ import { getAddress } from "ethers"
 import { SqlParam, TaskCompletionCallback } from "src/interfaces"
 import { isEvmPlatform } from "src/utils/assets-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { createSubscription } from "src/utils/sub-utils"
 
 import {
   AuditLogOperation,
@@ -192,9 +193,7 @@ export async function subscribeToConnections(
   accountName: string,
   callback: (cause: EventCause, connection: Connection) => void
 ) {
-  const account = await getAccount(accountName)
-  account.eventEmitter.on(SubscriptionChannel.Connections, callback)
-  return () => account.eventEmitter.off(SubscriptionChannel.Connections, callback)
+  return createSubscription(accountName, SubscriptionChannel.Connections, callback)
 }
 
 export async function syncConnection(

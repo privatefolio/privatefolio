@@ -1,5 +1,6 @@
 import { NewServerFile, ServerFile, SqlParam, SubscriptionChannel } from "src/interfaces"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { createSubscription } from "src/utils/sub-utils"
 
 import { getAccount } from "../accounts-api"
 
@@ -106,7 +107,5 @@ export async function countServerFiles(
 }
 
 export async function subscribeToServerFiles(accountName: string, callback: () => void) {
-  const account = await getAccount(accountName)
-  account.eventEmitter.on(SubscriptionChannel.ServerFiles, callback)
-  return () => account.eventEmitter.off(SubscriptionChannel.ServerFiles, callback)
+  return createSubscription(accountName, SubscriptionChannel.ServerFiles, callback)
 }

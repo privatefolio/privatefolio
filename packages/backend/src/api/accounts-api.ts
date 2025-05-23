@@ -1,23 +1,23 @@
 import EventEmitter from "events"
 import { access, mkdir, readdir, rm, stat, writeFile } from "fs/promises"
 import { join } from "path"
-import { EventCause, SubscriptionChannel, TaskPriority } from "src/interfaces"
+import { EventCause, SubscriptionChannel, SubscriptionId, TaskPriority } from "src/interfaces"
 import { DATABASES_LOCATION, TASK_LOGS_LOCATION } from "src/settings"
 import { createSqliteDatabaseConnection } from "src/sqlite/sqlite"
 import { isDevelopment, isTestEnvironment } from "src/utils/environment-utils"
 import { sql } from "src/utils/sql-utils"
-import { getPrefix, sleep } from "src/utils/utils"
+import { createSubscription } from "src/utils/sub-utils"
+import { getPrefix, sleep, wasteCpuCycles } from "src/utils/utils"
 
 import { getValue, setValue } from "./account/kv-api"
 import { enqueueTask, upsertServerTask } from "./account/server-tasks-api"
+import { allSubscriptions, appEventEmitter } from "./internal"
 
 if (typeof window !== "undefined") {
   throw new Error(
     "Database should not be initialized in the browser, only in a web worker or node environment"
   )
 }
-
-const appEventEmitter = new EventEmitter()
 
 const IN_MEMORY_DB = ":memory:"
 
@@ -459,14 +459,23 @@ export async function pingAccount(accountName: string) {
   return (await account.execute(`SELECT "pong"`))[0][0]
 }
 
-export async function enqueueSleep(accountName: string, seconds: number, step = 1) {
+export async function enqueueSleep(
+  accountName: string,
+  seconds: number,
+  step = 1,
+  wasteCpu = false
+) {
   return enqueueTask(accountName, {
     description: `This action can be used for testing purposes.`,
     determinate: true,
     function: async (progress, signal) => {
       for (let i = 0; i < seconds; i += step) {
         if (signal?.aborted) throw new Error(signal.reason)
-        await sleep(step * 1_000)
+        if (wasteCpu) {
+          await wasteCpuCycles(step * 1_000)
+        } else {
+          await sleep(step * 1_000)
+        }
         await progress([((i + step) * 100) / seconds, `Slept for ${i + step} seconds`])
       }
     },
@@ -479,8 +488,7 @@ export async function enqueueSleep(accountName: string, seconds: number, step = 
 export async function subscribeToAccounts(
   callback: (cause: EventCause, accountName: string) => void
 ) {
-  appEventEmitter.on(SubscriptionChannel.Accounts, callback)
-  return () => appEventEmitter.off(SubscriptionChannel.Accounts, callback)
+  return createSubscription(undefined, SubscriptionChannel.Accounts, callback)
 }
 
 export async function getListenerCount() {
@@ -530,4 +538,21 @@ export async function getDiskUsage(accountName: string) {
 export async function executeSql(accountName: string, sql: string) {
   const account = await getAccount(accountName)
   return account.execute(sql)
+}
+
+export async function unsubscribe(subscriptionId: SubscriptionId) {
+  const subscription = allSubscriptions.get(subscriptionId)
+  if (!subscription) throw new Error(`Subscription not found: ${subscriptionId}`)
+
+  const { channel, accountName, listener } = subscription
+  // console.log("Unsubscribing", subscriptionId)
+
+  if (accountName) {
+    const account = await getAccount(accountName)
+    account.eventEmitter.off(channel, listener)
+  } else {
+    appEventEmitter.off(channel, listener)
+  }
+
+  allSubscriptions.delete(subscriptionId)
 }

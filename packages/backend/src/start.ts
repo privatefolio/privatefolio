@@ -1,19 +1,23 @@
 import "./logger"
 
+import { proxy, wrap } from "comlink"
 import { Cron } from "croner"
 import { throttle } from "lodash-es"
 
-import { api } from "./api/api"
+import { Api, api } from "./api/api"
 import { BackendServer } from "./backend-server"
-import { EventCause } from "./interfaces"
+import { EventCause, SubscriptionId } from "./interfaces"
 import { SHORT_THROTTLE_DURATION } from "./settings"
 import { getCronExpression, getPrefix } from "./utils/utils"
 
-const accountNames = await api.getAccountNames()
+const worker = new Worker(import.meta.resolve("./api-worker.ts"))
+const writeApi = wrap<Api>(worker)
 
-const sideEffects: Record<string, () => void> = {}
+const accountNames = await writeApi.getAccountNames()
+
+const sideEffects: Record<string, SubscriptionId> = {}
 const cronJobs: Record<string, Cron> = {}
-const settingsSubscriptions: Record<string, () => void> = {}
+const settingsSubscriptions: Record<string, SubscriptionId> = {}
 
 async function setupCronJob(accountName: string) {
   if (cronJobs[accountName]) {
@@ -21,7 +25,7 @@ async function setupCronJob(accountName: string) {
     cronJobs[accountName].stop()
   }
 
-  const { refreshInterval } = await api.getSettings(accountName)
+  const { refreshInterval } = await writeApi.getSettings(accountName)
 
   console.log(
     getPrefix(accountName),
@@ -32,9 +36,9 @@ async function setupCronJob(accountName: string) {
 
   const cronJob = new Cron(cronExpression, async () => {
     console.log(getPrefix(accountName), `Cron: Refreshing account.`)
-    await api.enqueueRefreshBalances(accountName, "cron")
-    await api.enqueueFetchPrices(accountName, "cron")
-    await api.enqueueRefreshNetworth(accountName, "cron")
+    await writeApi.enqueueRefreshBalances(accountName, "cron")
+    await writeApi.enqueueFetchPrices(accountName, "cron")
+    await writeApi.enqueueRefreshNetworth(accountName, "cron")
   })
   cronJobs[accountName] = cronJob
 }
@@ -42,80 +46,90 @@ async function setupCronJob(accountName: string) {
 async function setupSideEffects(accountName: string) {
   console.log(getPrefix(accountName), `Setting up side-effects.`)
 
-  const unsubscribe = await api.subscribeToAuditLogs(
+  const subId = await writeApi.subscribeToAuditLogs(
     accountName,
-    throttle(
-      async (cause) => {
-        console.log(getPrefix(accountName), `Running side-effects (trigger by audit log changes).`)
-        if (cause === EventCause.Updated) return
-        if (cause === EventCause.Reset) return
+    proxy(
+      throttle(
+        async (cause) => {
+          console.log(
+            getPrefix(accountName),
+            `Running side-effects (trigger by audit log changes).`
+          )
+          if (cause === EventCause.Updated) return
+          if (cause === EventCause.Reset) return
 
-        await api.computeGenesis(accountName)
-        await api.computeLastTx(accountName)
+          await writeApi.computeGenesis(accountName)
+          await writeApi.computeLastTx(accountName)
 
-        if (cause === EventCause.Created) {
-          await api.enqueueFetchAssetInfos(accountName, "side-effect")
-          await api.enqueueDetectSpamTransactions(accountName, "side-effect")
-          await api.enqueueAutoMerge(accountName, "side-effect")
+          if (cause === EventCause.Created) {
+            await writeApi.enqueueFetchAssetInfos(accountName, "side-effect")
+            await writeApi.enqueueDetectSpamTransactions(accountName, "side-effect")
+            await writeApi.enqueueAutoMerge(accountName, "side-effect")
+          }
+
+          // when created or deleted
+          await writeApi.enqueueRefreshBalances(accountName, "side-effect")
+
+          if (cause === EventCause.Created) {
+            await writeApi.enqueueFetchPrices(accountName, "side-effect")
+          }
+          await writeApi.enqueueRefreshNetworth(accountName, "side-effect")
+        },
+        SHORT_THROTTLE_DURATION,
+        {
+          leading: false,
+          trailing: true,
         }
-
-        // when created or deleted
-        await api.enqueueRefreshBalances(accountName, "side-effect")
-
-        if (cause === EventCause.Created) {
-          await api.enqueueFetchPrices(accountName, "side-effect")
-        }
-        await api.enqueueRefreshNetworth(accountName, "side-effect")
-      },
-      SHORT_THROTTLE_DURATION,
-      {
-        leading: false,
-        trailing: true,
-      }
+      )
     )
   )
 
-  sideEffects[accountName] = unsubscribe
+  sideEffects[accountName] = subId
 
   await setupCronJob(accountName)
 
-  const settingsUnsubscribe = await api.subscribeToSettings(accountName, async () => {
-    console.log(getPrefix(accountName), `Settings changed, refreshing cron job.`)
-    await setupCronJob(accountName)
-  })
+  const settingsSubId = await writeApi.subscribeToSettings(
+    accountName,
+    proxy(async () => {
+      console.log(getPrefix(accountName), `Settings changed, refreshing cron job.`)
+      await setupCronJob(accountName)
+    })
+  )
 
-  settingsSubscriptions[accountName] = settingsUnsubscribe
+  settingsSubscriptions[accountName] = settingsSubId
 }
 
-await api.subscribeToAccounts(async (cause, accountName) => {
-  if (cause === EventCause.Deleted) {
-    console.log(getPrefix(accountName), `Tearing down side-effects.`)
-    const unsubscribe = sideEffects[accountName]
-    try {
-      unsubscribe()
+await writeApi.subscribeToAccounts(
+  proxy(async (cause, accountName) => {
+    if (cause === EventCause.Deleted) {
+      console.log(getPrefix(accountName), `Tearing down side-effects.`)
+      const subId = sideEffects[accountName]
+      try {
+        await writeApi.unsubscribe(subId)
 
-      if (cronJobs[accountName]) {
-        cronJobs[accountName].stop()
-        delete cronJobs[accountName]
-      }
+        if (cronJobs[accountName]) {
+          cronJobs[accountName].stop()
+          delete cronJobs[accountName]
+        }
 
-      if (settingsSubscriptions[accountName]) {
-        settingsSubscriptions[accountName]()
-        delete settingsSubscriptions[accountName]
-      }
-    } catch {}
-  }
+        if (settingsSubscriptions[accountName]) {
+          await writeApi.unsubscribe(settingsSubscriptions[accountName])
+          delete settingsSubscriptions[accountName]
+        }
+      } catch {}
+    }
 
-  if (cause === EventCause.Created) {
-    await setupSideEffects(accountName)
-  }
-})
+    if (cause === EventCause.Created) {
+      await setupSideEffects(accountName)
+    }
+  })
+)
 
 for (const accountName of accountNames) {
   await setupSideEffects(accountName)
 }
 
-const server = new BackendServer(api)
+const server = new BackendServer(api, writeApi as Api)
 
 const port = Number(process.env.PORT)
 server.start(isNaN(port) ? 4001 : port)
@@ -123,5 +137,6 @@ server.start(isNaN(port) ? 4001 : port)
 process.on("SIGINT", () => {
   console.log("Shutting down server.")
   server.close()
+  worker.terminate()
   process.exit()
 })

@@ -9,6 +9,7 @@ import {
 import { getAssetTicker } from "src/utils/assets-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { sql } from "src/utils/sql-utils"
+import { createSubscription } from "src/utils/sub-utils"
 import { noop } from "src/utils/utils"
 
 import { getAccount } from "../accounts-api"
@@ -191,7 +192,5 @@ export function enqueueFetchAssetInfos(accountName: string, trigger: TaskTrigger
 }
 
 export async function subscribeToAssetMetadata(accountName: string, callback: () => void) {
-  const account = await getAccount(accountName)
-  account.eventEmitter.on(SubscriptionChannel.AssetMetadata, callback)
-  return () => account.eventEmitter.off(SubscriptionChannel.AssetMetadata, callback)
+  return createSubscription(accountName, SubscriptionChannel.AssetMetadata, callback)
 }

@@ -1,4 +1,4 @@
-import { DEFAULT_CRON_REFRESH_INTERVAL } from "../../settings"
+import { DEFAULT_SERVER_REFRESH_INTERVAL } from "../../settings"
 import { getValue, setValue, subscribeToKV } from "./kv-api"
 
 export interface Settings {
@@ -6,7 +6,7 @@ export interface Settings {
 }
 
 const defaultSettings: Settings = {
-  refreshInterval: DEFAULT_CRON_REFRESH_INTERVAL,
+  refreshInterval: DEFAULT_SERVER_REFRESH_INTERVAL,
 }
 
 const SETTINGS_KEY = "settings"
@@ -42,6 +42,9 @@ export async function updateSettings(
   return updatedSettings
 }
 
-export async function subscribeToSettings(accountName: string, callback: () => void) {
+export async function subscribeToSettings(
+  accountName: string,
+  callback: (settings: Settings) => void
+) {
   return subscribeToKV(accountName, SETTINGS_KEY, callback)
 }

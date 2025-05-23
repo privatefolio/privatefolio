@@ -1,5 +1,7 @@
 import { logger } from "@nanostores/logger"
 import { AnyStore } from "nanostores"
+import { SubscriptionId } from "src/interfaces"
+import { $rpc } from "src/workers/remotes"
 
 import { isProduction } from "./utils"
 
@@ -14,15 +16,20 @@ export function logAtoms(atoms: { [key: string]: AnyStore }) {
   }
 }
 
-export function closeSubscription(subscription: Promise<() => void>) {
+export function closeSubscription(sub: Promise<SubscriptionId>) {
   function closeSub() {
-    subscription
-      .then((unsubscribe) => {
-        try {
-          unsubscribe()
-        } catch {}
-      })
-      .catch()
+    sub.then((subscriptionId) => {
+      // console.log("Closing subscription", subscriptionId)
+      $rpc
+        .get()
+        .unsubscribe(subscriptionId)
+        .then(() => {
+          // console.log("Subscription closed", subscriptionId)
+        })
+        .catch(() => {
+          // console.error("Error closing subscription", subscriptionId, error)
+        })
+    })
   }
 
   window.addEventListener("beforeunload", closeSub)

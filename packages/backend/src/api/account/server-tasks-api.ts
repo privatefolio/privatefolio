@@ -12,6 +12,7 @@ import {
 } from "src/interfaces"
 import { TASK_LOGS_LOCATION } from "src/settings"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { createSubscription } from "src/utils/sub-utils"
 import { getPrefix, sleep } from "src/utils/utils"
 
 import { Account, getAccount } from "../accounts-api"
@@ -296,9 +297,7 @@ export async function cancelTask(accountName: string, taskId: number) {
 }
 
 export async function subscribeToServerTasks(accountName: string, callback: () => void) {
-  const account = await ensureTaskQueue(accountName)
-  account.eventEmitter.on(SubscriptionChannel.ServerTasks, callback)
-  return () => account.eventEmitter.off(SubscriptionChannel.ServerTasks, callback)
+  return createSubscription(accountName, SubscriptionChannel.ServerTasks, callback)
 }
 
 export async function getServerTaskLog(accountName: string, taskId: number) {
@@ -317,14 +316,11 @@ export async function subscribeToServerTaskProgress(
   id: number,
   callback: (logEntry: string) => void
 ) {
-  const account = await ensureTaskQueue(accountName)
-
   function listener(taskId: number, logEntry: string) {
     if (taskId === id) {
       callback(logEntry)
     }
   }
 
-  account.eventEmitter.on(SubscriptionChannel.ServerTaskProgress, listener)
-  return () => account.eventEmitter.off(SubscriptionChannel.ServerTaskProgress, listener)
+  return createSubscription(accountName, SubscriptionChannel.ServerTaskProgress, listener)
 }

@@ -1,5 +1,6 @@
 import { EventCause, SqlParam, SubscriptionChannel, Tag } from "src/interfaces"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { createSubscription } from "src/utils/sub-utils"
 
 import { getAccount } from "../accounts-api"
 
@@ -228,7 +229,5 @@ export async function getTagsForTrade(accountName: string, tradeId: string) {
 }
 
 export async function subscribeToTags(accountName: string, callback: (cause: EventCause) => void) {
-  const account = await getAccount(accountName)
-  account.eventEmitter.on(SubscriptionChannel.Tags, callback)
-  return () => account.eventEmitter.off(SubscriptionChannel.Tags, callback)
+  return createSubscription(accountName, SubscriptionChannel.Tags, callback)
 }
