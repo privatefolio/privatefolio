@@ -221,15 +221,15 @@ export type PriceApiMeta = {
 
 export const PRICE_APIS_META: Record<PriceApiId, PriceApiMeta> = {
   binance: {
-    logoUrl: "/app-data/integrations/binance.svg",
+    logoUrl: "./app-data/integrations/binance.svg",
     name: "Binance",
   },
   coinbase: {
-    logoUrl: "/app-data/integrations/coinbase.svg",
+    logoUrl: "./app-data/integrations/coinbase.svg",
     name: "Coinbase",
   },
   "defi-llama": {
-    logoUrl: "/app-data/integrations/defi-llama.png",
+    logoUrl: "./app-data/integrations/defi-llama.png",
     name: "DefiLlama",
   },
 }
