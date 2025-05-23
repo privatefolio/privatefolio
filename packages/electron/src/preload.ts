@@ -43,9 +43,10 @@ contextBridge.exposeInMainWorld("electron", {
 })
 
 window.addEventListener("DOMContentLoaded", () => {
+  const deps: string[] = []
   for (const dependency of ["chrome", "node", "electron"]) {
-    console.log(`Deps: ${dependency}-version`, process.versions[dependency])
+    deps.push(`${dependency} ${process.versions[dependency]}`)
   }
-  console.log("Platform:", process.platform)
-  console.log("Production env:", isProduction)
+  console.log("Platform versions", deps.join(", "))
+  console.log("Shell environment is", isProduction ? "production" : "development")
 })
