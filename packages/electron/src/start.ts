@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu, Tray } from "electron"
+import { app, BrowserWindow, ipcMain, Menu, shell, Tray } from "electron"
 import Logger from "electron-log/main"
 import Store from "electron-store"
 import path from "path"
@@ -8,7 +8,7 @@ import { TITLE_BAR_OPTS } from "./api"
 import { getAutoLaunchEnabled, toggleAutoLaunch } from "./auto-launch"
 import * as backendManager from "./backend-manager"
 import { configureIpcMain } from "./ipc-main"
-import { getLogsPath, hasDevFlag, isProduction, isWindows } from "./utils"
+import { getLatestLogFilepath, getLogsPath, hasDevFlag, isProduction, isWindows } from "./utils"
 
 interface WindowState {
   height: number
@@ -25,14 +25,14 @@ const store = new Store<StoreType>()
 
 const startMinimized = process.argv.includes("--hidden")
 
-Logger.transports.file.resolvePathFn = getLogsPath
+Logger.transports.file.resolvePathFn = getLatestLogFilepath
 Logger.initialize({ spyRendererConsole: false })
 Logger.errorHandler.startCatching()
 Logger.eventLogger.startLogging()
 Object.assign(console, Logger.scope("Main"))
 
 console.log("Starting app...")
-console.log("Logging to", getLogsPath())
+console.log("Logging to", getLatestLogFilepath())
 console.log("Dev flag", hasDevFlag)
 
 updateElectronApp({
@@ -175,6 +175,7 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
 
   const isVisible = mainWindow.isVisible()
   const isAutoLaunchEnabled = await getAutoLaunchEnabled()
+  const isDevToolsOpened = mainWindow.webContents.isDevToolsOpened()
 
   console.log("Updating tray menu for", isVisible ? "visible" : "hidden", "window")
 
@@ -210,14 +211,51 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
       type: "checkbox",
     },
     {
-      click: function () {
-        mainWindow?.webContents.openDevTools()
-      },
-      label: "Open DevTools",
-    },
-    {
-      label: "Version",
-      sublabel: `v${app.getVersion()}`,
+      label: "Debug",
+      submenu: [
+        {
+          enabled: false,
+          label: `v${app.getVersion()}`,
+        },
+        {
+          checked: isDevToolsOpened,
+          click: function () {
+            console.log(`Dev tools ${isDevToolsOpened ? "closing" : "opening"}`)
+            if (isDevToolsOpened) {
+              mainWindow.webContents.closeDevTools()
+            } else {
+              mainWindow.webContents.openDevTools()
+            }
+            updateTrayMenu(mainWindow)
+          },
+          label: "Open dev tools",
+          type: "checkbox",
+        },
+        {
+          click: function () {
+            shell.openPath(getLatestLogFilepath())
+          },
+          label: "Open latest log file",
+        },
+        {
+          click: function () {
+            shell.openPath(getLogsPath())
+          },
+          label: "Open logs directory",
+        },
+        {
+          click: function () {
+            shell.openPath(app.getPath("userData"))
+          },
+          label: "Open user data directory",
+        },
+        {
+          click: function () {
+            shell.openPath(path.join(app.getPath("userData"), "config.json"))
+          },
+          label: "Open config file",
+        },
+      ],
     },
     { type: "separator" },
     {

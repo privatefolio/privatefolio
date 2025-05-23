@@ -4,7 +4,7 @@ import path from "path"
 import { TITLE_BAR_OPTS } from "./api"
 import * as backendManager from "./backend-manager"
 import { PaletteMode } from "./preload"
-import { getLogsPath, isProduction, isWindows } from "./utils"
+import { getLatestLogFilepath, isProduction, isWindows } from "./utils"
 
 export function configureIpcMain(ipcMain: Electron.IpcMain, window: BrowserWindow) {
   ipcMain.on("notify", (_, message: string) => {
@@ -44,7 +44,7 @@ function handleOpenLogsDir(event: IpcMainEvent) {
 }
 
 function handleReadLogs(event: IpcMainEvent) {
-  const logsPath = getLogsPath()
+  const logsPath = getLatestLogFilepath()
   const logs = require("fs").readFileSync(logsPath).toString()
   event.returnValue = logs
 }

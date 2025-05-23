@@ -4,6 +4,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: {
+        "api-worker": "src/api-worker.ts",
         bun: "src/start.ts",
         // 'web-worker': resolve(__dirname, "src/index.ts"),
       },

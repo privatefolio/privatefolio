@@ -10,8 +10,10 @@ import { EventCause, SubscriptionId } from "./interfaces"
 import { SHORT_THROTTLE_DURATION } from "./settings"
 import { getCronExpression, getPrefix } from "./utils/utils"
 
-const worker = new Worker(import.meta.resolve("./api-worker.ts"))
+console.log("Starting worker...")
+const worker = new Worker(import.meta.resolve("./api-worker"))
 const writeApi = wrap<Api>(worker)
+console.log("Started worker...")
 
 const accountNames = await writeApi.getAccountNames()
 
