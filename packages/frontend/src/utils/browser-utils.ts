@@ -1,7 +1,7 @@
 import { logger } from "@nanostores/logger"
 import { AnyStore } from "nanostores"
 import { SubscriptionId } from "src/interfaces"
-import { $rpc } from "src/workers/remotes"
+import { RPC } from "src/workers/remotes"
 
 import { isProduction } from "./utils"
 
@@ -16,12 +16,11 @@ export function logAtoms(atoms: { [key: string]: AnyStore }) {
   }
 }
 
-export function closeSubscription(sub: Promise<SubscriptionId>) {
+export function closeSubscription(sub: Promise<SubscriptionId>, rpc: RPC) {
   function closeSub() {
     sub.then((subscriptionId) => {
       // console.log("Closing subscription", subscriptionId)
-      $rpc
-        .get()
+      rpc
         .unsubscribe(subscriptionId)
         .then(() => {
           // console.log("Subscription closed", subscriptionId)

@@ -46,7 +46,7 @@ export function TagList({ itemId, itemType }: TagListProps) {
       )
     )
 
-    return closeSubscription(subscription)
+    return closeSubscription(subscription, $rpc.get())
   }, [accountName, connectionStatus, itemType])
 
   useEffect(() => {

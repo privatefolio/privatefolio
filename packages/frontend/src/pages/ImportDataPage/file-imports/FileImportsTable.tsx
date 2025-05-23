@@ -34,7 +34,7 @@ export function FileImportsTable() {
 
     const subscription = $rpc.get().subscribeToFileImports($activeAccount.get(), fetchData)
 
-    return closeSubscription(subscription)
+    return closeSubscription(subscription, $rpc.get())
   }, [connectionStatus])
 
   const headCells: HeadCell<FileImport>[] = useMemo(

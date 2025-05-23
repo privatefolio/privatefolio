@@ -30,7 +30,7 @@ export function ServerLogs() {
   //     setLogs((prevLogs) => `${prevLogs}\n${logEntry}`)
   //   })
 
-  //   return closeSubscription(subscription)
+  //   return closeSubscription(subscription, $rpc.get())
   // }, [activeAccount, connectionStatus])
 
   return (

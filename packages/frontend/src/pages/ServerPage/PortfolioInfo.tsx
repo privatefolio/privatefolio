@@ -31,7 +31,7 @@ export function PortfolioInfo() {
       .get()
       .subscribeToKV<Timestamp>($activeAccount.get(), "genesis", setGenesis)
 
-    return closeSubscription(subscription)
+    return closeSubscription(subscription, $rpc.get())
   }, [connectionStatus])
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export function PortfolioInfo() {
       .get()
       .subscribeToKV<Timestamp>($activeAccount.get(), "lastTx", setLastTx)
 
-    return closeSubscription(subscription)
+    return closeSubscription(subscription, $rpc.get())
   }, [connectionStatus])
 
   const filterMap = useStore($filterOptionsMap)

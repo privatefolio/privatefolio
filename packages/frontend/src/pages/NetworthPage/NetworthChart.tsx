@@ -26,7 +26,7 @@ function NetworthChartBase() {
       }, DEFAULT_DEBOUNCE_DURATION)
     )
 
-    return closeSubscription(subscription)
+    return closeSubscription(subscription, $rpc.get())
   }, [activeAccount, connectionStatus])
 
   const queryFn: QueryChartData = useCallback(

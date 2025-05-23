@@ -43,7 +43,7 @@ export function TradeTable(props: TradesTableProps) {
       )
     )
 
-    return closeSubscription(subscription)
+    return closeSubscription(subscription, $rpc.get())
   }, [accountName, connectionStatus])
 
   const queryFn: QueryTableData<Trade> = useCallback(

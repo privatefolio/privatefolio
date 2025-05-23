@@ -47,7 +47,7 @@ export function TransactionTable(props: TransactionsTableProps) {
       )
     )
 
-    return closeSubscription(subscription)
+    return closeSubscription(subscription, $rpc.get())
   }, [accountName, connectionStatus])
 
   const queryFn: QueryTableData<Transaction> = useCallback(

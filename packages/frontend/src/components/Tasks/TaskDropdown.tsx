@@ -81,7 +81,7 @@ export function TaskDropdown() {
       )
     )
 
-    return closeSubscription(subscription)
+    return closeSubscription(subscription, $rpc.get())
   }, [accountName, connectionStatus])
 
   const pendingTask = useMemo(

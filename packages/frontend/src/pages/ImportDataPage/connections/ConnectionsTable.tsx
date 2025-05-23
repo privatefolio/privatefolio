@@ -38,7 +38,7 @@ export function ConnectionsTable() {
 
     const subscription = $rpc.get().subscribeToConnections($activeAccount.get(), fetchData)
 
-    return closeSubscription(subscription)
+    return closeSubscription(subscription, $rpc.get())
   }, [connectionStatus])
 
   const headCells: HeadCell<Connection>[] = useMemo(

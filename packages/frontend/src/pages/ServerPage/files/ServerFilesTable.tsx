@@ -37,7 +37,7 @@ export function ServerFilesTable() {
       )
     )
 
-    return closeSubscription(subscription)
+    return closeSubscription(subscription, $rpc.get())
   }, [accountName, connectionStatus])
 
   const queryFn: QueryTableData<ServerFile> = useCallback(

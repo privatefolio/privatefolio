@@ -24,7 +24,7 @@ export function NoDataButton() {
       .get()
       .subscribeToKV<Timestamp>($activeAccount.get(), "lastTx", setLastTx)
 
-    return closeSubscription(subscription)
+    return closeSubscription(subscription, $rpc.get())
   }, [connectionStatus])
 
   const dataAvailable = lastTx !== null && lastTx !== 0

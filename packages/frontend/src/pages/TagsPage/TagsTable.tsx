@@ -52,7 +52,7 @@ export function TagsTable() {
       )
     )
 
-    return closeSubscription(subscription)
+    return closeSubscription(subscription, $rpc.get())
   }, [accountName, connectionStatus])
 
   const headCells: HeadCell<Tag>[] = [

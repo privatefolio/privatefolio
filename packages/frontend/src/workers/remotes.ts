@@ -90,7 +90,7 @@ export const $localRest = computed([], () => {
   } as RestConfig
 })
 
-type RPC = Api & IBackendRelayer
+export type RPC = Api & IBackendRelayer
 
 let latestLocalRpc: RPC | null = null
 let latestCloudRpc: RPC | null = null

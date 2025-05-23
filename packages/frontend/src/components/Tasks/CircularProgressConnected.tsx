@@ -33,7 +33,7 @@ export function CircularProgressConnected(props: CircularProgressConnectedProps)
         })
       })
 
-    return closeSubscription(subscription)
+    return closeSubscription(subscription, $rpc.get())
   }, [task.id, connectionStatus])
 
   const progressPercent = useMemo<number>(() => {

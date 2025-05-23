@@ -74,7 +74,7 @@ export default function App() {
       localRpc.getAccountNames().then($localAccounts.set)
     })
 
-    return closeSubscription(subscription)
+    return closeSubscription(subscription, localRpc)
   }, [localConnectionStatus, localAuth, localRpc])
 
   const cloudRpcReady = useStore($cloudRpcReady)
@@ -101,7 +101,7 @@ export default function App() {
       cloudRpc.getAccountNames().then($cloudAccounts.set)
     })
 
-    return closeSubscription(subscription)
+    return closeSubscription(subscription, cloudRpc)
   }, [cloudConnectionStatus, cloudRpcReady, cloudRpc])
 
   useEffect(() => {
@@ -140,7 +140,7 @@ export default function App() {
       })
     )
 
-    return closeSubscription(subscription)
+    return closeSubscription(subscription, rpc)
   }, [activeAccount, connectionStatus, auth, rpc])
 
   if (localServerEnabled && !localAuth.checked) {

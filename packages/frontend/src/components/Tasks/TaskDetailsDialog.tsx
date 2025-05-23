@@ -75,7 +75,7 @@ export function TaskDetailsDialog({ task, ...props }: DialogProps & { task: Serv
         })
       })
 
-    return closeSubscription(subscription)
+    return closeSubscription(subscription, $rpc.get())
   }, [task, connectionStatus])
 
   const progressPercent = useMemo<number>(() => {
