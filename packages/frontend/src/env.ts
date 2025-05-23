@@ -3,6 +3,7 @@ export const GIT_HASH = import.meta.env.VITE_GIT_HASH
 export const GIT_DATE = import.meta.env.VITE_GIT_DATE
 export const POSTHOG_KEY = import.meta.env.VITE_POSTHOG_KEY
 export const TARGET = import.meta.env.VITE_TARGET
+export const PLATFORM = TARGET === "electron" ? "electron" : "web"
 
 function extractVersion(version: string) {
   try {

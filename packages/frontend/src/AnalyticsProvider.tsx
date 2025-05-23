@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useEffect } from "react"
 
-import { APP_VERSION, POSTHOG_KEY } from "./env"
+import { APP_VERSION, PLATFORM, POSTHOG_KEY } from "./env"
 import { $telemetry } from "./stores/app-store"
 import { isProduction } from "./utils/utils"
 
@@ -40,6 +40,7 @@ export function AnalyticsProvider({ children }: PropsWithChildren) {
 
         posthog.register({
           appVersion: APP_VERSION,
+          platform: PLATFORM,
         })
 
         console.log("Telemetry enabled")
