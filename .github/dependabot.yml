@@ -12,4 +12,9 @@ updates:
       - "packages/electron"
       - "packages/frontend"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    open-pull-requests-limit: 1
+    groups:
+      all-deps:
+        patterns:
+          - "*"
