@@ -74,17 +74,15 @@ export async function start(): Promise<void> {
       stdio: "pipe", // Redirect stdout and stderr
     })
 
-    if (backendProcess.stdout) {
-      backendProcess.stdout.on("data", (data) => {
-        console.log(`BackendManager: Stdout: ${data}`)
-      })
-    }
+    backendProcess.stdout.on("data", (data) => {
+      const str = data.toString()
+      console.log(`BackendManager: stdout: ${str.endsWith("\n") ? str.slice(0, -1) : str}`)
+    })
 
-    if (backendProcess.stderr) {
-      backendProcess.stderr.on("data", (data) => {
-        console.error(`BackendManager: Stderr: ${data}`)
-      })
-    }
+    backendProcess.stderr.on("data", (data) => {
+      const str = data.toString()
+      console.error(`BackendManager: stderr: ${str.endsWith("\n") ? str.slice(0, -1) : str}`)
+    })
 
     backendProcess.on("error", (error) => {
       console.error(`BackendManager: Process error: ${error.message}`)

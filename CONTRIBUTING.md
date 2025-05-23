@@ -139,6 +139,7 @@ Data is persisted in the following directories:
    - Electron logs: `C:\Users\daniel\AppData\Roaming\Privatefolio\logs`
    - User data: `C:\Users\daniel\AppData\Roaming\Privatefolio\data`
    - App config: `C:\Users\daniel\AppData\Roaming\Privatefolio\config.json`
+   - App code: `C:\Users\daniel\AppData\Local\privatefolio_electron`
 
 2. Linux:
    - Electron logs: `~/.config/Privatefolio/logs`

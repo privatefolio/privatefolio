@@ -177,7 +177,13 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
   const isAutoLaunchEnabled = await getAutoLaunchEnabled()
   const isDevToolsOpened = mainWindow.webContents.isDevToolsOpened()
 
-  console.log("Updating tray menu for", isVisible ? "visible" : "hidden", "window")
+  console.log(
+    "Updating tray menu for",
+    isVisible ? "visible" : "hidden",
+    "window",
+    "with dev tools",
+    isDevToolsOpened ? "opened" : "closed"
+  )
 
   const contextMenu = Menu.buildFromTemplate([
     isVisible
@@ -215,18 +221,20 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
       submenu: [
         {
           enabled: false,
-          label: `v${app.getVersion()}`,
+          label: `Version: v${app.getVersion()}`,
         },
         {
           checked: isDevToolsOpened,
           click: function () {
-            console.log(`Dev tools ${isDevToolsOpened ? "closing" : "opening"}`)
+            // console.log(`Dev tools ${isDevToolsOpened ? "closing" : "opening"}`)
             if (isDevToolsOpened) {
               mainWindow.webContents.closeDevTools()
             } else {
               mainWindow.webContents.openDevTools()
             }
-            updateTrayMenu(mainWindow)
+            setTimeout(() => {
+              updateTrayMenu(mainWindow)
+            }, 500)
           },
           label: "Open dev tools",
           type: "checkbox",
@@ -245,7 +253,7 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
         },
         {
           click: function () {
-            shell.openPath(app.getPath("userData"))
+            shell.openPath(path.join(app.getPath("userData"), "data"))
           },
           label: "Open user data directory",
         },
