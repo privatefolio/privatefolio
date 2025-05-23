@@ -1,7 +1,7 @@
 import fs from "fs"
 import { join } from "path"
 import { importFile, subscribeToFileImports } from "src/api/account/file-imports/file-imports-api"
-import { getAccount } from "src/api/accounts-api"
+import { getAccount, unsubscribe } from "src/api/accounts-api"
 import { EventCause, FileImport, SubscriptionChannel } from "src/interfaces"
 import { expect, it, vi } from "vitest"
 
@@ -26,7 +26,7 @@ it("should add a file import", async () => {
   mocks.readFile.mockResolvedValue(buffer)
   const events: FileImport[] = []
   const triggers: EventCause[] = []
-  const unsubscribe = await subscribeToFileImports(accountName, (trigger, fileImport) => {
+  const subId = await subscribeToFileImports(accountName, (trigger, fileImport) => {
     triggers.push(trigger)
     events.push(fileImport)
   })
@@ -103,7 +103,7 @@ it("should add a file import", async () => {
   expect(account.eventEmitter.listenerCount(SubscriptionChannel.FileImports)).toMatchInlineSnapshot(
     `1`
   )
-  unsubscribe()
+  await unsubscribe(subId)
   expect(account.eventEmitter.listenerCount(SubscriptionChannel.FileImports)).toMatchInlineSnapshot(
     `0`
   )
