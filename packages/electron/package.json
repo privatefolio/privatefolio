@@ -76,5 +76,5 @@
     "prepackage:mac": "bash ./prebuild-bin.sh",
     "prepackage:win": "bash ./prebuild-bin.sh"
   },
-  "version": "2.0.0-alpha.26"
+  "version": "2.0.0-alpha.27"
 }
