@@ -19,6 +19,9 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
+    environment:
+      name: production
+      url: https://github.com/privatefolio/privatefolio/releases/tag/${{ github.ref_name }}
     steps:
       - uses: actions/checkout@v4
 

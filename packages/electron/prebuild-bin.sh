@@ -18,26 +18,21 @@ for PACKAGE_INFO in "${PACKAGES[@]}"; do
   PACKAGE_SRC=${PACKAGE_INFO#*:}
   PACKAGE_LOCATION="node_modules/$PACKAGE_NAME"
   
-  # Check if symlink exists
-  if [ -L "$PACKAGE_LOCATION" ]; then
-      # Remove existing symlink
-      unlink "$PACKAGE_LOCATION"
-      # Copy the files
-      mkdir -p "$PACKAGE_LOCATION/build"
-      cp -r "$PACKAGE_SRC"/build/* "$PACKAGE_LOCATION/build/"
-      # mkdir -p "$PACKAGE_LOCATION/src"
-      # cp -r "$PACKAGE_SRC"/src/* "$PACKAGE_LOCATION/src/"
-      
-      # Copy dependencies based on package
-      # IFS=' ' read -ra DEPS <<< "${PACKAGE_DEPS[$PACKAGE_NAME]}"
-      # for DEP in "${DEPS[@]}"; do
-      #   if [ -n "$DEP" ]; then
-      #     echo "Copying $DEP"
-      #     mkdir -p "$PACKAGE_LOCATION/node_modules/$DEP"
-      #     cp -r "$PACKAGE_SRC/node_modules/$DEP"/* "$PACKAGE_LOCATION/node_modules/$DEP/"
-      #   fi
-      # done
-  fi
+  # Copy the files
+  mkdir -p "$PACKAGE_LOCATION/build"
+  cp -r "$PACKAGE_SRC"/build/* "$PACKAGE_LOCATION/build/"
+  # mkdir -p "$PACKAGE_LOCATION/src"
+  # cp -r "$PACKAGE_SRC"/src/* "$PACKAGE_LOCATION/src/"
+  
+  # Copy dependencies based on package
+  # IFS=' ' read -ra DEPS <<< "${PACKAGE_DEPS[$PACKAGE_NAME]}"
+  # for DEP in "${DEPS[@]}"; do
+  #   if [ -n "$DEP" ]; then
+  #     echo "Copying $DEP"
+  #     mkdir -p "$PACKAGE_LOCATION/node_modules/$DEP"
+  #     cp -r "$PACKAGE_SRC/node_modules/$DEP"/* "$PACKAGE_LOCATION/node_modules/$DEP/"
+  #   fi
+  # done
 done
 
 # Bundle bun-sh into the resources folder

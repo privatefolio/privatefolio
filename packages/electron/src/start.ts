@@ -215,6 +215,10 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
       },
       label: "Open DevTools",
     },
+    {
+      label: "Version",
+      sublabel: `v${app.getVersion()}`,
+    },
     { type: "separator" },
     {
       click: function () {
