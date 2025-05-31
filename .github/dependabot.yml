@@ -5,6 +5,7 @@
 
 version: 2
 updates:
+  # Weekly PR for all minor & patch bumps
   - package-ecosystem: "npm"
     directories:
       - "/"
@@ -15,6 +16,29 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 1
     groups:
-      all-deps:
+      minor-patch:
+        update-types:
+          - "version-update:semver-minor"
+          - "version-update:semver-patch"
         patterns:
           - "*"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+
+  # Monthly PRs for major bumps (one PR per package)
+  - package-ecosystem: "npm"
+    directories:
+      - "/"
+      - "packages/backend"
+      - "packages/electron"
+      - "packages/frontend"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-minor"
+          - "version-update:semver-patch"
