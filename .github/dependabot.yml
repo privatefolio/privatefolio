@@ -18,14 +18,14 @@ updates:
     groups:
       minor-patch:
         update-types:
-          - "version-update:semver-minor"
-          - "version-update:semver-patch"
+          - "minor"
+          - "patch"
         patterns:
           - "*"
     ignore:
       - dependency-name: "*"
         update-types:
-          - "version-update:semver-major"
+          - "major"
 
   # Monthly PRs for major bumps (one PR per package)
   - package-ecosystem: "npm"
@@ -40,5 +40,5 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types:
-          - "version-update:semver-minor"
-          - "version-update:semver-patch"
+          - "minor"
+          - "patch"
