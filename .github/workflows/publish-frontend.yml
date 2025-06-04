@@ -2,7 +2,7 @@ name: Publish Frontend
 
 on:
   push:
-    branches-ignore: [ "dependabot/*" ]
+    branches: [ "*" ]
   pull_request:
     branches: [ "*" ]
 
@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   build-and-deploy:
-    if: github.head_ref == '' || !startsWith(github.head_ref, 'dependabot/')
+    if: (!startsWith(github.ref_name, 'dependabot/')) && (github.head_ref == '' || !startsWith(github.head_ref, 'dependabot/'))
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
