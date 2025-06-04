@@ -2,9 +2,9 @@ name: Publish Frontend
 
 on:
   push:
-    branches: [ "*" ]
+    branches-ignore: [ "dependabot/*" ]
   pull_request:
-    branches: [ "*" ]
+    branches-ignore: [ "dependabot/*" ]
 
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
 
