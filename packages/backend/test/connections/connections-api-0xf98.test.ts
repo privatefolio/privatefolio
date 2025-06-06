@@ -28,7 +28,7 @@ describe("should import 0xf98 via connection", () => {
       platform: "ethereum",
     })
     // assert
-    expect(connection.id).toMatchInlineSnapshot(`"431128919"`)
+    expect(connection.id).toMatchInlineSnapshot(`"3615858038"`)
   })
 
   it.sequential("should sync connection", async () => {

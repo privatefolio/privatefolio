@@ -94,8 +94,8 @@ export async function upsertConnections(accountName: string, records: NewConnect
   try {
     await account.executeMany(
       `INSERT OR REPLACE INTO connections (
-        id, address, key, label, meta, options, platform, secret, syncedAt, timestamp
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        id, address, key, label, meta, options, extensionId, platform, secret, syncedAt, timestamp
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       records.map((record) => [
         record.id || deriveConnectionId(record),
         record.address ? getAddress(record.address) : null,

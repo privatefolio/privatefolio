@@ -5,6 +5,7 @@ import { isBlockchain, isExchange } from "privatefolio-backend/src/utils/utils"
 import React, { useEffect, useState } from "react"
 import { useParams, useSearchParams } from "react-router-dom"
 import { ActionBlock } from "src/components/ActionBlock"
+import { ForeignAssetBlock } from "src/components/ForeignAssetBlock"
 import { BackButton } from "src/components/BackButton"
 import { CoinGeckoIcon } from "src/components/CoinGeckoIcon"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
@@ -21,6 +22,7 @@ import { extractRootUrl } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 import FourZeroFourPage from "../404"
+import { PlatformAssets } from "./PlatformAssets"
 
 export default function PlatformPage() {
   const { platformId } = useParams<{ platformId: string }>()
@@ -118,6 +120,7 @@ export default function PlatformPage() {
       <Stack>
         <Tabs value={tab} defaultValue={tab}>
           <NavTab value="details" to="?tab=details" label="Details" />
+          {isBlockchain(platform) && <NavTab value="assets" to="?tab=assets" label="Assets" />}
         </Tabs>
 
         {tab === "details" && (
@@ -195,13 +198,14 @@ export default function PlatformPage() {
                 {isBlockchain(platform) && platform.nativeCoinId && (
                   <div>
                     <SectionTitle>Native Asset</SectionTitle>
-                    <span>{platform.nativeCoinId}</span>
+                    <ForeignAssetBlock coingeckoId={platform.nativeCoinId} />
                   </div>
                 )}
               </Stack>
             </Typography>
           </Paper>
         )}
+        {tab === "assets" && isBlockchain(platform) && <PlatformAssets platformId={platform.id} />}
       </Stack>
     </Stack>
   )

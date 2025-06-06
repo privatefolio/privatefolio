@@ -46,7 +46,6 @@ export const DEFAULT_DEBOUNCE_DURATION = 1500
 export const DB_OPERATION_PAGE_SIZE = 1000
 export const PRICE_API_PAGINATION = 900 // coinbase limit is 300, binance is 1000
 
-export { API_KEYS } from "../extensions/connections/etherscan/etherscan-settings"
 export {
   getBlockExplorerName,
   getBlockExplorerUrl,

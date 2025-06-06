@@ -1,21 +1,26 @@
 import { Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { ReactNode } from "react"
-import { $assetMap } from "src/stores/metadata-store"
+import { $assetMap, $myPlatforms } from "src/stores/metadata-store"
 import { getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
 
 import { AssetAvatar, AssetAvatarProps } from "./AssetAvatar"
 import { Truncate } from "./Truncate"
 
-type AssetBlockProps = {
-  assetId?: string
+type MyAssetBlockProps = {
+  id?: string
   secondary?: ReactNode
   showPlatform?: boolean
 } & Omit<AssetAvatarProps, "alt" | "src">
 
-export function AssetBlock(props: AssetBlockProps) {
-  const { assetId, secondary, showPlatform, ...rest } = props
+/**
+ * TODO9: needs tooltip, refactored alongside ForeignAssetBlock
+ */
+export function MyAssetBlock(props: MyAssetBlockProps) {
+  const { id: assetId, secondary, showPlatform, ...rest } = props
+
   const assetMap = useStore($assetMap, { keys: assetId ? [assetId] : [] })
+  const myPlatforms = useStore($myPlatforms, { keys: assetId ? [getAssetPlatform(assetId)] : [] })
 
   return (
     <Stack
@@ -42,7 +47,7 @@ export function AssetBlock(props: AssetBlockProps) {
               letterSpacing={0.5}
             >
               {" "}
-              - {getAssetPlatform(assetId)}
+              - {myPlatforms[getAssetPlatform(assetId)]?.name}
             </Typography>
           )}
         </Truncate>

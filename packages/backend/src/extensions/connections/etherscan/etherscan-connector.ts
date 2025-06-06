@@ -1,5 +1,5 @@
 import { EtherscanConnection, ProgressCallback, SyncResult } from "src/interfaces"
-import { API_KEYS, PLATFORMS_META } from "src/settings/settings"
+import { PLATFORMS_META } from "src/settings/settings"
 import { noop } from "src/utils/utils"
 
 import { parseNormal } from "./etherscan"
@@ -11,6 +11,7 @@ import {
   FullEtherscanProvider,
   StakingWithdrawalTransaction,
 } from "./etherscan-rpc"
+import { ETHERSCAN_API_KEY_V2 } from "./etherscan-settings"
 import { parseStakingWithdrawal } from "./etherscan-staking-withdrawal"
 
 const parserList = [
@@ -31,7 +32,8 @@ export async function syncEtherscan(
   if (!chainId) {
     throw new Error(`ChainId not found for platform: ${connection.platform}`)
   }
-  const rpcProvider = new FullEtherscanProvider(chainId, API_KEYS[connection.platform])
+
+  const rpcProvider = new FullEtherscanProvider(chainId, ETHERSCAN_API_KEY_V2)
 
   await progress([0, `Starting from block number ${since}`])
 

@@ -17,6 +17,7 @@ import {
   TaskPriority,
   TaskTrigger,
 } from "../../interfaces"
+import { getMyPlatformIds } from "./audit-logs-api"
 import { enqueueTask } from "./server-tasks-api"
 
 const customExchanges: Exchange[] = [
@@ -113,7 +114,7 @@ export function enqueueRefetchPlatforms(accountName: string, trigger: TaskTrigge
       ])
     },
     name: "Refetch asset platforms",
-    priority: TaskPriority.MediumHigh,
+    priority: TaskPriority.High,
     trigger,
   })
 }
@@ -187,4 +188,9 @@ export async function getPlatformsByIds(ids: string[]): Promise<Platform[]> {
     ...blockchains.filter((blockchain) => ids.includes(blockchain.id)),
     ...exchanges.filter((exchange) => ids.includes(exchange.id)),
   ]
+}
+
+export async function getMyPlatforms(accountName: string) {
+  const platformIds = await getMyPlatformIds(accountName)
+  return getPlatformsByIds(platformIds)
 }

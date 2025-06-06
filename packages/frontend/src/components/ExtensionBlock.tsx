@@ -40,8 +40,10 @@ export function ExtensionBlock(props: ExtensionBlockProps) {
       href={`../extension/${id || extension.id}`}
       linkText={
         <Stack alignItems="center">
-          <Box sx={{ fontFamily: MonoFont }}>View extension</Box>
-          <span className="secondary">({extension.id})</span>
+          <span>View extension</span>
+          <Box sx={{ fontFamily: MonoFont }}>
+            <span className="secondary">({extension.id})</span>
+          </Box>
         </Stack>
       }
       {...rest}

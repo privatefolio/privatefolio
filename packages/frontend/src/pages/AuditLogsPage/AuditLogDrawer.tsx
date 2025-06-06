@@ -5,8 +5,8 @@ import React, { useEffect, useState } from "react"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AmountBlock } from "src/components/AmountBlock"
 import { AppLink } from "src/components/AppLink"
-import { AssetBlock } from "src/components/AssetBlock"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
+import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TagManager } from "src/components/TagManager"
@@ -112,7 +112,7 @@ export function AuditLogDrawer(props: AuditLogDrawerProps) {
               to={`../asset/${encodeURI(assetId)}`}
               sx={{ fontSize: "0.9rem", paddingX: 1 }}
             >
-              <AssetBlock assetId={assetId} size="small" />
+              <MyAssetBlock id={assetId} size="small" />
             </Button>
             <ValueChip
               value={
@@ -137,7 +137,7 @@ export function AuditLogDrawer(props: AuditLogDrawerProps) {
               to={`../asset/${encodeURI(assetId)}`}
               sx={{ fontSize: "0.9rem", padding: 1 }}
             >
-              <AssetBlock assetId={assetId} size="small" />
+              <MyAssetBlock id={assetId} size="small" />
             </Button>
             <ValueChip
               value={

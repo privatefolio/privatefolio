@@ -9,7 +9,9 @@ import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { getPrefix, sleep, wasteCpuCycles } from "src/utils/utils"
 
+import { enqueueRefetchAssets } from "./account/assets-api"
 import { getValue, setValue } from "./account/kv-api"
+import { enqueueRefetchPlatforms } from "./account/platforms-api"
 import { enqueueTask, upsertServerTask } from "./account/server-tasks-api"
 import { allSubscriptions, appEventEmitter } from "./internal"
 
@@ -66,18 +68,20 @@ const accounts: Record<string, Promise<Account>> = {}
 
 function populateFirstServerTask(accountName: string) {
   const createdAt = Date.now()
-  setTimeout(() => {
-    upsertServerTask(accountName, {
+  setTimeout(async () => {
+    await upsertServerTask(accountName, {
       completedAt: Date.now(),
       createdAt,
       description: `Initializing database for account "${accountName}".`,
       duration: Date.now() - createdAt,
       name: "Initialize database",
-      priority: TaskPriority.VeryHigh,
+      priority: TaskPriority.High,
       startedAt: createdAt,
       status: "completed",
       trigger: "system",
     })
+    await enqueueRefetchPlatforms(accountName, "system")
+    await enqueueRefetchAssets(accountName, "system")
   }, 50)
 }
 

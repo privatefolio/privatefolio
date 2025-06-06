@@ -1,4 +1,4 @@
-import { deleteAccount, getAccount } from "src/api/accounts-api"
+import { getAccount, resetAccount } from "src/api/accounts-api"
 import { expect, it } from "vitest"
 
 it("should have a sqlite database connection", async () => {
@@ -31,7 +31,7 @@ it("should reset the database", async () => {
   await account.execute("CREATE TABLE my_key_value (key TEXT PRIMARY KEY, value TEXT)")
   await account.execute("INSERT INTO my_key_value (key, value) VALUES (?, ?)", ["foo", "bar"])
 
-  await deleteAccount(accountName)
+  await resetAccount(accountName)
 
   await expect(
     account.execute(`SELECT * FROM my_key_value`)

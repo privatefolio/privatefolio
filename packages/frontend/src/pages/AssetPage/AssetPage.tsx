@@ -131,6 +131,12 @@ export default function AssetPage() {
           </Stack>
         </Stack>
         <Stack gap={6} direction="row">
+          {getAssetPlatform(assetId) && getAssetPlatform(assetId) !== "coingecko" && (
+            <div>
+              <SectionTitle>Platform</SectionTitle>
+              <PlatformBlock id={getAssetPlatform(assetId)} />
+            </div>
+          )}
           {metadata && (
             <>
               <div>
@@ -160,12 +166,6 @@ export default function AssetPage() {
                 </div>
               )}
             </>
-          )}
-          {getAssetPlatform(assetId) && (
-            <div>
-              <SectionTitle>Platform</SectionTitle>
-              <PlatformBlock id={getAssetPlatform(assetId)} />
-            </div>
           )}
           <div>
             <SectionTitle>

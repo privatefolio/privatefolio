@@ -623,6 +623,7 @@ export interface AssetMetadata {
   logoUrl: string
   marketCapRank?: number
   name: string
+  platforms?: Record<string, string>
   symbol?: string
 }
 
