@@ -1,10 +1,10 @@
 import Big from "big.js"
 import { mergeTransactions } from "src/extensions/utils/etherscan-utils"
 import {
-  MyAsset,
   AuditLog,
   AuditLogOperation,
   EventCause,
+  MyAsset,
   SqlParam,
   SubscriptionChannel,
 } from "src/interfaces"

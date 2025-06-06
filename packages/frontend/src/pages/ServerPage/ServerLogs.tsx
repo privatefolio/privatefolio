@@ -38,7 +38,7 @@ export function ServerLogs() {
       {isLoading ? (
         <DefaultSpinner />
       ) : logs.length === 0 ? (
-        <Typography variant="body2">Nothing to see here...</Typography>
+        <Typography variant="body2">Nothing to see here…</Typography>
       ) : (
         <Typography component="pre" variant="caption" fontFamily={MonoFont}>
           {logs}

@@ -130,7 +130,7 @@ export default function CloudUserPage({ show }: { show: boolean }) {
     renewal?: Date
   }>(() => {
     if (sub === undefined) {
-      return { isPremium: false, loading: true, name: "Loading..." }
+      return { isPremium: false, loading: true, name: "Loading…" }
     }
     if (sub === null) {
       return { isPremium: false, name: "Hobby" }

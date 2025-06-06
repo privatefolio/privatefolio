@@ -1,6 +1,5 @@
 import { getAddress } from "ethers"
 import { SqlParam, TaskCompletionCallback } from "src/interfaces"
-import { isEvmPlatform } from "src/utils/assets-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { createSubscription } from "src/utils/sub-utils"
 
@@ -44,10 +43,11 @@ export async function getConnections(
         label: row[3] as string,
         meta: JSON.parse(row[4] as string),
         options: JSON.parse(row[5] as string),
-        platform: row[6] as string,
-        secret: row[7] as string,
-        syncedAt: row[8] as number,
-        timestamp: row[9] as number,
+        extensionId: row[6] as string,
+        platform: row[7] as string,
+        secret: row[8] as string,
+        syncedAt: row[9] as number,
+        timestamp: row[10] as number,
       }
       /* eslint-enable */
       transformNullsToUndefined(value)
@@ -83,7 +83,9 @@ type PartialProps<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 export type NewConnection = PartialProps<Connection, "id" | "timestamp" | "syncedAt">
 
 function deriveConnectionId(record: NewConnection) {
-  return hashString(`con_${record.platform}_${record.address || record.key}_${record.label}`)
+  return hashString(
+    `con_${record.platform}_${record.extensionId}_${record.address || record.key}_${record.label}`
+  )
 }
 
 export async function upsertConnections(accountName: string, records: NewConnection[]) {
@@ -101,7 +103,8 @@ export async function upsertConnections(accountName: string, records: NewConnect
         record.label || null,
         JSON.stringify(record.meta) || null,
         JSON.stringify(record.options) || null,
-        record.platform || null,
+        record.extensionId,
+        record.platform,
         record.secret || null,
         record.syncedAt || null,
         record.timestamp || new Date().getTime(),
@@ -215,11 +218,9 @@ export async function syncConnection(
     until = String(Date.now())
   }
 
-  if (connection.platform === "ethereum") {
+  if (connection.extensionId === "etherscan-connection") {
     result = await syncEtherscan(progress, connection as EtherscanConnection, since, until)
-  } else if (isEvmPlatform(connection.platform)) {
-    result = await syncEtherscan(progress, connection as EtherscanConnection, since, until)
-  } else if (connection.platform === "binance") {
+  } else if (connection.extensionId === "binance-connection") {
     result = await syncBinance(
       progress,
       connection as BinanceConnection,
@@ -229,7 +230,7 @@ export async function syncConnection(
       signal
     )
   } else {
-    throw new Error(`Unsupported platform: ${connection.platform}`)
+    throw new Error(`Unsupported extension: ${connection.extensionId}`)
   }
 
   // Save logs

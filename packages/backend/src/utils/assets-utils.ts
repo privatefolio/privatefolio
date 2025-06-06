@@ -1,6 +1,7 @@
-import { getAddress, Networkish } from "ethers"
+import { getAddress } from "ethers"
 import { Web3Address } from "src/interfaces"
 
+import { PLATFORMS_META } from "../settings/platforms"
 import { memoize } from "./fp-utils"
 
 /**
@@ -32,13 +33,8 @@ export const getAssetContract = memoize(function getAssetPlatform(assetId: strin
   return formatAddress(contractAddress) as Web3Address
 })
 
-export const getEvmChainId = memoize(function getAssetPlatform(platformId: string) {
-  if (platformId === "ethereum") return 1
-  return Number(platformId.split("-")[1]) as Networkish
-})
-
 export const isEvmPlatform = memoize(function isEvmPlatform(platformId: string) {
-  return platformId === "ethereum" || platformId.includes("eip155") // TODO9
+  return PLATFORMS_META[platformId].chainId !== undefined
 })
 
 export const formatAddress = (address: string) => {

@@ -17,6 +17,7 @@ describe.skip("should import 0xab08B from base via connection", () => {
     // act
     connection = await upsertConnection(accountName, {
       address,
+      extensionId: "etherscan-connection",
       label: "",
       platform: "base",
     })

@@ -291,7 +291,7 @@ export function AddTransactionDrawer(props: PopoverToggleProps) {
               value={notes}
               minRows={3}
               fullWidth
-              placeholder="Write a custom note..."
+              placeholder="Write a custom note…"
             />
           </div>
           <div>

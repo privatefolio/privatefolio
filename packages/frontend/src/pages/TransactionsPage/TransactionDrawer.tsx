@@ -300,7 +300,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
             value={textInput}
             minRows={3}
             fullWidth
-            placeholder="Write a custom note..."
+            placeholder="Write a custom note…"
           />
         </div>
       </Stack>

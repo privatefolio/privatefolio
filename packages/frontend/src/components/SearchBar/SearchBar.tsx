@@ -417,7 +417,7 @@ function RenderResults({ loading }: { loading: boolean }) {
       )}
       {loading && (
         <MenuItem disabled sx={{ textAlign: "center" }}>
-          <ListItemText primary="Loading..." />
+          <ListItemText primary="Loading…" />
         </MenuItem>
       )}
     </div>

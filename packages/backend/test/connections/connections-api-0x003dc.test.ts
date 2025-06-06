@@ -27,6 +27,7 @@ describe("should import 0x003dc via connection", () => {
     // act
     connection = await upsertConnection(accountName, {
       address,
+      extensionId: "etherscan-connection",
       label: "",
       platform: "ethereum",
     })

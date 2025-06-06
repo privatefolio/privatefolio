@@ -17,6 +17,7 @@ describe.skip("should import 0x0E3ff from polygon via connection", () => {
     // act
     connection = await upsertConnection(accountName, {
       address,
+      extensionId: "etherscan-connection",
       label: "",
       platform: "polygon-pos",
     })
