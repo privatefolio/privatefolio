@@ -1,15 +1,18 @@
 import { useBunSqlite } from "src/utils/environment-utils"
 
-export async function createSqliteDatabaseConnection(databaseFilePath: string) {
+export async function createSqliteDatabaseConnection(
+  databaseFilePath: string,
+  accountName: string
+) {
   // console.log("Using bun sqlite", useBunSqlite)
   if (useBunSqlite) {
     const { createQueryExecutor } = await import("./bun-sqlite")
-    const db = await createQueryExecutor(databaseFilePath)
+    const db = await createQueryExecutor(databaseFilePath, accountName)
     return db
   }
 
   const { createQueryExecutor } = await import("./nodejs-sqlite")
-  const db = await createQueryExecutor(databaseFilePath)
+  const db = await createQueryExecutor(databaseFilePath, accountName)
   return db
 
   // const { createQueryExecutor, createSQLiteAPI } = await import("./webworker-sqlite")

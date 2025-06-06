@@ -1,5 +1,6 @@
 import { Database } from "bun:sqlite"
 import { isDevelopment } from "src/utils/environment-utils"
+import { getPrefix } from "src/utils/utils"
 
 export type SQLiteCompatibleType = boolean | string | number | null | Uint8Array
 
@@ -9,7 +10,10 @@ export type QueryExecutor = {
   executeMany(query: string, params?: SQLiteCompatibleType[][]): Promise<SQLiteCompatibleType[][]>
 }
 
-export async function createQueryExecutor(databaseFilePath: string): Promise<QueryExecutor> {
+export async function createQueryExecutor(
+  databaseFilePath: string,
+  accountName: string
+): Promise<QueryExecutor> {
   const db = new Database(databaseFilePath)
 
   async function executeFn(
@@ -32,6 +36,7 @@ export async function createQueryExecutor(databaseFilePath: string): Promise<Que
 
       if (isDevelopment) {
         console.log(
+          getPrefix(accountName),
           `Query took ${durationMs.toFixed(3)}ms`,
           query.slice(0, 80).replace(/\n/g, "").trim()
         )

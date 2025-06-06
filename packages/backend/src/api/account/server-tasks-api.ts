@@ -10,7 +10,7 @@ import {
   TaskCompletionCallback,
   TaskStatus,
 } from "src/interfaces"
-import { TASK_LOGS_LOCATION } from "src/settings"
+import { TASK_LOGS_LOCATION } from "src/settings/settings"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { getPrefix, sleep } from "src/utils/utils"

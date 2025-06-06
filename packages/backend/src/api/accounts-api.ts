@@ -2,7 +2,7 @@ import EventEmitter from "events"
 import { access, mkdir, readdir, rm, stat, writeFile } from "fs/promises"
 import { join } from "path"
 import { EventCause, SubscriptionChannel, SubscriptionId, TaskPriority } from "src/interfaces"
-import { DATABASES_LOCATION, TASK_LOGS_LOCATION } from "src/settings"
+import { DATABASES_LOCATION, TASK_LOGS_LOCATION } from "src/settings/settings"
 import { createSqliteDatabaseConnection } from "src/sqlite/sqlite"
 import { isDevelopment, isTestEnvironment } from "src/utils/environment-utils"
 import { sql } from "src/utils/sql-utils"
@@ -40,7 +40,7 @@ async function createDatabaseConnection(accountName: string, createIfNeeded = fa
     }
   }
 
-  const db = await createSqliteDatabaseConnection(databaseFilePath)
+  const db = await createSqliteDatabaseConnection(databaseFilePath, accountName)
 
   const journalMode = await db.execute(`PRAGMA journal_mode;`)
   if (isDevelopment) {

@@ -1,6 +1,7 @@
 import { open } from "sqlite"
 import sqlite3 from "sqlite3"
 import { isDevelopment } from "src/utils/environment-utils"
+import { getPrefix } from "src/utils/utils"
 
 export type SQLiteCompatibleType = boolean | string | number | null | Uint8Array
 
@@ -10,7 +11,10 @@ export type QueryExecutor = {
   executeMany(query: string, params?: SQLiteCompatibleType[][]): Promise<SQLiteCompatibleType[][]>
 }
 
-export async function createQueryExecutor(databaseFilePath: string): Promise<QueryExecutor> {
+export async function createQueryExecutor(
+  databaseFilePath: string,
+  accountName: string
+): Promise<QueryExecutor> {
   const db = await open({
     driver: sqlite3.Database,
     filename: databaseFilePath,
@@ -36,6 +40,7 @@ export async function createQueryExecutor(databaseFilePath: string): Promise<Que
 
       if (isDevelopment) {
         console.log(
+          getPrefix(accountName),
           `Query took ${durationMs.toFixed(3)}ms`,
           query.slice(0, 80).replace(/\n/g, "").trim()
         )

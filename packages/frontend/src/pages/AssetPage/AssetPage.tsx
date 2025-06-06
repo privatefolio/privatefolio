@@ -1,16 +1,17 @@
 import { Skeleton, Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import { getFullMetadata } from "privatefolio-backend/build/src/api/external/assets/coingecko-asset-api"
-import { getCachedAssetMeta } from "privatefolio-backend/build/src/api/external/assets/coingecko-asset-cache"
+import { getFullMetadata } from "privatefolio-backend/build/src/extensions/metadata/coingecko/coingecko-asset-api"
 import React, { useEffect, useMemo, useState } from "react"
 import { useParams, useSearchParams } from "react-router-dom"
 import { AmountBlock } from "src/components/AmountBlock"
-import { CircularSpinner } from "src/components/CircularSpinner"
+import { BackButton } from "src/components/BackButton"
+import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { NavTab } from "src/components/NavTab"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { Tabs } from "src/components/Tabs"
-import { Balance, CoingeckoMetadataFull } from "src/interfaces"
+import { UserWalletIcon } from "src/components/UserWalletIcon"
+import { Balance, CoingeckoMetadataFull, MyAsset } from "src/interfaces"
 import { $quoteCurrency } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
 import { getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
@@ -22,16 +23,18 @@ import { SerifFont } from "../../theme"
 import FourZeroFourPage from "../404"
 import { AuditLogTable } from "../AuditLogsPage/AuditLogTable"
 import { TransactionTable } from "../TransactionsPage/TransactionTable"
-import { AssetInfo } from "./AssetInfo"
+import { AssetDetails } from "./AssetDetails"
 import { AssetMarketTable } from "./AssetMarketTable"
 import { BalanceChart } from "./BalanceChart"
 import { PriceChart } from "./PriceChart"
+
+const defaultTab = "details"
 
 export default function AssetPage() {
   const params = useParams()
   const assetId = params.assetId // ?.toLocaleUpperCase()
   const [searchParams] = useSearchParams()
-  const tab = searchParams.get("tab") || ""
+  const tab = searchParams.get("tab") || defaultTab
   const assetMap = useStore($assetMap)
 
   const filterMap = useStore($filterOptionsMap)
@@ -41,8 +44,10 @@ export default function AssetPage() {
   const activeAccount = useStore($activeAccount)
   const currency = useStore($quoteCurrency)
 
+  const [asset, setAsset] = useState<MyAsset | undefined>()
+
   useEffect(() => {
-    document.title = `${getAssetTicker(assetId)} - ${activeAccount} - Privatefolio`
+    document.title = `${getAssetTicker(assetId)} (Asset) - ${activeAccount} - Privatefolio`
   }, [assetId, activeAccount])
 
   useEffect(() => {
@@ -70,30 +75,33 @@ export default function AssetPage() {
   useEffect(() => {
     if (!assetId) return
 
+    if (assetMap[assetId]) {
+      setAsset(assetMap[assetId])
+      if (!assetMap[assetId].coingeckoId) return
+      getFullMetadata(assetMap[assetId].coingeckoId).then(setMetadata)
+      return
+    }
+
     setLoading(true)
-    getCachedAssetMeta(assetId)
-      .then((x) => (x.coingeckoId ? getFullMetadata(x.coingeckoId) : null))
+    $rpc
+      .get()
+      .getAsset(activeAccount, assetId)
+      .then((x) => {
+        setAsset(x)
+        return x?.coingeckoId ? getFullMetadata(x.coingeckoId) : null
+      })
       .then(setMetadata)
       .finally(() => setLoading(false))
-  }, [assetId])
+  }, [activeAccount, assetId, assetMap])
 
-  if (!filterMap.assetId) {
-    return (
-      <Stack component="main" gap={2} alignItems="center">
-        <CircularSpinner color="secondary" />
-      </Stack>
-    )
-  }
-
-  if (!assetId) {
-    return <FourZeroFourPage show />
-  }
+  if (!filterMap.assetId) return <DefaultSpinner />
+  if (!assetId) return <FourZeroFourPage show type="Asset" />
 
   return (
     <Stack component="main" gap={2}>
-      {/* <BackButton to=".." sx={{ marginLeft: 1 }}>
+      <BackButton sx={{ marginLeft: 1 }} fallback="../assets">
         Back
-      </BackButton> */}
+      </BackButton>
       <Stack
         direction="row"
         alignItems="center"
@@ -107,7 +115,7 @@ export default function AssetPage() {
         <Stack direction="row" gap={1} component="div" alignItems="center">
           <AssetAvatar
             size="large"
-            src={assetMap[assetId]?.logoUrl || metadata?.image.large}
+            src={asset?.logoUrl || metadata?.image.large}
             alt={getAssetTicker(assetId)}
           />
           <Stack>
@@ -117,22 +125,14 @@ export default function AssetPage() {
             <Typography
               color="text.secondary"
               variant="subtitle2"
-              fontWeight={300}
+              fontWeight={400}
               letterSpacing={0.5}
             >
-              {assetMap[assetId]?.name || metadata?.name}
+              {asset?.name || metadata?.name}
             </Typography>
           </Stack>
         </Stack>
-        <Stack
-          gap={6}
-          direction="row"
-          // sx={{
-          //   "& > div": {
-          //     minWidth: 120,
-          //   },
-          // }}
-        >
+        <Stack gap={6} direction="row">
           {metadata && (
             <>
               <div>
@@ -166,11 +166,13 @@ export default function AssetPage() {
           {getAssetPlatform(assetId) && (
             <div>
               <SectionTitle>Platform</SectionTitle>
-              <PlatformBlock platform={getAssetPlatform(assetId)} />
+              <PlatformBlock id={getAssetPlatform(assetId)} />
             </div>
           )}
           <div>
-            <SectionTitle>Balance</SectionTitle>
+            <SectionTitle>
+              <UserWalletIcon /> Balance
+            </SectionTitle>
             {!balances ? (
               <Skeleton width="100%" />
             ) : (
@@ -182,7 +184,9 @@ export default function AssetPage() {
             )}
           </div>
           <div>
-            <SectionTitle>Value</SectionTitle>
+            <SectionTitle>
+              <UserWalletIcon /> Value
+            </SectionTitle>
             {!balances ? (
               <Skeleton width="100%" />
             ) : (
@@ -198,22 +202,47 @@ export default function AssetPage() {
         </Stack>
       </Stack>
       <Stack>
-        <Tabs value={tab}>
-          <NavTab value="" to="" label="Price history" />
-          <NavTab value="balance" to={`?tab=balance`} label="Balance history" />
-          {/* <NavTab value="pnl" to={`?tab=pnl`} label="Profit & Loss"  /> */}
-          <NavTab value="transactions" to={`?tab=transactions`} label="Transactions" />
-          <NavTab value="audit-logs" to={`?tab=audit-logs`} label="Audit logs" />
-          <NavTab value="info" to={`?tab=info`} label="Info" />
+        <Tabs value={tab} defaultValue={defaultTab}>
+          <NavTab value="details" to={`?tab=details`} label="About" />
           <NavTab value="markets" to={`?tab=markets`} label="Markets" />
+          <NavTab value="price-history" to={`?tab=price-history`} label="Price history" />
+          <NavTab
+            value="balance"
+            to={`?tab=balance`}
+            label={
+              <span>
+                <UserWalletIcon /> Balance history
+              </span>
+            }
+          />
+          {/* <NavTab value="pnl" to={`?tab=pnl`} label="Profit & Loss"  /> */}
+          <NavTab
+            value="transactions"
+            to={`?tab=transactions`}
+            label={
+              <span>
+                <UserWalletIcon /> Transactions
+              </span>
+            }
+          />
+          <NavTab
+            value="audit-logs"
+            to={`?tab=audit-logs`}
+            label={
+              <span>
+                <UserWalletIcon /> Audit logs
+              </span>
+            }
+          />
         </Tabs>
-        {tab === "" && <PriceChart symbol={assetId} />}
+        {tab === "details" && <AssetDetails metadata={metadata} isLoading={isLoading} />}
+        {tab === "price-history" && <PriceChart symbol={assetId} />}
+        {tab === "markets" && <AssetMarketTable metadata={metadata} isLoading={isLoading} />}
         {tab === "balance" && <BalanceChart symbol={assetId} />}
         {tab === "transactions" && <TransactionTable assetId={assetId} defaultRowsPerPage={10} />}
         {tab === "audit-logs" && <AuditLogTable assetId={assetId} defaultRowsPerPage={10} />}
-        {tab === "info" && <AssetInfo metadata={metadata} isLoading={isLoading} />}
-        {tab === "markets" && <AssetMarketTable metadata={metadata} isLoading={isLoading} />}
       </Stack>
+      {/* TODO5 */}
       {/* <AssetInfo
            assetSymbol={assetSymbol}
            amountBought={amounts.amountBought.toNumber()}
@@ -228,6 +257,7 @@ export default function AssetPage() {
   )
 }
 
+// {/* TODO5 */}
 // const [tradeHistory, setTradeHistory] = useState<Transaction[]>([])
 // const [amounts, setAmounts] = useState<any>({})
 

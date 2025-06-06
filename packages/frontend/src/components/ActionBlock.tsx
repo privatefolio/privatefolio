@@ -1,6 +1,10 @@
 import {
   AddRounded,
+  CloudOutlined,
+  CurrencyExchangeRounded,
+  DataObjectRounded,
   DoneRounded,
+  FolderOutlined,
   QuestionMarkRounded,
   RemoveRounded,
   SvgIconComponent,
@@ -15,13 +19,17 @@ import { greenColor, redColor } from "src/utils/color-utils"
 
 import { Truncate } from "./Truncate"
 
-type Action = AuditLogOperation | TransactionType
+type Action = AuditLogOperation | TransactionType | string
 
 type ActionBlockProps = {
   IconComponent?: SvgIconComponent
   action: string
   color?: string
-} & Omit<ChipProps, "color">
+  /**
+   * @default "small"
+   */
+  size?: "small" | "medium"
+} & Omit<ChipProps, "color" | "size">
 
 const colorMap: Partial<Record<Action, string>> = {
   Buy: greenColor,
@@ -34,9 +42,13 @@ const colorMap: Partial<Record<Action, string>> = {
 const iconMap: Partial<Record<Action, SvgIconComponent>> = {
   Approve: DoneRounded,
   Buy: AddRounded,
+  Connection: CloudOutlined,
   Deposit: AddRounded,
   Fee: RemoveRounded,
+  "File Import": FolderOutlined,
+  Metadata: DataObjectRounded,
   Mint: SwapHoriz,
+  "Price API": CurrencyExchangeRounded,
   Reward: AddRounded,
   Sell: RemoveRounded,
   Swap: SwapHoriz,
@@ -47,7 +59,13 @@ const iconMap: Partial<Record<Action, SvgIconComponent>> = {
 }
 
 export function ActionBlock(props: ActionBlockProps) {
-  const { action, color: colorOverride, IconComponent: IconComponentOverride, ...rest } = props
+  const {
+    action,
+    color: colorOverride,
+    IconComponent: IconComponentOverride,
+    size = "small",
+    ...rest
+  } = props
 
   const color = colorOverride || colorMap[action] || grey[500]
   const IconComponent = IconComponentOverride || iconMap[action]
@@ -55,10 +73,15 @@ export function ActionBlock(props: ActionBlockProps) {
   return (
     <Tooltip title={action}>
       <Chip
-        size="small"
+        size={size}
         sx={{ background: alpha(color, chipBgOpacity) }}
         label={
-          <Stack direction="row" gap={0.5} alignItems="center" paddingRight={0.5}>
+          <Stack
+            direction="row"
+            gap={size === "small" ? 0.5 : 1}
+            alignItems="center"
+            paddingRight={0.5}
+          >
             {IconComponent && <IconComponent sx={{ color, fontSize: "inherit" }} />}
             <Truncate>{action}</Truncate>
           </Stack>

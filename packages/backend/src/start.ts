@@ -7,7 +7,7 @@ import { throttle } from "lodash-es"
 import { Api, api } from "./api/api"
 import { BackendServer } from "./backend-server"
 import { EventCause, SubscriptionId } from "./interfaces"
-import { SHORT_THROTTLE_DURATION } from "./settings"
+import { SHORT_THROTTLE_DURATION } from "./settings/settings"
 import { getCronExpression, getPrefix } from "./utils/utils"
 
 console.log("Starting worker...")
@@ -64,7 +64,6 @@ async function setupSideEffects(accountName: string) {
           await writeApi.computeLastTx(accountName)
 
           if (cause === EventCause.Created) {
-            await writeApi.enqueueFetchAssetInfos(accountName, "side-effect")
             await writeApi.enqueueDetectSpamTransactions(accountName, "side-effect")
             await writeApi.enqueueAutoMerge(accountName, "side-effect")
           }

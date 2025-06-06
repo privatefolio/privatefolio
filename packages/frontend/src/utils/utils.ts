@@ -1,4 +1,5 @@
 import { createCsvString } from "privatefolio-backend/build/src/utils/csv-utils"
+import { STATIC_ASSET_LOCATION } from "src/env"
 
 import { CsvData, ProgressLog } from "../interfaces"
 
@@ -171,4 +172,31 @@ export function parseProgressLog(logEntry: string): ProgressLog {
   const timestamp = new Date(isoDate).getTime()
   const progressUpdate = JSON.parse(logEntry.slice(25))
   return [timestamp, progressUpdate] satisfies ProgressLog
+}
+
+export function resolveUrl(url?: string) {
+  if (!url) return url
+
+  if (url.includes("$STATIC_ASSETS")) {
+    return url.replace("$STATIC_ASSETS", STATIC_ASSET_LOCATION)
+  }
+
+  return url
+}
+
+export function prettifyUrl(url: string) {
+  url = url.replaceAll("https://", "")
+  url = url.replaceAll("http://", "")
+  url = url.replaceAll("www.", "")
+  url = url.replace("github.com/privatefolio/privatefolio/tree/main/", "")
+  return url
+}
+
+export function extractRootUrl(url: string) {
+  url = url.replaceAll("https://", "")
+  url = url.replaceAll("http://", "")
+  url = url.replaceAll("www.", "")
+  url = url.endsWith("/") ? url.slice(0, -1) : url
+  url = url.split("/")[0] // remove anything beyond the root tld
+  return url
 }

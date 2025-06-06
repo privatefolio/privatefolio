@@ -1,12 +1,11 @@
-import { BinancePair } from "./api/account/connections/integrations/binance/binance-account-api"
-import {
+import type { BinancePair } from "./extensions/connections/binance/binance-account-api"
+import { BinanceWalletId } from "./extensions/connections/binance/binance-settings"
+import type {
   Erc20Transaction,
   InternalTransaction,
   NormalTransaction,
-} from "./api/account/connections/integrations/etherscan-rpc"
-import { BinanceWalletId, ParserId, PlatformId, PriceApiId } from "./settings"
-
-export type { PlatformId } from "./settings"
+} from "./extensions/connections/etherscan/etherscan-rpc"
+import type { PriceApiId } from "./settings/settings"
 
 export type TransactionRole = "Maker" | "Taker"
 export type TransactionSide = "BUY" | "SELL"
@@ -63,7 +62,7 @@ export interface Transaction {
   notes?: string
   outgoing?: string
   outgoingAsset?: string
-  platform: PlatformId
+  platform: string
   price?: string
   role?: TransactionRole
   tags?: number[]
@@ -113,10 +112,13 @@ export type AuditLogOperation =
   | "Wrap"
 
 export interface Exchange {
-  coingeckoId: string
+  coingeckoTrustRank?: number
+  /**
+   * 0-10
+   */
   coingeckoTrustScore: number
-  coingeckoTrustScoreRank: number
-  country: string
+  country?: string
+  id: string
   image: string
   name: string
   url: string
@@ -128,17 +130,16 @@ export interface Blockchain {
    * EVM chainId
    */
   chainId: number
-  coingeckoId: string
+  id: string
   image: string
   name: string
   /**
    * coingeckoId of the native coin
    */
   nativeCoinId: string
-  shortName: string
 }
 
-export type PlatformMetadata = Exchange | Blockchain
+export type Platform = Exchange | Blockchain
 
 export interface AuditLog {
   assetId: string
@@ -149,7 +150,7 @@ export interface AuditLog {
   id: string
   importIndex: number
   operation: AuditLogOperation
-  platform: PlatformId
+  platform: string
   tags?: number[]
   timestamp: Timestamp
   txId?: string
@@ -169,10 +170,11 @@ export interface FileImport {
   lastModified: number
   meta?: {
     assetIds: string[]
-    integration: ParserId
+    extensionId: string
     logs: number
     operations: AuditLogOperation[]
-    platform: PlatformId
+    parserId: string
+    platform: string
     rows: number
     transactions: number
     wallets: string[]
@@ -375,7 +377,7 @@ export interface Connection {
     wallets: string[]
   }
   options?: BinanceConnectionOptions | ConnectionOptions
-  platform: PlatformId
+  platform: string
   secret?: string // rename to apiSecret
   syncedAt?: number
   /**
@@ -394,13 +396,23 @@ export type BinanceConnection = Connection & {
 }
 
 export type ParserResult = { logs: AuditLog[]; txns?: Transaction[] }
-export type CsvParser = (
+
+export type CsvParseFn = (
   csvRow: string,
   index: number,
   fileImportId: string,
   parserContext: Record<string, unknown>,
   header: string
 ) => ParserResult
+
+export type CsvParser = {
+  extensionId: string
+  parse: CsvParseFn
+  parserId: string
+  platform: string
+  requirements?: string[]
+}
+
 export type EvmParser = (
   row: NormalTransaction | InternalTransaction | Erc20Transaction,
   index: number,
@@ -595,10 +607,11 @@ export interface CoingeckoMetadataFull {
   web_slug: string
 }
 
-export type CoingeckoCoinId = string
-
+/**
+ * @deprecated TODO9 remove this
+ */
 export interface CoinData {
-  id: CoingeckoCoinId
+  id: string
   image: string
   name: string
   symbol?: string
@@ -607,17 +620,21 @@ export interface CoinData {
 export interface AssetMetadata {
   coingeckoId?: string
   logoUrl: string
+  marketCapRank?: number
   name: string
   symbol?: string
 }
 
 export interface Asset extends Partial<AssetMetadata> {
   id: string
-  priceApiId?: PriceApiId
   symbol: string
 }
 
-export interface AssetWithPrice extends Asset {
+export interface MyAsset extends Asset {
+  priceApiId?: PriceApiId
+}
+
+export interface AssetWithPrice extends MyAsset {
   price?: ChartData | null
 }
 
@@ -632,6 +649,7 @@ export type FilterOptionsMap = {
   assetId: string[]
   createdBy: string[]
   exchangeType: string[]
+  extensionType: string[]
   feeAsset: string[]
   incomingAsset: string[]
   operation: AuditLogOperation[]
@@ -771,4 +789,45 @@ export type AddressBook = LabeledAddress[]
 export interface Tag {
   id: number
   name: string
+}
+
+export type ExtensionType = "file-import" | "connection" | "price-api" | "metadata"
+
+export type SourceCode = {
+  tags: string[]
+  url: string
+}
+
+export interface Extension {
+  authorGithub: string
+  description: string
+  extensionLogoUrl: string
+  extensionName: string
+  extensionType: ExtensionType
+  extensionVersion: string
+  githubUrl: string
+  howTo?: string
+  id: string
+  platformIds?: string[]
+  priceUsd?: number
+  publishedAt: Timestamp
+  sources?: SourceCode[]
+  updatedAt: Timestamp
+}
+
+export interface RichExtension extends Extension {
+  platforms?: Platform[]
+}
+
+export type FindPlatformsResult = {
+  blockchains: Blockchain[]
+  exchanges: Exchange[]
+}
+
+export type PlatformMeta = {
+  blockExplorer?: {
+    name: string
+    url: string
+  }
+  nativeAssetId?: string
 }

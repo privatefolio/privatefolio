@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 
+import { backOff } from "exponential-backoff"
+
 import { BackendResponse, FunctionReference } from "./backend-comms"
 import { ConnectionStatusCallback } from "./interfaces"
 import { noop } from "./utils/utils"
@@ -17,6 +19,7 @@ class BackendRelayer {
   private logPrefix: string
   private closedByUser = false
   public readonly id: number
+  public reconnecting = false
 
   constructor(
     address: string,
@@ -97,20 +100,44 @@ class BackendRelayer {
       onStatusChange("connected")
     })
     socket.addEventListener("close", (event) => {
+      if (this.reconnecting) return
+
       let reason = event.reason || "unknown"
       if (event.code === 1006 && reason === "unknown") {
         reason = "Server offline."
       }
       console.log(this.logPrefix, "closed:", event.code, reason, baseAddress)
       onStatusChange("closed", `${event.code}: ${reason}`)
-      if (this.closedByUser) return
-      if (event.code !== 1008) {
-        setTimeout(() => {
+
+      if (this.closedByUser || event.code === 1008) return
+
+      this.reconnecting = true
+
+      backOff(
+        () => {
           this.socket = this.connect(address, onStatusChange)
-        }, 1_000)
-      }
+          if (this.socket.readyState !== WebSocket.OPEN) {
+            throw new Error("Reconnect attempt failed")
+          }
+          return Promise.resolve()
+        },
+        {
+          maxDelay: 10_000,
+          numOfAttempts: 100,
+          retry: (_err, attempt) => {
+            console.log(this.logPrefix, `reconnecting, attempt: #${attempt}`)
+            return !(this.closedByUser || event.code === 1008)
+          },
+          startingDelay: 100,
+        }
+      ).catch(() => {
+        console.error(this.logPrefix, "Failed to reconnect")
+        this.reconnecting = false
+      })
     })
     socket.addEventListener("error", (event) => {
+      if (this.reconnecting) return
+
       console.error(this.logPrefix, "error:", event, baseAddress)
     })
 

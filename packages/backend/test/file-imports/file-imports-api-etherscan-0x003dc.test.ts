@@ -7,7 +7,7 @@ import {
   deleteFileImport,
   getFileImports,
   importFile,
-} from "src/api/account/file-imports/file-imports-api"
+} from "src/api/account/file-imports-api"
 import { computeTrades, getTrades, getTradesFullQuery } from "src/api/account/trades-api"
 import {
   autoMergeTransactions,
@@ -66,13 +66,14 @@ describe("should import 0x003dc via files", () => {
           "assetIds": [
             "ethereum:0x0000000000000000000000000000000000000000:ETH",
           ],
-          "integration": "etherscan",
+          "extensionId": "etherscan-file-import",
           "logs": 545,
           "operations": [
             "Deposit",
             "Fee",
             "Withdraw",
           ],
+          "parserId": "etherscan-default",
           "platform": "ethereum",
           "rows": 482,
           "transactions": 482,
@@ -122,12 +123,13 @@ describe("should import 0x003dc via files", () => {
             "ethereum:0x0000000000000000000000000000000000000000:ETH",
             "ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2:WETH",
           ],
-          "integration": "etherscan-internal",
+          "extensionId": "etherscan-file-import",
           "logs": 61,
           "operations": [
             "Deposit",
             "Withdraw",
           ],
+          "parserId": "etherscan-internal",
           "platform": "ethereum",
           "rows": 48,
           "transactions": 48,
@@ -249,12 +251,13 @@ describe("should import 0x003dc via files", () => {
             "ethereum:0x7DD9c5Cba05E151C895FDe1CF355C9A1D5DA6429:GLM",
             "ethereum:0xdb25cA703181E7484a155DD612b06f57E12Be5F0:yvYFI",
           ],
-          "integration": "etherscan-erc20",
+          "extensionId": "etherscan-file-import",
           "logs": 419,
           "operations": [
             "Deposit",
             "Withdraw",
           ],
+          "parserId": "etherscan-erc20",
           "platform": "ethereum",
           "rows": 428,
           "transactions": 419,

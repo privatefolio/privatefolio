@@ -9,6 +9,8 @@ import IconButton from "@mui/material/IconButton"
 import * as React from "react"
 import { MonoFont } from "src/theme"
 
+import { Key, MAIN_KEY } from "./SearchBar/Key"
+
 interface TablePaginationActionsProps {
   count: number
   onPageChange: (event: React.MouseEvent<HTMLButtonElement>, page: number) => void
@@ -37,9 +39,45 @@ export function TablePaginationActions(props: TablePaginationActionsProps) {
     onPageChange(event, Math.max(0, lastPage))
   }
 
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey || event.metaKey) {
+        if (event.key === "ArrowLeft") {
+          if (page > 0) {
+            onPageChange(event as any, page - 1)
+          }
+        } else if (event.key === "ArrowRight") {
+          if (page < lastPage) {
+            onPageChange(event as any, page + 1)
+          }
+        } else if (event.key === "ArrowDown") {
+          if (page !== 0) {
+            onPageChange(event as any, 0)
+          }
+        } else if (event.key === "ArrowUp") {
+          if (page !== lastPage) {
+            onPageChange(event as any, lastPage)
+          }
+        }
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown)
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [page, lastPage, onPageChange])
+
   return (
     <Stack sx={{ flexShrink: 0, ml: 2.5 }} direction="row" alignItems="center">
-      <Tooltip title="Go to first page">
+      <Tooltip
+        title={
+          <>
+            Go to first page <Key variant="tooltip">{MAIN_KEY}</Key>
+            <Key variant="tooltip">↓</Key>
+          </>
+        }
+      >
         <span>
           <IconButton
             size="small"
@@ -52,7 +90,14 @@ export function TablePaginationActions(props: TablePaginationActionsProps) {
           </IconButton>
         </span>
       </Tooltip>
-      <Tooltip title="Go to previous page">
+      <Tooltip
+        title={
+          <>
+            Go to previous page <Key variant="tooltip">{MAIN_KEY}</Key>
+            <Key variant="tooltip">←</Key>
+          </>
+        }
+      >
         <span>
           <IconButton
             size="small"
@@ -92,7 +137,14 @@ export function TablePaginationActions(props: TablePaginationActionsProps) {
           of {lastPage + 1}
         </Typography>
       </Stack>
-      <Tooltip title="Go to next page">
+      <Tooltip
+        title={
+          <>
+            Go to next page <Key variant="tooltip">{MAIN_KEY}</Key>
+            <Key variant="tooltip">→</Key>
+          </>
+        }
+      >
         <span>
           <IconButton
             size="small"
@@ -105,7 +157,14 @@ export function TablePaginationActions(props: TablePaginationActionsProps) {
           </IconButton>
         </span>
       </Tooltip>
-      <Tooltip title="Go to last page">
+      <Tooltip
+        title={
+          <>
+            Go to last page <Key variant="tooltip">{MAIN_KEY}</Key>
+            <Key variant="tooltip">↑</Key>
+          </>
+        }
+      >
         <span>
           <IconButton
             size="small"

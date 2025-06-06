@@ -1,18 +1,69 @@
 import { KeyboardBackspace } from "@mui/icons-material"
 import { Button, ButtonProps } from "@mui/material"
-import React, { ReactNode } from "react"
-import { Link, LinkProps } from "react-router-dom"
+import React, { useCallback, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 
-type BackButtonProps = Omit<ButtonProps<"a">, "component"> & LinkProps & { children?: ReactNode }
+import { Key } from "./SearchBar/Key"
 
-export function BackButton({ sx = {}, ...rest }: BackButtonProps) {
+type BackButtonProps = ButtonProps & {
+  fallback?: string
+}
+
+export function BackButton({ fallback, sx = {}, ...rest }: BackButtonProps) {
+  const navigate = useNavigate()
+
+  const idx = window.history.state?.idx ?? 0
+  const canGoBack = idx > 0
+
+  const handleClick = useCallback(() => {
+    if (canGoBack || !fallback) {
+      navigate(-1)
+    } else {
+      navigate(fallback)
+    }
+  }, [canGoBack, fallback, navigate])
+
+  const hide = !canGoBack && !fallback
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Check if the active element is an input or textarea
+      const activeElement = document.activeElement
+      const isInputFocused =
+        activeElement instanceof HTMLInputElement ||
+        activeElement instanceof HTMLTextAreaElement ||
+        (activeElement instanceof HTMLElement && activeElement.isContentEditable)
+
+      if (event.key === "Backspace" && !isInputFocused && !hide) {
+        handleClick()
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown)
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [handleClick, hide])
+
   return (
     <Button
-      component={Link}
+      onClick={handleClick}
       size="small"
       color="secondary"
-      sx={{ borderRadius: 16, paddingLeft: 1, paddingRight: 2, ...sx }}
+      sx={{
+        "& .MuiButton-endIcon span": {
+          fontSize: "0.75rem !important",
+        },
+        alignSelf: "flex-start",
+        borderRadius: 16,
+        opacity: hide ? 0 : 1,
+        paddingLeft: 1,
+        paddingRight: 2,
+        paddingY: 0.25,
+        ...sx,
+      }}
       startIcon={<KeyboardBackspace sx={{ pointerEvents: "none" }} />}
+      endIcon={<Key>BKSP</Key>}
       {...rest}
     />
   )

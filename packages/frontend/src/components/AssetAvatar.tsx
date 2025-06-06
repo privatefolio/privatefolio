@@ -31,7 +31,7 @@ const SIZE_MAP = {
 const FONT_SIZE_MAP = {
   large: "1rem",
   medium: "0.8rem",
-  small: "0.65rem",
+  small: "0.625rem",
   snug: "0.5rem",
 }
 

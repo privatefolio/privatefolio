@@ -2,7 +2,7 @@ import { createWriteStream } from "fs"
 import { access, mkdir, open, readFile, stat } from "fs/promises"
 import mime from "mime-types"
 import { join } from "path"
-import { corsHeaders, FILES_LOCATION } from "src/settings"
+import { corsHeaders, FILES_LOCATION } from "src/settings/settings"
 import { getPrefix } from "src/utils/utils"
 import { promisify } from "util"
 

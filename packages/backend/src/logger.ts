@@ -2,7 +2,7 @@ import { BunFile, FileSink } from "bun"
 import { existsSync, mkdirSync } from "fs"
 import { join } from "path"
 
-import { SERVER_LOGS_LOCATION } from "./settings"
+import { SERVER_LOGS_LOCATION } from "./settings/settings"
 
 if (!existsSync(SERVER_LOGS_LOCATION)) mkdirSync(SERVER_LOGS_LOCATION, { recursive: true })
 

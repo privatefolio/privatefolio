@@ -2,15 +2,14 @@ import { atom, keepMount, map } from "nanostores"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { logAtoms } from "src/utils/browser-utils"
 
-import { Asset, FilterOptionsMap, PlatformId, TRANSACTIONS_TYPES } from "../interfaces"
-import { PLATFORMS_META } from "../settings"
+import { FilterOptionsMap, MyAsset, TRANSACTIONS_TYPES } from "../interfaces"
 import { $rpc } from "../workers/remotes"
 import { $activeAccount } from "./account-store"
 
 export type FilterKey = keyof FilterOptionsMap
 export const $filterOptionsMap = map<FilterOptionsMap>()
 
-export const $assetMap = map<Record<string, Asset>>({})
+export const $assetMap = map<Record<string, MyAsset>>({})
 export const $addressBook = map<Record<string, string>>({})
 export const $tags = map<Record<string, string>>({})
 
@@ -27,7 +26,7 @@ export async function fetchInMemoryData() {
 
   const start = Date.now()
   const [assets, platform, wallet, operation, addressBook, tags, triggers] = await Promise.all([
-    $rpc.get().getAssets(accountName),
+    $rpc.get().getMyAssets(accountName),
     $rpc.get().getPlatforms(accountName),
     $rpc.get().getWallets(accountName),
     $rpc.get().getOperations(accountName),
@@ -38,7 +37,7 @@ export async function fetchInMemoryData() {
 
   $inMemoryDataQueryTime.set(Date.now() - start)
 
-  const assetsMap: Record<string, Asset> = assets.reduce((acc, asset) => {
+  const assetsMap: Record<string, MyAsset> = assets.reduce((acc, asset) => {
     acc[asset.id] = asset
     return acc
   }, {})
@@ -64,6 +63,7 @@ export async function fetchInMemoryData() {
     assetId: assetIds,
     createdBy: ["user", "system"],
     exchangeType: ["DEX", "CEX"],
+    extensionType: ["file-import", "connection", "price-api", "metadata"],
     feeAsset: assetIds,
     incomingAsset: assetIds,
     operation,
@@ -88,6 +88,7 @@ export const FILTER_LABEL_MAP: Record<FilterKey | DirectFilterKey, string> = {
   assetId: "Asset",
   createdBy: "Created By",
   exchangeType: "Exchange Type",
+  extensionType: "Type",
   feeAsset: "Fee Asset",
   id: "Id",
   incomingAsset: "Incoming Asset",
@@ -114,9 +115,10 @@ export function getAddressBookEntry(value: string) {
 export function getFilterValueLabel(value: string | number | undefined) {
   if (value === undefined) return ""
 
-  if (value in PLATFORMS_META) {
-    return PLATFORMS_META[value as PlatformId].name
-  }
+  // TODO9
+  // if (value in PLATFORMS_META) {
+  //   return PLATFORMS_META[value].name
+  // }
 
   if (typeof value === "number" || parseInt(value) in $tags.get()) {
     return $tags.get()[value]
@@ -130,6 +132,10 @@ export function getFilterValueLabel(value: string | number | undefined) {
   if (value === "system") return "System"
   if (value === "side-effect") return "Side-Effect"
   if (value === "cron") return "Cron"
+  if (value === "file-import") return "File Import"
+  if (value === "connection") return "Connection"
+  if (value === "price-api") return "Price API"
+  if (value === "metadata") return "Metadata"
 
   if (value in $addressBook.get()) {
     return $addressBook.get()[value]

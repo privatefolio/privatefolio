@@ -1,7 +1,7 @@
-import { getPair, mapToChartData, queryPrices } from "src/api/external/prices/redstone-price-api"
+import { getPair, mapToChartData, queryPrices } from "src/extensions/prices/redstone-price-api"
 import { ResolutionString } from "src/interfaces"
 import { GITHUB_CI } from "src/server-env"
-import { PLATFORMS_META } from "src/settings"
+import { PLATFORMS_META } from "src/settings/settings"
 import { expect, it } from "vitest"
 
 it.skip("should fetch WETH prices within a range", async () => {

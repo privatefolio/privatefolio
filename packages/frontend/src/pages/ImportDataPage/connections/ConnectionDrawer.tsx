@@ -17,6 +17,10 @@ import {
 } from "@mui/material"
 import { DatePicker } from "@mui/x-date-pickers"
 import { isAddress } from "ethers"
+import {
+  BINANCE_WALLET_LABELS,
+  BinanceWalletId,
+} from "privatefolio-backend/src/extensions/connections/binance/binance-settings"
 import React, { useCallback, useState } from "react"
 import { $activeAccount } from "src/stores/account-store"
 import { MonoFont } from "src/theme"
@@ -27,19 +31,14 @@ import { $rpc } from "src/workers/remotes"
 
 import { AddressInput } from "../../../components/AddressInput"
 import { SectionTitle } from "../../../components/SectionTitle"
-import { BinanceConnectionOptions, ConnectionOptions, PlatformId } from "../../../interfaces"
-import {
-  BINANCE_WALLET_LABELS,
-  BinanceWalletId,
-  CONNECTIONS,
-  PLATFORMS_META,
-} from "../../../settings"
+import { BinanceConnectionOptions, ConnectionOptions } from "../../../interfaces"
+import { CONNECTIONS, PLATFORMS_META } from "../../../settings"
 import { $debugMode, PopoverToggleProps } from "../../../stores/app-store"
 
 export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & PopoverToggleProps) {
   const [loading, setLoading] = useState(false)
 
-  const [platform, setPlatform] = useState<PlatformId>("ethereum")
+  const [platform, setPlatform] = useState<string>("ethereum")
   const [binanceWallets, setState] = useState({
     coinFutures: false,
     crossMargin: true,
@@ -138,15 +137,11 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
               fullWidth
               size="small"
               value={platform}
-              onChange={(event) => setPlatform(event.target.value as PlatformId)}
+              onChange={(event) => setPlatform(event.target.value)}
             >
               {CONNECTIONS.map((x) => (
-                <MenuItem
-                  key={x}
-                  value={x}
-                  disabled={PLATFORMS_META[x].name === "Binance" && isProduction}
-                >
-                  <ListItemText primary={PLATFORMS_META[x].name} />
+                <MenuItem key={x} value={x} disabled={x === "binance" && isProduction}>
+                  <ListItemText primary={PLATFORMS_META[x].blockExplorer?.name} />
                 </MenuItem>
               ))}
             </Select>

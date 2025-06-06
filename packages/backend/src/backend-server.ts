@@ -22,7 +22,7 @@ import {
   FunctionReference,
 } from "./backend-comms"
 import { APP_VERSION } from "./server-env"
-import { corsHeaders } from "./settings"
+import { corsHeaders } from "./settings/settings"
 import { isDevelopment } from "./utils/environment-utils"
 import { extractJwt, verifyJwt } from "./utils/jwt-utils"
 

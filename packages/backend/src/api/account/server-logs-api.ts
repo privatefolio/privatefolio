@@ -1,6 +1,6 @@
 import { readFile } from "fs/promises"
 import path from "path"
-import { SERVER_LOGS_LOCATION } from "src/settings"
+import { SERVER_LOGS_LOCATION } from "src/settings/settings"
 import { stripAnsi } from "src/utils/ansi-utils"
 
 export async function getServerLogs(date = new Date().toISOString().slice(0, 10)): Promise<string> {

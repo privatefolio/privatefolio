@@ -1,7 +1,6 @@
 import { Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { ReactNode } from "react"
-import { PLATFORMS_META } from "src/settings"
 import { $assetMap } from "src/stores/metadata-store"
 import { getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
 
@@ -43,7 +42,7 @@ export function AssetBlock(props: AssetBlockProps) {
               letterSpacing={0.5}
             >
               {" "}
-              - {PLATFORMS_META[getAssetPlatform(assetId)].name}
+              - {getAssetPlatform(assetId)}
             </Typography>
           )}
         </Truncate>

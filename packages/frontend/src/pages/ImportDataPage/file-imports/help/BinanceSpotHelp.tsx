@@ -145,7 +145,7 @@ export function BinanceSpotHelp() {
 
   return (
     <>
-      <Paper sx={{ padding: 2 }}>
+      <Paper sx={{ paddingX: 2, paddingY: 1 }}>
         <Stepper activeStep={activeStep} orientation="vertical">
           {steps.map((step, index) => (
             <Step key={step.label}>

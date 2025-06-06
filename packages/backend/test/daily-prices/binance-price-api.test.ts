@@ -1,7 +1,7 @@
-import { getPair, mapToChartData, queryPrices } from "src/api/external/prices/binance-price-api"
+import { getPair, mapToChartData, queryPrices } from "src/extensions/prices/binance-price-api"
 import { ResolutionString, Timestamp } from "src/interfaces"
 import { GITHUB_CI } from "src/server-env"
-import { PRICE_API_PAGINATION } from "src/settings"
+import { PRICE_API_PAGINATION } from "src/settings/settings"
 import { expect, it } from "vitest"
 
 it("should fetch BTC prices within a range", async (test) => {
