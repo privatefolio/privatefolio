@@ -21,8 +21,13 @@ export const getAssetTicker = memoize(function getAssetTicker(assetId?: string) 
     ticker = parts[2]
   }
 
-  return ticker.toUpperCase()
+  return formatTicker(ticker)
 })
+
+export function formatTicker(ticker?: string) {
+  if (!ticker) return "-"
+  return ticker.toUpperCase()
+}
 
 export const getAssetPlatform = memoize(function getAssetPlatform(assetId: string) {
   return assetId.split(":")[0]

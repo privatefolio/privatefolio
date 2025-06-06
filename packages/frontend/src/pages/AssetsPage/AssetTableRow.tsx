@@ -13,7 +13,7 @@ import { useStore } from "@nanostores/react"
 import React from "react"
 import { AmountBlock } from "src/components/AmountBlock"
 import { AppLink } from "src/components/AppLink"
-import { AssetBlock } from "src/components/AssetBlock"
+import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { PlatformAvatar } from "src/components/PlatformAvatar"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { PRICE_API_IDS, PRICE_APIS_META, PriceApiId } from "src/settings"
@@ -88,7 +88,7 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
           <Stack direction="row" gap={1} justifyContent="space-between" flexWrap="nowrap">
             <AppLink to={`../asset/${encodeURI(assetId)}`}>
               <Stack sx={{ height: 52 }} alignItems="center" direction="row" gap={1}>
-                <AssetBlock assetId={assetId} secondary={name} size="medium" />
+                <MyAssetBlock id={assetId} secondary={name} size="medium" />
                 {!coingeckoId && (
                   <Tooltip title="Not listed on Coingecko.com">
                     <Chip label="Unlisted" size="small" sx={{ color: "text.secondary" }} />
@@ -122,7 +122,7 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
         <TableCell variant="clickable">
           <AppLink to={`../asset/${encodeURI(assetId)}`}>
             <Stack alignItems="center" direction="row" gap={1}>
-              <AssetBlock assetId={assetId} size="small" />
+              <MyAssetBlock id={assetId} size="small" />
             </Stack>
           </AppLink>
         </TableCell>

@@ -20,7 +20,7 @@ import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { CoingeckoMetadataFull } from "src/interfaces"
-import { getBlockExplorerName, getBlockExplorerUrl } from "src/settings"
+import { getBlockExplorerUrl } from "src/settings"
 import { formatWebsiteLink, noop } from "src/utils/utils"
 
 type AssetDetailsProps = {
@@ -241,15 +241,9 @@ export function AssetDetails(props: AssetDetailsProps) {
                       <IdentifierBlock
                         label={details.contract_address}
                         id={details.contract_address}
-                        href={
-                          !platformId
-                            ? undefined
-                            : getBlockExplorerUrl(platformId, details.contract_address, "address")
-                          // TODO9
-                        }
-                        linkText={
-                          !platformId ? undefined : `See on ${getBlockExplorerName(platformId)}`
-                        }
+                        href={getBlockExplorerUrl(platformId, details.contract_address, "address")}
+                        linkText={`See on block explorer`}
+                        // linkText={`See on ${getBlockExplorerName(platformId)}`}
                         size="small"
                       />
                     </TableCell>

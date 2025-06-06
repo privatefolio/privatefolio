@@ -39,6 +39,7 @@ import { $debugMode, PopoverToggleProps } from "../../../stores/app-store"
 
 export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & PopoverToggleProps) {
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string>()
 
   const [extensionId, setExtensionId] = useState<string>("etherscan-connection")
   const [platformId, setPlatformId] = useState<string>("ethereum")
@@ -63,6 +64,7 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
       usdFutures: false,
     })
     setLoading(false)
+    setError(undefined)
   }, [open])
 
   const handleWalletsChange = (event) => {
@@ -105,10 +107,24 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
        */
       if (extensionId === "etherscan-connection") {
         const isValidAddress = address && isAddress(address)
-        if (!isValidAddress) return
+        if (!isValidAddress) {
+          setError("Invalid wallet address")
+          return
+        }
         //
       } else if (extensionId === "binance-connection") {
-        if (key.length === 0 || secret.length === 0 || walletsError) return
+        if (key.length === 0) {
+          setError("API key is required")
+          return
+        }
+        if (secret.length === 0) {
+          setError("Secret is required")
+          return
+        }
+        if (walletsError) {
+          setError("You need to choose at least one wallet")
+          return
+        }
         ;(options as BinanceConnectionOptions).wallets = binanceWallets
         //
       }
@@ -131,7 +147,8 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
             .get()
             .enqueueSyncConnection($activeAccount.get(), "user", connection.id, $debugMode.get())
         })
-        .catch(() => {
+        .catch((err) => {
+          setError(err.message ?? "Something went wrong")
           setLoading(false)
         })
     },
@@ -380,6 +397,7 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
             </SectionTitle>
             <TextField name="label" autoComplete="off" variant="outlined" fullWidth size="small" />
           </div>
+          {error && <FormHelperText error>{error}</FormHelperText>}
           <div>
             <LoadingButton variant="contained" type="submit" loading={loading}>
               Add connection

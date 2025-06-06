@@ -4,8 +4,8 @@ import { useStore } from "@nanostores/react"
 import React, { memo, useEffect, useState } from "react"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AssetAmountBlock } from "src/components/AssetAmountBlock"
-import { AssetBlock } from "src/components/AssetBlock"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
+import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { TagList } from "src/components/TagList"
 import { useBoolean } from "src/hooks/useBoolean"
@@ -83,7 +83,7 @@ function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
                     showSign
                     showTicker={!showAssetColumn}
                   />
-                  {showAssetColumn && <AssetBlock assetId={assetId} />}
+                  {showAssetColumn && <MyAssetBlock id={assetId} />}
                 </Stack>
               </Stack>
               <TagList itemId={id} itemType="auditLog" />
@@ -137,7 +137,7 @@ function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
         </TableCell>
         {showAssetColumn && (
           <TableCell>
-            <AssetBlock assetId={assetId} />
+            <MyAssetBlock id={assetId} />
           </TableCell>
         )}
         <TableCell align="right">

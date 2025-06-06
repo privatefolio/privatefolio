@@ -34,8 +34,10 @@ export function PlatformBlock(props: PlatformBlockProps) {
       size="small"
       linkText={
         <Stack alignItems="center">
-          <Box sx={{ fontFamily: MonoFont }}>View platform</Box>
-          <span className="secondary">({platform.id})</span>
+          <span>View platform</span>
+          <Box sx={{ fontFamily: MonoFont }}>
+            <span className="secondary">({platform.id})</span>
+          </Box>
         </Stack>
       }
       {...rest}

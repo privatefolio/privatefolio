@@ -87,6 +87,7 @@ export async function getAssets(): Promise<Asset[]> {
           logoUrl: asset.image,
           marketCapRank: asset.market_cap_rank,
           name: asset.name,
+          platforms: asset.platforms,
           symbol: asset.symbol,
         }) as Asset
     )
@@ -98,11 +99,16 @@ export async function getAssets(): Promise<Asset[]> {
   }
 }
 
+export async function getAssetsByPlatform(platformId: string): Promise<Asset[]> {
+  const assets = await getAssets()
+  return assets.filter((asset) => asset.platforms && asset.platforms[platformId])
+}
+
 export async function getAsset(accountName: string, id: string): Promise<MyAsset | undefined> {
   const records = await getMyAssets(accountName, `${getQuery} WHERE audit_logs.assetId = ?`, [id])
   if (records.length === 0) {
     const cachedAssets = await getAssets()
-    return cachedAssets.find((asset) => asset.id === id)
+    return cachedAssets.find((asset) => asset.coingeckoId === id || asset.id === id)
   }
   return records[0]
 }
@@ -180,7 +186,7 @@ export function enqueueRefetchAssets(accountName: string, trigger: TaskTrigger) 
       account.eventEmitter.emit(SubscriptionChannel.AssetMetadata)
     },
     name: "Refetch assets",
-    priority: TaskPriority.MediumHigh,
+    priority: TaskPriority.High,
     trigger,
   })
 }

@@ -57,6 +57,7 @@
     "simple-import-sort/exports": "warn",
     "@typescript-eslint/no-unused-vars": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-extra-semi": "off",
     "unused-imports/no-unused-imports": "warn",
     "no-non-null-assertion": "off",
     "unused-imports/no-unused-vars": [
