@@ -12,7 +12,7 @@ import {
   TaskTrigger,
   Timestamp,
 } from "../../interfaces"
-import { DB_OPERATION_PAGE_SIZE } from "../../settings"
+import { DB_OPERATION_PAGE_SIZE } from "../../settings/settings"
 import { getAccount } from "../accounts-api"
 import { countAuditLogs, getAuditLogs } from "./audit-logs-api"
 import { getPricesForAsset } from "./daily-prices-api"

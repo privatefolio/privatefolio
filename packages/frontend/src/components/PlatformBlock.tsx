@@ -1,36 +1,46 @@
-import { Stack, Tooltip } from "@mui/material"
-import React from "react"
-import { PlatformId, PLATFORMS_META } from "src/settings"
+import { Box, Stack } from "@mui/material"
+import React, { useEffect, useState } from "react"
+import { Platform } from "src/interfaces"
+import { MonoFont } from "src/theme"
+import { $rpc } from "src/workers/remotes"
 
-import { AssetAvatarProps } from "./AssetAvatar"
+import { IdentifierBlock, IdentifierBlockProps } from "./IdentifierBlock"
 import { PlatformAvatar } from "./PlatformAvatar"
 
-type PlatformBlockProps = {
-  hideName?: boolean
-  platform: string
-} & Omit<AssetAvatarProps, "alt" | "src">
+export type PlatformBlockProps = Omit<IdentifierBlockProps, "id"> & {
+  id?: string
+  platform?: Platform
+}
 
 export function PlatformBlock(props: PlatformBlockProps) {
-  const { platform, hideName, ...rest } = props
+  const { id, platform: cachedValue, ...rest } = props
 
-  const meta = PLATFORMS_META[platform as PlatformId]
+  const [platform, setPlatform] = useState<Platform | undefined>(cachedValue)
 
-  if (!meta) return platform
+  useEffect(() => {
+    if (!cachedValue && id) {
+      $rpc.get().getPlatform(id).then(setPlatform)
+    }
+  }, [id, cachedValue])
+
+  if (!platform) return null
 
   return (
-    <Tooltip title={hideName ? PLATFORMS_META[platform].name : null}>
-      <Stack direction="row" gap={0.5} alignItems="center" component="div">
-        <PlatformAvatar
-          size="small"
-          src={meta.logoUrl}
-          sx={{
-            borderRadius: "2px",
-          }}
-          alt={meta.name}
-          {...rest}
-        />
-        {!hideName && <span>{meta.name}</span>}
-      </Stack>
-    </Tooltip>
+    <IdentifierBlock
+      id={id || platform.id}
+      href={`../platform/${id || platform.id}`}
+      label={platform.name}
+      avatar={<PlatformAvatar src={platform.image} alt={platform.name} size="small" />}
+      size="small"
+      linkText={
+        <Stack alignItems="center">
+          <span>View platform</span>
+          <Box sx={{ fontFamily: MonoFont }}>
+            <span className="secondary">({platform.id})</span>
+          </Box>
+        </Stack>
+      }
+      {...rest}
+    />
   )
 }

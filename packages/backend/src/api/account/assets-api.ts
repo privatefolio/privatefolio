@@ -1,37 +1,23 @@
+import { mkdir, readFile, writeFile } from "fs/promises"
+import { CoingeckoCoin } from "src/extensions/metadata/coingecko/coingecko-interfaces"
 import {
   Asset,
-  ProgressCallback,
+  MyAsset,
   SqlParam,
   SubscriptionChannel,
   TaskPriority,
   TaskTrigger,
 } from "src/interfaces"
+import { CACHE_LOCATION } from "src/settings/settings"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { isTestEnvironment } from "src/utils/environment-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
-import { noop } from "src/utils/utils"
 
+import { getCoingeckoCoins } from "../../extensions/metadata/coingecko/coingecko-asset-cache"
 import { getAccount } from "../accounts-api"
-import { getCachedAssetMeta } from "../external/assets/coingecko-asset-cache"
 import { enqueueTask } from "./server-tasks-api"
-
-export async function getAssetIds(
-  accountName: string,
-  query = "SELECT DISTINCT assetId FROM audit_logs",
-  params?: SqlParam[]
-): Promise<string[]> {
-  const account = await getAccount(accountName)
-
-  try {
-    const result = await account.execute(query, params)
-    return result.map((row) => {
-      return row[0] as string
-    })
-  } catch (error) {
-    throw new Error(`Failed to query assets: ${error}`)
-  }
-}
 
 const getQuery = sql`
 SELECT DISTINCT
@@ -42,16 +28,16 @@ FROM
 LEFT JOIN
  assets ON assets.id = audit_logs.assetId`
 
-export async function getAssets(
+export async function getMyAssets(
   accountName: string,
   query = getQuery,
   params?: SqlParam[]
-): Promise<Asset[]> {
+): Promise<MyAsset[]> {
   const account = await getAccount(accountName)
 
   try {
     const result = await account.execute(query, params)
-    return result.map((row) => {
+    const results = result.map((row) => {
       /* eslint-disable sort-keys-fix/sort-keys-fix */
       const value = {
         id: row[0],
@@ -63,19 +49,71 @@ export async function getAssets(
       }
       /* eslint-enable */
       transformNullsToUndefined(value)
-      return value as Asset
+      return value as MyAsset
+    })
+
+    // try to get the asset from the cache
+    const cachedAssets = await getAssets()
+
+    return results.map((result) => {
+      let cachedAsset = cachedAssets.find((asset) => asset.id === result.id)
+      if (!cachedAsset) {
+        cachedAsset = cachedAssets.find(
+          (asset) => getAssetTicker(asset.symbol) === getAssetTicker(result.symbol)
+        )
+      }
+      return { ...cachedAsset, ...result }
     })
   } catch (error) {
     throw new Error(`Failed to query assets: ${error}`)
   }
 }
 
-export async function getAsset(accountName: string, id: string) {
-  const records = await getAssets(accountName, `${getQuery} WHERE audit_logs.assetId = ?`, [id])
+const assets: Asset[] = []
+
+export async function getAssets(): Promise<Asset[]> {
+  if (assets.length > 0 || isTestEnvironment) {
+    return assets
+  }
+
+  try {
+    const data = await readFile(`${CACHE_LOCATION}/coins/all.json`, "utf8")
+
+    const list: MyAsset[] = JSON.parse(data).map(
+      (asset: CoingeckoCoin) =>
+        ({
+          coingeckoId: asset.id,
+          id: `coingecko:${asset.id}:${asset.symbol}`,
+          logoUrl: asset.image,
+          marketCapRank: asset.market_cap_rank,
+          name: asset.name,
+          platforms: asset.platforms,
+          symbol: asset.symbol,
+        }) as Asset
+    )
+    list.sort((a, b) => (a.marketCapRank ?? Infinity) - (b.marketCapRank ?? Infinity))
+    return list
+  } catch (error) {
+    console.error(error)
+    return []
+  }
+}
+
+export async function getAssetsByPlatform(platformId: string): Promise<Asset[]> {
+  const assets = await getAssets()
+  return assets.filter((asset) => asset.platforms && asset.platforms[platformId])
+}
+
+export async function getAsset(accountName: string, id: string): Promise<MyAsset | undefined> {
+  const records = await getMyAssets(accountName, `${getQuery} WHERE audit_logs.assetId = ?`, [id])
+  if (records.length === 0) {
+    const cachedAssets = await getAssets()
+    return cachedAssets.find((asset) => asset.coingeckoId === id || asset.id === id)
+  }
   return records[0]
 }
 
-export async function upsertAssets(accountName: string, records: Asset[]) {
+export async function upsertAssets(accountName: string, records: MyAsset[]) {
   const account = await getAccount(accountName)
 
   try {
@@ -99,94 +137,56 @@ export async function upsertAssets(accountName: string, records: Asset[]) {
   }
 }
 
-export async function upsertAsset(accountName: string, record: Asset) {
+export async function upsertAsset(accountName: string, record: MyAsset) {
   return upsertAssets(accountName, [record])
 }
 
-export async function patchAsset(accountName: string, id: string, patch: Partial<Asset>) {
+export async function patchAsset(accountName: string, id: string, patch: Partial<MyAsset>) {
   const existing = await getAsset(accountName, id)
   const newValue = { ...existing, ...patch }
   await upsertAsset(accountName, newValue)
 }
 
-export async function deleteAssetInfos(accountName: string) {
-  const account = await getAccount(accountName)
-  await account.execute("DELETE FROM assets")
-  account.eventEmitter.emit(SubscriptionChannel.AssetMetadata)
-}
+export async function findAssets(query: string, limit = 5): Promise<Asset[]> {
+  const normalizedQuery = query.toLowerCase().trim()
 
-export function enqueueDeleteAssetInfos(accountName: string, trigger: TaskTrigger) {
-  return enqueueTask(accountName, {
-    description: "Deleting info for all assets.",
-    determinate: true,
-    function: async () => {
-      await deleteAssetInfos(accountName)
-    },
-    name: "Delete asset infos",
-    priority: TaskPriority.Low,
-    trigger,
-  })
-}
-
-export async function fetchAssetInfos(
-  accountName: string,
-  assetIds?: string[],
-  progress: ProgressCallback = noop,
-  signal?: AbortSignal
-) {
-  if (!assetIds) {
-    throw new Error("No assetIds provided")
+  if (!normalizedQuery) {
+    return []
   }
 
-  await progress([0, `Fetching asset info for ${assetIds.length} assets`])
+  const assets = await getAssets()
+  const matchingAssets: Asset[] = []
 
-  let skipped = 0
+  for (const asset of assets) {
+    if (matchingAssets.length >= limit) {
+      break
+    }
 
-  const promises: (() => Promise<void>)[] = []
-
-  for (let i = 1; i <= assetIds.length; i++) {
-    const assetId = assetIds[i - 1]
-
-    promises.push(async () => {
-      try {
-        const meta = await getCachedAssetMeta(assetId)
-        await patchAsset(accountName, assetId, meta)
-        await progress([undefined, `Fetched ${getAssetTicker(assetId)}`])
-      } catch (error) {
-        skipped += 1
-        await progress([undefined, `Skipped ${getAssetTicker(assetId)}: ${String(error)}`])
-      }
-
-      if (signal?.aborted) throw new Error(signal.reason)
-    })
+    if (
+      asset.name.toLowerCase().includes(normalizedQuery) ||
+      asset.id.toLowerCase().includes(normalizedQuery) ||
+      asset.symbol.toLowerCase().includes(normalizedQuery)
+    ) {
+      matchingAssets.push(asset)
+    }
   }
 
-  // let progressCount = 0
-
-  await Promise.all(
-    promises.map((fetchFn) =>
-      fetchFn().then(() => {
-        if (signal?.aborted) {
-          throw new Error(signal.reason)
-        }
-        // progressCount += 1
-        //  progress([(progressCount / assetIds.length) * 100])
-      })
-    )
-  )
-
-  await progress([100, `Fetched ${assetIds.length - skipped} assets, skipped ${skipped} assets`])
+  return matchingAssets
 }
 
-export function enqueueFetchAssetInfos(accountName: string, trigger: TaskTrigger) {
+export function enqueueRefetchAssets(accountName: string, trigger: TaskTrigger) {
   return enqueueTask(accountName, {
-    description: "Fetching info for all assets.",
-    determinate: true,
-    function: async (progress, signal) => {
-      await fetchAssetInfos(accountName, await getAssetIds(accountName), progress, signal)
+    description: "Refetching assets.",
+    function: async (progress) => {
+      const data = await getCoingeckoCoins()
+      await mkdir(`${CACHE_LOCATION}/coins`, { recursive: true })
+      await writeFile(`${CACHE_LOCATION}/coins/all.json`, JSON.stringify(data, null, 2))
+      await progress([undefined, `Refetched ${data.length} coins from coingecko.com.`])
+      const account = await getAccount(accountName)
+      account.eventEmitter.emit(SubscriptionChannel.AssetMetadata)
     },
-    name: "Fetch asset infos",
-    priority: TaskPriority.MediumHigh,
+    name: "Refetch assets",
+    priority: TaskPriority.High,
     trigger,
   })
 }

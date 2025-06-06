@@ -15,7 +15,7 @@ async function setupDemoAccount() {
 
   console.log("Setting up demo account")
   // $infoBanner.set("Please be patient while the demo gets loaded...")
-  const backup = await fetch("./app-data/demo-backup.zip")
+  const backup = await fetch("/app-data/demo-backup.zip")
   const buffer = await backup.arrayBuffer()
   const file = new File([new Blob([buffer])], "demo-backup.zip")
 

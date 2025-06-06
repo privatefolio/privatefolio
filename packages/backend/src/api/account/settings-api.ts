@@ -1,12 +1,17 @@
-import { DEFAULT_SERVER_REFRESH_INTERVAL } from "../../settings"
+import {
+  DEFAULT_METADATA_REFRESH_INTERVAL,
+  DEFAULT_NETWORTH_REFRESH_INTERVAL,
+} from "../../settings/settings"
 import { getValue, setValue, subscribeToKV } from "./kv-api"
 
 export interface Settings {
-  refreshInterval: number
+  metadataRefreshInterval: number
+  networthRefreshInterval: number
 }
 
 const defaultSettings: Settings = {
-  refreshInterval: DEFAULT_SERVER_REFRESH_INTERVAL,
+  metadataRefreshInterval: DEFAULT_METADATA_REFRESH_INTERVAL,
+  networthRefreshInterval: DEFAULT_NETWORTH_REFRESH_INTERVAL,
 }
 
 const SETTINGS_KEY = "settings"
@@ -20,7 +25,8 @@ export async function getSettings(accountName: string): Promise<Settings> {
   }
 
   try {
-    return JSON.parse(settingsJson) as Settings
+    const savedSettings = JSON.parse(settingsJson) as Settings
+    return Object.assign({}, defaultSettings, savedSettings)
   } catch (error) {
     console.error("Failed to parse settings:", error)
     return defaultSettings

@@ -1,7 +1,5 @@
-import { describe } from "node:test"
-
 import { upsertServerTasks } from "src/api/account/server-tasks-api"
-import { expect, it } from "vitest"
+import { describe, expect, it } from "vitest"
 
 const accountName = Math.random().toString(36).substring(7)
 

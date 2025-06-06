@@ -87,7 +87,7 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
         </CustomLink>
         <CustomLink
           target="_blank"
-          href="https://github.com/kernelwhisperer/privatefolio"
+          href="https://github.com/privatefolio/privatefolio"
           role="listitem"
         >
           <GitHub fontSize="small" />
@@ -211,7 +211,7 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
         )}
         <MenuItem
           target="_blank"
-          href="https://github.com/kernelwhisperer/privatefolio/issues/new"
+          href="https://github.com/privatefolio/privatefolio/issues/new"
           role="listitem"
           component={MuiLink}
           tabIndex={0}

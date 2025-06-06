@@ -4,11 +4,13 @@ import * as assets from "./account/assets-api"
 import * as auditLogs from "./account/audit-logs-api"
 import * as backup from "./account/backup-api"
 import * as balances from "./account/balances-api"
-import * as connections from "./account/connections/connections-api"
+import * as connections from "./account/connections-api"
 import * as dailyPrices from "./account/daily-prices-api"
-import * as fileImports from "./account/file-imports/file-imports-api"
+import * as extensions from "./account/extensions-api"
+import * as fileImports from "./account/file-imports-api"
 import * as kv from "./account/kv-api"
 import * as networth from "./account/networth-api"
+import * as platforms from "./account/platforms-api"
 import * as portfolio from "./account/portfolio-api"
 import * as serverFiles from "./account/server-files-api"
 import * as serverLogs from "./account/server-logs-api"
@@ -25,6 +27,7 @@ export const api = {
   ...balances,
   ...networth,
   ...dailyPrices,
+  ...extensions,
   ...fileImports,
   ...accounts,
   ...transactions,
@@ -38,6 +41,7 @@ export const api = {
   ...tags,
   ...trades,
   ...settings,
+  ...platforms,
 } satisfies BackendApiShape
 
 export type Api = typeof api

@@ -12,11 +12,9 @@ import { ConnectionsTable } from "./connections/ConnectionsTable"
 import { FileImportsTable } from "./file-imports/FileImportsTable"
 import { ImportDataActions } from "./ImportDataActions"
 
-const defaultTab = "connections"
-
 export default function ImportDataPage({ show }: { show: boolean }) {
   const [searchParams] = useSearchParams()
-  const tab = searchParams.get("tab") || defaultTab
+  const tab = searchParams.get("tab") || "connections"
 
   useEffect(() => {
     document.title = `Data - ${$activeAccount.get()} - Privatefolio`
@@ -26,7 +24,7 @@ export default function ImportDataPage({ show }: { show: boolean }) {
     <StaggeredList component="main" gap={2} show={show}>
       <Stack>
         <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
-          <Tabs value={tab} defaultValue={defaultTab} largeSize>
+          <Tabs value={tab} defaultValue={tab} largeSize>
             <NavTab value="connections" to={"?tab=connections"} label="Connections" />
             <NavTab value="file-imports" to={"?tab=file-imports"} label="File imports" />
             <NavTab value="address-book" to={"?tab=address-book"} label="Address book" />

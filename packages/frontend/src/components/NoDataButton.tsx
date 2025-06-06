@@ -42,7 +42,7 @@ export function NoDataButton() {
       <Typography color="text.secondary" variant="body2" component="div">
         <Stack alignItems="center">
           <DataArrayRounded sx={{ height: 64, width: 64 }} />
-          <span>No records could be found...</span>
+          <span>No records could be found…</span>
           <Box sx={{ marginTop: 2 }}>
             Visit <u>Data</u> to get started.
           </Box>

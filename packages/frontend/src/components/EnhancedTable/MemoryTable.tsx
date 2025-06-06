@@ -37,16 +37,24 @@ import { FilterChip } from "../FilterChip"
 import { NoDataButton } from "../NoDataButton"
 import { ConnectedTableHead } from "./ConnectedTableHead"
 
-function descendingComparator<T extends BaseType>(a: T, b: T, valueSelector: ValueSelector<T>) {
+function descendingComparator<T extends BaseType>(
+  a: T,
+  b: T,
+  valueSelector: ValueSelector<T>,
+  nullishSortPosition: "start" | "end" = "end"
+) {
   const valueA = valueSelector(a)
   const valueB = valueSelector(b)
 
-  if (valueA === undefined && valueB === undefined) {
+  const nullishA = valueA === undefined || valueA === null
+  const nullishB = valueB === undefined || valueB === null
+
+  if (nullishA && nullishB) {
     return 0
-  } else if (valueA === undefined) {
-    return 1
-  } else if (valueB === undefined) {
-    return -1
+  } else if (nullishA) {
+    return nullishSortPosition === "end" ? -1 : 1
+  } else if (nullishB) {
+    return nullishSortPosition === "end" ? 1 : -1
   }
 
   if (valueB < valueA) {
@@ -61,11 +69,12 @@ function descendingComparator<T extends BaseType>(a: T, b: T, valueSelector: Val
 
 export function getComparator<T extends BaseType>(
   order: Order,
-  valueSelector: ValueSelector<T>
+  valueSelector: ValueSelector<T>,
+  nullishSortPosition: "start" | "end" = "end"
 ): (a: T, b: T) => number {
   return order === "desc"
-    ? (a, b) => descendingComparator(a, b, valueSelector)
-    : (a, b) => -descendingComparator(a, b, valueSelector)
+    ? (a, b) => descendingComparator(a, b, valueSelector, nullishSortPosition)
+    : (a, b) => -descendingComparator(a, b, valueSelector, nullishSortPosition)
 }
 
 export type MemoryTableProps<T extends BaseType> = {
@@ -80,6 +89,11 @@ export type MemoryTableProps<T extends BaseType> = {
   headCells: HeadCell<T>[]
   initOrderBy: keyof T
   initOrderDir?: "asc" | "desc"
+  /**
+   * Controls where undefined values appear when sorting
+   * @default 'end'
+   */
+  nullishSortPosition?: "start" | "end"
   queryTime?: number | null
   rowCount?: number
   rows: T[]
@@ -98,6 +112,7 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
     emptyContent = <NoDataButton />,
     extraRow,
     rowCount = rows.length,
+    nullishSortPosition = "end",
   } = props
 
   const [order, setOrder] = useState<Order>(initOrderDir)
@@ -175,9 +190,9 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
   const visibleRows = useMemo(
     () =>
       filteredRows
-        .sort(getComparator<T>(order, valueSelectors[orderBy]))
+        .sort(getComparator<T>(order, valueSelectors[orderBy], nullishSortPosition))
         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [filteredRows, order, valueSelectors, orderBy, page, rowsPerPage]
+    [filteredRows, order, valueSelectors, orderBy, page, rowsPerPage, nullishSortPosition]
   )
 
   const inMemoryDataQueryTime = useStore($inMemoryDataQueryTime)

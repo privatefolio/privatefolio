@@ -1,8 +1,4 @@
-/* @import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,200;8..144,300;8..144,400;8..144,500;8..144,700&family=Roboto+Mono:wght@200;300;400&family=Roboto+Serif:opsz,wght@8..144,300;8..144,500&display=block'); */
-/* @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400&family=Roboto+Flex:opsz,wght@8..144,200;8..144,300;8..144,400;8..144,500;8..144,700&family=Roboto+Mono:wght@200;300;400&family=Roboto+Serif:opsz,wght@8..144,300;8..144,500&family=Space+Mono&display=swap'); */
-
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400&family=Roboto+Flex:opsz,wght,GRAD@8..144,100..1000,150&family=Roboto+Serif:opsz,wght@8..144,300;8..144,500&display=block');
-/* @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400&family=Roboto+Flex:opsz,wght@8..144,200;8..144,300;8..144,400;8..144,500;8..144,700&family=Roboto+Serif:opsz,wght@8..144,300;8..144,400;8..144,500&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400;500;600;700&family=IBM+Plex+Sans:wght@200;300;400;500;600;700&family=Roboto+Serif:opsz,wght@8..144,300;8..144,500&display=block');
 
 /* ::selection {
   color: var(--mui-palette-background-default);

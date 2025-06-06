@@ -15,12 +15,25 @@ type TimestampBlockProps = {
   hideTime?: boolean
   relative?: boolean
   timestamp: Timestamp
+  variant?: "default" | "simple"
 }
 
 export function TimestampBlock(props: TimestampBlockProps) {
-  const { timestamp, hideTime = false, relative } = props
+  const { timestamp, hideTime = false, relative, variant = "default" } = props
 
   const debugMode = useStore($debugMode)
+
+  if (variant === "simple") {
+    return (
+      <>
+        <span>{formatDate(timestamp)}</span>
+        <Typography variant="inherit" color="text.secondary" component="span">
+          {" "}
+          ({formatDateRelative(timestamp)})
+        </Typography>
+      </>
+    )
+  }
 
   return (
     <Tooltip

@@ -1,8 +1,15 @@
 import { randomBytes, scrypt, timingSafeEqual } from "crypto"
 import { access, mkdir, readFile, writeFile } from "fs/promises"
+import { isTestEnvironment } from "src/utils/environment-utils"
 import { promisify } from "util"
 
-import { AUTH_DATA_DIR, corsHeaders, HASH_FILE, JWT_SECRET_FILE, SALT_FILE } from "../settings"
+import {
+  AUTH_DATA_DIR,
+  corsHeaders,
+  HASH_FILE,
+  JWT_SECRET_FILE,
+  SALT_FILE,
+} from "../settings/settings"
 import { extractJwt, generateJwt, verifyJwt } from "../utils/jwt-utils"
 
 const scryptAsync = promisify(scrypt)
@@ -60,7 +67,7 @@ export async function storeSecrets(salt: Buffer, hash: Buffer, jwtSecret: Buffer
   await writeFile(SALT_FILE, salt)
   await writeFile(HASH_FILE, hash)
   await writeFile(JWT_SECRET_FILE, jwtSecret)
-  console.log("⚠️ Stored salt, hash, and JWT secret.")
+  if (!isTestEnvironment) console.log("⚠️ Stored salt, hash, and JWT secret.")
 }
 
 /**

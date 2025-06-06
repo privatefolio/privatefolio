@@ -118,7 +118,7 @@ export function AccountPickerContents(props: AccountPickerContentsProps) {
         <ListItemAvatar>
           <PersonRemoveRounded fontSize="small" />
         </ListItemAvatar>
-        <ListItemText>{deleting ? "Deleting account..." : "Delete account"} </ListItemText>
+        <ListItemText>{deleting ? "Deleting account…" : "Delete account"} </ListItemText>
       </MenuItem>
       <Divider />
       <MenuItem

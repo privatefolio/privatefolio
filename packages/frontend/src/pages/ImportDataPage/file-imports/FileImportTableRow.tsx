@@ -28,7 +28,7 @@ export function FileImportTableRow(props: TableRowComponentProps<FileImport>) {
               <Stack gap={0.5} marginY={0.5}>
                 <Stack direction="row" gap={1} alignItems="center" component="div">
                   {platform ? (
-                    <PlatformBlock platform={platform} hideName />
+                    <PlatformBlock id={platform} hideName />
                   ) : (
                     <Skeleton height={20} width={80} />
                   )}
@@ -100,7 +100,7 @@ export function FileImportTableRow(props: TableRowComponentProps<FileImport>) {
           )}
         </TableCell>
         <TableCell>
-          {platform ? <PlatformBlock platform={platform} hideName /> : <Skeleton></Skeleton>}
+          {platform ? <PlatformBlock id={platform} hideName /> : <Skeleton></Skeleton>}
         </TableCell>
         <TableCell>
           <Tooltip title={name}>

@@ -22,7 +22,7 @@ import { ConnectionInspectDrawer } from "./ConnectionInspectDrawer"
 
 export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
   const { row, relativeTime, headCells, isMobile: _isMobile, isTablet, ...rest } = props
-  const { key, address, timestamp, syncedAt, platform, label, meta } = row
+  const { key, address, timestamp, syncedAt, platform: platformId, label, meta } = row
   const { value: open, toggle: toggleOpen } = useBoolean(false)
 
   if (isTablet) {
@@ -33,8 +33,8 @@ export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Stack gap={0.5} marginY={0.5}>
                 <Stack direction="row" gap={1} alignItems="center" component="div">
-                  {platform ? (
-                    <PlatformBlock platform={platform} hideName />
+                  {platformId ? (
+                    <PlatformBlock id={platformId} hideName />
                   ) : (
                     <Skeleton height={20} width={80} />
                   )}
@@ -110,7 +110,7 @@ export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
         </TableCell>
         <TableCell sx={{ maxWidth: 420, minWidth: 300, width: 420 }}>
           <Stack spacing={1} direction="row" sx={{ fontFamily: MonoFont }}>
-            {platform ? <PlatformBlock platform={platform} hideName /> : <Skeleton></Skeleton>}
+            {platformId ? <PlatformBlock id={platformId} hideName /> : <Skeleton></Skeleton>}
             {address ? (
               <Tooltip title={address}>
                 <Truncate>{address}</Truncate>

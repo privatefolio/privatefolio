@@ -9,33 +9,27 @@ import {
   Tab,
   Typography,
 } from "@mui/material"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Callout } from "src/components/Callout"
 import { PlatformAvatar } from "src/components/PlatformAvatar"
 import { Tabs } from "src/components/Tabs"
 import { useBoolean } from "src/hooks/useBoolean"
-import { ParserId, PARSERS_META } from "src/settings"
+import { RichExtension } from "src/interfaces"
+import { $rpc } from "src/workers/remotes"
 
-import { BinanceHelp } from "./help/BinanceHelp"
-import { BinanceSpotHelp } from "./help/BinanceSpotHelp"
-import { EtherscanHelp } from "./help/EtherscanHelp"
-import { PrivatefolioHelp } from "./help/PrivatefolioHelp"
-
-const DOCUMENTED_PARSERS: ParserId[] = [
-  "etherscan",
-  "binance-account-statement",
-  "privatefolio",
-  // "binance-spot-history",
-]
+import BinanceHelp from "./help/BinanceHelp"
+import EtherscanHelp from "./help/EtherscanHelp"
+import PrivatefolioHelp from "./help/PrivatefolioHelp"
 
 export function FileImportHelp() {
   const { value: modalOpen, toggle: toggleModalOpen } = useBoolean(false)
 
-  const [tab, setTab] = useState<ParserId>("etherscan")
+  const [tab, setTab] = useState<string>("etherscan-file-import")
+  const [extensions, setExtensions] = useState<RichExtension[]>([])
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
-    setTab(newValue as ParserId)
-  }
+  useEffect(() => {
+    $rpc.get().getExtensions(true).then(setExtensions)
+  }, [])
 
   return (
     <>
@@ -60,27 +54,32 @@ export function FileImportHelp() {
         </DialogTitle>
         <DialogContent sx={{ maxWidth: 540, minWidth: 320, paddingX: 2, width: 540 }}>
           <div>
-            <Tabs value={tab} onChange={handleTabChange}>
-              {DOCUMENTED_PARSERS.map((parserId) => (
+            <Tabs
+              value={tab}
+              onChange={(event: React.SyntheticEvent, newValue: string) => {
+                setTab(newValue)
+              }}
+            >
+              {extensions.map((extension) => (
                 <Tab
                   sx={{ textTransform: "none" }}
-                  key={parserId}
-                  value={parserId}
+                  key={extension.id}
+                  value={extension.id}
                   label={
                     <Stack direction="row" alignItems={"center"} gap={0.5}>
                       <PlatformAvatar
                         size="small"
-                        src={`./app-data/integrations/${parserId.split("-")[0].toLowerCase()}.svg`}
-                        alt={parserId}
+                        src={extension.extensionLogoUrl}
+                        alt={extension.extensionName}
                       />
-                      {PARSERS_META[parserId].name}
+                      {extension.extensionName}
                     </Stack>
                   }
                 />
               ))}
             </Tabs>
             {tab === "binance-account-statement" && <BinanceHelp />}
-            {tab === "binance-spot-history" && <BinanceSpotHelp />}
+            {/* {tab === "binance-spot-history" && <BinanceSpotHelp />} */}
             {tab === "etherscan" && <EtherscanHelp />}
             {tab === "privatefolio" && <PrivatefolioHelp />}
           </div>

@@ -2,12 +2,14 @@ import { CloseRounded } from "@mui/icons-material"
 import { LoadingButton } from "@mui/lab"
 import {
   Checkbox,
+  Chip,
   Drawer,
   DrawerProps,
   FormControl,
   FormControlLabel,
   FormHelperText,
   IconButton,
+  ListItemAvatar,
   ListItemText,
   MenuItem,
   Select,
@@ -17,29 +19,30 @@ import {
 } from "@mui/material"
 import { DatePicker } from "@mui/x-date-pickers"
 import { isAddress } from "ethers"
-import React, { useCallback, useState } from "react"
+import {
+  BINANCE_WALLET_LABELS,
+  BinanceWalletId,
+} from "privatefolio-backend/src/extensions/connections/binance/binance-settings"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
+import { ExtensionAvatar } from "src/components/ExtensionAvatar"
+import { PlatformAvatar } from "src/components/PlatformAvatar"
 import { $activeAccount } from "src/stores/account-store"
 import { MonoFont } from "src/theme"
-import { isEvmPlatform } from "src/utils/assets-utils"
 import { asUTC } from "src/utils/formatting-utils"
 import { isProduction } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 import { AddressInput } from "../../../components/AddressInput"
 import { SectionTitle } from "../../../components/SectionTitle"
-import { BinanceConnectionOptions, ConnectionOptions, PlatformId } from "../../../interfaces"
-import {
-  BINANCE_WALLET_LABELS,
-  BinanceWalletId,
-  CONNECTIONS,
-  PLATFORMS_META,
-} from "../../../settings"
+import { BinanceConnectionOptions, ConnectionOptions, RichExtension } from "../../../interfaces"
 import { $debugMode, PopoverToggleProps } from "../../../stores/app-store"
 
 export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & PopoverToggleProps) {
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string>()
 
-  const [platform, setPlatform] = useState<PlatformId>("ethereum")
+  const [extensionId, setExtensionId] = useState<string>("etherscan-connection")
+  const [platformId, setPlatformId] = useState<string>("ethereum")
   const [binanceWallets, setState] = useState({
     coinFutures: false,
     crossMargin: true,
@@ -47,6 +50,23 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
     spot: true,
     usdFutures: false,
   })
+
+  useEffect(() => {
+    if (open) return
+
+    setExtensionId("etherscan-connection")
+    setPlatformId("ethereum")
+    setState({
+      coinFutures: false,
+      crossMargin: true,
+      isolatedMargin: true,
+      spot: true,
+      usdFutures: false,
+    })
+    setLoading(false)
+    setError(undefined)
+  }, [open])
+
   const handleWalletsChange = (event) => {
     setState({
       ...binanceWallets,
@@ -85,12 +105,26 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
       /**
        * 2. Validate
        */
-      if (isEvmPlatform(platform)) {
+      if (extensionId === "etherscan-connection") {
         const isValidAddress = address && isAddress(address)
-        if (!isValidAddress) return
+        if (!isValidAddress) {
+          setError("Invalid wallet address")
+          return
+        }
         //
-      } else if (platform === "binance") {
-        if (key.length === 0 || secret.length === 0 || walletsError) return
+      } else if (extensionId === "binance-connection") {
+        if (key.length === 0) {
+          setError("API key is required")
+          return
+        }
+        if (secret.length === 0) {
+          setError("Secret is required")
+          return
+        }
+        if (walletsError) {
+          setError("You need to choose at least one wallet")
+          return
+        }
         ;(options as BinanceConnectionOptions).wallets = binanceWallets
         //
       }
@@ -100,10 +134,11 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
         .get()
         .upsertConnection($activeAccount.get(), {
           address,
+          extensionId,
           key,
           label,
           options,
-          platform,
+          platform: platformId,
           secret,
         })
         .then((connection) => {
@@ -112,11 +147,23 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
             .get()
             .enqueueSyncConnection($activeAccount.get(), "user", connection.id, $debugMode.get())
         })
-        .catch(() => {
+        .catch((err) => {
+          setError(err.message ?? "Something went wrong")
           setLoading(false)
         })
     },
-    [binanceWallets, platform, toggleOpen, walletsError]
+    [binanceWallets, extensionId, platformId, toggleOpen, walletsError]
+  )
+
+  const [extensions, setExtensions] = useState<RichExtension[]>([])
+
+  useEffect(() => {
+    $rpc.get().getExtensionsByType("connection").then(setExtensions)
+  }, [])
+
+  const extension = useMemo(
+    () => extensions.find((x) => x.id === extensionId),
+    [extensionId, extensions]
   )
 
   return (
@@ -132,38 +179,83 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
             </IconButton>
           </Stack>
           <div>
-            <SectionTitle>Platform</SectionTitle>
+            <SectionTitle>Extension</SectionTitle>
             <Select
               variant="outlined"
               fullWidth
               size="small"
-              value={platform}
-              onChange={(event) => setPlatform(event.target.value as PlatformId)}
+              value={extensionId}
+              onChange={(event) => setExtensionId(event.target.value)}
             >
-              {CONNECTIONS.map((x) => (
+              {extensions.map((x) => (
                 <MenuItem
-                  key={x}
-                  value={x}
-                  disabled={PLATFORMS_META[x].name === "Binance" && isProduction}
+                  key={x.id}
+                  value={x.id}
+                  disabled={x.id === "binance-connection" && isProduction}
                 >
-                  <ListItemText primary={PLATFORMS_META[x].name} />
+                  <Stack direction="row" alignItems="center">
+                    <ListItemAvatar>
+                      <ExtensionAvatar
+                        src={x.extensionLogoUrl}
+                        alt={x.extensionName}
+                        size="small"
+                      />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={
+                        <>
+                          {x.extensionName}{" "}
+                          {x.id === "binance-connection" && (
+                            <Chip
+                              size="small"
+                              sx={{ fontSize: "0.625rem", height: 16 }}
+                              label="Coming soon"
+                            />
+                          )}
+                        </>
+                      }
+                    />
+                  </Stack>
                 </MenuItem>
               ))}
             </Select>
           </div>
-          {platform !== "binance" ? (
-            <div>
-              <SectionTitle>Wallet</SectionTitle>
-              <AddressInput
-                name="walletAddr"
-                autoComplete="off"
-                autoFocus
-                variant="outlined"
-                fullWidth
-                size="small"
-                required
-              />
-            </div>
+          {extensionId !== "binance-connection" ? (
+            <>
+              <div>
+                <SectionTitle>Platform</SectionTitle>
+                <Select
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  value={platformId}
+                  onChange={(event) => setPlatformId(event.target.value)}
+                >
+                  {extension?.platforms?.map((x) => (
+                    <MenuItem key={x.id} value={x.id}>
+                      <Stack direction="row" alignItems="center">
+                        <ListItemAvatar>
+                          <PlatformAvatar src={x.image} alt={x.name} size="small" />
+                        </ListItemAvatar>
+                        <ListItemText primary={x.name} />
+                      </Stack>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </div>
+              <div>
+                <SectionTitle>Wallet</SectionTitle>
+                <AddressInput
+                  name="walletAddr"
+                  autoComplete="off"
+                  autoFocus
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  required
+                />
+              </div>
+            </>
           ) : (
             <>
               <div>
@@ -305,6 +397,7 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
             </SectionTitle>
             <TextField name="label" autoComplete="off" variant="outlined" fullWidth size="small" />
           </div>
+          {error && <FormHelperText error>{error}</FormHelperText>}
           <div>
             <LoadingButton variant="contained" type="submit" loading={loading}>
               Add connection

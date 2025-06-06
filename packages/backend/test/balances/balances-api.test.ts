@@ -8,7 +8,7 @@ import {
   getBalancesAt,
 } from "src/api/account/balances-api"
 import { fetchDailyPrices } from "src/api/account/daily-prices-api"
-import { importFile } from "src/api/account/file-imports/file-imports-api"
+import { importFile } from "src/api/account/file-imports-api"
 import { getValue } from "src/api/account/kv-api"
 import { ProgressUpdate, Timestamp } from "src/interfaces"
 import { beforeAll, expect, it, vi } from "vitest"

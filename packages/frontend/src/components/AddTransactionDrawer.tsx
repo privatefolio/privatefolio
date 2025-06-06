@@ -16,7 +16,7 @@ import { useStore } from "@nanostores/react"
 import React, { useCallback, useMemo, useState } from "react"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TRANSACTIONS_TYPES, TransactionType } from "src/interfaces"
-import { CONNECTIONS, PlatformId, PLATFORMS_META } from "src/settings"
+import { CONNECTIONS } from "src/settings"
 import { $activeAccount } from "src/stores/account-store"
 import { PopoverToggleProps } from "src/stores/app-store"
 import { $assetMap } from "src/stores/metadata-store"
@@ -33,7 +33,7 @@ export function AddTransactionDrawer(props: PopoverToggleProps) {
   const [incomingAsset, setIncomingAsset] = useState<string | null>(null)
   const [outgoingAsset, setOutgoingAsset] = useState<string | null>(null)
 
-  const [platform, setPlatform] = useState<PlatformId>("ethereum")
+  const [platform, setPlatform] = useState<string>("ethereum")
   const [type, setType] = useState<TransactionType>("Swap")
   const [binanceWallet, setBinanceWallet] = useState("Spot")
 
@@ -116,11 +116,11 @@ export function AddTransactionDrawer(props: PopoverToggleProps) {
               variant="outlined"
               fullWidth
               value={platform}
-              onChange={(event) => setPlatform(event.target.value as PlatformId)}
+              onChange={(event) => setPlatform(event.target.value)}
             >
               {CONNECTIONS.map((x) => (
                 <MenuItem key={x} value={x}>
-                  <ListItemText primary={PLATFORMS_META[x].name} />
+                  <ListItemText primary={x} />
                 </MenuItem>
               ))}
             </Select>
@@ -291,7 +291,7 @@ export function AddTransactionDrawer(props: PopoverToggleProps) {
               value={notes}
               minRows={3}
               fullWidth
-              placeholder="Write a custom note..."
+              placeholder="Write a custom note…"
             />
           </div>
           <div>

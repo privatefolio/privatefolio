@@ -7,7 +7,7 @@ import {
   deleteFileImport,
   getFileImports,
   importFile,
-} from "src/api/account/file-imports/file-imports-api"
+} from "src/api/account/file-imports-api"
 import { computeTrades, getTrades, getTradesFullQuery } from "src/api/account/trades-api"
 import { countTransactions, getTransactions } from "src/api/account/transactions-api"
 import { ProgressUpdate } from "src/interfaces"
@@ -62,13 +62,14 @@ describe("0xf98 file import", () => {
           "assetIds": [
             "ethereum:0x0000000000000000000000000000000000000000:ETH",
           ],
-          "integration": "etherscan",
+          "extensionId": "etherscan-file-import",
           "logs": 16,
           "operations": [
             "Deposit",
             "Withdraw",
             "Fee",
           ],
+          "parserId": "etherscan-default",
           "platform": "ethereum",
           "rows": 9,
           "transactions": 9,
@@ -130,11 +131,12 @@ describe("0xf98 file import", () => {
             "ethereum:0x7B2f9706CD8473B4F5B7758b0171a9933Fc6C4d6:HEALP",
             "ethereum:0x58b6A8A3302369DAEc383334672404Ee733aB239:LPT",
           ],
-          "integration": "etherscan-erc20",
+          "extensionId": "etherscan-file-import",
           "logs": 8,
           "operations": [
             "Deposit",
           ],
+          "parserId": "etherscan-erc20",
           "platform": "ethereum",
           "rows": 8,
           "transactions": 8,

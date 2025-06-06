@@ -11,15 +11,14 @@ import {
 } from "@mui/material"
 import React, { MouseEvent, useState } from "react"
 import { AmountBlock } from "src/components/AmountBlock"
+import { ExtensionBlock } from "src/components/ExtensionBlock"
 import { FileSizeBlock } from "src/components/FileSizeBlock"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
-import { PlatformAvatar } from "src/components/PlatformAvatar"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { useConfirm } from "src/hooks/useConfirm"
 import { FileImport } from "src/interfaces"
-import { PARSERS_META } from "src/settings"
 import { $activeAccount } from "src/stores/account-store"
 import { PopoverToggleProps } from "src/stores/app-store"
 import { $rpc } from "src/workers/remotes"
@@ -37,7 +36,8 @@ export function FileImportDrawer(props: FileImportDrawerProps) {
 
   const { id, timestamp, meta, name, lastModified, size } = fileImport
 
-  const parserId = meta?.integration
+  const extensionId = meta?.extensionId
+  const parserId = meta?.parserId
 
   // const [logsNumber, setLogsNumber] = useState<number | null>(null)
 
@@ -107,21 +107,20 @@ export function FileImportDrawer(props: FileImportDrawerProps) {
           </Stack>
         </div>
         <div>
-          <SectionTitle>Integration</SectionTitle>
+          <SectionTitle>Parser Id</SectionTitle>
           {!parserId ? (
             <Skeleton height={20} width={80} />
           ) : (
-            <>
-              <Stack direction="row" alignItems={"center"} gap={0.5}>
-                <PlatformAvatar
-                  size="small"
-                  src={`./app-data/integrations/${parserId.split("-")[0].toLowerCase()}.svg`}
-                  alt={parserId}
-                />
-                {PARSERS_META[parserId].name}
-              </Stack>
-            </>
+            <IdentifierBlock id={parserId} size="small" />
           )}
+        </div>
+        <div>
+          <SectionTitle>Extension</SectionTitle>
+          {!extensionId ? <Skeleton height={20} width={80} /> : <ExtensionBlock id={extensionId} />}
+        </div>
+        <div>
+          <SectionTitle>Platform</SectionTitle>
+          {!meta ? <Skeleton height={20} width={80} /> : <PlatformBlock id={meta.platform} />}
         </div>
         <div>
           <SectionTitle>Imported</SectionTitle>
@@ -130,10 +129,6 @@ export function FileImportDrawer(props: FileImportDrawerProps) {
           ) : (
             <Skeleton height={20} width={80} />
           )}
-        </div>
-        <div>
-          <SectionTitle>Platform</SectionTitle>
-          {!meta ? <Skeleton height={20} width={80} /> : <PlatformBlock platform={meta.platform} />}
         </div>
         <div>
           <SectionTitle>Audit logs</SectionTitle>
@@ -147,7 +142,7 @@ export function FileImportDrawer(props: FileImportDrawerProps) {
           <SectionTitle>Actions</SectionTitle>
           <Tooltip
             title={
-              loading ? "Removing..." : "This will remove all its transactions and audit logs too"
+              loading ? "Removing…" : "This will remove all its transactions and audit logs too"
             }
           >
             <span>
