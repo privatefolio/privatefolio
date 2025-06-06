@@ -90,7 +90,7 @@ export function AssetsActions() {
           <ListItemText>Refetch all assets</ListItemText>
         </MenuItem>
         {debugMode && (
-          <div>
+          <>
             <Divider textAlign="center">
               <Typography variant="caption" color="text.secondary">
                 DEBUG
@@ -108,7 +108,7 @@ export function AssetsActions() {
               </ListItemAvatar>
               <ListItemText>Delete asset prices</ListItemText>
             </MenuItem>
-          </div>
+          </>
         )}
       </Menu>
     </Stack>

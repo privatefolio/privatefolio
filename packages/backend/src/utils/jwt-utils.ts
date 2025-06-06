@@ -1,6 +1,8 @@
 import * as jose from "jose"
 import { TextEncoder } from "util" // Node.js util for encoding secret
 
+import { isTestEnvironment } from "./environment-utils"
+
 // TODO7 move these to settings.ts
 const JWT_EXPIRATION = "30d" // Token expires in 30 days
 const JWT_ISSUER = "Privatefolio"
@@ -62,6 +64,7 @@ export async function verifyJwt(
     })
     return payload as PrivatefolioJwtPayload
   } catch (error) {
+    if (isTestEnvironment) return null
     // Log specific JOSE errors if needed
     if (error instanceof jose.errors.JWTExpired) {
       console.warn("JWT Verification failed: Token expired")

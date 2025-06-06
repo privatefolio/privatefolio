@@ -9,16 +9,14 @@ import { NetworthActions } from "../NetworthPage/NetworthActions"
 import NetworthPage from "../NetworthPage/NetworthPage"
 import { PnLPage } from "../PnLPage/PnLPage"
 
-const defaultTab = "networth"
-
 export default function HomePage() {
   const [searchParams] = useSearchParams()
-  const tab = searchParams.get("tab") || defaultTab
+  const tab = searchParams.get("tab") || "networth"
 
   return (
     <main>
       <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
-        <Tabs value={tab} defaultValue={defaultTab} largeSize>
+        <Tabs value={tab} defaultValue={tab} largeSize>
           <NavTab value="networth" to="?tab=networth" label="Net worth" />
           <NavTab value="breakdown" to="?tab=breakdown" label="Breakdown" />
           <NavTab value="pnl" to="?tab=pnl" label="Profit & loss" />

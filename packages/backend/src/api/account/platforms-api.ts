@@ -91,7 +91,6 @@ export async function getBlockchains(): Promise<Blockchain[]> {
 export function enqueueRefetchPlatforms(accountName: string, trigger: TaskTrigger) {
   return enqueueTask(accountName, {
     description: "Refetching asset platforms.",
-    // determinate: true,
     function: async (progress) => {
       await Promise.all([
         (async function refetchPlatforms() {

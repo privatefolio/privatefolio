@@ -11,42 +11,79 @@ import { SHORT_THROTTLE_DURATION } from "./settings/settings"
 import { getCronExpression, getPrefix } from "./utils/utils"
 
 console.log("Starting worker...")
-const worker = new Worker(import.meta.resolve("./api-worker"))
+const worker = new Worker(import.meta.resolve("./api-worker"), {
+  env: {
+    BUN_WORKER: "true",
+    NODE_ENV: process.env.NODE_ENV,
+  },
+})
 const writeApi = wrap<Api>(worker)
 console.log("Started worker...")
 
 const accountNames = await writeApi.getAccountNames()
 
 const sideEffects: Record<string, SubscriptionId> = {}
-const cronJobs: Record<string, Cron> = {}
+const networthCronJobs: Record<string, Cron> = {}
+const metadataCronJobs: Record<string, Cron> = {}
 const settingsSubscriptions: Record<string, SubscriptionId> = {}
 
-async function setupCronJob(accountName: string) {
-  if (cronJobs[accountName]) {
-    console.log(getPrefix(accountName), `Stopping existing cron job.`)
-    cronJobs[accountName].stop()
+async function setupNetworthCronJob(accountName: string) {
+  if (networthCronJobs[accountName]) {
+    console.log(getPrefix(accountName, true), `Stopping existing networth cron job.`)
+    networthCronJobs[accountName].stop()
   }
 
-  const { refreshInterval } = await writeApi.getSettings(accountName)
+  const { networthRefreshInterval } = await writeApi.getSettings(accountName)
 
   console.log(
-    getPrefix(accountName),
-    `Setting up cron job with interval: ${refreshInterval} minutes.`
+    getPrefix(accountName, true),
+    `Setting up networth cron job with interval: ${networthRefreshInterval} minutes.`
   )
-  const cronExpression = getCronExpression(refreshInterval)
-  console.log(getPrefix(accountName), `Cron expression: ${cronExpression}`)
+  try {
+    const cronExpression = getCronExpression(networthRefreshInterval)
+    console.log(getPrefix(accountName, true), `Networth cron expression: ${cronExpression}`)
 
-  const cronJob = new Cron(cronExpression, async () => {
-    console.log(getPrefix(accountName), `Cron: Refreshing account.`)
-    await writeApi.enqueueRefreshBalances(accountName, "cron")
-    await writeApi.enqueueFetchPrices(accountName, "cron")
-    await writeApi.enqueueRefreshNetworth(accountName, "cron")
-  })
-  cronJobs[accountName] = cronJob
+    const cronJob = new Cron(cronExpression, async () => {
+      console.log(getPrefix(accountName, true), `Cron: Refreshing account.`)
+      await writeApi.enqueueRefreshBalances(accountName, "cron")
+      await writeApi.enqueueFetchPrices(accountName, "cron")
+      await writeApi.enqueueRefreshNetworth(accountName, "cron")
+    })
+    networthCronJobs[accountName] = cronJob
+  } catch (error) {
+    console.error(getPrefix(accountName, true), `Error setting up networth cron job:`, error)
+  }
+}
+
+async function setupMetadataCronJob(accountName: string) {
+  if (metadataCronJobs[accountName]) {
+    console.log(getPrefix(accountName, true), `Stopping existing metadata cron job.`)
+    metadataCronJobs[accountName].stop()
+  }
+
+  const { metadataRefreshInterval } = await writeApi.getSettings(accountName)
+
+  console.log(
+    getPrefix(accountName, true),
+    `Setting up metadata cron job with interval: ${metadataRefreshInterval} minutes.`
+  )
+  try {
+    const cronExpression = getCronExpression(metadataRefreshInterval)
+    console.log(getPrefix(accountName, true), `Metadata cron expression: ${cronExpression}`)
+
+    const cronJob = new Cron(cronExpression, async () => {
+      console.log(getPrefix(accountName, true), `Cron: Refreshing metadata.`)
+      await writeApi.enqueueRefetchAssets(accountName, "cron")
+      await writeApi.enqueueRefetchPlatforms(accountName, "cron")
+    })
+    metadataCronJobs[accountName] = cronJob
+  } catch (error) {
+    console.error(getPrefix(accountName, true), `Error setting up metadata cron job:`, error)
+  }
 }
 
 async function setupSideEffects(accountName: string) {
-  console.log(getPrefix(accountName), `Setting up side-effects.`)
+  console.log(getPrefix(accountName, true), `Setting up side-effects.`)
 
   const subId = await writeApi.subscribeToAuditLogs(
     accountName,
@@ -54,7 +91,7 @@ async function setupSideEffects(accountName: string) {
       throttle(
         async (cause) => {
           console.log(
-            getPrefix(accountName),
+            getPrefix(accountName, true),
             `Running side-effects (trigger by audit log changes).`
           )
           if (cause === EventCause.Updated) return
@@ -87,13 +124,15 @@ async function setupSideEffects(accountName: string) {
 
   sideEffects[accountName] = subId
 
-  await setupCronJob(accountName)
+  await setupNetworthCronJob(accountName)
+  await setupMetadataCronJob(accountName)
 
   const settingsSubId = await writeApi.subscribeToSettings(
     accountName,
     proxy(async () => {
-      console.log(getPrefix(accountName), `Settings changed, refreshing cron job.`)
-      await setupCronJob(accountName)
+      console.log(getPrefix(accountName, true), `Settings changed, refreshing cron jobs.`)
+      await setupNetworthCronJob(accountName)
+      await setupMetadataCronJob(accountName)
     })
   )
 
@@ -103,20 +142,31 @@ async function setupSideEffects(accountName: string) {
 await writeApi.subscribeToAccounts(
   proxy(async (cause, accountName) => {
     if (cause === EventCause.Deleted) {
-      console.log(getPrefix(accountName), `Tearing down side-effects.`)
+      console.log(getPrefix(accountName, true), `Tearing down side-effects.`)
       const subId = sideEffects[accountName]
       try {
         await writeApi.unsubscribe(subId)
 
-        if (cronJobs[accountName]) {
-          cronJobs[accountName].stop()
-          delete cronJobs[accountName]
+        if (networthCronJobs[accountName]) {
+          networthCronJobs[accountName].stop()
+          delete networthCronJobs[accountName]
+        }
+
+        if (metadataCronJobs[accountName]) {
+          metadataCronJobs[accountName].stop()
+          delete metadataCronJobs[accountName]
         }
 
         if (settingsSubscriptions[accountName]) {
           await writeApi.unsubscribe(settingsSubscriptions[accountName])
           delete settingsSubscriptions[accountName]
         }
+      } catch {}
+    }
+
+    if (cause === EventCause.Reset) {
+      try {
+        await api.reconnectAccount(accountName)
       } catch {}
     }
 

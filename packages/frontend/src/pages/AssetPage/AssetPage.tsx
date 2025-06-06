@@ -28,13 +28,11 @@ import { AssetMarketTable } from "./AssetMarketTable"
 import { BalanceChart } from "./BalanceChart"
 import { PriceChart } from "./PriceChart"
 
-const defaultTab = "details"
-
 export default function AssetPage() {
   const params = useParams()
   const assetId = params.assetId // ?.toLocaleUpperCase()
   const [searchParams] = useSearchParams()
-  const tab = searchParams.get("tab") || defaultTab
+  const tab = searchParams.get("tab") || "details"
   const assetMap = useStore($assetMap)
 
   const filterMap = useStore($filterOptionsMap)
@@ -202,8 +200,8 @@ export default function AssetPage() {
         </Stack>
       </Stack>
       <Stack>
-        <Tabs value={tab} defaultValue={defaultTab}>
-          <NavTab value="details" to={`?tab=details`} label="About" />
+        <Tabs value={tab} defaultValue={tab}>
+          <NavTab value="details" to={`?tab=details`} label="Details" />
           <NavTab value="markets" to={`?tab=markets`} label="Markets" />
           <NavTab value="price-history" to={`?tab=price-history`} label="Price history" />
           <NavTab

@@ -17,17 +17,15 @@ import { TrustScoreIndicator } from "src/components/TrustScoreIndicator"
 import { Platform } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 import { MonoFont, SerifFont } from "src/theme"
-import { extractRootUrl, resolveUrl } from "src/utils/utils"
+import { extractRootUrl } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 import FourZeroFourPage from "../404"
 
-const defaultTab = "details"
-
 export default function PlatformPage() {
   const { platformId } = useParams<{ platformId: string }>()
   const [searchParams] = useSearchParams()
-  const tab = searchParams.get("tab") || defaultTab
+  const tab = searchParams.get("tab") || "details"
 
   const [platform, setPlatform] = useState<Platform | undefined>(undefined)
   const [isLoading, setIsLoading] = useState(true)
@@ -78,7 +76,7 @@ export default function PlatformPage() {
         sx={{ paddingX: 2 }}
       >
         <Stack direction="row" gap={1} component="div" alignItems="center">
-          <PlatformAvatar src={resolveUrl(logoUrl)} alt={name} size="large" />
+          <PlatformAvatar src={logoUrl} alt={name} size="large" />
           <Stack>
             <Typography variant="h6" fontFamily={SerifFont} sx={{ marginBottom: -0.5 }}>
               <span>{name}</span>
@@ -118,7 +116,7 @@ export default function PlatformPage() {
       </Stack>
 
       <Stack>
-        <Tabs value={tab} defaultValue={defaultTab}>
+        <Tabs value={tab} defaultValue={tab}>
           <NavTab value="details" to="?tab=details" label="Details" />
         </Tabs>
 

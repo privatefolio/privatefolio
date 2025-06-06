@@ -168,6 +168,14 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
             avatar={<AccountBalanceRounded fontSize="small" />}
           />
           <NavMenuItem
+            value="extensions"
+            to={`/u/${accountIndex}/extensions`}
+            label="Extensions"
+            aria-label="Visit Extensions"
+            onClick={toggleOpen}
+            avatar={<ExtensionRounded fontSize="small" />}
+          />
+          <NavMenuItem
             value="import-data"
             to={`/u/${accountIndex}/import-data`}
             label="Data"
@@ -182,14 +190,6 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
             aria-label="Visit Server"
             onClick={toggleOpen}
             avatar={<CloudRounded fontSize="small" />}
-          />
-          <NavMenuItem
-            value="extensions"
-            to={`/u/${accountIndex}/extensions`}
-            label="Extensions"
-            aria-label="Visit Extensions"
-            onClick={toggleOpen}
-            avatar={<ExtensionRounded fontSize="small" />}
           />
         </Stack>
         <Stack>

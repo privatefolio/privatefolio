@@ -8,16 +8,14 @@ import { Tabs } from "src/components/Tabs"
 import { BlockchainsTable } from "./BlockchainsTable"
 import { ExchangesTable } from "./ExchangesTable"
 
-const defaultTab = "exchanges"
-
 export default function PlatformsPage({ show }: { show: boolean }) {
   const [searchParams] = useSearchParams()
-  const tab = searchParams.get("tab") || defaultTab
+  const tab = searchParams.get("tab") || "exchanges"
 
   return (
     <StaggeredList component="main" gap={2} show={show}>
       <Stack>
-        <Tabs value={tab} defaultValue={defaultTab} largeSize>
+        <Tabs value={tab} defaultValue={tab} largeSize>
           <NavTab value="exchanges" to={"?tab=exchanges"} label="Exchanges" />
           <NavTab value="blockchains" to={"?tab=blockchains"} label="Blockchains" />
         </Tabs>

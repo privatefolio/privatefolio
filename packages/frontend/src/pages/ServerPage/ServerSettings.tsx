@@ -1,6 +1,7 @@
 import { Info } from "@mui/icons-material"
 import {
   Button,
+  FormHelperText,
   IconButton,
   InputAdornment,
   Paper,
@@ -15,9 +16,19 @@ import { enqueueSnackbar } from "notistack"
 import React, { MouseEvent, useEffect, useState } from "react"
 import { SectionTitle } from "src/components/SectionTitle"
 
-import { DEFAULT_SERVER_REFRESH_INTERVAL } from "../../settings"
+import {
+  DEFAULT_METADATA_REFRESH_INTERVAL,
+  DEFAULT_NETWORTH_REFRESH_INTERVAL,
+} from "../../settings"
 import { $activeAccount } from "../../stores/account-store"
 import { $rpc } from "../../workers/remotes"
+
+const isValidInterval = (minutes: number): boolean => {
+  if (minutes <= 0) return false
+  // This logic mirrors the backend's getCronExpression function's valid cases.
+  // It allows intervals less than 60 minutes, or intervals that are whole hours or whole days.
+  return minutes < 60 || minutes % 60 === 0
+}
 
 // Predefined refresh interval options in minutes
 const REFRESH_INTERVALS = [
@@ -27,10 +38,31 @@ const REFRESH_INTERVALS = [
   { label: "24h", value: 1440 },
 ]
 
+// Predefined refresh interval options in minutes
+const METADATA_REFRESH_INTERVALS = [
+  { label: "1 day", value: 1440 },
+  { label: "7 days", value: 10080 },
+  { label: "30 days", value: 43200 },
+]
+
 export function ServerSettings() {
+  useEffect(() => {
+    document.title = `Server settings - ${$activeAccount.get()} - Privatefolio`
+  }, [])
+
   const [isLoading, setIsLoading] = useState(true)
-  const [cronInterval, setCronInterval] = useState(DEFAULT_SERVER_REFRESH_INTERVAL)
+  const [networthCronInterval, setNetworthCronInterval] = useState(
+    DEFAULT_NETWORTH_REFRESH_INTERVAL
+  )
   const [isCustomMode, setIsCustomMode] = useState(false)
+  const [isNetworthIntervalValid, setIsNetworthIntervalValid] = useState(true)
+
+  const [metadataCronInterval, setMetadataCronInterval] = useState(
+    DEFAULT_METADATA_REFRESH_INTERVAL
+  )
+  const [isMetadataCustomMode, setIsMetadataCustomMode] = useState(false)
+  const [isMetadataIntervalValid, setIsMetadataIntervalValid] = useState(true)
+
   const [isSaving, setIsSaving] = useState(false)
 
   const activeAccount = useStore($activeAccount)
@@ -42,10 +74,27 @@ export function ServerSettings() {
       setIsLoading(true)
       try {
         const settings = await $rpc.get().getSettings(activeAccount)
-        setCronInterval(settings.refreshInterval)
+        const { networthRefreshInterval } = settings
+        const metadataRefreshInterval =
+          settings.metadataRefreshInterval ?? DEFAULT_METADATA_REFRESH_INTERVAL
+        setNetworthCronInterval(networthRefreshInterval)
+        setMetadataCronInterval(metadataRefreshInterval)
+
         // Check if the loaded value matches any predefined interval
-        setIsCustomMode(
-          !REFRESH_INTERVALS.some((option) => option.value === settings.refreshInterval)
+        const isNetworthCustom = !REFRESH_INTERVALS.some(
+          (option) => option.value === networthRefreshInterval
+        )
+        setIsCustomMode(isNetworthCustom)
+        setIsNetworthIntervalValid(
+          isNetworthCustom ? isValidInterval(networthRefreshInterval) : true
+        )
+
+        const isMetadataCustom = !METADATA_REFRESH_INTERVALS.some(
+          (option) => option.value === metadataRefreshInterval
+        )
+        setIsMetadataCustomMode(isMetadataCustom)
+        setIsMetadataIntervalValid(
+          isMetadataCustom ? isValidInterval(metadataRefreshInterval) : true
         )
       } catch (error) {
         console.error("Failed to load settings:", error)
@@ -65,7 +114,8 @@ export function ServerSettings() {
 
     try {
       await $rpc.get().updateSettings(activeAccount, {
-        refreshInterval: cronInterval,
+        metadataRefreshInterval: metadataCronInterval,
+        networthRefreshInterval: networthCronInterval,
       })
       enqueueSnackbar("Settings saved successfully", { variant: "success" })
     } catch (error) {
@@ -76,37 +126,91 @@ export function ServerSettings() {
     }
   }
 
-  const handleIntervalChange = (_: MouseEvent<HTMLElement>, value: number | "custom" | null) => {
+  const handleNetworthIntervalChange = (
+    _: MouseEvent<HTMLElement>,
+    value: number | "custom" | null
+  ) => {
     if (value !== null) {
       if (value === "custom") {
         setIsCustomMode(true)
-        // Retain the current interval value
+        setIsNetworthIntervalValid(isValidInterval(networthCronInterval))
       } else {
         setIsCustomMode(false)
-        setCronInterval(value)
+        setNetworthCronInterval(value)
+        setIsNetworthIntervalValid(true) // Predefined are always valid
       }
     }
   }
 
-  const handleCustomIntervalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNetworthCustomIntervalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.includes(".")) {
+      setNetworthCronInterval(parseFloat(e.target.value))
+      setIsNetworthIntervalValid(false)
+      return
+    }
+
     const value = parseInt(e.target.value, 10)
     if (!isNaN(value) && value > 0) {
-      setCronInterval(value)
+      setNetworthCronInterval(value)
+      setIsNetworthIntervalValid(isValidInterval(value))
+    } else {
+      setNetworthCronInterval(value || 0)
+      setIsNetworthIntervalValid(false)
+    }
+  }
+
+  const handleMetadataIntervalChange = (
+    _: MouseEvent<HTMLElement>,
+    value: number | "custom" | null
+  ) => {
+    if (value !== null) {
+      if (value === "custom") {
+        setIsMetadataCustomMode(true)
+        setIsMetadataIntervalValid(isValidInterval(metadataCronInterval))
+      } else {
+        setIsMetadataCustomMode(false)
+        setMetadataCronInterval(value)
+        setIsMetadataIntervalValid(true) // Predefined are always valid
+      }
+    }
+  }
+
+  const handleMetadataCustomIntervalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.includes(".")) {
+      setMetadataCronInterval(parseFloat(e.target.value) * 1440)
+      setIsMetadataIntervalValid(false)
+      return
+    }
+
+    const valueInDays = parseInt(e.target.value, 10)
+    if (!isNaN(valueInDays) && valueInDays > 0) {
+      const valueInMinutes = valueInDays * 1440
+      setMetadataCronInterval(valueInMinutes)
+      setIsMetadataIntervalValid(isValidInterval(valueInMinutes))
+
+      // If the custom value matches a predefined option, switch back to the toggle button
+      if (METADATA_REFRESH_INTERVALS.some((option) => option.value === valueInMinutes)) {
+        setIsMetadataCustomMode(false)
+      }
+    } else {
+      setMetadataCronInterval(0) // invalid
+      setIsMetadataIntervalValid(false)
     }
   }
 
   // Determine which value to show in the toggle group
-  const toggleValue = isCustomMode ? "custom" : cronInterval
+  const networthToggleValue = isCustomMode ? "custom" : networthCronInterval
+  const metadataToggleValue = isMetadataCustomMode ? "custom" : metadataCronInterval
 
   return (
     <Paper sx={{ paddingX: 2, paddingY: 2 }}>
       <Stack gap={2}>
         <Stack gap={1}>
           <Stack direction="row" alignItems="center" spacing={1}>
-            <SectionTitle>Refresh Interval</SectionTitle>
+            <SectionTitle>Networth Refresh Interval</SectionTitle>
             <Tooltip
               title={`How often the server will automatically refresh balances, prices, and networth.
-                  Default is ${DEFAULT_SERVER_REFRESH_INTERVAL} minutes.`}
+                  Default is ${DEFAULT_NETWORTH_REFRESH_INTERVAL} minutes.`}
             >
               <IconButton size="small" aria-label="Help with cron expressions" color="secondary">
                 <Info fontSize="small" />
@@ -114,9 +218,9 @@ export function ServerSettings() {
             </Tooltip>
           </Stack>
           <ToggleButtonGroup
-            value={toggleValue}
+            value={networthToggleValue}
             exclusive
-            onChange={handleIntervalChange}
+            onChange={handleNetworthIntervalChange}
             disabled={isLoading}
             aria-label="refresh interval"
             color="primary"
@@ -138,12 +242,13 @@ export function ServerSettings() {
           </ToggleButtonGroup>
 
           {isCustomMode && (
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction="row" gap={2} alignItems="center" flexWrap="wrap">
               <SectionTitle>Custom interval:</SectionTitle>
               <TextField
+                error={!isNetworthIntervalValid}
                 disabled={isLoading}
-                value={cronInterval}
-                onChange={handleCustomIntervalChange}
+                value={networthCronInterval || ""}
+                onChange={handleNetworthCustomIntervalChange}
                 type="number"
                 InputProps={{
                   endAdornment: <InputAdornment position="end">minutes</InputAdornment>,
@@ -152,12 +257,82 @@ export function ServerSettings() {
                 sx={{ width: 160 }}
                 size="small"
               />
+              {!isNetworthIntervalValid && (
+                <FormHelperText error>Must be &lt; 60, or a whole number of hours.</FormHelperText>
+              )}
+            </Stack>
+          )}
+        </Stack>
+
+        <Stack gap={1}>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <SectionTitle>Metadata Refresh Interval</SectionTitle>
+            <Tooltip
+              title={`How often the server will automatically refetch assets and platforms metadata.`}
+            >
+              <IconButton size="small" aria-label="Help with cron expressions" color="secondary">
+                <Info fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+          <ToggleButtonGroup
+            value={metadataToggleValue}
+            exclusive
+            onChange={handleMetadataIntervalChange}
+            disabled={isLoading}
+            aria-label="metadata refresh interval"
+            color="primary"
+            sx={{
+              "& .MuiButtonBase-root": {
+                minWidth: 64,
+                paddingX: 2,
+                paddingY: 0.75,
+                textTransform: "none",
+              },
+            }}
+          >
+            {METADATA_REFRESH_INTERVALS.map((option) => (
+              <ToggleButton key={option.label} value={option.value}>
+                {option.label}
+              </ToggleButton>
+            ))}
+            <ToggleButton value={"custom" as const}>Custom</ToggleButton>
+          </ToggleButtonGroup>
+
+          {isMetadataCustomMode && (
+            <Stack direction="row" gap={2} alignItems="center" flexWrap="wrap">
+              <SectionTitle>Custom interval:</SectionTitle>
+              <TextField
+                error={!isMetadataIntervalValid}
+                disabled={isLoading}
+                value={metadataCronInterval > 0 ? metadataCronInterval / 1440 : ""}
+                onChange={handleMetadataCustomIntervalChange}
+                type="number"
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">days</InputAdornment>,
+                  inputProps: { min: 1 },
+                }}
+                sx={{ width: 160 }}
+                size="small"
+              />
+              {!isMetadataIntervalValid && (
+                <FormHelperText error>Must be a whole number of days.</FormHelperText>
+              )}
             </Stack>
           )}
         </Stack>
 
         <div>
-          <Button variant="contained" onClick={handleSave} disabled={isLoading || isSaving}>
+          <Button
+            variant="contained"
+            onClick={handleSave}
+            disabled={
+              isLoading ||
+              isSaving ||
+              (isCustomMode && !isNetworthIntervalValid) ||
+              (isMetadataCustomMode && !isMetadataIntervalValid)
+            }
+          >
             Save
           </Button>
         </div>
