@@ -1,4 +1,4 @@
-import { RichExtension } from "src/interfaces"
+import { ExtensionType, RichExtension } from "src/interfaces"
 import { extensions } from "src/settings/extensions"
 
 import { getPlatformsByIds } from "./platforms-api"
@@ -37,4 +37,35 @@ export const getExtension = async (id: string): Promise<RichExtension | undefine
       (extension.platformIds as string[])?.includes(platform.id)
     ),
   }
+}
+
+export async function findExtensions(query: string, limit = 5): Promise<RichExtension[]> {
+  const normalizedQuery = query.toLowerCase().trim()
+
+  if (!normalizedQuery) {
+    return []
+  }
+
+  const allExtensions = await getExtensions()
+
+  const matchingExtensions: RichExtension[] = []
+  for (const extension of allExtensions) {
+    if (matchingExtensions.length >= limit) {
+      break
+    }
+    if (
+      extension.extensionName.toLowerCase().includes(normalizedQuery) ||
+      extension.id.toLowerCase().includes(normalizedQuery) ||
+      extension.authorGithub.toLowerCase().includes(normalizedQuery) ||
+      extension.description.toLowerCase().includes(normalizedQuery)
+    ) {
+      matchingExtensions.push(extension)
+    }
+  }
+
+  return matchingExtensions
+}
+
+export async function getExtensionsByType(type: ExtensionType) {
+  return (await getExtensions()).filter((x) => x.extensionType === type)
 }

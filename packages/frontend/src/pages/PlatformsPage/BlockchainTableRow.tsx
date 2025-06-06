@@ -19,7 +19,7 @@ export function BlockchainTableRow({ row }: BlockchainTableRowProps) {
           variant="tablecell"
           label={row.nativeCoinId}
           id={row.nativeCoinId}
-          avatar={<AssetAvatar src={resolveUrl(row.image)} alt={row.nativeCoinId} size="small" />}
+          avatar={<AssetAvatar src={row.image} alt={row.nativeCoinId} size="small" />}
           size="small"
           href={`../asset/${row.id}`}
           linkText={`View asset`}

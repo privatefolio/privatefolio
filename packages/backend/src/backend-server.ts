@@ -23,7 +23,6 @@ import {
 } from "./backend-comms"
 import { APP_VERSION } from "./server-env"
 import { corsHeaders } from "./settings/settings"
-import { isDevelopment } from "./utils/environment-utils"
 import { extractJwt, verifyJwt } from "./utils/jwt-utils"
 
 // Disallow functions because of bun worker bug
@@ -205,27 +204,29 @@ export class BackendServer<T extends BackendApiShape> {
             if (!this.readApi[method]) {
               response = { error: `API method not found: ${method}`, id, method }
             } else if (isReadMethod) {
-              if (isDevelopment) {
-                console.log(`Forwarding method ${method} to ${chalk.bold.blue("readApi")}`)
-              }
+              // if (isDevelopment) {
+              //   console.log(`Forwarding method ${method} to ${chalk.bold.blue("readApi")}`)
+              // }
               const result = await this.readApi[method](...deserializedParams)
               response = { id, method, result }
             } else {
-              if (isDevelopment) {
-                console.log(`Forwarding method ${method} to ${chalk.bold.yellow("writeApi")}`)
-              }
+              // if (isDevelopment) {
+              //   console.log(`Forwarding method ${method} to ${chalk.bold.yellow("writeApi")}`)
+              // }
               const result = await this.writeApi[method](...deserializedParams)
               response = { id, method, result }
             }
           } catch (error) {
-            console.error(`Error executing request "${request.method}" ${String(error)}`)
+            console.warn(
+              `${chalk.yellow.bold("[warn]")} Failed to execute request "${request.method}" ${String(error)}`
+            )
             if (error.message.includes("Worker has been terminated")) {
-              console.error("Shutting down server due to invalid worker state")
+              console.error("[error] Shutting down server due to invalid worker state")
               this.server?.stop()
               return
             }
             response = {
-              error: `Could not execute request ${String(error)}`,
+              error: `Could not execute request "${request.method}" ${String(error)}`,
               id: request.id,
             }
             if (error instanceof Error) response.stackTrace = error.stack

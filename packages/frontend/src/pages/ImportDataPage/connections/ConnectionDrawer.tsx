@@ -2,12 +2,14 @@ import { CloseRounded } from "@mui/icons-material"
 import { LoadingButton } from "@mui/lab"
 import {
   Checkbox,
+  Chip,
   Drawer,
   DrawerProps,
   FormControl,
   FormControlLabel,
   FormHelperText,
   IconButton,
+  ListItemAvatar,
   ListItemText,
   MenuItem,
   Select,
@@ -21,7 +23,9 @@ import {
   BINANCE_WALLET_LABELS,
   BinanceWalletId,
 } from "privatefolio-backend/src/extensions/connections/binance/binance-settings"
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
+import { ExtensionAvatar } from "src/components/ExtensionAvatar"
+import { PlatformAvatar } from "src/components/PlatformAvatar"
 import { $activeAccount } from "src/stores/account-store"
 import { MonoFont } from "src/theme"
 import { isEvmPlatform } from "src/utils/assets-utils"
@@ -31,13 +35,13 @@ import { $rpc } from "src/workers/remotes"
 
 import { AddressInput } from "../../../components/AddressInput"
 import { SectionTitle } from "../../../components/SectionTitle"
-import { BinanceConnectionOptions, ConnectionOptions } from "../../../interfaces"
-import { CONNECTIONS, PLATFORMS_META } from "../../../settings"
+import { BinanceConnectionOptions, ConnectionOptions, RichExtension } from "../../../interfaces"
 import { $debugMode, PopoverToggleProps } from "../../../stores/app-store"
 
 export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & PopoverToggleProps) {
   const [loading, setLoading] = useState(false)
 
+  const [extensionId, setExtensionId] = useState<string>("etherscan-connection")
   const [platform, setPlatform] = useState<string>("ethereum")
   const [binanceWallets, setState] = useState({
     coinFutures: false,
@@ -46,6 +50,22 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
     spot: true,
     usdFutures: false,
   })
+
+  useEffect(() => {
+    if (open) return
+
+    setExtensionId("etherscan-connection")
+    setPlatform("ethereum")
+    setState({
+      coinFutures: false,
+      crossMargin: true,
+      isolatedMargin: true,
+      spot: true,
+      usdFutures: false,
+    })
+    setLoading(false)
+  }, [open])
+
   const handleWalletsChange = (event) => {
     setState({
       ...binanceWallets,
@@ -118,6 +138,17 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
     [binanceWallets, platform, toggleOpen, walletsError]
   )
 
+  const [extensions, setExtensions] = useState<RichExtension[]>([])
+
+  useEffect(() => {
+    $rpc.get().getExtensionsByType("connection").then(setExtensions)
+  }, [])
+
+  const extension = useMemo(
+    () => extensions.find((x) => x.id === extensionId),
+    [extensionId, extensions]
+  )
+
   return (
     <Drawer open={open} onClose={toggleOpen} {...rest}>
       <form onSubmit={handleSubmit}>
@@ -131,34 +162,83 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
             </IconButton>
           </Stack>
           <div>
-            <SectionTitle>Platform</SectionTitle>
+            <SectionTitle>Extension</SectionTitle>
             <Select
               variant="outlined"
               fullWidth
               size="small"
-              value={platform}
-              onChange={(event) => setPlatform(event.target.value)}
+              value={extensionId}
+              onChange={(event) => setExtensionId(event.target.value)}
             >
-              {CONNECTIONS.map((x) => (
-                <MenuItem key={x} value={x} disabled={x === "binance" && isProduction}>
-                  <ListItemText primary={PLATFORMS_META[x].blockExplorer?.name} />
+              {extensions.map((x) => (
+                <MenuItem
+                  key={x.id}
+                  value={x.id}
+                  disabled={x.id === "binance-connection" && isProduction}
+                >
+                  <Stack direction="row" alignItems="center">
+                    <ListItemAvatar>
+                      <ExtensionAvatar
+                        src={x.extensionLogoUrl}
+                        alt={x.extensionName}
+                        size="small"
+                      />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={
+                        <>
+                          {x.extensionName}{" "}
+                          {x.id === "binance-connection" && (
+                            <Chip
+                              size="small"
+                              sx={{ fontSize: "0.625rem", height: 16 }}
+                              label="Coming soon"
+                            />
+                          )}
+                        </>
+                      }
+                    />
+                  </Stack>
                 </MenuItem>
               ))}
             </Select>
           </div>
-          {platform !== "binance" ? (
-            <div>
-              <SectionTitle>Wallet</SectionTitle>
-              <AddressInput
-                name="walletAddr"
-                autoComplete="off"
-                autoFocus
-                variant="outlined"
-                fullWidth
-                size="small"
-                required
-              />
-            </div>
+          {extensionId !== "binance-connection" ? (
+            <>
+              <div>
+                <SectionTitle>Platform</SectionTitle>
+                <Select
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  value={platform}
+                  onChange={(event) => setPlatform(event.target.value)}
+                >
+                  {extension?.platforms?.map((x) => (
+                    <MenuItem key={x.id} value={x.id}>
+                      <Stack direction="row" alignItems="center">
+                        <ListItemAvatar>
+                          <PlatformAvatar src={x.image} alt={x.name} size="small" />
+                        </ListItemAvatar>
+                        <ListItemText primary={x.name} />
+                      </Stack>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </div>
+              <div>
+                <SectionTitle>Wallet</SectionTitle>
+                <AddressInput
+                  name="walletAddr"
+                  autoComplete="off"
+                  autoFocus
+                  variant="outlined"
+                  fullWidth
+                  size="small"
+                  required
+                />
+              </div>
+            </>
           ) : (
             <>
               <div>

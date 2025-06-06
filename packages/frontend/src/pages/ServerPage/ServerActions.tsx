@@ -11,8 +11,10 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React from "react"
 import { $activeAccount } from "src/stores/account-store"
+import { $debugMode } from "src/stores/app-store"
 import { handleBackupRequest } from "src/utils/backup-utils"
 import { onRestoreRequest } from "src/utils/common-tasks"
 import { $rpc } from "src/workers/remotes"
@@ -26,6 +28,8 @@ export function ServerActions() {
   const handleClose = () => {
     setAnchorEl(null)
   }
+
+  const debugMode = useStore($debugMode)
 
   return (
     <>
@@ -83,35 +87,39 @@ export function ServerActions() {
           </ListItemAvatar>
           <ListItemText>Recompute networth</ListItemText>
         </MenuItem>{" "}
-        <Divider textAlign="center">
-          <Typography variant="caption" color="text.secondary">
-            DEBUG
-          </Typography>
-        </Divider>
-        <MenuItem
-          dense
-          onClick={() => {
-            $rpc.get().enqueueSleep($activeAccount.get(), 1, 0.1)
-            handleClose()
-          }}
-        >
-          <ListItemAvatar>
-            <Bedtime fontSize="small" />
-          </ListItemAvatar>
-          <ListItemText>Sleep 1s</ListItemText>
-        </MenuItem>
-        <MenuItem
-          dense
-          onClick={() => {
-            $rpc.get().enqueueSleep($activeAccount.get(), 50, 10, true)
-            handleClose()
-          }}
-        >
-          <ListItemAvatar>
-            <Bedtime fontSize="small" />
-          </ListItemAvatar>
-          <ListItemText>Sleep 50s</ListItemText>
-        </MenuItem>
+        {debugMode && (
+          <>
+            <Divider textAlign="center">
+              <Typography variant="caption" color="text.secondary">
+                DEBUG
+              </Typography>
+            </Divider>
+            <MenuItem
+              dense
+              onClick={() => {
+                $rpc.get().enqueueSleep($activeAccount.get(), 1, 0.1)
+                handleClose()
+              }}
+            >
+              <ListItemAvatar>
+                <Bedtime fontSize="small" />
+              </ListItemAvatar>
+              <ListItemText>Sleep 1s</ListItemText>
+            </MenuItem>
+            <MenuItem
+              dense
+              onClick={() => {
+                $rpc.get().enqueueSleep($activeAccount.get(), 50, 10, true)
+                handleClose()
+              }}
+            >
+              <ListItemAvatar>
+                <Bedtime fontSize="small" />
+              </ListItemAvatar>
+              <ListItemText>Sleep 50s</ListItemText>
+            </MenuItem>
+          </>
+        )}
       </Menu>
     </>
   )

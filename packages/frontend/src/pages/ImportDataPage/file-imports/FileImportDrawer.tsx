@@ -37,6 +37,7 @@ export function FileImportDrawer(props: FileImportDrawerProps) {
   const { id, timestamp, meta, name, lastModified, size } = fileImport
 
   const extensionId = meta?.extensionId
+  const parserId = meta?.parserId
 
   // const [logsNumber, setLogsNumber] = useState<number | null>(null)
 
@@ -104,6 +105,14 @@ export function FileImportDrawer(props: FileImportDrawerProps) {
               <FileSizeBlock size={size} />
             </Typography>
           </Stack>
+        </div>
+        <div>
+          <SectionTitle>Parser Id</SectionTitle>
+          {!parserId ? (
+            <Skeleton height={20} width={80} />
+          ) : (
+            <IdentifierBlock id={parserId} size="small" />
+          )}
         </div>
         <div>
           <SectionTitle>Extension</SectionTitle>

@@ -2,19 +2,20 @@ import { getPair, mapToChartData, queryPrices } from "src/extensions/prices/reds
 import { ResolutionString } from "src/interfaces"
 import { GITHUB_CI } from "src/server-env"
 import { PLATFORMS_META } from "src/settings/settings"
-import { expect, it } from "vitest"
+import { describe, expect, it } from "vitest"
 
-it.skip("should fetch WETH prices within a range", async () => {
-  // act
-  const result = await queryPrices({
-    limit: 3,
-    pair: getPair(PLATFORMS_META.ethereum.nativeAssetId as string),
-    since: 1678492800000,
-    timeInterval: "1d" as ResolutionString,
-    until: 1678665600000,
-  })
-  // assert
-  expect(result.map(mapToChartData)).toMatchInlineSnapshot(`
+describe.skip("redstone price api", () => {
+  it.skip("should fetch WETH prices within a range", async () => {
+    // act
+    const result = await queryPrices({
+      limit: 3,
+      pair: getPair(PLATFORMS_META.ethereum.nativeAssetId as string),
+      since: 1678492800000,
+      timeInterval: "1d" as ResolutionString,
+      until: 1678665600000,
+    })
+    // assert
+    expect(result.map(mapToChartData)).toMatchInlineSnapshot(`
     [
       {
         "time": 1678492800,
@@ -30,32 +31,32 @@ it.skip("should fetch WETH prices within a range", async () => {
       },
     ]
   `)
-})
-
-it.skip("should return 0 for non-supported", async () => {
-  // act
-  const results = await queryPrices({
-    pair: "EFJA",
-    timeInterval: "1d" as ResolutionString,
   })
-  // assert
-  expect(results.length).toBe(0)
-})
 
-it.skip("should fetch WETH prices within a small range", async (test) => {
-  if (GITHUB_CI) {
-    test.skip()
-  }
-  // act
-  const result = await queryPrices({
-    limit: 1,
-    pair: getPair(PLATFORMS_META.ethereum.nativeAssetId as string),
-    since: 1706572800000,
-    timeInterval: "1d" as ResolutionString,
-    until: 1706572800000,
+  it.skip("should return 0 for non-supported", async () => {
+    // act
+    const results = await queryPrices({
+      pair: "EFJA",
+      timeInterval: "1d" as ResolutionString,
+    })
+    // assert
+    expect(results.length).toBe(0)
   })
-  // assert
-  expect(result.map(mapToChartData)).toMatchInlineSnapshot(`
+
+  it.skip("should fetch WETH prices within a small range", async (test) => {
+    if (GITHUB_CI) {
+      test.skip()
+    }
+    // act
+    const result = await queryPrices({
+      limit: 1,
+      pair: getPair(PLATFORMS_META.ethereum.nativeAssetId as string),
+      since: 1706572800000,
+      timeInterval: "1d" as ResolutionString,
+      until: 1706572800000,
+    })
+    // assert
+    expect(result.map(mapToChartData)).toMatchInlineSnapshot(`
     [
       {
         "time": 1706572800,
@@ -63,4 +64,5 @@ it.skip("should fetch WETH prices within a small range", async (test) => {
       },
     ]
   `)
+  })
 })

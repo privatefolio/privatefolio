@@ -2,7 +2,6 @@ import { Box, Stack } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import { Platform } from "src/interfaces"
 import { MonoFont } from "src/theme"
-import { resolveUrl } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 import { IdentifierBlock, IdentifierBlockProps } from "./IdentifierBlock"
@@ -31,7 +30,7 @@ export function PlatformBlock(props: PlatformBlockProps) {
       id={id || platform.id}
       href={`../platform/${id || platform.id}`}
       label={platform.name}
-      avatar={<PlatformAvatar src={resolveUrl(platform.image)} alt={platform.name} size="small" />}
+      avatar={<PlatformAvatar src={platform.image} alt={platform.name} size="small" />}
       size="small"
       linkText={
         <Stack alignItems="center">

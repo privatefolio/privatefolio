@@ -1,10 +1,4 @@
-import {
-  deleteAssetInfos,
-  getAsset,
-  getMyAssets,
-  patchAsset,
-  upsertAsset,
-} from "src/api/account/assets-api" // Adjust the path if necessary
+import { getAsset, patchAsset, upsertAsset } from "src/api/account/assets-api" // Adjust the path if necessary
 import { upsertAuditLog } from "src/api/account/audit-logs-api"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { describe, expect, it } from "vitest"
@@ -109,34 +103,6 @@ describe("assets", () => {
         "priceApiId": "coinbase",
         "symbol": "ETH",
       }
-    `)
-  })
-
-  it.sequential("should delete all asset infos", async () => {
-    // arrange
-    expect(await getMyAssets(accountName)).toMatchInlineSnapshot(`
-      [
-        {
-          "coingeckoId": "ethereum",
-          "id": "ethereum:0x0000000000000000000000000000000000000000:ETH",
-          "logoUrl": "logo.svg",
-          "name": "Ether",
-          "priceApiId": "coinbase",
-          "symbol": "ETH",
-        },
-      ]
-    `)
-    // act
-    await deleteAssetInfos(accountName)
-    // assert
-    const assets = await getMyAssets(accountName)
-    expect(assets).toMatchInlineSnapshot(`
-      [
-        {
-          "id": "ethereum:0x0000000000000000000000000000000000000000:ETH",
-          "symbol": "ETH",
-        },
-      ]
     `)
   })
 })

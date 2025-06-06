@@ -223,7 +223,7 @@ export function AssetDetails(props: AssetDetailsProps) {
                 <TableCell sx={{ minWidth: 180, width: 220 }}>
                   <SectionTitle>Platform</SectionTitle>
                 </TableCell>
-                <TableCell sx={{ minWidth: 180, width: 400 }}>
+                <TableCell sx={{ minWidth: 180, width: 410 }}>
                   <SectionTitle>Contract Address</SectionTitle>
                 </TableCell>
               </TableRow>

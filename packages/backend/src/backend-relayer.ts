@@ -4,7 +4,7 @@ import { backOff } from "exponential-backoff"
 
 import { BackendResponse, FunctionReference } from "./backend-comms"
 import { ConnectionStatusCallback } from "./interfaces"
-import { noop } from "./utils/utils"
+import { isDevelopment, noop } from "./utils/utils"
 
 let instanceCounter = 0
 
@@ -70,7 +70,7 @@ class BackendRelayer {
             const err = new Error(error)
             err.stack = stackTrace
             this.pendingRequests[id](Promise.reject(err))
-            if (this.logResponses) console.error(this.logPrefix, err)
+            if (this.logResponses) console.warn(this.logPrefix, err)
           } else {
             let deserializedResult = result
             if (result && (result as FunctionReference).__isFunction) {
@@ -122,7 +122,7 @@ class BackendRelayer {
           return Promise.resolve()
         },
         {
-          maxDelay: 10_000,
+          maxDelay: isDevelopment ? 1000 : 10_000,
           numOfAttempts: 100,
           retry: (_err, attempt) => {
             console.log(this.logPrefix, `reconnecting, attempt: #${attempt}`)

@@ -25,6 +25,10 @@ export const PLATFORMS_META: Record<string, PlatformMeta> = {
     nativeAssetId: "ethereum:0x0000000000000000000000000000000000000000:ETH",
   },
   "optimistic-ethereum": {
+    blockExplorer: {
+      name: "Optimistic Etherscan",
+      url: "https://optimistic.etherscan.io",
+    },
     nativeAssetId: "optimistic-ethereum:0x0000000000000000000000000000000000000000:ETH",
   },
   "polygon-pos": {

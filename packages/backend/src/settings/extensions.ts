@@ -42,7 +42,7 @@ export const extensions: Extension[] = [
     authorGithub: "kernelwhisperer",
     description: "Import your Binance account statement.",
     extensionLogoUrl: "$STATIC_ASSETS/extensions/binance.svg",
-    extensionName: "Binance Account Statement",
+    extensionName: "Binance",
     extensionType: "file-import",
     extensionVersion: "1.0.0",
     githubUrl: "https://github.com/privatefolio/privatefolio",

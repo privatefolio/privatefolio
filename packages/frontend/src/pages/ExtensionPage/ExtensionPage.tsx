@@ -26,17 +26,15 @@ import { RichExtension } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 import { getFilterValueLabel } from "src/stores/metadata-store"
 import { MonoFont, SerifFont } from "src/theme"
-import { prettifyUrl, resolveUrl } from "src/utils/utils"
+import { prettifyUrl } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 import FourZeroFourPage from "../404"
 
-const defaultTab = "details"
-
 export default function ExtensionPage() {
   const { extensionId } = useParams<{ extensionId: string }>()
   const [searchParams] = useSearchParams()
-  const tab = searchParams.get("tab") || defaultTab
+  const tab = searchParams.get("tab") || "details"
 
   const [extension, setExtension] = useState<RichExtension | null | undefined>(undefined)
   const [isLoading, setIsLoading] = useState(true)
@@ -109,7 +107,7 @@ export default function ExtensionPage() {
         sx={{ paddingX: 2 }}
       >
         <Stack direction="row" gap={1} component="div" alignItems="center">
-          <ExtensionAvatar src={resolveUrl(extensionLogoUrl)} alt={extensionName} size="large" />
+          <ExtensionAvatar src={extensionLogoUrl} alt={extensionName} size="large" />
           <Stack>
             <Typography variant="h6" fontFamily={SerifFont} sx={{ marginBottom: -0.5 }}>
               <span>{extensionName}</span>
@@ -149,7 +147,7 @@ export default function ExtensionPage() {
       </Stack>
 
       <Stack>
-        <Tabs value={tab} defaultValue={defaultTab}>
+        <Tabs value={tab} defaultValue={tab}>
           <NavTab value="details" to="?tab=details" label="Details" />
           {extension.howTo && <NavTab value="how-to" to="?tab=how-to" label="How to use" />}
           {extension.sources && extension.sources.length > 0 && (

@@ -2,7 +2,6 @@ import { Box, Stack } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import { RichExtension } from "src/interfaces"
 import { MonoFont } from "src/theme"
-import { resolveUrl } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 import { ExtensionAvatar } from "./ExtensionAvatar"
@@ -32,7 +31,7 @@ export function ExtensionBlock(props: ExtensionBlockProps) {
       id={id || extension.id}
       avatar={
         <ExtensionAvatar
-          src={resolveUrl(extension?.extensionLogoUrl)}
+          src={extension?.extensionLogoUrl}
           alt={extension?.extensionName}
           size="small"
         />

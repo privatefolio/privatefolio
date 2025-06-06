@@ -20,7 +20,7 @@ import { Action, KBarResults, useKBar, useMatches, useRegisterActions, VisualSta
 import { enqueueSnackbar } from "notistack"
 import React, { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Asset, FindPlatformsResult, Transaction } from "src/interfaces"
+import { Asset, FindPlatformsResult, RichExtension, Transaction } from "src/interfaces"
 import { $activeAccount, $activeIndex } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
 import { handleBackupRequest } from "src/utils/backup-utils"
@@ -29,8 +29,10 @@ import { normalizeTxHash } from "src/utils/parsing-utils"
 import { $rpc } from "src/workers/remotes"
 
 import { AssetAvatar } from "../AssetAvatar"
+import { ExtensionAvatar } from "../ExtensionAvatar"
 import { TransactionIcon } from "../icons"
 import { PlatformAvatar } from "../PlatformAvatar"
+import { Truncate } from "../Truncate"
 import { Key } from "./Key"
 import { SearchInput } from "./SearchInput"
 
@@ -58,6 +60,9 @@ export const SearchBar = () => {
     exchanges: [],
   })
   const [platformsLoading, setPlatformsLoading] = useState(false)
+
+  const [extensionsFound, setExtensionsFound] = useState<RichExtension[]>([])
+  const [extensionsLoading, setExtensionsLoading] = useState(false)
 
   useEffect(() => {
     setAssetsFound([])
@@ -114,6 +119,27 @@ export const SearchBar = () => {
         setPlatformsFound({ blockchains: [], exchanges: [] })
       } finally {
         setPlatformsLoading(false)
+      }
+    })()
+  }, [searchQuery])
+
+  useEffect(() => {
+    setExtensionsFound([])
+    setExtensionsLoading(false)
+    ;(async () => {
+      if (!searchQuery || searchQuery.length < 1) {
+        setExtensionsFound([])
+        return
+      }
+
+      try {
+        setExtensionsLoading(true)
+        const extensions = await $rpc.get().findExtensions(searchQuery)
+        setExtensionsFound(extensions)
+      } catch {
+        setExtensionsFound([])
+      } finally {
+        setExtensionsLoading(false)
       }
     })()
   }, [searchQuery])
@@ -189,11 +215,36 @@ export const SearchBar = () => {
     }))
   }, [assetsFound, navigate])
 
+  const extensionActions = useMemo<Action[]>(() => {
+    const actions: Action[] = []
+
+    extensionsFound.forEach((extension) => {
+      actions.push({
+        icon: (
+          <ExtensionAvatar
+            src={extension.extensionLogoUrl}
+            alt={extension.extensionName}
+            size="snug"
+          />
+        ),
+        id: `extension-${extension.id}`,
+        keywords: `${extension.extensionName} ${extension.description} ${extension.authorGithub} extension`,
+        name: extension.extensionName,
+        perform: () => navigate(`/u/${$activeIndex.get()}/extension/${extension.id}`),
+        section: "Extensions",
+        subtitle: extension.description,
+      })
+    })
+
+    return actions
+  }, [extensionsFound, navigate])
+
   const actions = useMemo<Action[]>(
     () => [
       ...txnsFoundActions,
       ...platformActions,
       ...assetActions,
+      ...extensionActions,
       // {
       //   icon: <HomeRounded fontSize="small" />,
       //   id: "page-home",
@@ -274,7 +325,7 @@ export const SearchBar = () => {
         section: "Actions",
       },
     ],
-    [assetActions, txnsFoundActions, platformActions]
+    [assetActions, txnsFoundActions, platformActions, extensionActions]
   )
 
   useRegisterActions(actions, [actions])
@@ -304,10 +355,12 @@ export const SearchBar = () => {
           <Stack gap={1} padding={0.5} marginTop={0.5}>
             <SearchInput
               defaultPlaceholder={SEARCH_PLACEHOLDER}
-              loading={txnsLoading || platformsLoading || assetsLoading}
+              loading={txnsLoading || platformsLoading || assetsLoading || extensionsLoading}
             />
             <Divider />
-            <RenderResults loading={txnsLoading || platformsLoading || assetsLoading} />
+            <RenderResults
+              loading={txnsLoading || platformsLoading || assetsLoading || extensionsLoading}
+            />
           </Stack>
         </>
       </Dialog>
@@ -336,7 +389,7 @@ function RenderResults({ loading }: { loading: boolean }) {
               {item.icon && <ListItemAvatar>{item.icon}</ListItemAvatar>}
               <ListItemText
                 primary={item.name}
-                secondary={item.subtitle}
+                secondary={<Truncate>{item.subtitle}</Truncate>}
                 primaryTypographyProps={{ variant: "body2" }}
                 secondaryTypographyProps={{ variant: "caption" }}
               />
