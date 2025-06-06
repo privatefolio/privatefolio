@@ -1,4 +1,4 @@
-import { SUPPORTED_PLATFORMS as etherscanConnectionPlatforms } from "src/extensions/connections/etherscan/etherscan-settings"
+import { SUPPORTED_PLATFORMS as etherscanPlatforms } from "src/extensions/connections/etherscan/etherscan-settings"
 import {
   extensionId as binanceFileImportId,
   platform as binanceFileImportPlatform,
@@ -11,10 +11,7 @@ import {
   extensionId as coinmamaFileImportId,
   platform as coinmamaFileImportPlatform,
 } from "src/extensions/file-imports/coinmama"
-import {
-  extensionId as etherscanFileImportId,
-  platform as etherscanFileImportPlatform,
-} from "src/extensions/file-imports/etherscan"
+import { extensionId as etherscanFileImportId } from "src/extensions/file-imports/etherscan"
 import {
   extensionId as mexcFileImportId,
   platform as mexcFileImportPlatform,
@@ -135,14 +132,7 @@ export const extensions: Extension[] = [
     githubUrl: "https://github.com/privatefolio/privatefolio",
     howTo: "/src/pages/ImportDataPage/file-imports/help/EtherscanHelp.tsx",
     id: etherscanFileImportId,
-    platformIds: [
-      etherscanFileImportPlatform,
-      "arbitrum-one",
-      "base",
-      "polygon-pos",
-      "optimistic-ethereum",
-      // TODO9
-    ],
+    platformIds: etherscanPlatforms,
     publishedAt: new Date("2025-06-01").getTime(),
     sources: [
       {
@@ -225,7 +215,7 @@ export const extensions: Extension[] = [
     extensionVersion: "1.0.0",
     githubUrl: "https://github.com/privatefolio/privatefolio",
     id: "etherscan-connection",
-    platformIds: etherscanConnectionPlatforms,
+    platformIds: etherscanPlatforms,
     publishedAt: new Date("2025-06-01").getTime(),
     sources: [
       {

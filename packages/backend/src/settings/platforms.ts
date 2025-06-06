@@ -19,6 +19,13 @@ export const PLATFORMS_META: Record<string, PlatformMeta> = {
     chainId: 8453,
     nativeAssetId: "base:0x0000000000000000000000000000000000000000:ETH",
   },
+  "binance-smart-chain": {
+    blockExplorer: {
+      name: "BSCScan",
+      url: "https://bscscan.com",
+    },
+    chainId: 56,
+  },
   ethereum: {
     blockExplorer: {
       name: "Etherscan",
