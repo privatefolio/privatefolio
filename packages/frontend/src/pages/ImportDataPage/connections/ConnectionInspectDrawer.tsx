@@ -2,6 +2,10 @@ import { CloseRounded } from "@mui/icons-material"
 import { LoadingButton } from "@mui/lab"
 import { Drawer, DrawerProps, IconButton, Stack, Tooltip, Typography } from "@mui/material"
 import { enqueueSnackbar } from "notistack"
+import {
+  BINANCE_WALLET_IDS,
+  BINANCE_WALLET_LABELS,
+} from "privatefolio-backend/src/extensions/connections/binance/binance-settings"
 import React, { useState } from "react"
 import { AmountBlock } from "src/components/AmountBlock"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
@@ -10,7 +14,6 @@ import { SectionTitle } from "src/components/SectionTitle"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { useConfirm } from "src/hooks/useConfirm"
 import { BinanceConnectionOptions, Connection } from "src/interfaces"
-import { BINANCE_WALLET_IDS, BINANCE_WALLET_LABELS } from "src/settings"
 import { $activeAccount } from "src/stores/account-store"
 import { $debugMode, PopoverToggleProps } from "src/stores/app-store"
 import { $rpc } from "src/workers/remotes"
@@ -75,7 +78,7 @@ export function ConnectionInspectDrawer(props: ConnectionInspectDrawerProps) {
         </div>
         <div>
           <SectionTitle>Platform</SectionTitle>
-          <PlatformBlock platform={platform} />
+          <PlatformBlock id={platform} />
         </div>
         <div>
           <SectionTitle>Audit logs</SectionTitle>

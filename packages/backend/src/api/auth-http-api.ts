@@ -2,7 +2,7 @@ import { randomBytes, scrypt, timingSafeEqual } from "crypto"
 import { access, mkdir, readFile, writeFile } from "fs/promises"
 import { promisify } from "util"
 
-import { AUTH_DATA_DIR, corsHeaders, HASH_FILE, JWT_SECRET_FILE, SALT_FILE } from "../settings"
+import { AUTH_DATA_DIR, corsHeaders, HASH_FILE, JWT_SECRET_FILE, SALT_FILE } from "../settings/settings"
 import { extractJwt, generateJwt, verifyJwt } from "../utils/jwt-utils"
 
 const scryptAsync = promisify(scrypt)

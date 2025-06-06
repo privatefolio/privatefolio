@@ -8,7 +8,7 @@ import {
   deleteFileImport,
   getFileImports,
   importFile,
-} from "src/api/account/file-imports/file-imports-api"
+} from "src/api/account/file-imports-api"
 import { computeNetworth, getNetworth } from "src/api/account/networth-api"
 import { upsertServerTask } from "src/api/account/server-tasks-api"
 import { countTransactions, getTransactions } from "src/api/account/transactions-api"
@@ -57,9 +57,10 @@ describe("0xf98 file import", () => {
       lastModified: 0,
       meta: {
         assetIds: ["ethereum:0x0000000000000000000000000000000000000000:ETH"],
-        integration: "etherscan",
+        extensionId: "etherscan-file-import",
         logs: 16,
         operations: ["Deposit", "Withdraw", "Fee"],
+        parserId: "etherscan-default",
         platform: "ethereum",
         rows: 9,
         transactions: 9,
@@ -114,9 +115,10 @@ describe("0xf98 file import", () => {
           "ethereum:0x7B2f9706CD8473B4F5B7758b0171a9933Fc6C4d6:HEALP",
           "ethereum:0x58b6A8A3302369DAEc383334672404Ee733aB239:LPT",
         ],
-        integration: "etherscan-erc20",
+        extensionId: "etherscan-file-import",
         logs: 8,
         operations: ["Deposit"],
+        parserId: "etherscan-erc20",
         platform: "ethereum",
         rows: 8,
         transactions: 8,

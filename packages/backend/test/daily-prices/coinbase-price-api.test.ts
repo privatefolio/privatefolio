@@ -1,6 +1,6 @@
-import { mapToChartData, queryPrices } from "src/api/external/prices/coinbase-price-api"
+import { mapToChartData, queryPrices } from "src/extensions/prices/coinbase-price-api"
 import { ResolutionString, Timestamp } from "src/interfaces"
-import { PRICE_API_PAGINATION } from "src/settings"
+import { PRICE_API_PAGINATION } from "src/settings/settings"
 import { expect, it } from "vitest"
 
 it("should fetch BTC prices within a range", async () => {

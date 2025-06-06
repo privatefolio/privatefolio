@@ -1,4 +1,6 @@
+import { AlertTitle, Box } from "@mui/material"
 import React, { useEffect, useRef } from "react"
+import { Callout } from "src/components/Callout"
 import { Subheading } from "src/components/Subheading"
 import { AuditLog } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
@@ -23,6 +25,14 @@ export default function AuditLogsPage({ show }: { show: boolean }) {
         </Subheading>
         <AuditLogTable tableDataRef={tableDataRef} />
       </div>
+      <Callout>
+        <AlertTitle sx={{ fontSize: "0.85rem" }}>What are audit logs?</AlertTitle>
+        <Box>
+          An audit log is a single balance change on your account.
+          <br />
+          They are the smallest unit of accounting.
+        </Box>
+      </Callout>
     </StaggeredList>
   )
 }

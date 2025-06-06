@@ -1,7 +1,6 @@
-import { ParserId } from "src/settings"
-
-import { AuditLog, Transaction } from "../interfaces"
-import * as binance from "./integrations/binance-utils"
+import { parserId as binanceAccountStatement } from "src/extensions/file-imports/binance"
+import * as binance from "src/extensions/utils/binance-utils"
+import { AuditLog, Transaction } from "src/interfaces"
 
 /**
  * @warn This function mutates the logs param
@@ -9,11 +8,11 @@ import * as binance from "./integrations/binance-utils"
 export function extractTransactions(
   logs: AuditLog[],
   fileImportId: string,
-  parserId: ParserId
+  parserId: string
 ): Transaction[] {
   const transactions: Transaction[] = []
 
-  if (parserId === "binance-account-statement") {
+  if (parserId === binanceAccountStatement) {
     return binance.extractTransactions(logs, fileImportId)
   }
 
@@ -23,11 +22,11 @@ export function extractTransactions(
 export function groupTransactions(
   transactions: Transaction[],
   _fileImportId: string,
-  parserId: ParserId
+  parserId: string
 ): Transaction[] {
-  if (parserId === "binance-spot-history") {
-    return binance.groupTransactions(transactions)
-  }
+  // if (parserId === "binance-spot-history") {
+  //   return binance.groupTransactions(transactions)
+  // }
 
   return transactions
 }

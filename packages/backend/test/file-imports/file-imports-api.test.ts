@@ -1,6 +1,6 @@
 import fs from "fs"
 import { join } from "path"
-import { importFile, subscribeToFileImports } from "src/api/account/file-imports/file-imports-api"
+import { importFile, subscribeToFileImports } from "src/api/account/file-imports-api"
 import { getAccount, unsubscribe } from "src/api/accounts-api"
 import { EventCause, FileImport, SubscriptionChannel } from "src/interfaces"
 import { expect, it, vi } from "vitest"
@@ -52,11 +52,12 @@ it("should add a file import", async () => {
         "assetIds": [
           "coinmama:BTC",
         ],
-        "integration": "coinmama",
+        "extensionId": "coinmama-file-import",
         "logs": 2,
         "operations": [
           "Buy with Credit Card",
         ],
+        "parserId": "coinmama",
         "platform": "coinmama",
         "rows": 5,
         "transactions": 2,
@@ -82,11 +83,12 @@ it("should add a file import", async () => {
           "assetIds": [
             "coinmama:BTC",
           ],
-          "integration": "coinmama",
+          "extensionId": "coinmama-file-import",
           "logs": 2,
           "operations": [
             "Buy with Credit Card",
           ],
+          "parserId": "coinmama",
           "platform": "coinmama",
           "rows": 5,
           "transactions": 2,

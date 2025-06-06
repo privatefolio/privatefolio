@@ -1,4 +1,4 @@
-import { DEFAULT_SERVER_REFRESH_INTERVAL } from "../../settings"
+import { DEFAULT_SERVER_REFRESH_INTERVAL } from "../../settings/settings"
 import { getValue, setValue, subscribeToKV } from "./kv-api"
 
 export interface Settings {

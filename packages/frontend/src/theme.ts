@@ -2,7 +2,7 @@ import { ExpandMoreRounded } from "@mui/icons-material"
 import { alpha, CssVarsThemeOptions, Fade } from "@mui/material"
 import { blue, grey } from "@mui/material/colors"
 
-export const MainFont = "'Roboto Flex', sans-serif"
+export const MainFont = "'IBM Plex Sans', sans-serif"
 export const SerifFont = "'Roboto Serif', serif"
 export const MonoFont = "'IBM Plex Mono', monospace"
 

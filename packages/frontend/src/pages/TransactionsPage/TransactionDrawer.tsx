@@ -129,7 +129,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
         </div>
         <div>
           <SectionTitle>Platform</SectionTitle>
-          <PlatformBlock platform={platform} />
+          <PlatformBlock id={platform} />
         </div>
         <div>
           <SectionTitle>Wallet</SectionTitle>

@@ -1,7 +1,7 @@
 import {
   deleteAssetInfos,
   getAsset,
-  getAssets,
+  getMyAssets,
   patchAsset,
   upsertAsset,
 } from "src/api/account/assets-api" // Adjust the path if necessary
@@ -114,7 +114,7 @@ describe("assets", () => {
 
   it.sequential("should delete all asset infos", async () => {
     // arrange
-    expect(await getAssets(accountName)).toMatchInlineSnapshot(`
+    expect(await getMyAssets(accountName)).toMatchInlineSnapshot(`
       [
         {
           "coingeckoId": "ethereum",
@@ -129,7 +129,7 @@ describe("assets", () => {
     // act
     await deleteAssetInfos(accountName)
     // assert
-    const assets = await getAssets(accountName)
+    const assets = await getMyAssets(accountName)
     expect(assets).toMatchInlineSnapshot(`
       [
         {

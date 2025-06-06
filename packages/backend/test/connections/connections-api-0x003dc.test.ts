@@ -6,7 +6,7 @@ import {
   getConnections,
   syncConnection,
   upsertConnection,
-} from "src/api/account/connections/connections-api"
+} from "src/api/account/connections-api"
 import {
   autoMergeTransactions,
   countTransactions,

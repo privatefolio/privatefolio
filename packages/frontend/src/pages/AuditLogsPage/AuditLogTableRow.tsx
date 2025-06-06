@@ -109,7 +109,7 @@ function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
           <TimestampBlock timestamp={timestamp} relative={relativeTime} />
         </TableCell>
         <TableCell>
-          <PlatformBlock platform={platform} hideName />
+          <PlatformBlock id={platform} hideName />
         </TableCell>
         <TableCell variant="clickable">
           <IdentifierBlock id={wallet} variant="tablecell" label={getAddressBookEntry(wallet)} />

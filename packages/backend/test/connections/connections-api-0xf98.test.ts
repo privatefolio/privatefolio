@@ -6,7 +6,7 @@ import {
   resetConnection,
   syncConnection,
   upsertConnection,
-} from "src/api/account/connections/connections-api"
+} from "src/api/account/connections-api"
 import { countTransactions, getTransactions } from "src/api/account/transactions-api"
 import { Connection, ProgressUpdate } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"

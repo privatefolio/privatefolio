@@ -1,5 +1,5 @@
 import chalk from "chalk"
-import { ProgressLog } from "src/interfaces"
+import { Blockchain, Exchange, Platform, ProgressLog } from "src/interfaces"
 
 /**
  * Returns a hash code from a string
@@ -112,3 +112,6 @@ export function parseProgressLog(logEntry: string): ProgressLog {
 export function getPrefix(accountName: string): string {
   return chalk.bold.magenta(`[${accountName}]`)
 }
+
+export const isExchange = (x: Platform): x is Exchange => "coingeckoTrustScore" in x
+export const isBlockchain = (x: Platform): x is Blockchain => !("coingeckoTrustScore" in x)

@@ -11,6 +11,7 @@ import {
 } from "@mui/material"
 import * as React from "react"
 import { ExternalLink } from "src/components/ExternalLink"
+import { resolveUrl } from "src/utils/utils"
 
 const steps = [
   {
@@ -21,11 +22,15 @@ const steps = [
         <ExternalLink href="https://privatefolio.app/u/0/transactions">Transactions</ExternalLink>.
         <br />
         <br />
-        <a href="./app-data/help/privatefolio/Step1.png" target="_blank" rel="noreferrer">
+        <a
+          href={resolveUrl("$STATIC_ASSETS/help/privatefolio/Step1.png")}
+          target="_blank"
+          rel="noreferrer"
+        >
           <img
             height={201}
             width={433}
-            src="./app-data/help/privatefolio/Step1.png"
+            src={resolveUrl("$STATIC_ASSETS/help/privatefolio/Step1.png")}
             alt="Step visualization"
           />
         </a>
@@ -40,11 +45,15 @@ const steps = [
         the transactions from this account.
         <br />
         <br />
-        <a href="./app-data/help/privatefolio/Step2.png" target="_blank" rel="noreferrer">
+        <a
+          href={resolveUrl("$STATIC_ASSETS/help/privatefolio/Step2.png")}
+          target="_blank"
+          rel="noreferrer"
+        >
           <img
             height={201}
             width={433}
-            src="./app-data/help/privatefolio/Step2.png"
+            src={resolveUrl("$STATIC_ASSETS/help/privatefolio/Step2.png")}
             alt="Step visualization"
           />
         </a>
@@ -54,7 +63,7 @@ const steps = [
   },
 ]
 
-export function PrivatefolioHelp() {
+export default function PrivatefolioHelp() {
   const [activeStep, setActiveStep] = React.useState(0)
 
   const handleNext = () => {
@@ -70,7 +79,7 @@ export function PrivatefolioHelp() {
   }
   return (
     <>
-      <Paper sx={{ padding: 2 }}>
+      <Paper sx={{ paddingX: 2, paddingY: 1 }}>
         <Stepper activeStep={activeStep} orientation="vertical">
           {steps.map((step, index) => (
             <Step key={step.label}>

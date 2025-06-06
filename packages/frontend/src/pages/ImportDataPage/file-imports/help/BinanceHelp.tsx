@@ -131,7 +131,7 @@ const steps = [
   },
 ]
 
-export function BinanceHelp() {
+export default function BinanceHelp() {
   const [activeStep, setActiveStep] = React.useState(0)
 
   const handleNext = () => {
@@ -148,7 +148,7 @@ export function BinanceHelp() {
 
   return (
     <>
-      <Paper sx={{ padding: 2 }}>
+      <Paper sx={{ paddingX: 2, paddingY: 1 }}>
         <Stepper activeStep={activeStep} orientation="vertical">
           {steps.map((step, index) => (
             <Step key={step.label}>
@@ -201,7 +201,7 @@ export function BinanceHelp() {
         )}
       </Paper>
       <ExternalLink
-        sx={{ paddingX: 2 }}
+        sx={{ marginTop: 1, paddingX: 2 }}
         variant="caption"
         href="https://www.binance.com/en/support/faq/how-to-generate-transaction-history-990afa0a0a9341f78e7a9298a9575163"
       >

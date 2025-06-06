@@ -21,6 +21,7 @@ import { $quoteCurrency } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
 import { $assetMap } from "src/stores/metadata-store"
 import { getAssetPlatform } from "src/utils/assets-utils"
+import { resolveUrl } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 import { AssetWithPrice } from "../../interfaces"
@@ -55,10 +56,11 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
       sx={{
         "& .MuiSelect-select": {
           paddingX: 1.5,
-          paddingY: 0.5,
+          paddingY: 0.25,
         },
 
         borderRadius: 5,
+        fontSize: "0.8125rem",
       }}
     >
       <MenuItem value="">
@@ -69,7 +71,7 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
           <Stack direction="row" alignItems={"center"} gap={1}>
             <PlatformAvatar
               size="small"
-              src={PRICE_APIS_META[priceApiId].logoUrl}
+              src={resolveUrl(PRICE_APIS_META[priceApiId].logoUrl)}
               alt={priceApiId}
             />
             {PRICE_APIS_META[priceApiId].name}
@@ -119,23 +121,26 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
       <TableRow hover {...rest}>
         <TableCell variant="clickable">
           <AppLink to={`../asset/${encodeURI(assetId)}`}>
-            <Stack sx={{ height: 52 }} alignItems="center" direction="row" gap={1}>
-              <AssetBlock assetId={assetId} secondary={name} size="medium" />
-              {!coingeckoId && (
-                <Tooltip title="Not listed on Coingecko.com">
-                  <Chip label="Unlisted" size="small" sx={{ color: "text.secondary" }} />
-                </Tooltip>
-              )}
+            <Stack alignItems="center" direction="row" gap={1}>
+              <AssetBlock assetId={assetId} size="small" />
             </Stack>
           </AppLink>
         </TableCell>
         <TableCell>
-          <PlatformBlock platform={getAssetPlatform(assetId)} />
+          {name}
+          {!coingeckoId && (
+            <Tooltip title="Not listed on Coingecko.com">
+              <Chip label="Unlisted" size="small" sx={{ color: "text.secondary" }} />
+            </Tooltip>
+          )}
+        </TableCell>
+        <TableCell variant="clickable">
+          <PlatformBlock id={getAssetPlatform(assetId)} variant="tablecell" />
         </TableCell>
         <TableCell>{priceApiSelect}</TableCell>
         <TableCell variant="clickable" align="right">
           {price === null ? (
-            <Skeleton sx={{ margin: "6px 16px" }}></Skeleton>
+            <Skeleton sx={{ margin: "0px 16px" }}></Skeleton>
           ) : (
             <AmountBlock
               amount={price?.value}

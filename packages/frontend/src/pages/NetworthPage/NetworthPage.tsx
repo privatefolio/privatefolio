@@ -132,6 +132,7 @@ export default function NetworthPage() {
                 </AttentionBlock>
               )
             }
+            // nullishSortPosition="start" TODO5: test me
           />
         </div>
       )}

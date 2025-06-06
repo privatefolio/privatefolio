@@ -7,7 +7,7 @@ import {
 } from "@mui/material"
 import React from "react"
 
-type CircularSpinnerProps = CircularProgressProps & { bgColor?: string; rootSx?: SxProps }
+export type CircularSpinnerProps = CircularProgressProps & { bgColor?: string; rootSx?: SxProps }
 
 export function CircularSpinner(props: CircularSpinnerProps) {
   const {

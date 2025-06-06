@@ -1,7 +1,7 @@
-import { Paper, Stack, Typography } from "@mui/material"
+import { Paper, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
-import { CircularSpinner } from "src/components/CircularSpinner"
+import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { $activeAccount } from "src/stores/account-store"
 import { MonoFont } from "src/theme"
 import { $rpc } from "src/workers/remotes"
@@ -36,9 +36,7 @@ export function ServerLogs() {
   return (
     <Paper sx={{ paddingX: 2, paddingY: 1 }}>
       {isLoading ? (
-        <Stack alignItems="center" justifyContent="center" sx={{ height: 400, width: "100%" }}>
-          <CircularSpinner color="secondary" />
-        </Stack>
+        <DefaultSpinner />
       ) : logs.length === 0 ? (
         <Typography variant="body2">Nothing to see here...</Typography>
       ) : (

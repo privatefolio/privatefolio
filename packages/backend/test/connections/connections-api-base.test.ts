@@ -1,6 +1,6 @@
 import { getAuditLogs } from "src/api/account/audit-logs-api"
 import { computeBalances, getBalances } from "src/api/account/balances-api"
-import { syncConnection, upsertConnection } from "src/api/account/connections/connections-api"
+import { syncConnection, upsertConnection } from "src/api/account/connections-api"
 import { autoMergeTransactions, getTransactions } from "src/api/account/transactions-api"
 import { Connection, ProgressUpdate } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
@@ -18,7 +18,7 @@ describe.skip("should import 0xab08B from base via connection", () => {
     connection = await upsertConnection(accountName, {
       address,
       label: "",
-      platform: "eip155-8453",
+      platform: "base",
     })
     // assert
     expect(connection.id).toMatchInlineSnapshot(`"3945698152"`)

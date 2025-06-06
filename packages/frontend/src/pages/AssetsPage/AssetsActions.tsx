@@ -1,10 +1,10 @@
 import {
-  AssignmentOutlined,
   AttachMoneyRounded,
   DeleteForever,
   MoreHoriz,
   VisibilityOffRounded,
   VisibilityRounded,
+  Workspaces,
 } from "@mui/icons-material"
 import {
   Divider,
@@ -80,14 +80,14 @@ export function AssetsActions() {
         <MenuItem
           dense
           onClick={() => {
-            $rpc.get().enqueueFetchAssetInfos($activeAccount.get(), "user")
+            $rpc.get().enqueueRefetchAssets($activeAccount.get(), "user")
             handleClose()
           }}
         >
           <ListItemAvatar>
-            <AssignmentOutlined fontSize="small" />
+            <Workspaces fontSize="small" />
           </ListItemAvatar>
-          <ListItemText>Fetch asset infos</ListItemText>
+          <ListItemText>Refetch all assets</ListItemText>
         </MenuItem>
         {debugMode && (
           <div>
@@ -107,18 +107,6 @@ export function AssetsActions() {
                 <DeleteForever fontSize="small" />
               </ListItemAvatar>
               <ListItemText>Delete asset prices</ListItemText>
-            </MenuItem>
-            <MenuItem
-              dense
-              onClick={() => {
-                $rpc.get().enqueueDeleteAssetInfos($activeAccount.get(), "user")
-                handleClose()
-              }}
-            >
-              <ListItemAvatar>
-                <DeleteForever fontSize="small" />
-              </ListItemAvatar>
-              <ListItemText>Delete asset infos</ListItemText>
             </MenuItem>
           </div>
         )}
