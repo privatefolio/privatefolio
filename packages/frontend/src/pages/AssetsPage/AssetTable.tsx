@@ -105,7 +105,7 @@ export function AssetTable() {
           !!hiddenAssets && (
             <AttentionBlock>
               <InfoOutlined sx={{ height: 20, width: 20 }} />
-              <span>{hiddenAssets} unlisted assets hidden...</span>
+              <span>{hiddenAssets} unlisted assets hidden…</span>
             </AttentionBlock>
           )
         }

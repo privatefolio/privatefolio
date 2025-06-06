@@ -1,6 +1,5 @@
 import { EtherscanConnection, ProgressCallback, SyncResult } from "src/interfaces"
-import { API_KEYS } from "src/settings/settings"
-import { getAssetPlatform, getEvmChainId } from "src/utils/assets-utils"
+import { API_KEYS, PLATFORMS_META } from "src/settings/settings"
 import { noop } from "src/utils/utils"
 
 import { parseNormal } from "./etherscan"
@@ -28,7 +27,10 @@ export async function syncEtherscan(
   since: string,
   until: string
 ) {
-  const chainId = getEvmChainId(getAssetPlatform(connection.platform))
+  const chainId = PLATFORMS_META[connection.platform].chainId
+  if (!chainId) {
+    throw new Error(`ChainId not found for platform: ${connection.platform}`)
+  }
   const rpcProvider = new FullEtherscanProvider(chainId, API_KEYS[connection.platform])
 
   await progress([0, `Starting from block number ${since}`])

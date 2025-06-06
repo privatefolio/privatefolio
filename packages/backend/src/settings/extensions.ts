@@ -1,3 +1,4 @@
+import { SUPPORTED_PLATFORMS as etherscanConnectionPlatforms } from "src/extensions/connections/etherscan/etherscan-settings"
 import {
   extensionId as binanceFileImportId,
   platform as binanceFileImportPlatform,
@@ -224,7 +225,7 @@ export const extensions: Extension[] = [
     extensionVersion: "1.0.0",
     githubUrl: "https://github.com/privatefolio/privatefolio",
     id: "etherscan-connection",
-    platformIds: ["ethereum", "arbitrum-one", "base", "polygon-pos", "optimistic-ethereum"],
+    platformIds: etherscanConnectionPlatforms,
     publishedAt: new Date("2025-06-01").getTime(),
     sources: [
       {

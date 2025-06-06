@@ -185,7 +185,7 @@ export function TaskDropdown() {
         {latestTasks.length === 0 && (
           <ListItem>
             <ListItemButton disabled sx={{ opacity: "1 !important" }}>
-              <ListItemText primary="Nothing to see here..." />
+              <ListItemText primary="Nothing to see here…" />
             </ListItemButton>
           </ListItem>
         )}
@@ -196,7 +196,7 @@ export function TaskDropdown() {
               to={`/u/${activeIndex}/server?tab=tasks`}
               onClick={handleClose}
             >
-              <ListItemText primary="See all..." />
+              <ListItemText primary="See all…" />
             </ListItemButton>
           </ListItem>
         )}

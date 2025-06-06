@@ -17,6 +17,7 @@ describe.skip("should import 0x003dc from optimism via connection", () => {
     // act
     connection = await upsertConnection(accountName, {
       address,
+      extensionId: "etherscan-connection",
       label: "",
       platform: "optimistic-ethereum",
     })

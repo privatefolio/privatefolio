@@ -32,7 +32,7 @@ export default function LocalAuthPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      console.log("Already authenticated, redirecting from Auth page...")
+      console.log("Already authenticated, redirecting from Auth page…")
       navigate("/", { replace: true })
     }
   }, [isAuthenticated, navigate])
@@ -157,7 +157,7 @@ export default function LocalAuthPage() {
                   variant="contained"
                   disabled={loading || !password || !confirmPassword}
                 >
-                  {loading ? "Setting password..." : "Set password"}
+                  {loading ? "Setting password…" : "Set password"}
                 </Button>
               </CardActions>
             </>
@@ -190,7 +190,7 @@ export default function LocalAuthPage() {
               </CardContent>
               <CardActions sx={{ paddingX: 3 }}>
                 <Button type="submit" variant="contained" disabled={loading}>
-                  {loading ? "Unlocking..." : "Unlock"}
+                  {loading ? "Unlocking…" : "Unlock"}
                 </Button>
               </CardActions>
             </>

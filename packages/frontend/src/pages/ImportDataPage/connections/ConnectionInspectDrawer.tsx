@@ -8,6 +8,7 @@ import {
 } from "privatefolio-backend/src/extensions/connections/binance/binance-settings"
 import React, { useState } from "react"
 import { AmountBlock } from "src/components/AmountBlock"
+import { ExtensionBlock } from "src/components/ExtensionBlock"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
@@ -26,7 +27,18 @@ type ConnectionInspectDrawerProps = DrawerProps &
 
 export function ConnectionInspectDrawer(props: ConnectionInspectDrawerProps) {
   const { open, toggleOpen, connection, relativeTime, ...rest } = props
-  const { id, address, timestamp, syncedAt, platform, label, meta, key, options } = connection
+  const {
+    id,
+    address,
+    timestamp,
+    syncedAt,
+    extensionId,
+    platform: platformId,
+    label,
+    meta,
+    key,
+    options,
+  } = connection
 
   const confirm = useConfirm()
   const [loadingRemove, setLoadingRemove] = useState(false)
@@ -53,8 +65,12 @@ export function ConnectionInspectDrawer(props: ConnectionInspectDrawerProps) {
           <SectionTitle>Identifier</SectionTitle>
           <IdentifierBlock id={id} />
         </div>
+        <div>
+          <SectionTitle>Extension</SectionTitle>
+          <ExtensionBlock id={extensionId} />
+        </div>
 
-        {platform === "binance" ? (
+        {extensionId === "binance-connection" ? (
           <div>
             <SectionTitle>API Key</SectionTitle>
             <Stack gap={0.5} alignItems="flex-start">
@@ -78,7 +94,7 @@ export function ConnectionInspectDrawer(props: ConnectionInspectDrawerProps) {
         </div>
         <div>
           <SectionTitle>Platform</SectionTitle>
-          <PlatformBlock id={platform} />
+          <PlatformBlock id={platformId} />
         </div>
         <div>
           <SectionTitle>Audit logs</SectionTitle>
@@ -110,7 +126,7 @@ export function ConnectionInspectDrawer(props: ConnectionInspectDrawerProps) {
             </Typography>
           )}
         </div>
-        {platform === "binance" && (
+        {extensionId === "binance-connection" && (
           <>
             {(options?.sinceLimit || options?.untilLimit) && (
               <div>
@@ -147,7 +163,7 @@ export function ConnectionInspectDrawer(props: ConnectionInspectDrawerProps) {
         )}
         <Stack direction="column" gap={1}>
           <SectionTitle>Actions</SectionTitle>
-          <Tooltip title={loadingSync ? "Syncing..." : "Sync connection"}>
+          <Tooltip title={loadingSync ? "Syncing…" : "Sync connection"}>
             <span>
               <LoadingButton
                 size="small"
@@ -177,7 +193,7 @@ export function ConnectionInspectDrawer(props: ConnectionInspectDrawerProps) {
             </span>
           </Tooltip>
           <Tooltip
-            title={loadingReset ? "Resetting..." : "This will reset and sync the connection"}
+            title={loadingReset ? "Resetting…" : "This will reset and sync the connection"}
           >
             <span>
               <LoadingButton
@@ -209,7 +225,7 @@ export function ConnectionInspectDrawer(props: ConnectionInspectDrawerProps) {
           <Tooltip
             title={
               loadingRemove
-                ? "Removing..."
+                ? "Removing…"
                 : "This will remove the connection alongside its transactions and audit logs"
             }
           >

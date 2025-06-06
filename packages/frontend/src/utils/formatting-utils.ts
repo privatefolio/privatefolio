@@ -68,9 +68,13 @@ export function toUTCString(timestamp: number): string {
 }
 
 export function formatDateRelative(date: Date | number) {
-  return formatDistance(date, new Date(), {
-    addSuffix: true,
-  })
+  try {
+    return formatDistance(date, new Date(), {
+      addSuffix: true,
+    })
+  } catch {
+    return "Invalid date"
+  }
 }
 
 export function formatDate(date: Date | number) {

@@ -142,7 +142,7 @@ export function FileImportDrawer(props: FileImportDrawerProps) {
           <SectionTitle>Actions</SectionTitle>
           <Tooltip
             title={
-              loading ? "Removing..." : "This will remove all its transactions and audit logs too"
+              loading ? "Removing…" : "This will remove all its transactions and audit logs too"
             }
           >
             <span>

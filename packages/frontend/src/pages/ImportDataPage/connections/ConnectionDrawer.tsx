@@ -28,7 +28,6 @@ import { ExtensionAvatar } from "src/components/ExtensionAvatar"
 import { PlatformAvatar } from "src/components/PlatformAvatar"
 import { $activeAccount } from "src/stores/account-store"
 import { MonoFont } from "src/theme"
-import { isEvmPlatform } from "src/utils/assets-utils"
 import { asUTC } from "src/utils/formatting-utils"
 import { isProduction } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
@@ -42,7 +41,7 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
   const [loading, setLoading] = useState(false)
 
   const [extensionId, setExtensionId] = useState<string>("etherscan-connection")
-  const [platform, setPlatform] = useState<string>("ethereum")
+  const [platformId, setPlatformId] = useState<string>("ethereum")
   const [binanceWallets, setState] = useState({
     coinFutures: false,
     crossMargin: true,
@@ -55,7 +54,7 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
     if (open) return
 
     setExtensionId("etherscan-connection")
-    setPlatform("ethereum")
+    setPlatformId("ethereum")
     setState({
       coinFutures: false,
       crossMargin: true,
@@ -104,11 +103,11 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
       /**
        * 2. Validate
        */
-      if (isEvmPlatform(platform)) {
+      if (extensionId === "etherscan-connection") {
         const isValidAddress = address && isAddress(address)
         if (!isValidAddress) return
         //
-      } else if (platform === "binance") {
+      } else if (extensionId === "binance-connection") {
         if (key.length === 0 || secret.length === 0 || walletsError) return
         ;(options as BinanceConnectionOptions).wallets = binanceWallets
         //
@@ -119,10 +118,11 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
         .get()
         .upsertConnection($activeAccount.get(), {
           address,
+          extensionId,
           key,
           label,
           options,
-          platform,
+          platform: platformId,
           secret,
         })
         .then((connection) => {
@@ -135,7 +135,7 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
           setLoading(false)
         })
     },
-    [binanceWallets, platform, toggleOpen, walletsError]
+    [binanceWallets, extensionId, platformId, toggleOpen, walletsError]
   )
 
   const [extensions, setExtensions] = useState<RichExtension[]>([])
@@ -211,8 +211,8 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
                   variant="outlined"
                   fullWidth
                   size="small"
-                  value={platform}
-                  onChange={(event) => setPlatform(event.target.value)}
+                  value={platformId}
+                  onChange={(event) => setPlatformId(event.target.value)}
                 >
                   {extension?.platforms?.map((x) => (
                     <MenuItem key={x.id} value={x.id}>

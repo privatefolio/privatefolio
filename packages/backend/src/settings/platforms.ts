@@ -8,6 +8,7 @@ export const PLATFORMS_META: Record<string, PlatformMeta> = {
       name: "ArbiScan",
       url: "https://arbiscan.io",
     },
+    chainId: 42161,
     nativeAssetId: "arbitrum-one:0x0000000000000000000000000000000000000000:ETH",
   },
   base: {
@@ -15,6 +16,7 @@ export const PLATFORMS_META: Record<string, PlatformMeta> = {
       name: "BaseScan",
       url: "https://basescan.org",
     },
+    chainId: 8453,
     nativeAssetId: "base:0x0000000000000000000000000000000000000000:ETH",
   },
   ethereum: {
@@ -22,6 +24,7 @@ export const PLATFORMS_META: Record<string, PlatformMeta> = {
       name: "Etherscan",
       url: "https://etherscan.io",
     },
+    chainId: 1,
     nativeAssetId: "ethereum:0x0000000000000000000000000000000000000000:ETH",
   },
   "optimistic-ethereum": {
@@ -29,6 +32,7 @@ export const PLATFORMS_META: Record<string, PlatformMeta> = {
       name: "Optimistic Etherscan",
       url: "https://optimistic.etherscan.io",
     },
+    chainId: 10,
     nativeAssetId: "optimistic-ethereum:0x0000000000000000000000000000000000000000:ETH",
   },
   "polygon-pos": {
@@ -36,6 +40,7 @@ export const PLATFORMS_META: Record<string, PlatformMeta> = {
       name: "PolygonScan",
       url: "https://polygonscan.com",
     },
+    chainId: 137,
     nativeAssetId: "polygon-pos:0x0000000000000000000000000000000000000000:MATIC",
   },
 }

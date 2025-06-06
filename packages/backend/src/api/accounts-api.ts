@@ -388,6 +388,7 @@ CREATE TABLE connections (
   label VARCHAR,
   meta JSON,
   options JSON,
+  extensionId VARCHAR NOT NULL,
   platform VARCHAR NOT NULL,
   secret VARCHAR,
   syncedAt INTEGER,

@@ -365,6 +365,7 @@ export type BinanceConnectionOptions = ConnectionOptions & {
 
 export interface Connection {
   address?: string
+  extensionId: string
   id: string
   key?: string // rename to apiKey
   label: string
@@ -829,5 +830,6 @@ export type PlatformMeta = {
     name: string
     url: string
   }
+  chainId?: number
   nativeAssetId?: string
 }

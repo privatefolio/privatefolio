@@ -150,7 +150,7 @@ export function AssetDetails(props: AssetDetailsProps) {
                 <span>
                   {showFullDescription
                     ? metadata.description.en
-                    : metadata.description.en.substring(0, descriptionCharLimit) + "..."}{" "}
+                    : metadata.description.en.substring(0, descriptionCharLimit) + "…"}{" "}
                   {metadata.description.en.length > descriptionCharLimit && (
                     <Typography
                       variant="inherit"
