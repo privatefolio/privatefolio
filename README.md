@@ -5,7 +5,7 @@
 <h1 align="center">Privatefolio</h1>
 
 <p align="center">
-  The Free* and Open-source Portfolio Tracker - All your crypto assets in one place
+  The Free* and Open-source Portfolio Manager - All your crypto assets in one place
 </p>
 
 <div align="center">
@@ -90,7 +90,7 @@ For detailed setup instructions, including prerequisites, installation, and test
 3. Use `yarn dev` to start the development environment.
 4. When you are ready, commit your changes and submit a pull request.
 
-For Docker setup and deployment, see the [Docker documentation](docs/DOCKER.md).
+For Docker setup and deployment, see the [Docker documentation](docs/DOCKER_DEPLOY.md).
 
 ### Key Technologies
 

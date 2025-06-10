@@ -63,7 +63,7 @@ export function CloudLoginDialog(props: AddAccountDialogProps) {
       try {
         if (form === "sign-up") {
           await handleSignUp(email, password)
-          navigate("/privatecloud")
+          navigate("/cloud")
           return
         } else {
           await handleLogin(email, password, false)

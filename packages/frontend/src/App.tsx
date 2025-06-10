@@ -230,7 +230,7 @@ export default function App() {
           <ErrorBoundary>
             <Routes>
               <Route index element={<AccountsPage />} />
-              <Route path="/privatecloud" element={<CloudUserPage show />} />
+              <Route path="/cloud" element={<CloudUserPage show />} />
               <Route path="/u/:accountIndex" element={<AccountIndexRoute />}>
                 <Route index element={<HomePage />} />
                 <Route path="assets" element={<AssetsPage show />} />

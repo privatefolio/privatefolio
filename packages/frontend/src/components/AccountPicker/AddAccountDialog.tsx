@@ -92,7 +92,7 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
       return (
         <>
           Local accounts are not available in the browser. Download our desktop app for Windows,
-          Mac, and Linux or {/* <MuiLink component={Link} to={"/privatecloud"}> */}
+          Mac, and Linux or {/* <MuiLink component={Link} to={"/cloud"}> */}
           login to PrivateCloud
           {/* </MuiLink> */}.
         </>
@@ -105,7 +105,7 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
     if (!cloudAvailable && accountType === "cloud") {
       return (
         <>
-          {/* <MuiLink component={Link} to="/privatecloud"> */}
+          {/* <MuiLink component={Link} to="/cloud"> */}
           Login to PrivateCloud
           {/* </MuiLink>{" "} */} to start using the cloud.
         </>

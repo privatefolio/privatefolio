@@ -3,6 +3,30 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-alpha.30 - 2025/05/23
+
+This release concludes the alpha phase of the v2.0.0 release cycle, marking a significant milestone in the development of the application.
+
+### 💡 Feature updates
+
+- You can now crete cloud account through PrivateCloud™.
+- Payments are now live for the premium plan of the cloud service.
+- New `Logs` tab in the Server page, allowing users to view server logs directly in the application.
+- New `Settings` tab in the Server page, allowing users to configure server settings directly in the application.
+- Automatic updates for the Windows app, allowing users to stay up-to-date without manually installing new versions.
+
+### 🐛 Bug Fixes
+
+- Fix the start on login feature on Linux.
+- Reading from the database happens on a separate thread now, improving performance and responsiveness when there is a write operation in the background.
+- Backup & restore functionality been rewritten to be more robust and user-friendly.
+
+### Other updates
+
+- Comprehensive project documentation for developers and AI agents.
+- Improved developer experience for Linux and Windows developers.
+- Using the app now requires a one-time password setup. This protects user data from unauthorized access, especially in cloud or self-hosting deployments.
+
 ## v2.0.0-alpha.0 - 2025/03/19
 
 ### 💡 Feature updates

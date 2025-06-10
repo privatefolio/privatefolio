@@ -133,12 +133,12 @@ export default function CloudUserPage({ show }: { show: boolean }) {
       return { isPremium: false, loading: true, name: "Loading..." }
     }
     if (sub === null) {
-      return { isPremium: false, name: "Free" }
+      return { isPremium: false, name: "Hobby" }
     }
 
     const item = sub.items.data[0]
     if (!item) {
-      return { isPremium: false, name: "Free" }
+      return { isPremium: false, name: "Hobby" }
     }
 
     const { plan } = item

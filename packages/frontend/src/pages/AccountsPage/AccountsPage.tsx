@@ -140,7 +140,7 @@ export default function AccountsPage() {
                         }
                         variant="outlined"
                         component={Link}
-                        to="/privatecloud"
+                        to="/cloud"
                       >
                         <Truncate sx={{ maxWidth: { sm: "unset", xs: "15vw" } }}>
                           {cloudUser.email}

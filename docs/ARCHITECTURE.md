@@ -1,7 +1,7 @@
 # Privatefolio Architecture
 
 ## Overview
-Privatefolio is a free, open-source cryptocurrency portfolio tracker built as a monorepo using Lerna for package management. It enables users to track all their crypto assets in one place with a focus on privacy and data ownership. The application is structured as a desktop app with a React frontend and a Node.js/Bun backend, packaged with Electron for cross-platform compatibility.
+Privatefolio is a free, open-source cryptocurrency portfolio manager built as a monorepo using Lerna for package management. It enables users to track all their crypto assets in one place with a focus on privacy and data ownership. The application is structured as a desktop app with a React frontend and a Node.js/Bun backend, packaged with Electron for cross-platform compatibility.
 
 ## Structure
 - **Root Config:** Yarn workspaces (v1.22.22) with nohoist, AGPL-3.0 license, Lerna (v8.1.3) for monorepo management, and TypeScript for type safety across all packages.

@@ -20,8 +20,6 @@ export default defineConfig(({ mode }) => {
       outDir: "build",
       sourcemap: true,
     },
-    // https://github.com/pouchdb/pouchdb/issues/8516#issuecomment-1546129302
-    define: { global: typeof window === "undefined" ? "self" : "window" },
     plugins: [
       MillionLint.vite({
         enabled: false,
