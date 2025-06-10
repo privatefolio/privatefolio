@@ -18,6 +18,11 @@ export default defineConfig(({ mode }) => {
     base: env.VITE_TARGET === "electron" ? "./" : "/",
     build: {
       outDir: "build",
+      rollupOptions: {
+        output: {
+          sourcemapBaseUrl: env.VITE_TARGET === "electron" ? "file:///" : undefined,
+        },
+      },
       sourcemap: true,
     },
     plugins: [

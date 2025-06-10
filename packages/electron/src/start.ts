@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu, shell, Tray } from "electron"
+import { app, BrowserWindow, dialog, ipcMain, Menu, shell, Tray } from "electron"
 import Logger from "electron-log/main"
 import Store from "electron-store"
 import path from "path"
@@ -262,6 +262,28 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
             shell.openPath(path.join(app.getPath("userData"), "config.json"))
           },
           label: "Open config file",
+        },
+        {
+          click: async function () {
+            const { response } = await dialog.showMessageBox(mainWindow, {
+              buttons: ["Cancel", "Reset"],
+              cancelId: 0,
+              defaultId: 0,
+              detail: "This will delete all your data and settings. This action cannot be undone.",
+              message: "Are you sure you want to remove all data?",
+              title: "Remove all data",
+              type: "warning",
+            })
+
+            if (response === 1) {
+              store.clear()
+              const userDataPath = app.getPath("userData")
+              require("fs").rmSync(userDataPath, { force: true, recursive: true })
+              app.relaunch()
+              app.exit(0)
+            }
+          },
+          label: "Remove all data",
         },
       ],
     },
