@@ -14,7 +14,7 @@ console.log("Starting worker...")
 const worker = new Worker(import.meta.resolve("./api-worker"), {
   env: {
     BUN_WORKER: "true",
-    NODE_ENV: process.env.NODE_ENV,
+    ...process.env,
   },
 })
 const writeApi = wrap<Api>(worker)
