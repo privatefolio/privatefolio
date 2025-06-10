@@ -22,10 +22,36 @@ console.log("Started worker...")
 
 const accountNames = await writeApi.getAccountNames()
 
+// Get kiosk mode from first account's settings
+let kioskMode = false
+if (accountNames.length > 0) {
+  const settings = await writeApi.getSettings(accountNames[0])
+  kioskMode = settings.kioskMode
+}
+
 const sideEffects: Record<string, SubscriptionId> = {}
 const networthCronJobs: Record<string, Cron> = {}
 const metadataCronJobs: Record<string, Cron> = {}
 const settingsSubscriptions: Record<string, SubscriptionId> = {}
+let server: BackendServer<Api>
+
+async function handleMainAccountChange() {
+  const accounts = await writeApi.getAccountNames()
+  if (accounts.length === 0) return
+
+  await writeApi.subscribeToSettings(
+    accounts[0],
+    proxy(async (settings) => {
+      if (kioskMode !== settings.kioskMode) {
+        kioskMode = settings.kioskMode
+        // Restart server with new kiosk mode
+        server?.close()
+        server = new BackendServer(api, writeApi as Api, false, kioskMode)
+        server.start(isNaN(port) ? 4001 : port)
+      }
+    })
+  )
+}
 
 async function setupNetworthCronJob(accountName: string) {
   if (networthCronJobs[accountName]) {
@@ -172,6 +198,7 @@ await writeApi.subscribeToAccounts(
 
     if (cause === EventCause.Created) {
       await setupSideEffects(accountName)
+      await handleMainAccountChange()
     }
   })
 )
@@ -180,7 +207,9 @@ for (const accountName of accountNames) {
   await setupSideEffects(accountName)
 }
 
-const server = new BackendServer(api, writeApi as Api)
+await handleMainAccountChange()
+
+server = new BackendServer(api, writeApi as Api, false, kioskMode)
 
 const port = Number(process.env.PORT)
 server.start(isNaN(port) ? 4001 : port)

@@ -9,6 +9,7 @@ export interface AuthState {
   checked: boolean
   errorMessage?: string
   isAuthenticated: boolean
+  kioskMode: boolean
   loading: boolean
   needsSetup: boolean
 }
@@ -17,6 +18,7 @@ export const $localAuth = atom<AuthState>({
   checked: false,
   errorMessage: undefined,
   isAuthenticated: false,
+  kioskMode: false,
   loading: false,
   needsSetup: false,
 })
@@ -25,6 +27,7 @@ export const $cloudAuth = atom<AuthState>({
   checked: false,
   errorMessage: undefined,
   isAuthenticated: false,
+  kioskMode: false,
   loading: false,
   needsSetup: false,
 })
@@ -47,9 +50,23 @@ export async function checkAuthentication(atom: WritableAtom<AuthState>, api: Re
     if (!statusRes.ok) {
       atom.set({ ...atom.get(), errorMessage: "Failed to check setup status." })
     } else {
-      const { needsSetup } = (await statusRes.json()) as { needsSetup: boolean }
+      const { needsSetup, kioskMode } = (await statusRes.json()) as {
+        kioskMode: boolean
+        needsSetup: boolean
+      }
       if (needsSetup) {
-        atom.set({ ...atom.get(), checked: true, loading: false, needsSetup })
+        atom.set({ ...atom.get(), checked: true, kioskMode, loading: false, needsSetup })
+        return
+      }
+      if (kioskMode) {
+        atom.set({
+          ...atom.get(),
+          checked: true,
+          isAuthenticated: true,
+          kioskMode,
+          loading: false,
+          needsSetup: false,
+        })
         return
       }
     }
@@ -66,7 +83,7 @@ export async function checkAuthentication(atom: WritableAtom<AuthState>, api: Re
 
     const data = await verifyRes.json()
     if (data.valid) {
-      atom.set({ ...atom.get(), checked: true, isAuthenticated: true })
+      atom.set({ ...atom.get(), checked: true, isAuthenticated: true, kioskMode: data.kioskMode })
     } else {
       atom.set({
         ...atom.get(),

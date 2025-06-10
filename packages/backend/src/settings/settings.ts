@@ -41,8 +41,6 @@ export const SHORT_THROTTLE_DURATION = 200
 export const MEDIUM_THROTTLE_DURATION = 1_000
 export const LONG_THROTTLE_DURATION = 2_000
 
-export const DEFAULT_NETWORTH_REFRESH_INTERVAL = 60 // 1 hour
-export const DEFAULT_METADATA_REFRESH_INTERVAL = 7 * 24 * 60 // 7 days
 export const DEFAULT_DEBOUNCE_DURATION = 1500
 
 export const DB_OPERATION_PAGE_SIZE = 1000
@@ -55,3 +53,15 @@ export {
   WETH_ASSET_ID,
 } from "./platforms"
 export { PRICE_API_IDS, PRICE_APIS_META, type PriceApiId } from "./price-apis"
+
+export interface Settings {
+  kioskMode: boolean
+  metadataRefreshInterval: number
+  networthRefreshInterval: number
+}
+
+export const DEFAULT_SETTINGS: Settings = {
+  kioskMode: false,
+  metadataRefreshInterval: 7 * 24 * 60, // 7 days
+  networthRefreshInterval: 60, // 1 hour
+}

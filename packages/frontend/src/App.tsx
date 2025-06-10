@@ -159,7 +159,11 @@ export default function App() {
     )
   }
 
-  if (localServerEnabled && (!localAuth.isAuthenticated || localAuth.needsSetup)) {
+  if (
+    localServerEnabled &&
+    (!localAuth.isAuthenticated || localAuth.needsSetup) &&
+    !localAuth.kioskMode
+  ) {
     return <LocalAuthPage />
   }
 

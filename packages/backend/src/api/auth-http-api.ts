@@ -107,9 +107,9 @@ export async function isAuthSetupComplete(): Promise<boolean> {
 /**
  * Handler for GET /api/setup-status
  */
-export async function handleStatusRequest(): Promise<Response> {
+export async function handleStatusRequest(kioskMode: boolean): Promise<Response> {
   const needsSetup = !(await isAuthSetupComplete())
-  return new Response(JSON.stringify({ needsSetup }), {
+  return new Response(JSON.stringify({ kioskMode, needsSetup }), {
     headers: { "Content-Type": "application/json", ...corsHeaders },
     status: 200,
   })

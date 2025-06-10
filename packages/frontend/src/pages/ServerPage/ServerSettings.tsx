@@ -1,11 +1,13 @@
 import { Info } from "@mui/icons-material"
 import {
   Button,
+  FormControlLabel,
   FormHelperText,
   IconButton,
   InputAdornment,
   Paper,
   Stack,
+  Switch,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
@@ -16,10 +18,7 @@ import { enqueueSnackbar } from "notistack"
 import React, { MouseEvent, useEffect, useState } from "react"
 import { SectionTitle } from "src/components/SectionTitle"
 
-import {
-  DEFAULT_METADATA_REFRESH_INTERVAL,
-  DEFAULT_NETWORTH_REFRESH_INTERVAL,
-} from "../../settings"
+import { DEFAULT_SETTINGS } from "../../settings"
 import { $activeAccount } from "../../stores/account-store"
 import { $rpc } from "../../workers/remotes"
 
@@ -51,14 +50,15 @@ export function ServerSettings() {
   }, [])
 
   const [isLoading, setIsLoading] = useState(true)
-  const [networthCronInterval, setNetworthCronInterval] = useState(
-    DEFAULT_NETWORTH_REFRESH_INTERVAL
+  const [networthRefreshInterval, setNetworthCronInterval] = useState(
+    DEFAULT_SETTINGS.networthRefreshInterval
   )
   const [isCustomMode, setIsCustomMode] = useState(false)
   const [isNetworthIntervalValid, setIsNetworthIntervalValid] = useState(true)
+  const [kioskMode, setKioskMode] = useState(false)
 
-  const [metadataCronInterval, setMetadataCronInterval] = useState(
-    DEFAULT_METADATA_REFRESH_INTERVAL
+  const [metadataRefreshInterval, setMetadataCronInterval] = useState(
+    DEFAULT_SETTINGS.metadataRefreshInterval
   )
   const [isMetadataCustomMode, setIsMetadataCustomMode] = useState(false)
   const [isMetadataIntervalValid, setIsMetadataIntervalValid] = useState(true)
@@ -73,28 +73,28 @@ export function ServerSettings() {
     const loadSettings = async () => {
       setIsLoading(true)
       try {
-        const settings = await $rpc.get().getSettings(activeAccount)
-        const { networthRefreshInterval } = settings
-        const metadataRefreshInterval =
-          settings.metadataRefreshInterval ?? DEFAULT_METADATA_REFRESH_INTERVAL
-        setNetworthCronInterval(networthRefreshInterval)
-        setMetadataCronInterval(metadataRefreshInterval)
+        const savedSettings = await $rpc.get().getSettings(activeAccount)
+        const settings = Object.assign({}, DEFAULT_SETTINGS, savedSettings)
+
+        setNetworthCronInterval(settings.networthRefreshInterval)
+        setMetadataCronInterval(settings.metadataRefreshInterval)
+        setKioskMode(settings.kioskMode ?? false)
 
         // Check if the loaded value matches any predefined interval
         const isNetworthCustom = !REFRESH_INTERVALS.some(
-          (option) => option.value === networthRefreshInterval
+          (option) => option.value === settings.networthRefreshInterval
         )
         setIsCustomMode(isNetworthCustom)
         setIsNetworthIntervalValid(
-          isNetworthCustom ? isValidInterval(networthRefreshInterval) : true
+          isNetworthCustom ? isValidInterval(settings.networthRefreshInterval) : true
         )
 
         const isMetadataCustom = !METADATA_REFRESH_INTERVALS.some(
-          (option) => option.value === metadataRefreshInterval
+          (option) => option.value === settings.metadataRefreshInterval
         )
         setIsMetadataCustomMode(isMetadataCustom)
         setIsMetadataIntervalValid(
-          isMetadataCustom ? isValidInterval(metadataRefreshInterval) : true
+          isMetadataCustom ? isValidInterval(settings.metadataRefreshInterval) : true
         )
       } catch (error) {
         console.error("Failed to load settings:", error)
@@ -114,8 +114,9 @@ export function ServerSettings() {
 
     try {
       await $rpc.get().updateSettings(activeAccount, {
-        metadataRefreshInterval: metadataCronInterval,
-        networthRefreshInterval: networthCronInterval,
+        kioskMode,
+        metadataRefreshInterval,
+        networthRefreshInterval,
       })
       enqueueSnackbar("Settings saved successfully", { variant: "success" })
     } catch (error) {
@@ -133,7 +134,7 @@ export function ServerSettings() {
     if (value !== null) {
       if (value === "custom") {
         setIsCustomMode(true)
-        setIsNetworthIntervalValid(isValidInterval(networthCronInterval))
+        setIsNetworthIntervalValid(isValidInterval(networthRefreshInterval))
       } else {
         setIsCustomMode(false)
         setNetworthCronInterval(value)
@@ -166,7 +167,7 @@ export function ServerSettings() {
     if (value !== null) {
       if (value === "custom") {
         setIsMetadataCustomMode(true)
-        setIsMetadataIntervalValid(isValidInterval(metadataCronInterval))
+        setIsMetadataIntervalValid(isValidInterval(metadataRefreshInterval))
       } else {
         setIsMetadataCustomMode(false)
         setMetadataCronInterval(value)
@@ -199,8 +200,8 @@ export function ServerSettings() {
   }
 
   // Determine which value to show in the toggle group
-  const networthToggleValue = isCustomMode ? "custom" : networthCronInterval
-  const metadataToggleValue = isMetadataCustomMode ? "custom" : metadataCronInterval
+  const networthToggleValue = isCustomMode ? "custom" : networthRefreshInterval
+  const metadataToggleValue = isMetadataCustomMode ? "custom" : metadataRefreshInterval
 
   return (
     <Paper sx={{ paddingX: 2, paddingY: 2 }}>
@@ -210,7 +211,7 @@ export function ServerSettings() {
             <SectionTitle>Networth Refresh Interval</SectionTitle>
             <Tooltip
               title={`How often the server will automatically refresh balances, prices, and networth.
-                  Default is ${DEFAULT_NETWORTH_REFRESH_INTERVAL} minutes.`}
+                  Default is ${DEFAULT_SETTINGS.networthRefreshInterval} minutes.`}
             >
               <IconButton size="small" aria-label="Help with cron expressions" color="secondary">
                 <Info fontSize="small" />
@@ -247,7 +248,7 @@ export function ServerSettings() {
               <TextField
                 error={!isNetworthIntervalValid}
                 disabled={isLoading}
-                value={networthCronInterval || ""}
+                value={networthRefreshInterval || ""}
                 onChange={handleNetworthCustomIntervalChange}
                 type="number"
                 InputProps={{
@@ -305,7 +306,7 @@ export function ServerSettings() {
               <TextField
                 error={!isMetadataIntervalValid}
                 disabled={isLoading}
-                value={metadataCronInterval > 0 ? metadataCronInterval / 1440 : ""}
+                value={metadataRefreshInterval > 0 ? metadataRefreshInterval / 1440 : ""}
                 onChange={handleMetadataCustomIntervalChange}
                 type="number"
                 InputProps={{
@@ -320,6 +321,35 @@ export function ServerSettings() {
               )}
             </Stack>
           )}
+        </Stack>
+        <Stack gap={1}>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <SectionTitle>Kiosk Mode</SectionTitle>
+            <Tooltip title="When enabled, read operations are available to anyone without authentication. Write operations still require authentication.">
+              <IconButton size="small" aria-label="Help with kiosk mode" color="secondary">
+                <Info fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+          <FormControlLabel
+            sx={{
+              "&:not(:hover)": {
+                color: "var(--mui-palette-secondary-main)",
+              },
+              gap: 1,
+              marginLeft: 0,
+            }}
+            control={
+              <Switch
+                checked={kioskMode}
+                onChange={(e) => setKioskMode(e.target.checked)}
+                disabled={isLoading}
+                color="secondary"
+                size="small"
+              />
+            }
+            label="Make portfolio public"
+          />
         </Stack>
 
         <div>

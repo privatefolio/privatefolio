@@ -31,15 +31,18 @@ export type Serializable = string | number | boolean | null | void | object | ob
 export type BackendApiShape = { [key: string]: (...params: unknown[]) => Promise<Serializable> }
 
 export class BackendServer<T extends BackendApiShape> {
-  private authDisabled: boolean
+  private _authDisabled: boolean
+  private _kioskMode: boolean
+
   close() {
     this.server?.stop()
   }
 
-  constructor(readApi: T, writeApi?: T, authDisabled = false) {
+  constructor(readApi: T, writeApi?: T, authDisabled = false, kioskMode = false) {
     this.readApi = readApi
     this.writeApi = writeApi
-    this.authDisabled = authDisabled
+    this._authDisabled = authDisabled
+    this._kioskMode = kioskMode
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -48,8 +51,9 @@ export class BackendServer<T extends BackendApiShape> {
   private server?: Server
 
   start(port: number) {
-    const authDisabled = this.authDisabled
-    // console.log(`Server starting on port ${port}.`)
+    const authDisabled = this._authDisabled
+    const kioskMode = this._kioskMode
+    console.log(`Server starting on port ${port}. Kiosk mode ${kioskMode ? "enabled" : "disabled"}`)
     this.server = Bun.serve({
       async fetch(request, server) {
         const { method } = request
@@ -72,7 +76,7 @@ export class BackendServer<T extends BackendApiShape> {
           )
         }
         if (pathname === "/api/setup-status") {
-          return handleStatusRequest()
+          return handleStatusRequest(kioskMode)
         }
         if (pathname === "/api/setup" && method === "POST") {
           return handleSetupRequest(request)
@@ -87,8 +91,7 @@ export class BackendServer<T extends BackendApiShape> {
         // Authentication guard
         const setupCompleted = await isAuthSetupComplete()
         const jwt = extractJwt(request)
-        // eslint-disable-next-line no-unneeded-ternary
-        let isAuthenticated = authDisabled ? true : false
+        let isAuthenticated = !!authDisabled
 
         if (setupCompleted && jwt && !authDisabled) {
           const secrets = await readSecrets()
@@ -117,7 +120,7 @@ export class BackendServer<T extends BackendApiShape> {
         }
 
         // WebSocket upgrade check (protected)
-        if (server.upgrade(request, { data: { isAuthenticated } })) return
+        if (server.upgrade(request, { data: { isAuthenticated, kioskMode } })) return
 
         // Static file serving (public)
         try {
@@ -142,12 +145,12 @@ export class BackendServer<T extends BackendApiShape> {
           // console.log("Connection closed.")
         },
         message: async (
-          socket: ServerWebSocket<{ isAuthenticated?: boolean }>,
+          socket: ServerWebSocket<{ isAuthenticated?: boolean; kioskMode?: boolean }>,
           message: string
         ) => {
-          const { isAuthenticated } = socket.data
+          const { isAuthenticated, kioskMode } = socket.data
 
-          if (!isAuthenticated) {
+          if (!isAuthenticated && !kioskMode) {
             console.warn("Connection denied: auth check failed.")
             socket.close(1008, "Unauthorized")
             return
@@ -170,6 +173,19 @@ export class BackendServer<T extends BackendApiShape> {
 
             const isReadMethod =
               method.startsWith("get") || method.startsWith("count") || !this.writeApi
+
+            const isSubcribeMethod = method.startsWith("subscribe")
+
+            // In kiosk mode, only allow read operations without auth
+            if (kioskMode && !isAuthenticated && !isReadMethod && !isSubcribeMethod) {
+              response = {
+                error: "Write operations require authentication in kiosk mode",
+                id,
+                method,
+              }
+              socket.send(JSON.stringify(response))
+              return
+            }
 
             const deserializedParams = params.map((param) => {
               if (typeof param === "object" && (param as FunctionReference).__isFunction) {
@@ -240,8 +256,8 @@ export class BackendServer<T extends BackendApiShape> {
 
           socket.send(JSON.stringify(response))
         },
-        open(socket: ServerWebSocket<{ isAuthenticated?: boolean }>) {
-          if (!socket.data.isAuthenticated) {
+        open(socket: ServerWebSocket<{ isAuthenticated?: boolean; kioskMode?: boolean }>) {
+          if (!socket.data.isAuthenticated && !socket.data.kioskMode) {
             socket.close(1008, "Unauthorized")
             // return
           }
