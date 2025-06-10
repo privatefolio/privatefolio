@@ -65,7 +65,7 @@ export class BackendServer<T extends BackendApiShape> {
               buildDate: process.env.GIT_DATE,
               commit: process.env.GIT_HASH,
               digest: process.env.GIT_HASH?.slice(0, 7),
-              homepage: "https://privatefolio.app",
+              homepage: "https://privatefolio.xyz",
               name: "Privatefolio Backend",
               version: APP_VERSION,
             }),

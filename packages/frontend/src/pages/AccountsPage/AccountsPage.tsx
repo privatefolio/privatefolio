@@ -108,7 +108,7 @@ export default function AccountsPage() {
                 <Button
                   size="small"
                   variant="text"
-                  href="https://privatefolio.app"
+                  href="https://privatefolio.xyz"
                   target="_blank"
                   sx={{ marginX: -2, paddingX: 2 }}
                 >
