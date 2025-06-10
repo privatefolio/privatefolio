@@ -53,9 +53,15 @@ export function AssetTable() {
     () => [
       {
         key: "symbol",
-        label: "Symbol",
+        label: "Ticker",
         sortable: true,
-        sx: { maxWidth: 360, minWidth: 140, width: "100%" },
+        sx: { maxWidth: 130, minWidth: 130, width: 130 },
+      },
+      {
+        key: "name",
+        label: "Name",
+        sortable: true,
+        sx: { maxWidth: 350, minWidth: 140, width: "100%" },
       },
       {
         key: "platform" as keyof AssetWithPrice,
@@ -99,7 +105,7 @@ export function AssetTable() {
           !!hiddenAssets && (
             <AttentionBlock>
               <InfoOutlined sx={{ height: 20, width: 20 }} />
-              <span>{hiddenAssets} unlisted assets hidden...</span>
+              <span>{hiddenAssets} unlisted assets hidden…</span>
             </AttentionBlock>
           )
         }

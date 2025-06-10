@@ -9,6 +9,7 @@ import Stepper from "@mui/material/Stepper"
 import Typography from "@mui/material/Typography"
 import * as React from "react"
 import { ExternalLink } from "src/components/ExternalLink"
+import { resolveUrl } from "src/utils/utils"
 
 const steps = [
   {
@@ -18,11 +19,15 @@ const steps = [
         <ExternalLink href="https://etherscan.io/exportData">CSV Export</ExternalLink>.
         <br />
         <br />
-        <a href="./app-data/help/etherscan/step1.png" target="_blank" rel="noreferrer">
+        <a
+          href={resolveUrl("$STATIC_ASSETS/help/etherscan/step1.png")}
+          target="_blank"
+          rel="noreferrer"
+        >
           <img
             height={217}
             width={433}
-            src="./app-data/help/etherscan/step1.png"
+            src={resolveUrl("$STATIC_ASSETS/help/etherscan/step1.png")}
             alt="Step visualization"
           />
         </a>
@@ -37,11 +42,15 @@ const steps = [
         .
         <br />
         <br />
-        <a href="./app-data/help/etherscan/step2.png" target="_blank" rel="noreferrer">
+        <a
+          href={resolveUrl("$STATIC_ASSETS/help/etherscan/step2.png")}
+          target="_blank"
+          rel="noreferrer"
+        >
           <img
             height={249}
             width={433}
-            src="./app-data/help/etherscan/step2.png"
+            src={resolveUrl("$STATIC_ASSETS/help/etherscan/step2.png")}
             alt="Step visualization"
           />
         </a>
@@ -57,11 +66,15 @@ const steps = [
         .
         <br />
         <br />
-        <a href="./app-data/help/etherscan/step3.png" target="_blank" rel="noreferrer">
+        <a
+          href={resolveUrl("$STATIC_ASSETS/help/etherscan/step3.png")}
+          target="_blank"
+          rel="noreferrer"
+        >
           <img
             height={249}
             width={433}
-            src="./app-data/help/etherscan/step3.png"
+            src={resolveUrl("$STATIC_ASSETS/help/etherscan/step3.png")}
             alt="Step visualization"
           />
         </a>
@@ -77,11 +90,15 @@ const steps = [
         .
         <br />
         <br />
-        <a href="./app-data/help/etherscan/step4.png" target="_blank" rel="noreferrer">
+        <a
+          href={resolveUrl("$STATIC_ASSETS/help/etherscan/step4.png")}
+          target="_blank"
+          rel="noreferrer"
+        >
           <img
             height={249}
             width={433}
-            src="./app-data/help/etherscan/step4.png"
+            src={resolveUrl("$STATIC_ASSETS/help/etherscan/step4.png")}
             alt="Step visualization"
           />
         </a>
@@ -91,7 +108,7 @@ const steps = [
   },
 ]
 
-export function EtherscanHelp() {
+export default function EtherscanHelp() {
   const [activeStep, setActiveStep] = React.useState(0)
 
   const handleNext = () => {
@@ -108,7 +125,7 @@ export function EtherscanHelp() {
 
   return (
     <>
-      <Paper sx={{ padding: 2 }}>
+      <Paper sx={{ paddingX: 2, paddingY: 1 }}>
         <Stepper activeStep={activeStep} orientation="vertical">
           {steps.map((step, index) => (
             <Step key={step.label}>

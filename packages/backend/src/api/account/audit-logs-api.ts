@@ -118,7 +118,7 @@ export async function subscribeToAuditLogs(
   return createSubscription(accountName, SubscriptionChannel.AuditLogs, callback)
 }
 
-export async function getPlatforms(
+export async function getMyPlatformIds(
   accountName: string,
   query = "SELECT DISTINCT platform FROM audit_logs ORDER BY platform ASC",
   params?: SqlParam[]

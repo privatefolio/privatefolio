@@ -1,5 +1,13 @@
 import { ArrowRightAltRounded, OpenInNew } from "@mui/icons-material"
-import { Box, Chip, Link as MuiLink, Stack, Tooltip, Typography } from "@mui/material"
+import {
+  Box,
+  Chip,
+  Link as MuiLink,
+  Stack,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+} from "@mui/material"
 import React, { ReactNode, useState } from "react"
 import { Link as RouterLink } from "react-router-dom"
 import { MonoFont } from "src/theme"
@@ -7,14 +15,16 @@ import { noop } from "src/utils/utils"
 
 import { Truncate } from "./Truncate"
 
-type IdentifierBlockProps = {
+export type IdentifierBlockProps = {
+  avatar?: ReactNode
+  hideName?: boolean
   href?: string
   id: string
   label?: ReactNode
   /**
    * @default "Open in new tab"
    */
-  linkText?: string
+  linkText?: ReactNode
   size?: "small" | "medium"
   /**
    * @default "chip"
@@ -23,7 +33,18 @@ type IdentifierBlockProps = {
 }
 
 export function IdentifierBlock(props: IdentifierBlockProps) {
-  const { id, size, variant = "chip", label, href, linkText = "Open in new tab" } = props
+  let {
+    id,
+    size,
+    variant = "chip",
+    label,
+    href,
+    linkText = "Open in new tab",
+    avatar,
+    hideName,
+  } = props
+
+  if (hideName && props.variant === undefined) variant = "tablecell"
 
   const [copied, setCopied] = useState(false)
   const [hrefHovered, setHrefHovered] = useState(false)
@@ -32,9 +53,16 @@ export function IdentifierBlock(props: IdentifierBlockProps) {
   const labelElement = (
     <Truncate>
       <Typography fontFamily={MonoFont} variant="inherit" component="span">
-        {label || id}
+        {hideName ? null : label || id}
       </Typography>
     </Truncate>
+  )
+
+  const mainElement = (
+    <Stack direction="row" alignItems="center" gap={1}>
+      {avatar}
+      {labelElement}
+    </Stack>
   )
 
   const handleCopy = () => {
@@ -44,6 +72,8 @@ export function IdentifierBlock(props: IdentifierBlockProps) {
       setCopied(false)
     }, 1_000)
   }
+
+  const isTablet = useMediaQuery("(max-width: 899px)")
 
   return (
     <Tooltip
@@ -62,7 +92,7 @@ export function IdentifierBlock(props: IdentifierBlockProps) {
         <Chip
           size={size}
           onClick={handleCopy}
-          label={labelElement}
+          label={mainElement}
           onDelete={href ? noop : undefined}
           deleteIcon={
             <Box
@@ -80,7 +110,7 @@ export function IdentifierBlock(props: IdentifierBlockProps) {
                 display: "flex",
                 height: "100%",
                 margin: "0px !important",
-                paddingX: 1,
+                paddingX: isTablet ? 1 : 0.5,
               }}
             >
               {!isLocalLink ? (
@@ -91,9 +121,24 @@ export function IdentifierBlock(props: IdentifierBlockProps) {
             </Box>
           }
         />
+      ) : href ? (
+        <MuiLink
+          component={isLocalLink ? RouterLink : MuiLink}
+          href={href}
+          to={href}
+          target={!isLocalLink ? "_blank" : undefined}
+          onMouseEnter={() => setHrefHovered(true)}
+          onMouseLeave={() => setHrefHovered(false)}
+          underline="none"
+        >
+          <Stack direction="row" alignItems="center" gap={1}>
+            {mainElement}
+            {!isLocalLink ? <OpenInNew sx={{ height: "1rem !important" }} /> : <></>}
+          </Stack>
+        </MuiLink>
       ) : (
         <Box onClick={handleCopy} sx={{ cursor: "pointer" }}>
-          {labelElement}
+          {mainElement}
         </Box>
       )}
     </Tooltip>

@@ -7,13 +7,7 @@ import {
   getTradeTransactions,
 } from "src/api/account/trades-api"
 import * as transactionsApi from "src/api/account/transactions-api"
-import {
-  AuditLog,
-  AuditLogOperation,
-  PlatformId,
-  ProgressUpdate,
-  Transaction,
-} from "src/interfaces"
+import { AuditLog, AuditLogOperation, ProgressUpdate, Transaction } from "src/interfaces"
 import { describe, expect, it, vi } from "vitest"
 
 const accountName = Math.random().toString(36).substring(7)
@@ -34,7 +28,7 @@ describe("trades-api", () => {
         id: "1",
         importIndex: 1,
         operation: "Deposit" as AuditLogOperation,
-        platform: "ethereum" as PlatformId,
+        platform: "ethereum",
         timestamp: 1600000000000,
         txId: "tx1",
         wallet: "0x123",
@@ -46,7 +40,7 @@ describe("trades-api", () => {
         id: "2",
         importIndex: 2,
         operation: "Withdraw" as AuditLogOperation,
-        platform: "ethereum" as PlatformId,
+        platform: "ethereum",
         timestamp: 1600100000000,
         txId: "tx2",
         wallet: "0x123",
@@ -58,7 +52,7 @@ describe("trades-api", () => {
         id: "3",
         importIndex: 3,
         operation: "Withdraw" as AuditLogOperation,
-        platform: "ethereum" as PlatformId,
+        platform: "ethereum",
         timestamp: 1600200000000,
         txId: "tx3",
         wallet: "0x123",
@@ -73,7 +67,7 @@ describe("trades-api", () => {
         incoming: "1.5",
         incomingAsset: "ethereum:ETH",
         metadata: { txHash: "0xabc1" },
-        platform: "ethereum" as PlatformId,
+        platform: "ethereum",
         timestamp: 1600000000000,
         type: "Deposit",
         wallet: "0x123",
@@ -84,7 +78,7 @@ describe("trades-api", () => {
         metadata: { txHash: "0xabc2" },
         outgoing: "1.0",
         outgoingAsset: "ethereum:ETH",
-        platform: "ethereum" as PlatformId,
+        platform: "ethereum",
         timestamp: 1600100000000,
         type: "Withdraw",
         wallet: "0x123",
@@ -95,7 +89,7 @@ describe("trades-api", () => {
         metadata: { txHash: "0xabc3" },
         outgoing: "0.5",
         outgoingAsset: "ethereum:ETH",
-        platform: "ethereum" as PlatformId,
+        platform: "ethereum",
         timestamp: 1600200000000,
         type: "Withdraw",
         wallet: "0x123",

@@ -1,5 +1,7 @@
 import chalk from "chalk"
-import { ProgressLog } from "src/interfaces"
+import { Blockchain, Exchange, Platform, ProgressLog } from "src/interfaces"
+
+import { isBunWorker } from "./environment-utils"
 
 /**
  * Returns a hash code from a string
@@ -42,7 +44,7 @@ export async function wasteCpuCycles(interval: number) {
 }
 
 /**
- * Converts a minutes interval to a valid cron expression that works for any interval
+ * Converts a minutes interval to a valid cron expression (if it evenly divides 60, 1440, or 60).
  * @param {number} minutes - The interval in minutes
  * @return {string} A valid cron expression
  */
@@ -51,24 +53,28 @@ export function getCronExpression(minutes: number): string {
     throw new Error("Minutes must be greater than 0")
   }
 
-  if (minutes <= 60) {
-    // If interval is 60 or less, we can use the standard minute syntax
-    return `*/${minutes} * * * *`
-  } else {
-    // For intervals > 60 minutes, we need to run at specific hours
-    // Calculate how many times per day and at which hours
-    const hoursPerDay = 24
-    const intervalsPerDay = Math.floor((hoursPerDay * 60) / minutes)
-
-    if (intervalsPerDay <= 1) {
-      // Run once per day at midnight
-      return `0 0 * * *`
-    } else {
-      // For intervals that result in multiple runs per day
-      const hourStep = Math.floor(hoursPerDay / intervalsPerDay)
-      return `0 0/${hourStep} * * *`
-    }
+  // If it’s an exact number of days
+  if (minutes % 1440 === 0) {
+    const days = minutes / 1440
+    return `0 0 */${days} * *`
   }
+
+  // If it’s an exact number of hours (but less than a day)
+  if (minutes % 60 === 0) {
+    const hours = minutes / 60
+    return `0 */${hours} * * *`
+  }
+
+  // If it’s less than 60 minutes
+  if (minutes < 60) {
+    return `*/${minutes} * * * *`
+  }
+
+  // Otherwise, a strictly “every N minutes” schedule cannot be represented
+  // by a single standard cron line. Throw to let caller know.
+  throw new Error(
+    `Interval must evenly divide 60 or 1440 (i.e. a whole number of hours or days). Received: ${minutes}`
+  )
 }
 
 export function timeQueue<T extends (...args: never[]) => void>(
@@ -109,6 +115,17 @@ export function parseProgressLog(logEntry: string): ProgressLog {
   return [timestamp, progressUpdate] satisfies ProgressLog
 }
 
-export function getPrefix(accountName: string): string {
-  return chalk.bold.magenta(`[${accountName}]`)
+export function getPrefix(accountName: string, isCron = false): string {
+  if (isCron) return chalk.green(`[${accountName}]`)
+  if (isBunWorker) return `[${accountName}]`
+
+  return chalk.gray(`[${accountName}]`)
+  // return `${isBunWorker ? "[writeApi]" : "[readApi] "} [${accountName}]`
+  // return (
+  //   chalk.bold.magenta(`[${accountName}]`) +
+  //   (isBunWorker ? chalk.bold.yellow("[writeApi]") : chalk.bold.blue("[readApi]"))
+  // )
 }
+
+export const isExchange = (x: Platform): x is Exchange => "coingeckoTrustScore" in x
+export const isBlockchain = (x: Platform): x is Blockchain => !("coingeckoTrustScore" in x)

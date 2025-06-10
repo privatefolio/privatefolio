@@ -1,5 +1,7 @@
 import {
+  AccountBalanceRounded,
   CloudRounded,
+  ExtensionRounded,
   HomeRounded,
   ReceiptLong,
   SdStorageRounded,
@@ -142,6 +144,14 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
             avatar={<TransactionIcon fontSize="small" />}
           />
           <NavMenuItem
+            value="audit-logs"
+            to={`/u/${accountIndex}/audit-logs`}
+            label="Audit logs"
+            aria-label="Visit Audit logs"
+            onClick={toggleOpen}
+            avatar={<ReceiptLong fontSize="small" />}
+          />
+          <NavMenuItem
             value="assets"
             to={`/u/${accountIndex}/assets`}
             label="Assets"
@@ -150,12 +160,20 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
             avatar={<Workspaces fontSize="small" />}
           />
           <NavMenuItem
-            value="audit-logs"
-            to={`/u/${accountIndex}/audit-logs`}
-            label="Audit logs"
-            aria-label="Visit Audit logs"
+            value="platforms"
+            to={`/u/${accountIndex}/platforms`}
+            label="Platforms"
+            aria-label="Visit Platforms"
             onClick={toggleOpen}
-            avatar={<ReceiptLong fontSize="small" />}
+            avatar={<AccountBalanceRounded fontSize="small" />}
+          />
+          <NavMenuItem
+            value="extensions"
+            to={`/u/${accountIndex}/extensions`}
+            label="Extensions"
+            aria-label="Visit Extensions"
+            onClick={toggleOpen}
+            avatar={<ExtensionRounded fontSize="small" />}
           />
           <NavMenuItem
             value="import-data"
@@ -199,7 +217,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
                     color="secondary"
                     sx={{
                       backgroundColor: "var(--mui-palette-secondary-main)",
-                      fontSize: "0.65rem",
+                      fontSize: "0.625rem",
                       height: 18,
                     }}
                     label="Coming soon"

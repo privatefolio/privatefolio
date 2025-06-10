@@ -13,7 +13,8 @@ export function Subheading({ sx = {}, ...rest }: TypographyProps) {
         "& span": {
           paddingY: 0.25,
         },
-        letterSpacing: 0.75,
+        fontWeight: 500,
+        letterSpacing: 0.66,
         minHeight: 45,
         paddingLeft: 2,
         ...sx,

@@ -188,7 +188,7 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
             variant="contained"
             disabled={loading || !!errorComponent}
           >
-            {loading ? "Creating..." : "Create"}
+            {loading ? "Creating…" : "Create"}
           </Button>
         </DialogActions>
       </form>

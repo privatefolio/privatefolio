@@ -128,10 +128,11 @@ export default function NetworthPage() {
               !!hiddenBalances && (
                 <AttentionBlock>
                   <InfoOutlined sx={{ height: 20, width: 20 }} />
-                  <span>{hiddenBalances} small balances hidden...</span>
+                  <span>{hiddenBalances} small balances hidden…</span>
                 </AttentionBlock>
               )
             }
+            // nullishSortPosition="start" TODO5: test me
           />
         </div>
       )}

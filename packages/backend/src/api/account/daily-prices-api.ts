@@ -1,7 +1,8 @@
+import { PAIR_MAPPER, PRICE_APIS, PRICE_MAPPER } from "src/extensions/prices/providers"
 import {
-  Asset,
   ChartData,
   DailyPrice,
+  MyAsset,
   ProgressCallback,
   ResolutionString,
   TaskPriority,
@@ -9,14 +10,13 @@ import {
   Time,
   Timestamp,
 } from "src/interfaces"
-import { PRICE_API_PAGINATION, PRICE_APIS_META, PriceApiId } from "src/settings"
+import { PRICE_API_PAGINATION, PRICE_APIS_META, PriceApiId } from "src/settings/settings"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { formatDate } from "src/utils/formatting-utils"
 import { noop } from "src/utils/utils"
 
 import { getAccount } from "../accounts-api"
-import { PAIR_MAPPER, PRICE_APIS, PRICE_MAPPER } from "../external/prices/providers"
-import { getAssets, patchAsset } from "./assets-api"
+import { getMyAssets, patchAsset } from "./assets-api"
 import { enqueueTask } from "./server-tasks-api"
 
 type NewDailyPrice = Omit<DailyPrice, "id">
@@ -128,14 +128,14 @@ export async function getPriceCursor(
 
 export async function fetchDailyPrices(
   accountName: string,
-  assetsParam?: Asset[],
+  assetsParam?: MyAsset[],
   progress: ProgressCallback = noop,
   signal?: AbortSignal
 ) {
-  let assets: Asset[]
+  let assets: MyAsset[]
 
   if (!assetsParam) {
-    assets = await getAssets(accountName)
+    assets = await getMyAssets(accountName)
   } else {
     assets = assetsParam
   }

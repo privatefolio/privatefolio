@@ -13,7 +13,7 @@ import JSZip from "jszip"
 import { join } from "path"
 import type { NewServerTask, TaskStatus } from "src/interfaces"
 import { ProgressCallback, ServerFile, TaskPriority, TaskTrigger } from "src/interfaces"
-import { DATABASES_LOCATION, FILES_LOCATION, TASK_LOGS_LOCATION } from "src/settings"
+import { DATABASES_LOCATION, FILES_LOCATION, TASK_LOGS_LOCATION } from "src/settings/settings"
 import { noop, parseProgressLog } from "src/utils/utils"
 
 import { getAccount, reconnectAccount } from "../accounts-api"

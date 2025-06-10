@@ -497,7 +497,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
                         <Chip
                           size="small"
                           color="primary"
-                          sx={{ fontSize: "0.65rem", height: 18, marginLeft: 1 }}
+                          sx={{ fontSize: "0.625rem", height: 18, marginLeft: 1 }}
                           label="Coming soon"
                         />
                       )}

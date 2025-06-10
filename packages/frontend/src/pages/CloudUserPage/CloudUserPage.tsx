@@ -130,7 +130,7 @@ export default function CloudUserPage({ show }: { show: boolean }) {
     renewal?: Date
   }>(() => {
     if (sub === undefined) {
-      return { isPremium: false, loading: true, name: "Loading..." }
+      return { isPremium: false, loading: true, name: "Loading…" }
     }
     if (sub === null) {
       return { isPremium: false, name: "Hobby" }
@@ -169,7 +169,7 @@ export default function CloudUserPage({ show }: { show: boolean }) {
   return (
     <Container maxWidth="xs" sx={{ marginTop: 8 }} disableGutters>
       <StaggeredList component="main" gap={1} show={show} tertiary>
-        <BackButton to=".." sx={{ marginLeft: 2 }}>
+        <BackButton sx={{ marginLeft: 2 }} fallback="/">
           Back
         </BackButton>
         <Card variant="outlined">
@@ -179,9 +179,9 @@ export default function CloudUserPage({ show }: { show: boolean }) {
           <CardContent component={Stack} gap={3}>
             <div>
               <SectionTitle>Account</SectionTitle>
-              <Stack direction="row" alignItems="flex-start">
+              <Stack direction="row" alignItems="flex-start" gap={2} sx={{ overflowX: "auto" }}>
                 <Gravatar email={account?.email} />
-                <Stack marginLeft={2}>
+                <Stack>
                   <Typography variant="caption" component="div">
                     <Stack direction="row" gap={1}>
                       <Typography variant="inherit" color="text.secondary">
@@ -263,359 +263,343 @@ export default function CloudUserPage({ show }: { show: boolean }) {
 
             <div>
               <SectionTitle>Cloud server</SectionTitle>
-              <Stack>
-                <Stack alignItems="flex-start">
-                  <Stack direction="row" alignItems="flex-start">
-                    <Badge
-                      overlap="circular"
-                      anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-                      badgeContent={
-                        cloudInstance && (
-                          <Fade in>
-                            <Stack
-                              sx={{
-                                backgroundColor: "var(--mui-palette-background-paper)",
-                                borderRadius: "50%",
-                              }}
-                              alignItems="center"
-                              justifyContent="center"
-                            >
-                              <ServerStatusIcon status={serverStatus} />
-                            </Stack>
-                          </Fade>
-                        )
-                      }
-                    >
-                      <Avatar>
-                        <Cloud color="primary" fontSize="small" />
-                      </Avatar>
-                      {(cloudInstance === undefined ||
-                        serverStatus === "pending" ||
-                        serverStatus === "creating" ||
-                        serverStatus === "restarting") && (
-                        <CircularSpinner
-                          size={40}
-                          rootSx={{
-                            left: 0,
-                            position: "absolute",
-                            top: 0,
+              <Stack direction="row" alignItems="flex-start" gap={2} sx={{ overflowX: "auto" }}>
+                <Badge
+                  overlap="circular"
+                  anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                  badgeContent={
+                    cloudInstance && (
+                      <Fade in>
+                        <Stack
+                          sx={{
+                            backgroundColor: "var(--mui-palette-background-paper)",
+                            borderRadius: "50%",
                           }}
-                          bgColor="transparent"
-                        />
-                      )}
-                    </Badge>
-
-                    <Stack marginLeft={2}>
-                      {cloudInstance === undefined ? (
-                        <Stack>
-                          <Skeleton height={18} width={80} />
-                          <Skeleton height={18} width={100} />
-                          <Skeleton height={18} width={100} />
-                          <Skeleton height={32} width={220} />
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          <ServerStatusIcon status={serverStatus} />
                         </Stack>
-                      ) : (
-                        <>
-                          <Typography variant="caption" component="div">
-                            <Stack direction="row" gap={1}>
-                              <Typography variant="inherit" color="text.secondary">
-                                Status
+                      </Fade>
+                    )
+                  }
+                >
+                  <Avatar>
+                    <Cloud color="primary" fontSize="small" />
+                  </Avatar>
+                  {(cloudInstance === undefined ||
+                    serverStatus === "pending" ||
+                    serverStatus === "creating" ||
+                    serverStatus === "restarting") && (
+                    <CircularSpinner
+                      size={40}
+                      rootSx={{
+                        left: 0,
+                        position: "absolute",
+                        top: 0,
+                      }}
+                      bgColor="transparent"
+                    />
+                  )}
+                </Badge>
+
+                <Stack>
+                  {cloudInstance === undefined ? (
+                    <Stack>
+                      <Skeleton height={18} width={80} />
+                      <Skeleton height={18} width={100} />
+                      <Skeleton height={18} width={100} />
+                      <Skeleton height={32} width={220} />
+                    </Stack>
+                  ) : (
+                    <>
+                      <Typography variant="caption" component="div">
+                        <Stack direction="row" gap={1}>
+                          <Typography variant="inherit" color="text.secondary">
+                            Status
+                          </Typography>
+                          <Typography variant="inherit" textTransform="capitalize">
+                            {serverStatus}
+                          </Typography>
+                          <Typography variant="inherit" component="span">
+                            {cloudInstance?.statusText && (
+                              <Typography
+                                variant="inherit"
+                                component="span"
+                                color="text.secondary"
+                                fontStyle="italic"
+                              >
+                                {cloudInstance.statusText}
                               </Typography>
-                              <Typography variant="inherit" textTransform="capitalize">
-                                {serverStatus}
-                              </Typography>
-                              <Typography variant="inherit" component="span">
-                                {cloudInstance?.statusText && (
-                                  <Typography
-                                    variant="inherit"
-                                    component="span"
-                                    color="text.secondary"
-                                    fontStyle="italic"
-                                  >
-                                    {cloudInstance.statusText}
-                                  </Typography>
-                                )}
-                              </Typography>
-                            </Stack>
-                            <Stack direction="row" gap={1}>
-                              <Typography variant="inherit" component="span" color="text.secondary">
-                                Server ID
-                              </Typography>{" "}
-                              <Typography variant="inherit" component="span">
-                                {cloudInstance ? cloudInstance.id : "Unknown"}
-                              </Typography>
-                            </Stack>
-                            {cloudInstance && (
-                              <Stack direction="row" gap={1}>
-                                <Typography
-                                  variant="inherit"
-                                  component="span"
-                                  color="text.secondary"
-                                >
-                                  Server limits
-                                </Typography>{" "}
-                                <Typography variant="inherit" component="span">
-                                  {cloudInstance.limits.cpus}{" "}
-                                  <Typography
-                                    variant="inherit"
-                                    component="span"
-                                    color="text.secondary"
-                                    fontStyle="italic"
-                                  >
-                                    CPUs -{" "}
-                                  </Typography>
-                                  {cloudInstance.limits.memory}{" "}
-                                  <Typography
-                                    variant="inherit"
-                                    component="span"
-                                    color="text.secondary"
-                                    fontStyle="italic"
-                                  >
-                                    RAM
-                                  </Typography>
-                                </Typography>
-                              </Stack>
-                            )}
-                            {serverInfo && (
-                              <Stack direction="row" gap={1}>
-                                <Typography
-                                  variant="inherit"
-                                  component="span"
-                                  color="text.secondary"
-                                >
-                                  Server version
-                                </Typography>{" "}
-                                <Typography variant="inherit" component="span">
-                                  {serverInfo.version}
-                                  <Typography
-                                    variant="inherit"
-                                    component="span"
-                                    color="text.secondary"
-                                    fontStyle="italic"
-                                  >
-                                    {" "}
-                                    {formatDate(new Date(serverInfo.buildDate))}
-                                  </Typography>
-                                </Typography>
-                              </Stack>
                             )}
                           </Typography>
-                          <ButtonGroup
-                            size="small"
-                            variant="outlined"
-                            color="secondary"
-                            sx={{
-                              "& button": {
-                                // borderRadius: 0,
-                                paddingY: 1.5,
-                              },
-                              height: 32,
-                              paddingY: 0.5,
+                        </Stack>
+                        <Stack direction="row" gap={1}>
+                          <Typography variant="inherit" component="span" color="text.secondary">
+                            Server ID
+                          </Typography>{" "}
+                          <Typography variant="inherit" component="span">
+                            {cloudInstance ? cloudInstance.id : "Unknown"}
+                          </Typography>
+                        </Stack>
+                        {cloudInstance && (
+                          <Stack direction="row" gap={1}>
+                            <Typography variant="inherit" component="span" color="text.secondary">
+                              Server limits
+                            </Typography>{" "}
+                            <Typography variant="inherit" component="span">
+                              {cloudInstance.limits.cpus}{" "}
+                              <Typography
+                                variant="inherit"
+                                component="span"
+                                color="text.secondary"
+                                fontStyle="italic"
+                              >
+                                CPUs -{" "}
+                              </Typography>
+                              {cloudInstance.limits.memory}{" "}
+                              <Typography
+                                variant="inherit"
+                                component="span"
+                                color="text.secondary"
+                                fontStyle="italic"
+                              >
+                                RAM
+                              </Typography>
+                            </Typography>
+                          </Stack>
+                        )}
+                        {serverInfo && (
+                          <Stack direction="row" gap={1}>
+                            <Typography variant="inherit" component="span" color="text.secondary">
+                              Server version
+                            </Typography>{" "}
+                            <Typography variant="inherit" component="span">
+                              {serverInfo.version}
+                              <Typography
+                                variant="inherit"
+                                component="span"
+                                color="text.secondary"
+                                fontStyle="italic"
+                              >
+                                {" "}
+                                {formatDate(new Date(serverInfo.buildDate))}
+                              </Typography>
+                            </Typography>
+                          </Stack>
+                        )}
+                      </Typography>
+                      <ButtonGroup
+                        size="small"
+                        variant="outlined"
+                        color="secondary"
+                        sx={{
+                          "& button": {
+                            // borderRadius: 0,
+                            // paddingY: 1.5,
+                            paddingX: 1,
+                          },
+                          height: 32,
+                          paddingY: 0.5,
+                        }}
+                      >
+                        {serverStatus === "needs setup" && (
+                          <Button
+                            onClick={async () => {
+                              const { confirmed, event } = await confirm({
+                                confirmText: "Complete setup",
+                                content: (
+                                  <Stack gap={0} maxWidth={420}>
+                                    <Typography variant="body2" color="text.secondary">
+                                      To complete the setup, please enter the password of your
+                                      PrivateCloud account.
+                                      <br />
+                                      <br />
+                                    </Typography>
+                                    <div>
+                                      <SectionTitle>Password</SectionTitle>
+                                      <TextField
+                                        name="password"
+                                        type="password"
+                                        autoComplete="current-password"
+                                        required
+                                        variant="outlined"
+                                        fullWidth
+                                        size="small"
+                                      />
+                                    </div>
+                                  </Stack>
+                                ),
+                                title: "Password required",
+                              })
+
+                              if (!event) return
+
+                              const formData = new FormData(event.target as HTMLFormElement)
+                              const password = formData.get("password") as string
+
+                              if (confirmed) {
+                                handleSetupServer(password)
+                              }
                             }}
+                            startIcon={<Settings />}
+                            disabled={serverMutating}
                           >
-                            {serverStatus === "needs setup" && (
-                              <Button
-                                onClick={async () => {
-                                  const { confirmed, event } = await confirm({
-                                    confirmText: "Complete setup",
-                                    content: (
-                                      <Stack gap={0} maxWidth={420}>
-                                        <Typography variant="body2" color="text.secondary">
-                                          To complete the setup, please enter the password of your
-                                          PrivateCloud account.
-                                          <br />
-                                          <br />
-                                        </Typography>
-                                        <div>
-                                          <SectionTitle>Password</SectionTitle>
-                                          <TextField
-                                            name="password"
-                                            type="password"
-                                            autoComplete="current-password"
-                                            required
-                                            variant="outlined"
-                                            fullWidth
-                                            size="small"
-                                          />
-                                        </div>
-                                      </Stack>
-                                    ),
-                                    title: "Password required",
+                            Setup
+                          </Button>
+                        )}
+                        {serverStatus === "needs login" && (
+                          <Button
+                            onClick={async () => {
+                              const { confirmed, event } = await confirm({
+                                confirmText: "Login",
+                                content: (
+                                  <Stack gap={0} maxWidth={420}>
+                                    <Typography variant="body2" color="text.secondary">
+                                      To login to your server, please enter the password of your
+                                      PrivateCloud account.
+                                      <br />
+                                      <br />
+                                    </Typography>
+                                    <div>
+                                      <SectionTitle>Password</SectionTitle>
+                                      <TextField
+                                        name="password"
+                                        type="password"
+                                        autoComplete="current-password"
+                                        required
+                                        variant="outlined"
+                                        fullWidth
+                                        size="small"
+                                      />
+                                    </div>
+                                  </Stack>
+                                ),
+                                title: "Password required",
+                              })
+
+                              if (!event) return
+
+                              const formData = new FormData(event.target as HTMLFormElement)
+                              const password = formData.get("password") as string
+
+                              if (confirmed) {
+                                try {
+                                  await unlockApp(password, $cloudAuth, $cloudRest.get())
+                                } catch (err) {
+                                  enqueueSnackbar(`Cloud server: ${(err as Error).message}`, {
+                                    variant: "error",
                                   })
-
-                                  if (!event) return
-
-                                  const formData = new FormData(event.target as HTMLFormElement)
-                                  const password = formData.get("password") as string
-
-                                  if (confirmed) {
-                                    handleSetupServer(password)
-                                  }
-                                }}
-                                startIcon={<Settings />}
-                                disabled={serverMutating}
-                              >
-                                Setup
-                              </Button>
-                            )}
-                            {serverStatus === "needs login" && (
-                              <Button
-                                onClick={async () => {
-                                  const { confirmed, event } = await confirm({
-                                    confirmText: "Login",
-                                    content: (
-                                      <Stack gap={0} maxWidth={420}>
-                                        <Typography variant="body2" color="text.secondary">
-                                          To login to your server, please enter the password of your
-                                          PrivateCloud account.
-                                          <br />
-                                          <br />
-                                        </Typography>
-                                        <div>
-                                          <SectionTitle>Password</SectionTitle>
-                                          <TextField
-                                            name="password"
-                                            type="password"
-                                            autoComplete="current-password"
-                                            required
-                                            variant="outlined"
-                                            fullWidth
-                                            size="small"
-                                          />
-                                        </div>
-                                      </Stack>
-                                    ),
-                                    title: "Password required",
-                                  })
-
-                                  if (!event) return
-
-                                  const formData = new FormData(event.target as HTMLFormElement)
-                                  const password = formData.get("password") as string
-
-                                  if (confirmed) {
-                                    try {
-                                      await unlockApp(password, $cloudAuth, $cloudRest.get())
-                                    } catch (err) {
-                                      enqueueSnackbar(`Cloud server: ${(err as Error).message}`, {
-                                        variant: "error",
-                                      })
-                                    }
-                                  }
-                                }}
-                                startIcon={<KeyRounded />}
-                                disabled={serverMutating}
-                              >
-                                Login
-                              </Button>
-                            )}
-                            {latestVersion &&
-                              serverInfo &&
-                              serverInfo.version !== latestVersion && (
-                                <Button
-                                  onClick={handleUpdateServer}
-                                  startIcon={<ArrowCircleDownRounded />}
-                                  disabled={serverMutating}
-                                >
-                                  Update
-                                </Button>
-                              )}
-                            {cloudInstance && serverStatus === "paused" && (
-                              <Button
-                                onClick={handleUnpauseServer}
-                                startIcon={<PlayCircle />}
-                                disabled={serverMutating}
-                              >
-                                Resume
-                              </Button>
-                            )}
-                            {cloudInstance && serverStatus === "running" && (
-                              <Button
-                                onClick={handlePauseServer}
-                                startIcon={<PauseCircle />}
-                                disabled={serverMutating}
-                              >
-                                Pause
-                              </Button>
-                            )}
-                            {cloudInstance !== null && (
-                              <Button
-                                onClick={handleRestartServer}
-                                startIcon={<RestartAlt />}
-                                disabled={
-                                  serverMutating ||
-                                  (!!cloudInstance &&
-                                    (["restarting"] as CloudInstanceStatus[]).includes(
-                                      cloudInstance.status
-                                    ))
                                 }
-                              >
-                                Restart
-                              </Button>
-                            )}
-                            {cloudInstance === null && (
-                              <Button
-                                startIcon={<AddCircle />}
-                                onClick={handleCreateServer}
-                                disabled={serverMutating}
-                              >
-                                Create
-                              </Button>
-                            )}
-                            {cloudInstance !== null && (
-                              <Button
-                                startIcon={<Cancel />}
-                                onClick={async () => {
-                                  const { confirmed, event } = await confirm({
-                                    confirmText: "Destroy",
-                                    content: (
-                                      <Stack gap={0}>
-                                        <Typography variant="body2" color="text.secondary">
-                                          Destroy the server instance, which allows you start again.
-                                          Optionally you can also remove all user data and start
-                                          fresh.
-                                          <br />
-                                          <br />
-                                          This action is permanent. Are you sure you wish to
-                                          continue?
-                                          <br />
-                                          <br />
-                                        </Typography>
-                                        <FormControlLabel
-                                          control={
-                                            <Checkbox
-                                              name="remove-data"
-                                              color="secondary"
-                                              sx={{ marginLeft: 0.5 }}
-                                            />
-                                          }
-                                          label="Remove user data"
+                              }
+                            }}
+                            startIcon={<KeyRounded />}
+                            disabled={serverMutating}
+                          >
+                            Login
+                          </Button>
+                        )}
+                        {latestVersion && serverInfo && serverInfo.version !== latestVersion && (
+                          <Button
+                            onClick={handleUpdateServer}
+                            startIcon={<ArrowCircleDownRounded />}
+                            disabled={serverMutating}
+                          >
+                            Update
+                          </Button>
+                        )}
+                        {cloudInstance && serverStatus === "paused" && (
+                          <Button
+                            onClick={handleUnpauseServer}
+                            startIcon={<PlayCircle />}
+                            disabled={serverMutating}
+                          >
+                            Resume
+                          </Button>
+                        )}
+                        {cloudInstance && serverStatus === "running" && (
+                          <Button
+                            onClick={handlePauseServer}
+                            startIcon={<PauseCircle />}
+                            disabled={serverMutating}
+                          >
+                            Pause
+                          </Button>
+                        )}
+                        {cloudInstance !== null && (
+                          <Button
+                            onClick={handleRestartServer}
+                            startIcon={<RestartAlt />}
+                            disabled={
+                              serverMutating ||
+                              (!!cloudInstance &&
+                                (["restarting"] as CloudInstanceStatus[]).includes(
+                                  cloudInstance.status
+                                ))
+                            }
+                          >
+                            Restart
+                          </Button>
+                        )}
+                        {cloudInstance === null && (
+                          <Button
+                            startIcon={<AddCircle />}
+                            onClick={handleCreateServer}
+                            disabled={serverMutating}
+                          >
+                            Create
+                          </Button>
+                        )}
+                        {cloudInstance !== null && (
+                          <Button
+                            startIcon={<Cancel />}
+                            onClick={async () => {
+                              const { confirmed, event } = await confirm({
+                                confirmText: "Destroy",
+                                content: (
+                                  <Stack gap={0}>
+                                    <Typography variant="body2" color="text.secondary">
+                                      Destroy the server instance, which allows you start again.
+                                      Optionally you can also remove all user data and start fresh.
+                                      <br />
+                                      <br />
+                                      This action is permanent. Are you sure you wish to continue?
+                                      <br />
+                                      <br />
+                                    </Typography>
+                                    <FormControlLabel
+                                      control={
+                                        <Checkbox
+                                          name="remove-data"
+                                          color="secondary"
+                                          sx={{ marginLeft: 0.5 }}
                                         />
-                                      </Stack>
-                                    ),
-                                    title: "Destroy server",
-                                    variant: "warning",
-                                  })
+                                      }
+                                      label="Remove user data"
+                                    />
+                                  </Stack>
+                                ),
+                                title: "Destroy server",
+                                variant: "warning",
+                              })
 
-                                  if (!event) return
+                              if (!event) return
 
-                                  const formData = new FormData(event.target as HTMLFormElement)
-                                  const removeData =
-                                    (formData.get("remove-data") as string) === "on"
+                              const formData = new FormData(event.target as HTMLFormElement)
+                              const removeData = (formData.get("remove-data") as string) === "on"
 
-                                  if (confirmed) {
-                                    handleRemoveServer(removeData)
-                                  }
-                                }}
-                                disabled={serverMutating}
-                              >
-                                Destroy
-                              </Button>
-                            )}
-                          </ButtonGroup>
-                        </>
-                      )}
-                    </Stack>
-                  </Stack>
+                              if (confirmed) {
+                                handleRemoveServer(removeData)
+                              }
+                            }}
+                            disabled={serverMutating}
+                          >
+                            Destroy
+                          </Button>
+                        )}
+                      </ButtonGroup>
+                    </>
+                  )}
                 </Stack>
               </Stack>
             </div>

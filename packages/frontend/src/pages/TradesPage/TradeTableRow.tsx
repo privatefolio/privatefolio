@@ -4,7 +4,7 @@ import { useStore } from "@nanostores/react"
 import { formatDistance } from "date-fns"
 import React, { useEffect, useState } from "react"
 import { AmountBlock } from "src/components/AmountBlock"
-import { AssetBlock } from "src/components/AssetBlock"
+import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { TagList } from "src/components/TagList"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { useBoolean } from "src/hooks/useBoolean"
@@ -63,7 +63,7 @@ export function TradeTableRow({
             </Typography>
 
             <Typography variant="body2" sx={{ mt: 1 }}>
-              <strong>Asset:</strong> <AssetBlock assetId={assetId} />
+              <strong>Asset:</strong> <MyAssetBlock id={assetId} />
             </Typography>
 
             <Typography variant="body2">
@@ -141,7 +141,7 @@ export function TradeTableRow({
         </TableCell>
 
         <TableCell>
-          <AssetBlock assetId={assetId} />
+          <MyAssetBlock id={assetId} />
         </TableCell>
 
         <TableCell variant="clickable" align="right">

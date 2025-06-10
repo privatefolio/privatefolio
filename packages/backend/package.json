@@ -10,7 +10,7 @@
   "scripts": {
     "start": "bun ./scripts/start.sh",
     "prestart:watch": "bun ./scripts/prestart-watch.sh",
-    "start:watch": "bun ./scripts/start-watch.sh",
+    "start:watch": "cross-env NODE_ENV=development bun ./scripts/start-watch.sh",
     "dev": "bun ./scripts/dev.sh",
     "lint": "eslint .",
     "lint:fix": "yarn lint --fix",

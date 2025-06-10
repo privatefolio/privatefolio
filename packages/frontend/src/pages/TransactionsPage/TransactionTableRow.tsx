@@ -4,8 +4,8 @@ import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AssetAmountBlock } from "src/components/AssetAmountBlock"
-import { AssetBlock } from "src/components/AssetBlock"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
+import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { TagList } from "src/components/TagList"
 import { useBoolean } from "src/hooks/useBoolean"
@@ -92,7 +92,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
                           showSign
                           placeholder=""
                         />
-                        <AssetBlock assetId={outgoingAsset} />
+                        <MyAssetBlock id={outgoingAsset} />
                       </Stack>
                     )}
                     {outgoing && incoming ? (
@@ -108,7 +108,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
                           showSign
                           placeholder=""
                         />
-                        <AssetBlock assetId={incomingAsset} />
+                        <MyAssetBlock id={incomingAsset} />
                       </Stack>
                     )}
                   </Stack>
@@ -137,7 +137,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
           <TimestampBlock timestamp={timestamp} relative={relativeTime} />
         </TableCell>
         <TableCell>
-          <PlatformBlock platform={platform} hideName />
+          <PlatformBlock id={platform} hideName />
         </TableCell>
         <TableCell variant="clickable">
           <IdentifierBlock id={wallet} variant="tablecell" label={getAddressBookEntry(wallet)} />
@@ -156,7 +156,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
           />
         </TableCell>
         <TableCell>
-          <AssetBlock assetId={outgoingAsset} />
+          <MyAssetBlock id={outgoingAsset} />
         </TableCell>
         <TableCell align="right" variant="clickable">
           <AssetAmountBlock
@@ -169,7 +169,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
           />
         </TableCell>
         <TableCell>
-          <AssetBlock assetId={incomingAsset} />
+          <MyAssetBlock id={incomingAsset} />
         </TableCell>
         <TableCell align="right" variant="clickable">
           <AssetAmountBlock
@@ -182,7 +182,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
           />
         </TableCell>
         <TableCell>
-          <AssetBlock assetId={feeAsset} />
+          <MyAssetBlock id={feeAsset} />
         </TableCell>
         <TableCell>
           <TagList itemId={id} itemType="transaction" />

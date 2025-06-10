@@ -2,14 +2,16 @@ import EventEmitter from "events"
 import { access, mkdir, readdir, rm, stat, writeFile } from "fs/promises"
 import { join } from "path"
 import { EventCause, SubscriptionChannel, SubscriptionId, TaskPriority } from "src/interfaces"
-import { DATABASES_LOCATION, TASK_LOGS_LOCATION } from "src/settings"
+import { DATABASES_LOCATION, FILES_LOCATION, TASK_LOGS_LOCATION } from "src/settings/settings"
 import { createSqliteDatabaseConnection } from "src/sqlite/sqlite"
 import { isDevelopment, isTestEnvironment } from "src/utils/environment-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { getPrefix, sleep, wasteCpuCycles } from "src/utils/utils"
 
+import { enqueueRefetchAssets } from "./account/assets-api"
 import { getValue, setValue } from "./account/kv-api"
+import { enqueueRefetchPlatforms } from "./account/platforms-api"
 import { enqueueTask, upsertServerTask } from "./account/server-tasks-api"
 import { allSubscriptions, appEventEmitter } from "./internal"
 
@@ -32,15 +34,15 @@ async function createDatabaseConnection(accountName: string, createIfNeeded = fa
       await access(databaseFilePath)
       console.log(getPrefix(accountName), "Connecting to existing database", databaseFilePath)
     } catch {
-      console.log(getPrefix(accountName), "Creating database file", databaseFilePath)
       if (!createIfNeeded) throw new Error(`Account "${accountName}" does not exist`)
+      console.log(getPrefix(accountName), "Creating database file", databaseFilePath)
       // ensure databases dir exists
       await mkdir(DATABASES_LOCATION, { recursive: true })
       await writeFile(databaseFilePath, "")
     }
   }
 
-  const db = await createSqliteDatabaseConnection(databaseFilePath)
+  const db = await createSqliteDatabaseConnection(databaseFilePath, accountName)
 
   const journalMode = await db.execute(`PRAGMA journal_mode;`)
   if (isDevelopment) {
@@ -66,18 +68,20 @@ const accounts: Record<string, Promise<Account>> = {}
 
 function populateFirstServerTask(accountName: string) {
   const createdAt = Date.now()
-  setTimeout(() => {
-    upsertServerTask(accountName, {
+  setTimeout(async () => {
+    await upsertServerTask(accountName, {
       completedAt: Date.now(),
       createdAt,
       description: `Initializing database for account "${accountName}".`,
       duration: Date.now() - createdAt,
       name: "Initialize database",
-      priority: TaskPriority.VeryHigh,
+      priority: TaskPriority.High,
       startedAt: createdAt,
       status: "completed",
       trigger: "system",
     })
+    await enqueueRefetchPlatforms(accountName, "system")
+    await enqueueRefetchAssets(accountName, "system")
   }, 50)
 }
 
@@ -88,6 +92,8 @@ function populateFirstServerTask(accountName: string) {
  */
 export async function getAccount(accountName: string, createIfNeeded = false): Promise<Account> {
   if (!accountName) throw new Error("Account name is required")
+
+  let promise = accounts[accountName]
 
   if (!accounts[accountName]) {
     accounts[accountName] = (async () => {
@@ -107,14 +113,22 @@ export async function getAccount(accountName: string, createIfNeeded = false): P
 
       return account as Account
     })()
+    promise = accounts[accountName]
   }
 
-  return accounts[accountName]
+  return promise
+    .then((x) => x)
+    .catch((err) => {
+      delete accounts[accountName]
+      throw err
+    })
 }
 
 export async function reconnectAccount(accountName: string) {
-  const account = await getAccount(accountName)
-  await account.close()
+  try {
+    const account = await getAccount(accountName)
+    await account.close()
+  } catch {}
   delete accounts[accountName]
   return getAccount(accountName)
 }
@@ -124,30 +138,21 @@ export async function createAccount(accountName: string) {
 }
 
 export async function deleteAccount(accountName: string, keepAccount = false) {
+  if (!isTestEnvironment) console.log(getPrefix(accountName), "Deleting account.")
+
+  if (!isTestEnvironment) console.log(getPrefix(accountName), "Closing database connection.")
   const account = await getAccount(accountName)
-  console.log(getPrefix(accountName), "Deleting database.")
-
-  const schema = await account.execute(
-    "SELECT type, name FROM sqlite_master WHERE type IN ('table', 'index', 'trigger') AND name NOT IN ('sqlite_sequence', 'sqlite_master')"
-  )
-
-  for (const row of schema) {
-    const [type, name] = row
-    await account.execute(`DROP ${type} IF EXISTS "${name}"`)
-  }
-
-  await account.execute("VACUUM;")
-
-  const integrityCheck = (await account.execute("PRAGMA INTEGRITY_CHECK;"))[0][0]
-  if (integrityCheck !== "ok") {
-    throw new Error("Database integrity check failed")
-  }
+  await account.close()
+  if (!isTestEnvironment) console.log(getPrefix(accountName), "Closed database connection.")
 
   // delete logs & database file
   await rm(join(DATABASES_LOCATION, `${accountName}.sqlite`), { force: true, recursive: true })
+  await rm(join(DATABASES_LOCATION, `${accountName}.sqlite-shm`), { force: true, recursive: true })
+  await rm(join(DATABASES_LOCATION, `${accountName}.sqlite-wal`), { force: true, recursive: true })
   await rm(join(TASK_LOGS_LOCATION, accountName), { force: true, recursive: true })
+  await rm(join(FILES_LOCATION, accountName), { force: true, recursive: true })
 
-  console.log(getPrefix(accountName), "Deleted database.")
+  if (!isTestEnvironment) console.log(getPrefix(accountName), "Deleted account.")
 
   if (!keepAccount) {
     delete accounts[accountName]
@@ -186,6 +191,7 @@ export async function resetAccount(accountName: string) {
   for (const channelName in SubscriptionChannel) {
     account.eventEmitter.emit(SubscriptionChannel[channelName], EventCause.Reset)
   }
+  appEventEmitter.emit(SubscriptionChannel.Accounts, EventCause.Reset, accountName)
 }
 
 async function initializeDatabaseIfNeeded(
@@ -204,7 +210,7 @@ async function initializeDatabaseIfNeeded(
     return false
   }
 
-  console.log(getPrefix(accountName), "Initializing database.")
+  if (!isTestEnvironment) console.log(getPrefix(accountName), "Initializing database.")
   try {
     await account.execute(`PRAGMA journal_mode = WAL;`)
   } catch {
@@ -386,6 +392,7 @@ CREATE TABLE connections (
   label VARCHAR,
   meta JSON,
   options JSON,
+  extensionId VARCHAR NOT NULL,
   platform VARCHAR NOT NULL,
   secret VARCHAR,
   syncedAt INTEGER,

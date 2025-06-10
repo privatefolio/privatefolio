@@ -3,7 +3,7 @@ import { useStore } from "@nanostores/react"
 import React from "react"
 import { AmountBlock } from "src/components/AmountBlock"
 import { AppLink } from "src/components/AppLink"
-import { AssetBlock } from "src/components/AssetBlock"
+import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { $quoteCurrency } from "src/stores/account-settings-store"
 import { getAssetTicker } from "src/utils/assets-utils"
 
@@ -29,8 +29,8 @@ export function NetworthTableRow(props: TableRowComponentProps<Balance>) {
         <TableCell sx={{ width: "100%" }} variant="clickable">
           <AppLink to={`./asset/${encodeURI(assetId)}`}>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <AssetBlock
-                assetId={assetId}
+              <MyAssetBlock
+                id={assetId}
                 size="medium"
                 secondary={<AmountBlock amount={balance} />}
               />
@@ -70,7 +70,7 @@ export function NetworthTableRow(props: TableRowComponentProps<Balance>) {
     <TableRow hover {...rest}>
       <TableCell variant="clickable">
         <AppLink to={`./asset/${encodeURI(assetId)}`}>
-          <AssetBlock assetId={assetId} showPlatform />
+          <MyAssetBlock id={assetId} showPlatform />
         </AppLink>
       </TableCell>
       <TableCell variant="clickable" align="right">

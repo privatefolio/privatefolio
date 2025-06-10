@@ -36,7 +36,7 @@ export function AddressInput({ value, onChange, ...rest }: AddressInputProps) {
   return (
     <TextField
       autoComplete="off"
-      placeholder="0x000..."
+      placeholder="0x000…"
       variant="outlined"
       value={value}
       onChange={handleChange}

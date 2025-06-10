@@ -19,8 +19,12 @@ import AssetPage from "./pages/AssetPage/AssetPage"
 import AssetsPage from "./pages/AssetsPage/AssetsPage"
 import AuditLogsPage from "./pages/AuditLogsPage/AuditLogsPage"
 import CloudUserPage from "./pages/CloudUserPage/CloudUserPage"
+import ExtensionPage from "./pages/ExtensionPage/ExtensionPage"
+import ExtensionsPage from "./pages/ExtensionsPage/ExtensionsPage"
 import HomePage from "./pages/HomePage/HomePage"
 import ImportDataPage from "./pages/ImportDataPage/ImportDataPage"
+import PlatformPage from "./pages/PlatformPage/PlatformPage"
+import PlatformsPage from "./pages/PlatformsPage/PlatformsPage"
 import ServerPage from "./pages/ServerPage/ServerPage"
 import TradesPage from "./pages/TradesPage/TradesPage"
 import TransactionsPage from "./pages/TransactionsPage/TransactionsPage"
@@ -233,13 +237,17 @@ export default function App() {
               <Route path="/cloud" element={<CloudUserPage show />} />
               <Route path="/u/:accountIndex" element={<AccountIndexRoute />}>
                 <Route index element={<HomePage />} />
-                <Route path="assets" element={<AssetsPage show />} />
                 <Route path="trades" element={<TradesPage show />} />
+                <Route path="assets" element={<AssetsPage show />} />
                 <Route path="asset/:assetId" element={<AssetPage />} />
                 <Route path="transactions" element={<TransactionsPage show />} />
                 <Route path="audit-logs" element={<AuditLogsPage show />} />
                 <Route path="import-data" element={<ImportDataPage show />} />
                 <Route path="server" element={<ServerPage show />} />
+                <Route path="extensions" element={<ExtensionsPage show />} />
+                <Route path="extension/:extensionId" element={<ExtensionPage />} />
+                <Route path="platforms" element={<PlatformsPage show />} />
+                <Route path="platform/:platformId" element={<PlatformPage />} />
                 <Route path="*" element={<FourZeroFourPage show />} />
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />

@@ -6,7 +6,7 @@ import {
   resetConnection,
   syncConnection,
   upsertConnection,
-} from "src/api/account/connections/connections-api"
+} from "src/api/account/connections-api"
 import { countTransactions, getTransactions } from "src/api/account/transactions-api"
 import { Connection, ProgressUpdate } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
@@ -23,11 +23,12 @@ describe("should import 0xf98 via connection", () => {
     // act
     connection = await upsertConnection(accountName, {
       address,
+      extensionId: "etherscan-connection",
       label: "",
       platform: "ethereum",
     })
     // assert
-    expect(connection.id).toMatchInlineSnapshot(`"431128919"`)
+    expect(connection.id).toMatchInlineSnapshot(`"3615858038"`)
   })
 
   it.sequential("should sync connection", async () => {

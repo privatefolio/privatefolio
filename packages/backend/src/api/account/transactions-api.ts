@@ -1,15 +1,15 @@
 import Big from "big.js"
+import { mergeTransactions } from "src/extensions/utils/etherscan-utils"
 import {
-  Asset,
   AuditLog,
   AuditLogOperation,
   EventCause,
+  MyAsset,
   SqlParam,
   SubscriptionChannel,
 } from "src/interfaces"
 import { isEvmPlatform } from "src/utils/assets-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
-import { mergeTransactions } from "src/utils/integrations/etherscan-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { hashString, noop } from "src/utils/utils"
 
@@ -21,7 +21,7 @@ import {
   Transaction,
 } from "../../interfaces"
 import { getAccount } from "../accounts-api"
-import { getAssets } from "./assets-api"
+import { getMyAssets } from "./assets-api"
 import { getAuditLogsByTxId } from "./audit-logs-api"
 import { enqueueTask } from "./server-tasks-api"
 import { assignTagToAuditLog, assignTagToTransaction } from "./tags-api"
@@ -273,13 +273,13 @@ export async function detectSpamTransactions(
   }
 
   await progress([33, `Processing ${etherscanTransactions.length} (EVM) transactions`])
-  const assets = await getAssets(accountName)
+  const assets = await getMyAssets(accountName)
   const assetMap = assets.reduce(
     (acc, asset) => {
       acc[asset.id] = asset
       return acc
     },
-    {} as Record<string, Asset>
+    {} as Record<string, MyAsset>
   )
 
   const spam = etherscanTransactions.filter((tx) => {

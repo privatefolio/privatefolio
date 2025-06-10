@@ -16,8 +16,8 @@ import { Link } from "react-router-dom"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AmountBlock } from "src/components/AmountBlock"
 import { AppLink } from "src/components/AppLink"
-import { AssetBlock } from "src/components/AssetBlock"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
+import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TagManager } from "src/components/TagManager"
@@ -129,7 +129,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
         </div>
         <div>
           <SectionTitle>Platform</SectionTitle>
-          <PlatformBlock platform={platform} />
+          <PlatformBlock id={platform} />
         </div>
         <div>
           <SectionTitle>Wallet</SectionTitle>
@@ -156,7 +156,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
                 to={`../asset/${encodeURI(incomingAsset)}`}
                 sx={{ fontSize: "0.9rem", padding: 1 }}
               >
-                <AssetBlock assetId={incomingAsset} size="small" />
+                <MyAssetBlock id={incomingAsset} size="small" />
               </Button>
               <ValueChip
                 value={
@@ -185,7 +185,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
                 to={`../asset/${encodeURI(outgoingAsset)}`}
                 sx={{ fontSize: "0.9rem", padding: 1 }}
               >
-                <AssetBlock assetId={outgoingAsset} size="small" />
+                <MyAssetBlock id={outgoingAsset} size="small" />
               </Button>
               <ValueChip
                 value={
@@ -214,7 +214,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
                 to={`../asset/${encodeURI(feeAsset)}`}
                 sx={{ fontSize: "0.9rem", padding: 1 }}
               >
-                <AssetBlock assetId={feeAsset} size="small" />
+                <MyAssetBlock id={feeAsset} size="small" />
               </Button>
               <ValueChip
                 value={
@@ -300,7 +300,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
             value={textInput}
             minRows={3}
             fullWidth
-            placeholder="Write a custom note..."
+            placeholder="Write a custom note…"
           />
         </div>
       </Stack>

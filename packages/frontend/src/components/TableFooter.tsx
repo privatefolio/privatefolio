@@ -30,15 +30,16 @@ export function TableFooter(props: TableFooterProps) {
         paddingX: 1.5,
         position: stickyVersion ? "sticky" : undefined,
         ...sx,
-        [`& .QueryTimer, & .MuiTablePagination-select[aria-expanded="false"], & .MuiSelect-icon:not(.MuiSelect-iconOpen)`]:
-          {
-            opacity: isTablet ? 1 : 0,
-            transition: "opacity 0.1s ease-in 0.1s",
-          },
-        [`&:hover .QueryTimer, &:hover .MuiTablePagination-select[aria-expanded="false"], &:hover .MuiSelect-icon:not(.MuiSelect-iconOpen)`]:
-          {
-            opacity: 1,
-          },
+        // TODO6
+        // [`& .QueryTimer, & .MuiTablePagination-select[aria-expanded="false"], & .MuiSelect-icon:not(.MuiSelect-iconOpen)`]:
+        //   {
+        //     opacity: isTablet ? 1 : 0,
+        //     transition: "opacity 0.1s ease-in 0.1s",
+        //   },
+        // [`&:hover .QueryTimer, &:hover .MuiTablePagination-select[aria-expanded="false"], &:hover .MuiSelect-icon:not(.MuiSelect-iconOpen)`]:
+        //   {
+        //     opacity: 1,
+        //   },
       }}
       justifyContent="space-between"
       alignItems="center"

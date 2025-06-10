@@ -8,13 +8,27 @@ type NavMenuItemProps = Omit<MenuItemProps<typeof Link>, "style"> & {
   value: string
 }
 
+const getOverriddenPathname = (currentPath: string): string => {
+  if (currentPath.includes("asset/")) {
+    return "assets"
+  }
+  if (currentPath.includes("extension/") || currentPath === "extensions") {
+    return "extensions"
+  }
+  if (currentPath.includes("platform/") || currentPath === "platforms") {
+    return "platforms"
+  }
+  return currentPath
+}
+
 export function NavMenuItem(props: NavMenuItemProps) {
   const { label, avatar, value, ...rest } = props
 
   const location = useLocation()
   const { pathname } = location
   const appPath = pathname.split("/").slice(3).join("/")
-  const overriddenPathname = appPath.includes("asset/") ? "assets" : appPath
+
+  const overriddenPathname = getOverriddenPathname(appPath)
 
   return (
     <MenuItem

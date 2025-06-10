@@ -1,16 +1,15 @@
 import { alpha, Avatar, AvatarProps, styled, Typography } from "@mui/material"
-import React from "react"
+import React, { useMemo } from "react"
+import { resolveUrl } from "src/utils/utils"
 
 import { MonoFont } from "../theme"
 import { stringToColor } from "../utils/color-utils"
 
 const StyledAvatar = styled(Avatar)`
-  border-radius: 0;
   & img {
     object-fit: contain;
   }
   &.MuiAvatar-colorDefault {
-    border-radius: 50%;
     border: 1px solid ${({ color = "#fff" }) => alpha(color, 0.25)};
     background: ${({ color = "#fff" }) => alpha(color, 0.15)};
   }
@@ -31,13 +30,15 @@ const SIZE_MAP = {
 const FONT_SIZE_MAP = {
   large: "1rem",
   medium: "0.8rem",
-  small: "0.65rem",
+  small: "0.625rem",
   snug: "0.5rem",
 }
 
 export function AssetAvatar(props: AssetAvatarProps) {
-  const { alt = "", size = "medium", sx, ...rest } = props
+  const { alt = "", src, size = "medium", sx, ...rest } = props
   const color = stringToColor(alt)
+
+  const source = useMemo(() => resolveUrl(src), [src])
 
   return (
     <StyledAvatar
@@ -48,6 +49,7 @@ export function AssetAvatar(props: AssetAvatarProps) {
         ...sx,
       }}
       color={color}
+      src={source}
       {...rest}
     >
       <Typography
