@@ -39,8 +39,6 @@ export const $isCloudAccount = computed(
   }
 )
 
-export const demoAccountName = "demo" // TODO8 move to server
-
 export const $localConnectionStatus = atom<"closed" | "connected" | undefined>(undefined)
 export const $localConnectionStatusText = atom<string | undefined>()
 

@@ -8,7 +8,7 @@ import {
   ShowChartRounded,
   Workspaces,
 } from "@mui/icons-material"
-import { Button, Stack, useMediaQuery } from "@mui/material"
+import { Button, Stack } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { Link, useLocation } from "react-router-dom"
@@ -33,7 +33,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
   // const telemetry = useStore($telemetry)
 
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null)
-  const isInstalled = useMediaQuery("(display-mode: standalone)")
+  // const isInstalled = useMediaQuery("(display-mode: standalone)")
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e) => {
@@ -46,7 +46,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
     return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
   }, [])
 
-  // TODO2
+  // TODO9
   const promptInstall = () => {
     if (installPrompt) {
       installPrompt.prompt()
