@@ -1,4 +1,4 @@
-import { TableCell, TableRow } from "@mui/material"
+import { TableCell, TableRow, Typography } from "@mui/material"
 import React from "react"
 import { ExternalLink } from "src/components/ExternalLink"
 import { PlatformBlock } from "src/components/PlatformBlock"
@@ -17,14 +17,38 @@ export function ExchangeTableRow({ row }: ExchangeTableRowProps) {
         <PlatformBlock variant="tablecell" platform={row} />
       </TableCell>
       <TableCell>
-        {row.url && <ExternalLink href={row.url}>{extractRootUrl(row.url)}</ExternalLink>}
+        {row.url ? (
+          <ExternalLink href={row.url}>{extractRootUrl(row.url)}</ExternalLink>
+        ) : (
+          <Typography color="text.secondary" variant="inherit">
+            Unknown
+          </Typography>
+        )}
       </TableCell>
-      <TableCell>{row.country}</TableCell>
-      <TableCell>{row.year}</TableCell>
+      <TableCell>
+        {row.country || (
+          <Typography color="text.secondary" variant="inherit">
+            Unknown
+          </Typography>
+        )}
+      </TableCell>
+      <TableCell>
+        {row.year || (
+          <Typography color="text.secondary" variant="inherit">
+            Unknown
+          </Typography>
+        )}
+      </TableCell>
       <TableCell>
         <TrustScoreIndicator score={row.coingeckoTrustScore} />
       </TableCell>
-      <TableCell align="right">{row.coingeckoTrustRank}</TableCell>
+      <TableCell align="right">
+        {row.coingeckoTrustRank || (
+          <Typography color="text.secondary" variant="inherit">
+            Unknown
+          </Typography>
+        )}
+      </TableCell>
     </TableRow>
   )
 }

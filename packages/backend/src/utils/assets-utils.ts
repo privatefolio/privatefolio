@@ -39,6 +39,7 @@ export const getAssetContract = memoize(function getAssetPlatform(assetId: strin
 })
 
 export const isEvmPlatform = memoize(function isEvmPlatform(platformId: string) {
+  if (!PLATFORMS_META[platformId]) return false
   return PLATFORMS_META[platformId].chainId !== undefined
 })
 
