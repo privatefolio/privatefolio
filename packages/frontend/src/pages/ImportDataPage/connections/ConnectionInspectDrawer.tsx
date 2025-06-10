@@ -192,9 +192,7 @@ export function ConnectionInspectDrawer(props: ConnectionInspectDrawerProps) {
               </LoadingButton>
             </span>
           </Tooltip>
-          <Tooltip
-            title={loadingReset ? "Resetting…" : "This will reset and sync the connection"}
-          >
+          <Tooltip title={loadingReset ? "Resetting…" : "This will reset and sync the connection"}>
             <span>
               <LoadingButton
                 size="small"
