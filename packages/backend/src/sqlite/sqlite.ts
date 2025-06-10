@@ -4,7 +4,6 @@ export async function createSqliteDatabaseConnection(
   databaseFilePath: string,
   accountName: string
 ) {
-  // console.log("Using bun sqlite", useBunSqlite)
   if (useBunSqlite) {
     const { createQueryExecutor } = await import("./bun-sqlite")
     const db = await createQueryExecutor(databaseFilePath, accountName)

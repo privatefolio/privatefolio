@@ -8,7 +8,14 @@ import { TITLE_BAR_OPTS } from "./api"
 import { getAutoLaunchEnabled, toggleAutoLaunch } from "./auto-launch"
 import * as backendManager from "./backend-manager"
 import { configureIpcMain } from "./ipc-main"
-import { getLatestLogFilepath, getLogsPath, hasDevFlag, isProduction, isWindows } from "./utils"
+import {
+  appEnvironment,
+  getLatestLogFilepath,
+  getLogsPath,
+  hasDevFlag,
+  isProduction,
+  isWindows,
+} from "./utils"
 
 interface WindowState {
   height: number
@@ -91,7 +98,7 @@ function createWindow() {
     titleBarOverlay: TITLE_BAR_OPTS.light,
     titleBarStyle: "default",
     webPreferences: {
-      additionalArguments: isProduction ? ["--production"] : [],
+      additionalArguments: [`--${appEnvironment}`],
       preload: path.join(__dirname, "./preload.js"),
     },
     width: windowState.width,
@@ -240,6 +247,18 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
           type: "checkbox",
         },
         {
+          checked: hasDevFlag,
+          click: async function () {
+            if (backendManager.isRunning()) {
+              await backendManager.stop()
+            }
+            app.relaunch({ args: hasDevFlag ? [] : ["--dev"] })
+            app.exit(0)
+          },
+          label: "Extra logging",
+          type: "checkbox",
+        },
+        {
           click: function () {
             shell.openPath(getLatestLogFilepath())
           },
@@ -266,7 +285,7 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
         {
           click: async function () {
             const { response } = await dialog.showMessageBox(mainWindow, {
-              buttons: ["Cancel", "Reset"],
+              buttons: ["Cancel", "Remove all data"],
               cancelId: 0,
               defaultId: 0,
               detail: "This will delete all your data and settings. This action cannot be undone.",
@@ -276,11 +295,23 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
             })
 
             if (response === 1) {
-              store.clear()
-              const userDataPath = app.getPath("userData")
-              require("fs").rmSync(userDataPath, { force: true, recursive: true })
-              app.relaunch()
-              app.exit(0)
+              try {
+                if (backendManager.isRunning()) {
+                  await backendManager.stop()
+                }
+                store.clear()
+                const dataLocation = path.join(app.getPath("userData"), "data")
+                require("fs").rmSync(dataLocation, { force: true, recursive: true })
+                app.relaunch()
+                app.exit(0)
+              } catch (error) {
+                console.error("Failed to remove data:", error)
+                dialog.showErrorBox(
+                  "Error",
+                  "Failed to remove data. Please try to manually delete the data located at:\n" +
+                    path.join(app.getPath("userData"), "data")
+                )
+              }
             }
           },
           label: "Remove all data",

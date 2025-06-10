@@ -20,11 +20,12 @@ import { $localAuth } from "../stores/auth-store"
 const LOCAL_JWT_STORATE_KEY = "privatefolio_jwt"
 const CLOUD_JWT_STORATE_KEY = "privatecloud_instance_jwt"
 
-const BASE_LOCAL_SERVER_URL = isProduction
-  ? TARGET === "electron"
+const BASE_LOCAL_SERVER_URL =
+  TARGET === "electron"
     ? "localhost:5555"
-    : window.location.hostname // self hosted
-  : "localhost:4001"
+    : isProduction
+      ? window.location.hostname // self hosted
+      : "localhost:4001"
 const REMOTE_SERVER_URL = (cloudAccount: User) => `${cloudAccount.id}.privatefolio.app`
 
 function getWebSocketUrl(baseServerUrl: string, jwtKey: string): string {

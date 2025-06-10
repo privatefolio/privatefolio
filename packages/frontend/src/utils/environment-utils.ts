@@ -10,8 +10,10 @@ export const isSecure = window.location.protocol === "https:"
 // const isWebWorker = isServer && !isNode
 // const isTestEnvironment = typeof process !== "undefined" && process.env.NODE_ENV === "test"
 
-export const isProduction = isProductionBuild || isProductionElectron
-console.log(`Environment is ${isProduction ? "production" : "development"}`)
+export const isProduction = TARGET === "electron" ? isProductionElectron : isProductionBuild
+const environment = isProduction ? "production" : "development"
+
+console.log(`Frontend environment is ${environment}`)
 
 const isOfficialUrl =
   window.location.hostname === "privatefolio.app" || window.location.hostname.includes("pages.dev")

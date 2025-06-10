@@ -1,8 +1,10 @@
-import { isNode } from "../utils/environment-utils"
+import { isServer } from "../utils/environment-utils"
 
 const DEFAULT_DATA_LOCATION = "./data"
 const DATA_LOCATION =
-  isNode && process.env.DATA_LOCATION ? process.env.DATA_LOCATION : DEFAULT_DATA_LOCATION
+  isServer && process.env.DATA_LOCATION ? process.env.DATA_LOCATION : DEFAULT_DATA_LOCATION
+
+console.log(`Data location is "${DATA_LOCATION}"`)
 
 export const DATABASES_LOCATION = `${DATA_LOCATION}/databases`
 export const TASK_LOGS_LOCATION = `${DATA_LOCATION}/logs`

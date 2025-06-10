@@ -2,15 +2,13 @@ import { ChildProcess, exec, spawn } from "child_process"
 import { app } from "electron"
 import path from "path"
 
-import { isProduction, isWindows } from "./utils"
+import { appEnvironment, isProduction, isWindows } from "./utils"
 
 let backendProcess: ChildProcess | null = null
 let isStarted = false
 const port = isProduction ? 5555 : 4001
 
-console.log(
-  `BackendManager: Using backend port: ${port} (${isProduction ? "production" : "development"} mode)`
-)
+console.log(`BackendManager: Using backend port: ${port} (${appEnvironment} environment)`)
 
 /**
  * Starts the backend server
@@ -63,7 +61,7 @@ export async function start(): Promise<void> {
       DATA_LOCATION: dataLocation,
       GIT_DATE: new Date().toISOString(),
       GIT_HASH: "N/A",
-      NODE_ENV: "production",
+      NODE_ENV: appEnvironment,
       PORT: port.toString(),
     }
 
