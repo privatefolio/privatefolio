@@ -30,8 +30,8 @@ import {
 import { useStore } from "@nanostores/react"
 import { enqueueSnackbar } from "notistack"
 import React, { useEffect, useMemo } from "react"
-import { useNavigate } from "react-router-dom"
 import { CloudInstanceStatus, getCheckoutLink, getPortalLink } from "src/api/privatecloud-api"
+import { CloudLoginForm } from "src/components/AccountPicker/CloudLoginForm"
 import { BackButton } from "src/components/BackButton"
 import { CircularSpinner } from "src/components/CircularSpinner"
 import { Gravatar } from "src/components/Gravatar"
@@ -67,7 +67,7 @@ import { ServerStatusIcon } from "./ServerStatusIcon"
 
 export default function CloudUserPage({ show }: { show: boolean }) {
   useEffect(() => {
-    document.title = "My PrivateCloud"
+    document.title = "PrivateCloud"
   }, [])
 
   const account = useStore($cloudUser)
@@ -98,13 +98,6 @@ export default function CloudUserPage({ show }: { show: boolean }) {
       clearInterval(interval)
     }
   }, [])
-
-  const navigate = useNavigate()
-  useEffect(() => {
-    if (!account) {
-      navigate("/", { replace: true })
-    }
-  }, [account, navigate])
 
   const portalLink = useStore($cloudPortalLink)
 
@@ -163,7 +156,18 @@ export default function CloudUserPage({ show }: { show: boolean }) {
   const confirm = useConfirm()
 
   if (!account) {
-    return null
+    return (
+      <Container maxWidth="xs" sx={{ marginTop: 8 }} disableGutters>
+        <StaggeredList component="main" gap={1} show={show} tertiary>
+          <BackButton sx={{ marginLeft: 2 }} fallback="/">
+            Back
+          </BackButton>
+          <Card variant="outlined">
+            <CloudLoginForm />
+          </Card>
+        </StaggeredList>
+      </Container>
+    )
   }
 
   return (

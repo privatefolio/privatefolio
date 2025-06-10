@@ -19,7 +19,6 @@ import React, { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { AccountAvatar, SIZE_MAP } from "src/components/AccountAvatar"
 import { AddAccountDialog } from "src/components/AccountPicker/AddAccountDialog"
-import { CloudLoginDialog } from "src/components/AccountPicker/CloudLoginDialog"
 import { CircularSpinner } from "src/components/CircularSpinner"
 import { Gravatar } from "src/components/Gravatar"
 import { LogoText } from "src/components/Header/LogoText"
@@ -41,7 +40,6 @@ export default function AccountsPage() {
   const activeIndex = useStore($activeIndex)
 
   const { value: addAccountOpen, toggle: toggleAddAccount } = useBoolean(false)
-  const { value: loginOpen, toggle: toggleLoginOpen } = useBoolean(false)
 
   const cloudUser = useStore($cloudUser)
   const cloudRpcReady = useStore($cloudRpcReady)
@@ -121,7 +119,8 @@ export default function AccountsPage() {
                       size="small"
                       endIcon={<Cloud />}
                       variant="outlined"
-                      onClick={toggleLoginOpen}
+                      component={Link}
+                      to="/cloud"
                     >
                       Login to PrivateCloud
                     </Button>
@@ -281,7 +280,6 @@ export default function AccountsPage() {
         )}
       </Stack>
       <AddAccountDialog open={addAccountOpen} toggleOpen={toggleAddAccount} />
-      <CloudLoginDialog open={loginOpen} toggleOpen={toggleLoginOpen} />
     </>
   )
 }

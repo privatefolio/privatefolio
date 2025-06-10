@@ -2,7 +2,6 @@ import { Visibility, VisibilityOff } from "@mui/icons-material"
 import {
   Alert,
   Button,
-  Dialog,
   DialogActions,
   DialogContent,
   IconButton,
@@ -12,22 +11,14 @@ import {
   tabsClasses,
   TextField,
 } from "@mui/material"
-import React, { FormEvent, useCallback, useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import React, { FormEvent, useCallback, useState } from "react"
 import { handleLogin, handleSignUp } from "src/stores/cloud-user-store"
 
 import { LogoText } from "../Header/LogoText"
 import { SectionTitle } from "../SectionTitle"
 import { Tabs } from "../Tabs"
 
-interface AddAccountDialogProps {
-  open: boolean
-  toggleOpen: () => void
-}
-
-export function CloudLoginDialog(props: AddAccountDialogProps) {
-  const { open, toggleOpen } = props
-
+export function CloudLoginForm() {
   const [form, setForm] = useState<"login" | "sign-up">("login")
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -42,7 +33,6 @@ export function CloudLoginDialog(props: AddAccountDialogProps) {
     event.preventDefault()
   }
 
-  const navigate = useNavigate()
   const handleSubmit = useCallback(
     async (event: FormEvent) => {
       event.preventDefault()
@@ -63,13 +53,10 @@ export function CloudLoginDialog(props: AddAccountDialogProps) {
       try {
         if (form === "sign-up") {
           await handleSignUp(email, password)
-          navigate("/cloud")
-          return
         } else {
           await handleLogin(email, password, false)
         }
         setLoading(false)
-        toggleOpen()
       } catch (error) {
         console.error(error)
         if (String(error).includes("UNIQUE constraint failed")) {
@@ -80,15 +67,15 @@ export function CloudLoginDialog(props: AddAccountDialogProps) {
         setLoading(false)
       }
     },
-    [form, toggleOpen]
+    [form]
   )
 
-  useEffect(() => {
-    setApiError("")
-    setValidationError("")
-    setForm("login")
-    setShowPassword(false)
-  }, [open])
+  // useEffect(() => {
+  //   setApiError("")
+  //   setValidationError("")
+  //   setForm("login")
+  //   setShowPassword(false)
+  // }, [open])
 
   const passwordAdornment = (
     <InputAdornment position="end">
@@ -106,7 +93,7 @@ export function CloudLoginDialog(props: AddAccountDialogProps) {
   )
 
   return (
-    <Dialog open={open} onClose={toggleOpen}>
+    <>
       <form onSubmit={handleSubmit}>
         <LogoText color="primary" sx={{ paddingTop: 2, paddingX: 3 }}>
           PrivateCloud™
@@ -218,9 +205,6 @@ export function CloudLoginDialog(props: AddAccountDialogProps) {
           </Stack>
         </DialogContent>
         <DialogActions sx={{ paddingX: 3 }}>
-          <Button onClick={toggleOpen} color="secondary" sx={{ paddingX: 2 }}>
-            Cancel
-          </Button>
           <Button
             type="submit"
             color="primary"
@@ -232,6 +216,6 @@ export function CloudLoginDialog(props: AddAccountDialogProps) {
           </Button>
         </DialogActions>
       </form>
-    </Dialog>
+    </>
   )
 }
