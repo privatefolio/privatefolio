@@ -3,6 +3,16 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.1 - 2025/06/10
+
+This release has breaking changes and is not compatiable with the previous `alpha` versions! 🚨🚨🚨
+
+### 💡 Feature updates
+
+- New `Extensions` page, allowing developers and users to discover extensions.
+- New `Platforms` page, allowing users to discover exchanges and blockchains.
+- Rewritten Coingecko integration, supporting all their assets, exchanges and blockchains in a seamless way.
+
 ## v2.0.0-alpha.30 - 2025/05/23
 
 This release concludes the alpha phase of the v2.0.0 release cycle, marking a significant milestone in the development of the application.
