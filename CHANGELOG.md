@@ -5,7 +5,7 @@ Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ## v2.0.0-beta.0 - 2025/06/10
 
-This release has breaking changes and is not compatiable with the previous `alpha` versions! 🚨🚨🚨
+This release has breaking changes and is not compatible with the previous `alpha` versions! 🚨🚨🚨
 
 ### 💡 Feature updates
 

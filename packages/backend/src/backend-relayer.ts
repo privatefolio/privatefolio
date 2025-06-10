@@ -104,7 +104,7 @@ class BackendRelayer {
 
       let reason = event.reason || "unknown"
       if (event.code === 1006 && reason === "unknown") {
-        reason = "Server offline."
+        reason = "Server is unreachable."
       }
       console.log(this.logPrefix, "closed:", event.code, reason, baseAddress)
       onStatusChange("closed", `${event.code}: ${reason}`)

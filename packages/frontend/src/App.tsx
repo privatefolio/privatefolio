@@ -31,6 +31,7 @@ import TransactionsPage from "./pages/TransactionsPage/TransactionsPage"
 import { SHORT_THROTTLE_DURATION } from "./settings"
 import {
   $activeAccount,
+  $activeIndex,
   $cloudAccounts,
   $cloudConnectionStatus,
   $cloudConnectionStatusText,
@@ -125,6 +126,7 @@ export default function App() {
   }, [cloudUser])
 
   const activeAccount = useStore($activeAccount)
+  const activeIndex = useStore($activeIndex)
   const connectionStatus = useStore($connectionStatus)
   const auth = useStore($auth)
   const rpc = useStore($rpc)
@@ -163,7 +165,7 @@ export default function App() {
 
   return (
     <Stack direction="row">
-      {activeAccount && (
+      {typeof activeIndex === "number" && (
         <>
           <Box
             sx={{

@@ -1,4 +1,4 @@
-import { Add, Cloud, Settings } from "@mui/icons-material"
+import { Add, Cloud, OpenInNewRounded, Settings } from "@mui/icons-material"
 import {
   AppBar,
   Avatar,
@@ -7,7 +7,6 @@ import {
   Container,
   Fade,
   IconButton,
-  Link as MuiLink,
   Stack,
   Toolbar,
   Tooltip,
@@ -72,6 +71,9 @@ export default function AccountsPage() {
 
   const isDesktop = useMediaQuery("(min-width: 900px)")
 
+  const showWelcomeMessage = !localServerEnabled && cloudUser === null
+  const showConfigureMessage = !localServerEnabled && cloudUser && cloudRpcReady === false
+
   return (
     <>
       <AppBar
@@ -121,6 +123,9 @@ export default function AccountsPage() {
                       variant="outlined"
                       component={Link}
                       to="/cloud"
+                      sx={{
+                        display: showWelcomeMessage ? "none" : "inline-flex",
+                      }}
                     >
                       Login to PrivateCloud
                     </Button>
@@ -187,20 +192,56 @@ export default function AccountsPage() {
         alignItems="center"
         justifyContent="center"
       >
-        {!localServerEnabled && cloudUser === null ? (
+        {showWelcomeMessage ? (
           <Fade in timeout={400}>
-            <Typography variant="caption" textAlign="center">
-              Login to PrivateCloud to get started.
-              <br />
-              <br />
-              Download the desktop app for Windows, Mac, and Linux <br /> to use the app locally,
-              without the cloud.
-            </Typography>
+            <Stack gap={2} alignItems="center">
+              <Typography variant="h5" textAlign="center" fontWeight={700}>
+                Welcome to Privatefolio!
+              </Typography>
+              <Button
+                size="large"
+                variant="contained"
+                component={Link}
+                to="/cloud"
+                endIcon={<Cloud />}
+                sx={{
+                  paddingY: 0.25,
+                }}
+              >
+                Login to PrivateCloud
+              </Button>{" "}
+              <Button
+                size="large"
+                variant="contained"
+                href="https://privatefolio.xyz/downloads"
+                target="_blank"
+                endIcon={<OpenInNewRounded sx={{ fontSize: "1rem !important" }} />}
+                sx={{
+                  paddingY: 0.25,
+                }}
+              >
+                Download the Desktop app
+              </Button>{" "}
+            </Stack>
           </Fade>
-        ) : !localServerEnabled && cloudUser && cloudRpcReady === false ? (
-          <MuiLink component={Link} to="/privatecloud" variant="caption" textAlign="center">
-            Please configure your PrivateCloud instance
-          </MuiLink>
+        ) : showConfigureMessage ? (
+          <Stack gap={2} alignItems="center">
+            <Typography variant="h5" textAlign="center" fontWeight={700}>
+              Your cloud instance is not yet set up.
+            </Typography>
+            <Button
+              size="large"
+              variant="contained"
+              component={Link}
+              to="/cloud"
+              endIcon={<Cloud />}
+              sx={{
+                paddingY: 0.25,
+              }}
+            >
+              Configure your cloud instance
+            </Button>
+          </Stack>
         ) : !accounts ? (
           <Stack alignItems="center" justifyContent="center" gap={1}>
             <CircularSpinner />
