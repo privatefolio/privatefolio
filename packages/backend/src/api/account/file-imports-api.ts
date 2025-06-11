@@ -1,4 +1,4 @@
-import { readFile } from "fs/promises"
+import { access, readFile } from "fs/promises"
 import { join } from "path"
 import { getAccount } from "src/api/accounts-api"
 import { HEADER_MATCHER, PARSER_MATCHER } from "src/extensions/file-imports/matchers"
@@ -30,6 +30,7 @@ import { countTransactions, upsertTransactions } from "./transactions-api"
 
 async function readFileImportText(accountName: string, fileRecord: ServerFile) {
   const filePath = join(FILES_LOCATION, accountName, String(fileRecord.id))
+  await access(filePath)
   const text = await readFile(filePath, "utf-8")
   return text
 }

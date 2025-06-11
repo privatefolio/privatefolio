@@ -1,4 +1,4 @@
-import { readFile } from "fs/promises"
+import { access, readFile } from "fs/promises"
 import path from "path"
 import { SERVER_LOGS_LOCATION } from "src/settings/settings"
 import { stripAnsi } from "src/utils/ansi-utils"
@@ -7,6 +7,7 @@ export async function getServerLogs(date = new Date().toISOString().slice(0, 10)
   const logFilePath = path.join(SERVER_LOGS_LOCATION, `${date}.log`)
 
   try {
+    await access(logFilePath)
     const content = await readFile(logFilePath, "utf-8")
     const lines = content.split("\n")
 

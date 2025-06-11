@@ -18,12 +18,14 @@ const accountName = Math.random().toString(36).substring(7)
 
 const mocks = vi.hoisted(() => {
   return {
+    access: vi.fn().mockResolvedValue(true),
     readFile: vi.fn(),
   }
 })
 
 vi.mock("fs/promises", () => ({
   ...fs.promises,
+  access: mocks.access,
   readFile: mocks.readFile,
 }))
 

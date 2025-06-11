@@ -8,7 +8,7 @@ import { Api, api } from "./api/api"
 import { BackendServer } from "./backend-server"
 import { EventCause, SubscriptionId } from "./interfaces"
 import { SHORT_THROTTLE_DURATION } from "./settings/settings"
-import { getCronExpression, getPrefix } from "./utils/utils"
+import { getCronExpression, getPrefix, isDevelopment } from "./utils/utils"
 
 console.log("Starting worker...")
 const worker = new Worker(import.meta.resolve("./api-worker"), {
@@ -209,7 +209,11 @@ for (const accountName of accountNames) {
 
 await handleMainAccountChange()
 
-server = new BackendServer(api, writeApi as Api, false, kioskMode)
+server = new BackendServer(api, writeApi as Api, false, kioskMode, function shutdown() {
+  console.log("Shutting down server.")
+  worker.terminate()
+  if (!isDevelopment) process.exit()
+})
 
 const port = Number(process.env.PORT)
 server.start(isNaN(port) ? 4001 : port)

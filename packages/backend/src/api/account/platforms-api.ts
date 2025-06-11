@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "fs/promises"
+import { access, mkdir, readFile, writeFile } from "fs/promises"
 import { CACHE_LOCATION } from "src/settings/settings"
 
 import {
@@ -40,6 +40,7 @@ export async function getExchanges(): Promise<Exchange[]> {
   }
 
   try {
+    await access(`${CACHE_LOCATION}/exchanges/all.json`)
     const data = await readFile(`${CACHE_LOCATION}/exchanges/all.json`, "utf8")
     const list: Exchange[] = JSON.parse(data).map(
       (exchange: CoingeckoExchange) =>
@@ -69,6 +70,7 @@ export async function getBlockchains(): Promise<Blockchain[]> {
   }
 
   try {
+    await access(`${CACHE_LOCATION}/asset-platforms/all.json`)
     const data = await readFile(`${CACHE_LOCATION}/asset-platforms/all.json`, "utf8")
     const list: Blockchain[] = JSON.parse(data).map(
       (platform: CoingeckoAssetPlatform) =>

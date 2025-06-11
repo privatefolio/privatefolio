@@ -33,16 +33,24 @@ export type BackendApiShape = { [key: string]: (...params: unknown[]) => Promise
 export class BackendServer<T extends BackendApiShape> {
   private _authDisabled: boolean
   private _kioskMode: boolean
+  private _requestShutdown?: () => void
 
   close() {
     this.server?.stop()
   }
 
-  constructor(readApi: T, writeApi?: T, authDisabled = false, kioskMode = false) {
+  constructor(
+    readApi: T,
+    writeApi?: T,
+    authDisabled = false,
+    kioskMode = false,
+    requestShutdown?: () => void
+  ) {
     this.readApi = readApi
     this.writeApi = writeApi
     this._authDisabled = authDisabled
     this._kioskMode = kioskMode
+    this._requestShutdown = requestShutdown
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -169,7 +177,7 @@ export class BackendServer<T extends BackendApiShape> {
 
           try {
             const { id, method, params, functionId } = request
-            // console.log("New request", request)
+            // console.log("RPC: New request", request)
 
             const isReadMethod =
               method.startsWith("get") || method.startsWith("count") || !this.writeApi
@@ -220,15 +228,11 @@ export class BackendServer<T extends BackendApiShape> {
             if (!this.readApi[method]) {
               response = { error: `API method not found: ${method}`, id, method }
             } else if (isReadMethod) {
-              // if (isDevelopment) {
-              //   console.log(`Forwarding method ${method} to ${chalk.bold.blue("readApi")}`)
-              // }
+              // console.log(`Forwarding method ${method} to ${chalk.bold.blue("readApi")}`)
               const result = await this.readApi[method](...deserializedParams)
               response = { id, method, result }
             } else {
-              // if (isDevelopment) {
-              //   console.log(`Forwarding method ${method} to ${chalk.bold.yellow("writeApi")}`)
-              // }
+              // console.log(`Forwarding method ${method} to ${chalk.bold.yellow("writeApi")}`)
               const result = await this.writeApi[method](...deserializedParams)
               response = { id, method, result }
             }
@@ -239,6 +243,7 @@ export class BackendServer<T extends BackendApiShape> {
             if (error.message.includes("Worker has been terminated")) {
               console.error("[error] Shutting down server due to invalid worker state")
               this.server?.stop()
+              this._requestShutdown?.()
               return
             }
             response = {

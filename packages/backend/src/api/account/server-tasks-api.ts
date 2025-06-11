@@ -1,4 +1,4 @@
-import { appendFile, mkdir, readFile } from "fs/promises"
+import { access, appendFile, mkdir, readFile } from "fs/promises"
 import path from "path"
 import {
   NewServerTask,
@@ -128,13 +128,18 @@ export async function countServerTasks(
 
 function createProgressCallback(account: Account, taskId: number): ProgressCallback {
   const logFilePath = path.join(TASK_LOGS_LOCATION, account.name, `server_task_${taskId}.log`)
+  let entryCount = 0
 
   return async (update: ProgressUpdate) => {
     try {
+      if (entryCount >= 200) return
+
       const logEntry = `${new Date().toISOString()} ${JSON.stringify(update)}\n`
       // save to file
       await mkdir(path.join(TASK_LOGS_LOCATION, account.name), { recursive: true })
       await appendFile(logFilePath, logEntry)
+      entryCount++
+
       // emit event
       account.eventEmitter.emit(SubscriptionChannel.ServerTaskProgress, taskId, logEntry)
     } catch (error) {
@@ -304,7 +309,13 @@ export async function getServerTaskLog(accountName: string, taskId: number) {
   const logFilePath = path.join(TASK_LOGS_LOCATION, accountName, `server_task_${taskId}.log`)
 
   try {
-    return readFile(logFilePath, "utf-8")
+    await access(logFilePath)
+    const lines = await readFile(logFilePath, "utf-8")
+    if (lines.length > 10_000) {
+      return lines.slice(0, 10_000)
+    } else {
+      return lines
+    }
   } catch (error) {
     console.error(`Failed to read ${logFilePath}`, error)
     throw error

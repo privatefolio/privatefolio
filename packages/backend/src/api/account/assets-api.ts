@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "fs/promises"
+import { access, mkdir, readFile, writeFile } from "fs/promises"
 import { CoingeckoCoin } from "src/extensions/metadata/coingecko/coingecko-interfaces"
 import {
   Asset,
@@ -77,6 +77,7 @@ export async function getAssets(): Promise<Asset[]> {
   }
 
   try {
+    await access(`${CACHE_LOCATION}/coins/all.json`)
     const data = await readFile(`${CACHE_LOCATION}/coins/all.json`, "utf8")
 
     const list: MyAsset[] = JSON.parse(data).map(

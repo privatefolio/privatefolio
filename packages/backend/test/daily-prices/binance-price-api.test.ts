@@ -62,7 +62,7 @@ it("should throw an error", async (test) => {
     // until: 0,
   })
   // assert
-  await expect(promise).rejects.toMatchInlineSnapshot(`[Error: Binance: Invalid symbol. (-1121)]`)
+  await expect(promise).rejects.toMatchInlineSnapshot(`[Error: Binance: NotFound]`)
 })
 
 it("should fetch ETH prices within a range", async (test) => {

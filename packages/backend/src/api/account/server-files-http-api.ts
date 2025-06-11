@@ -84,6 +84,7 @@ export async function handleDownload(request: Request): Promise<Response> {
   const contentType = mime.lookup(filePath) || "application/octet-stream"
   const fileStats = await stat(filePath)
 
+  await access(filePath)
   const fileBuffer = await readFile(filePath)
   return new Response(fileBuffer, {
     headers: {

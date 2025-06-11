@@ -17,7 +17,7 @@ import { extractJwt, generateJwt, verifyJwt } from "../../src/utils/jwt-utils"
 
 // Mock the fs/promises module
 vi.mock("fs/promises", () => ({
-  access: vi.fn(),
+  access: vi.fn().mockResolvedValue(true),
   mkdir: vi.fn(),
   readFile: vi.fn(),
   writeFile: vi.fn(),

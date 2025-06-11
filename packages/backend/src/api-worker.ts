@@ -3,6 +3,7 @@
 import { expose } from "comlink"
 
 import { api } from "./api/api"
+// import { api as rawApi } from "./api/api"
 
 // const api = new Proxy(rawApi, {
 //   get(api, method: string) {

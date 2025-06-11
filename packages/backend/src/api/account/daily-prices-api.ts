@@ -199,7 +199,7 @@ export async function fetchDailyPrices(
             if (signal?.aborted) throw new Error(signal.reason)
 
             if (results.length === 0) {
-              throw new Error(`${PRICE_APIS_META[priceApiId].name} EmptyResponse`)
+              throw new Error(`${PRICE_APIS_META[priceApiId].name}: EmptyResponse`)
             }
 
             const documents = results.map((result) => {

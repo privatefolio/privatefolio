@@ -58,7 +58,7 @@ export async function getLivePricesForAsset(
   })
 
   if (results.length === 0) {
-    throw new Error(`${PRICE_APIS_META[priceApiId].name} EmptyResponse`)
+    throw new Error(`${PRICE_APIS_META[priceApiId].name}: EmptyResponse`)
   }
 
   return results.map(priceMapper)

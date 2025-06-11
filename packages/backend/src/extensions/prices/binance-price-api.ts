@@ -46,6 +46,10 @@ export async function queryPrices(request: QueryRequest) {
     const res = await fetch(apiUrl)
     const data = await res.json()
 
+    if (data.msg?.includes("Invalid symbol")) {
+      throw new Error("Binance: NotFound")
+    }
+
     if (data.code) {
       throw new Error(`Binance: ${data.msg} (${data.code})`)
     }

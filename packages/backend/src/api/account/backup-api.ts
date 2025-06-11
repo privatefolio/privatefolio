@@ -49,6 +49,7 @@ export async function backup(
     await account.execute(`VACUUM INTO '${vacuumIntoPathSQL}'`)
     await progress([25, `Database backup completed. Reading file for zipping.`])
 
+    await access(backupPath)
     const dbFile = await readFile(backupPath)
     zip.file("database.sqlite", dbFile)
     await progress([30, `Database added to zip archive.`])
@@ -82,6 +83,7 @@ export async function backup(
           const displayFilename = serverFileRecord ? serverFileRecord.name : dirent.name // Fallback to ID if name not found
 
           const filePath = join(userFilesDir, dirent.name)
+          await access(filePath)
           const fileContent = await readFile(filePath)
           archiveFolder.file(dirent.name, fileContent) // Use dirent.name (the ID) as filename in zip
           filesProcessed++
@@ -125,6 +127,7 @@ export async function backup(
         for (const dirent of logFilesToBackup) {
           // No need to check dirent.isFile() again as it's already filtered
           const logFilePath = join(userLogsDir, dirent.name)
+          await access(logFilePath)
           const logFileContent = await readFile(logFilePath)
           archiveFolder.file(dirent.name, logFileContent)
           logsProcessed++
@@ -263,6 +266,7 @@ export async function restore(
     await mkdir(tempRestoreDir, { recursive: true })
 
     await progress([10, `Reading backup file: ${fileRecord.name}`])
+    await access(backupFileStoragePath)
     const backupZipBuffer = await readFile(backupFileStoragePath)
 
     await progress([15, "Loading backup ZIP contents..."])
