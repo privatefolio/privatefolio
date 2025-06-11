@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 
-import { backOff } from "exponential-backoff"
-
 import { BackendResponse, FunctionReference } from "./backend-comms"
 import { ConnectionStatusCallback } from "./interfaces"
-import { isDevelopment, noop } from "./utils/utils"
+import { noop } from "./utils/utils"
 
 let instanceCounter = 0
 
@@ -114,27 +112,31 @@ class BackendRelayer {
 
       this.reconnecting = true
 
-      backOff(
-        () => {
-          this.socket = this.connect(address, onStatusChange)
-          if (this.socket.readyState !== WebSocket.OPEN) {
-            throw new Error("Reconnect attempt failed")
-          }
-          return Promise.resolve()
-        },
-        {
-          maxDelay: isDevelopment ? 1_000 : 10_000,
-          numOfAttempts: 100,
-          retry: (_err, attempt) => {
-            console.log(this.logPrefix, `reconnecting, attempt: #${attempt}`)
-            return !(this.closedByUser || event.code === 1008)
-          },
-          startingDelay: 100,
-        }
-      ).catch(() => {
-        console.error(this.logPrefix, "Failed to reconnect")
-        this.reconnecting = false
-      })
+      setTimeout(() => {
+        this.socket = this.connect(address, onStatusChange)
+      }, 1_000)
+
+      //   backOff(
+      //     () => {
+      //       this.socket = this.connect(address, onStatusChange)
+      //       if (this.socket.readyState !== WebSocket.OPEN) {
+      //         throw new Error("Reconnect attempt failed")
+      //       }
+      //       return Promise.resolve()
+      //     },
+      //     {
+      //       maxDelay: isDevelopment ? 1_000 : 10_000,
+      //       numOfAttempts: 100,
+      //       retry: (_err, attempt) => {
+      //         console.log(this.logPrefix, `reconnecting, attempt: #${attempt}`)
+      //         return !(this.closedByUser || event.code === 1008)
+      //       },
+      //       startingDelay: 100,
+      //     }
+      //   ).catch(() => {
+      //     console.error(this.logPrefix, "Failed to reconnect")
+      //     this.reconnecting = false
+      //   })
     })
     socket.addEventListener("error", (event) => {
       if (this.reconnecting) return
@@ -160,6 +162,10 @@ class BackendRelayer {
       }
       return param
     })
+
+    if (this.socket.readyState !== WebSocket.OPEN) {
+      return Promise.reject(new Error("WebSocket is not open"))
+    }
 
     return new Promise((resolve) => {
       this.pendingRequests[id] = resolve
