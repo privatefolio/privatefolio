@@ -24,6 +24,7 @@ export function getPair(assetId: string) {
   const network = getNetwork(platform)
 
   if (!network) {
+    if (!ticker) throw new Error("Alchemy: No network or ticker")
     return ticker
   }
 
@@ -83,13 +84,13 @@ export async function queryPrices(request: QueryRequest) {
   const apiUrl = `https://api.g.alchemy.com/prices/v1/${apiKey}/tokens/historical`
 
   let validSince = since
-  let previousPricesPromise: Promise<ChartData[]> = Promise.resolve([])
+  let previousPage: ChartData[] = []
 
   if (since && until) {
-    const days = (until - since) / (24 * 60 * 60 * 1000)
-    if (days > pageLimit) {
+    const records = Math.floor((until - since) / (24 * 60 * 60 * 1000))
+    if (records > pageLimit) {
       validSince = until - pageLimit * 24 * 60 * 60 * 1000
-      previousPricesPromise = queryPrices({
+      previousPage = await queryPrices({
         limit: limit - pageLimit,
         pair,
         since,
@@ -116,7 +117,7 @@ export async function queryPrices(request: QueryRequest) {
 
   if (!res.ok) {
     const text = await res.text()
-    if (text.includes("Internal server error")) {
+    if (text.includes("Internal server error") || text.includes("not found")) {
       throw new Error("Alchemy: NotFound")
     }
     throw new Error(`Alchemy: ${res.statusText} ${text}`)
@@ -150,8 +151,7 @@ export async function queryPrices(request: QueryRequest) {
     prevRecord = record
   }
 
-  const [previousPrices] = await Promise.all([previousPricesPromise])
-  return previousPrices.concat(patched).slice(0, limit)
+  return previousPage.concat(patched).slice(0, limit)
 }
 
 export function mapToChartData(data: ChartData): ChartData {

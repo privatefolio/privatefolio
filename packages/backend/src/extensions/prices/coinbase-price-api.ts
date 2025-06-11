@@ -35,15 +35,13 @@ export async function queryPrices(request: QueryRequest) {
   let apiUrl = `https://api.exchange.coinbase.com/products/${pair}/candles?granularity=${coinbaseInterval}`
 
   let validSince = since
-  let previousBucketsPromise: Promise<CoinbaseBucket[]> = Promise.resolve([])
+  let previousPage: CoinbaseBucket[] = []
 
   if (since && until) {
-    const records = (until - since) / timestampOffset
-    if (records <= pageLimit) {
-      validSince = since
-    } else {
+    const records = Math.floor((until - since) / timestampOffset)
+    if (records > pageLimit) {
       validSince = until - timestampOffset * pageLimit
-      previousBucketsPromise = queryPrices({
+      previousPage = await queryPrices({
         limit: limit - pageLimit,
         pair,
         since,
@@ -64,7 +62,7 @@ export async function queryPrices(request: QueryRequest) {
     apiUrl = `${apiUrl}&end=${validSince + timestampOffset * pageLimit}`
   }
 
-  const [res, previousBuckets] = await Promise.all([fetch(apiUrl), previousBucketsPromise])
+  const res = await fetch(apiUrl)
   const data = await res.json()
 
   if ("message" in data) {
@@ -83,7 +81,7 @@ export async function queryPrices(request: QueryRequest) {
   }
 
   // .slice should not be needed, but a new change in the API is returning more data 300 records
-  return previousBuckets.concat(buckets).slice(-limit)
+  return previousPage.concat(buckets).slice(-limit)
 }
 
 export function mapToChartData(bucket: CoinbaseBucket): ChartData {
