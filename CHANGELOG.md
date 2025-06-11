@@ -3,7 +3,24 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v2.0.0-beta.0 - 2025/06/10
+## v2.0.0-beta.2 - 2025/06/11
+
+### 💡 Feature updates
+
+- Added Alchemy price API extension for better price data coverage
+- Added kiosk mode for public portfolio displays
+- Added support for searching assets by contract address
+- Added a data source selector to the asset price history chart
+
+### 🐛 Bug Fixes
+
+- Fixed critical bugs in Alchemy & Coinbase price APIs
+- Fixed bug in refreshing prices
+- Fixed bug reading non-existent files
+- Fixed UI glitch when deleting the last account
+- Fixed bug in asset table: changing the price api back to auto failed
+
+## v2.0.0-beta.1 - 2025/06/10
 
 This release has breaking changes and is not compatible with the previous `alpha` versions! 🚨🚨🚨
 
