@@ -9,11 +9,11 @@ import { QueryChartData, SingleSeriesChart } from "../../components/SingleSeries
 import { $rpc } from "../../workers/remotes"
 
 type BalanceChartProps = {
-  symbol: string
+  assetId: string
 }
 
 export function BalanceChart(props: BalanceChartProps) {
-  const { symbol: assetId } = props
+  const { assetId } = props
 
   const activeAccount = useStore($activeAccount)
 

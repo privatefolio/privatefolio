@@ -127,11 +127,19 @@ export async function getPriceCursor(
   return JSON.parse(prices[0][0] as string)
 }
 
+type FetchDailyPricesOptions = {
+  /**
+   * less than or equal to this timestamp
+   */
+  until?: number
+}
+
 export async function fetchDailyPrices(
   accountName: string,
   assetsParam?: MyAsset[],
   progress: ProgressCallback = noop,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  options: FetchDailyPricesOptions = {}
 ) {
   let assets: MyAsset[]
 
@@ -159,9 +167,9 @@ export async function fetchDailyPrices(
       const priceApiIds = preferredPriceApiId ? [preferredPriceApiId] : allPriceApiIds
 
       let since: Timestamp | undefined = await getPriceCursor(accountName, asset.id)
-      let until: Timestamp | undefined = today
+      let until: Timestamp | undefined = options.until || today
 
-      if (!since) since = today - 86400000 * (PRICE_API_PAGINATION - 1)
+      if (!since) since = until - 86400000 * PRICE_API_PAGINATION - 1
 
       for (const priceApiId of priceApiIds) {
         try {
@@ -177,7 +185,7 @@ export async function fetchDailyPrices(
             const pair = pairMapper(asset.id)
 
             const results = await priceApi({
-              limit: PRICE_API_PAGINATION,
+              // limit: PRICE_API_PAGINATION,
               pair,
               since,
               timeInterval: "1d" as ResolutionString,

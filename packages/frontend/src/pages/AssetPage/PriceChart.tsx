@@ -1,62 +1,53 @@
-import { useMediaQuery } from "@mui/material"
+import { MenuItem, Select, SelectChangeEvent, Stack, useMediaQuery } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import { IChartApi, ISeriesApi, SeriesType, Time } from "lightweight-charts"
+import { getLivePricesForAsset } from "privatefolio-backend/build/src/extensions/prices/providers"
+import { allPriceApiIds } from "privatefolio-backend/src/settings/price-apis"
 import React, { useCallback, useMemo } from "react"
-import { SessionHighlighting } from "src/lightweight-charts/plugins/session-highlighting/session-highlighting"
-import { VertLine } from "src/lightweight-charts/plugins/vertical-line/vertical-line"
+import { useSearchParams } from "react-router-dom"
+import { PlatformAvatar } from "src/components/PlatformAvatar"
+import { SectionTitle } from "src/components/SectionTitle"
+import { MyAsset } from "src/interfaces"
+import { PRICE_APIS_META, PriceApiId } from "src/settings"
 import { $quoteCurrency } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
-import { aggregateByWeek, createPriceFormatter, getDate } from "src/utils/chart-utils"
+import { aggregateByWeek, createPriceFormatter } from "src/utils/chart-utils"
+import { resolveUrl } from "src/utils/utils"
 
 import { QueryChartData, SingleSeriesChart, TooltipOpts } from "../../components/SingleSeriesChart"
 import { $rpc } from "../../workers/remotes"
 
 type BalanceChartProps = {
-  symbol: string
+  asset?: MyAsset
 }
 
+const defaultPriceApiId = allPriceApiIds[0]
+
 export function PriceChart(props: BalanceChartProps) {
-  const { symbol } = props
+  const { asset } = props
+
+  const [searchParams, setSearchParams] = useSearchParams()
+  const priceApiId = (searchParams.get("priceApiId") || null) as PriceApiId | null
+
+  const handleChange = (event: SelectChangeEvent<string>) => {
+    searchParams.set("priceApiId", event.target.value)
+    setSearchParams(searchParams)
+  }
 
   const queryFn: QueryChartData = useCallback(
     async (interval) => {
-      const prices = await $rpc.get().getPricesForAsset($activeAccount.get(), symbol)
+      if (!asset) return []
+
+      const useCache = priceApiId === null && !!asset.priceApiId
+
+      const prices = useCache
+        ? await $rpc.get().getPricesForAsset($activeAccount.get(), asset.id)
+        : await getLivePricesForAsset(asset.id, priceApiId || defaultPriceApiId)
+
       return interval === "1w" ? aggregateByWeek(prices) : prices
     },
-    [symbol]
+    [asset, priceApiId]
   )
-
-  const handleSeriesReady = useCallback((chart: IChartApi, series: ISeriesApi<SeriesType>) => {
-    return
-    const sessionHighlighter = (time: Time) => {
-      const timestamp = getDate(time).getTime()
-      if (timestamp >= 1681669295000 && timestamp <= 1694422703000) {
-        return "rgba(41, 98, 255, 0.08)" // "rgba(255, 152, 1, 0.08)"
-      }
-      return ""
-    }
-
-    const sessionHighlighting = new SessionHighlighting(sessionHighlighter)
-    series.attachPrimitive(sessionHighlighting)
-
-    // WARN: vertical's line time must be present in the data
-    const vertLine1 = new VertLine(chart, series, (1681669295 - (1681669295 % 86400)) as Time, {
-      color: "rgba(41, 98, 255, 0.5)",
-      // labelText: "z",
-      // showLabel: true,
-      width: 2,
-    })
-    const vertLine2 = new VertLine(chart, series, (1694422703 - (1694422703 % 86400)) as Time, {
-      color: "rgba(41, 98, 255, 0.5)",
-      // labelText: "z",
-      // showLabel: true,
-      width: 2,
-    })
-
-    series.attachPrimitive(vertLine1)
-    series.attachPrimitive(vertLine2)
-  }, [])
 
   const currency = useStore($quoteCurrency)
   const isMobile = useMediaQuery("(max-width: 599px)")
@@ -85,12 +76,59 @@ export function PriceChart(props: BalanceChartProps) {
     [currency, debugMode, isMobile]
   )
 
+  if (!asset) return null
+
   return (
-    <SingleSeriesChart
-      queryFn={queryFn}
-      tooltipOptions={tooltipOptions}
-      chartOptions={chartOptions}
-      onSeriesReady={handleSeriesReady}
-    />
+    <Stack gap={1}>
+      <SingleSeriesChart
+        queryFn={queryFn}
+        tooltipOptions={tooltipOptions}
+        chartOptions={chartOptions}
+      />
+      <Stack paddingX={1} alignItems="flex-start">
+        <SectionTitle>Price source</SectionTitle>
+        <Select
+          size="small"
+          onChange={handleChange}
+          value={priceApiId || (asset.priceApiId ? "" : defaultPriceApiId)}
+          displayEmpty
+          sx={{
+            "& .MuiSelect-select": {
+              paddingX: 1.5,
+              paddingY: 0.5,
+            },
+
+            borderRadius: 5,
+            fontSize: "0.8125rem",
+          }}
+        >
+          {asset.priceApiId && (
+            <MenuItem value="">
+              <Stack direction="row" alignItems={"center"} gap={1}>
+                <PlatformAvatar
+                  size="small"
+                  src={resolveUrl(PRICE_APIS_META[asset.priceApiId].logoUrl)}
+                  alt={asset.priceApiId}
+                />
+                {PRICE_APIS_META[asset.priceApiId].name}
+                <span>(cached)</span>
+              </Stack>
+            </MenuItem>
+          )}
+          {allPriceApiIds.map((priceApiId) => (
+            <MenuItem key={priceApiId} value={priceApiId}>
+              <Stack direction="row" alignItems={"center"} gap={1}>
+                <PlatformAvatar
+                  size="small"
+                  src={resolveUrl(PRICE_APIS_META[priceApiId].logoUrl)}
+                  alt={priceApiId}
+                />
+                {PRICE_APIS_META[priceApiId].name}
+              </Stack>
+            </MenuItem>
+          ))}
+        </Select>
+      </Stack>
+    </Stack>
   )
 }

@@ -52,7 +52,7 @@ export {
   PLATFORMS_META,
   WETH_ASSET_ID,
 } from "./platforms"
-export { PRICE_API_IDS, PRICE_APIS_META, type PriceApiId } from "./price-apis"
+export { PRICE_APIS_META, type PriceApiId } from "./price-apis"
 
 export interface Settings {
   kioskMode: boolean

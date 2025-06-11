@@ -10,13 +10,14 @@ import {
   Tooltip,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
+import { allPriceApiIds } from "privatefolio-backend/src/settings/price-apis"
 import React from "react"
 import { AmountBlock } from "src/components/AmountBlock"
 import { AppLink } from "src/components/AppLink"
 import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { PlatformAvatar } from "src/components/PlatformAvatar"
 import { PlatformBlock } from "src/components/PlatformBlock"
-import { PRICE_API_IDS, PRICE_APIS_META, PriceApiId } from "src/settings"
+import { PRICE_APIS_META, PriceApiId } from "src/settings"
 import { $quoteCurrency } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
 import { $assetMap } from "src/stores/metadata-store"
@@ -66,7 +67,7 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
       <MenuItem value="">
         <em>Auto</em>
       </MenuItem>
-      {PRICE_API_IDS.map((priceApiId) => (
+      {allPriceApiIds.map((priceApiId) => (
         <MenuItem key={priceApiId} value={priceApiId}>
           <Stack direction="row" alignItems={"center"} gap={1}>
             <PlatformAvatar

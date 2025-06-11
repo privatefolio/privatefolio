@@ -16,6 +16,7 @@ import {
   Stack,
   SvgIcon,
   Tooltip,
+  Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material"
@@ -121,6 +122,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
   const [isLoading, setLoading] = useState<boolean>(true)
   const [queryTime, setQueryTime] = useState<number | null>(null)
   const [data, setData] = useState<ChartData[] | StackedAreaData[]>([])
+  const [error, setError] = useState<Error | null>(null)
 
   const activeType = useMemo(() => {
     if (data.length <= 0) return preferredType
@@ -349,14 +351,22 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
 
   useEffect(() => {
     setQueryTime(null)
+    setLoading(true)
+    setError(null)
     const start = Date.now()
 
-    queryFn(activeInterval).then((result) => {
-      // if (!isArray(result)) throw new Error("Invalid data")
-      setData(result)
-      setLoading(false)
-      setQueryTime(Date.now() - start)
-    })
+    queryFn(activeInterval)
+      .then((result) => {
+        // if (!isArray(result)) throw new Error("Invalid data")
+        setData(result)
+        setLoading(false)
+        setQueryTime(Date.now() - start)
+      })
+      .catch((err) => {
+        console.error(err)
+        setError(err)
+        setLoading(false)
+      })
   }, [queryFn, activeInterval])
 
   const isEmpty = data.length === 0
@@ -399,7 +409,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
             borderBottom: "1px solid var(--mui-palette-TableCell-border)",
             marginLeft: -0.5,
             minHeight: 43,
-            ...(isLoading || isEmpty
+            ...(isLoading || isEmpty || error
               ? {
                   borderColor: "transparent",
                   opacity: 0,
@@ -591,14 +601,22 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
           </Stack>
         </Stack>
         <Box sx={{ height: "calc(100% - 43px - 4px)" }}>
-          {(isLoading || isEmpty) && (
+          {(isLoading || isEmpty || error) && (
             <Stack
               justifyContent="center"
               alignItems="center"
               sx={{ height: "100%", width: "100%" }}
             >
-              {isEmpty && !isLoading && emptyContent}
+              {isEmpty && !isLoading && !error && emptyContent}
               {isLoading && <CircularSpinner color="secondary" />}
+              {error && (
+                <Stack spacing={1} alignItems="center">
+                  <Typography>Error loading data</Typography>
+                  <Typography color="error" variant="body2" component="div">
+                    <span>{error.message}</span>
+                  </Typography>
+                </Stack>
+              )}
             </Stack>
           )}
           <Chart
@@ -624,7 +642,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
             position: "absolute",
             width: "100%",
             zIndex: 1,
-            ...(isLoading || isEmpty
+            ...(isLoading || isEmpty || error
               ? {
                   borderColor: "transparent",
                   opacity: 0,

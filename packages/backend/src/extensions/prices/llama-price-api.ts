@@ -13,6 +13,8 @@ function approximateTimestamp(timestamp: Time) {
   return remainder > 43200 ? timestamp - remainder + 86400 : timestamp - remainder
 }
 
+// https://docs.llama.fi/coin-prices-api
+// https://defillama.com/docs/api
 export async function queryPrices(request: QueryRequest) {
   const { timeInterval, since, until, limit = 900, pair } = request
 

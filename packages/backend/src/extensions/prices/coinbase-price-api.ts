@@ -1,6 +1,6 @@
-import { ChartData, CoinbaseBucket, QueryRequest, ResolutionString, Time } from "src/interfaces"
-import { PriceApiId, WETH_ASSET_ID } from "src/settings/settings"
-import { getAssetTicker } from "src/utils/assets-utils"
+import { ChartData, CoinbaseBucket, QueryRequest, ResolutionString, Time } from "../../interfaces"
+import { PriceApiId, WETH_ASSET_ID } from "../../settings/settings"
+import { getAssetTicker } from "../../utils/assets-utils"
 
 export const Identifier: PriceApiId = "coinbase"
 

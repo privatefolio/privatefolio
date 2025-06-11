@@ -59,7 +59,9 @@ it("should fetch BTC prices using Binance", async (test) => {
   await fetchDailyPrices(
     accountName,
     [{ id: "binance:BTC", priceApiId: "binance", symbol: "BTC" }],
-    async (state) => updates.push(state)
+    async (state) => updates.push(state),
+    undefined,
+    { until: 1735682400000 }
   )
   const records = await getPricesForAsset(accountName, "binance:BTC")
   // assert
@@ -71,19 +73,15 @@ it("should fetch BTC prices using Binance", async (test) => {
       ],
       [
         undefined,
-        "Fetched BTC using Binance from Dec 24, 2022 to Jun 10, 2025",
+        "Fetched BTC using Binance from Jul 16, 2022 to Dec 31, 2024",
       ],
       [
         undefined,
-        "Fetched BTC using Binance from Jul 07, 2020 to Dec 23, 2022",
+        "Fetched BTC using Binance from Jan 28, 2020 to Jul 15, 2022",
       ],
       [
         undefined,
-        "Fetched BTC using Binance from Jan 19, 2018 to Jul 06, 2020",
-      ],
-      [
-        undefined,
-        "Fetched BTC using Binance from Aug 17, 2017 to Jan 18, 2018",
+        "Fetched BTC using Binance from Aug 17, 2017 to Jan 27, 2020",
       ],
       [
         100,
@@ -91,45 +89,44 @@ it("should fetch BTC prices using Binance", async (test) => {
     ]
   `)
   assertTimeConsistency(records)
-  expect(records.slice(0, 3)).toMatchInlineSnapshot(`
+  expect(records.slice(-3)).toMatchInlineSnapshot(`
     [
       {
-        "close": 4285.08,
-        "high": 4485.39,
-        "low": 4200.74,
-        "open": 4261.48,
-        "time": 1502928000,
-        "value": 4285.08,
-        "volume": 795.150377,
+        "close": 93738.2,
+        "high": 95340,
+        "low": 93009.52,
+        "open": 95300,
+        "time": 1735430400,
+        "value": 93738.2,
+        "volume": 13576.00578,
       },
       {
-        "close": 4108.37,
-        "high": 4371.52,
-        "low": 3938.77,
-        "open": 4285.08,
-        "time": 1503014400,
-        "value": 4108.37,
-        "volume": 1199.888264,
+        "close": 92792.05,
+        "high": 95024.5,
+        "low": 91530.45,
+        "open": 93738.19,
+        "time": 1735516800,
+        "value": 92792.05,
+        "volume": 27619.4225,
       },
       {
-        "close": 4139.98,
-        "high": 4184.69,
-        "low": 3850,
-        "open": 4108.37,
-        "time": 1503100800,
-        "value": 4139.98,
-        "volume": 381.309763,
+        "close": 93576,
+        "high": 96250,
+        "low": 92033.73,
+        "open": 92792.05,
+        "time": 1735603200,
+        "value": 93576,
+        "volume": 19612.03389,
       },
     ]
   `)
   expect(formatDate((records[0].time as number) * 1000)).toMatchInlineSnapshot(`"Aug 17, 2017"`)
   expect(formatDate((records[records.length - 1].time as number) * 1000)).toMatchInlineSnapshot(
-    `"Jun 10, 2025"`
+    `"Dec 31, 2024"`
   )
 })
 
-// TODO1 coinbase no longer returns since genesis
-it.skip("should fetch BTC prices using Coinbase", async () => {
+it("should fetch BTC prices using Coinbase", async () => {
   // arrange
   const updates: ProgressUpdate[] = []
   // act
@@ -138,46 +135,79 @@ it.skip("should fetch BTC prices using Coinbase", async () => {
     [
       {
         id: "coinbase:BTC",
+        priceApiId: "coinbase",
         symbol: "BTC",
       },
     ],
-    async (state) => updates.push(state)
+    async (state) => updates.push(state),
+    undefined,
+    { until: 1735682400000 }
   )
   const records = await getPricesForAsset(accountName, "coinbase:BTC")
   // assert
+  expect(updates).toMatchInlineSnapshot(`
+    [
+      [
+        0,
+        "Fetching asset prices for 1 assets",
+      ],
+      [
+        undefined,
+        "Fetched BTC using Coinbase from Jul 16, 2022 to Dec 31, 2024",
+      ],
+      [
+        undefined,
+        "Fetched BTC using Coinbase from Jan 30, 2020 to Jul 15, 2022",
+      ],
+      [
+        undefined,
+        "Fetched BTC using Coinbase from Aug 15, 2017 to Jan 29, 2020",
+      ],
+      [
+        undefined,
+        "Fetched BTC using Coinbase from Jul 20, 2015 to Aug 14, 2017",
+      ],
+      [
+        100,
+      ],
+    ]
+  `)
   assertTimeConsistency(records)
-  expect(formatDate((records[0].time as number) * 1000)).toMatchInlineSnapshot(`"Jul 20, 2015"`)
-  expect(records.slice(0, 3)).toMatchInlineSnapshot(`
+  expect(records.slice(-3)).toMatchInlineSnapshot(`
     [
       {
-        "close": 280,
-        "high": 280,
-        "low": 277.37,
-        "open": 277.98,
-        "time": 1437350400,
-        "value": 280,
-        "volume": 782.88341959,
+        "close": 93563.35,
+        "high": 95170.06,
+        "low": 92841.48,
+        "open": 95125.59,
+        "time": 1735430400,
+        "value": 93563.35,
+        "volume": 3417.52751094,
       },
       {
-        "close": 277.32,
-        "high": 281.27,
-        "low": 276.85,
-        "open": 279.96,
-        "time": 1437436800,
-        "value": 277.32,
-        "volume": 4943.55943437,
+        "close": 92620.71,
+        "high": 94910.48,
+        "low": 91271.19,
+        "open": 93563.35,
+        "time": 1735516800,
+        "value": 92620.71,
+        "volume": 15271.24432744,
       },
       {
-        "close": 277.89,
-        "high": 278.54,
-        "low": 275.01,
-        "open": 277.33,
-        "time": 1437523200,
-        "value": 277.89,
-        "volume": 4687.90938331,
+        "close": 93354.22,
+        "high": 96148.94,
+        "low": 91887.13,
+        "open": 92620.7,
+        "time": 1735603200,
+        "value": 93354.22,
+        "volume": 10348.6325655,
       },
     ]
   `)
+  expect(formatDate((records[0].time as number) * 1000)).toMatchInlineSnapshot(`"Jul 20, 2015"`)
+  expect(formatDate((records[records.length - 1].time as number) * 1000)).toMatchInlineSnapshot(
+    `"Dec 31, 2024"`
+  )
 })
 
 it("should fetch WBTC prices using DefiLlama", async () => {
@@ -193,7 +223,9 @@ it("should fetch WBTC prices using DefiLlama", async () => {
         symbol: "WBTC",
       },
     ],
-    async (state) => updates.push(state)
+    async (state) => updates.push(state),
+    undefined,
+    { until: 1735682400000 }
   )
   const records = await getPricesForAsset(
     accountName,
@@ -208,15 +240,15 @@ it("should fetch WBTC prices using DefiLlama", async () => {
       ],
       [
         undefined,
-        "Fetched WBTC-1 using DefiLlama from Dec 24, 2022 to Jun 10, 2025",
+        "Fetched WBTC-1 using DefiLlama from Jul 16, 2022 to Dec 31, 2024",
       ],
       [
         undefined,
-        "Fetched WBTC-1 using DefiLlama from Jul 07, 2020 to Dec 23, 2022",
+        "Fetched WBTC-1 using DefiLlama from Jan 28, 2020 to Jul 15, 2022",
       ],
       [
         undefined,
-        "Fetched WBTC-1 using DefiLlama from Jan 31, 2019 to Jul 06, 2020",
+        "Fetched WBTC-1 using DefiLlama from Jan 31, 2019 to Jan 27, 2020",
       ],
       [
         100,
@@ -224,24 +256,24 @@ it("should fetch WBTC prices using DefiLlama", async () => {
     ]
   `)
   assertTimeConsistency(records)
-  expect(records.slice(0, 3)).toMatchInlineSnapshot(`
+  expect(records.slice(-3)).toMatchInlineSnapshot(`
     [
       {
-        "time": 1548892800,
-        "value": 3509.6256705662845,
+        "time": 1735430400,
+        "value": 94848,
       },
       {
-        "time": 1548979200,
-        "value": 3438.2214190869468,
+        "time": 1735516800,
+        "value": 93345,
       },
       {
-        "time": 1549065600,
-        "value": 3476.5580017564303,
+        "time": 1735603200,
+        "value": 92234,
       },
     ]
   `)
   expect(formatDate((records[0].time as number) * 1000)).toMatchInlineSnapshot(`"Jan 31, 2019"`)
   expect(formatDate((records[records.length - 1].time as number) * 1000)).toMatchInlineSnapshot(
-    `"Jun 10, 2025"`
+    `"Dec 31, 2024"`
   )
 })

@@ -1,7 +1,7 @@
-import { BinanceKline, ChartData, QueryRequest, ResolutionString, Time } from "src/interfaces"
-import { GITHUB_CI } from "src/server-env"
-import { PriceApiId, WETH_ASSET_ID } from "src/settings/settings"
-import { getAssetTicker } from "src/utils/assets-utils"
+import { BinanceKline, ChartData, QueryRequest, ResolutionString, Time } from "../../interfaces"
+import { GITHUB_CI } from "../../server-env"
+import { PriceApiId, WETH_ASSET_ID } from "../../settings/settings"
+import { getAssetTicker } from "../../utils/assets-utils"
 
 export const Identifier: PriceApiId = "binance"
 

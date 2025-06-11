@@ -3,6 +3,7 @@ import {
   AttachMoneyRounded,
   BackupRounded,
   CallMergeRounded,
+  DeleteForever,
   SyncRounded,
   Workspaces,
 } from "@mui/icons-material"
@@ -329,6 +330,14 @@ export const SearchBar = () => {
         id: "action-refetch-assets",
         name: "Refetch assets",
         perform: () => $rpc.get().enqueueRefetchAssets($activeAccount.get(), "user"),
+        priority: 1,
+        section: "Actions",
+      },
+      {
+        icon: <DeleteForever fontSize="small" />,
+        id: "action-delete-asset-prices",
+        name: "Delete asset prices",
+        perform: () => $rpc.get().enqueueDeleteAssetPrices($activeAccount.get(), "user"),
         priority: 1,
         section: "Actions",
       },

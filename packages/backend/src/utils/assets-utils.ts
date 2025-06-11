@@ -50,3 +50,9 @@ export const formatAddress = (address: string) => {
     return address
   }
 }
+
+export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
+
+export function isNativeAsset(contractAddress: string) {
+  return contractAddress === ZERO_ADDRESS
+}

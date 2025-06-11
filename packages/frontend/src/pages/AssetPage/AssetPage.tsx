@@ -234,9 +234,9 @@ export default function AssetPage() {
           />
         </Tabs>
         {tab === "details" && <AssetDetails metadata={metadata} isLoading={isLoading} />}
-        {tab === "price-history" && <PriceChart symbol={assetId} />}
+        {tab === "price-history" && <PriceChart asset={asset} />}
         {tab === "markets" && <AssetMarketTable metadata={metadata} isLoading={isLoading} />}
-        {tab === "balance" && <BalanceChart symbol={assetId} />}
+        {tab === "balance" && <BalanceChart assetId={assetId} />}
         {tab === "transactions" && <TransactionTable assetId={assetId} defaultRowsPerPage={10} />}
         {tab === "audit-logs" && <AuditLogTable assetId={assetId} defaultRowsPerPage={10} />}
       </Stack>
