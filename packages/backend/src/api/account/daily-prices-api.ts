@@ -161,6 +161,11 @@ export async function fetchDailyPrices(
     promises.push(async () => {
       const asset = assets[i - 1]
 
+      if (!asset.coingeckoId) {
+        await progress([undefined, `Skipped ${getAssetTicker(asset.id)}: No coingeckoId`])
+        return
+      }
+
       if (signal?.aborted) throw new Error(signal.reason)
 
       const preferredPriceApiId = asset.priceApiId
@@ -170,6 +175,7 @@ export async function fetchDailyPrices(
       let until: Timestamp | undefined = options.until || today
 
       if (!since) since = until - 86400000 * PRICE_API_PAGINATION - 1
+      if (since === until) since = since - 1
 
       for (const priceApiId of priceApiIds) {
         try {
@@ -184,13 +190,17 @@ export async function fetchDailyPrices(
 
             const pair = pairMapper(asset.id)
 
-            const results = await priceApi({
+            const request = {
               limit: PRICE_API_PAGINATION,
               pair,
               since,
               timeInterval: "1d" as ResolutionString,
               until,
-            })
+            }
+
+            // console.log("Daily price api request:", request)
+
+            const results = await priceApi(request)
 
             if (!preferredPriceApiId && results.length > 0) {
               patchAsset(accountName, asset.id, { priceApiId })
@@ -262,7 +272,6 @@ export function enqueueFetchPrices(accountName: string, trigger: TaskTrigger) {
     description: "Fetching price data for all assets.",
     determinate: true,
     function: async (progress, signal) => {
-      // TODO9 skip assets without coingeckoId
       await fetchDailyPrices(accountName, undefined, progress, signal)
     },
     name: "Fetch asset prices",

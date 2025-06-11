@@ -96,6 +96,7 @@ class BackendRelayer {
     })
 
     socket.addEventListener("open", () => {
+      this.reconnecting = false
       console.log(this.logPrefix, "connected", baseAddress)
       onStatusChange("connected")
     })
@@ -122,7 +123,7 @@ class BackendRelayer {
           return Promise.resolve()
         },
         {
-          maxDelay: isDevelopment ? 1000 : 10_000,
+          maxDelay: isDevelopment ? 1_000 : 10_000,
           numOfAttempts: 100,
           retry: (_err, attempt) => {
             console.log(this.logPrefix, `reconnecting, attempt: #${attempt}`)
