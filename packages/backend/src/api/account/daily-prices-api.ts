@@ -185,7 +185,7 @@ export async function fetchDailyPrices(
             const pair = pairMapper(asset.id)
 
             const results = await priceApi({
-              // limit: PRICE_API_PAGINATION,
+              limit: PRICE_API_PAGINATION,
               pair,
               since,
               timeInterval: "1d" as ResolutionString,

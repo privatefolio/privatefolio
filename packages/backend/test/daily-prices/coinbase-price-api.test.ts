@@ -75,6 +75,7 @@ it("should include today when limit is reached", async () => {
 
   // act
   const result = await queryPrices({
+    limit: 900,
     pair: "ETH-USD",
     since,
     timeInterval: "1d" as ResolutionString,

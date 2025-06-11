@@ -28,7 +28,7 @@ function getInterval(timeInterval: ResolutionString) {
 // https://docs.cloud.coinbase.com/exchange/reference/exchangerestapi_getproductcandles
 // https://docs.cloud.coinbase.com/advanced-trade-api/reference/retailbrokerageapi_getcandles
 export async function queryPrices(request: QueryRequest) {
-  const { timeInterval, since, until, limit = 900, pair } = request
+  const { timeInterval, since, until, limit = pageLimit, pair } = request
   const coinbaseInterval = getInterval(timeInterval)
   const timestampOffset = coinbaseInterval * 1000
 
