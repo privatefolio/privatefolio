@@ -1,4 +1,4 @@
-const PRICE_API_IDS = ["coinbase", "binance", "defi-llama", "alchemy"] as const
+const PRICE_API_IDS = ["coinbase", "binance", "defi-llama"] as const
 export type PriceApiId = (typeof PRICE_API_IDS)[number]
 
 export type PriceApiMeta = {
@@ -8,11 +8,6 @@ export type PriceApiMeta = {
 }
 
 export const PRICE_APIS_META: Record<PriceApiId, PriceApiMeta> = {
-  alchemy: {
-    logoUrl: "$STATIC_ASSETS/extensions/alchemy.svg",
-    name: "Alchemy",
-    priority: 5,
-  },
   binance: {
     logoUrl: "$STATIC_ASSETS/extensions/binance.svg",
     name: "Binance",

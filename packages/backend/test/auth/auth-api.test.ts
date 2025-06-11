@@ -154,7 +154,7 @@ describe("Auth HTTP handlers", () => {
   it("should handle status request when setup is not complete", async () => {
     vi.mocked(fsPromises.access).mockRejectedValueOnce(new Error("ENOENT"))
 
-    const response = await handleStatusRequest()
+    const response = await handleStatusRequest(false)
     const body = await response.json()
 
     expect(response.status).toBe(200)
@@ -164,7 +164,7 @@ describe("Auth HTTP handlers", () => {
   it("should handle status request when setup is complete", async () => {
     vi.mocked(fsPromises.access).mockResolvedValue(undefined)
 
-    const response = await handleStatusRequest()
+    const response = await handleStatusRequest(false)
     const body = await response.json()
 
     expect(response.status).toBe(200)
