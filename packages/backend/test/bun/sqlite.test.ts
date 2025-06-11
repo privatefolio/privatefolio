@@ -20,11 +20,13 @@ import { sleep } from "src/utils/utils"
 const accountName = Math.random().toString(36).substring(7)
 
 const mocks = {
+  access: mock().mockResolvedValue(true),
   readFile: mock(),
 }
 
 mock.module("fs/promises", () => ({
   ...fs.promises,
+  access: mocks.access,
   readFile: mocks.readFile,
 }))
 
