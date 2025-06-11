@@ -272,4 +272,18 @@ export const extensions: Extension[] = [
     publishedAt: new Date("2025-06-01").getTime(),
     updatedAt: new Date("2025-06-01").getTime(),
   },
+  {
+    authorGithub: "kernelwhisperer",
+    description:
+      "Get historical asset prices, aggregated from decentralized & centralized exchanges by Alchemy.",
+    extensionLogoUrl: "$STATIC_ASSETS/extensions/alchemy.svg",
+    extensionName: "Alchemy",
+    extensionType: "price-api",
+    extensionVersion: "1.0.0",
+    githubUrl: "https://github.com/privatefolio/privatefolio",
+    id: "alchemy-price-api",
+    platformIds: [],
+    publishedAt: new Date("2025-06-11").getTime(),
+    updatedAt: new Date("2025-06-11").getTime(),
+  },
 ]

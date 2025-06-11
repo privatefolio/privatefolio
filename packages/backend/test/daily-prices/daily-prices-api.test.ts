@@ -277,3 +277,71 @@ it("should fetch WBTC prices using DefiLlama", async () => {
     `"Dec 31, 2024"`
   )
 })
+
+it("should fetch WBTC prices using Alchemy", async () => {
+  // arrange
+  const updates: ProgressUpdate[] = []
+  // act
+  await fetchDailyPrices(
+    accountName,
+    [
+      {
+        id: "ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC-2",
+        priceApiId: "alchemy",
+        symbol: "WBTC",
+      },
+    ],
+    async (state) => updates.push(state),
+    undefined,
+    { until: 1735682400000 }
+  )
+  const records = await getPricesForAsset(
+    accountName,
+    "ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC-2"
+  )
+  // assert
+  expect(updates).toMatchInlineSnapshot(`
+    [
+      [
+        0,
+        "Fetching asset prices for 1 assets",
+      ],
+      [
+        undefined,
+        "Fetched WBTC-2 using Alchemy from Jul 16, 2022 to Dec 31, 2024",
+      ],
+      [
+        undefined,
+        "Fetched WBTC-2 using Alchemy from Jan 28, 2020 to Jul 15, 2022",
+      ],
+      [
+        undefined,
+        "Fetched WBTC-2 using Alchemy from Feb 01, 2019 to Jan 27, 2020",
+      ],
+      [
+        100,
+      ],
+    ]
+  `)
+  assertTimeConsistency(records)
+  expect(records.slice(-3)).toMatchInlineSnapshot(`
+    [
+      {
+        "time": 1735430400,
+        "value": 94990.9075141471,
+      },
+      {
+        "time": 1735516800,
+        "value": 93856.9343126552,
+      },
+      {
+        "time": 1735603200,
+        "value": 92423.6634782479,
+      },
+    ]
+  `)
+  expect(formatDate((records[0].time as number) * 1000)).toMatchInlineSnapshot(`"Feb 01, 2019"`)
+  expect(formatDate((records[records.length - 1].time as number) * 1000)).toMatchInlineSnapshot(
+    `"Dec 31, 2024"`
+  )
+})
