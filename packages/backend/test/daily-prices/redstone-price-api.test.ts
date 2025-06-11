@@ -1,7 +1,7 @@
 import { getPair, mapToChartData, queryPrices } from "src/extensions/prices/redstone-price-api"
 import { ResolutionString } from "src/interfaces"
 import { GITHUB_CI } from "src/server-env"
-import { PLATFORMS_META } from "src/settings/settings"
+import { WETH_ASSET_ID } from "src/settings/settings"
 import { describe, expect, it } from "vitest"
 
 describe.skip("redstone price api", () => {
@@ -9,7 +9,7 @@ describe.skip("redstone price api", () => {
     // act
     const result = await queryPrices({
       limit: 3,
-      pair: getPair(PLATFORMS_META.ethereum.nativeAssetId as string),
+      pair: getPair(WETH_ASSET_ID),
       since: 1678492800000,
       timeInterval: "1d" as ResolutionString,
       until: 1678665600000,
@@ -50,7 +50,7 @@ describe.skip("redstone price api", () => {
     // act
     const result = await queryPrices({
       limit: 1,
-      pair: getPair(PLATFORMS_META.ethereum.nativeAssetId as string),
+      pair: getPair(WETH_ASSET_ID),
       since: 1706572800000,
       timeInterval: "1d" as ResolutionString,
       until: 1706572800000,

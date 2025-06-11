@@ -1,6 +1,7 @@
 import { PlatformMeta } from "src/interfaces"
 
 export const WETH_ASSET_ID = "ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2:WETH"
+export const WBTC_ASSET_ID = "ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC"
 
 export const PLATFORMS_META: Record<string, PlatformMeta> = {
   "arbitrum-one": {

@@ -1,6 +1,7 @@
 import { mapToChartData, queryPrices } from "src/extensions/prices/coinbase-price-api"
 import { ResolutionString, Timestamp } from "src/interfaces"
 import { PRICE_API_PAGINATION } from "src/settings/settings"
+import { assertTimeConsistency } from "src/utils/test-utils"
 import { expect, it } from "vitest"
 
 it("should fetch BTC prices within a range", async () => {
@@ -52,15 +53,7 @@ it("should fetch BTC prices in correct order", async () => {
     timeInterval: "1d" as ResolutionString,
   })
   const records = results.map(mapToChartData)
-  let prevRecord
-  for (const record of records) {
-    if (prevRecord && Number(record.time) !== Number(prevRecord.time) + 86400) {
-      console.log(prevRecord, record)
-      throw new Error("Inconsistency error")
-    }
-
-    prevRecord = record
-  }
+  assertTimeConsistency(records)
 })
 
 it("should throw an error", async () => {

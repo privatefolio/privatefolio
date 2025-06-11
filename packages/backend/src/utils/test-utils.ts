@@ -82,3 +82,16 @@ export function sanitizeTransaction(transaction: Transaction) {
     ...rest,
   }
 }
+
+export function assertTimeConsistency(records: { time: number }[]) {
+  let prevRecord
+  for (const record of records) {
+    if (prevRecord && Number(record.time) !== Number(prevRecord.time) + 86400) {
+      console.log(prevRecord, record)
+      throw new Error("Inconsistency error")
+    }
+    prevRecord = record
+  }
+}
+
+export const ONE_DAY = 24 * 60 * 60 * 1000

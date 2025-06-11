@@ -5,6 +5,7 @@ import { importFile } from "src/api/account/file-imports-api"
 import { ProgressUpdate } from "src/interfaces"
 import { GITHUB_CI } from "src/server-env"
 import { formatDate } from "src/utils/formatting-utils"
+import { assertTimeConsistency } from "src/utils/test-utils"
 import { beforeAll, expect, it, vi } from "vitest"
 
 const accountName = Math.random().toString(36).substring(7)
@@ -57,26 +58,39 @@ it("should fetch BTC prices using Binance", async (test) => {
   // act
   await fetchDailyPrices(
     accountName,
-    [
-      {
-        id: "binance:BTC",
-        symbol: "BTC",
-      },
-    ],
+    [{ id: "binance:BTC", priceApiId: "binance", symbol: "BTC" }],
     async (state) => updates.push(state)
   )
   const records = await getPricesForAsset(accountName, "binance:BTC")
   // assert
-  // console.log(updates.join("\n"))
-  let prevRecord
-  for (const record of records) {
-    if (prevRecord && Number(record.time) !== Number(prevRecord.time) + 86400) {
-      console.log(prevRecord, record)
-      throw new Error("Inconsistency error")
-    }
-
-    prevRecord = record
-  }
+  expect(updates).toMatchInlineSnapshot(`
+    [
+      [
+        0,
+        "Fetching asset prices for 1 assets",
+      ],
+      [
+        undefined,
+        "Fetched BTC using Binance from Dec 24, 2022 to Jun 10, 2025",
+      ],
+      [
+        undefined,
+        "Fetched BTC using Binance from Jul 07, 2020 to Dec 23, 2022",
+      ],
+      [
+        undefined,
+        "Fetched BTC using Binance from Jan 19, 2018 to Jul 06, 2020",
+      ],
+      [
+        undefined,
+        "Fetched BTC using Binance from Aug 17, 2017 to Jan 18, 2018",
+      ],
+      [
+        100,
+      ],
+    ]
+  `)
+  assertTimeConsistency(records)
   expect(records.slice(0, 3)).toMatchInlineSnapshot(`
     [
       {
@@ -108,6 +122,10 @@ it("should fetch BTC prices using Binance", async (test) => {
       },
     ]
   `)
+  expect(formatDate((records[0].time as number) * 1000)).toMatchInlineSnapshot(`"Aug 17, 2017"`)
+  expect(formatDate((records[records.length - 1].time as number) * 1000)).toMatchInlineSnapshot(
+    `"Jun 10, 2025"`
+  )
 })
 
 // TODO1 coinbase no longer returns since genesis
@@ -127,16 +145,7 @@ it.skip("should fetch BTC prices using Coinbase", async () => {
   )
   const records = await getPricesForAsset(accountName, "coinbase:BTC")
   // assert
-  // console.log(updates.join("\n"))
-  let prevRecord
-  for (const record of records) {
-    if (prevRecord && Number(record.time) !== Number(prevRecord.time) + 86400) {
-      console.log(prevRecord, record)
-      throw new Error("Inconsistency error")
-    }
-
-    prevRecord = record
-  }
+  assertTimeConsistency(records)
   expect(formatDate((records[0].time as number) * 1000)).toMatchInlineSnapshot(`"Jul 20, 2015"`)
   expect(records.slice(0, 3)).toMatchInlineSnapshot(`
     [
@@ -171,7 +180,7 @@ it.skip("should fetch BTC prices using Coinbase", async () => {
   `)
 })
 
-it.skip("should fetch WBTC prices using DefiLlama", async () => {
+it("should fetch WBTC prices using DefiLlama", async () => {
   // arrange
   const updates: ProgressUpdate[] = []
   // act
@@ -179,7 +188,8 @@ it.skip("should fetch WBTC prices using DefiLlama", async () => {
     accountName,
     [
       {
-        id: "ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC",
+        id: "ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC-1",
+        priceApiId: "defi-llama",
         symbol: "WBTC",
       },
     ],
@@ -187,19 +197,51 @@ it.skip("should fetch WBTC prices using DefiLlama", async () => {
   )
   const records = await getPricesForAsset(
     accountName,
-    "ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC"
+    "ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC-1"
   )
   // assert
-  // console.log(updates.join("\n"))
-  let prevRecord
-  for (const record of records) {
-    if (prevRecord && Number(record.time) !== Number(prevRecord.time) + 86400) {
-      console.log(prevRecord, record)
-      throw new Error("Inconsistency error")
-    }
-
-    prevRecord = record
-  }
-  expect(records.slice(0, 1800)).toMatchSnapshot()
+  expect(updates).toMatchInlineSnapshot(`
+    [
+      [
+        0,
+        "Fetching asset prices for 1 assets",
+      ],
+      [
+        undefined,
+        "Fetched WBTC-1 using DefiLlama from Dec 24, 2022 to Jun 10, 2025",
+      ],
+      [
+        undefined,
+        "Fetched WBTC-1 using DefiLlama from Jul 07, 2020 to Dec 23, 2022",
+      ],
+      [
+        undefined,
+        "Fetched WBTC-1 using DefiLlama from Jan 31, 2019 to Jul 06, 2020",
+      ],
+      [
+        100,
+      ],
+    ]
+  `)
+  assertTimeConsistency(records)
+  expect(records.slice(0, 3)).toMatchInlineSnapshot(`
+    [
+      {
+        "time": 1548892800,
+        "value": 3509.6256705662845,
+      },
+      {
+        "time": 1548979200,
+        "value": 3438.2214190869468,
+      },
+      {
+        "time": 1549065600,
+        "value": 3476.5580017564303,
+      },
+    ]
+  `)
   expect(formatDate((records[0].time as number) * 1000)).toMatchInlineSnapshot(`"Jan 31, 2019"`)
+  expect(formatDate((records[records.length - 1].time as number) * 1000)).toMatchInlineSnapshot(
+    `"Jun 10, 2025"`
+  )
 })

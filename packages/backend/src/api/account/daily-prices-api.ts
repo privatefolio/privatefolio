@@ -10,7 +10,8 @@ import {
   Time,
   Timestamp,
 } from "src/interfaces"
-import { PRICE_API_PAGINATION, PRICE_APIS_META, PriceApiId } from "src/settings/settings"
+import { allPriceApiIds } from "src/settings/price-apis"
+import { PRICE_API_PAGINATION, PRICE_APIS_META } from "src/settings/settings"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { formatDate } from "src/utils/formatting-utils"
 import { noop } from "src/utils/utils"
@@ -155,9 +156,7 @@ export async function fetchDailyPrices(
       if (signal?.aborted) throw new Error(signal.reason)
 
       const preferredPriceApiId = asset.priceApiId
-      const priceApiIds = preferredPriceApiId
-        ? [preferredPriceApiId]
-        : (Object.keys(PRICE_APIS) as PriceApiId[])
+      const priceApiIds = preferredPriceApiId ? [preferredPriceApiId] : allPriceApiIds
 
       let since: Timestamp | undefined = await getPriceCursor(accountName, asset.id)
       let until: Timestamp | undefined = today

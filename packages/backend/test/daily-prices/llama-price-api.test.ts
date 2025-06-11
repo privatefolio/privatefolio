@@ -1,16 +1,17 @@
 import { getPair, mapToChartData, queryPrices } from "src/extensions/prices/llama-price-api"
 import { ResolutionString } from "src/interfaces"
-import { PLATFORMS_META } from "src/settings/settings"
+import { WETH_ASSET_ID } from "src/settings/settings"
+import { ONE_DAY } from "src/utils/test-utils"
 import { expect, it } from "vitest"
 
 it("should fetch WETH prices within a range", async () => {
   // act
   const result = await queryPrices({
     limit: 3,
-    pair: getPair("ethereum:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"), // WETH
+    pair: getPair(WETH_ASSET_ID),
     since: 1518566400000,
     timeInterval: "1d" as ResolutionString,
-    until: 1518739200000,
+    until: 1518739200000 + ONE_DAY,
   })
   // assert
   expect(result.map(mapToChartData)).toMatchInlineSnapshot(`
@@ -35,17 +36,17 @@ it("should fetch WETH prices within a small range", async () => {
   // act
   const result = await queryPrices({
     limit: 1,
-    pair: getPair(PLATFORMS_META.ethereum.nativeAssetId as string),
+    pair: getPair(WETH_ASSET_ID),
     since: 1706572800000,
     timeInterval: "1d" as ResolutionString,
-    until: 1706572800000,
+    until: 1706572800000 + ONE_DAY,
   })
   // assert
   expect(result.map(mapToChartData)).toMatchInlineSnapshot(`
     [
       {
         "time": 1706572800,
-        "value": 2316.96,
+        "value": 2311.82,
       },
     ]
   `)
