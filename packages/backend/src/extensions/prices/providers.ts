@@ -1,5 +1,6 @@
 import { ChartData, QueryRequest, ResolutionString, Timestamp } from "../../interfaces"
 import { PRICE_APIS_META, PriceApiId } from "../../settings/settings"
+import * as alchemy from "./alchemy-price-api"
 import * as binance from "./binance-price-api"
 import * as coinbase from "./coinbase-price-api"
 import * as llama from "./llama-price-api"
@@ -9,18 +10,21 @@ type PairMapper = (symbol: string) => string
 type PriceApi = (request: QueryRequest) => Promise<any>
 
 export const PRICE_MAPPER: Record<PriceApiId, PriceMapper> = {
+  alchemy: alchemy.mapToChartData,
   binance: binance.mapToChartData,
   coinbase: coinbase.mapToChartData,
   "defi-llama": llama.mapToChartData,
 }
 
 export const PRICE_APIS: Record<PriceApiId, PriceApi> = {
+  alchemy: alchemy.queryPrices,
   binance: binance.queryPrices,
   coinbase: coinbase.queryPrices,
   "defi-llama": llama.queryPrices,
 }
 
 export const PAIR_MAPPER: Record<PriceApiId, PairMapper> = {
+  alchemy: alchemy.getPair,
   binance: binance.getPair,
   coinbase: coinbase.getPair,
   "defi-llama": llama.getPair,
