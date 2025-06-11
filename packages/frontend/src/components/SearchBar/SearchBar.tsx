@@ -206,7 +206,15 @@ export const SearchBar = () => {
     return assetsFound.map((asset) => ({
       icon: <AssetAvatar src={asset.logoUrl} alt={asset.symbol} size="snug" />,
       id: `asset-${asset.id}`,
-      keywords: [asset.name, asset.id, asset.symbol].filter(Boolean).join(" "),
+      keywords: [
+        asset.name,
+        asset.id,
+        asset.symbol,
+        asset.coingeckoId,
+        ...(asset.platforms ? Object.values(asset.platforms) : []),
+      ]
+        .filter(Boolean)
+        .join(" "),
       name: asset.symbol.toUpperCase(),
       perform: () => navigate(`/u/${$activeIndex.get()}/asset/${asset.id}`),
       priority: -(asset.marketCapRank ?? Infinity),

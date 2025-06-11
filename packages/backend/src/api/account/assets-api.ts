@@ -9,7 +9,7 @@ import {
   TaskTrigger,
 } from "src/interfaces"
 import { CACHE_LOCATION } from "src/settings/settings"
-import { getAssetTicker } from "src/utils/assets-utils"
+import { getAssetContract, getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { isTestEnvironment } from "src/utils/environment-utils"
 import { sql } from "src/utils/sql-utils"
@@ -107,8 +107,22 @@ export async function getAssetsByPlatform(platformId: string): Promise<Asset[]> 
 export async function getAsset(accountName: string, id: string): Promise<MyAsset | undefined> {
   const records = await getMyAssets(accountName, `${getQuery} WHERE audit_logs.assetId = ?`, [id])
   if (records.length === 0) {
+    const contract = getAssetContract(id)
+    const platform = getAssetPlatform(id)
+
     const cachedAssets = await getAssets()
-    return cachedAssets.find((asset) => asset.coingeckoId === id || asset.id === id)
+    return cachedAssets.find((x) => {
+      if (x.coingeckoId === id) return true
+      if (x.id === id) return true
+      if (
+        x.platforms &&
+        x.platforms[platform] &&
+        x.platforms[platform] === contract.toLowerCase()
+      ) {
+        return true
+      }
+      return false
+    })
   }
   return records[0]
 }
@@ -165,7 +179,12 @@ export async function findAssets(query: string, limit = 5): Promise<Asset[]> {
     if (
       asset.name.toLowerCase().includes(normalizedQuery) ||
       asset.id.toLowerCase().includes(normalizedQuery) ||
-      asset.symbol.toLowerCase().includes(normalizedQuery)
+      asset.coingeckoId?.toLowerCase().includes(normalizedQuery) ||
+      asset.symbol.toLowerCase().includes(normalizedQuery) ||
+      (asset.platforms &&
+        Object.values(asset.platforms).some((contract) =>
+          contract.toLowerCase().includes(normalizedQuery)
+        ))
     ) {
       matchingAssets.push(asset)
     }
