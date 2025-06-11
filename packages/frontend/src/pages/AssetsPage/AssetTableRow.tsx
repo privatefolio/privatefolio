@@ -42,7 +42,7 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
   const handleChange = (event: SelectChangeEvent<string>) => {
     const newValue: PriceApiId | undefined = (event.target.value as PriceApiId) || undefined
     $rpc.get().patchAsset($activeAccount.get(), assetId, {
-      priceApiId: newValue,
+      priceApiId: newValue ?? null,
     })
     $assetMap.setKey(assetId, { ...row, priceApiId: newValue })
   }
@@ -56,7 +56,7 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
       sx={{
         "& .MuiSelect-select": {
           paddingX: 1.5,
-          paddingY: 0.25,
+          paddingY: 0.5,
         },
 
         borderRadius: 5,
