@@ -1,29 +1,32 @@
+import { SdCardRounded } from "@mui/icons-material"
 import { MenuItem, Select, SelectChangeEvent, Stack, useMediaQuery } from "@mui/material"
 import { useStore } from "@nanostores/react"
+import { debounce } from "lodash-es"
 import { getLivePricesForAsset } from "privatefolio-backend/build/src/extensions/prices/providers"
 import { allPriceApiIds } from "privatefolio-backend/src/settings/price-apis"
-import React, { useCallback, useMemo } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 import { PlatformAvatar } from "src/components/PlatformAvatar"
 import { SectionTitle } from "src/components/SectionTitle"
 import { MyAsset } from "src/interfaces"
-import { PRICE_APIS_META, PriceApiId } from "src/settings"
+import { DEFAULT_DEBOUNCE_DURATION, PRICE_APIS_META, PriceApiId } from "src/settings"
 import { $quoteCurrency } from "src/stores/account-settings-store"
-import { $activeAccount } from "src/stores/account-store"
+import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
+import { closeSubscription } from "src/utils/browser-utils"
 import { aggregateByWeek, createPriceFormatter } from "src/utils/chart-utils"
 import { resolveUrl } from "src/utils/utils"
 
 import { QueryChartData, SingleSeriesChart, TooltipOpts } from "../../components/SingleSeriesChart"
 import { $rpc } from "../../workers/remotes"
 
-type BalanceChartProps = {
+type AssetPriceHistoryProps = {
   asset?: MyAsset
 }
 
 const defaultPriceApiId = allPriceApiIds[0]
 
-export function PriceChart(props: BalanceChartProps) {
+export function AssetPriceHistory(props: AssetPriceHistoryProps) {
   const { asset } = props
 
   const rpc = useStore($rpc)
@@ -31,25 +34,44 @@ export function PriceChart(props: BalanceChartProps) {
 
   const [searchParams, setSearchParams] = useSearchParams()
   const priceApiId = (searchParams.get("priceApiId") || null) as PriceApiId | null
+  const [refresh, setRefresh] = useState(0)
+  const connectionStatus = useStore($connectionStatus)
 
   const handleChange = (event: SelectChangeEvent<string>) => {
     searchParams.set("priceApiId", event.target.value)
     setSearchParams(searchParams)
   }
 
+  useEffect(() => {
+    if (!asset) return
+
+    const useDatabaseCache = priceApiId === null && !!asset.priceApiId
+    if (!useDatabaseCache) return
+
+    const subscription = rpc.subscribeToDailyPrices(
+      activeAccount,
+      debounce(() => {
+        setRefresh(Math.random())
+      }, DEFAULT_DEBOUNCE_DURATION)
+    )
+
+    return closeSubscription(subscription, rpc)
+  }, [rpc, activeAccount, connectionStatus, asset, priceApiId])
+
   const queryFn: QueryChartData = useCallback(
     async (interval) => {
       if (!asset) return []
+      const _refresh = refresh // reference the dependency for eslint(react-hooks/exhaustive-deps)
 
-      const useCache = priceApiId === null && !!asset.priceApiId
+      const useDatabaseCache = priceApiId === null && !!asset.priceApiId
 
-      const prices = useCache
+      const prices = useDatabaseCache
         ? await rpc.getPricesForAsset(activeAccount, asset.id)
         : await getLivePricesForAsset(asset.id, priceApiId || defaultPriceApiId)
 
       return interval === "1w" ? aggregateByWeek(prices) : prices
     },
-    [rpc, activeAccount, asset, priceApiId]
+    [rpc, activeAccount, asset, priceApiId, refresh]
   )
 
   const currency = useStore($quoteCurrency)
@@ -108,13 +130,8 @@ export function PriceChart(props: BalanceChartProps) {
           {asset.priceApiId && (
             <MenuItem value="">
               <Stack direction="row" alignItems={"center"} gap={1}>
-                <PlatformAvatar
-                  size="small"
-                  src={resolveUrl(PRICE_APIS_META[asset.priceApiId].logoUrl)}
-                  alt={asset.priceApiId}
-                />
-                {PRICE_APIS_META[asset.priceApiId].name}
-                <span>(cached)</span>
+                <SdCardRounded sx={{ fontSize: "1rem !important" }} />
+                Database cache
               </Stack>
             </MenuItem>
           )}

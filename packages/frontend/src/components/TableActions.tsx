@@ -6,8 +6,9 @@ import {
 } from "@mui/icons-material"
 import { inputBaseClasses, Stack, TextField, Tooltip, Typography } from "@mui/material"
 import IconButton from "@mui/material/IconButton"
-import * as React from "react"
+import React, { useEffect } from "react"
 import { MonoFont } from "src/theme"
+import { isInputFocused } from "src/utils/browser-utils"
 
 import { Key, MAIN_KEY } from "./SearchBar/Key"
 
@@ -39,29 +40,30 @@ export function TablePaginationActions(props: TablePaginationActionsProps) {
     onPageChange(event, Math.max(0, lastPage))
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.ctrlKey || event.metaKey) {
-        if (event.key === "ArrowLeft") {
-          if (page > 0) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onPageChange(event as any, page - 1)
-          }
-        } else if (event.key === "ArrowRight") {
-          if (page < lastPage) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onPageChange(event as any, page + 1)
-          }
-        } else if (event.key === "ArrowDown") {
-          if (page !== 0) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onPageChange(event as any, 0)
-          }
-        } else if (event.key === "ArrowUp") {
-          if (page !== lastPage) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onPageChange(event as any, lastPage)
-          }
+      if (isInputFocused()) return
+      if (!event.ctrlKey && !event.metaKey) return
+
+      if (event.key === "ArrowLeft") {
+        if (page > 0) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          onPageChange(event as any, page - 1)
+        }
+      } else if (event.key === "ArrowRight") {
+        if (page < lastPage) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          onPageChange(event as any, page + 1)
+        }
+      } else if (event.key === "ArrowDown") {
+        if (page !== 0) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          onPageChange(event as any, 0)
+        }
+      } else if (event.key === "ArrowUp") {
+        if (page !== lastPage) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          onPageChange(event as any, lastPage)
         }
       }
     }

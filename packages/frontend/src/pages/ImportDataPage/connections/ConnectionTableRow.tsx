@@ -18,7 +18,7 @@ import { MonoFont } from "src/theme"
 import { formatNumber } from "src/utils/formatting-utils"
 import { TableRowComponentProps } from "src/utils/table-utils"
 
-import { ConnectionInspectDrawer } from "./ConnectionInspectDrawer"
+import { ConnectionDrawer } from "./ConnectionDrawer"
 
 export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
   const { row, relativeTime, headCells, isMobile: _isMobile, isTablet, ...rest } = props
@@ -82,7 +82,7 @@ export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
             </Stack>
           </TableCell>
         </TableRow>
-        <ConnectionInspectDrawer
+        <ConnectionDrawer
           key={row.id}
           open={open}
           toggleOpen={toggleOpen}
@@ -182,7 +182,7 @@ export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
           </Tooltip>
         </TableCell>
       </TableRow>
-      <ConnectionInspectDrawer
+      <ConnectionDrawer
         key={row.id}
         open={open}
         toggleOpen={toggleOpen}

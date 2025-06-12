@@ -1,17 +1,9 @@
-import { CloseRounded } from "@mui/icons-material"
 import { LoadingButton } from "@mui/lab"
-import {
-  Drawer,
-  DrawerProps,
-  IconButton,
-  Skeleton,
-  Stack,
-  Tooltip,
-  Typography,
-} from "@mui/material"
+import { Drawer, DrawerProps, Skeleton, Stack, Tooltip, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { MouseEvent, useState } from "react"
 import { AmountBlock } from "src/components/AmountBlock"
+import { DrawerHeader } from "src/components/DrawerHeader"
 import { ExtensionBlock } from "src/components/ExtensionBlock"
 import { FileSizeBlock } from "src/components/FileSizeBlock"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
@@ -83,14 +75,7 @@ export function FileImportDrawer(props: FileImportDrawerProps) {
         gap={2}
         sx={(theme) => ({ overflowX: "hidden", width: 359, ...theme.typography.body2 })}
       >
-        <Stack marginBottom={2} direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="subtitle1" letterSpacing="0.025rem">
-            File import details
-          </Typography>
-          <IconButton onClick={toggleOpen} edge="end" color="secondary" aria-label="Close dialog">
-            <CloseRounded fontSize="small" />
-          </IconButton>
-        </Stack>
+        <DrawerHeader toggleOpen={toggleOpen}>File import details</DrawerHeader>
         <div>
           <SectionTitle>Identifier</SectionTitle>
           <IdentifierBlock id={id} />

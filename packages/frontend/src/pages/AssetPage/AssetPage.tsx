@@ -23,10 +23,10 @@ import { SerifFont } from "../../theme"
 import FourZeroFourPage from "../404"
 import { AuditLogTable } from "../AuditLogsPage/AuditLogTable"
 import { TransactionTable } from "../TransactionsPage/TransactionTable"
+import { AssetBalanceHistory } from "./AssetBalanceHistory"
 import { AssetDetails } from "./AssetDetails"
 import { AssetMarketTable } from "./AssetMarketTable"
-import { BalanceChart } from "./BalanceChart"
-import { PriceChart } from "./PriceChart"
+import { AssetPriceHistory } from "./AssetPriceHistory"
 
 export default function AssetPage() {
   const params = useParams()
@@ -231,9 +231,9 @@ export default function AssetPage() {
           />
         </Tabs>
         {tab === "details" && <AssetDetails metadata={metadata} isLoading={isLoading} />}
-        {tab === "price-history" && <PriceChart asset={asset} />}
+        {tab === "price-history" && <AssetPriceHistory asset={asset} />}
         {tab === "markets" && <AssetMarketTable metadata={metadata} isLoading={isLoading} />}
-        {tab === "balance" && <BalanceChart assetId={assetId} />}
+        {tab === "balance" && <AssetBalanceHistory assetId={assetId} />}
         {tab === "transactions" && <TransactionTable assetId={assetId} defaultRowsPerPage={10} />}
         {tab === "audit-logs" && <AuditLogTable assetId={assetId} defaultRowsPerPage={10} />}
       </Stack>

@@ -665,6 +665,7 @@ export enum SubscriptionChannel {
   KeyValue = "key-value",
   AuditLogs = "audit-logs",
   Networth = "networth",
+  DailyPrices = "daily-prices",
   FileImports = "file-imports",
   Connections = "connections",
   AssetMetadata = "asset-metadata",

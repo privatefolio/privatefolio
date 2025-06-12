@@ -1,11 +1,12 @@
-import { ArrowRightAltRounded, CloseRounded } from "@mui/icons-material"
-import { Button, Drawer, DrawerProps, IconButton, Stack, Typography } from "@mui/material"
+import { ArrowRightAltRounded } from "@mui/icons-material"
+import { Button, Drawer, DrawerProps, Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { formatDistance } from "date-fns"
 import React, { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { AmountBlock } from "src/components/AmountBlock"
 import { AppLink } from "src/components/AppLink"
+import { DrawerHeader } from "src/components/DrawerHeader"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
 import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { SectionTitle } from "src/components/SectionTitle"
@@ -77,14 +78,7 @@ export function TradeDrawer(props: TradeDrawerProps) {
           ...theme.typography.body2,
         })}
       >
-        <Stack marginBottom={2} direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="subtitle1" letterSpacing="0.025rem">
-            Trade details
-          </Typography>
-          <IconButton onClick={toggleOpen} edge="end" color="secondary" aria-label="Close dialog">
-            <CloseRounded fontSize="small" />
-          </IconButton>
-        </Stack>
+        <DrawerHeader toggleOpen={toggleOpen}>Trade details</DrawerHeader>
 
         <div>
           <SectionTitle>Identifier</SectionTitle>

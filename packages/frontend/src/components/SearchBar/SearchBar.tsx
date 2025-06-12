@@ -43,10 +43,10 @@ import { ExtensionAvatar } from "../ExtensionAvatar"
 import { TransactionIcon } from "../icons"
 import { PlatformAvatar } from "../PlatformAvatar"
 import { Truncate } from "../Truncate"
-import { Key } from "./Key"
+import { Key, MAIN_KEY } from "./Key"
 import { SearchInput } from "./SearchInput"
 
-const SEARCH_PLACEHOLDER = "Search for assets, transactions, actions, etc."
+const SEARCH_PLACEHOLDER = "Search for assets, transactions, actions or anything else."
 
 export const SearchBar = () => {
   const navigate = useNavigate()
@@ -268,13 +268,26 @@ export const SearchBar = () => {
       ...extensionActions,
       {
         icon: <AttachMoneyRounded fontSize="small" />,
-        id: "action-fetch-asset-prices",
-        name: "Fetch asset prices",
-        perform: () => rpc.enqueueFetchPrices(activeAccount, "user"),
+        id: "action-refresh-networth",
+        name: "Refresh networth",
+        perform: () => {
+          rpc.enqueueFetchPrices(activeAccount, "user")
+          rpc.enqueueRefreshBalances(activeAccount, "user")
+          rpc.enqueueRefreshNetworth(activeAccount, "user")
+        },
         priority: 1,
         section: { name: "Actions", priority: 10 },
-        shortcut: ["f", "p"],
+        shortcut: ["$mod+a"],
       },
+      // {
+      //   icon: <AttachMoneyRounded fontSize="small" />,
+      //   id: "action-fetch-asset-prices",
+      //   name: "Fetch asset prices",
+      //   perform: () => rpc.enqueueFetchPrices(activeAccount, "user"),
+      //   priority: 1,
+      //   section: { name: "Actions", priority: 10 },
+      //   shortcut: ["f", "p"],
+      // },
       {
         icon: <SyncRounded fontSize="small" />,
         id: "action-sync-all-connections",
@@ -287,7 +300,6 @@ export const SearchBar = () => {
           }),
         priority: 1,
         section: { name: "Actions", priority: 10 },
-        shortcut: ["s", "c"],
       },
       {
         icon: <AttachMoneyRounded fontSize="small" />,
@@ -438,9 +450,14 @@ function RenderResults({ loading }: { loading: boolean }) {
                 <ListItemText
                   primary={
                     <>
-                      {item.shortcut.map((x) => (
-                        <Key key={x}>{x}</Key>
-                      ))}
+                      {item.shortcut.map((x) => {
+                        if (x.startsWith("$mod")) {
+                          return (
+                            <Key key={x}>{x.replace("$mod", MAIN_KEY).replace("+", " + ")}</Key>
+                          )
+                        }
+                        return <Key key={x}>{x}</Key>
+                      })}
                     </>
                   }
                   primaryTypographyProps={{ variant: "caption" }}

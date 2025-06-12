@@ -8,11 +8,11 @@ import { aggregateByWeek, neutralColor } from "src/utils/chart-utils"
 import { QueryChartData, SingleSeriesChart } from "../../components/SingleSeriesChart"
 import { $rpc } from "../../workers/remotes"
 
-type BalanceChartProps = {
+type AssetBalanceHistoryProps = {
   assetId: string
 }
 
-export function BalanceChart(props: BalanceChartProps) {
+export function AssetBalanceHistory(props: AssetBalanceHistoryProps) {
   const { assetId } = props
 
   const activeAccount = useStore($activeAccount)

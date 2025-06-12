@@ -1,19 +1,21 @@
 import { Add, CloudOutlined } from "@mui/icons-material"
 import { AlertTitle, Box, Button, Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
+import { atom } from "nanostores"
 import React, { useEffect, useMemo, useState } from "react"
 import { AttentionBlock } from "src/components/AttentionBlock"
 import { Callout } from "src/components/Callout"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
-import { useBoolean } from "src/hooks/useBoolean"
 import { Connection } from "src/interfaces"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { closeSubscription } from "src/utils/browser-utils"
 import { HeadCell } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
 
-import { ConnectionDrawer } from "./ConnectionDrawer"
+import { AddConnectionDrawer } from "./AddConnectionDrawer"
 import { ConnectionTableRow } from "./ConnectionTableRow"
+
+const $drawerOpen = atom(false)
 
 export function ConnectionsTable() {
   const rpc = useStore($rpc)
@@ -23,7 +25,6 @@ export function ConnectionsTable() {
     document.title = `Connections - ${activeAccount} - Privatefolio`
   }, [activeAccount])
 
-  const { value: open, toggle: toggleOpen } = useBoolean(false)
   const [queryTime, setQueryTime] = useState<number | null>(null)
   const [rows, setRows] = useState<Connection[]>([])
 
@@ -97,7 +98,7 @@ export function ConnectionsTable() {
         rows={rows}
         queryTime={queryTime}
         emptyContent={
-          <Button sx={{ padding: 4 }} onClick={toggleOpen}>
+          <Button sx={{ padding: 4 }} onClick={() => $drawerOpen.set(true)}>
             <Typography color="text.secondary" variant="body2" component="div">
               <Stack alignItems="center">
                 <CloudOutlined sx={{ height: 64, width: 64 }} />
@@ -109,7 +110,7 @@ export function ConnectionsTable() {
           </Button>
         }
         addNewRow={
-          <AttentionBlock component={Button} onClick={toggleOpen} fullWidth>
+          <AttentionBlock component={Button} onClick={() => $drawerOpen.set(true)} fullWidth>
             <Add sx={{ height: 20, width: 20 }} />
             <span>
               Click to <u>add a new connection</u>.
@@ -128,7 +129,7 @@ export function ConnectionsTable() {
           </Box>
         </Callout>
       </Stack>
-      <ConnectionDrawer open={open} toggleOpen={toggleOpen} />
+      <AddConnectionDrawer atom={$drawerOpen} />
     </>
   )
 }

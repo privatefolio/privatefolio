@@ -771,22 +771,22 @@ export const theme: CssVarsThemeOptions = {
     },
     MuiTooltip: {
       defaultProps: {
-        PopperProps: {
-          modifiers: [
-            {
-              name: "offset",
-              options: {
-                offset: [0, 16],
-              },
-            },
-          ],
-        },
+        // PopperProps: {
+        //   modifiers: [
+        //     {
+        //       name: "offset",
+        //       options: {
+        //         offset: [0, 16],
+        //       },
+        //     },
+        //   ],
+        // },
         TransitionComponent: Fade,
         TransitionProps: { timeout: 0 },
         arrow: true,
         disableInteractive: true,
         enterDelay: 200,
-        followCursor: true,
+        followCursor: false,
       },
       styleOverrides: {
         arrow: {
@@ -801,7 +801,7 @@ export const theme: CssVarsThemeOptions = {
           },
           background: "var(--mui-palette-grey-900)",
           border: "1px solid var(--mui-palette-background-default)",
-          borderRadius: 0,
+          borderRadius: 4,
           fontSize: "0.8rem",
           fontWeight: 400,
           "html[data-mui-color-scheme='dark'] &": {

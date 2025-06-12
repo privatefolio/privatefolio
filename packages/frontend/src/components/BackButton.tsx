@@ -2,6 +2,7 @@ import { KeyboardBackspace } from "@mui/icons-material"
 import { Button, ButtonProps } from "@mui/material"
 import React, { useCallback, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { isInputFocused } from "src/utils/browser-utils"
 
 import { Key } from "./SearchBar/Key"
 
@@ -27,14 +28,8 @@ export function BackButton({ fallback, sx = {}, ...rest }: BackButtonProps) {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Check if the active element is an input or textarea
-      const activeElement = document.activeElement
-      const isInputFocused =
-        activeElement instanceof HTMLInputElement ||
-        activeElement instanceof HTMLTextAreaElement ||
-        (activeElement instanceof HTMLElement && activeElement.isContentEditable)
-
-      if (event.key === "Backspace" && !isInputFocused && !hide) {
+      if (isInputFocused()) return
+      if (event.key === "Backspace" && !hide) {
         handleClick()
       }
     }

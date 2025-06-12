@@ -5,6 +5,7 @@ import {
   MyAsset,
   ProgressCallback,
   ResolutionString,
+  SubscriptionChannel,
   TaskPriority,
   TaskTrigger,
   Time,
@@ -14,6 +15,7 @@ import { allPriceApiIds } from "src/settings/price-apis"
 import { PRICE_API_PAGINATION, PRICE_APIS_META } from "src/settings/settings"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { formatDate } from "src/utils/formatting-utils"
+import { createSubscription } from "src/utils/sub-utils"
 import { isTestEnvironment, noop } from "src/utils/utils"
 
 import { getAccount } from "../accounts-api"
@@ -23,8 +25,7 @@ import { enqueueTask } from "./server-tasks-api"
 type NewDailyPrice = Omit<DailyPrice, "id">
 
 function deriveDailyPriceId(record: NewDailyPrice) {
-  // should we hashString?
-  return `p_${record.assetId}_${record.priceApiId}_${record.pair}_${record.timestamp}`
+  return `${record.assetId}_${record.timestamp}`
 }
 
 export async function upsertDailyPrices(
@@ -47,6 +48,7 @@ export async function upsertDailyPrices(
         record.priceApiId || null,
       ])
     )
+    account.eventEmitter.emit(SubscriptionChannel.DailyPrices)
   } catch (error) {
     throw new Error(`Failed to add or replace daily prices: ${error}`)
   }
@@ -296,4 +298,8 @@ export function enqueueDeleteAssetPrices(accountName: string, trigger: TaskTrigg
     priority: TaskPriority.High,
     trigger,
   })
+}
+
+export async function subscribeToDailyPrices(accountName: string, callback: () => void) {
+  return createSubscription(accountName, SubscriptionChannel.DailyPrices, callback)
 }

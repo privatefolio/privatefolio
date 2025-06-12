@@ -27,16 +27,6 @@ export const corsHeaders = {
 export const GITHUB_CACHE_URL =
   "https://raw.githubusercontent.com/privatefolio/coingecko/refs/heads/main/public"
 
-// TODO8
-export const CONNECTIONS: string[] = [
-  "arbitrum-one",
-  "base",
-  "polygon-pos",
-  "optimistic-ethereum",
-  "ethereum",
-  "binance",
-]
-
 export const SHORT_THROTTLE_DURATION = 200
 export const MEDIUM_THROTTLE_DURATION = 1_000
 export const LONG_THROTTLE_DURATION = 2_000

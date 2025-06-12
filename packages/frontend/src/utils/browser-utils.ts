@@ -38,3 +38,12 @@ export function closeSubscription(sub: Promise<SubscriptionId>, rpc: RPC) {
     window.removeEventListener("beforeunload", closeSub)
   }
 }
+
+export function isInputFocused() {
+  const { activeElement } = document
+  return (
+    activeElement instanceof HTMLInputElement ||
+    activeElement instanceof HTMLTextAreaElement ||
+    (activeElement instanceof HTMLElement && activeElement.isContentEditable)
+  )
+}

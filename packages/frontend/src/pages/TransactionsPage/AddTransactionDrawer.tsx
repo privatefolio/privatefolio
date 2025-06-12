@@ -1,31 +1,33 @@
-import { CloseRounded } from "@mui/icons-material"
 import { LoadingButton } from "@mui/lab"
 import {
   Autocomplete,
   Drawer,
-  IconButton,
+  ListItemAvatar,
   ListItemText,
   MenuItem,
   Select,
   Stack,
   TextField,
-  Typography,
 } from "@mui/material"
 import { DatePicker } from "@mui/x-date-pickers"
 import { useStore } from "@nanostores/react"
-import React, { useCallback, useMemo, useState } from "react"
+import { WritableAtom } from "nanostores"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
+import { DrawerHeader } from "src/components/DrawerHeader"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TRANSACTIONS_TYPES, TransactionType } from "src/interfaces"
-import { CONNECTIONS } from "src/settings"
 import { $activeAccount } from "src/stores/account-store"
-import { PopoverToggleProps } from "src/stores/app-store"
-import { $assetMap } from "src/stores/metadata-store"
+import { $assetMap, $myPlatforms } from "src/stores/metadata-store"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { asUTC } from "src/utils/formatting-utils"
 import { $rpc } from "src/workers/remotes"
 
-export function AddTransactionDrawer(props: PopoverToggleProps) {
-  const { open, toggleOpen, ...rest } = props
+import { PlatformAvatar } from "../../components/PlatformAvatar"
+
+export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
+  const { atom } = props
+
+  const open = useStore(atom)
 
   const [loading, setLoading] = useState(false)
 
@@ -91,14 +93,14 @@ export function AddTransactionDrawer(props: PopoverToggleProps) {
           activeAccount
         )
         .then(() => {
-          toggleOpen()
+          atom.set(false)
         })
         .catch(() => {
           setLoading(false)
         })
     },
     [
-      toggleOpen,
+      atom,
       platform,
       binanceWallet,
       type,
@@ -111,18 +113,27 @@ export function AddTransactionDrawer(props: PopoverToggleProps) {
     ]
   )
 
+  const platformsMap = useStore($myPlatforms)
+  const platforms = useMemo(() => Object.values(platformsMap), [platformsMap])
+
+  useEffect(() => {
+    if (open) return
+
+    setPlatform("ethereum")
+    setBinanceWallet("Spot")
+    setType("Swap")
+    setNotes("")
+    setFeeAsset(null)
+    setIncomingAsset(null)
+    setOutgoingAsset(null)
+    setLoading(false)
+  }, [open])
+
   return (
-    <Drawer open={open} onClose={toggleOpen} {...rest}>
+    <Drawer open={open} onClose={() => atom.set(false)}>
       <form onSubmit={handleSubmit}>
-        <Stack paddingX={2} paddingY={1} gap={4} sx={{ overflowX: "hidden", width: 359 }}>
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Typography variant="subtitle1" letterSpacing="0.025rem">
-              Add transaction
-            </Typography>
-            <IconButton onClick={toggleOpen} edge="end" color="secondary" aria-label="Close dialog">
-              <CloseRounded fontSize="small" />
-            </IconButton>
-          </Stack>
+        <Stack paddingX={2} paddingY={1} gap={2} sx={{ overflowX: "hidden", width: 359 }}>
+          <DrawerHeader toggleOpen={() => atom.set(false)}>Add transaction</DrawerHeader>
           <div>
             <SectionTitle>Platform</SectionTitle>
             <Select
@@ -131,9 +142,14 @@ export function AddTransactionDrawer(props: PopoverToggleProps) {
               value={platform}
               onChange={(event) => setPlatform(event.target.value)}
             >
-              {CONNECTIONS.map((x) => (
-                <MenuItem key={x} value={x}>
-                  <ListItemText primary={x} />
+              {platforms?.map((x) => (
+                <MenuItem key={x.id} value={x.id}>
+                  <Stack direction="row" alignItems="center">
+                    <ListItemAvatar>
+                      <PlatformAvatar src={x.image} alt={x.name} size="small" />
+                    </ListItemAvatar>
+                    <ListItemText primary={x.name} />
+                  </Stack>
                 </MenuItem>
               ))}
             </Select>

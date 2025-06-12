@@ -1,5 +1,5 @@
 import { ExpandMore } from "@mui/icons-material"
-import { Button, Stack, Tooltip, Typography } from "@mui/material"
+import { Button, MenuItem, Stack, Tooltip, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useState } from "react"
 import { useBoolean } from "src/hooks/useBoolean"
@@ -31,10 +31,10 @@ export function AccountPickerButton(props: { onClose?: () => void }) {
   return (
     <>
       <Tooltip title="Account">
-        <Button
+        <MenuItem
+          component={Button}
           onClick={handleClick}
           color="secondary"
-          fullWidth
           sx={{
             borderRadius: 0.5,
             gap: 0.5,
@@ -60,7 +60,7 @@ export function AccountPickerButton(props: { onClose?: () => void }) {
             </Typography>
           </Stack>
           <ExpandMore fontSize="small" sx={{ flex: "0 0 20px" }} />
-        </Button>
+        </MenuItem>
       </Tooltip>
       <AccountPicker
         open={open}

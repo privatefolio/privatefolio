@@ -26,7 +26,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <ThemeProvider>
         <ConfirmDialogProvider>
           {/* <NoticeBoard /> */}
-          <KBarProvider options={{ disableDocumentLock: true, toggleShortcut: "/" }}>
+          <KBarProvider
+            options={{
+              disableDocumentLock: true,
+              // enableHistory: true, does not do what I expected it to do
+              toggleShortcut: "/",
+            }}
+          >
             <SnackbarProvider
               anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
               maxSnack={3}

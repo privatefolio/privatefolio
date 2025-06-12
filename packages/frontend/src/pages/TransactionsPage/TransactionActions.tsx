@@ -1,5 +1,4 @@
 import {
-  Add,
   CallMergeRounded,
   DownloadRounded,
   MoreHoriz,
@@ -32,7 +31,7 @@ interface TransactionActionsProps {
 }
 
 export function TransactionActions(props: TransactionActionsProps) {
-  const { tableDataRef, toggleAddTransactionDrawer } = props
+  const { tableDataRef, toggleAddTransactionDrawer: _toggleAddTransactionDrawer } = props
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const menuOpen = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -49,6 +48,17 @@ export function TransactionActions(props: TransactionActionsProps) {
 
   return (
     <Stack direction="row">
+      {/* <Tooltip title="Add Transaction">
+        <IconButton
+          color="secondary"
+          onClick={() => {
+            handleClose()
+            toggleAddTransactionDrawer()
+          }}
+        >
+          <Add fontSize="small" />
+        </IconButton>
+      </Tooltip> */}
       <Tooltip
         title={showQuotedAmounts ? "Show amounts in Base Asset" : "Show amounts in Quote Currency"}
       >
@@ -121,18 +131,6 @@ export function TransactionActions(props: TransactionActionsProps) {
             <RemoveCircle fontSize="small" />
           </ListItemAvatar>
           <ListItemText>Detect spam transactions</ListItemText>
-        </MenuItem>
-        <MenuItem
-          dense
-          onClick={() => {
-            handleClose()
-            toggleAddTransactionDrawer()
-          }}
-        >
-          <ListItemAvatar>
-            <Add fontSize="small" />
-          </ListItemAvatar>
-          <ListItemText>Add Transaction</ListItemText>
         </MenuItem>
       </Menu>
     </Stack>

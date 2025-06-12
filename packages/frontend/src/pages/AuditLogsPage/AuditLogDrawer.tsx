@@ -1,10 +1,10 @@
-import { CloseRounded } from "@mui/icons-material"
-import { Button, Drawer, DrawerProps, IconButton, Stack, Typography } from "@mui/material"
+import { Button, Drawer, DrawerProps, Stack } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AmountBlock } from "src/components/AmountBlock"
 import { AppLink } from "src/components/AppLink"
+import { DrawerHeader } from "src/components/DrawerHeader"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
 import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { PlatformBlock } from "src/components/PlatformBlock"
@@ -70,14 +70,7 @@ export function AuditLogDrawer(props: AuditLogDrawerProps) {
           ...theme.typography.body2,
         })}
       >
-        <Stack marginBottom={2} direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="subtitle1" letterSpacing="0.025rem">
-            Audit log details
-          </Typography>
-          <IconButton onClick={toggleOpen} edge="end" color="secondary" aria-label="Close dialog">
-            <CloseRounded fontSize="small" />
-          </IconButton>
-        </Stack>
+        <DrawerHeader toggleOpen={toggleOpen}>Audit log details</DrawerHeader>
         <div>
           <SectionTitle>Identifier</SectionTitle>
           <IdentifierBlock id={id} />

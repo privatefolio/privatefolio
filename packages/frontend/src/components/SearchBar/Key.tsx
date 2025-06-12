@@ -46,3 +46,5 @@ export const Key: FC<KeyProps> = ({ children, variant = "default", sx, ...props 
 const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform)
 
 export const MAIN_KEY = isMac ? "⌘" : "Ctrl"
+
+// https://github.com/jamiebuilds/tinykeys

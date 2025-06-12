@@ -1,14 +1,5 @@
-import { ArrowRightAltRounded, CloseRounded } from "@mui/icons-material"
-import {
-  Button,
-  Drawer,
-  DrawerProps,
-  IconButton,
-  Skeleton,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material"
+import { ArrowRightAltRounded } from "@mui/icons-material"
+import { Button, Drawer, DrawerProps, Skeleton, Stack, TextField } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { debounce } from "lodash-es"
 import React, { useEffect, useState } from "react"
@@ -16,6 +7,7 @@ import { Link } from "react-router-dom"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AmountBlock } from "src/components/AmountBlock"
 import { AppLink } from "src/components/AppLink"
+import { DrawerHeader } from "src/components/DrawerHeader"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
 import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { PlatformBlock } from "src/components/PlatformBlock"
@@ -110,14 +102,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
           ...theme.typography.body2,
         })}
       >
-        <Stack marginBottom={2} direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="subtitle1" letterSpacing="0.025rem">
-            Transaction details
-          </Typography>
-          <IconButton onClick={toggleOpen} edge="end" color="secondary" aria-label="Close dialog">
-            <CloseRounded fontSize="small" />
-          </IconButton>
-        </Stack>
+        <DrawerHeader toggleOpen={toggleOpen}>Transaction details</DrawerHeader>
         <div>
           <SectionTitle>Identifier</SectionTitle>
           <IdentifierBlock id={id} />

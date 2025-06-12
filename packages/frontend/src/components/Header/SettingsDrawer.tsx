@@ -1,18 +1,10 @@
-import { CloseRounded } from "@mui/icons-material"
-import {
-  Drawer,
-  IconButton,
-  Stack,
-  styled,
-  SwipeableDrawer,
-  Typography,
-  useMediaQuery,
-} from "@mui/material"
+import { Drawer, styled, SwipeableDrawer, Typography, useMediaQuery } from "@mui/material"
 import { grey } from "@mui/material/colors"
 import React from "react"
 import { APP_VERSION, GIT_HASH } from "src/env"
 import { PopoverToggleProps } from "src/stores/app-store"
 
+import { DrawerHeader } from "../DrawerHeader"
 import { SettingsDrawerContents } from "./SettingsDrawerContents"
 
 const Puller = styled("div")(({ theme }) => ({
@@ -63,20 +55,9 @@ export function SettingsDrawer(props: PopoverToggleProps) {
   return (
     <>
       <Drawer keepMounted open={open} onClose={toggleOpen}>
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          paddingX={2}
-          paddingY={1}
-        >
-          <Typography variant="subtitle1" letterSpacing="0.025rem">
-            Settings
-          </Typography>
-          <IconButton onClick={toggleOpen} edge="end" color="secondary" aria-label="Close dialog">
-            <CloseRounded fontSize="small" />
-          </IconButton>
-        </Stack>
+        <DrawerHeader toggleOpen={toggleOpen} paddingX={2} paddingY={1}>
+          Settings
+        </DrawerHeader>
         <SettingsDrawerContents appVer={APP_VERSION} gitHash={GIT_HASH} />
       </Drawer>
     </>

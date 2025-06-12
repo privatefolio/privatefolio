@@ -1,14 +1,16 @@
 import { useStore } from "@nanostores/react"
+import { atom } from "nanostores"
 import React, { useEffect, useRef } from "react"
-import { AddTransactionDrawer } from "src/components/AddTransactionDrawer"
 import { Subheading } from "src/components/Subheading"
-import { useBoolean } from "src/hooks/useBoolean"
 import { Transaction } from "src/interfaces"
+import { AddTransactionDrawer } from "src/pages/TransactionsPage/AddTransactionDrawer"
 import { $activeAccount } from "src/stores/account-store"
 
 import { StaggeredList } from "../../components/StaggeredList"
 import { TransactionActions } from "./TransactionActions"
 import { TransactionTable } from "./TransactionTable"
+
+const $drawerOpen = atom(false)
 
 export default function TransactionsPage({ show }: { show: boolean }) {
   const activeAccount = useStore($activeAccount)
@@ -19,8 +21,6 @@ export default function TransactionsPage({ show }: { show: boolean }) {
 
   const tableDataRef = useRef<Transaction[]>([])
 
-  const { value: open, toggle: toggleOpen } = useBoolean(false)
-
   return (
     <>
       <StaggeredList component="main" gap={2} show={show}>
@@ -29,13 +29,16 @@ export default function TransactionsPage({ show }: { show: boolean }) {
             <span>Transactions</span>
             <TransactionActions
               tableDataRef={tableDataRef}
-              toggleAddTransactionDrawer={toggleOpen}
+              toggleAddTransactionDrawer={() => $drawerOpen.set(true)}
             />
           </Subheading>
-          <TransactionTable tableDataRef={tableDataRef} toggleAddTransactionDrawer={toggleOpen} />
+          <TransactionTable
+            tableDataRef={tableDataRef}
+            toggleAddTransactionDrawer={() => $drawerOpen.set(true)}
+          />
         </div>
       </StaggeredList>
-      <AddTransactionDrawer open={open} toggleOpen={toggleOpen} />
+      <AddTransactionDrawer atom={$drawerOpen} />
     </>
   )
 }

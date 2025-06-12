@@ -37,6 +37,7 @@ import { StackedAreaSeries } from "src/lightweight-charts/plugins/stacked-area-s
 import { StackedTooltipPrimitive } from "src/lightweight-charts/plugins/stacked-tooltip/stacked-tooltip"
 import { $inspectTime } from "src/stores/pages/balances-store"
 import { MonoFont } from "src/theme"
+import { isInputFocused } from "src/utils/browser-utils"
 import { noop } from "src/utils/utils"
 
 import { useBoolean } from "../hooks/useBoolean"
@@ -109,7 +110,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
     if (size === "small") {
       return 200
     } else if (size === "medium") {
-      return isMobile ? 320 : 460
+      return isMobile ? 320 : 444
     } else {
       return isMobile ? 400 : 540
     }
@@ -196,7 +197,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
           seriesRef.current.setData(data as ChartData[] as never)
         } catch (error) {
           console.error(error)
-          // setError(error) TODO2
+          setError(error as Error)
         }
       }
       //
@@ -299,6 +300,8 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
     }
 
     function handleKeyup(event: KeyboardEvent) {
+      if (isInputFocused()) return
+
       if (event.key === "Shift") {
         shiftPressedRef.current = false
         if (allowedCursorModes.includes("move")) {
