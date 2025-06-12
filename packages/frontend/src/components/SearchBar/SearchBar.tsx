@@ -4,6 +4,8 @@ import {
   BackupRounded,
   CallMergeRounded,
   DeleteForever,
+  DownloadRounded,
+  RestoreRounded,
   SyncRounded,
   Workspaces,
 } from "@mui/icons-material"
@@ -25,9 +27,15 @@ import { useNavigate } from "react-router-dom"
 import { Asset, FindPlatformsResult, RichExtension, Transaction } from "src/interfaces"
 import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
-import { handleBackupRequest } from "src/utils/backup-utils"
+import {
+  handleBackupRequest,
+  handleExportAuditLogsRequest,
+  handleExportTransactionsRequest,
+  onRestoreRequest,
+} from "src/utils/backup-utils"
 import { formatDateRelative, formatPrivatefolioTxId } from "src/utils/formatting-utils"
 import { normalizeTxHash } from "src/utils/parsing-utils"
+import { noop } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 import { AssetAvatar } from "../AssetAvatar"
@@ -158,7 +166,7 @@ export const SearchBar = () => {
       keywords: txHash,
       name: `${tx.metadata.method || "Unknown"}`,
       perform: () => navigate(`${activeAccountPath}/transactions?id=${tx.id}`),
-      section: "Transactions",
+      section: { name: "Transactions", priority: 11 },
       subtitle: `${formatDateRelative(tx.timestamp)} - ${formatPrivatefolioTxId(tx.id)}`, // Show at the very top
     }))
 
@@ -169,7 +177,7 @@ export const SearchBar = () => {
         keywords: txHash,
         name: "View all ",
         perform: () => navigate(`${activeAccountPath}/transactions?txHash=${txHash}`),
-        section: "Transactions",
+        section: { name: "Transactions", priority: 11 },
         subtitle: `${actions.length} transactions linked to this tx hash`,
       })
     }
@@ -188,7 +196,7 @@ export const SearchBar = () => {
         name: blockchain.name,
         perform: () => navigate(`${activeAccountPath}/platform/${blockchain.id}`),
         priority: -(blockchain.chainId ?? Infinity),
-        section: "Blockchains",
+        section: { name: "Blockchains", priority: 6 },
       })
     })
 
@@ -196,11 +204,11 @@ export const SearchBar = () => {
       actions.push({
         icon: <PlatformAvatar src={exchange.image} alt={exchange.name} size="snug" />,
         id: `exchange-${exchange.id}`,
-        keywords: `${exchange.name} ${exchange.id} ${exchange.country} exchange`,
+        keywords: `${exchange.name} ${exchange.id} exchange`, // ${exchange.country} TODO7
         name: exchange.name,
         perform: () => navigate(`${activeAccountPath}/platform/${exchange.id}`),
         priority: -(exchange.coingeckoTrustRank ?? Infinity),
-        section: "Exchanges",
+        section: { name: "Exchanges", priority: 7 },
       })
     })
 
@@ -223,7 +231,7 @@ export const SearchBar = () => {
       name: asset.symbol.toUpperCase(),
       perform: () => navigate(`${activeAccountPath}/asset/${asset.id}`),
       priority: -(asset.marketCapRank ?? Infinity),
-      section: "Assets",
+      section: { name: "Assets", priority: 8 },
       subtitle: asset.name,
     }))
   }, [assetsFound, navigate, activeAccountPath])
@@ -244,7 +252,7 @@ export const SearchBar = () => {
         keywords: `${extension.extensionName} ${extension.description} ${extension.authorGithub} extension`,
         name: extension.extensionName,
         perform: () => navigate(`${activeAccountPath}/extension/${extension.id}`),
-        section: "Extensions",
+        section: { name: "Extensions", priority: 9 },
         subtitle: extension.description,
       })
     })
@@ -264,7 +272,7 @@ export const SearchBar = () => {
         name: "Fetch asset prices",
         perform: () => rpc.enqueueFetchPrices(activeAccount, "user"),
         priority: 1,
-        section: "Actions",
+        section: { name: "Actions", priority: 10 },
         shortcut: ["f", "p"],
       },
       {
@@ -274,11 +282,11 @@ export const SearchBar = () => {
         perform: () =>
           rpc.enqueueSyncAllConnections(activeAccount, "user", $debugMode.get(), (error) => {
             if (error) {
-              enqueueSnackbar("Could not sync connection", {})
+              enqueueSnackbar("Could not sync connection", { variant: "error" })
             }
           }),
         priority: 1,
-        section: "Actions",
+        section: { name: "Actions", priority: 10 },
         shortcut: ["s", "c"],
       },
       {
@@ -287,7 +295,7 @@ export const SearchBar = () => {
         name: "Detect spam transactions",
         perform: () => rpc.enqueueDetectSpamTransactions(activeAccount, "user"),
         priority: 1,
-        section: "Actions",
+        section: { name: "Actions", priority: 10 },
       },
       {
         icon: <CallMergeRounded fontSize="small" />,
@@ -295,15 +303,43 @@ export const SearchBar = () => {
         name: "Auto-merge transactions",
         perform: () => rpc.enqueueAutoMerge(activeAccount, "user"),
         priority: 1,
-        section: "Actions",
+        section: { name: "Actions", priority: 10 },
       },
       {
         icon: <BackupRounded fontSize="small" />,
         id: "action-backup-account",
+        keywords: "backup account restore",
         name: "Backup account",
         perform: () => handleBackupRequest(rpc, activeAccount),
         priority: 1,
-        section: "Actions",
+        section: { name: "Actions", priority: 10 },
+      },
+      {
+        icon: <RestoreRounded fontSize="small" />,
+        id: "action-restore-account",
+        keywords: "restore account backup",
+        name: "Restore account",
+        perform: () => onRestoreRequest(rpc, activeAccount, noop),
+        priority: 1,
+        section: { name: "Actions", priority: 10 },
+      },
+      {
+        icon: <DownloadRounded fontSize="small" />,
+        id: "action-export-transactions",
+        keywords: "export transactions",
+        name: "Export transactions",
+        perform: () => handleExportTransactionsRequest(rpc, activeAccount),
+        priority: 1,
+        section: { name: "Actions", priority: 10 },
+      },
+      {
+        icon: <DownloadRounded fontSize="small" />,
+        id: "action-export-audit-logs",
+        keywords: "export audit logs",
+        name: "Export audit logs",
+        perform: () => handleExportAuditLogsRequest(rpc, activeAccount),
+        priority: 1,
+        section: { name: "Actions", priority: 10 },
       },
       {
         icon: <AccountBalanceRounded fontSize="small" />,
@@ -311,7 +347,7 @@ export const SearchBar = () => {
         name: "Refetch asset platforms",
         perform: () => rpc.enqueueRefetchPlatforms(activeAccount, "user"),
         priority: 1,
-        section: "Actions",
+        section: { name: "Actions", priority: 10 },
       },
       {
         icon: <Workspaces fontSize="small" />,
@@ -319,7 +355,7 @@ export const SearchBar = () => {
         name: "Refetch assets",
         perform: () => rpc.enqueueRefetchAssets(activeAccount, "user"),
         priority: 1,
-        section: "Actions",
+        section: { name: "Actions", priority: 10 },
       },
       {
         icon: <DeleteForever fontSize="small" />,
@@ -327,7 +363,7 @@ export const SearchBar = () => {
         name: "Delete asset prices",
         perform: () => rpc.enqueueDeleteAssetPrices(activeAccount, "user"),
         priority: 1,
-        section: "Actions",
+        section: { name: "Actions", priority: 10 },
       },
     ],
     [assetActions, txnsFoundActions, platformActions, extensionActions, rpc, activeAccount]

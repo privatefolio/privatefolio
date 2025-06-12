@@ -1,10 +1,64 @@
-import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded"
-import { IconButton, Tooltip } from "@mui/material"
-import { enqueueSnackbar } from "notistack"
-import React from "react"
+import { closeSnackbar, enqueueSnackbar } from "notistack"
 import { $rest, RPC } from "src/workers/remotes"
 
-import { downloadFile, requestFile } from "./utils"
+import { requestFile } from "./utils"
+
+export async function handleBackupRequest(rpc: RPC, accountName: string) {
+  const snackbarKey = enqueueSnackbar("Backup queued", { persist: true, variant: "info" })
+  try {
+    const fileRecord = await rpc.enqueueBackup(accountName, "user")
+    closeSnackbar(snackbarKey)
+    enqueueSnackbar("Backup ready for download", {
+      accountName,
+      autoHideDuration: null,
+      fileRecord,
+      rpc,
+      variant: "fileDownload",
+    })
+  } catch (error) {
+    enqueueSnackbar("An error occurred while creating the file", {
+      variant: "error",
+    })
+  }
+}
+
+export async function handleExportTransactionsRequest(rpc: RPC, accountName: string) {
+  const snackbarKey = enqueueSnackbar("Export queued", { persist: true, variant: "info" })
+  try {
+    const fileRecord = await rpc.enqueueExportTransactions(accountName, "user")
+    closeSnackbar(snackbarKey)
+    enqueueSnackbar("Transactions export ready for download", {
+      accountName,
+      autoHideDuration: null,
+      fileRecord,
+      rpc,
+      variant: "fileDownload",
+    })
+  } catch (error) {
+    enqueueSnackbar("An error occurred while creating the file", {
+      variant: "error",
+    })
+  }
+}
+
+export async function handleExportAuditLogsRequest(rpc: RPC, accountName: string) {
+  const snackbarKey = enqueueSnackbar("Export queued", { persist: true, variant: "info" })
+  try {
+    const fileRecord = await rpc.enqueueExportAuditLogs(accountName, "user")
+    closeSnackbar(snackbarKey)
+    enqueueSnackbar("Audit logs export ready for download", {
+      accountName,
+      autoHideDuration: null,
+      fileRecord,
+      rpc,
+      variant: "fileDownload",
+    })
+  } catch (error) {
+    enqueueSnackbar("An error occurred while creating the file", {
+      variant: "error",
+    })
+  }
+}
 
 export async function onRestoreRequest(rpc: RPC, activeAccount: string, handleClose: () => void) {
   const file = await requestFile([".zip"], false)
@@ -12,52 +66,6 @@ export async function onRestoreRequest(rpc: RPC, activeAccount: string, handleCl
   await rpc.resetAccount(activeAccount)
   const fileRecord = await handleRestoreRequest(rpc, activeAccount, file[0])
   await rpc.enqueueRestore(activeAccount, "user", fileRecord)
-}
-
-export async function handleBackupRequest(rpc: RPC, accountName: string) {
-  const snackbarKey = enqueueSnackbar("Backup queued", { persist: true, variant: "info" })
-  try {
-    const fileRecord = await rpc.enqueueBackup(accountName, "user")
-    enqueueSnackbar(
-      <div>
-        <span>Backup ready for download</span>
-        <Tooltip title="Download">
-          <IconButton
-            aria-label="download"
-            color="inherit"
-            onClick={async () => {
-              const params = new URLSearchParams({
-                accountName,
-                fileId: fileRecord.id.toString(),
-              })
-
-              const { baseUrl, jwtKey } = $rest.get()
-
-              const response = await fetch(`${baseUrl}/download?${params.toString()}`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem(jwtKey)}` },
-              })
-
-              const blob = await response.blob()
-
-              downloadFile(blob, fileRecord.name)
-            }}
-          >
-            <DownloadRoundedIcon />
-          </IconButton>
-        </Tooltip>
-      </div>,
-      {
-        autoHideDuration: null,
-        key: snackbarKey,
-        variant: "success",
-      }
-    )
-  } catch (error) {
-    enqueueSnackbar("An error occurred while creating the file", {
-      key: snackbarKey,
-      variant: "error",
-    })
-  }
 }
 
 export async function handleRestoreRequest(rpc: RPC, accountName: string, file: File) {

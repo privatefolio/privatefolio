@@ -1,4 +1,3 @@
-// import InfoRoundedIcon from "@mui/icons-material/InfoRounded"
 import { Stack, StackProps, StackTypeMap } from "@mui/material"
 import React from "react"
 

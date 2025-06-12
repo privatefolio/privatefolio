@@ -12,6 +12,7 @@ import { BrowserRouter, HashRouter } from "react-router-dom"
 
 import { AnalyticsProvider } from "./AnalyticsProvider"
 import App from "./App"
+import { FileDownloadSnackbar } from "./components/FileDownloadSnackbar"
 import { ConfirmDialogProvider } from "./hooks/useConfirm"
 import { ThemeProvider } from "./ThemeProvider"
 import { isElectron } from "./utils/electron-utils"
@@ -29,6 +30,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <SnackbarProvider
               anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
               maxSnack={3}
+              // transitionDuration={{ enter: 225, exit: 195 }}
+              Components={{
+                fileDownload: FileDownloadSnackbar,
+              }}
               action={(snackbarId) => (
                 <IconButton onClick={() => closeSnackbar(snackbarId)} size="small">
                   <CloseRounded fontSize="small" />

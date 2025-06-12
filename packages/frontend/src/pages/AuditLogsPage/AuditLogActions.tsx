@@ -18,12 +18,13 @@ import {
   Typography,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
+import { transformAuditLogsToCsv } from "privatefolio-backend/build/src/utils/csv-export-utils"
 import React, { MutableRefObject, useState } from "react"
 import { AuditLog } from "src/interfaces"
 import { $showQuotedAmounts } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
-import { exportAuditLogsToCsv } from "src/utils/csv-export-utils"
+import { handleExportAuditLogsRequest } from "src/utils/backup-utils"
 import { downloadCsv } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
@@ -76,7 +77,7 @@ export function AuditLogActions(props: AuditLogsActionsProps) {
         <MenuItem
           dense
           onClick={() => {
-            const data = exportAuditLogsToCsv(tableDataRef.current)
+            const data = transformAuditLogsToCsv(tableDataRef.current)
             downloadCsv(data, `${activeAccount}-audit-logs.csv`)
             handleClose()
           }}
@@ -88,25 +89,9 @@ export function AuditLogActions(props: AuditLogsActionsProps) {
         </MenuItem>
         <MenuItem
           dense
-          onClick={async () => {
-            // TODO9
-            // const auditLogs = await rpc.getAuditLogs(activeAccount)
-            // const data = exportAuditLogsToCsv(auditLogs)
-            // downloadCsv(data, `${activeAccount}-audit-logs.csv`)
-            // handleClose()
-            // return enqueueTask(accountName, {
-            //   abortable: true,
-            //   description: "Export all audit logs.",
-            //   determinate: true,
-            //   function: async () => {
-            //     const auditLogs = await getAuditLogs(accountName)
-            //     const data = exportAuditLogsToCsv(auditLogs)
-            //     downloadCsv(data, `${accountName}-audit-logs.csv`)
-            //   },
-            //   name: "Export all audit logs",
-            //   priority: TaskPriority.Low,
-            //   trigger,
-            // })
+          onClick={() => {
+            handleExportAuditLogsRequest(rpc, activeAccount)
+            handleClose()
           }}
         >
           <ListItemAvatar>

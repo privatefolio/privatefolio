@@ -30,7 +30,7 @@ export function AssetAmountBlock(props: AssetAmountBlockProps) {
     )
   }
 
-  if (priceMap === undefined) return <Skeleton sx={{ minWidth: 60 }} />
+  if (priceMap === undefined) return <Skeleton sx={{ marginX: 1, minWidth: 60 }} />
   const price = assetId ? priceMap[assetId]?.value : undefined
 
   return (

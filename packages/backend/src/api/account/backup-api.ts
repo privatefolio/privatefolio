@@ -14,10 +14,11 @@ import { join } from "path"
 import type { NewServerTask, TaskStatus } from "src/interfaces"
 import { ProgressCallback, ServerFile, TaskPriority, TaskTrigger } from "src/interfaces"
 import { DATABASES_LOCATION, FILES_LOCATION, TASK_LOGS_LOCATION } from "src/settings/settings"
+import { saveFile } from "src/utils/file-utils"
 import { noop, parseProgressLog } from "src/utils/utils"
 
 import { getAccount, reconnectAccount } from "../accounts-api"
-import { getServerFiles, patchServerFile, upsertServerFile } from "./server-files-api"
+import { getServerFiles } from "./server-files-api"
 import {
   enqueueTask,
   getServerTaskLog,
@@ -161,7 +162,7 @@ export async function backup(
     })
 
     await progress([95, `Saving full backup file record: ${archiveFilename}`])
-    const fileRecord = await saveBackupFile(
+    const fileRecord = await saveFile(
       accountName,
       zipBufferData,
       archiveFilename,
@@ -189,62 +190,6 @@ export async function backup(
       }
     }
   }
-}
-
-async function saveBackupFile(
-  accountName: string,
-  bufferData: Buffer,
-  name: string,
-  mimeType: string
-): Promise<ServerFile> {
-  const fileRecord = await upsertServerFile(accountName, {
-    createdBy: "system",
-    metadata: {
-      lastModified: Date.now(),
-      size: bufferData.length,
-      type: mimeType,
-    },
-    name,
-    scheduledAt: Date.now(),
-    status: "scheduled",
-  })
-
-  await patchServerFile(accountName, fileRecord.id, {
-    startedAt: Date.now(),
-    status: "uploading",
-    //
-  })
-
-  const uploadDir = join(FILES_LOCATION, accountName)
-
-  // Ensure the directory for the account exists, create it if not
-  try {
-    await access(uploadDir)
-  } catch {
-    // Directory doesn't exist, create it
-    await mkdir(uploadDir, { recursive: true })
-  }
-
-  const filePath = join(uploadDir, String(fileRecord.id))
-
-  try {
-    await writeFile(filePath, bufferData)
-    await patchServerFile(accountName, fileRecord.id, {
-      completedAt: Date.now(),
-      progress: 100,
-      status: "completed",
-      //
-    })
-  } catch (error) {
-    await patchServerFile(accountName, fileRecord.id, {
-      completedAt: Date.now(),
-      status: "aborted",
-      //
-    })
-    throw error
-  }
-
-  return fileRecord
 }
 
 export async function restore(

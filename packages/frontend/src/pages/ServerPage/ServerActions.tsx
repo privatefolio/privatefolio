@@ -1,6 +1,10 @@
-import { Bedtime, CalculateOutlined, MoreHoriz } from "@mui/icons-material"
-import BackupRoundedIcon from "@mui/icons-material/BackupRounded"
-import RestoreRoundedIcon from "@mui/icons-material/RestoreRounded"
+import {
+  BackupRounded,
+  Bedtime,
+  CalculateOutlined,
+  MoreHoriz,
+  RestoreRounded,
+} from "@mui/icons-material"
 import {
   Divider,
   IconButton,
@@ -54,13 +58,13 @@ export function ServerActions() {
           }}
         >
           <ListItemAvatar>
-            <BackupRoundedIcon fontSize="small" />
+            <BackupRounded fontSize="small" />
           </ListItemAvatar>
           <ListItemText>Backup</ListItemText>
         </MenuItem>
         <MenuItem dense onClick={() => onRestoreRequest(rpc, activeAccount, handleClose)}>
           <ListItemAvatar>
-            <RestoreRoundedIcon fontSize="small" />
+            <RestoreRounded fontSize="small" />
           </ListItemAvatar>
           <ListItemText>Restore</ListItemText>
         </MenuItem>

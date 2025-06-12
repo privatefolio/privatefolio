@@ -140,7 +140,7 @@ function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
             <MyAssetBlock id={assetId} />
           </TableCell>
         )}
-        <TableCell align="right">
+        <TableCell align="right" variant="clickable">
           <AssetAmountBlock
             assetId={assetId}
             amount={balance}

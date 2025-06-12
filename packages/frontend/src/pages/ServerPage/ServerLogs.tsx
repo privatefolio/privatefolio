@@ -33,7 +33,7 @@ export function ServerLogs() {
   // }, [activeAccount, connectionStatus])
 
   return (
-    <Paper sx={{ paddingX: 2, paddingY: 1 }}>
+    <Paper sx={{ maxHeight: 800, overflow: "auto", paddingX: 2, paddingY: 1 }}>
       {isLoading ? (
         <DefaultSpinner />
       ) : logs.length === 0 ? (

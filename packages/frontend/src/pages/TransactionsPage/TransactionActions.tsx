@@ -17,12 +17,12 @@ import {
   Tooltip,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
+import { transformTransactionsToCsv } from "privatefolio-backend/build/src/utils/csv-export-utils"
 import React, { MutableRefObject } from "react"
-// import { exportTransactionsToCsv } from "src/extensions/file-imports/csv-export-utils"
 import { Transaction } from "src/interfaces"
 import { $showQuotedAmounts } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
-import { exportTransactionsToCsv } from "src/utils/csv-export-utils"
+import { handleExportTransactionsRequest } from "src/utils/backup-utils"
 import { downloadCsv } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
@@ -76,7 +76,7 @@ export function TransactionActions(props: TransactionActionsProps) {
         <MenuItem
           dense
           onClick={() => {
-            const data = exportTransactionsToCsv(tableDataRef.current)
+            const data = transformTransactionsToCsv(tableDataRef.current)
             downloadCsv(data, `${activeAccount}-transactions.csv`)
             handleClose()
           }}
@@ -89,7 +89,7 @@ export function TransactionActions(props: TransactionActionsProps) {
         <MenuItem
           dense
           onClick={() => {
-            rpc.enqueueExportAllTransactions(activeAccount, "user")
+            handleExportTransactionsRequest(rpc, activeAccount)
             handleClose()
           }}
         >

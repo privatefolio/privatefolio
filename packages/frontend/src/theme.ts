@@ -117,7 +117,7 @@ export const theme: CssVarsThemeOptions = {
           defaultBg: grey[800],
         },
         Skeleton: {
-          bg: "rgb(50, 50, 50)",
+          bg: "rgb(50, 50, 50, 0.66)",
         },
         TableCell: {
           border: "rgba(255,255,255, 0.05)",
@@ -181,7 +181,7 @@ export const theme: CssVarsThemeOptions = {
       ],
       palette: {
         Skeleton: {
-          bg: "rgb(225, 225, 230)",
+          bg: "rgb(225, 225, 230, 0.33)",
         },
         TableCell: {
           border: "rgba(0,0,0, 0.05)",

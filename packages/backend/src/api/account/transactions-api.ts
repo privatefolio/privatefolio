@@ -3,11 +3,15 @@ import {
   AuditLogOperation,
   EventCause,
   MyAsset,
+  ServerFile,
   SqlParam,
   SubscriptionChannel,
 } from "src/interfaces"
 import { isEvmPlatform } from "src/utils/assets-utils"
+import { transformTransactionsToCsv } from "src/utils/csv-export-utils"
+import { createCsvString } from "src/utils/csv-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { saveFile } from "src/utils/file-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { noop } from "src/utils/utils"
 
@@ -432,18 +436,35 @@ export async function getTransactionsByTxHash(accountName: string, txHash: strin
   )
 }
 
-export async function enqueueExportAllTransactions(accountName: string, trigger: TaskTrigger) {
-  // return enqueueTask(accountName, {
-  //   abortable: true,
-  //   description: "Export all transactions.",
-  //   determinate: true,
-  //   function: async () => {
-  //     const txns = await getTransactions(accountName)
-  //     const data = exportTransactionsToCsv(txns)
-  //     downloadCsv(data, `${accountName}-transactions.csv`)
-  //   },
-  //   name: "Export all transactions",
-  //   priority: TaskPriority.Low,
-  //   trigger,
-  // })
+export async function enqueueExportTransactions(accountName: string, trigger: TaskTrigger) {
+  return new Promise<ServerFile>((resolve, reject) => {
+    enqueueTask(accountName, {
+      //   abortable: true, TODO5
+      description: "Export all transactions.",
+      determinate: true,
+      function: async (progress) => {
+        try {
+          await progress([0, "Fetching all transactions"])
+          const txns = await getTransactions(accountName)
+          await progress([25, `Transforming ${txns.length} transactions to CSV`])
+          const data = transformTransactionsToCsv(txns)
+          await progress([50, `Saving ${txns.length} transactions to CSV`])
+          const fileRecord = await saveFile(
+            accountName,
+            Buffer.from(createCsvString(data)),
+            `${accountName}-transactions.csv`,
+            "text/csv;charset=utf-8;"
+          )
+          await progress([75, `Transactions exported to CSV`])
+          resolve(fileRecord)
+        } catch (error) {
+          reject(error)
+          throw error
+        }
+      },
+      name: "Export all transactions",
+      priority: TaskPriority.Low,
+      trigger,
+    })
+  })
 }

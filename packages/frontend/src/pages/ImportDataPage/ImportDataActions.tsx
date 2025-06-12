@@ -1,6 +1,10 @@
-import { CalculateOutlined, MoreHoriz, SyncRounded } from "@mui/icons-material"
-import BackupRoundedIcon from "@mui/icons-material/BackupRounded"
-import RestoreRoundedIcon from "@mui/icons-material/RestoreRounded"
+import {
+  BackupRounded,
+  CalculateOutlined,
+  MoreHoriz,
+  RestoreRounded,
+  SyncRounded,
+} from "@mui/icons-material"
 import { IconButton, ListItemAvatar, ListItemText, Menu, MenuItem, Tooltip } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React from "react"
@@ -43,13 +47,13 @@ export function ImportDataActions() {
           }}
         >
           <ListItemAvatar>
-            <BackupRoundedIcon fontSize="small" />
+            <BackupRounded fontSize="small" />
           </ListItemAvatar>
           <ListItemText>Backup</ListItemText>
         </MenuItem>
         <MenuItem dense onClick={() => onRestoreRequest(rpc, activeAccount, handleClose)}>
           <ListItemAvatar>
-            <RestoreRoundedIcon fontSize="small" />
+            <RestoreRounded fontSize="small" />
           </ListItemAvatar>
           <ListItemText>Restore</ListItemText>
         </MenuItem>

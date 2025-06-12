@@ -1,7 +1,7 @@
 import { AuditLog, CsvData, EtherscanTransaction, Transaction } from "src/interfaces"
 import { toUTCString } from "src/utils/formatting-utils"
 
-const HEADER = [
+const txnsHeader = [
   "Timestamp",
   "Platform",
   "Wallet",
@@ -18,7 +18,7 @@ const HEADER = [
   "Notes",
 ]
 
-const HeaderAuditLogs = [
+const auditLogsHeader = [
   "Timestamp",
   "Platform",
   "Wallet",
@@ -28,7 +28,7 @@ const HeaderAuditLogs = [
   "New Balance",
 ]
 
-export function exportTransactionsToCsv(transactions: Transaction[]): CsvData {
+export function transformTransactionsToCsv(transactions: Transaction[]): CsvData {
   const rows: CsvData = transactions.map((tx) => [
     toUTCString(tx.timestamp),
     tx.platform,
@@ -46,12 +46,12 @@ export function exportTransactionsToCsv(transactions: Transaction[]): CsvData {
     tx.notes,
   ])
 
-  const data: CsvData = [HEADER, ...rows]
+  const data: CsvData = [txnsHeader, ...rows]
 
   return data
 }
 
-export function exportAuditLogsToCsv(auditLogs: AuditLog[]): CsvData {
+export function transformAuditLogsToCsv(auditLogs: AuditLog[]): CsvData {
   const rows: CsvData = auditLogs.map((logs) => [
     toUTCString(logs.timestamp),
     logs.platform,
@@ -62,7 +62,7 @@ export function exportAuditLogsToCsv(auditLogs: AuditLog[]): CsvData {
     logs.balance,
   ])
 
-  const data: CsvData = [HeaderAuditLogs, ...rows]
+  const data: CsvData = [auditLogsHeader, ...rows]
 
   return data
 }

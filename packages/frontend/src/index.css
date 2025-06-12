@@ -121,7 +121,7 @@ input[type=number]::-webkit-outer-spin-button {
 
 /* Notistack Customizations */
 .notistack-SnackbarContainer {
-  z-index: 3000 !important;
+  z-index: var(--mui-zIndex-snackbar) !important;
   bottom: 48px !important;
   gap: 4px !important;
 }

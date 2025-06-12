@@ -1,9 +1,13 @@
-import { EventCause, SqlParam } from "src/interfaces"
+import { EventCause, ServerFile, SqlParam, TaskPriority, TaskTrigger } from "src/interfaces"
+import { transformAuditLogsToCsv } from "src/utils/csv-export-utils"
+import { createCsvString } from "src/utils/csv-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { saveFile } from "src/utils/file-utils"
 import { createSubscription } from "src/utils/sub-utils"
 
 import { AuditLog, AuditLogOperation, SubscriptionChannel } from "../../interfaces"
 import { getAccount } from "../accounts-api"
+import { enqueueTask } from "./server-tasks-api"
 
 export async function getAuditLogs(
   accountName: string,
@@ -161,4 +165,37 @@ export async function getOperations(
   } catch (error) {
     throw new Error(`Failed to query operations: ${error}`)
   }
+}
+
+export async function enqueueExportAuditLogs(accountName: string, trigger: TaskTrigger) {
+  return new Promise<ServerFile>((resolve, reject) => {
+    enqueueTask(accountName, {
+      //   abortable: true, TODO5
+      description: "Export all audit logs.",
+      determinate: true,
+      function: async (progress) => {
+        try {
+          await progress([0, "Fetching all audit logs"])
+          const auditLogs = await getAuditLogs(accountName)
+          await progress([25, `Transforming ${auditLogs.length} audit logs to CSV`])
+          const data = transformAuditLogsToCsv(auditLogs)
+          await progress([50, `Saving ${auditLogs.length} audit logs to CSV`])
+          const fileRecord = await saveFile(
+            accountName,
+            Buffer.from(createCsvString(data)),
+            `${accountName}-audit-logs.csv`,
+            "text/csv;charset=utf-8;"
+          )
+          await progress([75, `Audit logs exported to CSV`])
+          resolve(fileRecord)
+        } catch (error) {
+          reject(error)
+          throw error
+        }
+      },
+      name: "Export all audit logs",
+      priority: TaskPriority.Low,
+      trigger,
+    })
+  })
 }
