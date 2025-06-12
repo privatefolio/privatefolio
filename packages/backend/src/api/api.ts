@@ -1,5 +1,6 @@
 import { BackendApiShape } from "src/backend-server"
 
+import * as analytics from "./account/analytics-api"
 import * as assets from "./account/assets-api"
 import * as auditLogs from "./account/audit-logs-api"
 import * as backup from "./account/backup-api"
@@ -22,6 +23,7 @@ import * as transactions from "./account/transactions-api"
 import * as accounts from "./accounts-api"
 
 export const api = {
+  ...analytics,
   ...connections,
   ...auditLogs,
   ...balances,
