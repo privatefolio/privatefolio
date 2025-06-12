@@ -2,7 +2,16 @@ import { sql } from "privatefolio-backend/build/src/utils/sql-utils"
 
 import { executeSql } from "../accounts-api"
 
-export async function getBreakdownChartData(accountName: string, interval: string) {
+export async function getBreakdownChartData(
+  accountName: string,
+  interval: string
+): Promise<
+  {
+    assets: string[]
+    time: number
+    values: number[]
+  }[]
+> {
   const result = await executeSql(
     accountName,
     sql`

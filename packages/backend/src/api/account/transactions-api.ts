@@ -432,7 +432,7 @@ export async function getTransactionsByTxHash(accountName: string, txHash: strin
   )
 }
 
-export function enqueueExportAllTransactions(accountName: string, trigger: TaskTrigger) {
+export async function enqueueExportAllTransactions(accountName: string, trigger: TaskTrigger) {
   // return enqueueTask(accountName, {
   //   abortable: true,
   //   description: "Export all transactions.",
