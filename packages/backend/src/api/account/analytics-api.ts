@@ -1,4 +1,4 @@
-import { sql } from "privatefolio-backend/build/src/utils/sql-utils"
+import { sql } from "src/utils/sql-utils"
 
 import { executeSql } from "../accounts-api"
 
