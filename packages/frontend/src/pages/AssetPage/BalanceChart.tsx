@@ -16,10 +16,11 @@ export function BalanceChart(props: BalanceChartProps) {
   const { assetId } = props
 
   const activeAccount = useStore($activeAccount)
+  const rpc = useStore($rpc)
 
   const queryFn: QueryChartData = useCallback(
     async (interval) => {
-      const balanceMaps = await $rpc.get().getBalances(activeAccount)
+      const balanceMaps = await rpc.getBalances(activeAccount)
 
       let hasHadABalance = false
       let lastNonZeroIndex = -1
@@ -48,7 +49,7 @@ export function BalanceChart(props: BalanceChartProps) {
 
       return interval === "1w" ? aggregateByWeek(records) : records
     },
-    [activeAccount, assetId]
+    [rpc, activeAccount, assetId]
   )
 
   return (

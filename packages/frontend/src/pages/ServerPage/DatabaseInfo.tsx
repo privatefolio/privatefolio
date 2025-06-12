@@ -18,9 +18,12 @@ export function DatabaseInfo() {
   const [transactions, setTransactions] = useState<number | null>(null)
   const connectionStatus = useStore($connectionStatus)
 
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
+
   useEffect(() => {
     function fetchData() {
-      $rpc.get().getDiskUsage($activeAccount.get()).then(setStorageUsage)
+      rpc.getDiskUsage(activeAccount).then(setStorageUsage)
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       // if (!window.navigator.storage) {
@@ -40,23 +43,23 @@ export function DatabaseInfo() {
     }, 2500)
 
     return () => clearInterval(interval)
-  }, [connectionStatus])
+  }, [connectionStatus, rpc, activeAccount])
 
   useEffect(() => {
     function fetchData() {
-      $rpc.get().countAuditLogs($activeAccount.get()).then(setAuditLogs)
+      rpc.countAuditLogs(activeAccount).then(setAuditLogs)
     }
 
     fetchData()
-  }, [connectionStatus])
+  }, [connectionStatus, rpc, activeAccount])
 
   useEffect(() => {
     function fetchData() {
-      $rpc.get().countTransactions($activeAccount.get()).then(setTransactions)
+      rpc.countTransactions(activeAccount).then(setTransactions)
     }
 
     fetchData()
-  }, [connectionStatus])
+  }, [connectionStatus, rpc, activeAccount])
 
   return (
     <Paper sx={{ minWidth: 340 }}>

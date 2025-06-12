@@ -9,7 +9,7 @@ export function parseMarginTransfer(
   connection: BinanceConnection
 ): ParserResult {
   const { platform } = connection
-  const { amount, asset, fromSymbol, timestamp: time, toSymbol, transFrom, transTo, txId: id } = row
+  const { amount, asset, timestamp: time, transFrom, transTo, txId: id } = row
   const timestamp = new Date(Number(time)).getTime()
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${time}`)

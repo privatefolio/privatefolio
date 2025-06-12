@@ -56,6 +56,9 @@ export function AddTransactionDrawer(props: PopoverToggleProps) {
     "USD-M Futures",
   ]
 
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
+
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
       const formData = new FormData(event.target as HTMLFormElement)
@@ -69,8 +72,7 @@ export function AddTransactionDrawer(props: PopoverToggleProps) {
       if (!incoming && !outgoing && !fee) return
 
       setLoading(true)
-      $rpc
-        .get()
+      rpc
         .addTransaction(
           {
             fee,
@@ -86,7 +88,7 @@ export function AddTransactionDrawer(props: PopoverToggleProps) {
             type,
             wallet,
           },
-          $activeAccount.get()
+          activeAccount
         )
         .then(() => {
           toggleOpen()
@@ -95,7 +97,18 @@ export function AddTransactionDrawer(props: PopoverToggleProps) {
           setLoading(false)
         })
     },
-    [toggleOpen, platform, binanceWallet, type, incomingAsset, outgoingAsset, feeAsset, notes]
+    [
+      toggleOpen,
+      platform,
+      binanceWallet,
+      type,
+      incomingAsset,
+      outgoingAsset,
+      feeAsset,
+      notes,
+      rpc,
+      activeAccount,
+    ]
   )
 
   return (

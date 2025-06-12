@@ -13,7 +13,7 @@ import { TagManager } from "src/components/TagManager"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { ValueChip } from "src/components/ValueChip"
 import { ChartData, Tag, Trade } from "src/interfaces"
-import { $activeAccount, $activeIndex } from "src/stores/account-store"
+import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
 import { PopoverToggleProps } from "src/stores/app-store"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { $rpc } from "src/workers/remotes"
@@ -27,7 +27,7 @@ type TradeDrawerProps = DrawerProps &
 
 export function TradeDrawer(props: TradeDrawerProps) {
   const { open, toggleOpen, trade, relativeTime, priceMap, ...rest } = props
-  const activeIndex = useStore($activeIndex)
+  const activeAccountPath = useStore($activeAccountPath)
   const activeAccount = useStore($activeAccount)
 
   const {
@@ -49,18 +49,20 @@ export function TradeDrawer(props: TradeDrawerProps) {
   const [auditLogIds, setAuditLogIds] = useState<string[]>([])
   const [transactionIds, setTransactionIds] = useState<string[]>([])
 
+  const rpc = useStore($rpc)
+
   useEffect(() => {
     if (open && id && activeAccount) {
-      $rpc.get().getTradeAuditLogs(activeAccount, id).then(setAuditLogIds)
-      $rpc.get().getTradeTransactions(activeAccount, id).then(setTransactionIds)
+      rpc.getTradeAuditLogs(activeAccount, id).then(setAuditLogIds)
+      rpc.getTradeTransactions(activeAccount, id).then(setTransactionIds)
     }
-  }, [id, open, activeAccount])
+  }, [id, open, activeAccount, rpc])
 
   useEffect(() => {
     if (open) {
-      $rpc.get().getTagsForTrade(activeAccount, id).then(setTags)
+      rpc.getTagsForTrade(activeAccount, id).then(setTags)
     }
-  }, [id, open, activeAccount])
+  }, [id, open, activeAccount, rpc])
 
   return (
     <Drawer open={open} onClose={toggleOpen} {...rest}>
@@ -216,7 +218,7 @@ export function TradeDrawer(props: TradeDrawerProps) {
                 size="small"
                 color="secondary"
                 component={Link}
-                to={`/u/${activeIndex}/transactions?tradeId=${id}`}
+                to={`${activeAccountPath}/transactions?tradeId=${id}`}
                 sx={{ paddingX: 2 }}
                 endIcon={<ArrowRightAltRounded fontSize="inherit" />}
               >
@@ -235,7 +237,7 @@ export function TradeDrawer(props: TradeDrawerProps) {
                 size="small"
                 color="secondary"
                 component={Link}
-                to={`/u/${activeIndex}/audit-logs?tradeId=${id}`}
+                to={`${activeAccountPath}/audit-logs?tradeId=${id}`}
                 sx={{ paddingX: 2 }}
                 endIcon={<ArrowRightAltRounded fontSize="inherit" />}
               >

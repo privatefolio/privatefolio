@@ -1,5 +1,6 @@
 import { Add, FolderOutlined } from "@mui/icons-material"
 import { Button, ButtonProps, Stack, Typography, useTheme } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React, { useCallback, useRef, useState } from "react"
 import { ConfirmDialogContextType, useConfirm } from "src/hooks/useConfirm"
 import { ServerFile } from "src/interfaces"
@@ -33,13 +34,14 @@ export function FileDrop(props: ButtonProps) {
 
   const confirm = useConfirm()
 
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
+
   const handleFileUpload = useCallback(
     async (file: File) => {
-      const fileRecord = await handleRestoreRequest(file)
+      const fileRecord = await handleRestoreRequest(rpc, activeAccount, file)
 
-      const requirements = await $rpc
-        .get()
-        .getFileImportRequirements($activeAccount.get(), fileRecord)
+      const requirements = await rpc.getFileImportRequirements(activeAccount, fileRecord)
 
       const parserContext = !requirements
         ? {}
@@ -47,14 +49,14 @@ export function FileDrop(props: ButtonProps) {
 
       return { fileRecord, parserContext }
     },
-    [confirm]
+    [confirm, rpc, activeAccount]
   )
 
   const handleFileImport = useCallback(
     async (fileRecord: ServerFile, parserContext: Record<string, unknown>) => {
-      $rpc.get().enqueueImportFile($activeAccount.get(), "user", fileRecord.id, parserContext)
+      rpc.enqueueImportFile(activeAccount, "user", fileRecord.id, parserContext)
     },
-    []
+    [rpc, activeAccount]
   )
 
   // ProTip: this callback cannot be async because it doesn't work on mobile

@@ -38,11 +38,11 @@ export function CloudLoginForm() {
       event.preventDefault()
       setValidationError("")
 
-      const email = (event.target as any).email.value as string
-      const password = (event.target as any).password.value as string
+      const email = (event.target as HTMLFormElement).email.value as string
+      const password = (event.target as HTMLFormElement).password.value as string
 
       if (form === "sign-up") {
-        const confirmPassword = (event.target as any).confirmPassword?.value as string
+        const confirmPassword = (event.target as HTMLFormElement).confirmPassword?.value as string
         if (password !== confirmPassword) {
           setValidationError("Passwords do not match.")
           return

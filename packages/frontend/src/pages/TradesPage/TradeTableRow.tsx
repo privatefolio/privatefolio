@@ -20,7 +20,7 @@ import { TradeDrawer } from "./TradeDrawer"
 export function TradeTableRow({
   row,
   headCells,
-  isMobile,
+  isMobile: _isMobile,
   isTablet,
   relativeTime,
 }: TableRowComponentProps<Trade>) {
@@ -40,18 +40,18 @@ export function TradeTableRow({
   const [priceMap, setPriceMap] = useState<Record<string, ChartData>>()
   const showQuotedAmounts = useStore($showQuotedAmounts)
 
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
+
   useEffect(() => {
     if (priceMap) return
     if (!showQuotedAmounts && !open) return
 
-    $rpc
-      .get()
-      .getAssetPriceMap($activeAccount.get(), createdAt)
-      .then((priceMap) => {
-        setPriceMap(priceMap)
-      })
+    rpc.getAssetPriceMap(activeAccount, createdAt).then((priceMap) => {
+      setPriceMap(priceMap)
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, showQuotedAmounts, createdAt])
+  }, [open, showQuotedAmounts, createdAt, rpc, activeAccount])
 
   if (isTablet) {
     return (

@@ -72,7 +72,7 @@ export async function upsertAuditLogs(accountName: string, records: AuditLog[]) 
         record.wallet,
       ])
     )
-    // TODO9 this will help invalidating balances cursor
+    // TODO8 this will help invalidating balances cursor
     // let earliestTimestamp = Date.now()
     // for (const record of records) {
     //   if (record.timestamp < earliestTimestamp) {

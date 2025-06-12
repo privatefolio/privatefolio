@@ -13,7 +13,7 @@ import { TagManager } from "src/components/TagManager"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { ValueChip } from "src/components/ValueChip"
 import { AuditLog, ChartData, Tag } from "src/interfaces"
-import { $activeAccount, $activeIndex } from "src/stores/account-store"
+import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
 import { PopoverToggleProps } from "src/stores/app-store"
 import { getAddressBookEntry } from "src/stores/metadata-store"
 import { getAssetTicker } from "src/utils/assets-utils"
@@ -44,14 +44,16 @@ export function AuditLogDrawer(props: AuditLogDrawerProps) {
     // ...extra
   } = auditLog
 
-  const activeIndex = useStore($activeIndex)
+  const activeAccountPath = useStore($activeAccountPath)
   const [tags, setTags] = useState<Tag[]>([])
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   useEffect(() => {
     if (!open) return
 
-    $rpc.get().getTagsForAuditLog($activeAccount.get(), id).then(setTags)
-  }, [id, open, timestamp])
+    rpc.getTagsForAuditLog(activeAccount, id).then(setTags)
+  }, [id, open, timestamp, rpc, activeAccount])
 
   return (
     <Drawer open={open} onClose={toggleOpen} {...rest}>
@@ -157,7 +159,7 @@ export function AuditLogDrawer(props: AuditLogDrawerProps) {
             <SectionTitle>Transaction Id</SectionTitle>
             <IdentifierBlock
               id={txId}
-              href={`/u/${activeIndex}/transactions?id=${txId}`}
+              href={`${activeAccountPath}/transactions?id=${txId}`}
               linkText="See transaction"
             />
           </div>

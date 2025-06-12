@@ -1,5 +1,6 @@
 import { HighlightOffRounded } from "@mui/icons-material"
 import { IconButton, TableCell, TableRow, Tooltip } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React from "react"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
 import { LabeledAddress } from "src/interfaces"
@@ -20,6 +21,9 @@ export function AddressBookTableRow(props: TableRowComponentProps<LabeledAddress
   } = props
   const { id: wallet, label } = row
 
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
+
   return (
     <>
       <TableRow hover {...rest}>
@@ -37,9 +41,7 @@ export function AddressBookTableRow(props: TableRowComponentProps<LabeledAddress
                 const newWalletLabels = Object.assign({}, walletLabels)
                 delete newWalletLabels[wallet]
 
-                $rpc
-                  .get()
-                  .setValue("wallet_labels", JSON.stringify(newWalletLabels), $activeAccount.get())
+                rpc.setValue("wallet_labels", JSON.stringify(newWalletLabels), activeAccount)
                 $addressBook.set(newWalletLabels)
               }}
             >

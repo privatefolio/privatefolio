@@ -39,6 +39,7 @@ export default function ExtensionPage() {
   const [extension, setExtension] = useState<RichExtension | null | undefined>(undefined)
   const [isLoading, setIsLoading] = useState(true)
   const activeAccount = useStore($activeAccount)
+  const rpc = useStore($rpc)
 
   useEffect(() => {
     if (extension && activeAccount) {
@@ -56,8 +57,7 @@ export default function ExtensionPage() {
     }
 
     setIsLoading(true)
-    $rpc
-      .get()
+    rpc
       .getExtension(extensionId)
       .then((data) => {
         setExtension(data ?? null)
@@ -68,7 +68,7 @@ export default function ExtensionPage() {
       .finally(() => {
         setIsLoading(false)
       })
-  }, [extensionId])
+  }, [extensionId, rpc])
 
   const HowToComponent = useMemo(() => {
     if (!extension?.howTo) return null

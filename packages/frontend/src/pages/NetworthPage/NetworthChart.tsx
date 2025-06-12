@@ -17,25 +17,26 @@ function NetworthChartBase() {
   // hack to  refresh the chart
   const [refresh, setRefresh] = useState(0)
   const connectionStatus = useStore($connectionStatus)
+  const rpc = useStore($rpc)
 
   useEffect(() => {
-    const subscription = $rpc.get().subscribeToNetworth(
+    const subscription = rpc.subscribeToNetworth(
       activeAccount,
       debounce(() => {
         setRefresh(Math.random())
       }, DEFAULT_DEBOUNCE_DURATION)
     )
 
-    return closeSubscription(subscription, $rpc.get())
-  }, [activeAccount, connectionStatus])
+    return closeSubscription(subscription, rpc)
+  }, [rpc, activeAccount, connectionStatus])
 
   const queryFn: QueryChartData = useCallback(
     async (interval) => {
       const _refresh = refresh // reference the dependency for eslint(react-hooks/exhaustive-deps)
-      const networth = await $rpc.get().getNetworth(activeAccount)
+      const networth = await rpc.getNetworth(activeAccount)
       return interval === "1w" ? aggregateByWeek(networth) : networth
     },
-    [activeAccount, refresh]
+    [rpc, activeAccount, refresh]
   )
 
   const currency = useStore($quoteCurrency)

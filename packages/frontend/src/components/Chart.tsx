@@ -47,9 +47,11 @@ function BaseChart(props: ChartProps) {
       },
       grid: {
         horzLines: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           color: (theme.palette as any).TableCell.border,
         },
         vertLines: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           color: (theme.palette as any).TableCell.border,
         },
       },

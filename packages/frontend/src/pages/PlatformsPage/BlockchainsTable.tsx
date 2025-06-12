@@ -12,6 +12,7 @@ export function BlockchainsTable() {
   const [blockchains, setBlockchains] = useState<Blockchain[]>([])
   const [queryTime, setQueryTime] = useState<number | null>(null)
   const accountName = useStore($activeAccount)
+  const rpc = useStore($rpc)
 
   useEffect(() => {
     document.title = `Blockchains - ${accountName} - Privatefolio`
@@ -20,13 +21,13 @@ export function BlockchainsTable() {
   useEffect(() => {
     const loadBlockchains = async () => {
       const start = Date.now()
-      const data = await $rpc.get().getBlockchains()
+      const data = await rpc.getBlockchains()
       setQueryTime(Date.now() - start)
       setBlockchains(data)
     }
 
     loadBlockchains()
-  }, [accountName])
+  }, [accountName, rpc])
 
   const headCells: HeadCell<Blockchain>[] = useMemo(
     () => [

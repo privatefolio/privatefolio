@@ -5,8 +5,10 @@ import * as binance from "./binance-price-api"
 import * as coinbase from "./coinbase-price-api"
 import * as llama from "./llama-price-api"
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PriceMapper = (data: any) => ChartData
 type PairMapper = (symbol: string) => string
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PriceApi = (request: QueryRequest) => Promise<any>
 
 export const PRICE_MAPPER: Record<PriceApiId, PriceMapper> = {
@@ -33,7 +35,7 @@ export const PAIR_MAPPER: Record<PriceApiId, PairMapper> = {
 export async function getLivePricesForAsset(
   assetId: string,
   priceApiId: PriceApiId,
-  // TODO9 allow more
+  // TODO8 allow more
   limit = 300
 ): Promise<ChartData[]> {
   const priceApi = PRICE_APIS[priceApiId]

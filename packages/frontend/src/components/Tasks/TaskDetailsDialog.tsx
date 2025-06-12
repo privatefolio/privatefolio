@@ -37,11 +37,12 @@ const TimeLabel = ({ timestamp, debugMode }: { debugMode: boolean; timestamp: nu
 
 export function TaskDetailsDialog({ task, ...props }: DialogProps & { task: ServerTask }) {
   const [progressLogs, setProgressLogs] = useState<ProgressLog[]>()
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   useEffect(() => {
-    $rpc
-      .get()
-      .getServerTaskLog($activeAccount.get(), task.id)
+    rpc
+      .getServerTaskLog(activeAccount, task.id)
       .then((text) => {
         return text
           .split("\n")
@@ -55,28 +56,26 @@ export function TaskDetailsDialog({ task, ...props }: DialogProps & { task: Serv
           .filter((x) => x !== null)
       })
       .then(setProgressLogs)
-  }, [task])
+  }, [rpc, task, activeAccount])
 
   const connectionStatus = useStore($connectionStatus)
 
   useEffect(() => {
     if (task.status !== "running") return
 
-    const subscription = $rpc
-      .get()
-      .subscribeToServerTaskProgress($activeAccount.get(), task.id, (logEntry) => {
-        setProgressLogs((prevLogs) => {
-          try {
-            const parsedLog = parseProgressLog(logEntry)
-            return [...(prevLogs ?? []), parsedLog]
-          } catch {
-            return prevLogs
-          }
-        })
+    const subscription = rpc.subscribeToServerTaskProgress(activeAccount, task.id, (logEntry) => {
+      setProgressLogs((prevLogs) => {
+        try {
+          const parsedLog = parseProgressLog(logEntry)
+          return [...(prevLogs ?? []), parsedLog]
+        } catch {
+          return prevLogs
+        }
       })
+    })
 
-    return closeSubscription(subscription, $rpc.get())
-  }, [task, connectionStatus])
+    return closeSubscription(subscription, rpc)
+  }, [rpc, task, connectionStatus, activeAccount])
 
   const progressPercent = useMemo<number>(() => {
     if (task.status === "completed") {

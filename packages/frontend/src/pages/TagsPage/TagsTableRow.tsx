@@ -1,5 +1,6 @@
 import { Delete, Edit } from "@mui/icons-material"
 import { IconButton, Stack, TableCell, TableRow, TextField, Tooltip } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React, { useCallback } from "react"
 import { useConfirm } from "src/hooks/useConfirm"
 import { Tag } from "src/interfaces"
@@ -12,6 +13,8 @@ interface TagsTableRowProps {
 
 export function TagsTableRow({ row }: TagsTableRowProps) {
   const confirm = useConfirm()
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   const handleEdit = useCallback(async () => {
     const { confirmed, event } = await confirm({
@@ -39,9 +42,9 @@ export function TagsTableRow({ row }: TagsTableRowProps) {
 
       if (!tagName || tagName === row.name) return
 
-      await $rpc.get().updateTag($activeAccount.get(), row.id, tagName)
+      await rpc.updateTag(activeAccount, row.id, tagName)
     }
-  }, [confirm, row])
+  }, [confirm, row, rpc, activeAccount])
 
   const handleDelete = useCallback(async () => {
     const { confirmed } = await confirm({
@@ -52,9 +55,9 @@ export function TagsTableRow({ row }: TagsTableRowProps) {
     })
 
     if (confirmed) {
-      await $rpc.get().deleteTag($activeAccount.get(), row.id)
+      await rpc.deleteTag(activeAccount, row.id)
     }
-  }, [confirm, row.id])
+  }, [confirm, row.id, rpc, activeAccount])
 
   return (
     <TableRow hover>

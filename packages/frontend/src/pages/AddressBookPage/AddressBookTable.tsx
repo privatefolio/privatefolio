@@ -18,6 +18,8 @@ import { AddressBookTableRow } from "./AddressBookTableRow"
 export function AddressBookTable() {
   const addressBook = useStore($addressBook)
   const queryTime = useStore($inMemoryDataQueryTime)
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   const rows: LabeledAddress[] = useMemo(
     () =>
@@ -87,10 +89,10 @@ export function AddressBookTable() {
       const addressBook = $addressBook.get()
       const newAddressBook = Object.assign({}, addressBook, { [address]: label })
 
-      $rpc.get().setValue("address_book", JSON.stringify(newAddressBook), $activeAccount.get())
+      rpc.setValue("address_book", JSON.stringify(newAddressBook), activeAccount)
       $addressBook.set(newAddressBook)
     }
-  }, [confirm])
+  }, [rpc, confirm, activeAccount])
 
   return (
     <>

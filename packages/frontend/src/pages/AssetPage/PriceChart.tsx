@@ -26,6 +26,9 @@ const defaultPriceApiId = allPriceApiIds[0]
 export function PriceChart(props: BalanceChartProps) {
   const { asset } = props
 
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
+
   const [searchParams, setSearchParams] = useSearchParams()
   const priceApiId = (searchParams.get("priceApiId") || null) as PriceApiId | null
 
@@ -41,12 +44,12 @@ export function PriceChart(props: BalanceChartProps) {
       const useCache = priceApiId === null && !!asset.priceApiId
 
       const prices = useCache
-        ? await $rpc.get().getPricesForAsset($activeAccount.get(), asset.id)
+        ? await rpc.getPricesForAsset(activeAccount, asset.id)
         : await getLivePricesForAsset(asset.id, priceApiId || defaultPriceApiId)
 
       return interval === "1w" ? aggregateByWeek(prices) : prices
     },
-    [asset, priceApiId]
+    [rpc, activeAccount, asset, priceApiId]
   )
 
   const currency = useStore($quoteCurrency)

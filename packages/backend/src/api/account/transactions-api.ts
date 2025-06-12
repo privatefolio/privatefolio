@@ -1,7 +1,5 @@
-import Big from "big.js"
 import { mergeTransactions } from "src/extensions/utils/etherscan-utils"
 import {
-  AuditLog,
   AuditLogOperation,
   EventCause,
   MyAsset,
@@ -11,7 +9,7 @@ import {
 import { isEvmPlatform } from "src/utils/assets-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { createSubscription } from "src/utils/sub-utils"
-import { hashString, noop } from "src/utils/utils"
+import { noop } from "src/utils/utils"
 
 import {
   EtherscanTransaction,
@@ -332,92 +330,93 @@ export function enqueueDetectSpamTransactions(accountName: string, trigger: Task
   })
 }
 
+// TODO9
 export async function addTransaction(
-  transaction: Omit<Transaction, "id" | "_rev" | "importId" | "importIndex">,
-  accountName: string
+  _transaction: Omit<Transaction, "id" | "_rev" | "importId" | "importIndex">,
+  _accountName: string
 ) {
-  const {
-    fee,
-    feeAsset,
-    incoming,
-    incomingAsset,
-    outgoing,
-    outgoingAsset,
-    platform,
-    timestamp,
-    type,
-    wallet,
-    notes,
-  } = transaction
-  const id = hashString(`con_${platform}_${wallet}_added_manually`)
-  const importId = ""
-  const importIndex = 0
-  const operation = type
-    .replace("Wrap", "Unknown")
-    .replace("Unwrap", "Unknown") as AuditLogOperation
-  const logs: AuditLog[] = []
-  let price: string | undefined
-  if (incoming && outgoing) {
-    price = Big(incoming).div(Big(outgoing)).toString()
-  }
-  if (incoming && incomingAsset) {
-    logs.push({
-      assetId: `${platform}:${incomingAsset}`,
-      change: incoming,
-      id: `${id}_BUY`,
-      importIndex,
-      operation: type === "Swap" ? "Buy" : operation,
-      platform,
-      timestamp,
-      txId: id,
-      wallet,
-    })
-  }
-  if (outgoing && outgoingAsset) {
-    logs.push({
-      assetId: `${platform}:${outgoingAsset}`,
-      change: `-${outgoing}`,
-      id: `${id}_SELL`,
-      importIndex,
-      operation: type === "Swap" ? "Sell" : operation,
-      platform,
-      timestamp,
-      txId: id,
-      wallet,
-    })
-  }
-  if (fee) {
-    logs.push({
-      assetId: `${platform}:${feeAsset}`,
-      change: `-${fee}`,
-      id: `${id}_FEE`,
-      importIndex,
-      operation: "Fee",
-      platform,
-      timestamp,
-      txId: id,
-      wallet,
-    })
-  }
-  const tx: Transaction[] = [
-    {
-      fee: !fee ? undefined : fee,
-      feeAsset: !fee ? undefined : `${platform}:${feeAsset}`,
-      id,
-      importIndex,
-      incoming: !incoming ? undefined : incoming,
-      incomingAsset: !incoming ? undefined : `${platform}:${incomingAsset}`,
-      metadata: {},
-      notes,
-      outgoing: !outgoing ? undefined : outgoing,
-      outgoingAsset: !outgoing ? undefined : `${platform}:${outgoingAsset}`,
-      platform,
-      price,
-      timestamp,
-      type,
-      wallet,
-    },
-  ]
+  // const {
+  //   fee,
+  //   feeAsset,
+  //   incoming,
+  //   incomingAsset,
+  //   outgoing,
+  //   outgoingAsset,
+  //   platform,
+  //   timestamp,
+  //   type,
+  //   wallet,
+  //   notes,
+  // } = transaction
+  // const id = hashString(`con_${platform}_${wallet}_added_manually`)
+  // // const importId = ""
+  // const importIndex = 0
+  // const operation = type
+  //   .replace("Wrap", "Unknown")
+  //   .replace("Unwrap", "Unknown") as AuditLogOperation
+  // const logs: AuditLog[] = []
+  // let price: string | undefined
+  // if (incoming && outgoing) {
+  //   price = Big(incoming).div(Big(outgoing)).toString()
+  // }
+  // if (incoming && incomingAsset) {
+  //   logs.push({
+  //     assetId: `${platform}:${incomingAsset}`,
+  //     change: incoming,
+  //     id: `${id}_BUY`,
+  //     importIndex,
+  //     operation: type === "Swap" ? "Buy" : operation,
+  //     platform,
+  //     timestamp,
+  //     txId: id,
+  //     wallet,
+  //   })
+  // }
+  // if (outgoing && outgoingAsset) {
+  //   logs.push({
+  //     assetId: `${platform}:${outgoingAsset}`,
+  //     change: `-${outgoing}`,
+  //     id: `${id}_SELL`,
+  //     importIndex,
+  //     operation: type === "Swap" ? "Sell" : operation,
+  //     platform,
+  //     timestamp,
+  //     txId: id,
+  //     wallet,
+  //   })
+  // }
+  // if (fee) {
+  //   logs.push({
+  //     assetId: `${platform}:${feeAsset}`,
+  //     change: `-${fee}`,
+  //     id: `${id}_FEE`,
+  //     importIndex,
+  //     operation: "Fee",
+  //     platform,
+  //     timestamp,
+  //     txId: id,
+  //     wallet,
+  //   })
+  // }
+  // const tx: Transaction[] = [
+  //   {
+  //     fee: !fee ? undefined : fee,
+  //     feeAsset: !fee ? undefined : `${platform}:${feeAsset}`,
+  //     id,
+  //     importIndex,
+  //     incoming: !incoming ? undefined : incoming,
+  //     incomingAsset: !incoming ? undefined : `${platform}:${incomingAsset}`,
+  //     metadata: {},
+  //     notes,
+  //     outgoing: !outgoing ? undefined : outgoing,
+  //     outgoingAsset: !outgoing ? undefined : `${platform}:${outgoingAsset}`,
+  //     platform,
+  //     price,
+  //     timestamp,
+  //     type,
+  //     wallet,
+  //   },
+  // ]
   throw new Error("Not implemented")
   // const account = getAccount(accountName)
   // account.auditLogsDB.bulkDocs(logs)
@@ -431,4 +430,20 @@ export async function getTransactionsByTxHash(accountName: string, txHash: strin
     "SELECT * FROM transactions WHERE json_extract(metadata, '$.txHash') = ?",
     [txHash]
   )
+}
+
+export function enqueueExportAllTransactions(accountName: string, trigger: TaskTrigger) {
+  // return enqueueTask(accountName, {
+  //   abortable: true,
+  //   description: "Export all transactions.",
+  //   determinate: true,
+  //   function: async () => {
+  //     const txns = await getTransactions(accountName)
+  //     const data = exportTransactionsToCsv(txns)
+  //     downloadCsv(data, `${accountName}-transactions.csv`)
+  //   },
+  //   name: "Export all transactions",
+  //   priority: TaskPriority.Low,
+  //   trigger,
+  // })
 }

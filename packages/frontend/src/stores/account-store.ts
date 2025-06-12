@@ -5,37 +5,22 @@ export const $localAccounts = atom<string[] | undefined>()
 export const $cloudAccounts = atom<string[] | undefined>()
 
 /**
- * All child routes of `/u/:accountIndex`, should assume this store as initialized,
- * because of `AccountIndexRoute` which does not let a child route render until `$accounts` is
+ * All child routes of `/:accountType/:accountIndex`, should assume this store as initialized,
+ * because of `AccountRouteGuard` which does not let a child route render until `$accounts` is
  * defined and a valid `$activeAccount` is set.
  */
 export const $activeAccount = atom<string>("")
+export const $activeAccountType = atom<"local" | "cloud">("local")
 
-export const $accounts = computed(
-  [$localAccounts, $cloudAccounts],
-  (localAccounts, cloudAccounts) => {
-    if (!localAccounts && !cloudAccounts) return undefined
-    return (localAccounts || []).concat(cloudAccounts || [])
-  }
-)
-
-// TODO9 remove this, it should be accountId instead
-export const $activeIndex = computed([$activeAccount, $accounts], (activeAccount, accounts) => {
-  if (!accounts || !activeAccount) return
-
-  const index = accounts.indexOf(activeAccount)
-
-  return index === -1 ? undefined : index
-})
-
-export const $isCloudAccount = computed(
-  [$activeIndex, $accounts, $localAccounts, $cloudAccounts],
-  (activeIndex, accounts, localAccounts, cloudAccounts) => {
-    if (!accounts || activeIndex === undefined) return false
-    if (!localAccounts) return true
-    if (!cloudAccounts) return false
-
-    return activeIndex >= (localAccounts?.length || 0)
+export const $activeAccountPath = computed(
+  [$activeAccountType, $activeAccount, $localAccounts, $cloudAccounts],
+  (accountType, activeAccount, localAccounts, cloudAccounts) => {
+    if (!activeAccount) return ""
+    const accounts = accountType === "local" ? localAccounts : cloudAccounts
+    if (!accounts) return ""
+    const index = accounts.indexOf(activeAccount)
+    if (index === -1) return ""
+    return `/${accountType === "local" ? "l" : "c"}/${index}`
   }
 )
 
@@ -46,16 +31,17 @@ export const $cloudConnectionStatus = atom<"closed" | "connected" | undefined>(u
 export const $cloudConnectionStatusText = atom<string | undefined>()
 
 export const $connectionStatus = computed(
-  [$isCloudAccount, $localConnectionStatus, $cloudConnectionStatus],
-  (isCloudAccount, localStatus, cloudStatus) => (isCloudAccount ? cloudStatus : localStatus)
+  [$activeAccountType, $localConnectionStatus, $cloudConnectionStatus],
+  (accountType, localStatus, cloudStatus) => (accountType === "cloud" ? cloudStatus : localStatus)
 )
 
 logAtoms({
   $activeAccount,
+  $activeAccountPath,
+  $activeAccountType,
   $cloudAccounts,
   $cloudConnectionStatus,
   $cloudConnectionStatusText,
-  $isCloudAccount,
   $localAccounts,
   $localConnectionStatus,
   $localConnectionStatusText,

@@ -1,6 +1,7 @@
 import { CloseRounded } from "@mui/icons-material"
 import { LoadingButton } from "@mui/lab"
 import { Drawer, DrawerProps, IconButton, Stack, Tooltip, Typography } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import { enqueueSnackbar } from "notistack"
 import {
   BINANCE_WALLET_IDS,
@@ -39,6 +40,9 @@ export function ConnectionInspectDrawer(props: ConnectionInspectDrawerProps) {
     key,
     options,
   } = connection
+
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   const confirm = useConfirm()
   const [loadingRemove, setLoadingRemove] = useState(false)
@@ -172,20 +176,18 @@ export function ConnectionInspectDrawer(props: ConnectionInspectDrawerProps) {
                 loading={loadingSync}
                 onClick={() => {
                   setLoadingSync(true)
-                  $rpc
-                    .get()
-                    .enqueueSyncConnection(
-                      $activeAccount.get(),
-                      "user",
-                      connection.id,
-                      $debugMode.get(),
-                      (error) => {
-                        setLoadingSync(false)
-                        if (error) {
-                          enqueueSnackbar("Could not sync connection", { variant: "error" })
-                        }
+                  rpc.enqueueSyncConnection(
+                    activeAccount,
+                    "user",
+                    connection.id,
+                    $debugMode.get(),
+                    (error) => {
+                      setLoadingSync(false)
+                      if (error) {
+                        enqueueSnackbar("Could not sync connection", { variant: "error" })
                       }
-                    )
+                    }
+                  )
                 }}
               >
                 Sync connection
@@ -201,18 +203,14 @@ export function ConnectionInspectDrawer(props: ConnectionInspectDrawerProps) {
                 onClick={async () => {
                   setLoadingReset(true)
 
-                  await $rpc
-                    .get()
-                    .enqueueResetConnection($activeAccount.get(), "user", connection.id)
-                  await $rpc
-                    .get()
-                    .enqueueSyncConnection(
-                      $activeAccount.get(),
-                      "user",
-                      connection.id,
-                      $debugMode.get(),
-                      () => setLoadingReset(false)
-                    )
+                  await rpc.enqueueResetConnection(activeAccount, "user", connection.id)
+                  await rpc.enqueueSyncConnection(
+                    activeAccount,
+                    "user",
+                    connection.id,
+                    $debugMode.get(),
+                    () => setLoadingReset(false)
+                  )
                 }}
                 loading={loadingReset}
               >
@@ -247,11 +245,9 @@ export function ConnectionInspectDrawer(props: ConnectionInspectDrawerProps) {
 
                   if (!confirmed) return
                   setLoadingRemove(true)
-                  await $rpc
-                    .get()
-                    .enqueueDeleteConnection($activeAccount.get(), "user", connection.id, () =>
-                      setLoadingRemove(false)
-                    )
+                  await rpc.enqueueDeleteConnection(activeAccount, "user", connection.id, () =>
+                    setLoadingRemove(false)
+                  )
                 }}
                 loading={loadingRemove}
               >

@@ -3,7 +3,7 @@ import { logAtoms } from "src/utils/browser-utils"
 import { sleep } from "src/utils/utils"
 import { RestConfig } from "src/workers/remotes"
 
-import { $isCloudAccount } from "./account-store"
+import { $activeAccountType } from "./account-store"
 
 export interface AuthState {
   checked: boolean
@@ -33,9 +33,9 @@ export const $cloudAuth = atom<AuthState>({
 })
 
 export const $auth = computed(
-  [$isCloudAccount, $localAuth, $cloudAuth],
-  (isCloudAccount, localAuth, cloudAuth) => {
-    return isCloudAccount ? cloudAuth : localAuth
+  [$activeAccountType, $localAuth, $cloudAuth],
+  (accountType, localAuth, cloudAuth) => {
+    return accountType === "cloud" ? cloudAuth : localAuth
   }
 )
 

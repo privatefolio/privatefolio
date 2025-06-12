@@ -19,34 +19,32 @@ export function PortfolioInfo() {
   const [lastTx, setLastTx] = useState<Timestamp | null>(null)
 
   const connectionStatus = useStore($connectionStatus)
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   useEffect(() => {
     function fetchData() {
-      $rpc.get().getValue<Timestamp>($activeAccount.get(), "genesis", 0).then(setGenesis)
+      rpc.getValue<Timestamp>(activeAccount, "genesis", 0).then(setGenesis)
     }
 
     fetchData()
 
-    const subscription = $rpc
-      .get()
-      .subscribeToKV<Timestamp>($activeAccount.get(), "genesis", setGenesis)
+    const subscription = rpc.subscribeToKV<Timestamp>(activeAccount, "genesis", setGenesis)
 
-    return closeSubscription(subscription, $rpc.get())
-  }, [connectionStatus])
+    return closeSubscription(subscription, rpc)
+  }, [connectionStatus, rpc, activeAccount])
 
   useEffect(() => {
     function fetchData() {
-      $rpc.get().getValue<Timestamp>($activeAccount.get(), "lastTx", 0).then(setLastTx)
+      rpc.getValue<Timestamp>(activeAccount, "lastTx", 0).then(setLastTx)
     }
 
     fetchData()
 
-    const subscription = $rpc
-      .get()
-      .subscribeToKV<Timestamp>($activeAccount.get(), "lastTx", setLastTx)
+    const subscription = rpc.subscribeToKV<Timestamp>(activeAccount, "lastTx", setLastTx)
 
-    return closeSubscription(subscription, $rpc.get())
-  }, [connectionStatus])
+    return closeSubscription(subscription, rpc)
+  }, [connectionStatus, rpc, activeAccount])
 
   const filterMap = useStore($filterOptionsMap)
 

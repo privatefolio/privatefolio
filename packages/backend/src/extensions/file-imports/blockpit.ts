@@ -41,8 +41,8 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
     feeAsset = `binance:${columns[10]}`
   }
 
-  const txHash = columns[12]
-  const notes = columns[13]
+  // const txHash = columns[12]
+  // const notes = columns[13]
 
   const hash = hashString(`${index}_${csvRow}`)
   const txId = `${fileImportId}_${hash}`

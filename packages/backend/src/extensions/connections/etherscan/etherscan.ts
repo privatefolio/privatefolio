@@ -102,7 +102,7 @@ export function parseNormal(
     }
   }
 
-  let fee: string | undefined, feeAsset: string | undefined, feeN: number | undefined
+  let fee: string | undefined, feeAsset: string | undefined //, feeN: number | undefined
 
   if ("gasPrice" in row && from === wallet) {
     fee = new Big(gasUsed).mul(row.gasPrice).div(1e18).mul(-1).toFixed()

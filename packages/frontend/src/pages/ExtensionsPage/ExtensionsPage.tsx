@@ -18,6 +18,7 @@ export default function ExtensionsPage({ show }: { show: boolean }) {
   const [extensions, setExtensions] = useState<RichExtension[]>([])
   const [queryTime, setQueryTime] = useState<number | null>(null)
   const accountName = useStore($activeAccount)
+  const rpc = useStore($rpc)
 
   useEffect(() => {
     document.title = `Extensions - ${accountName} - Privatefolio`
@@ -26,12 +27,12 @@ export default function ExtensionsPage({ show }: { show: boolean }) {
   useEffect(() => {
     const loadExtensions = async () => {
       const start = Date.now()
-      const data = await $rpc.get().getExtensions()
+      const data = await rpc.getExtensions()
       setQueryTime(Date.now() - start)
       setExtensions(data)
     }
     loadExtensions()
-  }, [])
+  }, [rpc])
 
   const headCells: HeadCell<RichExtension>[] = useMemo(
     () => [

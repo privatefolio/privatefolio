@@ -10,7 +10,7 @@ import { CircularSpinner } from "../CircularSpinner"
 export const KBAR_LISTBOX = "kbar-listbox"
 export const getListboxItemId = (id: number) => `kbar-listbox-item-${id}`
 
-type SearchInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+type SearchInputProps = {
   defaultPlaceholder?: string
   loading?: boolean
 }
@@ -31,7 +31,7 @@ export function SearchInput(props: SearchInputProps) {
     query.setSearch(inputValue)
   }, [inputValue, query])
 
-  const { defaultPlaceholder, loading, ...rest } = props
+  const { defaultPlaceholder, loading } = props
 
   React.useEffect(() => {
     query.setSearch("")

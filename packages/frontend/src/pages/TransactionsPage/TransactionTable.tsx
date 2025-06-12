@@ -30,9 +30,10 @@ export function TransactionTable(props: TransactionsTableProps) {
   const accountName = useStore($activeAccount)
   const [refresh, setRefresh] = useState(0)
   const connectionStatus = useStore($connectionStatus)
+  const rpc = useStore($rpc)
 
   useEffect(() => {
-    const subscription = $rpc.get().subscribeToTransactions(
+    const subscription = rpc.subscribeToTransactions(
       accountName,
       throttle(
         () => {
@@ -47,8 +48,8 @@ export function TransactionTable(props: TransactionsTableProps) {
       )
     )
 
-    return closeSubscription(subscription, $rpc.get())
-  }, [accountName, connectionStatus])
+    return closeSubscription(subscription, rpc)
+  }, [accountName, connectionStatus, rpc])
 
   const queryFn: QueryTableData<Transaction> = useCallback(
     async (filters, rowsPerPage, page, order, signal) => {
@@ -92,7 +93,7 @@ export function TransactionTable(props: TransactionsTableProps) {
 
       const query = `SELECT transactions.* FROM transactions ${tagJoin} ${tradeJoin} ${filterQuery} ${orderQuery} ${limitQuery}`
 
-      const transactions = await $rpc.get().getTransactions($activeAccount.get(), query)
+      const transactions = await rpc.getTransactions(accountName, query)
 
       if (signal?.aborted) throw new Error(signal.reason)
       if (tableDataRef) {
@@ -102,15 +103,13 @@ export function TransactionTable(props: TransactionsTableProps) {
       return [
         transactions,
         () =>
-          $rpc
-            .get()
-            .countTransactions(
-              accountName,
-              `SELECT COUNT (*) FROM transactions ${tagJoin} ${tradeJoin} ${filterQuery}`
-            ),
+          rpc.countTransactions(
+            accountName,
+            `SELECT COUNT (*) FROM transactions ${tagJoin} ${tradeJoin} ${filterQuery}`
+          ),
       ]
     },
-    [accountName, assetId, refresh, tableDataRef]
+    [accountName, assetId, refresh, tableDataRef, rpc]
   )
 
   const headCells = useMemo<HeadCell<Transaction>[]>(

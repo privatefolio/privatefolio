@@ -39,10 +39,12 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
   } = props
   const { id: assetId, name, coingeckoId, priceApiId, price } = row
   const currency = useStore($quoteCurrency)
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   const handleChange = (event: SelectChangeEvent<string>) => {
     const newValue: PriceApiId | undefined = (event.target.value as PriceApiId) || undefined
-    $rpc.get().patchAsset($activeAccount.get(), assetId, {
+    rpc.patchAsset(activeAccount, assetId, {
       priceApiId: newValue ?? null,
     })
     $assetMap.setKey(assetId, { ...row, priceApiId: newValue })

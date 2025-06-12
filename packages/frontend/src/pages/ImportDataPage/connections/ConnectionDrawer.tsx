@@ -18,6 +18,7 @@ import {
   Typography,
 } from "@mui/material"
 import { DatePicker } from "@mui/x-date-pickers"
+import { useStore } from "@nanostores/react"
 import { isAddress } from "ethers"
 import {
   BINANCE_WALLET_LABELS,
@@ -40,6 +41,9 @@ import { $debugMode, PopoverToggleProps } from "../../../stores/app-store"
 export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & PopoverToggleProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>()
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
+  const debugMode = useStore($debugMode)
 
   const [extensionId, setExtensionId] = useState<string>("etherscan-connection")
   const [platformId, setPlatformId] = useState<string>("ethereum")
@@ -130,9 +134,8 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
       }
 
       setLoading(true)
-      $rpc
-        .get()
-        .upsertConnection($activeAccount.get(), {
+      rpc
+        .upsertConnection(activeAccount, {
           address,
           extensionId,
           key,
@@ -143,23 +146,30 @@ export function ConnectionDrawer({ open, toggleOpen, ...rest }: DrawerProps & Po
         })
         .then((connection) => {
           toggleOpen()
-          $rpc
-            .get()
-            .enqueueSyncConnection($activeAccount.get(), "user", connection.id, $debugMode.get())
+          rpc.enqueueSyncConnection(activeAccount, "user", connection.id, debugMode)
         })
         .catch((err) => {
           setError(err.message ?? "Something went wrong")
           setLoading(false)
         })
     },
-    [binanceWallets, extensionId, platformId, toggleOpen, walletsError]
+    [
+      binanceWallets,
+      extensionId,
+      platformId,
+      toggleOpen,
+      walletsError,
+      rpc,
+      activeAccount,
+      debugMode,
+    ]
   )
 
   const [extensions, setExtensions] = useState<RichExtension[]>([])
 
   useEffect(() => {
-    $rpc.get().getExtensionsByType("connection").then(setExtensions)
-  }, [])
+    rpc.getExtensionsByType("connection").then(setExtensions)
+  }, [rpc])
 
   const extension = useMemo(
     () => extensions.find((x) => x.id === extensionId),

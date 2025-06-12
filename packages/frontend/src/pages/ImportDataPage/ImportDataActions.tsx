@@ -2,11 +2,11 @@ import { CalculateOutlined, MoreHoriz, SyncRounded } from "@mui/icons-material"
 import BackupRoundedIcon from "@mui/icons-material/BackupRounded"
 import RestoreRoundedIcon from "@mui/icons-material/RestoreRounded"
 import { IconButton, ListItemAvatar, ListItemText, Menu, MenuItem, Tooltip } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React from "react"
 import { $activeAccount } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
-import { handleBackupRequest } from "src/utils/backup-utils"
-import { onRestoreRequest } from "src/utils/common-tasks"
+import { handleBackupRequest, onRestoreRequest } from "src/utils/backup-utils"
 import { $rpc } from "src/workers/remotes"
 
 export function ImportDataActions() {
@@ -18,6 +18,8 @@ export function ImportDataActions() {
   const handleClose = () => {
     setAnchorEl(null)
   }
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   return (
     <>
@@ -36,7 +38,7 @@ export function ImportDataActions() {
         <MenuItem
           dense
           onClick={async () => {
-            handleBackupRequest()
+            handleBackupRequest(rpc, activeAccount)
             handleClose()
           }}
         >
@@ -45,7 +47,7 @@ export function ImportDataActions() {
           </ListItemAvatar>
           <ListItemText>Backup</ListItemText>
         </MenuItem>
-        <MenuItem dense onClick={() => onRestoreRequest(handleClose)}>
+        <MenuItem dense onClick={() => onRestoreRequest(rpc, activeAccount, handleClose)}>
           <ListItemAvatar>
             <RestoreRoundedIcon fontSize="small" />
           </ListItemAvatar>
@@ -54,7 +56,7 @@ export function ImportDataActions() {
         <MenuItem
           dense
           onClick={() => {
-            $rpc.get().enqueueRecomputeBalances($activeAccount.get(), "user")
+            rpc.enqueueRecomputeBalances(activeAccount, "user")
             handleClose()
           }}
         >
@@ -66,7 +68,7 @@ export function ImportDataActions() {
         <MenuItem
           dense
           onClick={() => {
-            $rpc.get().enqueueRecomputeNetworth($activeAccount.get(), "user")
+            rpc.enqueueRecomputeNetworth(activeAccount, "user")
             handleClose()
           }}
         >
@@ -78,7 +80,7 @@ export function ImportDataActions() {
         <MenuItem
           dense
           onClick={() => {
-            $rpc.get().enqueueSyncAllConnections($activeAccount.get(), "user", $debugMode.get())
+            rpc.enqueueSyncAllConnections(activeAccount, "user", $debugMode.get())
             handleClose()
           }}
         >

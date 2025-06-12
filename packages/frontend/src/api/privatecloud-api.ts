@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/member-ordering */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import auth from "@feathersjs/authentication-client"
 import { feathers } from "@feathersjs/feathers"
 import rest from "@feathersjs/rest-client"

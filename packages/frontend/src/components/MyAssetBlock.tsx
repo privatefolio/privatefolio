@@ -14,7 +14,7 @@ type MyAssetBlockProps = {
 } & Omit<AssetAvatarProps, "alt" | "src">
 
 /**
- * TODO9: needs tooltip, refactored alongside ForeignAssetBlock
+ * TODO8: needs tooltip, refactored alongside ForeignAssetBlock
  */
 export function MyAssetBlock(props: MyAssetBlockProps) {
   const { id: assetId, secondary, showPlatform, ...rest } = props

@@ -22,6 +22,8 @@ import React, { MutableRefObject } from "react"
 import { Transaction } from "src/interfaces"
 import { $showQuotedAmounts } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
+import { exportTransactionsToCsv } from "src/utils/csv-export-utils"
+import { downloadCsv } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 interface TransactionActionsProps {
@@ -39,6 +41,9 @@ export function TransactionActions(props: TransactionActionsProps) {
   const handleClose = () => {
     setAnchorEl(null)
   }
+
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   const showQuotedAmounts = useStore($showQuotedAmounts)
 
@@ -71,9 +76,9 @@ export function TransactionActions(props: TransactionActionsProps) {
         <MenuItem
           dense
           onClick={() => {
-            // const data = exportTransactionsToCsv(tableDataRef.current)
-            // downloadCsv(data, `${$activeAccount.get()}-transactions.csv`)
-            // handleClose()
+            const data = exportTransactionsToCsv(tableDataRef.current)
+            downloadCsv(data, `${activeAccount}-transactions.csv`)
+            handleClose()
           }}
         >
           <ListItemAvatar>
@@ -81,10 +86,10 @@ export function TransactionActions(props: TransactionActionsProps) {
           </ListItemAvatar>
           <ListItemText>Export table</ListItemText>
         </MenuItem>
-        {/* <MenuItem
+        <MenuItem
           dense
           onClick={() => {
-            $rpc.get().enqueueExportAllTransactions($activeAccount.get(), "user")
+            rpc.enqueueExportAllTransactions(activeAccount, "user")
             handleClose()
           }}
         >
@@ -92,11 +97,11 @@ export function TransactionActions(props: TransactionActionsProps) {
             <DownloadRounded fontSize="small" />
           </ListItemAvatar>
           <ListItemText>Export all transactions</ListItemText>
-        </MenuItem> */}
+        </MenuItem>
         <MenuItem
           dense
           onClick={() => {
-            $rpc.get().enqueueAutoMerge($activeAccount.get(), "user")
+            rpc.enqueueAutoMerge(activeAccount, "user")
             handleClose()
           }}
         >
@@ -108,7 +113,7 @@ export function TransactionActions(props: TransactionActionsProps) {
         <MenuItem
           dense
           onClick={() => {
-            $rpc.get().enqueueDetectSpamTransactions($activeAccount.get(), "user")
+            rpc.enqueueDetectSpamTransactions(activeAccount, "user")
             handleClose()
           }}
         >

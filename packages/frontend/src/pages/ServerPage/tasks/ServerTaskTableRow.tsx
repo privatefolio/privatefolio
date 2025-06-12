@@ -1,5 +1,6 @@
 import { CancelOutlined, Visibility } from "@mui/icons-material"
 import { IconButton, Stack, TableCell, TableRow, Tooltip, Typography } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React from "react"
 import { TaskDetailsDialog } from "src/components/Tasks/TaskDetailsDialog"
 import { TaskDuration } from "src/components/Tasks/TaskDuration"
@@ -26,6 +27,8 @@ export function ServerTaskTableRow(props: TableRowComponentProps<ServerTask>) {
   const { description, id, name, priority, createdAt, trigger, status } = row
 
   const { value: open, toggle: toggleOpen } = useBoolean(false)
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   return (
     <>
@@ -105,7 +108,7 @@ export function ServerTaskTableRow(props: TableRowComponentProps<ServerTask>) {
                   aria-label="Cancel Task"
                   size="small"
                   color="secondary"
-                  onClick={() => $rpc.get().cancelTask($activeAccount.get(), id)}
+                  onClick={() => rpc.cancelTask(activeAccount, id)}
                 >
                   <CancelOutlined fontSize="inherit" />
                 </IconButton>

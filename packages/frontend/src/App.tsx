@@ -5,7 +5,7 @@ import { throttle } from "lodash-es"
 import React, { useEffect } from "react"
 import { Navigate, Route, Routes } from "react-router-dom"
 
-import { AccountIndexRoute } from "./AccountIndexRoute"
+import { AccountRouteGuard } from "./AccountRouteGuard"
 import { CircularSpinner } from "./components/CircularSpinner"
 import { ErrorBoundary } from "./components/ErrorBoundary"
 import { ConnectionBanner } from "./components/Header/ConnectionBanner"
@@ -31,7 +31,6 @@ import TransactionsPage from "./pages/TransactionsPage/TransactionsPage"
 import { SHORT_THROTTLE_DURATION } from "./settings"
 import {
   $activeAccount,
-  $activeIndex,
   $cloudAccounts,
   $cloudConnectionStatus,
   $cloudConnectionStatusText,
@@ -126,7 +125,6 @@ export default function App() {
   }, [cloudUser])
 
   const activeAccount = useStore($activeAccount)
-  const activeIndex = useStore($activeIndex)
   const connectionStatus = useStore($connectionStatus)
   const auth = useStore($auth)
   const rpc = useStore($rpc)
@@ -136,11 +134,11 @@ export default function App() {
       return
     }
 
-    fetchInMemoryData()
+    fetchInMemoryData(rpc, activeAccount)
 
     const subscription = rpc.subscribeToAssetMetadata(
       activeAccount,
-      throttle(fetchInMemoryData, SHORT_THROTTLE_DURATION, {
+      throttle(() => fetchInMemoryData(rpc, activeAccount), SHORT_THROTTLE_DURATION, {
         leading: false,
         trailing: true,
       })
@@ -169,7 +167,7 @@ export default function App() {
 
   return (
     <Stack direction="row">
-      {typeof activeIndex === "number" && (
+      {activeAccount !== "" && (
         <>
           <Box
             sx={{
@@ -241,7 +239,7 @@ export default function App() {
             <Routes>
               <Route index element={<AccountsPage />} />
               <Route path="/cloud" element={<CloudUserPage show />} />
-              <Route path="/u/:accountIndex" element={<AccountIndexRoute />}>
+              <Route path="/:accountType/:accountIndex" element={<AccountRouteGuard />}>
                 <Route index element={<HomePage />} />
                 <Route path="trades" element={<TradesPage show />} />
                 <Route path="assets" element={<AssetsPage show />} />

@@ -26,9 +26,10 @@ export function TradeTable(props: TradesTableProps) {
   const accountName = useStore($activeAccount)
   const [refresh, setRefresh] = useState(0)
   const connectionStatus = useStore($connectionStatus)
+  const rpc = useStore($rpc)
 
   useEffect(() => {
-    const subscription = $rpc.get().subscribeToTrades(
+    const subscription = rpc.subscribeToTrades(
       accountName,
       throttle(
         () => {
@@ -43,8 +44,8 @@ export function TradeTable(props: TradesTableProps) {
       )
     )
 
-    return closeSubscription(subscription, $rpc.get())
-  }, [accountName, connectionStatus])
+    return closeSubscription(subscription, rpc)
+  }, [accountName, connectionStatus, rpc])
 
   const queryFn: QueryTableData<Trade> = useCallback(
     async (filters, rowsPerPage, page, order, signal) => {
@@ -72,7 +73,7 @@ export function TradeTable(props: TradesTableProps) {
       const limitQuery = `LIMIT ${rowsPerPage} OFFSET ${page * rowsPerPage}`
 
       const query = `SELECT * FROM trades ${filterQuery} ${orderQuery} ${limitQuery}`
-      const trades = await $rpc.get().getTrades($activeAccount.get(), query)
+      const trades = await rpc.getTrades(accountName, query)
 
       if (signal?.aborted) throw new Error(signal.reason)
       if (tableDataRef) {
@@ -81,10 +82,10 @@ export function TradeTable(props: TradesTableProps) {
 
       return [
         trades,
-        () => $rpc.get().countTrades(accountName, `SELECT COUNT (*) FROM trades ${filterQuery}`),
+        () => rpc.countTrades(accountName, `SELECT COUNT (*) FROM trades ${filterQuery}`),
       ]
     },
-    [accountName, assetId, refresh, tableDataRef]
+    [accountName, assetId, refresh, tableDataRef, rpc]
   )
 
   const headCells = useMemo<HeadCell<Trade>[]>(

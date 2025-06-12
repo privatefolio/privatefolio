@@ -25,15 +25,15 @@ import { TimestampBlock } from "src/components/TimestampBlock"
 import { ValueChip } from "src/components/ValueChip"
 import { ChartData, EtherscanMetadata, Tag, Transaction } from "src/interfaces"
 import { DEFAULT_DEBOUNCE_DURATION, getBlockExplorerName, getBlockExplorerUrl } from "src/settings"
-import { $activeAccount, $activeIndex } from "src/stores/account-store"
+import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
 import { PopoverToggleProps } from "src/stores/app-store"
 import { getAddressBookEntry } from "src/stores/metadata-store"
 import { getAssetTicker } from "src/utils/assets-utils"
-import { $rpc } from "src/workers/remotes"
+import { $rpc, RPC } from "src/workers/remotes"
 
 const patchTransactionDebounced = debounce(
-  (accountName: string, id: string, update: Partial<Transaction>) => {
-    $rpc.get().patchTransaction(accountName, id, update)
+  (rpc: RPC, accountName: string, id: string, update: Partial<Transaction>) => {
+    rpc.patchTransaction(accountName, id, update)
     // TODO0 is this wrapping necessary?
   },
   DEFAULT_DEBOUNCE_DURATION
@@ -48,7 +48,7 @@ type TransactionDrawerProps = DrawerProps &
 
 export function TransactionDrawer(props: TransactionDrawerProps) {
   const { open, toggleOpen, tx, relativeTime, priceMap, ...rest } = props
-  const activeIndex = useStore($activeIndex)
+  const activeAccountPath = useStore($activeAccountPath)
 
   const {
     incoming,
@@ -72,26 +72,25 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
 
   const [logsNumber, setLogsNumber] = useState<number | null>(null)
   const [tags, setTags] = useState<Tag[]>([])
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   useEffect(() => {
     if (!open) return
 
-    $rpc
-      .get()
-      .getAuditLogsByTxId($activeAccount.get(), id)
-      .then((logs) => {
-        setLogsNumber(logs.length)
-      })
+    rpc.getAuditLogsByTxId(activeAccount, id).then((logs) => {
+      setLogsNumber(logs.length)
+    })
 
-    $rpc.get().getTagsForTransaction($activeAccount.get(), id).then(setTags)
-  }, [id, open, timestamp])
+    rpc.getTagsForTransaction(activeAccount, id).then(setTags)
+  }, [id, open, timestamp, rpc, activeAccount])
 
   const [textInput, setTextInput] = useState(tx.notes || "")
 
-  const handleTextInputChange = (event) => {
+  const handleTextInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value.replace("\n", "")
     setTextInput(newValue)
-    patchTransactionDebounced($activeAccount.get(), id, {
+    patchTransactionDebounced(rpc, activeAccount, id, {
       notes: newValue,
     })
   }
@@ -275,7 +274,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
                   size="small"
                   color="secondary"
                   component={Link}
-                  to={`/u/${activeIndex}/audit-logs?txId=${id}`}
+                  to={`${activeAccountPath}/audit-logs?txId=${id}`}
                   sx={{ paddingX: 2 }}
                   endIcon={<ArrowRightAltRounded fontSize="inherit" />}
                 >

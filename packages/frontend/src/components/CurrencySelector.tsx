@@ -18,9 +18,11 @@ import { $activeAccount } from "src/stores/account-store"
 
 export function CurrencySelector() {
   const currency = useStore($quoteCurrency)
+  const activeAccount = useStore($activeAccount)
+
   const handleChange = (event: SelectChangeEvent<string>) => {
     const newCurrency = DEFAULT_CURRENCIES_MAP[event.target.value]
-    $quoteCurrencyMap.setKey($activeAccount.get(), newCurrency.id)
+    $quoteCurrencyMap.setKey(activeAccount, newCurrency.id)
   }
 
   return (

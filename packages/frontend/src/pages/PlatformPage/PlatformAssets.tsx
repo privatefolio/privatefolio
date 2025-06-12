@@ -1,4 +1,5 @@
 import { Paper } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo, useState } from "react"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
@@ -15,17 +16,18 @@ interface PlatformAssetsProps {
 export function PlatformAssets({ platformId }: PlatformAssetsProps) {
   const [assets, setAssets] = useState<Asset[] | undefined>(undefined)
   const [queryTime, setQueryTime] = useState<number | null>(null)
+  const rpc = useStore($rpc)
 
   useEffect(() => {
     const loadAssets = async () => {
       const start = Date.now()
-      const data = await $rpc.get().getAssetsByPlatform(platformId)
+      const data = await rpc.getAssetsByPlatform(platformId)
       setQueryTime(Date.now() - start)
       setAssets(data)
     }
 
     loadAssets()
-  }, [platformId])
+  }, [platformId, rpc])
 
   const headCells: HeadCell<Asset>[] = useMemo(
     () => [

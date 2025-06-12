@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/member-ordering */
 export type Callback<T1 = void> = (param1: T1) => void
 
 export interface ISubscription<T1 = void> {

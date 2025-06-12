@@ -4,28 +4,28 @@ import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { Timestamp } from "src/interfaces"
-import { $activeAccount, $activeIndex, $connectionStatus } from "src/stores/account-store"
+import { $activeAccount, $activeAccountPath, $connectionStatus } from "src/stores/account-store"
 import { closeSubscription } from "src/utils/browser-utils"
 import { $rpc } from "src/workers/remotes"
 
 export function NoDataButton() {
-  const activeIndex = useStore($activeIndex)
+  const activeAccountPath = useStore($activeAccountPath)
   const connectionStatus = useStore($connectionStatus)
   const [lastTx, setLastTx] = useState<Timestamp | null>(null)
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   useEffect(() => {
     function fetchData() {
-      $rpc.get().getValue<Timestamp>($activeAccount.get(), "lastTx", 0).then(setLastTx)
+      rpc.getValue<Timestamp>(activeAccount, "lastTx", 0).then(setLastTx)
     }
 
     fetchData()
 
-    const subscription = $rpc
-      .get()
-      .subscribeToKV<Timestamp>($activeAccount.get(), "lastTx", setLastTx)
+    const subscription = rpc.subscribeToKV<Timestamp>(activeAccount, "lastTx", setLastTx)
 
-    return closeSubscription(subscription, $rpc.get())
-  }, [connectionStatus])
+    return closeSubscription(subscription, rpc)
+  }, [rpc, connectionStatus, activeAccount])
 
   const dataAvailable = lastTx !== null && lastTx !== 0
 
@@ -38,7 +38,7 @@ export function NoDataButton() {
   }
 
   return (
-    <Button sx={{ padding: 4 }} component={Link} to={`/u/${activeIndex}/import-data`}>
+    <Button sx={{ padding: 4 }} component={Link} to={`${activeAccountPath}/import-data`}>
       <Typography color="text.secondary" variant="body2" component="div">
         <Stack alignItems="center">
           <DataArrayRounded sx={{ height: 64, width: 64 }} />

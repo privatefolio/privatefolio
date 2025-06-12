@@ -20,15 +20,13 @@ export function AssetTable() {
   const [priceMap, setPriceMap] = useState<Record<string, ChartData> | null>(null)
 
   const accountName = useStore($activeAccount)
+  const rpc = useStore($rpc)
 
   useEffect(() => {
-    $rpc
-      .get()
-      .getAssetPriceMap(accountName)
-      .then((priceMap) => {
-        setPriceMap(priceMap)
-      })
-  }, [accountName])
+    rpc.getAssetPriceMap(accountName).then((priceMap) => {
+      setPriceMap(priceMap)
+    })
+  }, [accountName, rpc])
 
   // const rows = useMemo(() => Object.values(assetMap), [assetMap])
   const rows: AssetWithPrice[] = useMemo(

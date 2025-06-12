@@ -1,4 +1,5 @@
 import { AlertTitle, Box } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React, { useEffect, useRef } from "react"
 import { Callout } from "src/components/Callout"
 import { Subheading } from "src/components/Subheading"
@@ -10,9 +11,11 @@ import { AuditLogActions } from "./AuditLogActions"
 import { AuditLogTable } from "./AuditLogTable"
 
 export default function AuditLogsPage({ show }: { show: boolean }) {
+  const activeAccount = useStore($activeAccount)
+
   useEffect(() => {
-    document.title = `Audit logs - ${$activeAccount.get()} - Privatefolio`
-  }, [])
+    document.title = `Audit logs - ${activeAccount} - Privatefolio`
+  }, [activeAccount])
 
   const tableDataRef = useRef<AuditLog[]>([])
 

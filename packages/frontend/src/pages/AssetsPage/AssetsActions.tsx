@@ -36,6 +36,8 @@ export function AssetsActions() {
 
   const debugMode = useStore($debugMode)
   const hideUnlisted = useStore($hideUnlisted)
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   return (
     <Stack direction="row">
@@ -43,7 +45,7 @@ export function AssetsActions() {
         <IconButton
           color="secondary"
           onClick={() => {
-            $hideUnlistedMap.setKey($activeAccount.get(), String(!hideUnlisted))
+            $hideUnlistedMap.setKey(activeAccount, String(!hideUnlisted))
           }}
         >
           {hideUnlisted ? (
@@ -68,7 +70,7 @@ export function AssetsActions() {
         <MenuItem
           dense
           onClick={() => {
-            $rpc.get().enqueueFetchPrices($activeAccount.get(), "user")
+            rpc.enqueueFetchPrices(activeAccount, "user")
             handleClose()
           }}
         >
@@ -80,7 +82,7 @@ export function AssetsActions() {
         <MenuItem
           dense
           onClick={() => {
-            $rpc.get().enqueueRefetchAssets($activeAccount.get(), "user")
+            rpc.enqueueRefetchAssets(activeAccount, "user")
             handleClose()
           }}
         >
@@ -99,7 +101,7 @@ export function AssetsActions() {
             <MenuItem
               dense
               onClick={async () => {
-                $rpc.get().enqueueDeleteAssetPrices($activeAccount.get(), "user")
+                rpc.enqueueDeleteAssetPrices(activeAccount, "user")
                 handleClose()
               }}
             >

@@ -22,7 +22,7 @@ export function extractTransactions(
 export function groupTransactions(
   transactions: Transaction[],
   _fileImportId: string,
-  parserId: string
+  _parserId: string
 ): Transaction[] {
   // if (parserId === "binance-spot-history") {
   //   return binance.groupTransactions(transactions)

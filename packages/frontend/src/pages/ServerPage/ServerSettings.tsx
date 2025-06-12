@@ -45,9 +45,12 @@ const METADATA_REFRESH_INTERVALS = [
 ]
 
 export function ServerSettings() {
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
+
   useEffect(() => {
-    document.title = `Server settings - ${$activeAccount.get()} - Privatefolio`
-  }, [])
+    document.title = `Server settings - ${activeAccount} - Privatefolio`
+  }, [activeAccount])
 
   const [isLoading, setIsLoading] = useState(true)
   const [networthRefreshInterval, setNetworthCronInterval] = useState(
@@ -65,15 +68,13 @@ export function ServerSettings() {
 
   const [isSaving, setIsSaving] = useState(false)
 
-  const activeAccount = useStore($activeAccount)
-
   useEffect(() => {
     if (!activeAccount) return
 
     const loadSettings = async () => {
       setIsLoading(true)
       try {
-        const savedSettings = await $rpc.get().getSettings(activeAccount)
+        const savedSettings = await rpc.getSettings(activeAccount)
         const settings = Object.assign({}, DEFAULT_SETTINGS, savedSettings)
 
         setNetworthCronInterval(settings.networthRefreshInterval)
@@ -105,7 +106,7 @@ export function ServerSettings() {
     }
 
     loadSettings()
-  }, [activeAccount])
+  }, [activeAccount, rpc])
 
   const handleSave = async () => {
     if (!activeAccount) return
@@ -113,7 +114,7 @@ export function ServerSettings() {
     setIsSaving(true)
 
     try {
-      await $rpc.get().updateSettings(activeAccount, {
+      await rpc.updateSettings(activeAccount, {
         kioskMode,
         metadataRefreshInterval,
         networthRefreshInterval,

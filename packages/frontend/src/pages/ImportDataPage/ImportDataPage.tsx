@@ -1,4 +1,5 @@
 import { Stack } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React, { useEffect } from "react"
 import { useSearchParams } from "react-router-dom"
 import { NavTab } from "src/components/NavTab"
@@ -16,9 +17,11 @@ export default function ImportDataPage({ show }: { show: boolean }) {
   const [searchParams] = useSearchParams()
   const tab = searchParams.get("tab") || "connections"
 
+  const activeAccount = useStore($activeAccount)
+
   useEffect(() => {
-    document.title = `Data - ${$activeAccount.get()} - Privatefolio`
-  }, [])
+    document.title = `Data - ${activeAccount} - Privatefolio`
+  }, [activeAccount])
 
   return (
     <StaggeredList component="main" gap={2} show={show}>

@@ -1,3 +1,4 @@
+import { useStore } from "@nanostores/react"
 import React, { useEffect, useRef } from "react"
 import { AddTransactionDrawer } from "src/components/AddTransactionDrawer"
 import { Subheading } from "src/components/Subheading"
@@ -10,9 +11,11 @@ import { TransactionActions } from "./TransactionActions"
 import { TransactionTable } from "./TransactionTable"
 
 export default function TransactionsPage({ show }: { show: boolean }) {
+  const activeAccount = useStore($activeAccount)
+
   useEffect(() => {
-    document.title = `Transactions - ${$activeAccount.get()} - Privatefolio`
-  }, [])
+    document.title = `Transactions - ${activeAccount} - Privatefolio`
+  }, [activeAccount])
 
   const tableDataRef = useRef<Transaction[]>([])
 

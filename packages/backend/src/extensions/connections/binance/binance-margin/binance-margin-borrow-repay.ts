@@ -9,7 +9,7 @@ export function parseLoan(
   connection: BinanceConnection
 ): ParserResult {
   const { platform } = connection
-  const { amount, asset, isolatedSymbol, principal, timestamp: time, txId: id } = row
+  const { asset, isolatedSymbol, principal, timestamp: time, txId: id } = row
   const wallet = isolatedSymbol ? `Binance Isolated Margin` : `Binance Cross Margin`
   const timestamp = new Date(Number(time)).getTime()
   if (isNaN(timestamp)) {
@@ -48,7 +48,7 @@ export function parseRepayment(
   connection: BinanceConnection
 ): ParserResult {
   const { platform } = connection
-  const { amount, asset, isolatedSymbol, principal, timestamp: time, txId: id } = row
+  const { amount, asset, isolatedSymbol, timestamp: time, txId: id } = row
   const wallet = isolatedSymbol ? `Binance isolated margin` : `Binance cross margin`
   const timestamp = new Date(Number(time)).getTime()
   if (isNaN(timestamp)) {

@@ -19,7 +19,7 @@ const steps = [
       <>
         Get in the account whose data you want to export. Afterwards open the Navigation Menu and
         click on{" "}
-        <ExternalLink href="https://privatefolio.app/u/0/transactions">Transactions</ExternalLink>.
+        <ExternalLink href="https://privatefolio.app/c/0/transactions">Transactions</ExternalLink>.
         <br />
         <br />
         <a

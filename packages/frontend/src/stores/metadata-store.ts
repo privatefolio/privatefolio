@@ -3,8 +3,7 @@ import { getAssetTicker } from "src/utils/assets-utils"
 import { logAtoms } from "src/utils/browser-utils"
 
 import { FilterOptionsMap, MyAsset, Platform, TRANSACTIONS_TYPES } from "../interfaces"
-import { $rpc } from "../workers/remotes"
-import { $activeAccount } from "./account-store"
+import { RPC } from "../workers/remotes"
 
 export type FilterKey = keyof FilterOptionsMap
 export const $filterOptionsMap = map<FilterOptionsMap>()
@@ -22,20 +21,18 @@ keepMount($addressBook)
 
 logAtoms({ $addressBook, $assetMap, $filterOptionsMap, $myPlatforms })
 
-export async function fetchInMemoryData() {
-  const accountName = $activeAccount.get()
-
+export async function fetchInMemoryData(rpc: RPC, accountName: string) {
   const start = Date.now()
   const [assets, platformIds, platforms, wallet, operation, addressBook, tags, triggers] =
     await Promise.all([
-      $rpc.get().getMyAssets(accountName),
-      $rpc.get().getMyPlatformIds(accountName),
-      $rpc.get().getMyPlatforms(accountName),
-      $rpc.get().getWallets(accountName),
-      $rpc.get().getOperations(accountName),
-      $rpc.get().getValue(accountName, "address_book", "{}"),
-      $rpc.get().getTags(accountName),
-      $rpc.get().getTriggers(accountName),
+      rpc.getMyAssets(accountName),
+      rpc.getMyPlatformIds(accountName),
+      rpc.getMyPlatforms(accountName),
+      rpc.getWallets(accountName),
+      rpc.getOperations(accountName),
+      rpc.getValue(accountName, "address_book", "{}"),
+      rpc.getTags(accountName),
+      rpc.getTriggers(accountName),
     ])
 
   $inMemoryDataQueryTime.set(Date.now() - start)

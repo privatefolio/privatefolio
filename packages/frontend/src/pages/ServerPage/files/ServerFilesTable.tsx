@@ -14,17 +14,19 @@ import { $rpc } from "src/workers/remotes"
 import { ServerFileTableRow } from "./ServerFileTableRow"
 
 export function ServerFilesTable() {
-  useEffect(() => {
-    document.title = `Server files - ${$activeAccount.get()} - Privatefolio`
-  }, [])
+  const activeAccount = useStore($activeAccount)
 
-  const accountName = useStore($activeAccount)
+  useEffect(() => {
+    document.title = `Server files - ${activeAccount} - Privatefolio`
+  }, [activeAccount])
+
   const [refresh, setRefresh] = useState(0)
   const connectionStatus = useStore($connectionStatus)
+  const rpc = useStore($rpc)
 
   useEffect(() => {
-    const subscription = $rpc.get().subscribeToServerFiles(
-      accountName,
+    const subscription = rpc.subscribeToServerFiles(
+      activeAccount,
       throttle(
         () => {
           setRefresh(Math.random())
@@ -37,8 +39,8 @@ export function ServerFilesTable() {
       )
     )
 
-    return closeSubscription(subscription, $rpc.get())
-  }, [accountName, connectionStatus])
+    return closeSubscription(subscription, rpc)
+  }, [activeAccount, connectionStatus, rpc])
 
   const queryFn: QueryTableData<ServerFile> = useCallback(
     async (filters, rowsPerPage, page, order, signal) => {
@@ -59,19 +61,17 @@ export function ServerFilesTable() {
       const limitQuery = `LIMIT ${rowsPerPage} OFFSET ${page * rowsPerPage}`
 
       const query = `SELECT * FROM server_files ${filterQuery} ${orderQuery} ${limitQuery}`
-      const records = await $rpc.get().getServerFiles(accountName, query)
+      const records = await rpc.getServerFiles(activeAccount, query)
 
       if (signal?.aborted) throw new Error(signal.reason)
 
       return [
         records,
         () =>
-          $rpc
-            .get()
-            .countServerFiles(accountName, `SELECT COUNT (*) FROM server_files ${filterQuery}`),
+          rpc.countServerFiles(activeAccount, `SELECT COUNT (*) FROM server_files ${filterQuery}`),
       ]
     },
-    [accountName, refresh]
+    [activeAccount, refresh, rpc]
   )
 
   const headCells: HeadCell<ServerFile>[] = useMemo(

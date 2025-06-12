@@ -12,14 +12,20 @@ import { createValueFormatter } from "src/utils/chart-utils"
 import { $rpc } from "../../workers/remotes"
 
 export function BreakdownChart() {
-  useEffect(() => {
-    document.title = `Breakdown - ${$activeAccount.get()} - Privatefolio`
-  }, [])
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
-  const queryFn: QueryChartData = useCallback(async (interval) => {
-    const result = await $rpc.get().getBreakdownChartData($activeAccount.get(), interval)
-    return result
-  }, [])
+  useEffect(() => {
+    document.title = `Breakdown - ${activeAccount} - Privatefolio`
+  }, [activeAccount])
+
+  const queryFn: QueryChartData = useCallback(
+    async (interval) => {
+      const result = await rpc.getBreakdownChartData(activeAccount, interval)
+      return result
+    },
+    [rpc, activeAccount]
+  )
 
   const currency = useStore($quoteCurrency)
   const isMobile = useMediaQuery("(max-width: 599px)")

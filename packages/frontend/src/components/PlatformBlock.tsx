@@ -1,4 +1,5 @@
 import { Box, Stack } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { Platform } from "src/interfaces"
 import { MonoFont } from "src/theme"
@@ -16,12 +17,13 @@ export function PlatformBlock(props: PlatformBlockProps) {
   const { id, platform: cachedValue, ...rest } = props
 
   const [platform, setPlatform] = useState<Platform | undefined>(cachedValue)
+  const rpc = useStore($rpc)
 
   useEffect(() => {
     if (!cachedValue && id) {
-      $rpc.get().getPlatform(id).then(setPlatform)
+      rpc.getPlatform(id).then(setPlatform)
     }
-  }, [id, cachedValue])
+  }, [id, cachedValue, rpc])
 
   if (!platform) return null
 

@@ -32,6 +32,7 @@ export default function PlatformPage() {
   const [platform, setPlatform] = useState<Platform | undefined>(undefined)
   const [isLoading, setIsLoading] = useState(true)
   const activeAccount = useStore($activeAccount)
+  const rpc = useStore($rpc)
 
   useEffect(() => {
     if (platform && activeAccount) {
@@ -48,14 +49,13 @@ export default function PlatformPage() {
     }
 
     setIsLoading(true)
-    $rpc
-      .get()
+    rpc
       .getPlatform(platformId)
       .then(setPlatform)
       .finally(() => {
         setIsLoading(false)
       })
-  }, [platformId])
+  }, [platformId, rpc])
 
   if (isLoading) return <DefaultSpinner />
   if (!platform) return <FourZeroFourPage type="Platform" show />

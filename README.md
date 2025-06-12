@@ -88,7 +88,7 @@ For detailed setup instructions, including prerequisites, installation, and test
 1. Fork the repository and clone it locally.
 2. Install dependencies using `yarn` and build the project using `yarn build`.
 3. Use `yarn dev` to start the development environment.
-4. Check [open issues](https://github.com/privatefolio/privatefolio/issues) to find tasks to work on.
+4. Check [open issues](https://github.com/privatefolio/privatefolio/issues) or `TODO` comments in the codebase to find tasks to work on.
 5. Join our [Discord community](https://discord.gg/YHHu9nK8VD) to discuss development and get help.
 6. When you are ready, commit your changes and submit a pull request.
 

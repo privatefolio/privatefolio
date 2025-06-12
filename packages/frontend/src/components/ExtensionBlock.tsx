@@ -1,4 +1,5 @@
 import { Box, Stack } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { RichExtension } from "src/interfaces"
 import { MonoFont } from "src/theme"
@@ -16,12 +17,13 @@ export function ExtensionBlock(props: ExtensionBlockProps) {
   const { id, extension: cachedValue, ...rest } = props
 
   const [extension, setExtension] = useState<RichExtension | undefined>(cachedValue)
+  const rpc = useStore($rpc)
 
   useEffect(() => {
     if (!cachedValue && id) {
-      $rpc.get().getExtension(id).then(setExtension)
+      rpc.getExtension(id).then(setExtension)
     }
-  }, [id, cachedValue])
+  }, [id, cachedValue, rpc])
 
   if (!extension) return null
 

@@ -12,6 +12,7 @@ export function ExchangesTable() {
   const [exchanges, setExchanges] = useState<Exchange[]>([])
   const [queryTime, setQueryTime] = useState<number | null>(null)
   const accountName = useStore($activeAccount)
+  const rpc = useStore($rpc)
 
   useEffect(() => {
     document.title = `Exchanges - ${accountName} - Privatefolio`
@@ -20,13 +21,13 @@ export function ExchangesTable() {
   useEffect(() => {
     const loadExchanges = async () => {
       const start = Date.now()
-      const data = await $rpc.get().getExchanges()
+      const data = await rpc.getExchanges()
       setQueryTime(Date.now() - start)
       setExchanges(data)
     }
 
     loadExchanges()
-  }, [accountName])
+  }, [accountName, rpc])
 
   const headCells: HeadCell<Exchange>[] = useMemo(
     () => [

@@ -41,6 +41,8 @@ export function AuditLogActions(props: AuditLogsActionsProps) {
   const handleClose = () => {
     setAnchorEl(null)
   }
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   const showQuotedAmounts = useStore($showQuotedAmounts)
   const debugMode = useStore($debugMode)
@@ -75,7 +77,7 @@ export function AuditLogActions(props: AuditLogsActionsProps) {
           dense
           onClick={() => {
             const data = exportAuditLogsToCsv(tableDataRef.current)
-            downloadCsv(data, `${$activeAccount.get()}-audit-logs.csv`)
+            downloadCsv(data, `${activeAccount}-audit-logs.csv`)
             handleClose()
           }}
         >
@@ -87,11 +89,24 @@ export function AuditLogActions(props: AuditLogsActionsProps) {
         <MenuItem
           dense
           onClick={async () => {
-            const accountName = $activeAccount.get()
-            const auditLogs = await $rpc.get().getAuditLogs(accountName)
-            const data = exportAuditLogsToCsv(auditLogs)
-            downloadCsv(data, `${accountName}-audit-logs.csv`)
-            handleClose()
+            // TODO9
+            // const auditLogs = await rpc.getAuditLogs(activeAccount)
+            // const data = exportAuditLogsToCsv(auditLogs)
+            // downloadCsv(data, `${activeAccount}-audit-logs.csv`)
+            // handleClose()
+            // return enqueueTask(accountName, {
+            //   abortable: true,
+            //   description: "Export all audit logs.",
+            //   determinate: true,
+            //   function: async () => {
+            //     const auditLogs = await getAuditLogs(accountName)
+            //     const data = exportAuditLogsToCsv(auditLogs)
+            //     downloadCsv(data, `${accountName}-audit-logs.csv`)
+            //   },
+            //   name: "Export all audit logs",
+            //   priority: TaskPriority.Low,
+            //   trigger,
+            // })
           }}
         >
           <ListItemAvatar>
@@ -102,7 +117,7 @@ export function AuditLogActions(props: AuditLogsActionsProps) {
         <MenuItem
           dense
           onClick={() => {
-            $rpc.get().enqueueRecomputeBalances($activeAccount.get(), "user")
+            rpc.enqueueRecomputeBalances(activeAccount, "user")
             handleClose()
           }}
         >
@@ -121,7 +136,7 @@ export function AuditLogActions(props: AuditLogsActionsProps) {
             <MenuItem
               dense
               onClick={() => {
-                $rpc.get().enqueueDeleteBalances($activeAccount.get(), "user")
+                rpc.enqueueDeleteBalances(activeAccount, "user")
                 handleClose()
               }}
             >

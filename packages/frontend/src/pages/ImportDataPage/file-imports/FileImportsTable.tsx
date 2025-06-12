@@ -13,9 +13,12 @@ import { FileImportHelp } from "./FileImportHelp"
 import { FileImportTableRow } from "./FileImportTableRow"
 
 export function FileImportsTable() {
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
+
   useEffect(() => {
-    document.title = `File imports - ${$activeAccount.get()} - Privatefolio`
-  }, [])
+    document.title = `File imports - ${activeAccount} - Privatefolio`
+  }, [activeAccount])
 
   const [queryTime, setQueryTime] = useState<number | null>(null)
   const [rows, setRows] = useState<FileImport[]>([])
@@ -25,17 +28,17 @@ export function FileImportsTable() {
   useEffect(() => {
     async function fetchData() {
       const start = Date.now()
-      const rows = await $rpc.get().getFileImports($activeAccount.get())
+      const rows = await rpc.getFileImports(activeAccount)
       setQueryTime(Date.now() - start)
       setRows(rows)
     }
 
     fetchData().then()
 
-    const subscription = $rpc.get().subscribeToFileImports($activeAccount.get(), fetchData)
+    const subscription = rpc.subscribeToFileImports(activeAccount, fetchData)
 
-    return closeSubscription(subscription, $rpc.get())
-  }, [connectionStatus])
+    return closeSubscription(subscription, rpc)
+  }, [connectionStatus, rpc, activeAccount])
 
   const headCells: HeadCell<FileImport>[] = useMemo(
     () => [

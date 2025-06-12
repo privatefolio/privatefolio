@@ -21,6 +21,7 @@
  * @param {Function} func: function to memoize
  * @returns {Function}
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function memoize<T extends (...args: any[]) => any>(func: T): T {
   const cache: Record<string, ReturnType<T>> = {}
   return function memoized(...args: Parameters<T>): ReturnType<T> {

@@ -35,18 +35,18 @@ function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
 
   const showQuotedAmounts = useStore($showQuotedAmounts)
 
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
+
   useEffect(() => {
     if (priceMap) return
     if (!showQuotedAmounts && !open) return
 
-    $rpc
-      .get()
-      .getAssetPriceMap($activeAccount.get(), timestamp)
-      .then((priceMap) => {
-        setPriceMap(priceMap)
-      })
+    rpc.getAssetPriceMap(activeAccount, timestamp).then((priceMap) => {
+      setPriceMap(priceMap)
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, timestamp, showQuotedAmounts])
+  }, [open, timestamp, showQuotedAmounts, rpc, activeAccount])
 
   if (isTablet) {
     return (

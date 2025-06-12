@@ -218,9 +218,11 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
 
     chartRef.current.subscribeClick(handleClick)
 
+    const chartRefCopy = chartRef.current
+
     return () => {
       $inspectTime.set(undefined)
-      chartRef.current?.unsubscribeClick(handleClick)
+      chartRefCopy?.unsubscribeClick(handleClick)
     }
   }, [seriesReady, cursorMode])
 
@@ -344,7 +346,8 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
   }, [plotSeries, data])
 
   const { value: logScale, toggle: toggleLogScale } = useBoolean(false)
-  const { value: fullscreen, toggle: toggleFullscreen } = useBoolean(false)
+  // TODO6
+  const { value: fullscreen, toggle: _toggleFullscreen } = useBoolean(false)
 
   const favoriteIntervals = useStore($favoriteIntervals)
   const activeInterval = useStore($preferredInterval)
@@ -619,15 +622,20 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
               )}
             </Stack>
           )}
-          <Chart
-            chartRef={chartRef}
-            onChartReady={handleChartReady}
-            logScale={logScale}
-            cursor={
-              cursorMode === "move" ? "move" : cursorMode === "inspect" ? "pointer" : "crosshair"
-            }
-            {...rest}
-          />
+          <Box
+            fontStyle={{ visibility: isLoading || isEmpty || error ? "hidden" : "visible" }}
+            sx={{ height: "100%", width: "100%" }}
+          >
+            <Chart
+              chartRef={chartRef}
+              onChartReady={handleChartReady}
+              logScale={logScale}
+              cursor={
+                cursorMode === "move" ? "move" : cursorMode === "inspect" ? "pointer" : "crosshair"
+              }
+              {...rest}
+            />
+          </Box>
         </Box>
         <Stack
           sx={{

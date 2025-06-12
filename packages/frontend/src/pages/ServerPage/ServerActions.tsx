@@ -15,8 +15,7 @@ import { useStore } from "@nanostores/react"
 import React from "react"
 import { $activeAccount } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
-import { handleBackupRequest } from "src/utils/backup-utils"
-import { onRestoreRequest } from "src/utils/common-tasks"
+import { handleBackupRequest, onRestoreRequest } from "src/utils/backup-utils"
 import { $rpc } from "src/workers/remotes"
 
 export function ServerActions() {
@@ -30,6 +29,8 @@ export function ServerActions() {
   }
 
   const debugMode = useStore($debugMode)
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   return (
     <>
@@ -49,7 +50,7 @@ export function ServerActions() {
           dense
           onClick={() => {
             handleClose()
-            handleBackupRequest()
+            handleBackupRequest(rpc, activeAccount)
           }}
         >
           <ListItemAvatar>
@@ -57,7 +58,7 @@ export function ServerActions() {
           </ListItemAvatar>
           <ListItemText>Backup</ListItemText>
         </MenuItem>
-        <MenuItem dense onClick={() => onRestoreRequest(handleClose)}>
+        <MenuItem dense onClick={() => onRestoreRequest(rpc, activeAccount, handleClose)}>
           <ListItemAvatar>
             <RestoreRoundedIcon fontSize="small" />
           </ListItemAvatar>
@@ -66,7 +67,7 @@ export function ServerActions() {
         <MenuItem
           dense
           onClick={() => {
-            $rpc.get().enqueueRecomputeBalances($activeAccount.get(), "user")
+            rpc.enqueueRecomputeBalances(activeAccount, "user")
             handleClose()
           }}
         >
@@ -78,7 +79,7 @@ export function ServerActions() {
         <MenuItem
           dense
           onClick={() => {
-            $rpc.get().enqueueRecomputeNetworth($activeAccount.get(), "user")
+            rpc.enqueueRecomputeNetworth(activeAccount, "user")
             handleClose()
           }}
         >
@@ -97,7 +98,7 @@ export function ServerActions() {
             <MenuItem
               dense
               onClick={() => {
-                $rpc.get().enqueueSleep($activeAccount.get(), 1, 0.1)
+                rpc.enqueueSleep(activeAccount, 1, 0.1)
                 handleClose()
               }}
             >
@@ -109,7 +110,7 @@ export function ServerActions() {
             <MenuItem
               dense
               onClick={() => {
-                $rpc.get().enqueueSleep($activeAccount.get(), 50, 10, true)
+                rpc.enqueueSleep(activeAccount, 50, 10, true)
                 handleClose()
               }}
             >

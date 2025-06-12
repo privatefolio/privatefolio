@@ -24,22 +24,23 @@ export function PnLChart() {
   // hack to  refresh the chart
   const [refresh, setRefresh] = useState(0)
   const connectionStatus = useStore($connectionStatus)
+  const rpc = useStore($rpc)
 
   useEffect(() => {
-    const subscription = $rpc.get().subscribeToNetworth(
+    const subscription = rpc.subscribeToNetworth(
       activeAccount,
       debounce(() => {
         setRefresh(Math.random())
       }, DEFAULT_DEBOUNCE_DURATION)
     )
 
-    return closeSubscription(subscription, $rpc.get())
-  }, [activeAccount, connectionStatus])
+    return closeSubscription(subscription, rpc)
+  }, [activeAccount, connectionStatus, rpc])
 
   const queryFn: QueryChartData = useCallback(
     async (interval) => {
       const _refresh = refresh // reference the dependency for eslint(react-hooks/exhaustive-deps)
-      const balances = await $rpc.get().getNetworth(activeAccount)
+      const balances = await rpc.getNetworth(activeAccount)
 
       const data = balances.map((balance) => ({
         color: balance.change === 0 ? neutralColor : balance.change > 0 ? profitColor : lossColor,
@@ -60,7 +61,7 @@ export function PnLChart() {
 
       return result
     },
-    [activeAccount, refresh]
+    [activeAccount, refresh, rpc]
   )
 
   const currency = useStore($quoteCurrency)

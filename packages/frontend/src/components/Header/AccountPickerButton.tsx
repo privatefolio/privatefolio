@@ -3,7 +3,7 @@ import { Button, Stack, Tooltip, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useState } from "react"
 import { useBoolean } from "src/hooks/useBoolean"
-import { $activeAccount } from "src/stores/account-store"
+import { $activeAccount, $activeAccountType } from "src/stores/account-store"
 import { noop } from "src/utils/utils"
 
 import { AccountAvatar } from "../AccountAvatar"
@@ -14,6 +14,7 @@ import { AccountPicker } from "./AccountPicker"
 export function AccountPickerButton(props: { onClose?: () => void }) {
   const { onClose: closeParentDrawer = noop } = props
   const activeAccount = useStore($activeAccount)
+  const activeAccountType = useStore($activeAccountType)
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement>()
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -46,7 +47,7 @@ export function AccountPickerButton(props: { onClose?: () => void }) {
           }}
         >
           <Stack direction="row" alignItems="center" sx={{ overflow: "hidden" }} gap={2}>
-            <AccountAvatar alt={activeAccount} size="small" />
+            <AccountAvatar alt={activeAccount} size="small" type={activeAccountType} />
             <Typography
               variant="subtitle1"
               letterSpacing="0.025rem"

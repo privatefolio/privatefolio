@@ -14,7 +14,7 @@ import {
   useMediaQuery,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import { AccountAvatar, SIZE_MAP } from "src/components/AccountAvatar"
 import { AddAccountDialog } from "src/components/AccountPicker/AddAccountDialog"
@@ -25,7 +25,7 @@ import { SettingsDrawer } from "src/components/Header/SettingsDrawer"
 import { StaggeredList } from "src/components/StaggeredList"
 import { Truncate } from "src/components/Truncate"
 import { useBoolean } from "src/hooks/useBoolean"
-import { $accounts, $activeAccount, $activeIndex } from "src/stores/account-store"
+import { $activeAccount, $cloudAccounts, $localAccounts } from "src/stores/account-store"
 import { $cloudRpcReady, $cloudUser } from "src/stores/cloud-user-store"
 import { SerifFont } from "src/theme"
 import { cloudEnabled, localServerEnabled, SPRING_CONFIGS } from "src/utils/utils"
@@ -35,8 +35,9 @@ export default function AccountsPage() {
     document.title = `Accounts - Privatefolio`
   }, [])
 
-  const accounts = useStore($accounts)
-  const activeIndex = useStore($activeIndex)
+  const localAccounts = useStore($localAccounts)
+  const cloudAccounts = useStore($cloudAccounts)
+  const activeAccount = useStore($activeAccount)
 
   const { value: addAccountOpen, toggle: toggleAddAccount } = useBoolean(false)
 
@@ -44,10 +45,10 @@ export default function AccountsPage() {
   const cloudRpcReady = useStore($cloudRpcReady)
 
   useEffect(() => {
-    if (activeIndex !== undefined) {
+    if (activeAccount) {
       $activeAccount.set("")
     }
-  }, [activeIndex])
+  }, [activeAccount])
 
   const [showAppBar, setShowAppBar] = useState(false)
   useEffect(() => {
@@ -73,6 +74,28 @@ export default function AccountsPage() {
 
   const showWelcomeMessage = !localServerEnabled && cloudUser === null
   const showConfigureMessage = !localServerEnabled && cloudUser && cloudRpcReady === false
+
+  const allAccounts = useMemo<
+    {
+      accountIndex: number
+      accountName: string
+      type: "local" | "cloud"
+    }[]
+  >(
+    () => [
+      ...(localAccounts ?? []).map((x, index) => ({
+        accountIndex: index,
+        accountName: x,
+        type: "local" as const,
+      })),
+      ...(cloudAccounts ?? []).map((x, index) => ({
+        accountIndex: index,
+        accountName: x,
+        type: "cloud" as const,
+      })),
+    ],
+    [localAccounts, cloudAccounts]
+  )
 
   return (
     <>
@@ -242,7 +265,7 @@ export default function AccountsPage() {
               Configure your cloud instance
             </Button>
           </Stack>
-        ) : !accounts ? (
+        ) : !localAccounts && !cloudAccounts ? (
           <Stack alignItems="center" justifyContent="center" gap={1}>
             <CircularSpinner />
           </Stack>
@@ -266,8 +289,8 @@ export default function AccountsPage() {
               sx={{
                 flexDirection: { sm: "row", xs: "column" },
                 minWidth: "fit-content",
-                ...(accounts.length > 0 &&
-                  accounts.length < 6 &&
+                ...(allAccounts.length > 0 &&
+                  allAccounts.length < 6 &&
                   isDesktop && {
                     "& .MuiButton-root .MuiTypography-root": { visibility: "hidden" },
                     "& .MuiButton-root:focus .MuiTypography-root": { visibility: "visible" },
@@ -275,21 +298,21 @@ export default function AccountsPage() {
                   }),
               }}
             >
-              {accounts.map((accountName, index) => (
+              {allAccounts.map((x, index) => (
                 <Button
                   size="large"
                   component={Link}
-                  key={accountName}
+                  key={`${x.type}-${x.accountName}`}
                   sx={{ borderRadius: 0.25, padding: 2, width: 156 }}
-                  to={`/u/${index}`}
-                  aria-label={`Switch to account ${accountName}`}
-                  autoFocus={index === 0} // Doesn't work
+                  to={`/${x.type === "local" ? "l" : "c"}/${x.accountIndex}`}
+                  aria-label={`Switch to account ${x.accountName}`}
+                  // autoFocus={index === 0} // Doesn't work
                   id={`account-${index}`}
                 >
                   <Stack alignItems="center" gap={1}>
-                    <AccountAvatar alt={accountName} size="xl" />
+                    <AccountAvatar alt={x.accountName} size="xl" type={x.type} />
                     <Typography variant="h6" fontFamily={SerifFont}>
-                      {accountName}
+                      {x.accountName}
                     </Typography>
                   </Stack>
                 </Button>
@@ -299,7 +322,7 @@ export default function AccountsPage() {
                 size="large"
                 sx={{ borderRadius: 0.25, padding: 2, width: 156 }}
                 onClick={toggleAddAccount}
-                autoFocus={accounts.length === 0}
+                autoFocus={allAccounts.length === 0}
               >
                 <Stack alignItems="center" gap={1}>
                   <Avatar

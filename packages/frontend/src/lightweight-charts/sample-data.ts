@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/member-ordering */
 import type { Time, WhitespaceData } from "lightweight-charts"
 
 type LineData = {

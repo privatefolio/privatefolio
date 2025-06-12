@@ -5,7 +5,7 @@ import { AppBar, Container, IconButton, Stack, Toolbar, Tooltip, useTheme } from
 import { useStore } from "@nanostores/react"
 import React, { useEffect } from "react"
 import { useBoolean } from "src/hooks/useBoolean"
-import { $activeIndex } from "src/stores/account-store"
+import { $activeAccount } from "src/stores/account-store"
 import { setElectronMode, stickyHeader } from "src/utils/electron-utils"
 
 import { CurrencySelector } from "../CurrencySelector"
@@ -22,8 +22,8 @@ export function Header() {
     setElectronMode?.(theme.palette.mode)
   }, [theme.palette.mode])
 
-  const activeIndex = useStore($activeIndex)
-  if (typeof activeIndex !== "number") return null
+  const activeAccount = useStore($activeAccount)
+  if (activeAccount === "") return null
 
   return (
     <AppBar

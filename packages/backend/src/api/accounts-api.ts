@@ -133,7 +133,19 @@ export async function reconnectAccount(accountName: string) {
   return getAccount(accountName)
 }
 
+function isValidFilename(name: string): boolean {
+  // Windows and Unix filename restrictions
+  const invalidChars = /[<>:"/\\|?*]/
+  const hasControlChars = Array.from(name).some((char) => char.charCodeAt(0) < 32)
+  return !invalidChars.test(name) && !hasControlChars && name.length > 0 && name.length <= 255
+}
+
 export async function createAccount(accountName: string) {
+  if (!isValidFilename(accountName)) {
+    throw new Error(
+      "Account name contains invalid characters. Allowed characters: letters (a-z, A-Z), numbers (0-9), spaces, hyphens (-), underscores (_), periods (.), and parentheses ()."
+    )
+  }
   await getAccount(accountName, true)
 }
 

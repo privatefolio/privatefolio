@@ -14,16 +14,18 @@ import { $rpc } from "src/workers/remotes"
 import { ServerTaskTableRow } from "./ServerTaskTableRow"
 
 export function ServerTasksTable() {
-  useEffect(() => {
-    document.title = `Server tasks - ${$activeAccount.get()} - Privatefolio`
-  }, [])
-
+  const rpc = useStore($rpc)
   const accountName = useStore($activeAccount)
+
+  useEffect(() => {
+    document.title = `Server tasks - ${accountName} - Privatefolio`
+  }, [accountName])
+
   const [refresh, setRefresh] = useState(0)
   const connectionStatus = useStore($connectionStatus)
 
   useEffect(() => {
-    const subscription = $rpc.get().subscribeToServerTasks(
+    const subscription = rpc.subscribeToServerTasks(
       accountName,
       throttle(
         () => {
@@ -37,8 +39,8 @@ export function ServerTasksTable() {
       )
     )
 
-    return closeSubscription(subscription, $rpc.get())
-  }, [accountName, connectionStatus])
+    return closeSubscription(subscription, rpc)
+  }, [accountName, connectionStatus, rpc])
 
   const queryFn: QueryTableData<ServerTask> = useCallback(
     async (filters, rowsPerPage, page, order, signal) => {
@@ -58,21 +60,19 @@ export function ServerTasksTable() {
       const orderQuery = `ORDER BY id ${order}`
       const limitQuery = `LIMIT ${rowsPerPage} OFFSET ${page * rowsPerPage}`
 
-      const records = await $rpc
-        .get()
-        .getServerTasks(
-          accountName,
-          `SELECT * FROM server_tasks ${filterQuery} ${orderQuery} ${limitQuery}`
-        )
+      const records = await rpc.getServerTasks(
+        accountName,
+        `SELECT * FROM server_tasks ${filterQuery} ${orderQuery} ${limitQuery}`
+      )
 
       if (signal?.aborted) throw new Error(signal.reason)
 
       return [
         records,
-        () => $rpc.get().countServerTasks(accountName, `SELECT COUNT (*) FROM server_tasks`),
+        () => rpc.countServerTasks(accountName, `SELECT COUNT (*) FROM server_tasks`),
       ]
     },
-    [accountName, refresh]
+    [accountName, refresh, rpc]
   )
 
   const headCells: HeadCell<ServerTask>[] = useMemo(

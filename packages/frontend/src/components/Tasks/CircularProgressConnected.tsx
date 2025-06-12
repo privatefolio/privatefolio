@@ -18,23 +18,23 @@ export function CircularProgressConnected(props: CircularProgressConnectedProps)
 
   const [progressLogs, setProgressLogs] = useState<ProgressLog[]>()
   const connectionStatus = useStore($connectionStatus)
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   useEffect(() => {
-    const subscription = $rpc
-      .get()
-      .subscribeToServerTaskProgress($activeAccount.get(), task.id, (logEntry) => {
-        setProgressLogs((prevLogs) => {
-          try {
-            const parsedLog = parseProgressLog(logEntry)
-            return [...(prevLogs ?? []), parsedLog]
-          } catch {
-            return prevLogs
-          }
-        })
+    const subscription = rpc.subscribeToServerTaskProgress(activeAccount, task.id, (logEntry) => {
+      setProgressLogs((prevLogs) => {
+        try {
+          const parsedLog = parseProgressLog(logEntry)
+          return [...(prevLogs ?? []), parsedLog]
+        } catch {
+          return prevLogs
+        }
       })
+    })
 
-    return closeSubscription(subscription, $rpc.get())
-  }, [task.id, connectionStatus])
+    return closeSubscription(subscription, rpc)
+  }, [rpc, task.id, connectionStatus, activeAccount])
 
   const progressPercent = useMemo<number>(() => {
     if (task.status === "completed") {

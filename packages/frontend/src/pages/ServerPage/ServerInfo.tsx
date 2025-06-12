@@ -1,4 +1,5 @@
 import { Paper, Skeleton, Stack, Typography, TypographyProps } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { $activeAccount } from "src/stores/account-store"
 
@@ -13,19 +14,21 @@ function SectionTitle(props: TypographyProps) {
 }
 
 export function ServerInfo() {
-  useEffect(() => {
-    document.title = `Server info - ${$activeAccount.get()} - Privatefolio`
-  }, [])
-
   const [listenerCount, setListenerCount] = useState<number | null>(null)
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
+
+  useEffect(() => {
+    document.title = `Server info - ${activeAccount} - Privatefolio`
+  }, [activeAccount])
 
   useEffect(() => {
     const interval = setInterval(() => {
-      $rpc.get().getListenerCount().then(setListenerCount)
+      rpc.getListenerCount().then(setListenerCount)
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [rpc])
 
   return (
     <>

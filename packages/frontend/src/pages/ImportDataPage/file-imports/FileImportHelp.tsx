@@ -9,6 +9,7 @@ import {
   Tab,
   Typography,
 } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { Callout } from "src/components/Callout"
 import { PlatformAvatar } from "src/components/PlatformAvatar"
@@ -27,9 +28,11 @@ export function FileImportHelp() {
   const [tab, setTab] = useState<string>("etherscan-file-import")
   const [extensions, setExtensions] = useState<RichExtension[]>([])
 
+  const rpc = useStore($rpc)
+
   useEffect(() => {
-    $rpc.get().getExtensions(true).then(setExtensions)
-  }, [])
+    rpc.getExtensions(true).then(setExtensions)
+  }, [rpc])
 
   return (
     <>

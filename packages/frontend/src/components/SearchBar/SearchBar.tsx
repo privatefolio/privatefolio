@@ -17,12 +17,13 @@ import {
   Stack,
   Tooltip,
 } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import { Action, KBarResults, useKBar, useMatches, useRegisterActions, VisualState } from "kbar"
 import { enqueueSnackbar } from "notistack"
 import React, { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Asset, FindPlatformsResult, RichExtension, Transaction } from "src/interfaces"
-import { $activeAccount, $activeIndex } from "src/stores/account-store"
+import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
 import { handleBackupRequest } from "src/utils/backup-utils"
 import { formatDateRelative, formatPrivatefolioTxId } from "src/utils/formatting-utils"
@@ -41,6 +42,9 @@ const SEARCH_PLACEHOLDER = "Search for assets, transactions, actions, etc."
 
 export const SearchBar = () => {
   const navigate = useNavigate()
+  const activeAccountPath = useStore($activeAccountPath)
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   const {
     showing,
@@ -76,7 +80,7 @@ export const SearchBar = () => {
 
       try {
         setAssetsLoading(true)
-        const assets = await $rpc.get().findAssets(searchQuery)
+        const assets = await rpc.findAssets(searchQuery)
         setAssetsFound(assets)
       } catch {
         setAssetsFound([])
@@ -84,7 +88,7 @@ export const SearchBar = () => {
         setAssetsLoading(false)
       }
     })()
-  }, [searchQuery])
+  }, [searchQuery, rpc])
 
   useEffect(() => {
     setTxnsFound([])
@@ -93,7 +97,7 @@ export const SearchBar = () => {
       try {
         const txHash = normalizeTxHash(searchQuery)
         setTxnsLoading(true)
-        const transaction = await $rpc.get().getTransactionsByTxHash($activeAccount.get(), txHash)
+        const transaction = await rpc.getTransactionsByTxHash(activeAccount, txHash)
         setTxnsFound(transaction)
       } catch {
         setTxnsFound([])
@@ -101,7 +105,7 @@ export const SearchBar = () => {
         setTxnsLoading(false)
       }
     })()
-  }, [searchQuery])
+  }, [searchQuery, rpc, activeAccount])
 
   useEffect(() => {
     setPlatformsFound({ blockchains: [], exchanges: [] })
@@ -114,7 +118,7 @@ export const SearchBar = () => {
 
       try {
         setPlatformsLoading(true)
-        const platforms = await $rpc.get().findPlatforms(searchQuery)
+        const platforms = await rpc.findPlatforms(searchQuery)
         setPlatformsFound(platforms)
       } catch {
         setPlatformsFound({ blockchains: [], exchanges: [] })
@@ -122,7 +126,7 @@ export const SearchBar = () => {
         setPlatformsLoading(false)
       }
     })()
-  }, [searchQuery])
+  }, [searchQuery, rpc])
 
   useEffect(() => {
     setExtensionsFound([])
@@ -135,7 +139,7 @@ export const SearchBar = () => {
 
       try {
         setExtensionsLoading(true)
-        const extensions = await $rpc.get().findExtensions(searchQuery)
+        const extensions = await rpc.findExtensions(searchQuery)
         setExtensionsFound(extensions)
       } catch {
         setExtensionsFound([])
@@ -143,7 +147,7 @@ export const SearchBar = () => {
         setExtensionsLoading(false)
       }
     })()
-  }, [searchQuery])
+  }, [searchQuery, rpc])
 
   const txnsFoundActions = useMemo<Action[]>(() => {
     const txHash = searchQuery
@@ -153,7 +157,7 @@ export const SearchBar = () => {
       id: tx.id,
       keywords: txHash,
       name: `${tx.metadata.method || "Unknown"}`,
-      perform: () => navigate(`/u/${$activeIndex.get()}/transactions?id=${tx.id}`),
+      perform: () => navigate(`${activeAccountPath}/transactions?id=${tx.id}`),
       section: "Transactions",
       subtitle: `${formatDateRelative(tx.timestamp)} - ${formatPrivatefolioTxId(tx.id)}`, // Show at the very top
     }))
@@ -164,14 +168,14 @@ export const SearchBar = () => {
         id: "view-all-found-txns",
         keywords: txHash,
         name: "View all ",
-        perform: () => navigate(`/u/${$activeIndex.get()}/transactions?txHash=${txHash}`),
+        perform: () => navigate(`${activeAccountPath}/transactions?txHash=${txHash}`),
         section: "Transactions",
         subtitle: `${actions.length} transactions linked to this tx hash`,
       })
     }
 
     return actions
-  }, [txnsFound, navigate, searchQuery])
+  }, [txnsFound, navigate, searchQuery, activeAccountPath])
 
   const platformActions = useMemo<Action[]>(() => {
     const actions: Action[] = []
@@ -182,7 +186,7 @@ export const SearchBar = () => {
         id: `blockchain-${blockchain.id}`,
         keywords: `${blockchain.name} ${blockchain.id} ${blockchain.chainId} blockchain`,
         name: blockchain.name,
-        perform: () => navigate(`/u/${$activeIndex.get()}/platform/${blockchain.id}`),
+        perform: () => navigate(`${activeAccountPath}/platform/${blockchain.id}`),
         priority: -(blockchain.chainId ?? Infinity),
         section: "Blockchains",
       })
@@ -194,14 +198,14 @@ export const SearchBar = () => {
         id: `exchange-${exchange.id}`,
         keywords: `${exchange.name} ${exchange.id} ${exchange.country} exchange`,
         name: exchange.name,
-        perform: () => navigate(`/u/${$activeIndex.get()}/platform/${exchange.id}`),
+        perform: () => navigate(`${activeAccountPath}/platform/${exchange.id}`),
         priority: -(exchange.coingeckoTrustRank ?? Infinity),
         section: "Exchanges",
       })
     })
 
     return actions
-  }, [platformsFound, navigate])
+  }, [platformsFound, navigate, activeAccountPath])
 
   const assetActions = useMemo<Action[]>(() => {
     return assetsFound.map((asset) => ({
@@ -217,12 +221,12 @@ export const SearchBar = () => {
         .filter(Boolean)
         .join(" "),
       name: asset.symbol.toUpperCase(),
-      perform: () => navigate(`/u/${$activeIndex.get()}/asset/${asset.id}`),
+      perform: () => navigate(`${activeAccountPath}/asset/${asset.id}`),
       priority: -(asset.marketCapRank ?? Infinity),
       section: "Assets",
       subtitle: asset.name,
     }))
-  }, [assetsFound, navigate])
+  }, [assetsFound, navigate, activeAccountPath])
 
   const extensionActions = useMemo<Action[]>(() => {
     const actions: Action[] = []
@@ -239,14 +243,14 @@ export const SearchBar = () => {
         id: `extension-${extension.id}`,
         keywords: `${extension.extensionName} ${extension.description} ${extension.authorGithub} extension`,
         name: extension.extensionName,
-        perform: () => navigate(`/u/${$activeIndex.get()}/extension/${extension.id}`),
+        perform: () => navigate(`${activeAccountPath}/extension/${extension.id}`),
         section: "Extensions",
         subtitle: extension.description,
       })
     })
 
     return actions
-  }, [extensionsFound, navigate])
+  }, [extensionsFound, navigate, activeAccountPath])
 
   const actions = useMemo<Action[]>(
     () => [
@@ -254,25 +258,11 @@ export const SearchBar = () => {
       ...platformActions,
       ...assetActions,
       ...extensionActions,
-      // {
-      //   icon: <HomeRounded fontSize="small" />,
-      //   id: "page-home",
-      //   name: "Home",
-      //   perform: () => navigate(`/u/${$activeIndex.get()}`),
-      //   section: "Navigation",
-      // },
-      // {
-      //   icon: <TransactionIcon fontSize="small" />,
-      //   id: "page-transactions",
-      //   name: "Transactions",
-      //   perform: () => navigate(`/u/${$activeIndex.get()}/transactions`),
-      //   section: "Navigation",
-      // },
       {
         icon: <AttachMoneyRounded fontSize="small" />,
         id: "action-fetch-asset-prices",
         name: "Fetch asset prices",
-        perform: () => $rpc.get().enqueueFetchPrices($activeAccount.get(), "user"),
+        perform: () => rpc.enqueueFetchPrices(activeAccount, "user"),
         priority: 1,
         section: "Actions",
         shortcut: ["f", "p"],
@@ -282,13 +272,11 @@ export const SearchBar = () => {
         id: "action-sync-all-connections",
         name: "Sync all connections",
         perform: () =>
-          $rpc
-            .get()
-            .enqueueSyncAllConnections($activeAccount.get(), "user", $debugMode.get(), (error) => {
-              if (error) {
-                enqueueSnackbar("Could not sync connection", {})
-              }
-            }),
+          rpc.enqueueSyncAllConnections(activeAccount, "user", $debugMode.get(), (error) => {
+            if (error) {
+              enqueueSnackbar("Could not sync connection", {})
+            }
+          }),
         priority: 1,
         section: "Actions",
         shortcut: ["s", "c"],
@@ -297,7 +285,7 @@ export const SearchBar = () => {
         icon: <AttachMoneyRounded fontSize="small" />,
         id: "action-detect-spam-transactions",
         name: "Detect spam transactions",
-        perform: () => $rpc.get().enqueueDetectSpamTransactions($activeAccount.get(), "user"),
+        perform: () => rpc.enqueueDetectSpamTransactions(activeAccount, "user"),
         priority: 1,
         section: "Actions",
       },
@@ -305,7 +293,7 @@ export const SearchBar = () => {
         icon: <CallMergeRounded fontSize="small" />,
         id: "action-auto-merge-txns",
         name: "Auto-merge transactions",
-        perform: () => $rpc.get().enqueueAutoMerge($activeAccount.get(), "user"),
+        perform: () => rpc.enqueueAutoMerge(activeAccount, "user"),
         priority: 1,
         section: "Actions",
       },
@@ -313,7 +301,7 @@ export const SearchBar = () => {
         icon: <BackupRounded fontSize="small" />,
         id: "action-backup-account",
         name: "Backup account",
-        perform: () => handleBackupRequest(),
+        perform: () => handleBackupRequest(rpc, activeAccount),
         priority: 1,
         section: "Actions",
       },
@@ -321,7 +309,7 @@ export const SearchBar = () => {
         icon: <AccountBalanceRounded fontSize="small" />,
         id: "action-refetch-platforms",
         name: "Refetch asset platforms",
-        perform: () => $rpc.get().enqueueRefetchPlatforms($activeAccount.get(), "user"),
+        perform: () => rpc.enqueueRefetchPlatforms(activeAccount, "user"),
         priority: 1,
         section: "Actions",
       },
@@ -329,7 +317,7 @@ export const SearchBar = () => {
         icon: <Workspaces fontSize="small" />,
         id: "action-refetch-assets",
         name: "Refetch assets",
-        perform: () => $rpc.get().enqueueRefetchAssets($activeAccount.get(), "user"),
+        perform: () => rpc.enqueueRefetchAssets(activeAccount, "user"),
         priority: 1,
         section: "Actions",
       },
@@ -337,12 +325,12 @@ export const SearchBar = () => {
         icon: <DeleteForever fontSize="small" />,
         id: "action-delete-asset-prices",
         name: "Delete asset prices",
-        perform: () => $rpc.get().enqueueDeleteAssetPrices($activeAccount.get(), "user"),
+        perform: () => rpc.enqueueDeleteAssetPrices(activeAccount, "user"),
         priority: 1,
         section: "Actions",
       },
     ],
-    [assetActions, txnsFoundActions, platformActions, extensionActions]
+    [assetActions, txnsFoundActions, platformActions, extensionActions, rpc, activeAccount]
   )
 
   useRegisterActions(actions, [actions])

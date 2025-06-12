@@ -40,6 +40,7 @@ export default function AssetPage() {
   const [balances, setBalances] = useState<Balance[]>()
 
   const activeAccount = useStore($activeAccount)
+  const rpc = useStore($rpc)
   const currency = useStore($quoteCurrency)
 
   const [asset, setAsset] = useState<MyAsset | undefined>()
@@ -49,15 +50,12 @@ export default function AssetPage() {
   }, [assetId, activeAccount])
 
   useEffect(() => {
-    $rpc
-      .get()
-      .getBalancesAt(activeAccount)
-      .then((balances) => {
-        // fetch no longer accurate
-        if (activeAccount !== $activeAccount.get()) return
-        setBalances(balances)
-      })
-  }, [activeAccount])
+    rpc.getBalancesAt(activeAccount).then((balances) => {
+      // fetch no longer accurate
+      if (activeAccount !== $activeAccount.get()) return
+      setBalances(balances)
+    })
+  }, [rpc, activeAccount])
 
   const balance = useMemo(
     () =>
@@ -81,8 +79,7 @@ export default function AssetPage() {
     }
 
     setLoading(true)
-    $rpc
-      .get()
+    rpc
       .getAsset(activeAccount, assetId)
       .then((x) => {
         setAsset(x)
@@ -90,7 +87,7 @@ export default function AssetPage() {
       })
       .then(setMetadata)
       .finally(() => setLoading(false))
-  }, [activeAccount, assetId, assetMap])
+  }, [activeAccount, assetId, assetMap, rpc])
 
   if (!filterMap.assetId) return <DefaultSpinner />
   if (!assetId) return <FourZeroFourPage show type="Asset" />

@@ -13,7 +13,7 @@ import {
 import { useStore } from "@nanostores/react"
 import React, { FormEvent, useCallback, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { $accounts, $cloudAccounts, $localAccounts } from "src/stores/account-store"
+import { $cloudAccounts, $localAccounts } from "src/stores/account-store"
 import { $cloudAvailable } from "src/stores/cloud-user-store"
 import { cloudEnabled, localServerEnabled } from "src/utils/environment-utils"
 import { $cloudRpc, $localRpc } from "src/workers/remotes"
@@ -28,7 +28,8 @@ interface AddAccountDialogProps {
 
 export function AddAccountDialog(props: AddAccountDialogProps) {
   const { open, toggleOpen } = props
-  const accounts = useStore($accounts)
+  const localAccounts = useStore($localAccounts)
+  const cloudAccounts = useStore($cloudAccounts)
   const [name, setName] = useState("")
   const [error, setError] = useState("")
 
@@ -44,13 +45,14 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
     async (event: FormEvent) => {
       event.preventDefault()
 
-      if (!accounts) throw new Error("Accounts is not defined")
-
       const newAcc = name.trim()
       if (newAcc === "") {
         setError("This field cannot be empty")
         return
       }
+
+      const accounts = accountType === "local" ? localAccounts : cloudAccounts
+      if (!accounts) throw new Error("Accounts is not defined")
 
       const exists = accounts.find((x) => x === newAcc)
       if (exists) {
@@ -65,24 +67,25 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
           if (!localRpc) throw new Error("RPC is not defined")
           await localRpc.createAccount(newAcc)
           await localRpc.getAccountNames().then($localAccounts.set)
+          navigate(`/l/${localAccounts?.length ?? 0}/import-data`)
         } else {
           const cloudRpc = $cloudRpc.get()
           if (!cloudRpc) throw new Error("RPC is not defined")
           await cloudRpc.createAccount(newAcc)
           await cloudRpc.getAccountNames().then($cloudAccounts.set)
+          navigate(`/c/${cloudAccounts?.length ?? 0}/import-data`)
         }
         setLoading(false)
         toggleOpen()
         setError("")
         setName("")
-        navigate(`/u/${accounts.length}/import-data`)
       } catch (error) {
         console.error(error)
         setError(String(error))
         setLoading(false)
       }
     },
-    [accounts, name, accountType, toggleOpen, navigate]
+    [name, accountType, toggleOpen, navigate, localAccounts, cloudAccounts]
   )
 
   const cloudAvailable = useStore($cloudAvailable)

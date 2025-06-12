@@ -26,9 +26,10 @@ export function AuditLogTable(props: AuditLogsTableProps) {
   const accountName = useStore($activeAccount)
   const [refresh, setRefresh] = useState(0)
   const connectionStatus = useStore($connectionStatus)
+  const rpc = useStore($rpc)
 
   useEffect(() => {
-    const subscription = $rpc.get().subscribeToAuditLogs(
+    const subscription = rpc.subscribeToAuditLogs(
       accountName,
       throttle(
         () => {
@@ -43,8 +44,8 @@ export function AuditLogTable(props: AuditLogsTableProps) {
       )
     )
 
-    return closeSubscription(subscription, $rpc.get())
-  }, [accountName, connectionStatus])
+    return closeSubscription(subscription, rpc)
+  }, [rpc, accountName, connectionStatus])
 
   const queryFn: QueryTableData<AuditLog> = useCallback(
     async (filters, rowsPerPage, page, order, signal) => {
@@ -84,7 +85,7 @@ export function AuditLogTable(props: AuditLogsTableProps) {
       const limitQuery = `LIMIT ${rowsPerPage} OFFSET ${page * rowsPerPage}`
 
       const query = `SELECT audit_logs.* FROM audit_logs ${tagJoin} ${tradeJoin} ${filterQuery} ${orderQuery} ${limitQuery}`
-      const auditLogs = await $rpc.get().getAuditLogs(accountName, query)
+      const auditLogs = await rpc.getAuditLogs(accountName, query)
 
       if (signal?.aborted) throw new Error(signal.reason)
       if (tableDataRef) {
@@ -94,15 +95,13 @@ export function AuditLogTable(props: AuditLogsTableProps) {
       return [
         auditLogs,
         () =>
-          $rpc
-            .get()
-            .countAuditLogs(
-              accountName,
-              `SELECT COUNT (*) FROM audit_logs ${tagJoin} ${tradeJoin} ${filterQuery}`
-            ),
+          rpc.countAuditLogs(
+            accountName,
+            `SELECT COUNT (*) FROM audit_logs ${tagJoin} ${tradeJoin} ${filterQuery}`
+          ),
       ]
     },
-    [accountName, assetId, tableDataRef, refresh]
+    [rpc, accountName, assetId, tableDataRef, refresh]
   )
 
   const headCells = useMemo<HeadCell<AuditLog>[]>(

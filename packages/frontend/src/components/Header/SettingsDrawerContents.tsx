@@ -2,7 +2,9 @@ import { GitHub, OpenInNew, Twitter } from "@mui/icons-material"
 import {
   FormControlLabel,
   Link as MuiLink,
+  LinkProps,
   MenuItem,
+  MenuItemProps,
   Stack,
   Switch,
   Typography,
@@ -20,7 +22,7 @@ import { SectionTitle } from "../SectionTitle"
 import { ReducedMotion } from "./ReducedMotion"
 import { ThemeMode } from "./ThemeMode"
 
-const CustomLink = ({ children, ...rest }: any) => (
+const CustomLink = ({ children, ...rest }: MenuItemProps & LinkProps) => (
   <MenuItem
     component={MuiLink}
     tabIndex={0}

@@ -22,22 +22,24 @@ export function TagsTable() {
   const [refresh, setRefresh] = useState(0)
   const accountName = useStore($activeAccount)
   const connectionStatus = useStore($connectionStatus)
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   const fetchTags = useCallback(async () => {
     const start = Date.now()
 
-    const result = await $rpc.get().getTags($activeAccount.get())
+    const result = await rpc.getTags(accountName)
     setTags(result)
 
     setQueryTime(Date.now() - start)
-  }, [])
+  }, [accountName, rpc])
 
   useEffect(() => {
     fetchTags()
   }, [fetchTags, refresh])
 
   useEffect(() => {
-    const subscription = $rpc.get().subscribeToTags(
+    const subscription = rpc.subscribeToTags(
       accountName,
       throttle(
         () => {
@@ -52,8 +54,8 @@ export function TagsTable() {
       )
     )
 
-    return closeSubscription(subscription, $rpc.get())
-  }, [accountName, connectionStatus])
+    return closeSubscription(subscription, rpc)
+  }, [accountName, connectionStatus, rpc])
 
   const headCells: HeadCell<Tag>[] = [
     {
@@ -96,9 +98,9 @@ export function TagsTable() {
 
       if (!tagName) return
 
-      await $rpc.get().upsertTag($activeAccount.get(), tagName)
+      await rpc.upsertTag(activeAccount, tagName)
     }
-  }, [confirm])
+  }, [confirm, rpc, activeAccount])
 
   return (
     <MemoryTable<Tag>

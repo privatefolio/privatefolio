@@ -130,7 +130,7 @@ export async function stop(): Promise<void> {
  * Kill any process running on the backend port
  */
 async function killProcessOnPort(): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<void>((resolve) => {
     const command = isWindows
       ? `netstat -ano | findstr :${port} | findstr LISTENING`
       : `lsof -i :${port} -t`

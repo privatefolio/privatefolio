@@ -17,7 +17,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react"
 import { Link } from "react-router-dom"
 import { ServerTask } from "src/interfaces"
 import { SHORT_THROTTLE_DURATION } from "src/settings"
-import { $activeAccount, $activeIndex, $connectionStatus } from "src/stores/account-store"
+import { $activeAccount, $activeAccountPath, $connectionStatus } from "src/stores/account-store"
 import { closeSubscription } from "src/utils/browser-utils"
 import { $rpc } from "src/workers/remotes"
 
@@ -48,7 +48,8 @@ export function TaskDropdown() {
   const open = Boolean(anchorEl)
 
   const accountName = useStore($activeAccount)
-  const activeIndex = useStore($activeIndex)
+  const activeAccountPath = useStore($activeAccountPath)
+  const rpc = useStore($rpc)
 
   const [refresh, setRefresh] = useState(0)
   const connectionStatus = useStore($connectionStatus)
@@ -56,21 +57,20 @@ export function TaskDropdown() {
   useEffect(() => {
     // TODO2 add filters: all, user, cron, side-effect
     // WHERE trigger = 'user'
-    $rpc
-      .get()
+    rpc
       .getServerTasks(accountName, `SELECT * FROM server_tasks ORDER BY id DESC LIMIT ${LIMIT}`)
       .then(setLatestTasks)
       .catch(console.error)
-  }, [refresh, accountName, connectionStatus])
+  }, [rpc, refresh, accountName, connectionStatus])
 
   useEffect(() => {
-    const subscription = $rpc.get().subscribeToServerTasks(
+    const subscription = rpc.subscribeToServerTasks(
       accountName,
       throttle(
         () => {
           setRefresh(Math.random())
           if (selectedTaskRef.current) {
-            $rpc.get().getServerTask(accountName, selectedTaskRef.current.id).then(setSelectedTask)
+            rpc.getServerTask(accountName, selectedTaskRef.current.id).then(setSelectedTask)
           }
         },
         SHORT_THROTTLE_DURATION,
@@ -81,8 +81,8 @@ export function TaskDropdown() {
       )
     )
 
-    return closeSubscription(subscription, $rpc.get())
-  }, [accountName, connectionStatus])
+    return closeSubscription(subscription, rpc)
+  }, [rpc, accountName, connectionStatus])
 
   const pendingTask = useMemo(
     () => latestTasks.find((task) => task.status === "running"),
@@ -150,7 +150,7 @@ export function TaskDropdown() {
                   aria-label="Cancel Task"
                   size="small"
                   color="secondary"
-                  onClick={() => $rpc.get().cancelTask(accountName, task.id)}
+                  onClick={() => rpc.cancelTask(accountName, task.id)}
                 >
                   <CancelOutlined fontSize="inherit" />
                 </IconButton>
@@ -193,7 +193,7 @@ export function TaskDropdown() {
           <ListItem>
             <ListItemButton
               component={Link}
-              to={`/u/${activeIndex}/server?tab=tasks`}
+              to={`${activeAccountPath}/server?tab=tasks`}
               onClick={handleClose}
             >
               <ListItemText primary="See all…" />

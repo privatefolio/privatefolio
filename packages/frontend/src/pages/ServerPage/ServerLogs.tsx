@@ -10,27 +10,26 @@ export function ServerLogs() {
   const activeAccount = useStore($activeAccount)
   const [logs, setLogs] = useState<string>("")
   const [isLoading, setIsLoading] = useState<boolean>(true)
-
+  const rpc = useStore($rpc)
   useEffect(() => {
     document.title = `Server logs - ${activeAccount} - Privatefolio`
   }, [activeAccount])
 
   useEffect(() => {
-    $rpc
-      .get()
+    rpc
       .getServerLogs()
       .then(setLogs)
       .finally(() => setIsLoading(false))
-  }, [activeAccount])
+  }, [activeAccount, rpc])
 
   // const connectionStatus = useStore($connectionStatus)
 
   // useEffect(() => {
-  //   const subscription = $rpc.get().subscribeToServerLog((logEntry) => {
+  //   const subscription = rpc.subscribeToServerLog((logEntry) => {
   //     setLogs((prevLogs) => `${prevLogs}\n${logEntry}`)
   //   })
 
-  //   return closeSubscription(subscription, $rpc.get())
+  //   return closeSubscription(subscription, rpc)
   // }, [activeAccount, connectionStatus])
 
   return (

@@ -6,9 +6,9 @@ import { User } from "src/api/privatecloud-api"
 import { TARGET } from "src/env"
 import { ConnectionStatusCallback } from "src/interfaces"
 import {
+  $activeAccountType,
   $cloudConnectionStatus,
   $cloudConnectionStatusText,
-  $isCloudAccount,
   $localConnectionStatus,
   $localConnectionStatusText,
 } from "src/stores/account-store"
@@ -124,9 +124,9 @@ export const $cloudRest = computed([$cloudUser, $cloudServerInfo], (cloudUser, c
 })
 
 export const $rest = computed(
-  [$isCloudAccount, $localRest, $cloudRest],
-  (isCloudAccount, localRest, cloudRest) => {
-    if (isCloudAccount) {
+  [$activeAccountType, $localRest, $cloudRest],
+  (accountType, localRest, cloudRest) => {
+    if (accountType === "cloud") {
       return cloudRest ?? (localRest as RestConfig)
     } else {
       return localRest as RestConfig
@@ -158,15 +158,17 @@ export const $cloudRpc = computed([$cloudUser, $cloudRpcReady], (cloudUser, clou
 })
 
 export const $rpc = computed(
-  [$isCloudAccount, $localRpc, $cloudRpc],
-  (isCloudAccount, localRpc, cloudRpc) => {
-    if (isCloudAccount) {
+  [$activeAccountType, $localRpc, $cloudRpc],
+  (accountType, localRpc, cloudRpc) => {
+    if (accountType === "cloud") {
       return cloudRpc ?? (localRpc as RPC)
     } else {
       return localRpc as RPC
     }
   }
 )
+
+// logAtoms({ $rpc })
 
 $rpc.subscribe((rpc) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any, prettier/prettier

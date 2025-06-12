@@ -109,7 +109,7 @@ export async function computeBalances(
   const { pageSize = DB_OPERATION_PAGE_SIZE, until = Date.now() } = request
   let since = request.since
 
-  // TODO9 skip assets tagged as spam
+  // TODO8 skip assets tagged as spam
 
   const account = await getAccount(accountName)
   if (since === undefined) {

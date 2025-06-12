@@ -44,18 +44,22 @@ export function TablePaginationActions(props: TablePaginationActionsProps) {
       if (event.ctrlKey || event.metaKey) {
         if (event.key === "ArrowLeft") {
           if (page > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onPageChange(event as any, page - 1)
           }
         } else if (event.key === "ArrowRight") {
           if (page < lastPage) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onPageChange(event as any, page + 1)
           }
         } else if (event.key === "ArrowDown") {
           if (page !== 0) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onPageChange(event as any, 0)
           }
         } else if (event.key === "ArrowUp") {
           if (page !== lastPage) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onPageChange(event as any, lastPage)
           }
         }
@@ -129,6 +133,7 @@ export function TablePaginationActions(props: TablePaginationActionsProps) {
             },
           }}
           type="number"
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           onChange={(event: any) => {
             onPageChange(event, Math.max(0, Math.min(event.target.value - 1, lastPage)))
           }}

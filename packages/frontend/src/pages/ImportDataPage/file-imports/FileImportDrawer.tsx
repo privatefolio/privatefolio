@@ -9,6 +9,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React, { MouseEvent, useState } from "react"
 import { AmountBlock } from "src/components/AmountBlock"
 import { ExtensionBlock } from "src/components/ExtensionBlock"
@@ -32,19 +33,20 @@ type FileImportDrawerProps = DrawerProps &
 export function FileImportDrawer(props: FileImportDrawerProps) {
   const { open, toggleOpen, fileImport, relativeTime, ...rest } = props
 
-  // const activeIndex = useStore($activeIndex)
-
   const { id, timestamp, meta, name, lastModified, size } = fileImport
 
   const extensionId = meta?.extensionId
   const parserId = meta?.parserId
+
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   // const [logsNumber, setLogsNumber] = useState<number | null>(null)
 
   // useEffect(() => {
   //   if (!open) return
 
-  //   $rpc.get().getAuditLogsByTxId($activeAccount.get(), _id).then((logs) => {
+  //   rpc.getAuditLogsByTxId(activeAccount, _id).then((logs) => {
   //     setLogsNumber(logs.length)
   //   })
   // }, [_id, open])
@@ -70,9 +72,7 @@ export function FileImportDrawer(props: FileImportDrawerProps) {
     if (!confirmed) return
 
     setLoading(true)
-    await $rpc
-      .get()
-      .enqueueRemoveFileImport($activeAccount.get(), "user", fileImport.id, () => setLoading(false))
+    await rpc.enqueueRemoveFileImport(activeAccount, "user", fileImport.id, () => setLoading(false))
   }
 
   return (

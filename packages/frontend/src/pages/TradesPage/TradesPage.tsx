@@ -10,10 +10,11 @@ import { TradeTable } from "./TradeTable"
 
 export default function TradesPage({ show }: { show: boolean }) {
   const accountName = useStore($activeAccount)
+  const rpc = useStore($rpc)
 
   const handleComputeTrades = useCallback(() => {
-    $rpc.get().enqueueComputeTrades(accountName)
-  }, [accountName])
+    rpc.enqueueComputeTrades(accountName)
+  }, [accountName, rpc])
 
   return (
     <StaggeredList component="main" gap={2} show={show}>

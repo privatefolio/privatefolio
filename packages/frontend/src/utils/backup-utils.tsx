@@ -2,16 +2,22 @@ import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded"
 import { IconButton, Tooltip } from "@mui/material"
 import { enqueueSnackbar } from "notistack"
 import React from "react"
-import { $activeAccount } from "src/stores/account-store"
-import { $rest, $rpc } from "src/workers/remotes"
+import { $rest, RPC } from "src/workers/remotes"
 
-import { downloadFile } from "./utils"
+import { downloadFile, requestFile } from "./utils"
 
-export async function handleBackupRequest() {
-  enqueueSnackbar("Backup queued", { persist: true, variant: "info" })
-  const accountName = $activeAccount.get()
+export async function onRestoreRequest(rpc: RPC, activeAccount: string, handleClose: () => void) {
+  const file = await requestFile([".zip"], false)
+  handleClose()
+  await rpc.resetAccount(activeAccount)
+  const fileRecord = await handleRestoreRequest(rpc, activeAccount, file[0])
+  await rpc.enqueueRestore(activeAccount, "user", fileRecord)
+}
+
+export async function handleBackupRequest(rpc: RPC, accountName: string) {
+  const snackbarKey = enqueueSnackbar("Backup queued", { persist: true, variant: "info" })
   try {
-    const fileRecord = await $rpc.get().enqueueBackup(accountName, "user")
+    const fileRecord = await rpc.enqueueBackup(accountName, "user")
     enqueueSnackbar(
       <div>
         <span>Backup ready for download</span>
@@ -21,7 +27,7 @@ export async function handleBackupRequest() {
             color="inherit"
             onClick={async () => {
               const params = new URLSearchParams({
-                accountName: $activeAccount.get(),
+                accountName,
                 fileId: fileRecord.id.toString(),
               })
 
@@ -42,16 +48,20 @@ export async function handleBackupRequest() {
       </div>,
       {
         autoHideDuration: null,
+        key: snackbarKey,
         variant: "success",
       }
     )
   } catch (error) {
-    enqueueSnackbar("An error occurred while creating the file", { variant: "error" })
+    enqueueSnackbar("An error occurred while creating the file", {
+      key: snackbarKey,
+      variant: "error",
+    })
   }
 }
 
-export async function handleRestoreRequest(file: File) {
-  const fileRecord = await $rpc.get().upsertServerFile($activeAccount.get(), {
+export async function handleRestoreRequest(rpc: RPC, accountName: string, file: File) {
+  const fileRecord = await rpc.upsertServerFile(accountName, {
     createdBy: "user",
     metadata: {
       lastModified: file.lastModified,
@@ -64,7 +74,7 @@ export async function handleRestoreRequest(file: File) {
   })
 
   const formData = new FormData()
-  formData.append("accountName", $activeAccount.get())
+  formData.append("accountName", accountName)
   formData.append("file", file)
   formData.append("fileId", fileRecord.id.toString())
 

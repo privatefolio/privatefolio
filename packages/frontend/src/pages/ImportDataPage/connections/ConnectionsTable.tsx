@@ -16,9 +16,12 @@ import { ConnectionDrawer } from "./ConnectionDrawer"
 import { ConnectionTableRow } from "./ConnectionTableRow"
 
 export function ConnectionsTable() {
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
+
   useEffect(() => {
-    document.title = `Connections - ${$activeAccount.get()} - Privatefolio`
-  }, [])
+    document.title = `Connections - ${activeAccount} - Privatefolio`
+  }, [activeAccount])
 
   const { value: open, toggle: toggleOpen } = useBoolean(false)
   const [queryTime, setQueryTime] = useState<number | null>(null)
@@ -29,17 +32,17 @@ export function ConnectionsTable() {
   useEffect(() => {
     async function fetchData() {
       const start = Date.now()
-      const rows = await $rpc.get().getConnections($activeAccount.get())
+      const rows = await rpc.getConnections(activeAccount)
       setQueryTime(Date.now() - start)
       setRows(rows)
     }
 
     fetchData().then()
 
-    const subscription = $rpc.get().subscribeToConnections($activeAccount.get(), fetchData)
+    const subscription = rpc.subscribeToConnections(activeAccount, fetchData)
 
-    return closeSubscription(subscription, $rpc.get())
-  }, [connectionStatus])
+    return closeSubscription(subscription, rpc)
+  }, [connectionStatus, rpc, activeAccount])
 
   const headCells: HeadCell<Connection>[] = useMemo(
     () => [

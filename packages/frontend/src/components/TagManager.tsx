@@ -1,5 +1,6 @@
 import { AddRounded } from "@mui/icons-material"
 import { Button, Chip, Stack, TextField } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React from "react"
 import { SectionTitle } from "src/components/SectionTitle"
 import { useConfirm } from "src/hooks/useConfirm"
@@ -16,6 +17,8 @@ interface TagManagerProps {
 
 export function TagManager({ tags, setTags, itemId, itemType }: TagManagerProps) {
   const confirm = useConfirm()
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   const handleAddTag = async () => {
     const { confirmed, event } = await confirm({
@@ -46,16 +49,16 @@ export function TagManager({ tags, setTags, itemId, itemType }: TagManagerProps)
 
       try {
         if (itemType === "transaction") {
-          await $rpc.get().assignTagToTransaction($activeAccount.get(), itemId, tagName)
-          const updatedTags = await $rpc.get().getTagsForTransaction($activeAccount.get(), itemId)
+          await rpc.assignTagToTransaction(activeAccount, itemId, tagName)
+          const updatedTags = await rpc.getTagsForTransaction(activeAccount, itemId)
           setTags(updatedTags)
         } else if (itemType === "auditLog") {
-          await $rpc.get().assignTagToAuditLog($activeAccount.get(), itemId, tagName)
-          const updatedTags = await $rpc.get().getTagsForAuditLog($activeAccount.get(), itemId)
+          await rpc.assignTagToAuditLog(activeAccount, itemId, tagName)
+          const updatedTags = await rpc.getTagsForAuditLog(activeAccount, itemId)
           setTags(updatedTags)
         } else {
-          await $rpc.get().assignTagToTrade($activeAccount.get(), itemId, tagName)
-          const updatedTags = await $rpc.get().getTagsForTrade($activeAccount.get(), itemId)
+          await rpc.assignTagToTrade(activeAccount, itemId, tagName)
+          const updatedTags = await rpc.getTagsForTrade(activeAccount, itemId)
           setTags(updatedTags)
         }
       } catch (error) {
@@ -67,16 +70,16 @@ export function TagManager({ tags, setTags, itemId, itemType }: TagManagerProps)
   const handleDeleteTag = async (tagId: number) => {
     try {
       if (itemType === "transaction") {
-        await $rpc.get().removeTagFromTransaction($activeAccount.get(), itemId, tagId)
-        const updatedTags = await $rpc.get().getTagsForTransaction($activeAccount.get(), itemId)
+        await rpc.removeTagFromTransaction(activeAccount, itemId, tagId)
+        const updatedTags = await rpc.getTagsForTransaction(activeAccount, itemId)
         setTags(updatedTags)
       } else if (itemType === "auditLog") {
-        await $rpc.get().removeTagFromAuditLog($activeAccount.get(), itemId, tagId)
-        const updatedTags = await $rpc.get().getTagsForAuditLog($activeAccount.get(), itemId)
+        await rpc.removeTagFromAuditLog(activeAccount, itemId, tagId)
+        const updatedTags = await rpc.getTagsForAuditLog(activeAccount, itemId)
         setTags(updatedTags)
       } else {
-        await $rpc.get().removeTagFromTrade($activeAccount.get(), itemId, tagId)
-        const updatedTags = await $rpc.get().getTagsForTrade($activeAccount.get(), itemId)
+        await rpc.removeTagFromTrade(activeAccount, itemId, tagId)
+        const updatedTags = await rpc.getTagsForTrade(activeAccount, itemId)
         setTags(updatedTags)
       }
     } catch (error) {

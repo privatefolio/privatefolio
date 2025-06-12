@@ -1,4 +1,5 @@
 import { Box, Stack } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo, useState } from "react"
 import { Asset } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
@@ -19,16 +20,16 @@ export function ForeignAssetBlock(props: ForeignAssetBlockProps) {
 
   const [asset, setAsset] = useState<Asset | undefined | null>(cachedValue)
 
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
+
   useEffect(() => {
     if (!cachedValue && coingeckoId) {
-      $rpc
-        .get()
-        .getAsset($activeAccount.get(), coingeckoId)
-        .then((x) => {
-          setAsset(x ?? null)
-        })
+      rpc.getAsset(activeAccount, coingeckoId).then((x) => {
+        setAsset(x ?? null)
+      })
     }
-  }, [coingeckoId, cachedValue])
+  }, [coingeckoId, cachedValue, rpc, activeAccount])
 
   const assetId = useMemo(() => {
     if (!asset) return `coingecko:${coingeckoId}`

@@ -1,5 +1,6 @@
 import { Download } from "@mui/icons-material"
 import { IconButton, Stack, TableCell, TableRow, Tooltip, Typography } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React from "react"
 import { FileStatusIcon } from "src/components/Files/FileStatusIcon"
 import { TimestampBlock } from "src/components/TimestampBlock"
@@ -23,6 +24,8 @@ export function ServerFileTableRow(props: TableRowComponentProps<ServerFile>) {
   } = props
 
   const { description, id, name, scheduledAt, status, createdBy } = row
+
+  const activeAccount = useStore($activeAccount)
 
   return (
     <>
@@ -73,7 +76,7 @@ export function ServerFileTableRow(props: TableRowComponentProps<ServerFile>) {
                   aria-label="Cancel Task"
                   size="small"
                   color="secondary"
-                  onClick={() => $rpc.get().cancelTask($activeAccount.get(), id)}
+                  onClick={() => rpc.cancelTask(activeAccount, id)}
                 >
                   <CancelOutlined fontSize="inherit" />
                 </IconButton>
@@ -86,7 +89,7 @@ export function ServerFileTableRow(props: TableRowComponentProps<ServerFile>) {
                   color="secondary"
                   onClick={async () => {
                     const params = new URLSearchParams({
-                      accountName: $activeAccount.get(),
+                      accountName: activeAccount,
                       fileId: row.id.toString(),
                     })
 

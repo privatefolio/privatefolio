@@ -9,7 +9,7 @@ export function parseMarginLiquidation(
   connection: BinanceConnection
 ): ParserResult {
   const { platform } = connection
-  const { executedQty, isIsolated, orderId, price, qty, side, symbol, updatedTime } = row
+  const { executedQty, isIsolated, orderId, symbol, updatedTime } = row
   const wallet = isIsolated ? `Binance Isolated Margin` : `Binance Cross Margin`
   const timestamp = new Date(Number(updatedTime)).getTime()
   if (isNaN(timestamp)) {

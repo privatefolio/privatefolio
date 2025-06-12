@@ -1,10 +1,15 @@
 import { Add, LockOutlined, PersonRemoveRounded, RestartAltRounded } from "@mui/icons-material"
 import { Divider, ListItemAvatar, ListItemText, MenuItem } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React, { useState } from "react"
-import { useLocation } from "react-router-dom"
+import React, { useMemo, useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useConfirm } from "src/hooks/useConfirm"
-import { $accounts, $activeAccount } from "src/stores/account-store"
+import {
+  $activeAccount,
+  $activeAccountType,
+  $cloudAccounts,
+  $localAccounts,
+} from "src/stores/account-store"
 import { $localAuth, lockApp } from "src/stores/auth-store"
 import { $localRest, $rpc } from "src/workers/remotes"
 
@@ -19,7 +24,8 @@ type AccountPickerContentsProps = {
 export function AccountPickerContents(props: AccountPickerContentsProps) {
   const { toggleAddAccount, onClose } = props
 
-  const accounts = useStore($accounts)
+  const localAccounts = useStore($localAccounts)
+  const cloudAccounts = useStore($cloudAccounts)
 
   const location = useLocation()
   const { pathname, search } = location
@@ -27,28 +33,54 @@ export function AccountPickerContents(props: AccountPickerContentsProps) {
 
   const confirm = useConfirm()
   const activeAccount = useStore($activeAccount)
-  // const navigate = useNavigate()
+  const activeAccountType = useStore($activeAccountType)
+  const navigate = useNavigate()
+
+  const rpc = useStore($rpc)
 
   const [deleting, setDeleting] = useState(false)
 
-  if (!accounts) return null
+  const allAccounts = useMemo<
+    {
+      accountIndex: number
+      accountName: string
+      type: "local" | "cloud"
+    }[]
+  >(
+    () => [
+      ...(localAccounts ?? []).map((x, index) => ({
+        accountIndex: index,
+        accountName: x,
+        type: "local" as const,
+      })),
+      ...(cloudAccounts ?? []).map((x, index) => ({
+        accountIndex: index,
+        accountName: x,
+        type: "cloud" as const,
+      })),
+    ],
+    [localAccounts, cloudAccounts]
+  )
+
+  if (!localAccounts && !cloudAccounts) return null
   if (!activeAccount) return null
 
   return (
     <>
-      {accounts.map((x, index) => (
+      {allAccounts.map((x) => (
         <NavMenuItem
-          key={x}
-          value={x}
-          className={activeAccount === x ? "Mui-selected" : undefined}
-          onClick={() => {
-            $activeAccount.set(x)
-            onClose()
-          }}
-          to={`/u/${index}/${currentPath}${search}`}
-          label={x}
-          avatar={<AccountAvatar alt={x} />}
-          aria-label={`Switch to account ${index}`}
+          key={`${x.type}-${x.accountName}`}
+          value={`${x.type}-${x.accountName}`}
+          className={
+            activeAccount === x.accountName && activeAccountType === x.type
+              ? "Mui-selected"
+              : undefined
+          }
+          onClick={onClose}
+          to={`/${x.type === "local" ? "l" : "c"}/${x.accountIndex}/${currentPath}${search}`}
+          label={x.accountName}
+          avatar={<AccountAvatar alt={x.accountName} type={x.type} />}
+          aria-label={`Switch to account ${x.accountName}`}
         />
       ))}
       <Divider />
@@ -80,8 +112,7 @@ export function AccountPickerContents(props: AccountPickerContentsProps) {
             variant: "warning",
           })
           if (confirmed) {
-            await $rpc.get().resetAccount($activeAccount.get())
-            // navigate(`/u/${$activeIndex.get()}/import-data`)
+            await rpc.resetAccount(activeAccount)
             onClose()
           }
         }}
@@ -109,9 +140,10 @@ export function AccountPickerContents(props: AccountPickerContentsProps) {
           })
           if (confirmed) {
             setDeleting(true)
-            await $rpc.get().deleteAccount($activeAccount.get())
+            await rpc.deleteAccount(activeAccount)
             setDeleting(false)
             onClose()
+            navigate("/")
           }
         }}
       >

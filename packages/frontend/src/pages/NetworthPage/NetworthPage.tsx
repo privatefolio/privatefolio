@@ -7,19 +7,22 @@ import { $hideSmallBalances, $hideSmallBalancesMap } from "src/stores/account-se
 import { $activeAccount } from "src/stores/account-store"
 import { $inspectTime } from "src/stores/pages/balances-store"
 import { formatDate } from "src/utils/formatting-utils"
+import { $rpc } from "src/workers/remotes"
 
 import { MemoryTable } from "../../components/EnhancedTable/MemoryTable"
 import { Subheading } from "../../components/Subheading"
 import { Balance } from "../../interfaces"
 import { HeadCell } from "../../utils/table-utils"
-import { $rpc } from "../../workers/remotes"
 import { NetworthChart } from "./NetworthChart"
 import { NetworthTableRow } from "./NetworthTableRow"
 
 export default function NetworthPage() {
+  const activeAccount = useStore($activeAccount)
+  const rpc = useStore($rpc)
+
   useEffect(() => {
-    document.title = `Net worth - ${$activeAccount.get()} - Privatefolio`
-  }, [])
+    document.title = `Net worth - ${activeAccount} - Privatefolio`
+  }, [activeAccount])
 
   const [queryTime, setQueryTime] = useState<number | null>(null)
   const [rows, setRows] = useState<Balance[]>([])
@@ -27,30 +30,26 @@ export default function NetworthPage() {
 
   const hideSmallBalances = useStore($hideSmallBalances)
   const inspectTime = useStore($inspectTime)
-  const activeAccount = useStore($activeAccount)
 
   useEffect(() => {
     function fetchData() {
       const start = Date.now()
-      $rpc
-        .get()
-        .getBalancesAt(activeAccount, inspectTime)
-        .then((allBalances) => {
-          // fetch no longer accurate
-          if (activeAccount !== $activeAccount.get()) return
+      rpc.getBalancesAt(activeAccount, inspectTime).then((allBalances) => {
+        // fetch no longer accurate
+        if (activeAccount !== $activeAccount.get()) return
 
-          const visibleBalances = hideSmallBalances
-            ? allBalances.filter((x) => x.value && (x.value > 0.1 || x.value < -0.1))
-            : allBalances
+        const visibleBalances = hideSmallBalances
+          ? allBalances.filter((x) => x.value && (x.value > 0.1 || x.value < -0.1))
+          : allBalances
 
-          setQueryTime(Date.now() - start)
-          setRows(visibleBalances)
-          setHiddenBalances(allBalances.length - visibleBalances.length)
-        })
+        setQueryTime(Date.now() - start)
+        setRows(visibleBalances)
+        setHiddenBalances(allBalances.length - visibleBalances.length)
+      })
     }
 
     fetchData()
-  }, [inspectTime, activeAccount, hideSmallBalances])
+  }, [rpc, inspectTime, activeAccount, hideSmallBalances])
 
   const headCells = useMemo<HeadCell<Balance>[]>(
     () => [
@@ -105,7 +104,7 @@ export default function NetworthPage() {
               <IconButton
                 color="secondary"
                 onClick={() => {
-                  $hideSmallBalancesMap.setKey($activeAccount.get(), String(!hideSmallBalances))
+                  $hideSmallBalancesMap.setKey(activeAccount, String(!hideSmallBalances))
                 }}
               >
                 {hideSmallBalances ? (

@@ -21,20 +21,22 @@ export function TagList({ itemId, itemType }: TagListProps) {
   const accountName = useStore($activeAccount)
   const [refresh, setRefresh] = useState(0)
   const connectionStatus = useStore($connectionStatus)
+  const rpc = useStore($rpc)
+  const activeAccount = useStore($activeAccount)
 
   // TODO0: optimize this
   useEffect(() => {
     const subFn =
       itemType === "transaction"
-        ? $rpc.get().subscribeToTransactions
+        ? rpc.subscribeToTransactions
         : itemType === "auditLog"
-          ? $rpc.get().subscribeToAuditLogs
-          : $rpc.get().subscribeToTrades
+          ? rpc.subscribeToAuditLogs
+          : rpc.subscribeToTrades
 
     const subscription = subFn(
       accountName,
       throttle(
-        (cause: EventCause) => {
+        (_cause: EventCause) => {
           console.log("Refreshing")
           setRefresh(Math.random())
         },
@@ -46,20 +48,20 @@ export function TagList({ itemId, itemType }: TagListProps) {
       )
     )
 
-    return closeSubscription(subscription, $rpc.get())
-  }, [accountName, connectionStatus, itemType])
+    return closeSubscription(subscription, rpc)
+  }, [rpc, accountName, connectionStatus, itemType])
 
   useEffect(() => {
     const fetchTags = async () => {
       try {
         if (itemType === "transaction") {
-          const fetchedTags = await $rpc.get().getTagsForTransaction($activeAccount.get(), itemId)
+          const fetchedTags = await rpc.getTagsForTransaction(activeAccount, itemId)
           setTags(fetchedTags)
         } else if (itemType === "auditLog") {
-          const fetchedTags = await $rpc.get().getTagsForAuditLog($activeAccount.get(), itemId)
+          const fetchedTags = await rpc.getTagsForAuditLog(activeAccount, itemId)
           setTags(fetchedTags)
         } else {
-          const fetchedTags = await $rpc.get().getTagsForTrade($activeAccount.get(), itemId)
+          const fetchedTags = await rpc.getTagsForTrade(activeAccount, itemId)
           setTags(fetchedTags)
         }
       } catch (error) {
@@ -68,7 +70,7 @@ export function TagList({ itemId, itemType }: TagListProps) {
     }
 
     fetchTags()
-  }, [itemId, itemType, refresh])
+  }, [rpc, itemId, itemType, refresh, activeAccount])
 
   const handleTagClick = (tag: Tag) => {
     // Add tag filter to URL

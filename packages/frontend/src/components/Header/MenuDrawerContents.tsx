@@ -10,9 +10,9 @@ import {
 } from "@mui/icons-material"
 import { Button, Stack } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React, { useEffect, useState } from "react"
-import { Link, useLocation } from "react-router-dom"
-import { $activeAccount } from "src/stores/account-store"
+import React from "react"
+import { Link } from "react-router-dom"
+import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
 import { isProduction } from "src/utils/utils"
 
 import { AppVerProps, PopoverToggleProps } from "../../stores/app-store"
@@ -23,47 +23,45 @@ import { LogoText } from "./LogoText"
 
 type MenuContentsProps = AppVerProps & PopoverToggleProps
 
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>
-  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>
-}
+// interface BeforeInstallPromptEvent extends Event {
+//   prompt: () => Promise<void>
+//   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>
+// }
 
-export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuContentsProps) => {
+export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
   // const debugMode = useStore($debugMode)
   // const telemetry = useStore($telemetry)
 
-  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null)
-  // const isInstalled = useMediaQuery("(display-mode: standalone)")
+  // const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null)
+  // // const isInstalled = useMediaQuery("(display-mode: standalone)")
 
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (e) => {
-      e.preventDefault()
-      setInstallPrompt(e as BeforeInstallPromptEvent)
-    }
+  // useEffect(() => {
+  //   const handleBeforeInstallPrompt = (e) => {
+  //     e.preventDefault()
+  //     setInstallPrompt(e as BeforeInstallPromptEvent)
+  //   }
 
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
+  //   window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
 
-    return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
-  }, [])
+  //   return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
+  // }, [])
 
-  // TODO9
-  const promptInstall = () => {
-    if (installPrompt) {
-      installPrompt.prompt()
-      installPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === "accepted") {
-          console.log("User accepted the install prompt")
-        } else {
-          console.log("User dismissed the install prompt")
-        }
-        setInstallPrompt(null)
-      })
-    }
-  }
+  // TODO8
+  // const promptInstall = () => {
+  //   if (installPrompt) {
+  //     installPrompt.prompt()
+  //     installPrompt.userChoice.then((choiceResult) => {
+  //       if (choiceResult.outcome === "accepted") {
+  //         console.log("User accepted the install prompt")
+  //       } else {
+  //         console.log("User dismissed the install prompt")
+  //       }
+  //       setInstallPrompt(null)
+  //     })
+  //   }
+  // }
 
-  const location = useLocation()
-  const { pathname } = location
-  const accountIndex = pathname.split("/")[2]
+  const activeAccountPath = useStore($activeAccountPath)
 
   // const { value: openSettings, toggle: toggleSettingsOpen } = useBoolean(false)
 
@@ -119,7 +117,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
           {/* </Stack> */}
           <NavMenuItem
             value=""
-            to={`/u/${accountIndex}`}
+            to={`${activeAccountPath}`}
             label="Home"
             aria-label="Visit Home"
             onClick={toggleOpen}
@@ -128,7 +126,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
           {!isProduction && (
             <NavMenuItem
               value="trades"
-              to={`/u/${accountIndex}/trades`}
+              to={`${activeAccountPath}/trades`}
               label="Trades"
               aria-label="Visit Trades"
               onClick={toggleOpen}
@@ -137,7 +135,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
           )}
           <NavMenuItem
             value="transactions"
-            to={`/u/${accountIndex}/transactions`}
+            to={`${activeAccountPath}/transactions`}
             label="Transactions"
             aria-label="Visit Transactions"
             onClick={toggleOpen}
@@ -145,7 +143,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
           />
           <NavMenuItem
             value="audit-logs"
-            to={`/u/${accountIndex}/audit-logs`}
+            to={`${activeAccountPath}/audit-logs`}
             label="Audit logs"
             aria-label="Visit Audit logs"
             onClick={toggleOpen}
@@ -153,7 +151,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
           />
           <NavMenuItem
             value="assets"
-            to={`/u/${accountIndex}/assets`}
+            to={`${activeAccountPath}/assets`}
             label="Assets"
             aria-label="Visit Assets"
             onClick={toggleOpen}
@@ -161,7 +159,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
           />
           <NavMenuItem
             value="platforms"
-            to={`/u/${accountIndex}/platforms`}
+            to={`${activeAccountPath}/platforms`}
             label="Platforms"
             aria-label="Visit Platforms"
             onClick={toggleOpen}
@@ -169,7 +167,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
           />
           <NavMenuItem
             value="extensions"
-            to={`/u/${accountIndex}/extensions`}
+            to={`${activeAccountPath}/extensions`}
             label="Extensions"
             aria-label="Visit Extensions"
             onClick={toggleOpen}
@@ -177,7 +175,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
           />
           <NavMenuItem
             value="import-data"
-            to={`/u/${accountIndex}/import-data`}
+            to={`${activeAccountPath}/import-data`}
             label="Data"
             aria-label="Visit Data"
             onClick={toggleOpen}
@@ -185,7 +183,7 @@ export const MenuDrawerContents = ({ appVer, gitHash, open, toggleOpen }: MenuCo
           />
           <NavMenuItem
             value="server"
-            to={`/u/${accountIndex}/server`}
+            to={`${activeAccountPath}/server`}
             label="Server"
             aria-label="Visit Server"
             onClick={toggleOpen}

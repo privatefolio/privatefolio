@@ -44,7 +44,7 @@ export type Time = number
 export interface EtherscanMetadata {
   contractAddress?: string
   failed?: boolean
-  from?: string // TODO9 TESTME
+  from?: string // TODO8 TESTME
   method?: string
   txHash: string
 }
@@ -606,16 +606,6 @@ export interface CoingeckoMetadataFull {
   tickers?: CoingeckoTickerData[]
   watchlist_portfolio_users?: number
   web_slug: string
-}
-
-/**
- * @deprecated TODO9 remove this
- */
-export interface CoinData {
-  id: string
-  image: string
-  name: string
-  symbol?: string
 }
 
 export interface AssetMetadata {
