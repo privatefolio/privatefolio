@@ -1,10 +1,11 @@
 import EventEmitter from "events"
-import { access, mkdir, readdir, rm, stat, writeFile } from "fs/promises"
+import { access, mkdir, readdir, stat, writeFile } from "fs/promises"
 import { join } from "path"
 import { EventCause, SubscriptionChannel, SubscriptionId, TaskPriority } from "src/interfaces"
 import { DATABASES_LOCATION, FILES_LOCATION, TASK_LOGS_LOCATION } from "src/settings/settings"
 import { createSqliteDatabaseConnection } from "src/sqlite/sqlite"
 import { isDevelopment, isTestEnvironment } from "src/utils/environment-utils"
+import { safeRemove } from "src/utils/file-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { getPrefix, sleep, wasteCpuCycles } from "src/utils/utils"
@@ -158,11 +159,11 @@ export async function deleteAccount(accountName: string, keepAccount = false) {
   if (!isTestEnvironment) console.log(getPrefix(accountName), "Closed database connection.")
 
   // delete logs & database file
-  await rm(join(DATABASES_LOCATION, `${accountName}.sqlite`), { force: true, recursive: true })
-  await rm(join(DATABASES_LOCATION, `${accountName}.sqlite-shm`), { force: true, recursive: true })
-  await rm(join(DATABASES_LOCATION, `${accountName}.sqlite-wal`), { force: true, recursive: true })
-  await rm(join(TASK_LOGS_LOCATION, accountName), { force: true, recursive: true })
-  await rm(join(FILES_LOCATION, accountName), { force: true, recursive: true })
+  await safeRemove(join(DATABASES_LOCATION, `${accountName}.sqlite`))
+  await safeRemove(join(DATABASES_LOCATION, `${accountName}.sqlite-shm`))
+  await safeRemove(join(DATABASES_LOCATION, `${accountName}.sqlite-wal`))
+  await safeRemove(join(TASK_LOGS_LOCATION, accountName))
+  await safeRemove(join(FILES_LOCATION, accountName))
 
   if (!isTestEnvironment) console.log(getPrefix(accountName), "Deleted account.")
 

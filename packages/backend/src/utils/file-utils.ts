@@ -1,8 +1,10 @@
-import { access, mkdir, writeFile } from "fs/promises"
+import { access, mkdir, rm, writeFile } from "fs/promises"
 import { join } from "path"
 import { patchServerFile, upsertServerFile } from "src/api/account/server-files-api"
 import { ServerFile } from "src/interfaces"
 import { FILES_LOCATION } from "src/settings/settings"
+
+import { sleep } from "./utils"
 
 export async function saveFile(
   accountName: string,
@@ -58,4 +60,19 @@ export async function saveFile(
   }
 
   return fileRecord
+}
+
+export async function safeRemove(path: string) {
+  for (let i = 0; i < 5; i++) {
+    try {
+      await rm(path, { force: true, recursive: true })
+      break
+    } catch (err) {
+      if (err.code === "EBUSY") {
+        await sleep(100)
+      } else {
+        throw err
+      }
+    }
+  }
 }
