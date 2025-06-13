@@ -23,8 +23,8 @@
       ],
     ],
     "id": "trade_361758743",
-    "isOpen": false,
     "profit": [],
+    "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
       "4118854677_0x60506e013981710b3c78e2b0403f121ddf242d63bcd951e1cf07e2738e208310_MERGED",
@@ -104,8 +104,8 @@
       ],
     ],
     "id": "trade_1426743361",
-    "isOpen": false,
     "profit": [],
+    "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
       "4118854677_0x1897af65b4a406a72304f2bdbbac91b26a31aadc28959876b29c23499a2d69ab_ERC20_377",
@@ -157,8 +157,8 @@
       ],
     ],
     "id": "trade_1533516200",
-    "isOpen": false,
     "profit": [],
+    "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
       "4118854677_0x12f8e6d3edf3dcc8e1951944508050e2770e6618442631a53bda671788b263ad_ERC20_304",
@@ -190,8 +190,8 @@
       ],
     ],
     "id": "trade_3424440640",
-    "isOpen": true,
     "profit": [],
+    "tradeStatus": "open",
     "tradeType": "Long",
     "txIds": [
       "4118854677_0x05c2f7cf8acd4204c498ea22efa173c4394dd70946cbf21ed3c40d7ad54bd797_MERGED",
@@ -210,8 +210,8 @@
     "createdAt": 1605881987000,
     "fees": [],
     "id": "trade_1186041057",
-    "isOpen": false,
     "profit": [],
+    "tradeStatus": "closed",
     "tradeType": "Short",
     "txIds": [
       "4118854677_0xb9c45a687505defc549030b729855ab4b0dc6f047e001a1611e147b4f39e1624_ERC20_309",

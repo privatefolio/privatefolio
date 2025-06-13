@@ -101,7 +101,7 @@ describe("trades-api", () => {
         metadata: { txHash: "0xabc1" },
         outgoing: "2250",
         outgoingAsset: "ethereum:USDT",
-        platform: "ethereum" as PlatformId,
+        platform: "ethereum",
         timestamp: 1600000000000,
         type: "Deposit",
         wallet: "0x123",
@@ -167,8 +167,8 @@ describe("trades-api", () => {
             ],
           ],
           "id": "trade_2097354210",
-          "isOpen": false,
           "profit": [],
+          "tradeStatus": "closed",
           "tradeType": "Long",
           "txIds": [
             "tx1",

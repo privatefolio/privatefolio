@@ -33,8 +33,8 @@
       ],
     ],
     "id": "trade_4147431052",
-    "isOpen": false,
     "profit": [],
+    "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
       "4118854677_0x16aa187a9077acfa3f40596922bfdb0bdedd9ecbf9e659b362acd7dc31430450_MERGED",
@@ -56,8 +56,8 @@
     "createdAt": 1595880014000,
     "fees": [],
     "id": "trade_3998195814",
-    "isOpen": false,
     "profit": [],
+    "tradeStatus": "closed",
     "tradeType": "Short",
     "txIds": [
       "4118854677_0x57183b743c7db3ce7db411f7575d74c560573ea2a1ae546a64dd13a4b4a8c5bb_ERC20_252",
@@ -87,13 +87,13 @@
       ],
     ],
     "id": "trade_1361537813",
-    "isOpen": false,
     "profit": [
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "17.728279993602678228",
       ],
     ],
+    "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
       "4118854677_0x4104f2e0496af7c8b00802c2b5588ac7321941bae65be6954c395750d583d227_MERGED",
@@ -128,13 +128,13 @@
       ],
     ],
     "id": "trade_3384309078",
-    "isOpen": false,
     "profit": [
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "3.570796094074657489",
       ],
     ],
+    "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
       "4118854677_0x7d25bff86cc72ec346ecec52be48d42057ef0947a1a3702411bd68188ec046cf_MERGED",
@@ -171,8 +171,8 @@
       ],
     ],
     "id": "trade_710144076",
-    "isOpen": false,
     "profit": [],
+    "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
       "4118854677_0x5a4ef42591d22ab92758a676a17536308ef5be5583420813e15e36b0409efd84_ERC20_278",

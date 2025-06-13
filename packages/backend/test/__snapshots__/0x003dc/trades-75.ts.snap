@@ -32,7 +32,6 @@
       ],
     ],
     "id": "trade_1875926360",
-    "isOpen": false,
     "profit": [
       [
         "ethereum:0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e:YFI",
@@ -43,6 +42,7 @@
         "0.050843401760063018",
       ],
     ],
+    "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
       "4118854677_0x167685ab25a6d44e05ab62b5209dccee358f4e011efe73f6e2e553a5c31e159b_MERGED",
@@ -64,8 +64,8 @@
     "duration": 2168388000,
     "fees": [],
     "id": "trade_1174390877",
-    "isOpen": false,
     "profit": [],
+    "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
       "4118854677_0x5a4ef42591d22ab92758a676a17536308ef5be5583420813e15e36b0409efd84_ERC20_279",
@@ -96,8 +96,8 @@
       ],
     ],
     "id": "trade_567629290",
-    "isOpen": false,
     "profit": [],
+    "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
       "4118854677_0xc2b0ae7ce7871af071d9ff65a8609c9d092399f11bce256a519be99497702517_MERGED",
@@ -118,8 +118,8 @@
     "duration": 4567424000,
     "fees": [],
     "id": "trade_1279942196",
-    "isOpen": false,
     "profit": [],
+    "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
       "4118854677_0x9a6e1b69ff202eb42683bfcb8e2e4dc40d35146cc902540cf9a65f519c2e13c6_ERC20_323",
@@ -140,8 +140,8 @@
     "duration": 2063068000,
     "fees": [],
     "id": "trade_2379906519",
-    "isOpen": false,
     "profit": [],
+    "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
       "4118854677_0x0c121c335293f6e658570f08fe8584b717d3aab44f863f9e381f73831d3292b0_ERC20_286",

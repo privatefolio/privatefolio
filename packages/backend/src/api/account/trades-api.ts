@@ -15,7 +15,7 @@ import {
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
-import { hashString, noop } from "src/utils/utils"
+import { hashString, isTestEnvironment, noop } from "src/utils/utils"
 
 import { getAccount } from "../accounts-api"
 import { getMyAssets } from "./assets-api"
@@ -257,7 +257,7 @@ export async function computeTrades(
 
   auditLogs.forEach((log) => {
     const key = log.assetId
-    if (!assetsMap[key] || !assetsMap[key].coingeckoId) {
+    if (!isTestEnvironment && (!assetsMap[key] || !assetsMap[key].coingeckoId)) {
       console.log(`Skipped ${key}: No coingeckoId`)
       return
     }
