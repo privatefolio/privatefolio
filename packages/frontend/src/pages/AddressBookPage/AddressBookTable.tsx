@@ -67,7 +67,7 @@ export function AddressBookTable() {
               fullWidth
               size="small"
               required
-              name={"address"}
+              name="address"
             />
           </div>
           <div>
@@ -76,6 +76,7 @@ export function AddressBookTable() {
           </div>
         </Stack>
       ),
+      focusInput: "address",
       title: "Add wallet or smart contract to address book",
     })
 

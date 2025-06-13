@@ -39,7 +39,7 @@ export function TradeDrawer(props: TradeDrawerProps) {
     createdAt,
     closedAt,
     duration,
-    isOpen,
+    tradeStatus: status,
     cost,
     fees,
     profit,
@@ -112,7 +112,7 @@ export function TradeDrawer(props: TradeDrawerProps) {
 
         <div>
           <SectionTitle>Status</SectionTitle>
-          <Typography>{isOpen ? "Open" : "Closed"}</Typography>
+          <Typography>{status === "open" ? "Open" : "Closed"}</Typography>
         </div>
 
         {duration && (
@@ -145,7 +145,7 @@ export function TradeDrawer(props: TradeDrawerProps) {
               {cost.map(([asset, assetAmount], index) => (
                 <Stack key={`${asset}-${index}`} direction="row" alignItems="center" gap={0.25}>
                   <AmountBlock
-                    amount={assetAmount}
+                    amount={assetAmount ? `-${assetAmount}` : undefined}
                     currencyTicker={getAssetTicker(asset)}
                     variant="body2"
                   />
@@ -219,7 +219,7 @@ export function TradeDrawer(props: TradeDrawerProps) {
                     to={`../asset/${encodeURI(asset)}`}
                     sx={{ fontSize: "0.8rem", padding: 0.5 }}
                   >
-                    <AssetBlock assetId={asset} size="small" />
+                    <MyAssetBlock id={asset} size="small" />
                   </Button>
                   <ValueChip
                     value={

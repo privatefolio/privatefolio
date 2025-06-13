@@ -28,7 +28,7 @@ const colorArray = [
   colors.purple[400],
   colors.red[500],
   colors.teal[500],
-  colors.yellow[500],
+  colors.yellow[900],
   // part 2
   colors.amber[900],
   colors.blue[800],
@@ -49,7 +49,7 @@ const colorArray = [
   colors.purple[800],
   colors.red[800],
   colors.teal[800],
-  colors.yellow[800],
+  colors.yellow[900],
 ]
 
 export const stringToColor = memoize(

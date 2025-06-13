@@ -8,7 +8,9 @@ import {
   NorthEastRounded,
   QuestionMarkRounded,
   RemoveRounded,
+  ShowChartOutlined,
   SouthEastRounded,
+  StopRounded,
   SvgIconComponent,
   SwapHoriz,
 } from "@mui/icons-material"
@@ -37,6 +39,7 @@ const colorMap: Partial<Record<Action, string>> = {
   Buy: greenColor,
   Fee: redColor,
   Long: greenColor,
+  Open: blue[500],
   Reward: greenColor,
   Sell: redColor,
   Short: redColor,
@@ -46,6 +49,7 @@ const colorMap: Partial<Record<Action, string>> = {
 const iconMap: Partial<Record<Action, SvgIconComponent>> = {
   Approve: DoneRounded,
   Buy: AddRounded,
+  Closed: StopRounded,
   Connection: CloudOutlined,
   Deposit: AddRounded,
   Fee: RemoveRounded,
@@ -53,6 +57,7 @@ const iconMap: Partial<Record<Action, SvgIconComponent>> = {
   Long: NorthEastRounded,
   Metadata: DataObjectRounded,
   Mint: SwapHoriz,
+  Open: ShowChartOutlined,
   "Price API": CurrencyExchangeRounded,
   Reward: AddRounded,
   Sell: RemoveRounded,

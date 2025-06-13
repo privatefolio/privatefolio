@@ -1,11 +1,11 @@
 import {
   AccountBalanceRounded,
+  CandlestickChartRounded,
   CloudRounded,
   ExtensionRounded,
   HomeRounded,
   ReceiptLong,
   SdStorageRounded,
-  ShowChartRounded,
   Workspaces,
 } from "@mui/icons-material"
 import { MenuItem, Stack } from "@mui/material"
@@ -125,7 +125,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
               aria-label="Visit Trades"
               onClick={toggleOpen}
               shortcutKey="r"
-              avatar={<ShowChartRounded fontSize="small" />}
+              avatar={<CandlestickChartRounded fontSize="small" />}
             />
           )}
           <NavMenuItem

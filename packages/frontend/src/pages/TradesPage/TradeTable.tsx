@@ -10,15 +10,15 @@ import {
   RemoteTable,
   RemoteTableProps,
 } from "../../components/EnhancedTable/RemoteTable"
-import { Trade } from "../../interfaces"
+import { Trade, TradeStatus } from "../../interfaces"
 import { HeadCell } from "../../utils/table-utils"
 import { $rpc } from "../../workers/remotes"
 import { TradeTableRow } from "./TradeTableRow"
 
 interface TradesTableProps extends Pick<RemoteTableProps<Trade>, "defaultRowsPerPage"> {
   assetId?: string
-  tableType: "active" | "closed"
   tableDataRef?: MutableRefObject<Trade[]>
+  tableType: TradeStatus
 }
 
 export function TradeTable(props: TradesTableProps) {
@@ -65,7 +65,7 @@ export function TradeTable(props: TradesTableProps) {
       }
 
       // Add active/closed condition
-      filterConditions.push(`isOpen = ${tableType === "active" ? 1 : 0}`)
+      filterConditions.push(`tradeStatus = '${tableType}'`)
 
       // Construct the filterQuery
       let filterQuery = ""
@@ -101,12 +101,12 @@ export function TradeTable(props: TradesTableProps) {
         sx: { maxWidth: 180, minWidth: 180, width: 180 },
         timestamp: true,
       },
-      {
-        key: "duration",
-        label: "Duration",
-        sortable: true,
-        sx: { maxWidth: 150, minWidth: 150, width: 150 },
-      },
+      // {
+      //   key: "duration",
+      //   label: "Duration",
+      //   sortable: true,
+      //   sx: { maxWidth: 150, minWidth: 150, width: 150 },
+      // },
       {
         filterable: true,
         key: "tradeType",
@@ -128,24 +128,24 @@ export function TradeTable(props: TradesTableProps) {
       {
         key: "cost",
         label: "Cost",
-        sx: { maxWidth: 220, minWidth: 220, width: 220 },
+        sx: { maxWidth: 240, minWidth: 240, width: 240 },
       },
       {
         key: "fees",
         label: "Fees",
-        sx: { maxWidth: 220, minWidth: 220, width: 220 },
+        sx: { maxWidth: 240, minWidth: 240, width: 240 },
       },
       {
         key: "profit",
         label: "Profit",
-        sx: { maxWidth: 220, minWidth: 220, width: 220 },
+        sx: { maxWidth: 240, minWidth: 240, width: 240 },
       },
-      {
-        filterable: true,
-        key: "tags",
-        label: "Tags",
-        sx: { maxWidth: 200, minWidth: 200, width: 200 },
-      },
+      // {
+      //   filterable: true,
+      //   key: "tags",
+      //   label: "Tags",
+      //   sx: { maxWidth: 200, minWidth: 200, width: 200 },
+      // },
       {
         sx: { maxWidth: 60, minWidth: 60, width: 60 },
       },

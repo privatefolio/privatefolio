@@ -76,6 +76,7 @@ export async function fetchInMemoryData(rpc: RPC, accountName: string) {
     outgoingAsset: assetIds,
     platform: platformIds,
     tags: tagIds,
+    tradeStatus: ["open", "closed"],
     tradeType: TRADE_TYPES,
     trigger: triggers,
     type: TRANSACTIONS_TYPES,
@@ -104,6 +105,7 @@ export const FILTER_LABEL_MAP: Record<FilterKey | DirectFilterKey, string> = {
   platform: "Platform",
   tags: "Tags",
   tradeId: "Trade Id",
+  tradeStatus: "Trade Status",
   tradeType: "Trade Type",
   trigger: "Trigger",
   txHash: "Tx Hash",
@@ -143,6 +145,9 @@ export function getFilterValueLabel(value: string | number | undefined) {
   if (value === "connection") return "Connection"
   if (value === "price-api") return "Price API"
   if (value === "metadata") return "Metadata"
+
+  if (value === "open") return "Open"
+  if (value === "closed") return "Closed"
 
   if (value in $addressBook.get()) {
     return $addressBook.get()[value]

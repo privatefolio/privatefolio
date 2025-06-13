@@ -29,6 +29,7 @@ export const TRADE_TYPES = [
   // "Borrow"
 ] as const
 export type TradeType = (typeof TRADE_TYPES)[number]
+export type TradeStatus = "open" | "closed"
 
 // type ExchangeId = "mexc" | "binance"
 
@@ -227,9 +228,9 @@ export interface Trade {
   duration?: number
   fees: [string, string][] // Array of [assetId, amount] pairs
   id: string
-  isOpen: boolean
   profit: [string, string][] // Array of [assetId, amount] pairs
   tags?: number[]
+  tradeStatus: "open" | "closed"
   tradeType: TradeType
   txIds?: string[]
 }
@@ -655,8 +656,9 @@ export type FilterOptionsMap = {
   outgoingAsset: string[]
   platform: string[]
   tags: number[]
-  trigger: string[]
+  tradeStatus: string[]
   tradeType: readonly TradeType[]
+  trigger: string[]
   type: readonly TransactionType[]
   wallet: string[]
 }

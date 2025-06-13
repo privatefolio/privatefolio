@@ -3,11 +3,13 @@ import {
   AuditLog,
   AuditLogOperation,
   EventCause,
+  MyAsset,
   ProgressCallback,
   SqlParam,
   SubscriptionChannel,
   Trade,
   TRADE_TYPES,
+  TradeStatus,
   TradeType,
 } from "src/interfaces"
 import { transformNullsToUndefined } from "src/utils/db-utils"
@@ -15,76 +17,78 @@ import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { hashString, noop } from "src/utils/utils"
 
-import { Account, getAccount } from "../accounts-api"
+import { getAccount } from "../accounts-api"
+import { getMyAssets } from "./assets-api"
 import { getAuditLogs } from "./audit-logs-api"
 import { getValue, setValue } from "./kv-api"
 import { enqueueTask } from "./server-tasks-api"
 import { getTransaction } from "./transactions-api"
 
-const TRADES_SCHEMA_VERSION = 3
+const SCHEMA_VERSION = 2
 
-async function initializeTradesSchema(account: Account): Promise<void> {
-  const currentVersion = await getValue(account.name, "trades_schema_version", "0")
+async function getAccountWithTrades(accountName: string) {
+  const schemaVersion = await getValue(accountName, `trade_schema_version`, 0)
 
-  if (Number(currentVersion) !== TRADES_SCHEMA_VERSION) {
-    // Drop existing tables if they exist
-    await account.execute("DROP TABLE IF EXISTS trade_tags")
-    await account.execute("DROP TABLE IF EXISTS trade_transactions")
-    await account.execute("DROP TABLE IF EXISTS trade_audit_logs")
-    await account.execute("DROP TABLE IF EXISTS trades")
+  const account = await getAccount(accountName)
 
-    // Create tables with new schema
-    await account.execute(sql`
-CREATE TABLE trades (
-  id VARCHAR PRIMARY KEY,
-  assetId VARCHAR NOT NULL,
-  amount FLOAT NOT NULL,
-  balance FLOAT NOT NULL,
-  createdAt INTEGER NOT NULL,
-  closedAt INTEGER,
-  duration INTEGER,
-  isOpen BOOLEAN NOT NULL DEFAULT 1,
-  tradeType VARCHAR NOT NULL,
-  cost JSON,
-  fees JSON,
-  profit JSON,
-  FOREIGN KEY (assetId) REFERENCES assets(id)
-);
-`)
+  if (schemaVersion < SCHEMA_VERSION) {
+    await account.execute(sql`DROP TABLE IF EXISTS trade_audit_logs`)
+    await account.execute(sql`DROP TABLE IF EXISTS trade_transactions`)
+    await account.execute(sql`DROP TABLE IF EXISTS trade_tags`)
+    await account.execute(sql`DROP TABLE IF EXISTS trades`)
 
     await account.execute(sql`
-CREATE TABLE trade_audit_logs (
-  trade_id VARCHAR NOT NULL,
-  audit_log_id VARCHAR NOT NULL,
-  PRIMARY KEY (trade_id, audit_log_id),
-  FOREIGN KEY (trade_id) REFERENCES trades(id),
-  FOREIGN KEY (audit_log_id) REFERENCES audit_logs(id)
-);
-`)
+      CREATE TABLE trades (
+        id VARCHAR PRIMARY KEY,
+        assetId VARCHAR NOT NULL,
+        amount FLOAT NOT NULL,
+        balance FLOAT NOT NULL,
+        createdAt INTEGER NOT NULL,
+        closedAt INTEGER,
+        duration INTEGER,
+        tradeStatus VARCHAR NOT NULL,
+        tradeType VARCHAR NOT NULL,
+        cost JSON,
+        fees JSON,
+        profit JSON,
+        FOREIGN KEY (assetId) REFERENCES assets(id)
+      );
+    `)
 
     await account.execute(sql`
-CREATE TABLE trade_transactions (
-  trade_id VARCHAR NOT NULL,
-  transaction_id VARCHAR NOT NULL,
-  PRIMARY KEY (trade_id, transaction_id),
-  FOREIGN KEY (trade_id) REFERENCES trades(id),
-  FOREIGN KEY (transaction_id) REFERENCES transactions(id)
-);
-`)
+      CREATE TABLE trade_audit_logs (
+        trade_id VARCHAR NOT NULL,
+        audit_log_id VARCHAR NOT NULL,
+        PRIMARY KEY (trade_id, audit_log_id),
+        FOREIGN KEY (trade_id) REFERENCES trades(id),
+        FOREIGN KEY (audit_log_id) REFERENCES audit_logs(id)
+      );
+    `)
 
     await account.execute(sql`
-CREATE TABLE trade_tags (
-  trade_id VARCHAR NOT NULL,
-  tag_id INTEGER NOT NULL,
-  PRIMARY KEY (trade_id, tag_id),
-  FOREIGN KEY (trade_id) REFERENCES trades(id),
-  FOREIGN KEY (tag_id) REFERENCES tags(id)
-);
-`)
+      CREATE TABLE trade_transactions (
+        trade_id VARCHAR NOT NULL,
+        transaction_id VARCHAR NOT NULL,
+        PRIMARY KEY (trade_id, transaction_id),
+        FOREIGN KEY (trade_id) REFERENCES trades(id),
+        FOREIGN KEY (transaction_id) REFERENCES transactions(id)
+      );
+    `)
 
-    // Update schema version
-    await setValue("trades_schema_version", TRADES_SCHEMA_VERSION.toString(), account.name)
+    await account.execute(sql`
+      CREATE TABLE trade_tags (
+        trade_id VARCHAR NOT NULL,
+        tag_id INTEGER NOT NULL,
+        PRIMARY KEY (trade_id, tag_id),
+        FOREIGN KEY (trade_id) REFERENCES trades(id),
+        FOREIGN KEY (tag_id) REFERENCES tags(id)
+      );
+    `)
+
+    await setValue(`trade_schema_version`, SCHEMA_VERSION, accountName)
   }
+
+  return account
 }
 
 export const getTradesFullQuery = async () => sql`
@@ -104,7 +108,7 @@ export async function getTrades(
   query = "SELECT * FROM trades ORDER BY createdAt DESC",
   params?: SqlParam[]
 ): Promise<Trade[]> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTrades(accountName)
 
   try {
     const result = await account.execute(query, params)
@@ -118,7 +122,7 @@ export async function getTrades(
         createdAt: row[4],
         closedAt: row[5],
         duration: row[6],
-        isOpen: Boolean(row[7]),
+        tradeStatus: row[7] as TradeStatus,
         tradeType: row[8] as TradeType,
         cost: JSON.parse(String(row[9] || "[]")),
         fees: JSON.parse(String(row[10] || "[]")),
@@ -141,13 +145,12 @@ export async function getTrade(accountName: string, id: string): Promise<Trade |
 }
 
 export async function upsertTrades(accountName: string, trades: Trade[]): Promise<void> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTrades(accountName)
 
   try {
     await account.executeMany(
       `INSERT OR REPLACE INTO trades (
-        id, assetId, amount, balance, createdAt, closedAt, duration, isOpen, tradeType,
-        cost, fees, profit
+        id, assetId, amount, balance, createdAt, closedAt, duration, tradeStatus, tradeType, cost, fees, profit
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       trades.map((trade) => [
         trade.id,
@@ -157,7 +160,7 @@ export async function upsertTrades(accountName: string, trades: Trade[]): Promis
         trade.createdAt,
         trade.closedAt || null,
         trade.duration || null,
-        trade.isOpen ? 1 : 0,
+        trade.tradeStatus,
         trade.tradeType,
         JSON.stringify(trade.cost || []),
         JSON.stringify(trade.fees || []),
@@ -189,7 +192,7 @@ export async function patchTrade(
 }
 
 export async function deleteTrade(accountName: string, id: string): Promise<void> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTrades(accountName)
   // First delete the relationships
   await account.execute("DELETE FROM trade_tags WHERE trade_id = ?", [id])
   await account.execute("DELETE FROM trade_audit_logs WHERE trade_id = ?", [id])
@@ -204,7 +207,7 @@ export async function countTrades(
   query = "SELECT COUNT(*) FROM trades",
   params?: SqlParam[]
 ): Promise<number> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTrades(accountName)
 
   try {
     const result = await account.execute(query, params)
@@ -225,10 +228,7 @@ export async function computeTrades(
   accountName: string,
   progress: ProgressCallback = noop
 ): Promise<void> {
-  const account = await getAccount(accountName)
-
-  // Initialize schema if needed
-  await initializeTradesSchema(account)
+  const account = await getAccountWithTrades(accountName)
 
   await account.execute("DELETE FROM trade_audit_logs")
   await account.execute("DELETE FROM trade_transactions")
@@ -247,10 +247,20 @@ export async function computeTrades(
 
   await progress([10, `Processing ${auditLogs.length} audit logs`])
 
+  const myAssets = await getMyAssets(accountName)
+  const assetsMap: Record<string, MyAsset> = myAssets.reduce((acc, asset) => {
+    acc[asset.id] = asset
+    return acc
+  }, {})
+
   const assetGroups: Record<string, AuditLog[]> = {}
 
   auditLogs.forEach((log) => {
-    const key = `${log.assetId}`
+    const key = log.assetId
+    if (!assetsMap[key] || !assetsMap[key].coingeckoId) {
+      console.log(`Skipped ${key}: No coingeckoId`)
+      return
+    }
     if (!assetGroups[key]) {
       assetGroups[key] = []
     }
@@ -319,8 +329,8 @@ export async function computeTrades(
           createdAt: log.timestamp,
           fees: [],
           id: tradeId,
-          isOpen: true,
           profit: [],
+          tradeStatus: "open",
           tradeType,
         }
 
@@ -360,7 +370,7 @@ export async function computeTrades(
           balance.eq(0) // Position fully closed
         ) {
           // Close current trade
-          currentTrade.isOpen = false
+          currentTrade.tradeStatus = "closed"
           currentTrade.closedAt = log.timestamp
           currentTrade.duration = log.timestamp - currentTrade.createdAt
           trades.push(currentTrade)
@@ -378,8 +388,8 @@ export async function computeTrades(
               createdAt: log.timestamp,
               fees: [],
               id: newTradeId,
-              isOpen: true,
               profit: [],
+              tradeStatus: "open",
               tradeType: newTradeType,
             }
 
@@ -442,7 +452,7 @@ export function enqueueComputeTrades(accountName: string) {
 }
 
 export async function getTradeAuditLogs(accountName: string, tradeId: string): Promise<string[]> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTrades(accountName)
   try {
     const result = await account.execute(
       "SELECT audit_log_id FROM trade_audit_logs WHERE trade_id = ?",
@@ -458,7 +468,7 @@ export async function getTradeTransactions(
   accountName: string,
   tradeId: string
 ): Promise<string[]> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTrades(accountName)
   try {
     const result = await account.execute(
       "SELECT transaction_id FROM trade_transactions WHERE trade_id = ?",
