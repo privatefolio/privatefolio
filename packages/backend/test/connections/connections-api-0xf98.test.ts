@@ -7,7 +7,11 @@ import {
   syncConnection,
   upsertConnection,
 } from "src/api/account/connections-api"
-import { countTransactions, getTransactions } from "src/api/account/transactions-api"
+import {
+  autoMergeTransactions,
+  countTransactions,
+  getTransactions,
+} from "src/api/account/transactions-api"
 import { Connection, ProgressUpdate } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
 import { describe, expect, it } from "vitest"
@@ -54,13 +58,29 @@ describe("should import 0xf98 via connection", () => {
     `)
   })
 
+  it.sequential("should merge transactions", async () => {
+    // arrange
+    const updates: ProgressUpdate[] = []
+    // act
+    await autoMergeTransactions(accountName, async (state) => updates.push(state))
+    // assert
+    expect(updates.join("\n")).toMatchInlineSnapshot(`
+      "0,Fetching all transactions
+      25,Processing 17 (EVM) transactions
+      50,Saving 1 merged transactions
+      70,Updating the audit logs of 1 merged transactions
+      90,Deleting 2 deduplicated transactions
+      100,Done"
+    `)
+  })
+
   it.sequential("should save the correct data", async () => {
     // act
     const auditLogs = await getAuditLogs(accountName)
     const transactions = await getTransactions(accountName)
     const balances = await getBalances(accountName)
     // assert
-    expect(transactions.length).toMatchInlineSnapshot(`17`)
+    expect(transactions.length).toMatchInlineSnapshot(`16`)
     await expect(transactions.map(normalizeTransaction)).toMatchFileSnapshot(
       "../__snapshots__/0xf98/transactions.ts.snap"
     )
@@ -91,7 +111,7 @@ describe("should import 0xf98 via connection", () => {
     //
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Removing 24 audit logs
-      50,Removing 17 transactions"
+      50,Removing 16 transactions"
     `)
     expect(remainingAuditLogs).toMatchInlineSnapshot(`0`)
     expect(remainingTransactions).toMatchInlineSnapshot(`0`)
