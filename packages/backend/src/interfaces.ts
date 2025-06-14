@@ -23,6 +23,14 @@ export const TRANSACTIONS_TYPES = [
 ] as const
 export type TransactionType = (typeof TRANSACTIONS_TYPES)[number]
 
+export const TRADE_TYPES = [
+  "Long",
+  "Short",
+  // "Borrow"
+] as const
+export type TradeType = (typeof TRADE_TYPES)[number]
+export type TradeStatus = "open" | "closed"
+
 // type ExchangeId = "mexc" | "binance"
 
 /**
@@ -63,6 +71,9 @@ export interface Transaction {
   outgoing?: string
   outgoingAsset?: string
   platform: string
+  /**
+   * outgoing / incoming
+   */
   price?: string
   role?: TransactionRole
   tags?: number[]
@@ -215,15 +226,16 @@ export interface Trade {
   auditLogIds?: string[]
   balance: number
   closedAt?: Timestamp
+  cost: [string, string, string, string][] // Array of [assetId, amount, usdValue, exposure] pairs
   createdAt: Timestamp
   duration?: number
-  feeAmounts: string[]
-  feeAssets: string[]
+  fees: [string, string, string][] // Array of [assetId, amount, usdValue] pairs
   id: string
-  isOpen: boolean
-  soldAmounts: string[]
-  soldAssets: string[]
+  proceeds: [string, string, string][] // Array of [assetId, amount, usdValue] pairs
   tags?: number[]
+  tradeNumber: number
+  tradeStatus: "open" | "closed"
+  tradeType: TradeType
   txIds?: string[]
 }
 
@@ -648,6 +660,8 @@ export type FilterOptionsMap = {
   outgoingAsset: string[]
   platform: string[]
   tags: number[]
+  tradeStatus: string[]
+  tradeType: readonly TradeType[]
   trigger: string[]
   type: readonly TransactionType[]
   wallet: string[]

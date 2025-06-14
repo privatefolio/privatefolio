@@ -1,4 +1,4 @@
-import { Add, Cloud, OpenInNewRounded, Settings } from "@mui/icons-material"
+import { Add, Cloud, OpenInNewRounded } from "@mui/icons-material"
 import {
   AppBar,
   Avatar,
@@ -6,7 +6,6 @@ import {
   Button,
   Container,
   Fade,
-  IconButton,
   Stack,
   Toolbar,
   Tooltip,
@@ -21,7 +20,7 @@ import { AddAccountDialog } from "src/components/AccountPicker/AddAccountDialog"
 import { CircularSpinner } from "src/components/CircularSpinner"
 import { Gravatar } from "src/components/Gravatar"
 import { LogoText } from "src/components/Header/LogoText"
-import { SettingsDrawer } from "src/components/Header/SettingsDrawer"
+import { SettingsButton } from "src/components/Header/SettingsButton"
 import { StaggeredList } from "src/components/StaggeredList"
 import { Truncate } from "src/components/Truncate"
 import { useBoolean } from "src/hooks/useBoolean"
@@ -67,8 +66,6 @@ export default function AccountsPage() {
     }, 50)
     return () => clearTimeout(timeout)
   }, [])
-
-  const { value: openSettings, toggle: toggleSettingsOpen } = useBoolean(false)
 
   const isDesktop = useMediaQuery("(min-width: 900px)")
 
@@ -175,25 +172,7 @@ export default function AccountsPage() {
                       </Button>
                     </Tooltip>
                   )}
-                  <Tooltip title="Device Settings">
-                    <IconButton
-                      onClick={toggleSettingsOpen}
-                      color="secondary"
-                      aria-label="Open Settings"
-                      size="small"
-                    >
-                      <Settings
-                        sx={{
-                          "button:hover &": {
-                            transform: "rotate(-30deg)",
-                          },
-                          transition: "transform 0.33s",
-                        }}
-                        fontSize="small"
-                      />
-                    </IconButton>
-                  </Tooltip>
-                  <SettingsDrawer open={openSettings} toggleOpen={toggleSettingsOpen} />
+                  <SettingsButton size="small" />
                 </Stack>
               </Stack>
             </Container>

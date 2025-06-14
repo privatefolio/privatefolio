@@ -13,13 +13,7 @@ import { describe, expect, it, vi } from "vitest"
 const accountName = Math.random().toString(36).substring(7)
 
 describe("trades-api", () => {
-  it("should have no trades initially", async () => {
-    const trades = await getTrades(accountName)
-    expect(trades).toHaveLength(0)
-  })
-
   it("should compute trades from audit logs", async () => {
-    // Create some simple audit logs
     const auditLogs: AuditLog[] = [
       {
         assetId: "ethereum:ETH",
@@ -59,9 +53,10 @@ describe("trades-api", () => {
       },
     ]
 
-    // Add mock transactions
     const transactions: Transaction[] = [
       {
+        fee: "0.001",
+        feeAsset: "ethereum:ETH",
         id: "tx1",
         importIndex: 1,
         incoming: "1.5",
@@ -73,6 +68,8 @@ describe("trades-api", () => {
         wallet: "0x123",
       },
       {
+        fee: "0.001",
+        feeAsset: "ethereum:ETH",
         id: "tx2",
         importIndex: 2,
         metadata: { txHash: "0xabc2" },
@@ -84,6 +81,8 @@ describe("trades-api", () => {
         wallet: "0x123",
       },
       {
+        fee: "0.001",
+        feeAsset: "ethereum:ETH",
         id: "tx3",
         importIndex: 3,
         metadata: { txHash: "0xabc3" },
@@ -94,21 +93,34 @@ describe("trades-api", () => {
         type: "Withdraw",
         wallet: "0x123",
       },
+      {
+        fee: "0.001",
+        feeAsset: "ethereum:ETH",
+        id: "tx1-usdt",
+        importIndex: 1,
+        metadata: { txHash: "0xabc1" },
+        outgoing: "2250",
+        outgoingAsset: "ethereum:USDT",
+        platform: "ethereum",
+        timestamp: 1600000000000,
+        type: "Deposit",
+        wallet: "0x123",
+      },
     ]
 
     // Mock the getAuditLogs and getTransactionsByTxHash functions
     vi.spyOn(auditLogsApi, "getAuditLogs").mockResolvedValue(auditLogs)
 
-    vi.spyOn(transactionsApi, "getTransactionsByTxHash").mockImplementation((accountName, txId) => {
+    vi.spyOn(transactionsApi, "getTransaction").mockImplementation((accountName, txId) => {
       const tx = transactions.find((t) => t.id === txId)
-      return Promise.resolve(tx ? [tx] : [])
+      return Promise.resolve(tx)
     })
 
-    const progressUpdates: ProgressUpdate[] = []
+    const updates: ProgressUpdate[] = []
 
     // Compute trades
     await computeTrades(accountName, async (update) => {
-      progressUpdates.push(update)
+      updates.push(update)
     })
 
     // Get the computed trades
@@ -117,34 +129,78 @@ describe("trades-api", () => {
     // Reset mocks
     vi.restoreAllMocks()
 
-    // Verify the results
-    expect(progressUpdates).toHaveLength(5) // Progress updates
-    expect(progressUpdates[0]).toEqual([0, "Fetching audit logs"])
-    expect(progressUpdates[4]).toEqual([100, "Trades computation completed"])
+    expect(updates.join("\n")).toMatchInlineSnapshot(`
+      "0,Fetching audit logs
+      10,Processing 3 audit logs
+      20,Found 1 asset groups
+      90,Processed 1/1 asset groups
+      100,Trades computation completed"
+    `)
 
-    expect(trades).toHaveLength(1)
-    expect(trades[0]).toMatchObject({
-      amount: 1.5,
-      assetId: "ethereum:ETH",
-      balance: 0,
-      closedAt: 1600200000000,
-      createdAt: 1600000000000,
-      duration: 200000000,
-      isOpen: false,
-    })
+    expect(trades).toMatchInlineSnapshot(`
+      [
+        {
+          "amount": 1.5,
+          "assetId": "ethereum:ETH",
+          "auditLogIds": [
+            "1",
+            "2",
+            "3",
+          ],
+          "balance": 0,
+          "closedAt": 1600200000000,
+          "cost": [],
+          "createdAt": 1600000000000,
+          "duration": 200000000,
+          "fees": [
+            [
+              "ethereum:ETH",
+              "0.001",
+              "0",
+            ],
+            [
+              "ethereum:ETH",
+              "0.001",
+              "0",
+            ],
+            [
+              "ethereum:ETH",
+              "0.001",
+              "0",
+            ],
+          ],
+          "id": "2097354210",
+          "proceeds": [],
+          "tradeNumber": 1,
+          "tradeStatus": "closed",
+          "tradeType": "Long",
+          "txIds": [
+            "tx1",
+            "tx2",
+            "tx3",
+          ],
+        },
+      ]
+    `)
 
     // Test the new getTradeAuditLogs function
     const tradeAuditLogs = await getTradeAuditLogs(accountName, trades[0].id)
-    expect(tradeAuditLogs).toHaveLength(3)
-    expect(tradeAuditLogs).toContain("1")
-    expect(tradeAuditLogs).toContain("2")
-    expect(tradeAuditLogs).toContain("3")
+    expect(tradeAuditLogs).toMatchInlineSnapshot(`
+      [
+        "1",
+        "2",
+        "3",
+      ]
+    `)
 
     // Test the new getTradeTransactions function
     const tradeTransactions = await getTradeTransactions(accountName, trades[0].id)
-    expect(tradeTransactions).toHaveLength(3)
-    expect(tradeTransactions).toContain("tx1")
-    expect(tradeTransactions).toContain("tx2")
-    expect(tradeTransactions).toContain("tx3")
+    expect(tradeTransactions).toMatchInlineSnapshot(`
+      [
+        "tx1",
+        "tx2",
+        "tx3",
+      ]
+    `)
   })
 })

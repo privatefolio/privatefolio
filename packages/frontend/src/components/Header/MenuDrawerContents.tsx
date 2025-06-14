@@ -1,11 +1,11 @@
 import {
   AccountBalanceRounded,
+  CandlestickChartRounded,
   CloudRounded,
   ExtensionRounded,
   HomeRounded,
   ReceiptLong,
   SdStorageRounded,
-  ShowChartRounded,
   Workspaces,
 } from "@mui/icons-material"
 import { MenuItem, Stack } from "@mui/material"
@@ -84,27 +84,29 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
           >
             <LogoText />
           </MenuItem>
-          {/* <Stack direction="row"> */}
+          {/* <Stack direction="row" alignItems="center" justifyContent="space-between"> */}
           <AccountPickerButton onClose={toggleOpen} />
           {/* <Tooltip title="Create">
-            <Button
-              sx={{
-                borderRadius: 0.5,
-                gap: 0.5,
-                justifyContent: "flex-start",
-                marginY: 1.5,
-                minWidth: "unset",
-                paddingLeft: 2,
-                paddingRight: 2,
-                paddingY: 1,
-                textTransform: "none",
-                width: "fit-content",
-              }}
-              color="secondary"
-            >
-              <AddCircle />
-            </Button>
-          </Tooltip> */}
+              <IconButton
+                size="small"
+                sx={{
+                  backgroundColor: "var(--mui-palette-action-hover)",
+                  borderRadius: 0.5,
+                  gap: 0.5,
+                  justifyContent: "flex-start",
+                  marginY: 1.5,
+                  minWidth: "unset",
+                  paddingLeft: 2,
+                  paddingRight: 2,
+                  paddingY: 1,
+                  textTransform: "none",
+                  width: "fit-content",
+                }}
+                color="secondary"
+              >
+                <AddRounded fontSize="small" />
+              </IconButton>
+            </Tooltip> */}
           {/* </Stack> */}
           <NavMenuItem
             value=""
@@ -123,7 +125,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
               aria-label="Visit Trades"
               onClick={toggleOpen}
               shortcutKey="r"
-              avatar={<ShowChartRounded fontSize="small" />}
+              avatar={<CandlestickChartRounded fontSize="small" />}
             />
           )}
           <NavMenuItem

@@ -54,8 +54,6 @@ export function NetworthTableRow(props: TableRowComponentProps<Balance>) {
                     amount={price?.value}
                     currencySymbol={currency.symbol}
                     currencyTicker={currency.id}
-                    significantDigits={currency.maxDigits}
-                    maxDigits={currency.maxDigits}
                   />
                 </Typography>
               </Stack>
@@ -81,8 +79,6 @@ export function NetworthTableRow(props: TableRowComponentProps<Balance>) {
           amount={price?.value}
           currencySymbol={currency.symbol}
           currencyTicker={currency.id}
-          significantDigits={currency.maxDigits}
-          maxDigits={currency.maxDigits}
         />
       </TableCell>
       <TableCell variant="clickable" align="right">

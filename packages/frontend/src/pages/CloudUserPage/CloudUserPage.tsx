@@ -434,6 +434,7 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                                     </div>
                                   </Stack>
                                 ),
+                                focusInput: "password",
                                 title: "Password required",
                               })
 
@@ -479,6 +480,7 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                                     </div>
                                   </Stack>
                                 ),
+                                focusInput: "password",
                                 title: "Password required",
                               })
 

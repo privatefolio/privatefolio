@@ -1,8 +1,9 @@
-import { ArrowRightAltRounded } from "@mui/icons-material"
+import { ArrowRightAltRounded, SwapHorizRounded } from "@mui/icons-material"
 import { Button, Drawer, DrawerProps, Skeleton, Stack, TextField } from "@mui/material"
 import { useStore } from "@nanostores/react"
+import Big from "big.js"
 import { debounce } from "lodash-es"
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AmountBlock } from "src/components/AmountBlock"
@@ -66,6 +67,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
   const [tags, setTags] = useState<Tag[]>([])
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
+  const [isPriceInverted, setIsPriceInverted] = useState(false)
 
   useEffect(() => {
     if (!open) return
@@ -86,6 +88,16 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
       notes: newValue,
     })
   }
+
+  const displayPrice = useMemo(() => {
+    if (!price) return undefined
+    try {
+      const priceBN = new Big(price)
+      return isPriceInverted ? new Big(1).div(priceBN).toString() : priceBN.toString()
+    } catch {
+      return price
+    }
+  }, [price, isPriceInverted])
 
   return (
     <Drawer open={open} onClose={toggleOpen} {...rest}>
@@ -132,13 +144,12 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
                 amount={incoming}
                 showSign
                 currencyTicker={getAssetTicker(incomingAsset)}
-                variant="body1"
               />
               <Button
                 size="small"
                 component={AppLink}
                 to={`../asset/${encodeURI(incomingAsset)}`}
-                sx={{ fontSize: "0.9rem", padding: 1 }}
+                sx={{ padding: 1 }}
               >
                 <MyAssetBlock id={incomingAsset} size="small" />
               </Button>
@@ -161,13 +172,12 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
                 amount={outgoing ? `-${outgoing}` : outgoing}
                 showSign
                 currencyTicker={getAssetTicker(outgoingAsset)}
-                variant="body1"
               />
               <Button
                 size="small"
                 component={AppLink}
                 to={`../asset/${encodeURI(outgoingAsset)}`}
-                sx={{ fontSize: "0.9rem", padding: 1 }}
+                sx={{ padding: 1 }}
               >
                 <MyAssetBlock id={outgoingAsset} size="small" />
               </Button>
@@ -190,13 +200,12 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
                 amount={fee}
                 showSign
                 currencyTicker={getAssetTicker(feeAsset)}
-                variant="body1"
               />
               <Button
                 size="small"
                 component={AppLink}
                 to={`../asset/${encodeURI(feeAsset)}`}
-                sx={{ fontSize: "0.9rem", padding: 1 }}
+                sx={{ padding: 1 }}
               >
                 <MyAssetBlock id={feeAsset} size="small" />
               </Button>
@@ -212,12 +221,23 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
         )}
         {price && (
           <div>
-            <SectionTitle>Price</SectionTitle>
-            <AmountBlock
-              colorized
-              amount={price}
-              currencyTicker={`${getAssetTicker(outgoingAsset)}/${getAssetTicker(incomingAsset)}`}
-            />
+            <SectionTitle>Price (excl. fees)</SectionTitle>
+            <Stack direction="row" alignItems="center">
+              <AmountBlock
+                amount={displayPrice}
+                currencyTicker={getAssetTicker(isPriceInverted ? incomingAsset : outgoingAsset)}
+              />
+              <Button
+                size="small"
+                color="secondary"
+                onClick={() => setIsPriceInverted(!isPriceInverted)}
+                sx={{ paddingX: 1 }}
+                endIcon={<SwapHorizRounded />}
+              >
+                {getAssetTicker(isPriceInverted ? incomingAsset : outgoingAsset)} per{" "}
+                {getAssetTicker(isPriceInverted ? outgoingAsset : incomingAsset)}
+              </Button>
+            </Stack>
           </div>
         )}
         {contractAddress && (

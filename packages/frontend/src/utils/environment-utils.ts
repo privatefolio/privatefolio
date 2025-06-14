@@ -24,6 +24,7 @@ export const cloudEnabled = !isSelfHosted
 export const localServerEnabled = isSelfHosted || !isWebDeployment
 
 const mode = isSelfHosted ? "self-hosted" : isWebDeployment ? "web" : "electron"
+export const isDevelopment = !isProduction
 
 console.log(`App mode is ${mode}`)
 console.log(`Local server ${localServerEnabled ? "enabled" : "disabled"}`)

@@ -5,6 +5,7 @@ import {
   MyAsset,
   ProgressCallback,
   ResolutionString,
+  SqlParam,
   SubscriptionChannel,
   TaskPriority,
   TaskTrigger,
@@ -61,7 +62,9 @@ export async function upsertDailyPrice(accountName: string, record: DailyPrice |
 export async function getPricesForAsset(
   accountName: string,
   assetId: string,
-  timestamp?: Timestamp
+  timestamp?: Timestamp,
+  start?: Timestamp,
+  end?: Timestamp
 ): Promise<ChartData[]> {
   if (assetId === "USDT" && !!timestamp) {
     return [{ time: timestamp / 1000, value: 1 }] as ChartData[]
@@ -69,14 +72,34 @@ export async function getPricesForAsset(
 
   const account = await getAccount(accountName)
 
-  const prices = await account.execute(
-    `
+  let query = `
     SELECT price FROM daily_prices
-    WHERE assetId = ? AND (timestamp = ? OR ? IS NULL)
-    ORDER BY timestamp ASC
-  `,
-    [assetId, timestamp || null, timestamp || null]
-  )
+    WHERE assetId = ? 
+  `
+  if (timestamp && (start || end)) {
+    throw new Error("You can only pass timestamp or start/end, not both")
+  }
+
+  const params: SqlParam[] = []
+
+  if (timestamp) {
+    query += " AND timestamp = ?"
+    params.push(timestamp)
+  }
+  if (start && end) {
+    query += " AND timestamp >= ? AND timestamp <= ?"
+    params.push(start, end)
+  } else if (start) {
+    query += " AND timestamp >= ?"
+    params.push(start)
+  } else if (end) {
+    query += " AND timestamp <= ?"
+    params.push(end)
+  }
+
+  query += " ORDER BY timestamp ASC"
+
+  const prices = await account.execute(query, [assetId, ...params])
 
   return prices.map((x) => JSON.parse(x[0] as string))
 }

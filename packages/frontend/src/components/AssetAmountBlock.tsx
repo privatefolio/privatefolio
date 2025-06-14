@@ -7,13 +7,15 @@ import { getAssetTicker } from "src/utils/assets-utils"
 
 import { AmountBlock, AmountBlockProps } from "./AmountBlock"
 
-type AssetAmountBlockProps = AmountBlockProps & {
+export type AssetAmountBlockProps = AmountBlockProps & {
   assetId?: string
+  formatting?: "value" | "price"
   priceMap?: Record<string, ChartData>
+  usdValue?: string
 }
 
 export function AssetAmountBlock(props: AssetAmountBlockProps) {
-  const { amount, priceMap, assetId, placeholder, ...rest } = props
+  const { amount, priceMap, assetId, placeholder, usdValue, formatting = "value", ...rest } = props
 
   const currency = useStore($quoteCurrency)
   const showQuotedAmounts = useStore($showQuotedAmounts)
@@ -30,16 +32,16 @@ export function AssetAmountBlock(props: AssetAmountBlockProps) {
     )
   }
 
-  if (priceMap === undefined) return <Skeleton sx={{ marginX: 1, minWidth: 60 }} />
-  const price = assetId ? priceMap[assetId]?.value : undefined
+  if (priceMap === undefined && !usdValue) return <Skeleton sx={{ marginX: 1, minWidth: 60 }} />
+  const price = assetId && priceMap ? priceMap[assetId]?.value : undefined
 
   return (
     <AmountBlock
-      amount={price && amount ? price * Number(amount) : undefined}
+      amount={usdValue || (price && amount ? price * Number(amount) : undefined)}
       currencySymbol={currency.symbol}
       currencyTicker={currency.id}
-      significantDigits={currency.maxDigits}
-      maxDigits={currency.maxDigits}
+      maxDigits={formatting === "value" ? currency.maxDigits : undefined}
+      significantDigits={formatting === "value" ? currency.maxDigits : undefined}
       placeholder={assetId && !price ? undefined : placeholder}
       {...rest}
     />

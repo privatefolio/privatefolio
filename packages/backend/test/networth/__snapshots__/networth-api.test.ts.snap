@@ -5,6 +5,13 @@ exports[`should compute historical networth 3`] = `
   {
     "change": 0,
     "changePercentage": 0,
+    "time": 1504137600,
+    "timestamp": 1504137600000,
+    "value": 0,
+  },
+  {
+    "change": 173.96,
+    "changePercentage": 0,
     "time": 1504224000,
     "timestamp": 1504224000000,
     "value": 173.96,
@@ -107,6 +114,13 @@ exports[`should refresh networth 3`] = `
 [
   {
     "change": 0,
+    "changePercentage": 0,
+    "time": 1504137600,
+    "timestamp": 1504137600000,
+    "value": 0,
+  },
+  {
+    "change": 173.96,
     "changePercentage": 0,
     "time": 1504224000,
     "timestamp": 1504224000000,

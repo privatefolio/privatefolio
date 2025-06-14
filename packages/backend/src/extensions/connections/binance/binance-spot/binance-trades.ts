@@ -114,7 +114,7 @@ export function parseTrade(
       wallet,
     })
   }
-  const price = Big(incoming).div(Big(outgoing)).toString()
+  const price = Big(outgoing).div(Big(incoming)).toString()
   const tx: Transaction = {
     fee: commission === "0" ? undefined : feeBN.toFixed(),
     feeAsset: commission === "0" ? undefined : `binance:${commissionAsset}`,

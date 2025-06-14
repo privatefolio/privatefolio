@@ -4,6 +4,7 @@ import { createSubscription } from "src/utils/sub-utils"
 
 import { getAccount } from "../accounts-api"
 
+// TODO9 move accountName to first parameter
 export async function setValue(key: string, value: unknown, accountName: string) {
   const account = await getAccount(accountName)
   await account.execute("INSERT OR REPLACE INTO key_value (key, value) VALUES (?, ?)", [

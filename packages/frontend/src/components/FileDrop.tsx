@@ -225,6 +225,7 @@ async function getParserContext(
       </>
     ),
     dismissable: false,
+    focusInput: requirements[0],
     title: "Import file needs extra information",
   })
 

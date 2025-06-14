@@ -108,8 +108,6 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
                   amount={price?.value}
                   currencySymbol={currency.symbol}
                   currencyTicker={currency.id}
-                  significantDigits={currency.maxDigits}
-                  maxDigits={currency.maxDigits}
                 />
               )}
             </Stack>
@@ -149,8 +147,6 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
               amount={price?.value}
               currencySymbol={currency.symbol}
               currencyTicker={currency.id}
-              significantDigits={currency.maxDigits}
-              maxDigits={currency.maxDigits}
             />
           )}
         </TableCell>

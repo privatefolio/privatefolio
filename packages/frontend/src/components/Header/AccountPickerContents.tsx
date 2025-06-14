@@ -1,6 +1,7 @@
 import { Add, LockOutlined, PersonRemoveRounded, RestartAltRounded } from "@mui/icons-material"
 import { Divider, ListItemAvatar, ListItemText, MenuItem } from "@mui/material"
 import { useStore } from "@nanostores/react"
+import { enqueueSnackbar } from "notistack"
 import React, { useMemo, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useConfirm } from "src/hooks/useConfirm"
@@ -140,10 +141,18 @@ export function AccountPickerContents(props: AccountPickerContentsProps) {
           })
           if (confirmed) {
             setDeleting(true)
-            await rpc.deleteAccount(activeAccount)
-            setDeleting(false)
-            onClose()
-            navigate("/")
+            rpc
+              .deleteAccount(activeAccount)
+              .then(() => {
+                setDeleting(false)
+                onClose()
+                navigate("/")
+              })
+              .catch((error) => {
+                console.error(error)
+                setDeleting(false)
+                enqueueSnackbar(error.message, { variant: "error" })
+              })
           }
         }}
       >

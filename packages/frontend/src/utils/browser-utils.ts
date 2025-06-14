@@ -41,9 +41,14 @@ export function closeSubscription(sub: Promise<SubscriptionId>, rpc: RPC) {
 
 export function isInputFocused() {
   const { activeElement } = document
-  return (
+  const inputFocused =
     activeElement instanceof HTMLInputElement ||
     activeElement instanceof HTMLTextAreaElement ||
     (activeElement instanceof HTMLElement && activeElement.isContentEditable)
-  )
+  if (inputFocused) return true
+
+  const modalOpen = document.querySelector("div[role='dialog']")
+  if (modalOpen) return true
+
+  return false
 }

@@ -26,7 +26,6 @@ export function ValueChip(props: ValueChipProps) {
         },
         borderRadius: 2,
         color: "text.secondary",
-        fontSize: "0.9rem",
         marginX: 1,
       }}
       label={
