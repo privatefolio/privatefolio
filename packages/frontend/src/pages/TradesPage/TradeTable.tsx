@@ -95,11 +95,10 @@ export function TradeTable(props: TradesTableProps) {
   const headCells = useMemo<HeadCell<Trade>[]>(
     () => [
       {
-        key: "createdAt",
-        label: "Created At",
+        key: "tradeNumber",
+        label: "#",
         sortable: true,
-        sx: { maxWidth: 180, minWidth: 180, width: 180 },
-        timestamp: true,
+        sx: { maxWidth: 80, minWidth: 80, width: 80 },
       },
       // {
       //   key: "duration",
@@ -111,7 +110,7 @@ export function TradeTable(props: TradesTableProps) {
         filterable: true,
         key: "tradeType",
         label: "Type",
-        sx: { maxWidth: 100, minWidth: 100, width: 100 },
+        sx: { maxWidth: 90, minWidth: 90, width: 90 },
       },
       {
         key: "amount",
@@ -123,7 +122,7 @@ export function TradeTable(props: TradesTableProps) {
         filterable: true,
         key: "assetId",
         label: "Asset",
-        sx: { maxWidth: 140, minWidth: 140, width: 140 },
+        sx: { maxWidth: 120, minWidth: 120, width: 120 },
       },
       {
         key: "cost",
@@ -147,7 +146,11 @@ export function TradeTable(props: TradesTableProps) {
       //   sx: { maxWidth: 200, minWidth: 200, width: 200 },
       // },
       {
-        sx: { maxWidth: 60, minWidth: 60, width: 60 },
+        key: "createdAt",
+        label: "Created At",
+        sortable: true,
+        sx: { maxWidth: 180, minWidth: 180, width: 180 },
+        timestamp: true,
       },
     ],
     []

@@ -20,11 +20,12 @@ import { hashString, isTestEnvironment, noop } from "src/utils/utils"
 import { getAccount } from "../accounts-api"
 import { getMyAssets } from "./assets-api"
 import { getAuditLogs } from "./audit-logs-api"
+import { getAssetPriceMap } from "./daily-prices-api"
 import { getValue, setValue } from "./kv-api"
 import { enqueueTask } from "./server-tasks-api"
 import { getTransaction } from "./transactions-api"
 
-const SCHEMA_VERSION = 2
+const SCHEMA_VERSION = 11
 
 async function getAccountWithTrades(accountName: string) {
   const schemaVersion = await getValue(accountName, `trade_schema_version`, 0)
@@ -40,6 +41,7 @@ async function getAccountWithTrades(accountName: string) {
     await account.execute(sql`
       CREATE TABLE trades (
         id VARCHAR PRIMARY KEY,
+        tradeNumber INTEGER NOT NULL,
         assetId VARCHAR NOT NULL,
         amount FLOAT NOT NULL,
         balance FLOAT NOT NULL,
@@ -116,19 +118,20 @@ export async function getTrades(
       /* eslint-disable sort-keys-fix/sort-keys-fix */
       const value = {
         id: row[0],
-        assetId: row[1],
-        amount: row[2],
-        balance: row[3],
-        createdAt: row[4],
-        closedAt: row[5],
-        duration: row[6],
-        tradeStatus: row[7] as TradeStatus,
-        tradeType: row[8] as TradeType,
-        cost: JSON.parse(String(row[9] || "[]")),
-        fees: JSON.parse(String(row[10] || "[]")),
-        profit: JSON.parse(String(row[11] || "[]")),
-        txIds: row[12] ? String(row[12]).split(",") : undefined,
-        auditLogIds: row[13] ? String(row[13]).split(",") : undefined,
+        tradeNumber: row[1],
+        assetId: row[2],
+        amount: row[3],
+        balance: row[4],
+        createdAt: row[5],
+        closedAt: row[6],
+        duration: row[7],
+        tradeStatus: row[8] as TradeStatus,
+        tradeType: row[9] as TradeType,
+        cost: JSON.parse(String(row[10] || "[]")),
+        fees: JSON.parse(String(row[11] || "[]")),
+        profit: JSON.parse(String(row[12] || "[]")),
+        txIds: row[13] ? String(row[13]).split(",") : undefined,
+        auditLogIds: row[14] ? String(row[14]).split(",") : undefined,
       }
       /* eslint-enable */
       transformNullsToUndefined(value)
@@ -150,10 +153,11 @@ export async function upsertTrades(accountName: string, trades: Trade[]): Promis
   try {
     await account.executeMany(
       `INSERT OR REPLACE INTO trades (
-        id, assetId, amount, balance, createdAt, closedAt, duration, tradeStatus, tradeType, cost, fees, profit
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        id, tradeNumber, assetId, amount, balance, createdAt, closedAt, duration, tradeStatus, tradeType, cost, fees, profit
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       trades.map((trade) => [
         trade.id,
+        trade.tradeNumber,
         trade.assetId,
         trade.amount,
         trade.balance,
@@ -224,6 +228,10 @@ export async function subscribeToTrades(
   return createSubscription(accountName, SubscriptionChannel.Trades, callback)
 }
 
+function derivadeTradeId(assetId: string, createdAt: number) {
+  return `${hashString(`${assetId}_${createdAt}`)}`
+}
+
 export async function computeTrades(
   accountName: string,
   progress: ProgressCallback = noop
@@ -282,6 +290,7 @@ export async function computeTrades(
     operation: AuditLogOperation
   ): Promise<void> {
     const tx = await getTransaction(accountName, txId)
+    const priceMap = await getAssetPriceMap(accountName, tx.timestamp)
 
     if (!tx) {
       throw new Error(`Transaction with id ${txId} not found`)
@@ -290,19 +299,33 @@ export async function computeTrades(
     if (tx.outgoingAsset && tx.outgoing) {
       // Add outgoing as cost if it's a different asset OR if it's the same asset in a deposit
       if (tx.outgoingAsset !== assetId || operation === "Deposit") {
-        trade.cost.push([tx.outgoingAsset, tx.outgoing])
+        const assetPrice = priceMap[tx.outgoingAsset].value
+        if (!assetPrice) throw new Error(`Price not found for asset ${tx.outgoingAsset}`)
+        trade.cost.push([
+          tx.outgoingAsset,
+          `-${tx.outgoing}`,
+          Big(assetPrice).mul(`-${tx.outgoing}`).toString(),
+        ])
       }
     }
 
     if (tx.incomingAsset && tx.incoming) {
       // Add incoming as profit if it's a different asset OR if it's the same asset in a withdraw
       if (tx.incomingAsset !== assetId || operation === "Withdraw") {
-        trade.profit.push([tx.incomingAsset, tx.incoming])
+        const assetPrice = priceMap[tx.incomingAsset].value
+        if (!assetPrice) throw new Error(`Price not found for asset ${tx.incomingAsset}`)
+        trade.profit.push([
+          tx.incomingAsset,
+          tx.incoming,
+          Big(assetPrice).mul(tx.incoming).toString(),
+        ])
       }
     }
 
     if (tx.feeAsset && tx.fee) {
-      trade.fees.push([tx.feeAsset, tx.fee])
+      const assetPrice = priceMap[tx.feeAsset].value
+      if (!assetPrice) throw new Error(`Price not found for asset ${tx.feeAsset}`)
+      trade.fees.push([tx.feeAsset, tx.fee, Big(assetPrice).mul(tx.fee).toString()])
     }
 
     tradeTransactions.push([trade.id, tx.id])
@@ -318,7 +341,7 @@ export async function computeTrades(
 
       // If balance is becoming non-zero from zero, start a new trade
       if (!balance.eq(0) && currentTrade === null) {
-        const tradeId = `trade_${hashString(`${assetId}_${log.timestamp}`)}`
+        const tradeId = derivadeTradeId(assetId, log.timestamp)
         const tradeType = balance.gt(0) ? TRADE_TYPES[0] : TRADE_TYPES[1] // "Long" or "Short"
 
         currentTrade = {
@@ -330,6 +353,7 @@ export async function computeTrades(
           fees: [],
           id: tradeId,
           profit: [],
+          tradeNumber: 0,
           tradeStatus: "open",
           tradeType,
         }
@@ -377,7 +401,7 @@ export async function computeTrades(
 
           // If balance is non-zero, start a new trade in the opposite direction
           if (!balance.eq(0)) {
-            const newTradeId = `trade_${hashString(`${assetId}_${log.timestamp}`)}`
+            const newTradeId = derivadeTradeId(assetId, log.timestamp)
             const newTradeType = balance.gt(0) ? TRADE_TYPES[0] : TRADE_TYPES[1] // "Long" or "Short"
 
             currentTrade = {
@@ -389,6 +413,7 @@ export async function computeTrades(
               fees: [],
               id: newTradeId,
               profit: [],
+              tradeNumber: 0,
               tradeStatus: "open",
               tradeType: newTradeType,
             }
@@ -416,6 +441,11 @@ export async function computeTrades(
 
   // Save trades
   if (trades.length > 0) {
+    trades.sort((a, b) => a.createdAt - b.createdAt)
+    trades.forEach((trade, index) => {
+      trade.tradeNumber = index + 1
+    })
+
     await upsertTrades(accountName, trades)
 
     // Insert all trade-audit log relationships

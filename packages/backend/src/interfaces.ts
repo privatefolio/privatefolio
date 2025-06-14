@@ -223,13 +223,14 @@ export interface Trade {
   auditLogIds?: string[]
   balance: number
   closedAt?: Timestamp
-  cost: [string, string][] // Array of [assetId, amount] pairs
+  cost: [string, string, string][] // Array of [assetId, amount, usdValue] pairs
   createdAt: Timestamp
   duration?: number
-  fees: [string, string][] // Array of [assetId, amount] pairs
+  fees: [string, string, string][] // Array of [assetId, amount, usdValue] pairs
   id: string
-  profit: [string, string][] // Array of [assetId, amount] pairs
+  profit: [string, string, string][] // Array of [assetId, amount, usdValue] pairs
   tags?: number[]
+  tradeNumber: number
   tradeStatus: "open" | "closed"
   tradeType: TradeType
   txIds?: string[]

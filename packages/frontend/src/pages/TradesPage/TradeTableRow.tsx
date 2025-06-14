@@ -1,33 +1,27 @@
-import { Visibility } from "@mui/icons-material"
-import { Chip, IconButton, Stack, TableCell, TableRow, Tooltip, Typography } from "@mui/material"
+import { TableCell, TableRow, Tooltip } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import { formatDistance } from "date-fns"
 import React, { useEffect, useState } from "react"
 import { ActionBlock } from "src/components/ActionBlock"
-import { AmountBlock } from "src/components/AmountBlock"
+import { AppLink } from "src/components/AppLink"
 import { AssetAmountBlock } from "src/components/AssetAmountBlock"
+import { AssetAmountBlocks } from "src/components/AssetAmountBlocks"
 import { MyAssetBlock } from "src/components/MyAssetBlock"
-import { TagList } from "src/components/TagList"
 import { TimestampBlock } from "src/components/TimestampBlock"
-import { useBoolean } from "src/hooks/useBoolean"
 import { ChartData, Trade } from "src/interfaces"
 import { $showQuotedAmounts } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
 import { TableRowComponentProps } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
 
-import { TradeDrawer } from "./TradeDrawer"
-
 export function TradeTableRow({
   row,
-  headCells,
+  headCells: _headCells,
   isMobile: _isMobile,
-  isTablet,
+  isTablet: _isTablet,
   relativeTime,
 }: TableRowComponentProps<Trade>) {
   const {
     createdAt,
-    duration,
     tradeStatus: status,
     assetId,
     amount,
@@ -35,10 +29,10 @@ export function TradeTableRow({
     cost,
     fees,
     profit,
+    tradeNumber,
     closedAt,
   } = row
 
-  const { value: open, toggle: toggleOpen } = useBoolean(false)
   const [priceMap, setPriceMap] = useState<Record<string, ChartData>>()
   const showQuotedAmounts = useStore($showQuotedAmounts)
 
@@ -47,7 +41,7 @@ export function TradeTableRow({
 
   useEffect(() => {
     if (priceMap) return
-    if (!showQuotedAmounts && !open) return
+    if (!showQuotedAmounts) return
 
     rpc
       .getAssetPriceMap(activeAccount, status === "closed" ? closedAt : undefined)
@@ -55,89 +49,83 @@ export function TradeTableRow({
         setPriceMap(priceMap)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, showQuotedAmounts, createdAt, rpc, activeAccount])
+  }, [showQuotedAmounts, createdAt, rpc, activeAccount])
 
-  if (isTablet) {
-    return (
-      <>
-        <TableRow hover tabIndex={-1}>
-          <TableCell colSpan={headCells.length}>
-            <Typography variant="caption" color="text.secondary">
-              <TimestampBlock timestamp={createdAt} relative={relativeTime} />
-            </Typography>
+  // TODO9
+  // if (isTablet) {
+  //   return (
+  //     <>
+  //       <TableRow hover tabIndex={-1}>
+  //         <TableCell colSpan={headCells.length}>
+  //           <Typography variant="caption" color="text.secondary">
+  //             <TimestampBlock timestamp={createdAt} relative={relativeTime} />
+  //           </Typography>
 
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              <strong>Asset:</strong> <MyAssetBlock id={assetId} />
-            </Typography>
+  //           <Typography variant="body2" sx={{ mt: 1 }}>
+  //             <strong>Asset:</strong> <MyAssetBlock id={assetId} />
+  //           </Typography>
 
-            <Typography variant="body2">
-              <strong>Amount:</strong> {amount}
-            </Typography>
+  //           <Typography variant="body2">
+  //             <strong>Amount:</strong> {amount}
+  //           </Typography>
 
-            <Typography variant="body2">
-              <strong>Direction:</strong> <ActionBlock action={tradeType} />
-              <strong>Status:</strong> {status}
-            </Typography>
+  //           <Typography variant="body2">
+  //             <strong>Direction:</strong> <ActionBlock action={tradeType} />
+  //             <strong>Status:</strong> {status}
+  //           </Typography>
 
-            {duration || status === "open" ? (
-              <Typography variant="body2">
-                <strong>Duration:</strong>{" "}
-                {!duration
-                  ? status === "open"
-                    ? formatDistance(new Date(createdAt), new Date(), { addSuffix: false })
-                    : "N/A"
-                  : formatDistance(0, duration, { includeSeconds: true })}
-              </Typography>
-            ) : null}
+  //           <Typography variant="body2">
+  //             <strong>Duration:</strong>{" "}
+  //             {!duration
+  //               ? formatDistance(new Date(createdAt), new Date(), { addSuffix: false })
+  //               : formatDistance(0, duration, { includeSeconds: true })}
+  //           </Typography>
 
-            {cost && cost.length > 0 ? (
-              <Typography variant="body2">
-                <strong>Cost:</strong>{" "}
-                {cost.map(([asset, amount]) => `${amount} ${asset.split(":").pop()}`).join(", ")}
-              </Typography>
-            ) : null}
+  //           {cost && cost.length > 0 ? (
+  //             <Typography variant="body2">
+  //               <strong>Cost:</strong>{" "}
+  //               {cost.map(([asset, amount]) => `${amount} ${asset.split(":").pop()}`).join(", ")}
+  //             </Typography>
+  //           ) : null}
 
-            {fees && fees.length > 0 ? (
-              <Typography variant="body2">
-                <strong>Fees:</strong>{" "}
-                {fees.map(([asset, amount]) => `${amount} ${asset.split(":").pop()}`).join(", ")}
-              </Typography>
-            ) : null}
+  //           {fees && fees.length > 0 ? (
+  //             <Typography variant="body2">
+  //               <strong>Fees:</strong>{" "}
+  //               {fees.map(([asset, amount]) => `${amount} ${asset.split(":").pop()}`).join(", ")}
+  //             </Typography>
+  //           ) : null}
 
-            {profit && profit.length > 0 ? (
-              <Typography variant="body2">
-                <strong>Profit:</strong>{" "}
-                {profit.map(([asset, amount]) => `${amount} ${asset.split(":").pop()}`).join(", ")}
-              </Typography>
-            ) : null}
+  //           {profit && profit.length > 0 ? (
+  //             <Typography variant="body2">
+  //               <strong>Profit:</strong>{" "}
+  //               {profit.map(([asset, amount]) => `${amount} ${asset.split(":").pop()}`).join(", ")}
+  //             </Typography>
+  //           ) : null}
 
-            <TagList itemId={row.id} itemType="trade" />
-
-            <Tooltip title="Inspect">
-              <IconButton size="small" color="secondary" onClick={toggleOpen} sx={{ mt: 1 }}>
-                <Visibility fontSize="inherit" />
-              </IconButton>
-            </Tooltip>
-          </TableCell>
-        </TableRow>
-        <TradeDrawer
-          key={row.id}
-          open={open}
-          toggleOpen={toggleOpen}
-          trade={row}
-          relativeTime={relativeTime}
-          priceMap={priceMap}
-          anchor="right"
-        />
-      </>
-    )
-  }
+  //           <Tooltip title="View Details">
+  //             <IconButton
+  //               size="small"
+  //               color="secondary"
+  //               component={AppLink}
+  //               to={`../trade/${row.id}`}
+  //               sx={{ mt: 1 }}
+  //             >
+  //               <Visibility fontSize="inherit" />
+  //             </IconButton>
+  //           </Tooltip>
+  //         </TableCell>
+  //       </TableRow>
+  //     </>
+  //   )
+  // }
 
   return (
     <>
       <TableRow hover tabIndex={-1}>
-        <TableCell>
-          <TimestampBlock timestamp={createdAt} relative={relativeTime} />
+        <TableCell variant="clickable">
+          <Tooltip title="View trade">
+            <AppLink to={`../trade/${row.id}`}>{tradeNumber}</AppLink>
+          </Tooltip>
         </TableCell>
         {/* <TableCell>
           {!duration
@@ -163,99 +151,21 @@ export function TradeTableRow({
         </TableCell>
 
         <TableCell>
-          <Stack direction="row" gap={0.5} flexWrap="wrap">
-            {cost && cost.length > 0 ? (
-              cost.map(([asset, amount]) => (
-                <Chip
-                  size="small"
-                  key={asset}
-                  label={
-                    <AssetAmountBlock
-                      amount={amount ? `-${amount}` : undefined}
-                      assetId={asset}
-                      priceMap={priceMap}
-                      showTicker
-                      showSign
-                      colorized
-                    />
-                  }
-                />
-              ))
-            ) : (
-              <AmountBlock placeholder="None" />
-            )}
-          </Stack>
+          <AssetAmountBlocks values={cost} />
         </TableCell>
         <TableCell>
-          <Stack direction="row" gap={0.5} flexWrap="wrap">
-            {fees && fees.length > 0 ? (
-              fees.map(([asset, amount]) => (
-                <Chip
-                  size="small"
-                  key={asset}
-                  label={
-                    <AssetAmountBlock
-                      key={asset}
-                      amount={amount}
-                      assetId={asset}
-                      priceMap={priceMap}
-                      showTicker
-                      showSign
-                      colorized
-                    />
-                  }
-                />
-              ))
-            ) : (
-              <AmountBlock placeholder="None" />
-            )}
-          </Stack>
+          <AssetAmountBlocks values={fees} />
         </TableCell>
         <TableCell>
-          <Stack direction="row" gap={0.5} flexWrap="wrap">
-            {profit && profit.length > 0 ? (
-              profit.map(([asset, amount]) => (
-                <Chip
-                  size="small"
-                  key={asset}
-                  label={
-                    <AssetAmountBlock
-                      key={asset}
-                      amount={amount}
-                      assetId={asset}
-                      priceMap={priceMap}
-                      showTicker
-                      showSign
-                      colorized
-                    />
-                  }
-                />
-              ))
-            ) : (
-              <AmountBlock placeholder="None" />
-            )}
-          </Stack>
+          <AssetAmountBlocks values={profit} />
+        </TableCell>
+        <TableCell>
+          <TimestampBlock timestamp={createdAt} relative={relativeTime} />
         </TableCell>
         {/* <TableCell>
           <TagList itemId={row.id} itemType="trade" />
         </TableCell> */}
-        <TableCell variant="actionList">
-          <Tooltip title="Inspect">
-            <IconButton size="small" color="secondary" onClick={toggleOpen}>
-              <Visibility fontSize="inherit" />
-            </IconButton>
-          </Tooltip>
-        </TableCell>
       </TableRow>
-      <TradeDrawer
-        key={row.id}
-        open={open}
-        toggleOpen={toggleOpen}
-        trade={row}
-        relativeTime={relativeTime}
-        priceMap={priceMap}
-        anchor="right"
-      />
     </>
   )
 }

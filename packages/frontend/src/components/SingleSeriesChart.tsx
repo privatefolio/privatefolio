@@ -76,6 +76,7 @@ export type CursorMode = "move" | "inspect" | "measure"
 interface SingleSeriesChartProps extends Omit<Partial<ChartProps>, "chartRef"> {
   allowedCursorModes?: CursorMode[]
   emptyContent?: ReactNode
+  extraSettings?: ReactNode
   /**
    * @default "Candlestick"
    */
@@ -101,6 +102,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
     emptyContent = <NoDataButton />,
     isStackedArea,
     onSeriesReady = noop,
+    extraSettings,
     ...rest
   } = props
 
@@ -415,13 +417,13 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
             borderBottom: "1px solid var(--mui-palette-TableCell-border)",
             marginLeft: -0.5,
             minHeight: 43,
-            ...(isLoading || isEmpty || error
-              ? {
-                  borderColor: "transparent",
-                  opacity: 0,
-                  pointerEvents: "none",
-                }
-              : {}),
+            // ...(isLoading || isEmpty || error
+            //   ? {
+            //       borderColor: "transparent",
+            //       opacity: 0,
+            //       pointerEvents: "none",
+            //     }
+            //   : {}),
           }}
           alignItems="center"
           justifyContent="space-between"
@@ -593,18 +595,23 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
               </Tooltip>
             </Stack>
           </Stack>
-          <Stack direction="row">
-            {/* <IconButton size="small" onClick={toggleFullscreen} color="secondary">
-                    {fullscreen ? (
-                      <FullscreenExit fontSize="inherit" />
-                    ) : (
-                      <Fullscreen fontSize="inherit" />
-                    )}
-                  </IconButton>
-                  <IconButton size="small" color="secondary">
-                    <MoreHoriz fontSize="inherit" />
-                  </IconButton> */}
-          </Stack>
+          {extraSettings}
+          {/* <Stack direction="row">
+            <IconButton
+              size="small"
+              // onClick={toggleFullscreen}
+              color="secondary"
+            >
+              {fullscreen ? (
+                <FullscreenExit fontSize="inherit" />
+              ) : (
+                <Fullscreen fontSize="inherit" />
+              )}
+            </IconButton>
+            <IconButton size="small" color="secondary">
+              <MoreHoriz fontSize="inherit" />
+            </IconButton>
+          </Stack> */}
         </Stack>
         <Box sx={{ height: "calc(100% - 43px - 4px)" }}>
           {(isLoading || isEmpty || error) && (
@@ -670,15 +677,17 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
             )}
           </div>
           <div>
-            <Button
-              color={logScale ? "accent" : "secondary"}
-              size="small"
-              variant="text"
-              onClick={toggleLogScale}
-              sx={{ borderRadius: 0.5, paddingX: 1 }}
-            >
-              Log
-            </Button>
+            <Tooltip title={logScale ? "Switch to linear scale" : "Switch to log scale"}>
+              <Button
+                color={logScale ? "accent" : "secondary"}
+                size="small"
+                variant="text"
+                onClick={toggleLogScale}
+                sx={{ borderRadius: 0.5, paddingX: 1 }}
+              >
+                Log
+              </Button>
+            </Tooltip>
           </div>
         </Stack>
       </Paper>

@@ -1,11 +1,4 @@
-import {
-  CalculateOutlined,
-  DeleteForever,
-  DownloadRounded,
-  MoreHoriz,
-  Paid,
-  PaidOutlined,
-} from "@mui/icons-material"
+import { CalculateOutlined, DeleteForever, DownloadRounded, MoreHoriz } from "@mui/icons-material"
 import {
   Divider,
   IconButton,
@@ -20,8 +13,8 @@ import {
 import { useStore } from "@nanostores/react"
 import { transformAuditLogsToCsv } from "privatefolio-backend/build/src/utils/csv-export-utils"
 import React, { MutableRefObject, useState } from "react"
+import { QuoteCurrencyToggle } from "src/components/QuoteCurrencyToggle"
 import { AuditLog } from "src/interfaces"
-import { $showQuotedAmounts } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
 import { handleExportAuditLogsRequest } from "src/utils/backup-utils"
@@ -45,23 +38,11 @@ export function AuditLogActions(props: AuditLogsActionsProps) {
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
 
-  const showQuotedAmounts = useStore($showQuotedAmounts)
   const debugMode = useStore($debugMode)
 
   return (
     <Stack direction="row">
-      <Tooltip
-        title={showQuotedAmounts ? "Show amounts in Base Asset" : "Show amounts in Quote Currency"}
-      >
-        <IconButton
-          color="secondary"
-          onClick={() => {
-            $showQuotedAmounts.set(!showQuotedAmounts)
-          }}
-        >
-          {showQuotedAmounts ? <Paid fontSize="small" /> : <PaidOutlined fontSize="small" />}
-        </IconButton>
-      </Tooltip>
+      <QuoteCurrencyToggle />
       <Tooltip title="Actions">
         <IconButton color="secondary" onClick={handleClick}>
           <MoreHoriz fontSize="small" />
