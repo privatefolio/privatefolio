@@ -489,7 +489,7 @@ export async function getAccountNames() {
 
       if (!createdAt) {
         createdAt = stats.ctime.getTime()
-        await setValue(`account_createdAt`, createdAt, accountName)
+        await setValue(accountName, `account_createdAt`, createdAt)
       }
 
       return { createdAt, file }

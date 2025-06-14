@@ -21,7 +21,7 @@ export async function invalidateNetworth(accountName: string, newValue: Timestam
   const existing = (await getValue<Timestamp>(accountName, "networthCursor", 0)) as Timestamp
 
   if (newValue < existing) {
-    await setValue("networthCursor", newValue, accountName)
+    await setValue(accountName, "networthCursor", newValue)
   }
 }
 
@@ -149,7 +149,7 @@ export async function computeNetworth(
   if (balances.length > 0) {
     const cursor = balances[balances.length - 1].timestamp
     await progress([99, `Setting networth cursor to ${formatDate(cursor)}`])
-    await setValue("networthCursor", cursor, accountName)
+    await setValue(accountName, "networthCursor", cursor)
   }
 }
 

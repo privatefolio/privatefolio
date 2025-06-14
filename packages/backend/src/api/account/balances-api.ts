@@ -43,7 +43,7 @@ export async function invalidateBalances(accountName: string, newValue: Timestam
   const existing = (await getValue<Timestamp>(accountName, "balancesCursor", 0)) as Timestamp
 
   if (newValue < existing) {
-    await setValue("balancesCursor", newValue, accountName)
+    await setValue(accountName, "balancesCursor", newValue)
   }
 }
 
@@ -224,7 +224,7 @@ export async function computeBalances(
       balanceIds.map((timestamp) => [timestamp, JSON.stringify(historicalBalances[timestamp])])
     )
 
-    await setValue("balancesCursor", latestDay, accountName)
+    await setValue(accountName, "balancesCursor", latestDay)
     await progress([
       Math.floor((Math.min(i + pageSize, count) * 90) / count),
       `Processed ${balanceIds.length} daily balances`,
@@ -267,7 +267,7 @@ export async function computeBalances(
     recordsLength += balanceIds.length
   }
 
-  await setValue("balancesCursor", latestDay, accountName)
+  await setValue(accountName, "balancesCursor", latestDay)
   await progress([100, `Saved ${recordsLength} records to disk`])
 }
 

@@ -7,7 +7,7 @@ export async function computeGenesis(accountName: string) {
     "SELECT * FROM transactions ORDER BY timestamp ASC LIMIT 1"
   )
   const genesis = res.length === 0 ? 0 : res[0].timestamp
-  await setValue("genesis", genesis, accountName)
+  await setValue(accountName, "genesis", genesis)
 }
 
 export async function computeLastTx(accountName: string) {
@@ -16,5 +16,5 @@ export async function computeLastTx(accountName: string) {
     "SELECT * FROM transactions ORDER BY timestamp DESC LIMIT 1"
   )
   const lastTx = res.length === 0 ? 0 : res[0].timestamp
-  await setValue("lastTx", lastTx, accountName)
+  await setValue(accountName, "lastTx", lastTx)
 }

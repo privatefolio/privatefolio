@@ -86,7 +86,7 @@ async function getAccountWithTrades(accountName: string) {
       );
     `)
 
-    await setValue(`trade_schema_version`, SCHEMA_VERSION, accountName)
+    await setValue(accountName, `trade_schema_version`, SCHEMA_VERSION)
   }
 
   return account
