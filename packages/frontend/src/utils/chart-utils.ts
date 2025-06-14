@@ -25,6 +25,42 @@ export const createValueFormatter = memoize((currency: Currency) => {
     })}`.replace(`${currency.symbol}-`, `-${currency.symbol}`)
 })
 
+export const createNativeAmountFormatter = memoize((ticker: string) => {
+  return (amountN: number) => {
+    // let minimumFractionDigits: number | undefined
+    // let maximumFractionDigits: number | undefined
+
+    // // auto-adjust minimumFractionDigits
+    // if (minimumFractionDigits === undefined && typeof amountN === "number") {
+    //   if (amountN > 10_000 || amountN < -10_000) {
+    //     minimumFractionDigits = 0
+    //   } else if (amountN < 1 && amountN > -1) {
+    //     minimumFractionDigits = Math.min(getMinimumDecimalPrecision(amountN), 6)
+    //   }
+    // }
+
+    // // auto-adjust maximumFractionDigits
+    // if (
+    //   minimumFractionDigits !== undefined &&
+    //   maximumFractionDigits === undefined &&
+    //   typeof amountN === "number"
+    // ) {
+    //   if (amountN > 10_000 || amountN < -10_000) {
+    //     maximumFractionDigits = Math.max(0, minimumFractionDigits)
+    //   } else if (amountN < 1 && amountN > -1) {
+    //     maximumFractionDigits = Math.max(minimumFractionDigits, getMinimumDecimalPrecision(amountN))
+    //   } else {
+    //     maximumFractionDigits = minimumFractionDigits
+    //   }
+    // }
+
+    return `${formatNumber(amountN, {
+      // maximumFractionDigits,
+      // minimumFractionDigits,
+    })} ${ticker}`
+  }
+})
+
 export const profitColor = "rgb(0, 150, 108)"
 // export const lossColor = "rgb(220, 60, 70)"
 // export const profitColor = "rgb(51,215,120)"

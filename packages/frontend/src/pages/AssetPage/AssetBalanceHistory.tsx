@@ -1,24 +1,37 @@
 import { useStore } from "@nanostores/react"
-import React, { useCallback } from "react"
+import React, { useCallback, useMemo } from "react"
 import { SqlParam, Time, Timestamp } from "src/interfaces"
+import { $quoteCurrency, $showQuotedAmounts } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
 import { getAssetTicker } from "src/utils/assets-utils"
-import { aggregateByWeek, neutralColor } from "src/utils/chart-utils"
+import {
+  aggregateByWeek,
+  createNativeAmountFormatter,
+  createValueFormatter,
+  neutralColor,
+} from "src/utils/chart-utils"
 
-import { QueryChartData, SingleSeriesChart } from "../../components/SingleSeriesChart"
+import {
+  QueryChartData,
+  SingleSeriesChart,
+  SingleSeriesChartProps,
+} from "../../components/SingleSeriesChart"
 import { $rpc } from "../../workers/remotes"
 
 type AssetBalanceHistoryProps = {
   assetId: string
   end?: Timestamp
   start?: Timestamp
-}
+} & Omit<SingleSeriesChartProps, "queryFn">
 
 export function AssetBalanceHistory(props: AssetBalanceHistoryProps) {
-  const { assetId, end, start } = props
+  const { assetId, end, start, ...rest } = props
 
   const activeAccount = useStore($activeAccount)
   const rpc = useStore($rpc)
+
+  const showQuotedAmounts = useStore($showQuotedAmounts)
+  const quoteCurrency = useStore($quoteCurrency)
 
   const queryFn: QueryChartData = useCallback(
     async (interval) => {
@@ -38,25 +51,38 @@ export function AssetBalanceHistory(props: AssetBalanceHistoryProps) {
 
       query += " ORDER BY timestamp ASC"
 
-      const balanceMaps = await rpc.getBalances(activeAccount, query, params)
+      const [balanceMaps, assetPrices] = await Promise.all([
+        rpc.getBalances(activeAccount, query, params),
+        showQuotedAmounts
+          ? rpc.getPricesForAsset(activeAccount, assetId, undefined, start, end)
+          : Promise.resolve([]),
+      ])
 
       let hasHadABalance = false
       let firstNonZeroIndex = -1
       let lastNonZeroIndex = -1
       let records = balanceMaps.map((item, index) => {
-        const value = Number(item[assetId]) || 0
+        const balance = Number(item[assetId]) || 0
+        const time = (item.timestamp / 1000) as Time
 
-        if (!hasHadABalance && value > 0) hasHadABalance = true
+        if (!hasHadABalance && balance > 0) hasHadABalance = true
 
-        if (value !== 0) {
+        if (balance !== 0) {
           if (firstNonZeroIndex === -1) firstNonZeroIndex = index
           lastNonZeroIndex = index
         }
 
+        let price =
+          assetPrices[index] && assetPrices[index].time === time ? assetPrices[index].value : 0
+
+        if (showQuotedAmounts && price === 0) {
+          price = assetPrices.find((x) => x.time === time)?.value || 0
+        }
+
         return {
           color: !item[assetId] ? neutralColor : undefined,
-          time: (item.timestamp / 1000) as Time,
-          value,
+          time,
+          value: showQuotedAmounts ? balance * price : balance,
         }
       })
 
@@ -74,17 +100,36 @@ export function AssetBalanceHistory(props: AssetBalanceHistoryProps) {
 
       return interval === "1w" ? aggregateByWeek(records) : records
     },
-    [rpc, activeAccount, assetId, start, end]
+    [rpc, activeAccount, assetId, start, end, showQuotedAmounts]
+  )
+
+  const chartOptions = useMemo(
+    () => ({
+      localization: {
+        priceFormatter: showQuotedAmounts
+          ? createValueFormatter(quoteCurrency)
+          : createNativeAmountFormatter(getAssetTicker(assetId)),
+      },
+    }),
+    [showQuotedAmounts, quoteCurrency, assetId]
+  )
+
+  const tooltipOptions = useMemo(
+    () => ({
+      currencySymbol: showQuotedAmounts ? quoteCurrency.symbol : getAssetTicker(assetId),
+      significantDigits: showQuotedAmounts ? quoteCurrency.maxDigits : undefined,
+    }),
+    [assetId, showQuotedAmounts, quoteCurrency]
   )
 
   return (
     <SingleSeriesChart
       queryFn={queryFn}
       initType="Histogram"
-      tooltipOptions={{
-        currencySymbol: getAssetTicker(assetId),
-      }}
+      tooltipOptions={tooltipOptions}
+      chartOptions={chartOptions}
       allowedCursorModes={["move", "measure"]}
+      {...rest}
     />
   )
 }

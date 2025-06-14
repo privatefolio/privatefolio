@@ -19,6 +19,7 @@ import { SerifFont } from "../../theme"
 import FourZeroFourPage from "../404"
 import { AssetBalanceHistory } from "../AssetPage/AssetBalanceHistory"
 import { AuditLogTable } from "../AuditLogsPage/AuditLogTable"
+import { PnLChart } from "../PnLPage/PnLChart"
 import { TradeActions } from "../TradesPage/TradeActions"
 import { TransactionTable } from "../TransactionsPage/TransactionTable"
 import { TradeDetails } from "./TradeDetails"
@@ -124,6 +125,7 @@ export default function TradePage() {
         <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
           <Tabs value={tab} defaultValue={tab}>
             <NavTab value="details" to={`?tab=details`} label="Details" />
+            <NavTab value="pnl" to="?tab=pnl" label="Profit & loss" />
             <NavTab value="exposure" to={`?tab=exposure`} label={"Exposure"} />
             <NavTab value="transactions" to={`?tab=transactions`} label="Transactions" />
             <NavTab value="audit-logs" to={`?tab=audit-logs`} label="Audit logs" />
@@ -131,6 +133,7 @@ export default function TradePage() {
           <TradeActions />
         </Stack>
         {tab === "details" && <TradeDetails trade={trade} />}
+        {tab === "pnl" && <PnLChart trade={trade} />}
         {tab === "exposure" && (
           <AssetBalanceHistory
             assetId={trade.assetId}

@@ -12,7 +12,9 @@
     "cost": [
       [
         "ethereum:0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e:YFI",
-        "0.0970886",
+        "-0.0970886",
+        "0",
+        "0.096708682006894037",
       ],
     ],
     "createdAt": 1602241039000,
@@ -21,27 +23,33 @@
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.007709112",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.008255801",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.003172208",
+        "0",
       ],
     ],
-    "id": "trade_1875926360",
-    "profit": [
+    "id": "1875926360",
+    "proceeds": [
       [
         "ethereum:0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e:YFI",
         "0.046449260886212647",
+        "0",
       ],
       [
         "ethereum:0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e:YFI",
         "0.050843401760063018",
+        "0",
       ],
     ],
+    "tradeNumber": 76,
     "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
@@ -63,8 +71,9 @@
     "createdAt": 1602254803000,
     "duration": 2168388000,
     "fees": [],
-    "id": "trade_1174390877",
-    "profit": [],
+    "id": "1174390877",
+    "proceeds": [],
+    "tradeNumber": 77,
     "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
@@ -84,7 +93,9 @@
     "cost": [
       [
         "ethereum:0xBA2E7Fed597fd0E3e70f5130BcDbbFE06bB94fe1:yYFI",
-        "0.0465",
+        "-0.0465",
+        "0",
+        "0.046449260886212647",
       ],
     ],
     "createdAt": 1602331853000,
@@ -93,10 +104,12 @@
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.008255801",
+        "0",
       ],
     ],
-    "id": "trade_567629290",
-    "profit": [],
+    "id": "567629290",
+    "proceeds": [],
+    "tradeNumber": 78,
     "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
@@ -117,8 +130,9 @@
     "createdAt": 1602333272000,
     "duration": 4567424000,
     "fees": [],
-    "id": "trade_1279942196",
-    "profit": [],
+    "id": "1279942196",
+    "proceeds": [],
+    "tradeNumber": 79,
     "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
@@ -139,8 +153,9 @@
     "createdAt": 1602360724000,
     "duration": 2063068000,
     "fees": [],
-    "id": "trade_2379906519",
-    "profit": [],
+    "id": "2379906519",
+    "proceeds": [],
+    "tradeNumber": 80,
     "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [

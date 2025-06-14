@@ -563,7 +563,6 @@ export const theme: CssVarsThemeOptions = {
             marginTop: 0.5,
           },
         },
-        disableUnderline: true,
       },
       styleOverrides: {
         root: {

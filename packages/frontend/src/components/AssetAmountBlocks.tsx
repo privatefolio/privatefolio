@@ -1,20 +1,52 @@
 import { UnfoldLess, UnfoldMore } from "@mui/icons-material"
 import { Chip, Stack } from "@mui/material"
+import Big from "big.js"
 import React, { useMemo, useState } from "react"
 
 import { AmountBlock } from "./AmountBlock"
 import { AssetAmountBlock } from "./AssetAmountBlock"
 
+export type AssetAmountBlockValue = [string, string, string] | [string, string, string, string]
+
 interface AssetAmountBlocksProps {
-  values: [string, string, string][]
+  values: AssetAmountBlockValue[]
+  variant?: "sum" | "average"
 }
 
 export function AssetAmountBlocks(props: AssetAmountBlocksProps) {
-  const { values } = props
+  const { values, variant = "sum" } = props
   const [isExpanded, setIsExpanded] = useState(false)
 
   const aggregatedValues = useMemo(() => {
     if (!values || values.length === 0) return []
+
+    if (variant === "average") {
+      const grouped = values.reduce(
+        (acc, [assetId, amount, usdValue]) => {
+          if (!acc[assetId]) {
+            acc[assetId] = {
+              count: 0,
+              totalAmount: Big(0),
+              totalUsdValue: Big(0),
+            }
+          }
+          acc[assetId].totalAmount = acc[assetId].totalAmount.plus(Big(amount))
+          acc[assetId].totalUsdValue = acc[assetId].totalUsdValue.plus(Big(usdValue))
+          acc[assetId].count++
+          return acc
+        },
+        {} as Record<string, { count: number; totalAmount: Big; totalUsdValue: Big }>
+      )
+
+      return Object.entries(grouped).map(
+        ([assetId, { totalAmount, totalUsdValue, count }]) =>
+          [assetId, totalAmount.div(count).toString(), totalUsdValue.div(count).toString()] as [
+            string,
+            string,
+            string,
+          ]
+      )
+    }
 
     const aggregated = values.reduce(
       (acc, [assetId, amount, usdValue]) => {
@@ -35,7 +67,7 @@ export function AssetAmountBlocks(props: AssetAmountBlocksProps) {
       ([assetId, { amount, usdValue }]) =>
         [assetId, amount.toString(), usdValue.toString()] as [string, string, string]
     )
-  }, [values])
+  }, [values, variant])
 
   const displayValues = isExpanded ? values : aggregatedValues
 

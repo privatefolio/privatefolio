@@ -1,6 +1,6 @@
 import Big from "big.js"
 import { EventCause, SqlParam } from "src/interfaces"
-import { formatDate } from "src/utils/formatting-utils"
+import { formatDate, ONE_DAY } from "src/utils/formatting-utils"
 import { noop } from "src/utils/utils"
 
 import {
@@ -131,6 +131,8 @@ export async function computeBalances(
   let recordsLength = 0
   let latestBalances: Omit<BalanceMap, "timestamp"> = {}
 
+  let genesisDay: Timestamp = -1
+
   if (since !== 0) {
     try {
       const result = await account.execute("SELECT data FROM balances WHERE timestamp = ?", [
@@ -141,6 +143,8 @@ export async function computeBalances(
     } catch {
       // ignore
     }
+  } else {
+    genesisDay = 0
   }
 
   let historicalBalances: Record<number, Omit<BalanceMap, "timestamp">> = {}
@@ -162,6 +166,10 @@ export async function computeBalances(
 
     for (const log of logs) {
       const { assetId, change, timestamp } = log
+
+      if (genesisDay === 0) {
+        genesisDay = timestamp - (timestamp % 86400000)
+      }
 
       const nextDay: Timestamp = timestamp - (timestamp % 86400000)
 
@@ -240,6 +248,11 @@ export async function computeBalances(
   for (let i = latestDay + 86400000; i <= until; i += 86400000) {
     historicalBalances[i] = latestBalances
     latestDay = i
+  }
+
+  // filling the day before the genesis day
+  if (genesisDay > 0) {
+    historicalBalances[genesisDay - ONE_DAY] = {}
   }
 
   if (Object.keys(historicalBalances).length > 0) {

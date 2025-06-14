@@ -110,6 +110,7 @@ export function AssetPriceHistory(props: AssetPriceHistoryProps) {
         <Select
           size="small"
           variant="filled"
+          disableUnderline
           color="secondary"
           onChange={handleChange}
           value={priceApiId || (asset.priceApiId ? "" : defaultPriceApiId)}

@@ -71,6 +71,9 @@ export interface Transaction {
   outgoing?: string
   outgoingAsset?: string
   platform: string
+  /**
+   * outgoing / incoming
+   */
   price?: string
   role?: TransactionRole
   tags?: number[]
@@ -223,12 +226,12 @@ export interface Trade {
   auditLogIds?: string[]
   balance: number
   closedAt?: Timestamp
-  cost: [string, string, string][] // Array of [assetId, amount, usdValue] pairs
+  cost: [string, string, string, string][] // Array of [assetId, amount, usdValue, exposure] pairs
   createdAt: Timestamp
   duration?: number
   fees: [string, string, string][] // Array of [assetId, amount, usdValue] pairs
   id: string
-  profit: [string, string, string][] // Array of [assetId, amount, usdValue] pairs
+  proceeds: [string, string, string][] // Array of [assetId, amount, usdValue] pairs
   tags?: number[]
   tradeNumber: number
   tradeStatus: "open" | "closed"

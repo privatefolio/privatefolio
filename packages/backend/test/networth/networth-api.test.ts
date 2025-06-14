@@ -64,13 +64,13 @@ it.sequential("should compute historical networth", async (test) => {
   // assert
   expect(updates.join("\n")).toMatchInlineSnapshot(
     `
-    "5,Computing networth for 14 days
-    10,Computing networth starting Sep 01, 2017
-    95,Saving 14 records to the database
+    "5,Computing networth for 15 days
+    10,Computing networth starting Aug 31, 2017
+    95,Saving 15 records to the database
     99,Setting networth cursor to Sep 14, 2017"
   `
   )
-  expect(networthArray.length).toMatchInlineSnapshot(`14`)
+  expect(networthArray.length).toMatchInlineSnapshot(`15`)
   expect(networthArray).toMatchSnapshot()
 })
 
@@ -90,6 +90,6 @@ it.sequential("should refresh networth", async (test) => {
     95,Saving 1 records to the database
     99,Setting networth cursor to Sep 14, 2017"
   `)
-  expect(networthArray.length).toMatchInlineSnapshot(`14`)
+  expect(networthArray.length).toMatchInlineSnapshot(`15`)
   expect(networthArray).toMatchSnapshot()
 })

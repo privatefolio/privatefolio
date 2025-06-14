@@ -29,71 +29,88 @@
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.00042102",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.00042102",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.00042",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.00042",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.00042102",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.00042102",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.000441",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.000441",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.00042",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.00042",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.000134622",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.000134622",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.0003213",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.0003213",
+        "0",
       ],
     ],
-    "id": "trade_1728606140",
-    "profit": [
+    "id": "1728606140",
+    "proceeds": [
       [
         "ethereum:0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0:LOOM",
         "10",
+        "0",
       ],
       [
         "ethereum:0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0:LOOM",
         "10",
+        "0",
       ],
     ],
+    "tradeNumber": 1,
     "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
@@ -118,8 +135,9 @@
     "cost": [],
     "createdAt": 1509139741000,
     "fees": [],
-    "id": "trade_1298341108",
-    "profit": [],
+    "id": "1298341108",
+    "proceeds": [],
+    "tradeNumber": 2,
     "tradeStatus": "open",
     "tradeType": "Long",
     "txIds": [
@@ -136,8 +154,9 @@
     "cost": [],
     "createdAt": 1509810019000,
     "fees": [],
-    "id": "trade_3613444326",
-    "profit": [],
+    "id": "3613444326",
+    "proceeds": [],
+    "tradeNumber": 3,
     "tradeStatus": "open",
     "tradeType": "Long",
     "txIds": [
@@ -154,8 +173,9 @@
     "cost": [],
     "createdAt": 1510355666000,
     "fees": [],
-    "id": "trade_2754821397",
-    "profit": [],
+    "id": "2754821397",
+    "proceeds": [],
+    "tradeNumber": 4,
     "tradeStatus": "open",
     "tradeType": "Long",
     "txIds": [
@@ -172,8 +192,9 @@
     "cost": [],
     "createdAt": 1511796400000,
     "fees": [],
-    "id": "trade_3920691763",
-    "profit": [],
+    "id": "3920691763",
+    "proceeds": [],
+    "tradeNumber": 5,
     "tradeStatus": "open",
     "tradeType": "Long",
     "txIds": [
@@ -190,8 +211,9 @@
     "cost": [],
     "createdAt": 1518786600000,
     "fees": [],
-    "id": "trade_3366454161",
-    "profit": [],
+    "id": "3366454161",
+    "proceeds": [],
+    "tradeNumber": 6,
     "tradeStatus": "open",
     "tradeType": "Long",
     "txIds": [
@@ -208,7 +230,9 @@
     "cost": [
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
-        "0.03",
+        "-0.03",
+        "0",
+        "10",
       ],
     ],
     "createdAt": 1521052009000,
@@ -216,10 +240,12 @@
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.000134622",
+        "0",
       ],
     ],
-    "id": "trade_392869011",
-    "profit": [],
+    "id": "392869011",
+    "proceeds": [],
+    "tradeNumber": 7,
     "tradeStatus": "open",
     "tradeType": "Long",
     "txIds": [
@@ -236,8 +262,9 @@
     "cost": [],
     "createdAt": 1529138603000,
     "fees": [],
-    "id": "trade_2318539084",
-    "profit": [],
+    "id": "2318539084",
+    "proceeds": [],
+    "tradeNumber": 8,
     "tradeStatus": "open",
     "tradeType": "Long",
     "txIds": [
@@ -254,8 +281,9 @@
     "cost": [],
     "createdAt": 1537435256000,
     "fees": [],
-    "id": "trade_2735413046",
-    "profit": [],
+    "id": "2735413046",
+    "proceeds": [],
+    "tradeNumber": 9,
     "tradeStatus": "open",
     "tradeType": "Long",
     "txIds": [

@@ -12,10 +12,12 @@
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.000290292",
+        "0",
       ],
     ],
-    "id": "trade_836085081",
-    "profit": [],
+    "id": "836085081",
+    "proceeds": [],
+    "tradeNumber": 21,
     "tradeStatus": "open",
     "tradeType": "Long",
     "txIds": [
@@ -39,19 +41,23 @@
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.00060476875",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.00109708",
+        "0",
       ],
     ],
-    "id": "trade_777919994",
-    "profit": [
+    "id": "777919994",
+    "proceeds": [
       [
         "ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2:WETH",
         "8",
+        "0",
       ],
     ],
+    "tradeNumber": 22,
     "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
@@ -76,10 +82,12 @@
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.001065245",
+        "0",
       ],
     ],
-    "id": "trade_3290547509",
-    "profit": [],
+    "id": "3290547509",
+    "proceeds": [],
+    "tradeNumber": 23,
     "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
@@ -106,23 +114,28 @@
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.0012342655",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.0002797275",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.0024009895",
+        "0",
       ],
     ],
-    "id": "trade_1976152576",
-    "profit": [
+    "id": "1976152576",
+    "proceeds": [
       [
         "ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2:WETH",
         "7",
+        "0",
       ],
     ],
+    "tradeNumber": 24,
     "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
@@ -149,10 +162,12 @@
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.000426354",
+        "0",
       ],
     ],
-    "id": "trade_2181358139",
-    "profit": [],
+    "id": "2181358139",
+    "proceeds": [],
+    "tradeNumber": 25,
     "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [

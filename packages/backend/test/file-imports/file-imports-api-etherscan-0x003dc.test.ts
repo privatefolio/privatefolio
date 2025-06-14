@@ -289,7 +289,7 @@ describe("should import 0x003dc via files", () => {
       90,Processed 622 daily balances
       95,Setting networth cursor to Dec 31, 1969
       96,Filling balances to reach today
-      100,Saved 1972 records to disk"
+      100,Saved 1973 records to disk"
     `)
   })
 
@@ -406,7 +406,7 @@ describe("should import 0x003dc via files", () => {
     await expect(auditLogs.map(sanitizeAuditLog)).toMatchFileSnapshot(
       "../__snapshots__/0x003dc/audit-logs.ts.snap"
     )
-    expect(balances.length).toMatchInlineSnapshot(`1971`)
+    expect(balances.length).toMatchInlineSnapshot(`1972`)
     for (let i = 0; i < balances.length; i += 100) {
       await expect(balances.slice(i, i + 100)).toMatchFileSnapshot(
         `../__snapshots__/0x003dc/balances-${i}.ts.snap`

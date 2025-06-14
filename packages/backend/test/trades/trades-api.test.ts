@@ -156,18 +156,22 @@ describe("trades-api", () => {
             [
               "ethereum:ETH",
               "0.001",
+              "0",
             ],
             [
               "ethereum:ETH",
               "0.001",
+              "0",
             ],
             [
               "ethereum:ETH",
               "0.001",
+              "0",
             ],
           ],
-          "id": "trade_2097354210",
-          "profit": [],
+          "id": "2097354210",
+          "proceeds": [],
+          "tradeNumber": 1,
           "tradeStatus": "closed",
           "tradeType": "Long",
           "txIds": [

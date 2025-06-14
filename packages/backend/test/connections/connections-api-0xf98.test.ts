@@ -54,7 +54,7 @@ describe("should import 0xf98 via connection", () => {
       90,Processed 1153 daily balances
       95,Setting networth cursor to Dec 31, 1969
       96,Filling balances to reach today
-      100,Saved 1210 records to disk"
+      100,Saved 1211 records to disk"
     `)
   })
 
@@ -88,7 +88,7 @@ describe("should import 0xf98 via connection", () => {
     await expect(auditLogs.map(sanitizeAuditLog)).toMatchFileSnapshot(
       "../__snapshots__/0xf98/audit-logs.ts.snap"
     )
-    expect(balances.length).toMatchInlineSnapshot(`1210`)
+    expect(balances.length).toMatchInlineSnapshot(`1211`)
     for (let i = 0; i < balances.length; i += 100) {
       await expect(balances.slice(i, i + 100)).toMatchFileSnapshot(
         `../__snapshots__/0xf98/balances-${i}.ts.snap`

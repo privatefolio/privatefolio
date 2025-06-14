@@ -361,7 +361,7 @@ export async function addTransaction(
   // const logs: AuditLog[] = []
   // let price: string | undefined
   // if (incoming && outgoing) {
-  //   price = Big(incoming).div(Big(outgoing)).toString()
+  //   price = Big(outgoing).div(Big(incoming)).toString()
   // }
   // if (incoming && incomingAsset) {
   //   logs.push({

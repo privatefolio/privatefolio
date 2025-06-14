@@ -28,7 +28,7 @@ export function TradeTableRow({
     tradeType,
     cost,
     fees,
-    profit,
+    proceeds,
     tradeNumber,
     closedAt,
   } = row
@@ -95,10 +95,10 @@ export function TradeTableRow({
   //             </Typography>
   //           ) : null}
 
-  //           {profit && profit.length > 0 ? (
+  //           {proceeds && proceeds.length > 0 ? (
   //             <Typography variant="body2">
-  //               <strong>Profit:</strong>{" "}
-  //               {profit.map(([asset, amount]) => `${amount} ${asset.split(":").pop()}`).join(", ")}
+  //               <strong>Proceeds:</strong>{" "}
+  //               {proceeds.map(([asset, amount]) => `${amount} ${asset.split(":").pop()}`).join(", ")}
   //             </Typography>
   //           ) : null}
 
@@ -157,7 +157,7 @@ export function TradeTableRow({
           <AssetAmountBlocks values={fees} />
         </TableCell>
         <TableCell>
-          <AssetAmountBlocks values={profit} />
+          <AssetAmountBlocks values={proceeds} />
         </TableCell>
         <TableCell>
           <TimestampBlock timestamp={createdAt} relative={relativeTime} />

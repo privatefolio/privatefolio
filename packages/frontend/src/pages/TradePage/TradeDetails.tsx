@@ -1,8 +1,9 @@
 import { Paper, Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
+import Big from "big.js"
 import { formatDistance } from "date-fns"
-import React, { useEffect, useState } from "react"
-import { AssetAmountBlocks } from "src/components/AssetAmountBlocks"
+import React, { useEffect, useMemo, useState } from "react"
+import { AssetAmountBlocks, AssetAmountBlockValue } from "src/components/AssetAmountBlocks"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TagManager } from "src/components/TagManager"
 import { TimestampBlock } from "src/components/TimestampBlock"
@@ -15,7 +16,7 @@ interface TradeDetailsProps {
 }
 
 export function TradeDetails({ trade }: TradeDetailsProps) {
-  const { duration, createdAt, cost, fees, profit, id } = trade
+  const { duration, createdAt, cost, fees, proceeds, id } = trade
 
   const activeAccount = useStore($activeAccount)
   const [tags, setTags] = useState<Tag[]>([])
@@ -33,6 +34,14 @@ export function TradeDetails({ trade }: TradeDetailsProps) {
   useEffect(() => {
     rpc.getTagsForTrade(activeAccount, id).then(setTags)
   }, [id, activeAccount, rpc])
+
+  const costBasis = useMemo<AssetAmountBlockValue[]>(() => {
+    return cost.map(([assetId, amount, usdValue, exposure]) => [
+      assetId,
+      Big(amount).div(exposure).toString(),
+      Big(usdValue).div(exposure).toString(),
+    ])
+  }, [cost])
 
   return (
     <Paper sx={{ paddingX: 2, paddingY: 1 }}>
@@ -68,12 +77,20 @@ export function TradeDetails({ trade }: TradeDetailsProps) {
           <AssetAmountBlocks values={cost} />
         </div>
         <div>
+          <SectionTitle>Cost Basis</SectionTitle>
+          <AssetAmountBlocks values={costBasis} variant="average" />
+        </div>
+        <div>
           <SectionTitle>Fees</SectionTitle>
           <AssetAmountBlocks values={fees} />
         </div>
         <div>
-          <SectionTitle>Profit</SectionTitle>
-          <AssetAmountBlocks values={profit} />
+          <SectionTitle>Proceeds</SectionTitle>
+          <AssetAmountBlocks values={proceeds} />
+        </div>
+
+        <div>
+          <SectionTitle>Realized proceeds</SectionTitle>
         </div>
 
         {/* TODO8 */}

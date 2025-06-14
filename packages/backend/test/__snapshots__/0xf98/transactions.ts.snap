@@ -53,6 +53,7 @@
     "outgoing": "0.03",
     "outgoingAsset": "ethereum:0x0000000000000000000000000000000000000000:ETH",
     "platform": "ethereum",
+    "price": "0.003",
     "timestamp": 1521052009000,
     "type": "Swap",
     "wallet": "0xf98C96B5d10faAFc2324847c82305Bd5fd7E5ad3",

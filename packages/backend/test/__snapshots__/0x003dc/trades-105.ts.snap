@@ -15,14 +15,17 @@
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.004240208",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.0019191402",
+        "0",
       ],
     ],
-    "id": "trade_2849417687",
-    "profit": [],
+    "id": "2849417687",
+    "proceeds": [],
+    "tradeNumber": 106,
     "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
@@ -43,8 +46,9 @@
     "createdAt": 1610101379000,
     "duration": 1067139000,
     "fees": [],
-    "id": "trade_3666725304",
-    "profit": [],
+    "id": "3666725304",
+    "proceeds": [],
+    "tradeNumber": 107,
     "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
@@ -68,10 +72,12 @@
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.004234581",
+        "0",
       ],
     ],
-    "id": "trade_3854678528",
-    "profit": [],
+    "id": "3854678528",
+    "proceeds": [],
+    "tradeNumber": 108,
     "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
@@ -95,10 +101,12 @@
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.00617032",
+        "0",
       ],
     ],
-    "id": "trade_1048722664",
-    "profit": [],
+    "id": "1048722664",
+    "proceeds": [],
+    "tradeNumber": 109,
     "tradeStatus": "closed",
     "tradeType": "Long",
     "txIds": [
@@ -125,27 +133,33 @@
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.004423632",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.0064895678",
+        "0",
       ],
       [
         "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "-0.013897804",
+        "0",
       ],
     ],
-    "id": "trade_4245497991",
-    "profit": [
+    "id": "4245497991",
+    "proceeds": [
       [
         "ethereum:0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599:WBTC",
         "0.0349237",
+        "0",
       ],
       [
         "ethereum:0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599:WBTC",
         "0.03047487",
+        "0",
       ],
     ],
+    "tradeNumber": 110,
     "tradeStatus": "open",
     "tradeType": "Long",
     "txIds": [

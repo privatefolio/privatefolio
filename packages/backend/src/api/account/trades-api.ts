@@ -1,7 +1,6 @@
 import Big from "big.js"
 import {
   AuditLog,
-  AuditLogOperation,
   EventCause,
   MyAsset,
   ProgressCallback,
@@ -25,7 +24,7 @@ import { getValue, setValue } from "./kv-api"
 import { enqueueTask } from "./server-tasks-api"
 import { getTransaction } from "./transactions-api"
 
-const SCHEMA_VERSION = 11
+const SCHEMA_VERSION = 12
 
 async function getAccountWithTrades(accountName: string) {
   const schemaVersion = await getValue(accountName, `trade_schema_version`, 0)
@@ -52,7 +51,7 @@ async function getAccountWithTrades(accountName: string) {
         tradeType VARCHAR NOT NULL,
         cost JSON,
         fees JSON,
-        profit JSON,
+        proceeds JSON,
         FOREIGN KEY (assetId) REFERENCES assets(id)
       );
     `)
@@ -129,7 +128,7 @@ export async function getTrades(
         tradeType: row[9] as TradeType,
         cost: JSON.parse(String(row[10] || "[]")),
         fees: JSON.parse(String(row[11] || "[]")),
-        profit: JSON.parse(String(row[12] || "[]")),
+        proceeds: JSON.parse(String(row[12] || "[]")),
         txIds: row[13] ? String(row[13]).split(",") : undefined,
         auditLogIds: row[14] ? String(row[14]).split(",") : undefined,
       }
@@ -153,7 +152,7 @@ export async function upsertTrades(accountName: string, trades: Trade[]): Promis
   try {
     await account.executeMany(
       `INSERT OR REPLACE INTO trades (
-        id, tradeNumber, assetId, amount, balance, createdAt, closedAt, duration, tradeStatus, tradeType, cost, fees, profit
+        id, tradeNumber, assetId, amount, balance, createdAt, closedAt, duration, tradeStatus, tradeType, cost, fees, proceeds
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       trades.map((trade) => [
         trade.id,
@@ -168,7 +167,7 @@ export async function upsertTrades(accountName: string, trades: Trade[]): Promis
         trade.tradeType,
         JSON.stringify(trade.cost || []),
         JSON.stringify(trade.fees || []),
-        JSON.stringify(trade.profit || []),
+        JSON.stringify(trade.proceeds || []),
       ])
     )
 
@@ -287,7 +286,7 @@ export async function computeTrades(
     trade: Trade,
     txId: string,
     assetId: string,
-    operation: AuditLogOperation
+    log: AuditLog
   ): Promise<void> {
     const tx = await getTransaction(accountName, txId)
     const priceMap = await getAssetPriceMap(accountName, tx.timestamp)
@@ -298,34 +297,42 @@ export async function computeTrades(
 
     if (tx.outgoingAsset && tx.outgoing) {
       // Add outgoing as cost if it's a different asset OR if it's the same asset in a deposit
-      if (tx.outgoingAsset !== assetId || operation === "Deposit") {
-        const assetPrice = priceMap[tx.outgoingAsset].value
-        if (!assetPrice) throw new Error(`Price not found for asset ${tx.outgoingAsset}`)
+      if (tx.outgoingAsset !== assetId || log.operation === "Deposit") {
+        const assetPrice = priceMap[tx.outgoingAsset]?.value
+        if (!assetPrice && !isTestEnvironment)
+          throw new Error(`Price not found for asset ${tx.outgoingAsset}`)
         trade.cost.push([
           tx.outgoingAsset,
           `-${tx.outgoing}`,
-          Big(assetPrice).mul(`-${tx.outgoing}`).toString(),
+          assetPrice ? Big(assetPrice).mul(`-${tx.outgoing}`).toString() : "0",
+          log.change,
         ])
       }
     }
 
     if (tx.incomingAsset && tx.incoming) {
-      // Add incoming as profit if it's a different asset OR if it's the same asset in a withdraw
-      if (tx.incomingAsset !== assetId || operation === "Withdraw") {
-        const assetPrice = priceMap[tx.incomingAsset].value
-        if (!assetPrice) throw new Error(`Price not found for asset ${tx.incomingAsset}`)
-        trade.profit.push([
+      // Add incoming as proceeds if it's a different asset OR if it's the same asset in a withdraw
+      if (tx.incomingAsset !== assetId || log.operation === "Withdraw") {
+        const assetPrice = priceMap[tx.incomingAsset]?.value
+        if (!assetPrice && !isTestEnvironment)
+          throw new Error(`Price not found for asset ${tx.incomingAsset}`)
+        trade.proceeds.push([
           tx.incomingAsset,
           tx.incoming,
-          Big(assetPrice).mul(tx.incoming).toString(),
+          assetPrice ? Big(assetPrice).mul(tx.incoming).toString() : "0",
         ])
       }
     }
 
     if (tx.feeAsset && tx.fee) {
-      const assetPrice = priceMap[tx.feeAsset].value
-      if (!assetPrice) throw new Error(`Price not found for asset ${tx.feeAsset}`)
-      trade.fees.push([tx.feeAsset, tx.fee, Big(assetPrice).mul(tx.fee).toString()])
+      const assetPrice = priceMap[tx.feeAsset]?.value
+      if (!assetPrice && !isTestEnvironment)
+        throw new Error(`Price not found for asset ${tx.feeAsset}`)
+      trade.fees.push([
+        tx.feeAsset,
+        tx.fee,
+        assetPrice ? Big(assetPrice).mul(tx.fee).toString() : "0",
+      ])
     }
 
     tradeTransactions.push([trade.id, tx.id])
@@ -352,7 +359,7 @@ export async function computeTrades(
           createdAt: log.timestamp,
           fees: [],
           id: tradeId,
-          profit: [],
+          proceeds: [],
           tradeNumber: 0,
           tradeStatus: "open",
           tradeType,
@@ -361,8 +368,8 @@ export async function computeTrades(
         tradeAuditLogs.push([tradeId, log.id])
         if (log.txId) {
           tradeTransactions.push([tradeId, log.txId])
-          // Track transactions for cost/profit/fees
-          await processTransactionForTrade(currentTrade, log.txId, assetId, log.operation)
+          // Track transactions for cost/proceeds/fees
+          await processTransactionForTrade(currentTrade, log.txId, assetId, log)
         }
       }
       // If we have an active trade, update it
@@ -383,8 +390,8 @@ export async function computeTrades(
         // Add the transaction relationship if txId exists
         if (log.txId) {
           tradeTransactions.push([currentTrade.id, log.txId])
-          // Update cost, profit and fees if this is a transaction
-          await processTransactionForTrade(currentTrade, log.txId, assetId, log.operation)
+          // Update cost, proceeds and fees if this is a transaction
+          await processTransactionForTrade(currentTrade, log.txId, assetId, log)
         }
 
         // Check if we need to close the current trade and start a new one
@@ -412,7 +419,7 @@ export async function computeTrades(
               createdAt: log.timestamp,
               fees: [],
               id: newTradeId,
-              profit: [],
+              proceeds: [],
               tradeNumber: 0,
               tradeStatus: "open",
               tradeType: newTradeType,

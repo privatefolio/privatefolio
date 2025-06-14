@@ -135,8 +135,8 @@ export function TradeTable(props: TradesTableProps) {
         sx: { maxWidth: 240, minWidth: 240, width: 240 },
       },
       {
-        key: "profit",
-        label: "Profit",
+        key: "proceeds",
+        label: "Proceeds",
         sx: { maxWidth: 240, minWidth: 240, width: 240 },
       },
       // {

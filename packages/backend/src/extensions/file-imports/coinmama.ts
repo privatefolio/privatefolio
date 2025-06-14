@@ -37,7 +37,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
   const outgoing = amount.split(" ")[0]
   const outgoingAsset = `coinmama:${amount.split(" ")[1]}`
   const wallet = "Coinmama Spot"
-  const price = Big(incoming).div(outgoing).toString()
+  const price = Big(outgoing).div(incoming).toString()
 
   const tx: Transaction = {
     fileImportId,

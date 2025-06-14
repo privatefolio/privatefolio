@@ -1,6 +1,9 @@
 import { Box, Stack, Tooltip, Typography, TypographyProps } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import { getDecimalPrecision } from "privatefolio-backend/build/src/utils/formatting-utils"
+import {
+  getDecimalPrecision,
+  getMinimumDecimalPrecision,
+} from "privatefolio-backend/build/src/utils/formatting-utils"
 import React, { useMemo, useState } from "react"
 import { $debugMode } from "src/stores/app-store"
 import { MonoFont } from "src/theme"
@@ -52,8 +55,10 @@ export function AmountBlock(props: AmountBlockProps) {
   if (minimumFractionDigits === undefined && typeof amountN === "number") {
     if (amountN > 10_000 || amountN < -10_000) {
       minimumFractionDigits = 0
+    } else if (amountN > 1000 || amountN < -1000) {
+      minimumFractionDigits = 2
     } else if (amountN < 1 && amountN > -1) {
-      minimumFractionDigits = Math.min(getDecimalPrecision(amountN), 6)
+      minimumFractionDigits = getMinimumDecimalPrecision(amountN) + 3
     }
 
     maximumFractionDigits = getDecimalPrecision(amountN)

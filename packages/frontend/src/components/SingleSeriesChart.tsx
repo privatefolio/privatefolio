@@ -73,7 +73,7 @@ export type TooltipOpts = Partial<Omit<TooltipPrimitiveOptions, "priceExtractor"
 
 export type CursorMode = "move" | "inspect" | "measure"
 
-interface SingleSeriesChartProps extends Omit<Partial<ChartProps>, "chartRef"> {
+export interface SingleSeriesChartProps extends Omit<Partial<ChartProps>, "chartRef"> {
   allowedCursorModes?: CursorMode[]
   emptyContent?: ReactNode
   extraSettings?: ReactNode
