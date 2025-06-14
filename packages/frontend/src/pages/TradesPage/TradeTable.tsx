@@ -18,11 +18,11 @@ import { TradeTableRow } from "./TradeTableRow"
 interface TradesTableProps extends Pick<RemoteTableProps<Trade>, "defaultRowsPerPage"> {
   assetId?: string
   tableDataRef?: MutableRefObject<Trade[]>
-  tableType: TradeStatus
+  tradeStatus?: TradeStatus
 }
 
 export function TradeTable(props: TradesTableProps) {
-  const { assetId, tableType, tableDataRef, ...rest } = props
+  const { assetId, tradeStatus, tableDataRef, ...rest } = props
 
   const accountName = useStore($activeAccount)
   const [refresh, setRefresh] = useState(0)
@@ -65,7 +65,9 @@ export function TradeTable(props: TradesTableProps) {
       }
 
       // Add active/closed condition
-      filterConditions.push(`tradeStatus = '${tableType}'`)
+      if (tradeStatus) {
+        filterConditions.push(`tradeStatus = '${tradeStatus}'`)
+      }
 
       // Construct the filterQuery
       let filterQuery = ""
@@ -89,7 +91,7 @@ export function TradeTable(props: TradesTableProps) {
         () => rpc.countTrades(accountName, `SELECT COUNT (*) FROM trades ${filterQuery}`),
       ]
     },
-    [accountName, assetId, refresh, tableDataRef, rpc, tableType]
+    [accountName, assetId, refresh, tableDataRef, rpc, tradeStatus]
   )
 
   const headCells = useMemo<HeadCell<Trade>[]>(

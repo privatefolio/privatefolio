@@ -67,18 +67,13 @@ export function TradeDetails({ trade }: TradeDetailsProps) {
           </span>
         </div>
 
-        {/* <div>
-          <SectionTitle>Balance</SectionTitle>
-          <AssetAmountBlock amount={trade.balance} assetId={trade.assetId} />
-        </div> */}
-
         <div>
           <SectionTitle>Cost</SectionTitle>
           <AssetAmountBlocks values={cost} />
         </div>
         <div>
           <SectionTitle>Cost Basis</SectionTitle>
-          <AssetAmountBlocks values={costBasis} variant="average" />
+          <AssetAmountBlocks values={costBasis} aggregation="average" formatting="price" />
         </div>
         <div>
           <SectionTitle>Fees</SectionTitle>

@@ -23,6 +23,7 @@ import { $assetMap, $filterOptionsMap } from "../../stores/metadata-store"
 import { SerifFont } from "../../theme"
 import FourZeroFourPage from "../404"
 import { AuditLogTable } from "../AuditLogsPage/AuditLogTable"
+import { TradeTable } from "../TradesPage/TradeTable"
 import { TransactionTable } from "../TransactionsPage/TransactionTable"
 import { AssetBalanceHistory } from "./AssetBalanceHistory"
 import { AssetDetails } from "./AssetDetails"
@@ -212,6 +213,15 @@ export default function AssetPage() {
             }
           />
           <NavTab
+            value="trades"
+            to={`?tab=trades`}
+            label={
+              <span>
+                <UserWalletIcon /> Trades
+              </span>
+            }
+          />
+          <NavTab
             value="transactions"
             to={`?tab=transactions`}
             label={
@@ -233,6 +243,7 @@ export default function AssetPage() {
         {tab === "details" && <AssetDetails metadata={metadata} isLoading={isLoading} />}
         {tab === "price-history" && <AssetPriceHistory asset={asset} />}
         {tab === "markets" && <AssetMarketTable metadata={metadata} isLoading={isLoading} />}
+        {tab === "trades" && <TradeTable assetId={assetId} defaultRowsPerPage={10} />}
         {tab === "balance" && (
           <AssetBalanceHistory assetId={assetId} extraSettings={<QuoteCurrencyToggle />} />
         )}

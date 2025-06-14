@@ -154,11 +154,11 @@ describe("0xf98 file import", () => {
     expect(transactions.map(normalizeTransaction)).toMatchSnapshot(`transactions`)
     expect(auditLogs.length).toEqual(24)
     expect(auditLogs.map(sanitizeAuditLog)).toMatchSnapshot(`audit logs`)
-    expect(balances.length).toEqual(1210)
+    expect(balances.length).toEqual(1211)
     for (let i = 0; i < balances.length; i += 100) {
       expect(balances.slice(i, i + 100)).toMatchSnapshot(`balances - page ${i / 100}`)
     }
-    expect(networth.length).toEqual(1210)
+    expect(networth.length).toEqual(1211)
     expect(networth).toMatchSnapshot(`networth`)
   })
 

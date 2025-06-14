@@ -27,7 +27,8 @@ export default function TradesPage({ show }: { show: boolean }) {
           </Tabs>
           <TradeActions />
         </Stack>
-        <TradeTable tableType={tab as "open" | "closed"} />
+        {tab === "open" && <TradeTable tradeStatus="open" />}
+        {tab === "closed" && <TradeTable tradeStatus="closed" />}
       </Stack>
     </StaggeredList>
   )

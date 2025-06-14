@@ -4,23 +4,23 @@ import Big from "big.js"
 import React, { useMemo, useState } from "react"
 
 import { AmountBlock } from "./AmountBlock"
-import { AssetAmountBlock } from "./AssetAmountBlock"
+import { AssetAmountBlock, AssetAmountBlockProps } from "./AssetAmountBlock"
 
 export type AssetAmountBlockValue = [string, string, string] | [string, string, string, string]
 
-interface AssetAmountBlocksProps {
+type AssetAmountBlocksProps = {
+  aggregation?: "sum" | "average"
   values: AssetAmountBlockValue[]
-  variant?: "sum" | "average"
-}
+} & AssetAmountBlockProps
 
 export function AssetAmountBlocks(props: AssetAmountBlocksProps) {
-  const { values, variant = "sum" } = props
+  const { values, aggregation = "sum", ...rest } = props
   const [isExpanded, setIsExpanded] = useState(false)
 
   const aggregatedValues = useMemo(() => {
     if (!values || values.length === 0) return []
 
-    if (variant === "average") {
+    if (aggregation === "average") {
       const grouped = values.reduce(
         (acc, [assetId, amount, usdValue]) => {
           if (!acc[assetId]) {
@@ -67,7 +67,7 @@ export function AssetAmountBlocks(props: AssetAmountBlocksProps) {
       ([assetId, { amount, usdValue }]) =>
         [assetId, amount.toString(), usdValue.toString()] as [string, string, string]
     )
-  }, [values, variant])
+  }, [values, aggregation])
 
   const displayValues = isExpanded ? values : aggregatedValues
 
@@ -88,6 +88,7 @@ export function AssetAmountBlocks(props: AssetAmountBlocksProps) {
                   showTicker
                   showSign
                   colorized
+                  {...rest}
                 />
               }
             />

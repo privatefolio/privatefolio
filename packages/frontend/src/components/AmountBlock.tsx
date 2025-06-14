@@ -79,6 +79,15 @@ export function AmountBlock(props: AmountBlockProps) {
     }
   }
 
+  // fail guard
+  if (
+    typeof minimumFractionDigits === "number" &&
+    typeof maximumFractionDigits === "number" &&
+    minimumFractionDigits > maximumFractionDigits
+  ) {
+    maximumFractionDigits = minimumFractionDigits
+  }
+
   const [copied, setCopied] = useState(false)
 
   const fullValue = useMemo(() => {

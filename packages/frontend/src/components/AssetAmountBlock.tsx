@@ -7,14 +7,15 @@ import { getAssetTicker } from "src/utils/assets-utils"
 
 import { AmountBlock, AmountBlockProps } from "./AmountBlock"
 
-type AssetAmountBlockProps = AmountBlockProps & {
+export type AssetAmountBlockProps = AmountBlockProps & {
   assetId?: string
+  formatting?: "value" | "price"
   priceMap?: Record<string, ChartData>
   usdValue?: string
 }
 
 export function AssetAmountBlock(props: AssetAmountBlockProps) {
-  const { amount, priceMap, assetId, placeholder, usdValue, ...rest } = props
+  const { amount, priceMap, assetId, placeholder, usdValue, formatting = "value", ...rest } = props
 
   const currency = useStore($quoteCurrency)
   const showQuotedAmounts = useStore($showQuotedAmounts)
@@ -39,8 +40,8 @@ export function AssetAmountBlock(props: AssetAmountBlockProps) {
       amount={usdValue || (price && amount ? price * Number(amount) : undefined)}
       currencySymbol={currency.symbol}
       currencyTicker={currency.id}
-      significantDigits={currency.maxDigits}
-      maxDigits={currency.maxDigits}
+      maxDigits={formatting === "value" ? currency.maxDigits : undefined}
+      significantDigits={formatting === "value" ? currency.maxDigits : undefined}
       placeholder={assetId && !price ? undefined : placeholder}
       {...rest}
     />
