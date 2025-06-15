@@ -65,7 +65,7 @@ export const profitColor = "rgb(0, 150, 108)"
 // export const lossColor = "rgb(220, 60, 70)"
 // export const profitColor = "rgb(51,215,120)"
 // export const lossColor = "rgb(239, 83, 80)"
-export const neutralColor = "gray"
+export const neutralColor = "rgb(128, 128, 128)"
 // export const profitColor = colors.green[500]
 export const lossColor = colors.red[500]
 

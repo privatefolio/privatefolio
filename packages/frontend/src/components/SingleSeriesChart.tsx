@@ -3,6 +3,7 @@ import {
   CandlestickChartSharp,
   ControlCamera,
   StraightenSharp,
+  Timeline,
 } from "@mui/icons-material"
 import {
   alpha,
@@ -23,6 +24,7 @@ import {
 import { useStore } from "@nanostores/react"
 import {
   AreaSeries,
+  BaselineSeries,
   CandlestickSeries,
   DeepPartial,
   HistogramSeries,
@@ -51,7 +53,13 @@ import {
   TooltipPrimitiveOptions,
 } from "../lightweight-charts/plugins/tooltip/tooltip"
 import { $favoriteIntervals, $preferredInterval, INTERVAL_LABEL_MAP } from "../stores/chart-store"
-import { candleStickOptions, extractTooltipColors, profitColor } from "../utils/chart-utils"
+import {
+  candleStickOptions,
+  extractTooltipColors,
+  lossColor,
+  neutralColor,
+  profitColor,
+} from "../utils/chart-utils"
 import { Chart, ChartProps } from "./Chart"
 import { CircularSpinner } from "./CircularSpinner"
 import { NoDataButton } from "./NoDataButton"
@@ -188,6 +196,18 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
             priceLineVisible: false,
             ...seriesOptions,
           })
+        } else if (activeType === "Baseline") {
+          seriesRef.current = chartRef.current.addSeries(BaselineSeries, {
+            baseLineColor: neutralColor,
+            bottomFillColor1: alpha(lossColor, 0),
+            bottomFillColor2: alpha(lossColor, 1),
+            lineWidth: 2,
+            priceLineVisible: false,
+            topFillColor1: alpha(profitColor, 1),
+            topFillColor2: alpha(profitColor, 0),
+            topLineColor: profitColor,
+            ...seriesOptions,
+          })
         } else {
           seriesRef.current = chartRef.current.addSeries(AreaSeries, {
             bottomColor: alpha(profitColor, 0),
@@ -195,6 +215,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
             // lineType: 2,
             lineWidth: 2,
             priceLineVisible: false,
+            topColor: alpha(profitColor, 1),
             ...seriesOptions,
           })
         }
@@ -556,6 +577,18 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
                     aria-label="Switch to Candlestick type"
                   >
                     <CandlestickChartSharp fontSize="inherit" />
+                  </ChartIconButton>
+                </span>
+              </Tooltip>
+              <Tooltip title="Switch to Baseline type">
+                <span>
+                  <ChartIconButton
+                    active={activeType === "Baseline"}
+                    onClick={() => setPreferredType("Baseline")}
+                    aria-label="Switch to Baseline type"
+                    disabled={isStackedArea}
+                  >
+                    <Timeline fontSize="inherit" />
                   </ChartIconButton>
                 </span>
               </Tooltip>
