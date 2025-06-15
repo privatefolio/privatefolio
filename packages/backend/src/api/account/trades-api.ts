@@ -663,13 +663,14 @@ export async function computePnl(
 
     // Calculate PnL for each day
     for (const price of prices) {
-      const timestamp = price.time * 1000 // Convert from seconds to milliseconds
+      const bucketStart = price.time * 1000
+      const bucketEnd = bucketStart + ONE_DAY
 
       // Find the latest audit log before or at this timestamp to get the balance
       const [latestLog] = await getAuditLogs(
         accountName,
         "SELECT * FROM audit_logs WHERE timestamp <= ? AND assetId = ? ORDER BY timestamp DESC LIMIT 1",
-        [timestamp + ONE_DAY, trade.assetId]
+        [bucketEnd, trade.assetId]
       )
 
       const balance = latestLog ? Number(latestLog.balance) : 0
@@ -678,23 +679,23 @@ export async function computePnl(
       // Calculate total cost and proceeds in USD
       const cost = trade.cost.reduce(
         (sum, [_assetId, _amount, usdValue, _exposure, _txId, txTimestamp]) =>
-          txTimestamp <= timestamp ? sum + Number(usdValue) : sum,
+          txTimestamp <= bucketEnd ? sum + Number(usdValue) : sum,
         0
       )
       const proceeds = trade.proceeds.reduce(
         (sum, [_assetId, _amount, usdValue, _txId, txTimestamp]) =>
-          txTimestamp <= timestamp ? sum + Number(usdValue) : sum,
+          txTimestamp <= bucketEnd ? sum + Number(usdValue) : sum,
         0
       )
       const fees = trade.fees.reduce(
         (sum, [_assetId, _amount, usdValue, _txId, txTimestamp]) =>
-          txTimestamp <= timestamp ? sum + Number(usdValue) : sum,
+          txTimestamp <= bucketEnd ? sum + Number(usdValue) : sum,
         0
       )
       const pnl = positionValue + cost + proceeds + fees
 
-      const pnlId = `${trade.id}_${timestamp}`
-      pnlRecords.push([pnlId, trade.id, timestamp, positionValue, cost, proceeds, fees, pnl])
+      const pnlId = `${trade.id}_${bucketStart}`
+      pnlRecords.push([pnlId, trade.id, bucketStart, positionValue, cost, proceeds, fees, pnl])
     }
 
     processedTrades++
