@@ -151,10 +151,10 @@ export function TradeTableRow({
         </TableCell>
 
         <TableCell>
-          <AssetAmountBlocks values={cost} />
+          <AssetAmountBlocks values={cost} showSign colorized />
         </TableCell>
         <TableCell>
-          <AssetAmountBlocks values={fees} />
+          <AssetAmountBlocks values={fees} showSign colorized />
         </TableCell>
         <TableCell>
           <AssetAmountBlocks values={proceeds} />

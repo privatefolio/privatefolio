@@ -86,8 +86,6 @@ export function AssetAmountBlocks(props: AssetAmountBlocksProps) {
                   usdValue={usdValue}
                   assetId={assetId}
                   showTicker
-                  showSign
-                  colorized
                   {...rest}
                 />
               }

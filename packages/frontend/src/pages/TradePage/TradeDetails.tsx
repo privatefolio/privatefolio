@@ -38,8 +38,8 @@ export function TradeDetails({ trade }: TradeDetailsProps) {
   const costBasis = useMemo<AssetAmountBlockValue[]>(() => {
     return cost.map(([assetId, amount, usdValue, exposure]) => [
       assetId,
-      Big(amount).div(exposure).toString(),
-      Big(usdValue).div(exposure).toString(),
+      Big(amount).div(`-${exposure}`).toString(),
+      Big(usdValue).div(`-${exposure}`).toString(),
     ])
   }, [cost])
 
@@ -69,7 +69,7 @@ export function TradeDetails({ trade }: TradeDetailsProps) {
 
         <div>
           <SectionTitle>Cost</SectionTitle>
-          <AssetAmountBlocks values={cost} />
+          <AssetAmountBlocks values={cost} showSign colorized />
         </div>
         <div>
           <SectionTitle>Cost Basis</SectionTitle>
@@ -77,16 +77,16 @@ export function TradeDetails({ trade }: TradeDetailsProps) {
         </div>
         <div>
           <SectionTitle>Fees</SectionTitle>
-          <AssetAmountBlocks values={fees} />
+          <AssetAmountBlocks values={fees} showSign colorized />
         </div>
         <div>
           <SectionTitle>Proceeds</SectionTitle>
-          <AssetAmountBlocks values={proceeds} />
+          <AssetAmountBlocks values={proceeds} showSign colorized />
         </div>
 
-        <div>
-          <SectionTitle>Realized proceeds</SectionTitle>
-        </div>
+        {/* <div>
+          <SectionTitle>Realized profit</SectionTitle>
+        </div> */}
 
         {/* TODO8 */}
         {/* {transactionIds && transactionIds.length > 0 && (

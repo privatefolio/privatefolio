@@ -295,7 +295,7 @@ export async function computeTrades(
       throw new Error(`Transaction with id ${txId} not found`)
     }
 
-    if (tx.outgoingAsset && tx.outgoing) {
+    if (tx.outgoingAsset && tx.outgoing && tx.incomingAsset === assetId) {
       // Add outgoing as cost if it's a different asset OR if it's the same asset in a deposit
       if (tx.outgoingAsset !== assetId || log.operation === "Deposit") {
         const assetPrice = priceMap[tx.outgoingAsset]?.value
@@ -310,7 +310,7 @@ export async function computeTrades(
       }
     }
 
-    if (tx.incomingAsset && tx.incoming) {
+    if (tx.incomingAsset && tx.incoming && tx.outgoingAsset === assetId) {
       // Add incoming as proceeds if it's a different asset OR if it's the same asset in a withdraw
       if (tx.incomingAsset !== assetId || log.operation === "Withdraw") {
         const assetPrice = priceMap[tx.incomingAsset]?.value

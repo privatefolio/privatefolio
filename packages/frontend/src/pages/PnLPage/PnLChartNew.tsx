@@ -2,7 +2,7 @@ import { useMediaQuery } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { debounce } from "lodash-es"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { ChartData } from "src/interfaces"
+import { ChartData, Trade } from "src/interfaces"
 import { DEFAULT_DEBOUNCE_DURATION } from "src/settings"
 import { $quoteCurrency } from "src/stores/account-settings-store"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
@@ -19,7 +19,7 @@ import {
 import { QueryChartData, SingleSeriesChart, TooltipOpts } from "../../components/SingleSeriesChart"
 import { $rpc } from "../../workers/remotes"
 
-export function PnLChart() {
+export function PnLChartNew({ trade }: { trade?: Trade }) {
   const activeAccount = useStore($activeAccount)
   // hack to  refresh the chart
   const [refresh, setRefresh] = useState(0)

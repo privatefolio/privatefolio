@@ -44,6 +44,7 @@ export function AssetAmountBlock(props: AssetAmountBlockProps) {
       significantDigits={formatting === "value" ? currency.maxDigits : undefined}
       placeholder={assetId && !price ? undefined : placeholder}
       {...rest}
+      showTicker={false}
     />
   )
 }

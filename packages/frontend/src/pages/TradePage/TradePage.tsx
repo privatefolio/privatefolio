@@ -19,7 +19,7 @@ import { SerifFont } from "../../theme"
 import FourZeroFourPage from "../404"
 import { AssetBalanceHistory } from "../AssetPage/AssetBalanceHistory"
 import { AuditLogTable } from "../AuditLogsPage/AuditLogTable"
-import { PnLChart } from "../PnLPage/PnLChart"
+import { PnLChartNew } from "../PnLPage/PnLChartNew"
 import { TradeActions } from "../TradesPage/TradeActions"
 import { TransactionTable } from "../TransactionsPage/TransactionTable"
 import { TradeDetails } from "./TradeDetails"
@@ -133,7 +133,7 @@ export default function TradePage() {
           <TradeActions />
         </Stack>
         {tab === "details" && <TradeDetails trade={trade} />}
-        {tab === "pnl" && <PnLChart trade={trade} />}
+        {tab === "pnl" && <PnLChartNew trade={trade} />}
         {tab === "exposure" && (
           <AssetBalanceHistory
             assetId={trade.assetId}
