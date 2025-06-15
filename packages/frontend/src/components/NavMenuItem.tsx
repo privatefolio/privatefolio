@@ -29,6 +29,9 @@ const getOverriddenPathname = (currentPath: string): string => {
   if (currentPath.includes("platform/") || currentPath === "platforms") {
     return "platforms"
   }
+  if (currentPath.includes("trade/")) {
+    return "trades"
+  }
   return currentPath
 }
 

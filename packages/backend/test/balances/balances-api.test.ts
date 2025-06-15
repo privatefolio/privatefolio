@@ -70,7 +70,7 @@ it.sequential("should compute historical balances", async () => {
     90,Processed 7 daily balances
     95,Setting networth cursor to Dec 31, 1969
     96,Filling balances to reach today
-    100,Saved 14 records to disk"
+    100,Saved 15 records to disk"
   `)
 })
 
@@ -106,7 +106,7 @@ it.sequential("should fetch historical balances", async () => {
   // act
   const balances = await getBalances(accountName)
   // assert
-  expect(balances.length).toMatchInlineSnapshot(`14`)
+  expect(balances.length).toMatchInlineSnapshot(`15`)
   expect(balances).toMatchSnapshot()
 })
 
@@ -129,6 +129,7 @@ it.sequential("should fetch latest balances with price data", async () => {
   // arrange
   await fetchDailyPrices(accountName, [
     {
+      coingeckoId: "bitcoin",
       id: "coinmama:BTC",
       priceApiId: "coinbase",
       symbol: "BTC",

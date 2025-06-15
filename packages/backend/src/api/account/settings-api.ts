@@ -7,7 +7,7 @@ export async function getSettings(accountName: string): Promise<Settings> {
   const settingsJson = await getValue<string>(accountName, SETTINGS_KEY, null)
   if (!settingsJson) {
     // Initialize with default settings
-    await setValue(SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS), accountName)
+    await setValue(accountName, SETTINGS_KEY, JSON.stringify(DEFAULT_SETTINGS))
     return DEFAULT_SETTINGS
   }
 
@@ -31,7 +31,7 @@ export async function updateSettings(
     ...settings,
   }
 
-  await setValue(SETTINGS_KEY, JSON.stringify(updatedSettings), accountName)
+  await setValue(accountName, SETTINGS_KEY, JSON.stringify(updatedSettings))
   return updatedSettings
 }
 

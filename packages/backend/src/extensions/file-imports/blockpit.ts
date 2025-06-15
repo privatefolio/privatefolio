@@ -55,7 +55,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
   let txns: Transaction[] = []
 
   if (type === "Swap") {
-    const price = incomingBN.div(outgoingBN).toString()
+    const price = outgoingBN.div(incomingBN).toString()
     if (fee) {
       logs = [
         {

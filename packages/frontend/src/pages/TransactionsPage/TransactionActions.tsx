@@ -1,11 +1,4 @@
-import {
-  CallMergeRounded,
-  DownloadRounded,
-  MoreHoriz,
-  Paid,
-  PaidOutlined,
-  RemoveCircle,
-} from "@mui/icons-material"
+import { CallMergeRounded, DownloadRounded, MoreHoriz, RemoveCircle } from "@mui/icons-material"
 import {
   IconButton,
   ListItemAvatar,
@@ -18,8 +11,8 @@ import {
 import { useStore } from "@nanostores/react"
 import { transformTransactionsToCsv } from "privatefolio-backend/build/src/utils/csv-export-utils"
 import React, { MutableRefObject } from "react"
+import { QuoteCurrencyToggle } from "src/components/QuoteCurrencyToggle"
 import { Transaction } from "src/interfaces"
-import { $showQuotedAmounts } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
 import { handleExportTransactionsRequest } from "src/utils/backup-utils"
 import { downloadCsv } from "src/utils/utils"
@@ -44,8 +37,6 @@ export function TransactionActions(props: TransactionActionsProps) {
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
 
-  const showQuotedAmounts = useStore($showQuotedAmounts)
-
   return (
     <Stack direction="row">
       {/* <Tooltip title="Add Transaction">
@@ -59,18 +50,7 @@ export function TransactionActions(props: TransactionActionsProps) {
           <Add fontSize="small" />
         </IconButton>
       </Tooltip> */}
-      <Tooltip
-        title={showQuotedAmounts ? "Show amounts in Base Asset" : "Show amounts in Quote Currency"}
-      >
-        <IconButton
-          color="secondary"
-          onClick={() => {
-            $showQuotedAmounts.set(!showQuotedAmounts)
-          }}
-        >
-          {showQuotedAmounts ? <Paid fontSize="small" /> : <PaidOutlined fontSize="small" />}
-        </IconButton>
-      </Tooltip>
+      <QuoteCurrencyToggle />
       <Tooltip title="Actions">
         <IconButton color="secondary" onClick={handleClick}>
           <MoreHoriz fontSize="small" />

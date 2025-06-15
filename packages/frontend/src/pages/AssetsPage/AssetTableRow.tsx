@@ -108,8 +108,6 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
                   amount={price?.value}
                   currencySymbol={currency.symbol}
                   currencyTicker={currency.id}
-                  significantDigits={currency.maxDigits}
-                  maxDigits={currency.maxDigits}
                 />
               )}
             </Stack>
@@ -124,9 +122,7 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
       <TableRow hover {...rest}>
         <TableCell variant="clickable">
           <AppLink to={`../asset/${encodeURI(assetId)}`}>
-            <Stack alignItems="center" direction="row" gap={1}>
-              <MyAssetBlock id={assetId} size="small" />
-            </Stack>
+            <MyAssetBlock id={assetId} size="small" />
           </AppLink>
         </TableCell>
         <TableCell>
@@ -149,8 +145,6 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
               amount={price?.value}
               currencySymbol={currency.symbol}
               currencyTicker={currency.id}
-              significantDigits={currency.maxDigits}
-              maxDigits={currency.maxDigits}
             />
           )}
         </TableCell>

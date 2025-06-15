@@ -30,9 +30,16 @@ describe("assets", () => {
     const asset = await getAsset(accountName, assetId)
     expect(asset).toMatchInlineSnapshot(`
       {
+        "coingeckoId": "wrapped-bitcoin",
         "id": "ethereum:0x0000000000000000000000000000000000000004:WBTC",
         "logoUrl": "https://example.com/logo.png",
+        "marketCapRank": 12,
         "name": "Wrapped Bitcoin",
+        "platforms": {
+          "ethereum": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+          "osmosis": "factory/osmo1z0qrq605sjgcqpylfl4aa6s90x738j7m58wyatt0tdzflg2ha26q67k743/wbtc",
+          "solana": "5XZw2LKTyrfvfiskJ78AMpackRjPcyCif1WhUsPDuVqQ",
+        },
         "symbol": "WBTC",
       }
     `)
@@ -70,7 +77,9 @@ describe("assets", () => {
         "coingeckoId": "ethereum",
         "id": "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "logoUrl": "logo.svg",
+        "marketCapRank": 2,
         "name": "Ether",
+        "platforms": {},
         "priceApiId": "coinbase",
         "symbol": "ETH",
       }
@@ -99,7 +108,9 @@ describe("assets", () => {
         "coingeckoId": "ethereum",
         "id": "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "logoUrl": "logo.svg",
+        "marketCapRank": 2,
         "name": "Ether",
+        "platforms": {},
         "priceApiId": "coinbase",
         "symbol": "ETH",
       }

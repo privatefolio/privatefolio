@@ -5,7 +5,6 @@ import { fetchDailyPrices } from "src/api/account/daily-prices-api"
 import { importFile } from "src/api/account/file-imports-api"
 import { computeNetworth, getNetworth } from "src/api/account/networth-api"
 import { ProgressUpdate } from "src/interfaces"
-import { GITHUB_CI } from "src/server-env"
 import { beforeAll, expect, it, vi } from "vitest"
 
 const accountName = Math.random().toString(36).substring(7)
@@ -45,17 +44,15 @@ beforeAll(async () => {
   await computeBalances(accountName, { until })
   await fetchDailyPrices(accountName, [
     {
+      coingeckoId: "bitcoin",
       id: "coinmama:BTC",
-      priceApiId: "binance",
+      priceApiId: "coinbase",
       symbol: "BTC",
     },
   ])
 })
 
-it.sequential("should compute historical networth", async (test) => {
-  if (GITHUB_CI) {
-    test.skip()
-  }
+it.sequential("should compute historical networth", async () => {
   // arrange
   // act
   const updates: ProgressUpdate[] = []
@@ -64,20 +61,17 @@ it.sequential("should compute historical networth", async (test) => {
   // assert
   expect(updates.join("\n")).toMatchInlineSnapshot(
     `
-    "5,Computing networth for 14 days
-    10,Computing networth starting Sep 01, 2017
-    95,Saving 14 records to the database
+    "5,Computing networth for 15 days
+    10,Computing networth starting Aug 31, 2017
+    95,Saving 15 records to the database
     99,Setting networth cursor to Sep 14, 2017"
   `
   )
-  expect(networthArray.length).toMatchInlineSnapshot(`14`)
+  expect(networthArray.length).toMatchInlineSnapshot(`15`)
   expect(networthArray).toMatchSnapshot()
 })
 
-it.sequential("should refresh networth", async (test) => {
-  if (GITHUB_CI) {
-    test.skip()
-  }
+it.sequential("should refresh networth", async () => {
   // arrange
   // act
   const updates: ProgressUpdate[] = []
@@ -90,6 +84,6 @@ it.sequential("should refresh networth", async (test) => {
     95,Saving 1 records to the database
     99,Setting networth cursor to Sep 14, 2017"
   `)
-  expect(networthArray.length).toMatchInlineSnapshot(`14`)
+  expect(networthArray.length).toMatchInlineSnapshot(`15`)
   expect(networthArray).toMatchSnapshot()
 })

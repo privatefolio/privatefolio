@@ -1,5 +1,5 @@
 import { SdCardRounded } from "@mui/icons-material"
-import { MenuItem, Select, SelectChangeEvent, Stack, useMediaQuery } from "@mui/material"
+import { MenuItem, Select, SelectChangeEvent, Stack, Tooltip, useMediaQuery } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { debounce } from "lodash-es"
 import { getLivePricesForAsset } from "privatefolio-backend/build/src/extensions/prices/providers"
@@ -7,7 +7,6 @@ import { allPriceApiIds } from "privatefolio-backend/src/settings/price-apis"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 import { PlatformAvatar } from "src/components/PlatformAvatar"
-import { SectionTitle } from "src/components/SectionTitle"
 import { MyAsset } from "src/interfaces"
 import { DEFAULT_DEBOUNCE_DURATION, PRICE_APIS_META, PriceApiId } from "src/settings"
 import { $quoteCurrency } from "src/stores/account-settings-store"
@@ -37,10 +36,13 @@ export function AssetPriceHistory(props: AssetPriceHistoryProps) {
   const [refresh, setRefresh] = useState(0)
   const connectionStatus = useStore($connectionStatus)
 
-  const handleChange = (event: SelectChangeEvent<string>) => {
-    searchParams.set("priceApiId", event.target.value)
-    setSearchParams(searchParams)
-  }
+  const handleChange = useCallback(
+    (event: SelectChangeEvent<string>) => {
+      searchParams.set("priceApiId", event.target.value)
+      setSearchParams(searchParams)
+    },
+    [searchParams, setSearchParams]
+  )
 
   useEffect(() => {
     if (!asset) return
@@ -101,29 +103,29 @@ export function AssetPriceHistory(props: AssetPriceHistoryProps) {
     [currency, debugMode, isMobile]
   )
 
-  if (!asset) return null
-
-  return (
-    <Stack gap={1}>
-      <SingleSeriesChart
-        queryFn={queryFn}
-        tooltipOptions={tooltipOptions}
-        chartOptions={chartOptions}
-      />
-      <Stack paddingX={1} alignItems="flex-start">
-        <SectionTitle>Price source</SectionTitle>
+  const extraSettings = useMemo(() => {
+    if (!asset) return null
+    return (
+      <Tooltip title="Price source" PopperProps={{ sx: { zIndex: 0 } }}>
         <Select
           size="small"
+          variant="filled"
+          disableUnderline
+          color="secondary"
           onChange={handleChange}
           value={priceApiId || (asset.priceApiId ? "" : defaultPriceApiId)}
           displayEmpty
           sx={{
             "& .MuiSelect-select": {
+              borderRadius: 0.5,
               paddingX: 1.5,
               paddingY: 0.5,
             },
-
-            borderRadius: 5,
+            "& input": {
+              borderRadius: 0.5,
+            },
+            background: "rgba(var(--mui-palette-common-onBackgroundChannel) / 0.05)",
+            borderRadius: 0.5,
             fontSize: "0.8125rem",
           }}
         >
@@ -148,7 +150,20 @@ export function AssetPriceHistory(props: AssetPriceHistoryProps) {
             </MenuItem>
           ))}
         </Select>
-      </Stack>
-    </Stack>
+      </Tooltip>
+    )
+  }, [asset, priceApiId, handleChange])
+
+  if (!asset) return null
+
+  return (
+    <>
+      <SingleSeriesChart
+        queryFn={queryFn}
+        tooltipOptions={tooltipOptions}
+        chartOptions={chartOptions}
+        extraSettings={extraSettings}
+      />
+    </>
   )
 }

@@ -3,6 +3,7 @@ import {
   CandlestickChartSharp,
   ControlCamera,
   StraightenSharp,
+  Timeline,
 } from "@mui/icons-material"
 import {
   alpha,
@@ -22,7 +23,11 @@ import {
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import {
+  AreaSeries,
+  BaselineSeries,
+  CandlestickSeries,
   DeepPartial,
+  HistogramSeries,
   IChartApi,
   ISeriesApi,
   MouseEventParams,
@@ -48,7 +53,13 @@ import {
   TooltipPrimitiveOptions,
 } from "../lightweight-charts/plugins/tooltip/tooltip"
 import { $favoriteIntervals, $preferredInterval, INTERVAL_LABEL_MAP } from "../stores/chart-store"
-import { candleStickOptions, extractTooltipColors, profitColor } from "../utils/chart-utils"
+import {
+  candleStickOptions,
+  extractTooltipColors,
+  lossColor,
+  neutralColor,
+  profitColor,
+} from "../utils/chart-utils"
 import { Chart, ChartProps } from "./Chart"
 import { CircularSpinner } from "./CircularSpinner"
 import { NoDataButton } from "./NoDataButton"
@@ -73,9 +84,10 @@ export type TooltipOpts = Partial<Omit<TooltipPrimitiveOptions, "priceExtractor"
 
 export type CursorMode = "move" | "inspect" | "measure"
 
-interface SingleSeriesChartProps extends Omit<Partial<ChartProps>, "chartRef"> {
+export interface SingleSeriesChartProps extends Omit<Partial<ChartProps>, "chartRef"> {
   allowedCursorModes?: CursorMode[]
   emptyContent?: ReactNode
+  extraSettings?: ReactNode
   /**
    * @default "Candlestick"
    */
@@ -101,6 +113,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
     emptyContent = <NoDataButton />,
     isStackedArea,
     onSeriesReady = noop,
+    extraSettings,
     ...rest
   } = props
 
@@ -172,24 +185,39 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
         seriesRef.current = customSeries
       } else {
         if (activeType === "Candlestick") {
-          seriesRef.current = chartRef.current.addCandlestickSeries({
+          seriesRef.current = chartRef.current.addSeries(CandlestickSeries, {
             ...candleStickOptions,
             priceLineVisible: false,
             ...seriesOptions,
           })
         } else if (activeType === "Histogram") {
-          seriesRef.current = chartRef.current.addHistogramSeries({
+          seriesRef.current = chartRef.current.addSeries(HistogramSeries, {
             color: alpha(profitColor, 0.5),
             priceLineVisible: false,
             ...seriesOptions,
           })
+        } else if (activeType === "Baseline") {
+          seriesRef.current = chartRef.current.addSeries(BaselineSeries, {
+            baseLineColor: neutralColor,
+            // baseValue: { price: 0, type: "price" },
+            bottomFillColor1: alpha(lossColor, 0),
+            bottomFillColor2: alpha(lossColor, 0.5),
+            bottomLineColor: lossColor,
+            lineWidth: 1,
+            priceLineVisible: false,
+            topFillColor1: alpha(profitColor, 1),
+            topFillColor2: alpha(profitColor, 0),
+            topLineColor: profitColor,
+            ...seriesOptions,
+          })
         } else {
-          seriesRef.current = chartRef.current.addAreaSeries({
+          seriesRef.current = chartRef.current.addSeries(AreaSeries, {
             bottomColor: alpha(profitColor, 0),
             lineColor: profitColor,
             // lineType: 2,
-            lineWidth: 2,
+            lineWidth: 1,
             priceLineVisible: false,
+            topColor: alpha(profitColor, 1),
             ...seriesOptions,
           })
         }
@@ -415,13 +443,13 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
             borderBottom: "1px solid var(--mui-palette-TableCell-border)",
             marginLeft: -0.5,
             minHeight: 43,
-            ...(isLoading || isEmpty || error
-              ? {
-                  borderColor: "transparent",
-                  opacity: 0,
-                  pointerEvents: "none",
-                }
-              : {}),
+            // ...(isLoading || isEmpty || error
+            //   ? {
+            //       borderColor: "transparent",
+            //       opacity: 0,
+            //       pointerEvents: "none",
+            //     }
+            //   : {}),
           }}
           alignItems="center"
           justifyContent="space-between"
@@ -554,6 +582,18 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
                   </ChartIconButton>
                 </span>
               </Tooltip>
+              <Tooltip title="Switch to Baseline type">
+                <span>
+                  <ChartIconButton
+                    active={activeType === "Baseline"}
+                    onClick={() => setPreferredType("Baseline")}
+                    aria-label="Switch to Baseline type"
+                    disabled={isStackedArea}
+                  >
+                    <Timeline fontSize="inherit" />
+                  </ChartIconButton>
+                </span>
+              </Tooltip>
               <Tooltip title="Switch to Area type">
                 <span>
                   <ChartIconButton
@@ -593,18 +633,23 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
               </Tooltip>
             </Stack>
           </Stack>
-          <Stack direction="row">
-            {/* <IconButton size="small" onClick={toggleFullscreen} color="secondary">
-                    {fullscreen ? (
-                      <FullscreenExit fontSize="inherit" />
-                    ) : (
-                      <Fullscreen fontSize="inherit" />
-                    )}
-                  </IconButton>
-                  <IconButton size="small" color="secondary">
-                    <MoreHoriz fontSize="inherit" />
-                  </IconButton> */}
-          </Stack>
+          {extraSettings}
+          {/* <Stack direction="row">
+            <IconButton
+              size="small"
+              // onClick={toggleFullscreen}
+              color="secondary"
+            >
+              {fullscreen ? (
+                <FullscreenExit fontSize="inherit" />
+              ) : (
+                <Fullscreen fontSize="inherit" />
+              )}
+            </IconButton>
+            <IconButton size="small" color="secondary">
+              <MoreHoriz fontSize="inherit" />
+            </IconButton>
+          </Stack> */}
         </Stack>
         <Box sx={{ height: "calc(100% - 43px - 4px)" }}>
           {(isLoading || isEmpty || error) && (
@@ -670,15 +715,17 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
             )}
           </div>
           <div>
-            <Button
-              color={logScale ? "accent" : "secondary"}
-              size="small"
-              variant="text"
-              onClick={toggleLogScale}
-              sx={{ borderRadius: 0.5, paddingX: 1 }}
-            >
-              Log
-            </Button>
+            <Tooltip title={logScale ? "Switch to linear scale" : "Switch to log scale"}>
+              <Button
+                color={logScale ? "accent" : "secondary"}
+                size="small"
+                variant="text"
+                onClick={toggleLogScale}
+                sx={{ borderRadius: 0.5, paddingX: 1 }}
+              >
+                Log
+              </Button>
+            </Tooltip>
           </div>
         </Stack>
       </Paper>

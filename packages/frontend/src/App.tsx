@@ -26,6 +26,7 @@ import ImportDataPage from "./pages/ImportDataPage/ImportDataPage"
 import PlatformPage from "./pages/PlatformPage/PlatformPage"
 import PlatformsPage from "./pages/PlatformsPage/PlatformsPage"
 import ServerPage from "./pages/ServerPage/ServerPage"
+import TradePage from "./pages/TradePage/TradePage"
 import TradesPage from "./pages/TradesPage/TradesPage"
 import TransactionsPage from "./pages/TransactionsPage/TransactionsPage"
 import { SHORT_THROTTLE_DURATION } from "./settings"
@@ -242,6 +243,7 @@ export default function App() {
               <Route path="/:accountType/:accountIndex" element={<AccountRouteGuard />}>
                 <Route index element={<HomePage />} />
                 <Route path="trades" element={<TradesPage show />} />
+                <Route path="trade/:tradeId" element={<TradePage />} />
                 <Route path="assets" element={<AssetsPage show />} />
                 <Route path="asset/:assetId" element={<AssetPage />} />
                 <Route path="transactions" element={<TransactionsPage show />} />

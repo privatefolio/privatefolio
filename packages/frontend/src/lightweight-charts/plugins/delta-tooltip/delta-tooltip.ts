@@ -5,8 +5,8 @@ import {
   CandlestickData,
   ColorType,
   CrosshairMode,
+  IPrimitivePaneView,
   ISeriesPrimitive,
-  ISeriesPrimitivePaneView,
   LineData,
   LineStyleOptions,
   SeriesAttachedParameter,
@@ -81,7 +81,7 @@ export class DeltaTooltipPrimitive implements ISeriesPrimitive<Time> {
   private _options: DeltaTooltipPrimitiveOptions
   _crosshairPaneView: MultiTouchCrosshairPaneView
   _deltaTooltipPaneView: DeltaTooltipPaneView
-  _paneViews: ISeriesPrimitivePaneView[]
+  _paneViews: IPrimitivePaneView[]
   _crosshairData: TooltipCrosshairLineData[] = []
   _tooltipData: Partial<DeltaTooltipData>
   _attachedParams: SeriesAttachedParameter<Time> | undefined

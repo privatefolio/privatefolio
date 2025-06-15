@@ -41,7 +41,7 @@ export function AddressBookTableRow(props: TableRowComponentProps<LabeledAddress
                 const newWalletLabels = Object.assign({}, walletLabels)
                 delete newWalletLabels[wallet]
 
-                rpc.setValue("wallet_labels", JSON.stringify(newWalletLabels), activeAccount)
+                rpc.setValue(activeAccount, "wallet_labels", JSON.stringify(newWalletLabels))
                 $addressBook.set(newWalletLabels)
               }}
             >

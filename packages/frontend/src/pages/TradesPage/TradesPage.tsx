@@ -1,32 +1,35 @@
-import { Button } from "@mui/material"
-import { useStore } from "@nanostores/react"
-import React, { useCallback } from "react"
+import { Stack } from "@mui/material"
+import React, { useEffect } from "react"
+import { useSearchParams } from "react-router-dom"
+import { NavTab } from "src/components/NavTab"
 import { StaggeredList } from "src/components/StaggeredList"
-import { Subheading } from "src/components/Subheading"
+import { Tabs } from "src/components/Tabs"
 import { $activeAccount } from "src/stores/account-store"
-import { $rpc } from "src/workers/remotes"
 
+import { TradeActions } from "./TradeActions"
 import { TradeTable } from "./TradeTable"
 
 export default function TradesPage({ show }: { show: boolean }) {
-  const accountName = useStore($activeAccount)
-  const rpc = useStore($rpc)
+  const [searchParams] = useSearchParams()
+  const tab = searchParams.get("tab") || "open"
 
-  const handleComputeTrades = useCallback(() => {
-    rpc.enqueueComputeTrades(accountName)
-  }, [accountName, rpc])
+  useEffect(() => {
+    document.title = `Trades - ${$activeAccount.get()} - Privatefolio`
+  }, [])
 
   return (
     <StaggeredList component="main" gap={2} show={show}>
-      <div>
-        <Subheading>
-          <span>Trades</span>
-          <Button variant="outlined" size="small" onClick={handleComputeTrades}>
-            Compute Trades
-          </Button>
-        </Subheading>
-        <TradeTable />
-      </div>
+      <Stack>
+        <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
+          <Tabs value={tab} defaultValue={tab} largeSize>
+            <NavTab value="open" to="?tab=open" label="Trades" />
+            <NavTab value="closed" to="?tab=closed" label="History" />
+          </Tabs>
+          <TradeActions />
+        </Stack>
+        {tab === "open" && <TradeTable tradeStatus="open" />}
+        {tab === "closed" && <TradeTable tradeStatus="closed" />}
+      </Stack>
     </StaggeredList>
   )
 }

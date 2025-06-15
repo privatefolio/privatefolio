@@ -40,12 +40,12 @@ export function PnLChart() {
   const queryFn: QueryChartData = useCallback(
     async (interval) => {
       const _refresh = refresh // reference the dependency for eslint(react-hooks/exhaustive-deps)
-      const balances = await rpc.getNetworth(activeAccount)
+      const values = await rpc.getNetworth(activeAccount)
 
-      const data = balances.map((balance) => ({
-        color: balance.change === 0 ? neutralColor : balance.change > 0 ? profitColor : lossColor,
-        time: balance.time,
-        value: balance.change,
+      const data = values.map((value) => ({
+        color: value.change === 0 ? neutralColor : value.change > 0 ? profitColor : lossColor,
+        time: value.time,
+        value: value.change,
       }))
 
       let result: ChartData[]

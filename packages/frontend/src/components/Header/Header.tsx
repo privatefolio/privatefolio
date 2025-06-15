@@ -1,10 +1,8 @@
 "use client"
 
-import { Settings } from "@mui/icons-material"
-import { AppBar, Container, IconButton, Stack, Toolbar, Tooltip, useTheme } from "@mui/material"
+import { AppBar, Container, Stack, Toolbar, useTheme } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect } from "react"
-import { useBoolean } from "src/hooks/useBoolean"
 import { $activeAccount } from "src/stores/account-store"
 import { setElectronMode, stickyHeader } from "src/utils/electron-utils"
 
@@ -12,11 +10,9 @@ import { CurrencySelector } from "../CurrencySelector"
 import { SearchBar } from "../SearchBar/SearchBar"
 import { TaskDropdown } from "../Tasks/TaskDropdown"
 import { NavigationMenu } from "./NavigationMenu"
-import { SettingsDrawer } from "./SettingsDrawer"
+import { SettingsButton } from "./SettingsButton"
 
 export function Header() {
-  const { value: openSettings, toggle: toggleSettingsOpen } = useBoolean(false)
-
   const theme = useTheme()
   useEffect(() => {
     setElectronMode?.(theme.palette.mode)
@@ -58,23 +54,7 @@ export function Header() {
             >
               <TaskDropdown />
               <CurrencySelector />
-              <Tooltip title="Device Settings">
-                <IconButton
-                  onClick={toggleSettingsOpen}
-                  color="secondary"
-                  aria-label="Open Settings"
-                >
-                  <Settings
-                    sx={{
-                      "button:hover &": {
-                        transform: "rotate(-30deg)",
-                      },
-                      transition: "transform 0.33s",
-                    }}
-                  />
-                </IconButton>
-              </Tooltip>
-              <SettingsDrawer open={openSettings} toggleOpen={toggleSettingsOpen} />
+              <SettingsButton />
             </Stack>
           </Stack>
         </Container>

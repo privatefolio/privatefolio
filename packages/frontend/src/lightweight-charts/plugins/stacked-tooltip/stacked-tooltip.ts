@@ -3,12 +3,12 @@ import { alpha } from "@mui/material"
 import { CanvasRenderingTarget2D } from "fancy-canvas"
 import {
   CrosshairMode,
+  IPrimitivePaneRenderer,
+  IPrimitivePaneView,
   ISeriesPrimitive,
-  ISeriesPrimitivePaneRenderer,
-  ISeriesPrimitivePaneView,
   MouseEventParams,
+  PrimitivePaneViewZOrder,
   SeriesAttachedParameter,
-  SeriesPrimitivePaneViewZOrder,
   Time,
 } from "lightweight-charts"
 import { throttle } from "lodash-es"
@@ -21,7 +21,7 @@ import { convertTime, formattedDateAndTime } from "../../helpers/time"
 import { StackedAreaData } from "../stacked-area-series/data"
 import { TooltipElement, TooltipOptions } from "./stacked-tooltip-element"
 
-class TooltipCrosshairLinePaneRenderer implements ISeriesPrimitivePaneRenderer {
+class TooltipCrosshairLinePaneRenderer implements IPrimitivePaneRenderer {
   _data: TooltipCrosshairLineData
 
   constructor(data: TooltipCrosshairLineData) {
@@ -44,7 +44,7 @@ class TooltipCrosshairLinePaneRenderer implements ISeriesPrimitivePaneRenderer {
   }
 }
 
-class MultiTouchCrosshairPaneView implements ISeriesPrimitivePaneView {
+class MultiTouchCrosshairPaneView implements IPrimitivePaneView {
   _data: TooltipCrosshairLineData
   constructor(data: TooltipCrosshairLineData) {
     this._data = data
@@ -54,11 +54,11 @@ class MultiTouchCrosshairPaneView implements ISeriesPrimitivePaneView {
     this._data = data
   }
 
-  renderer(): ISeriesPrimitivePaneRenderer | null {
+  renderer(): IPrimitivePaneRenderer | null {
     return new TooltipCrosshairLinePaneRenderer(this._data)
   }
 
-  zOrder(): SeriesPrimitivePaneViewZOrder {
+  zOrder(): PrimitivePaneViewZOrder {
     return "bottom"
   }
 }

@@ -78,17 +78,11 @@ export function TagsTable() {
         <Stack gap={2} sx={{ minWidth: 464 }}>
           <div>
             <SectionTitle>Tag name</SectionTitle>
-            <TextField
-              autoFocus
-              variant="outlined"
-              fullWidth
-              size="small"
-              required
-              name="tagName"
-            />
+            <TextField variant="outlined" fullWidth size="small" required name="tagName" />
           </div>
         </Stack>
       ),
+      focusInput: "tagName",
       title: "Add new tag",
     })
 

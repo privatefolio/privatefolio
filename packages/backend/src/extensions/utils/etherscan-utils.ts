@@ -1,3 +1,4 @@
+import Big from "big.js"
 import spamTokens from "src/config/spam-tokens.json"
 import { EtherscanTransaction, Transaction } from "src/interfaces"
 
@@ -96,6 +97,7 @@ export function mergeTransactions(transactions: EtherscanTransaction[]) {
 
       if (tx.incomingAsset && tx.outgoingAsset) {
         tx.type = "Swap"
+        tx.price = Big(tx.outgoing).div(tx.incoming).toString()
       }
 
       merged.push(tx)
