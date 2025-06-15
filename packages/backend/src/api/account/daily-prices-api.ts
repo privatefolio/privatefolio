@@ -17,7 +17,7 @@ import { PRICE_API_PAGINATION, PRICE_APIS_META } from "src/settings/settings"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { formatDate } from "src/utils/formatting-utils"
 import { createSubscription } from "src/utils/sub-utils"
-import { isTestEnvironment, noop } from "src/utils/utils"
+import { noop } from "src/utils/utils"
 
 import { getAccount } from "../accounts-api"
 import { getMyAssets, patchAsset } from "./assets-api"
@@ -186,7 +186,7 @@ export async function fetchDailyPrices(
     promises.push(async () => {
       const asset = assets[i - 1]
 
-      if (!asset.coingeckoId && !isTestEnvironment) {
+      if (!asset.coingeckoId) {
         await progress([undefined, `Skipped ${getAssetTicker(asset.id)}: No coingeckoId`])
         return
       }

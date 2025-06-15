@@ -11,7 +11,6 @@ import {
 import { CACHE_LOCATION } from "src/settings/settings"
 import { getAssetContract, getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
-import { isTestEnvironment } from "src/utils/environment-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 
@@ -59,7 +58,7 @@ export async function getMyAssets(
       let cachedAsset = cachedAssets.find((asset) => asset.id === result.id)
       if (!cachedAsset) {
         cachedAsset = cachedAssets.find(
-          (asset) => getAssetTicker(asset.symbol) === getAssetTicker(result.symbol)
+          (asset) => getAssetTicker(asset.id) === getAssetTicker(result.id)
         )
       }
       return { ...cachedAsset, ...result }
@@ -72,7 +71,7 @@ export async function getMyAssets(
 const assets: Asset[] = []
 
 export async function getAssets(): Promise<Asset[]> {
-  if (assets.length > 0 || isTestEnvironment) {
+  if (assets.length > 0) {
     return assets
   }
 

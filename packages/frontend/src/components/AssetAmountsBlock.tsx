@@ -2,18 +2,23 @@ import { UnfoldLess, UnfoldMore } from "@mui/icons-material"
 import { Chip, Stack } from "@mui/material"
 import Big from "big.js"
 import React, { useMemo, useState } from "react"
+import { Timestamp } from "src/interfaces"
 
 import { AmountBlock } from "./AmountBlock"
 import { AssetAmountBlock, AssetAmountBlockProps } from "./AssetAmountBlock"
 
-export type AssetAmountBlockValue = [string, string, string] | [string, string, string, string]
+export type AggregatableValue =
+  | [string, string, string, string, Timestamp]
+  | [string, string, string, string, string, Timestamp]
 
-type AssetAmountBlocksProps = {
+type AggregatedValue = [string, string, string]
+
+type AssetAmountsBlockProps = {
   aggregation?: "sum" | "average"
-  values: AssetAmountBlockValue[]
+  values: AggregatableValue[]
 } & AssetAmountBlockProps
 
-export function AssetAmountBlocks(props: AssetAmountBlocksProps) {
+export function AssetAmountsBlock(props: AssetAmountsBlockProps) {
   const { values, aggregation = "sum", ...rest } = props
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -40,11 +45,11 @@ export function AssetAmountBlocks(props: AssetAmountBlocksProps) {
 
       return Object.entries(grouped).map(
         ([assetId, { totalAmount, totalUsdValue, count }]) =>
-          [assetId, totalAmount.div(count).toString(), totalUsdValue.div(count).toString()] as [
-            string,
-            string,
-            string,
-          ]
+          [
+            assetId,
+            totalAmount.div(count).toString(),
+            totalUsdValue.div(count).toString(),
+          ] as AggregatedValue
       )
     }
 
@@ -65,11 +70,11 @@ export function AssetAmountBlocks(props: AssetAmountBlocksProps) {
 
     return Object.entries(aggregated).map(
       ([assetId, { amount, usdValue }]) =>
-        [assetId, amount.toString(), usdValue.toString()] as [string, string, string]
+        [assetId, amount.toString(), usdValue.toString()] as AggregatedValue
     )
   }, [values, aggregation])
 
-  const displayValues = isExpanded ? values : aggregatedValues
+  const displayValues: Array<AggregatedValue | AggregatableValue> = isExpanded ? values : aggregatedValues
 
   return (
     <Stack direction="row" gap={0.5} flexWrap="wrap" alignItems="center">

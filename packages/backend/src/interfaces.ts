@@ -226,12 +226,12 @@ export interface Trade {
   auditLogIds?: string[]
   balance: number
   closedAt?: Timestamp
-  cost: [string, string, string, string][] // Array of [assetId, amount, usdValue, exposure] pairs
+  cost: [string, string, string, string, string, Timestamp][] // Array of [assetId, amount, usdValue, exposure, txId, timestamp] pairs
   createdAt: Timestamp
   duration?: number
-  fees: [string, string, string][] // Array of [assetId, amount, usdValue] pairs
+  fees: [string, string, string, string, Timestamp][] // Array of [assetId, amount, usdValue, txId, timestamp] pairs
   id: string
-  proceeds: [string, string, string][] // Array of [assetId, amount, usdValue] pairs
+  proceeds: [string, string, string, string, Timestamp][] // Array of [assetId, amount, usdValue, txId, timestamp] pairs
   tags?: number[]
   tradeNumber: number
   tradeStatus: "open" | "closed"
@@ -838,4 +838,27 @@ export type PlatformMeta = {
   }
   chainId?: number
   nativeAssetId?: string
+}
+
+export interface TradePnL {
+  cost: number
+  fees: number
+  id: string
+  /**
+   * Formula: positionValue - cost + proceeds - fees
+   */
+  pnl: number
+  positionValue: number
+  proceeds: number
+  timestamp: number
+  tradeId: string
+}
+
+export interface AccountPnL {
+  cost: number
+  fees: number
+  pnl: number
+  positionValue: number
+  proceeds: number
+  timestamp: number
 }

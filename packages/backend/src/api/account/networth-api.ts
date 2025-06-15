@@ -100,7 +100,7 @@ export async function computeNetworth(
 
     const priceMap = await getAssetPriceMap(accountName, timestamp as Timestamp)
 
-    const totalValue = Object.keys(priceMap).reduce((acc, symbol) => {
+    let totalValue = Object.keys(priceMap).reduce((acc, symbol) => {
       const price = priceMap[symbol]
       const balance = balanceMap[symbol]
 
@@ -108,6 +108,9 @@ export async function computeNetworth(
 
       return acc + Math.round(price.value * Number(balance) * 100) / 100
     }, 0)
+
+    // ensure only 2 decimal places
+    totalValue = Math.round(totalValue * 100) / 100
 
     const networth: Networth = {
       change: 0,

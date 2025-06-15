@@ -2,7 +2,7 @@ import { useMediaQuery } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { debounce } from "lodash-es"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { ChartData, Trade } from "src/interfaces"
+import { ChartData, Time, Trade } from "src/interfaces"
 import { DEFAULT_DEBOUNCE_DURATION } from "src/settings"
 import { $quoteCurrency } from "src/stores/account-settings-store"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
@@ -21,13 +21,12 @@ import { $rpc } from "../../workers/remotes"
 
 export function PnLChartNew({ trade }: { trade?: Trade }) {
   const activeAccount = useStore($activeAccount)
-  // hack to  refresh the chart
   const [refresh, setRefresh] = useState(0)
   const connectionStatus = useStore($connectionStatus)
   const rpc = useStore($rpc)
 
   useEffect(() => {
-    const subscription = rpc.subscribeToNetworth(
+    const subscription = rpc.subscribeToTrades(
       activeAccount,
       debounce(() => {
         setRefresh(Math.random())
@@ -40,28 +39,38 @@ export function PnLChartNew({ trade }: { trade?: Trade }) {
   const queryFn: QueryChartData = useCallback(
     async (interval) => {
       const _refresh = refresh // reference the dependency for eslint(react-hooks/exhaustive-deps)
-      const values = await rpc.getNetworth(activeAccount)
+      let values: ChartData[]
 
-      const data = values.map((value) => ({
-        color: value.change === 0 ? neutralColor : value.change > 0 ? profitColor : lossColor,
-        time: value.time,
-        value: value.change,
-      }))
+      if (trade) {
+        const pnlData = await rpc.getTradePnL(activeAccount, trade.id)
+        values = pnlData.map((pnl) => ({
+          color: pnl.pnl === 0 ? neutralColor : pnl.pnl > 0 ? profitColor : lossColor,
+          time: (pnl.timestamp / 1000) as Time,
+          value: pnl.pnl,
+        }))
+      } else {
+        const pnlData = await rpc.getAccountPnL(activeAccount)
+        values = pnlData.map((pnl) => ({
+          color: pnl.pnl === 0 ? neutralColor : pnl.pnl > 0 ? profitColor : lossColor,
+          time: (pnl.timestamp / 1000) as Time,
+          value: pnl.pnl,
+        }))
+      }
 
       let result: ChartData[]
 
       if (interval === "1w") {
-        result = aggregateByWeek(data).map((x) => ({
+        result = aggregateByWeek(values).map((x) => ({
           ...x,
           color: x.value === 0 ? neutralColor : x.value > 0 ? profitColor : lossColor,
         }))
       } else {
-        result = data
+        result = values
       }
 
       return result
     },
-    [activeAccount, refresh, rpc]
+    [activeAccount, refresh, rpc, trade]
   )
 
   const currency = useStore($quoteCurrency)
@@ -97,7 +106,7 @@ export function PnLChartNew({ trade }: { trade?: Trade }) {
       queryFn={queryFn}
       tooltipOptions={tooltipOptions}
       chartOptions={chartOptions}
-      initType="Histogram"
+      initType="Baseline"
       allowedCursorModes={["move"]}
     />
   )

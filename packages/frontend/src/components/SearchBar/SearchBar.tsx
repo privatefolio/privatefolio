@@ -3,6 +3,7 @@ import {
   AttachMoneyRounded,
   BackupRounded,
   CallMergeRounded,
+  CandlestickChart,
   DeleteForever,
   DownloadRounded,
   RestoreRounded,
@@ -278,6 +279,17 @@ export const SearchBar = () => {
         priority: 1,
         section: { name: "Actions", priority: 10 },
         shortcut: ["$mod+a"],
+      },
+      {
+        icon: <CandlestickChart fontSize="small" />,
+        id: "action-refresh-trades",
+        name: "Refresh trades",
+        perform: () => {
+          rpc.enqueueComputeTrades(activeAccount, "user")
+        },
+        priority: 1,
+        section: { name: "Actions", priority: 10 },
+        shortcut: ["$mod+x"],
       },
       // {
       //   icon: <AttachMoneyRounded fontSize="small" />,

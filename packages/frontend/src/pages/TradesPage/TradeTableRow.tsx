@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AppLink } from "src/components/AppLink"
 import { AssetAmountBlock } from "src/components/AssetAmountBlock"
-import { AssetAmountBlocks } from "src/components/AssetAmountBlocks"
+import { AssetAmountsBlock } from "src/components/AssetAmountsBlock"
 import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { ChartData, Trade } from "src/interfaces"
@@ -151,13 +151,13 @@ export function TradeTableRow({
         </TableCell>
 
         <TableCell>
-          <AssetAmountBlocks values={cost} showSign colorized />
+          <AssetAmountsBlock values={cost} showSign colorized />
         </TableCell>
         <TableCell>
-          <AssetAmountBlocks values={fees} showSign colorized />
+          <AssetAmountsBlock values={fees} showSign colorized />
         </TableCell>
         <TableCell>
-          <AssetAmountBlocks values={proceeds} />
+          <AssetAmountsBlock values={proceeds} />
         </TableCell>
         <TableCell>
           <TimestampBlock timestamp={createdAt} relative={relativeTime} />

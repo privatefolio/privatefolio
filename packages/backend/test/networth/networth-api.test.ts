@@ -45,6 +45,7 @@ beforeAll(async () => {
   await computeBalances(accountName, { until })
   await fetchDailyPrices(accountName, [
     {
+      coingeckoId: "bitcoin",
       id: "coinmama:BTC",
       priceApiId: "binance",
       symbol: "BTC",

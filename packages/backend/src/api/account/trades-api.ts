@@ -1,17 +1,22 @@
 import Big from "big.js"
 import {
+  AccountPnL,
   AuditLog,
   EventCause,
   MyAsset,
   ProgressCallback,
   SqlParam,
   SubscriptionChannel,
+  TaskPriority,
+  TaskTrigger,
   Trade,
   TRADE_TYPES,
+  TradePnL,
   TradeStatus,
   TradeType,
 } from "src/interfaces"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { ONE_DAY } from "src/utils/formatting-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { hashString, isTestEnvironment, noop } from "src/utils/utils"
@@ -19,12 +24,12 @@ import { hashString, isTestEnvironment, noop } from "src/utils/utils"
 import { getAccount } from "../accounts-api"
 import { getMyAssets } from "./assets-api"
 import { getAuditLogs } from "./audit-logs-api"
-import { getAssetPriceMap } from "./daily-prices-api"
+import { getAssetPriceMap, getPricesForAsset } from "./daily-prices-api"
 import { getValue, setValue } from "./kv-api"
 import { enqueueTask } from "./server-tasks-api"
 import { getTransaction } from "./transactions-api"
 
-const SCHEMA_VERSION = 12
+const SCHEMA_VERSION = 14
 
 async function getAccountWithTrades(accountName: string) {
   const schemaVersion = await getValue(accountName, `trade_schema_version`, 0)
@@ -35,6 +40,7 @@ async function getAccountWithTrades(accountName: string) {
     await account.execute(sql`DROP TABLE IF EXISTS trade_audit_logs`)
     await account.execute(sql`DROP TABLE IF EXISTS trade_transactions`)
     await account.execute(sql`DROP TABLE IF EXISTS trade_tags`)
+    await account.execute(sql`DROP TABLE IF EXISTS trade_pnl`)
     await account.execute(sql`DROP TABLE IF EXISTS trades`)
 
     await account.execute(sql`
@@ -83,6 +89,20 @@ async function getAccountWithTrades(accountName: string) {
         PRIMARY KEY (trade_id, tag_id),
         FOREIGN KEY (trade_id) REFERENCES trades(id),
         FOREIGN KEY (tag_id) REFERENCES tags(id)
+      );
+    `)
+
+    await account.execute(sql`
+      CREATE TABLE trade_pnl (
+        id VARCHAR PRIMARY KEY,
+        trade_id VARCHAR NOT NULL,
+        timestamp INTEGER NOT NULL,
+        positionValue FLOAT NOT NULL,
+        cost FLOAT NOT NULL,
+        proceeds FLOAT NOT NULL,
+        fees FLOAT NOT NULL,
+        pnl FLOAT NOT NULL,
+        FOREIGN KEY (trade_id) REFERENCES trades(id)
       );
     `)
 
@@ -239,6 +259,7 @@ export async function computeTrades(
 
   await account.execute("DELETE FROM trade_audit_logs")
   await account.execute("DELETE FROM trade_transactions")
+  await account.execute("DELETE FROM trade_pnl")
   await account.execute("DELETE FROM trades")
 
   await progress([0, "Fetching audit logs"])
@@ -260,19 +281,25 @@ export async function computeTrades(
     return acc
   }, {})
 
-  const assetGroups: Record<string, AuditLog[]> = {}
+  const allAssetGroups: Record<string, AuditLog[]> = {}
 
   auditLogs.forEach((log) => {
     const key = log.assetId
-    if (!isTestEnvironment && (!assetsMap[key] || !assetsMap[key].coingeckoId)) {
-      console.log(`Skipped ${key}: No coingeckoId`)
-      return
+    if (!allAssetGroups[key]) {
+      allAssetGroups[key] = []
     }
-    if (!assetGroups[key]) {
-      assetGroups[key] = []
-    }
-    assetGroups[key].push(log)
+    allAssetGroups[key].push(log)
   })
+
+  const assetGroups: Record<string, AuditLog[]> = {}
+
+  for (const [key, logs] of Object.entries(allAssetGroups)) {
+    if (!assetsMap[key] || !assetsMap[key].coingeckoId) {
+      await progress([undefined, `Skipped ${key}: No coingeckoId`])
+    } else {
+      assetGroups[key] = logs
+    }
+  }
 
   await progress([20, `Found ${Object.keys(assetGroups).length} asset groups`])
 
@@ -306,6 +333,8 @@ export async function computeTrades(
           `-${tx.outgoing}`,
           assetPrice ? Big(assetPrice).mul(`-${tx.outgoing}`).toString() : "0",
           log.change,
+          txId,
+          tx.timestamp,
         ])
       }
     }
@@ -320,11 +349,13 @@ export async function computeTrades(
           tx.incomingAsset,
           tx.incoming,
           assetPrice ? Big(assetPrice).mul(tx.incoming).toString() : "0",
+          txId,
+          tx.timestamp,
         ])
       }
     }
 
-    if (tx.feeAsset && tx.fee) {
+    if (tx.feeAsset && tx.fee && tx.feeAsset === assetId) {
       const assetPrice = priceMap[tx.feeAsset]?.value
       if (!assetPrice && !isTestEnvironment)
         throw new Error(`Price not found for asset ${tx.feeAsset}`)
@@ -332,6 +363,8 @@ export async function computeTrades(
         tx.feeAsset,
         tx.fee,
         assetPrice ? Big(assetPrice).mul(tx.fee).toString() : "0",
+        txId,
+        tx.timestamp,
       ])
     }
 
@@ -472,10 +505,11 @@ export async function computeTrades(
     }
   }
 
-  await progress([100, "Trades computation completed"])
+  await progress([80, "Trades computation completed"])
+  await computePnl(accountName, progress, trades)
 }
 
-export function enqueueComputeTrades(accountName: string) {
+export function enqueueComputeTrades(accountName: string, trigger: TaskTrigger) {
   return enqueueTask(accountName, {
     description: "Computing trades from audit logs.",
     determinate: true,
@@ -483,8 +517,8 @@ export function enqueueComputeTrades(accountName: string) {
       await computeTrades(accountName, progress)
     },
     name: "Compute trades",
-    priority: 3, // Medium priority
-    trigger: "user",
+    priority: TaskPriority.Medium,
+    trigger,
   })
 }
 
@@ -515,4 +549,168 @@ export async function getTradeTransactions(
   } catch (error) {
     throw new Error(`Failed to get transactions for trade: ${error}`)
   }
+}
+
+export async function getTradePnL(accountName: string, tradeId: string): Promise<TradePnL[]> {
+  const account = await getAccountWithTrades(accountName)
+  try {
+    const result = await account.execute(
+      "SELECT * FROM trade_pnl WHERE trade_id = ? ORDER BY timestamp ASC",
+      [tradeId]
+    )
+    /* eslint-disable sort-keys-fix/sort-keys-fix */
+    return result.map((row) => ({
+      id: row[0] as string,
+      tradeId: row[1] as string,
+      timestamp: row[2] as number,
+      positionValue: row[3] as number,
+      cost: row[4] as number,
+      proceeds: row[5] as number,
+      fees: row[6] as number,
+      pnl: row[7] as number,
+    }))
+    /* eslint-enable */
+  } catch (error) {
+    throw new Error(`Failed to get pnl for trade: ${error}`)
+  }
+}
+
+export async function getAccountPnL(
+  accountName: string,
+  start?: number,
+  end?: number
+): Promise<AccountPnL[]> {
+  const account = await getAccountWithTrades(accountName)
+  try {
+    let query = `
+      SELECT 
+        timestamp,
+        SUM(positionValue) as positionValue,
+        SUM(cost) as cost,
+        SUM(proceeds) as proceeds,
+        SUM(fees) as fees,
+        SUM(pnl) as pnl
+      FROM trade_pnl
+    `
+    const params: SqlParam[] = []
+
+    if (start && end) {
+      query += " WHERE timestamp >= ? AND timestamp <= ?"
+      params.push(start, end)
+    } else if (start) {
+      query += " WHERE timestamp >= ?"
+      params.push(start)
+    } else if (end) {
+      query += " WHERE timestamp <= ?"
+      params.push(end)
+    }
+
+    query += " GROUP BY timestamp ORDER BY timestamp ASC"
+
+    const result = await account.execute(query, params)
+    /* eslint-disable sort-keys-fix/sort-keys-fix */
+    return result.map((row) => ({
+      timestamp: row[0] as number,
+      positionValue: row[1] as number,
+      cost: row[2] as number,
+      proceeds: row[3] as number,
+      fees: row[4] as number,
+      pnl: row[5] as number,
+    }))
+    /* eslint-enable */
+  } catch (error) {
+    throw new Error(`Failed to get account pnl: ${error}`)
+  }
+}
+
+export async function computePnl(
+  accountName: string,
+  progress: ProgressCallback = noop,
+  trades: Trade[]
+): Promise<void> {
+  const account = await getAccountWithTrades(accountName)
+  await account.execute("DELETE FROM trade_pnl")
+
+  if (trades.length === 0) {
+    await progress([100, "No trades found"])
+    return
+  }
+
+  await progress([82, `Processing ${trades.length} trades`])
+
+  const pnlRecords: Array<[string, string, number, number, number, number, number, number]> = []
+  let processedTrades = 0
+
+  for (const trade of trades) {
+    // Get daily prices for the asset during the trade period
+    const startTime = trade.createdAt - (trade.createdAt % 86400000)
+    const endTime = trade.closedAt
+      ? trade.closedAt - (trade.closedAt % 86400000)
+      : Date.now() - (Date.now() % 86400000)
+
+    // Add genesis entry (one day before trade creation)
+    const genesisTime = startTime - ONE_DAY
+    const genesisId = `${trade.id}_${genesisTime}`
+    pnlRecords.push([genesisId, trade.id, genesisTime, 0, 0, 0, 0, 0])
+
+    const prices = await getPricesForAsset(
+      accountName,
+      trade.assetId,
+      undefined,
+      startTime,
+      endTime
+    )
+
+    // Calculate PnL for each day
+    for (const price of prices) {
+      const timestamp = price.time * 1000 // Convert from seconds to milliseconds
+
+      // Find the latest audit log before or at this timestamp to get the balance
+      const [latestLog] = await getAuditLogs(
+        accountName,
+        "SELECT * FROM audit_logs WHERE timestamp <= ? AND assetId = ? ORDER BY timestamp DESC LIMIT 1",
+        [timestamp + ONE_DAY, trade.assetId]
+      )
+
+      const balance = latestLog ? Number(latestLog.balance) : 0
+      const positionValue = price.value * balance
+
+      // Calculate total cost and proceeds in USD
+      const cost = trade.cost.reduce(
+        (sum, [_assetId, _amount, usdValue, _exposure, _txId, txTimestamp]) =>
+          txTimestamp <= timestamp ? sum + Number(usdValue) : sum,
+        0
+      )
+      const proceeds = trade.proceeds.reduce(
+        (sum, [_assetId, _amount, usdValue, _txId, txTimestamp]) =>
+          txTimestamp <= timestamp ? sum + Number(usdValue) : sum,
+        0
+      )
+      const fees = trade.fees.reduce(
+        (sum, [_assetId, _amount, usdValue, _txId, txTimestamp]) =>
+          txTimestamp <= timestamp ? sum + Number(usdValue) : sum,
+        0
+      )
+      const pnl = positionValue + cost + proceeds + fees
+
+      const pnlId = `${trade.id}_${timestamp}`
+      pnlRecords.push([pnlId, trade.id, timestamp, positionValue, cost, proceeds, fees, pnl])
+    }
+
+    processedTrades++
+    await progress([
+      82 + Math.floor((processedTrades / trades.length) * 16),
+      `Processed ${processedTrades}/${trades.length} trades`,
+    ])
+  }
+
+  // Save PnL records
+  if (pnlRecords.length > 0) {
+    await account.executeMany(
+      "INSERT INTO trade_pnl (id, trade_id, timestamp, positionValue, cost, proceeds, fees, pnl) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      pnlRecords
+    )
+  }
+
+  await progress([100, "PnL computation completed"])
 }

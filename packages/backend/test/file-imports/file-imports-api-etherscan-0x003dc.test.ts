@@ -310,6 +310,7 @@ describe("should import 0x003dc via files", () => {
   })
 
   it.sequential("should compute trades from imported data", async () => {
+    mocks.readFile.mockImplementation(fs.promises.readFile)
     // act
     const updates: ProgressUpdate[] = []
     await computeTrades(accountName, async (state) => updates.push(state))
@@ -317,77 +318,180 @@ describe("should import 0x003dc via files", () => {
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Fetching audit logs
       10,Processing 1025 audit logs
-      20,Found 69 asset groups
-      21,Processed 1/69 asset groups
-      22,Processed 2/69 asset groups
-      23,Processed 3/69 asset groups
-      24,Processed 4/69 asset groups
-      25,Processed 5/69 asset groups
-      26,Processed 6/69 asset groups
-      27,Processed 7/69 asset groups
-      28,Processed 8/69 asset groups
-      29,Processed 9/69 asset groups
-      30,Processed 10/69 asset groups
-      31,Processed 11/69 asset groups
-      32,Processed 12/69 asset groups
-      33,Processed 13/69 asset groups
-      34,Processed 14/69 asset groups
-      35,Processed 15/69 asset groups
-      36,Processed 16/69 asset groups
-      37,Processed 17/69 asset groups
-      38,Processed 18/69 asset groups
-      39,Processed 19/69 asset groups
-      40,Processed 20/69 asset groups
-      41,Processed 21/69 asset groups
-      42,Processed 22/69 asset groups
-      43,Processed 23/69 asset groups
-      44,Processed 24/69 asset groups
-      45,Processed 25/69 asset groups
-      46,Processed 26/69 asset groups
-      47,Processed 27/69 asset groups
-      48,Processed 28/69 asset groups
-      49,Processed 29/69 asset groups
-      50,Processed 30/69 asset groups
-      51,Processed 31/69 asset groups
-      52,Processed 32/69 asset groups
-      53,Processed 33/69 asset groups
-      54,Processed 34/69 asset groups
-      55,Processed 35/69 asset groups
-      56,Processed 36/69 asset groups
-      57,Processed 37/69 asset groups
-      58,Processed 38/69 asset groups
-      59,Processed 39/69 asset groups
-      60,Processed 40/69 asset groups
-      61,Processed 41/69 asset groups
-      62,Processed 42/69 asset groups
-      63,Processed 43/69 asset groups
-      64,Processed 44/69 asset groups
-      65,Processed 45/69 asset groups
-      66,Processed 46/69 asset groups
-      67,Processed 47/69 asset groups
-      68,Processed 48/69 asset groups
-      69,Processed 49/69 asset groups
-      70,Processed 50/69 asset groups
-      71,Processed 51/69 asset groups
-      72,Processed 52/69 asset groups
-      73,Processed 53/69 asset groups
-      74,Processed 54/69 asset groups
-      75,Processed 55/69 asset groups
-      76,Processed 56/69 asset groups
-      77,Processed 57/69 asset groups
-      78,Processed 58/69 asset groups
-      79,Processed 59/69 asset groups
-      80,Processed 60/69 asset groups
-      81,Processed 61/69 asset groups
-      82,Processed 62/69 asset groups
-      83,Processed 63/69 asset groups
-      84,Processed 64/69 asset groups
-      85,Processed 65/69 asset groups
-      86,Processed 66/69 asset groups
-      87,Processed 67/69 asset groups
-      88,Processed 68/69 asset groups
-      90,Processed 69/69 asset groups
-      100,Trades computation completed"
+      ,Skipped ethereum:0x519475b31653E46D20cD09F9FdcF3B12BDAcB4f5:VIU: No coingeckoId
+      ,Skipped ethereum:0x42d6622deCe394b54999Fbd73D108123806f6a18:SPANK: No coingeckoId
+      ,Skipped ethereum:0xd8D605151f55cd04827c3673C31eD3761fe7B6E9:MESH: No coingeckoId
+      ,Skipped ethereum:0x2fF2B86C156583b1135C584fd940A1996FA4230b:findtherabbit.me: No coingeckoId
+      ,Skipped ethereum:0xF5DCe57282A584D2746FaF1593d3121Fcac444dC:cSAI: No coingeckoId
+      ,Skipped ethereum:0x88938e9358D763C7655E788D92c731EcC9153cC5:DMS: No coingeckoId
+      ,Skipped ethereum:0xcD62b1C403fa761BAadFC74C525ce2B51780b184:ANJ: No coingeckoId
+      ,Skipped ethereum:0x0f8b6440A1F7BE3354fe072638a5C0F500b044bE:KTH: No coingeckoId
+      ,Skipped ethereum:0x136faE4333EA36A24bb751E2d505D6ca4Fd9f00b:ETHRSIAPY: No coingeckoId
+      ,Skipped ethereum:0xbf70A33A13fBe8D0106Df321Da0Cf654d2E9Ab50:ETHBTCRSI7030: No coingeckoId
+      ,Skipped ethereum:0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8:yDAI+yUSDC+yUSDT+yTUSD: No coingeckoId
+      ,Skipped ethereum:0xBA2E7Fed597fd0E3e70f5130BcDbbFE06bB94fe1:yYFI: No coingeckoId
+      ,Skipped ethereum:0xC2aDdA861F89bBB333c90c492cB837741916A225:UNI-V2: No coingeckoId
+      ,Skipped ethereum:0x2fDbAdf3C4D5A8666Bc06645B8358ab803996E28:UNI-V2: No coingeckoId
+      ,Skipped ethereum:0xd3d2E2692501A5c9Ca623199D38826e513033a17:UNI-V2: No coingeckoId
+      ,Skipped ethereum:0xaeE2b2097ED86354AbfD4e2361761794C6DDc07b:oETH $500 Call 11/20/20: No coingeckoId
+      ,Skipped ethereum:0xc5bDdf9843308380375a611c18B50Fb9341f502A:yveCRV-DAO: No coingeckoId
+      ,Skipped ethereum:0x5D8d9F5b96f4438195BE9b99eee6118Ed4304286:COVER: No coingeckoId
+      ,Skipped ethereum:0x71fbC1d795FcfBcA43A3ebF6de0101952f31a410:ADAO: No coingeckoId
+      ,Skipped ethereum:0xcD7989894bc033581532D2cd88Da5db0A4b12859:UNI-V2: No coingeckoId
+      ,Skipped ethereum:0x235c9e24D3FB2FAFd58a2E49D454Fdcd2DBf7FF1:bUNI-V2: No coingeckoId
+      ,Skipped ethereum:0xE86204c4eDDd2f70eE00EAd6805f917671F56c52:UNI-V2: No coingeckoId
+      ,Skipped ethereum:0xC17078FDd324CC473F8175Dc5290fae5f2E84714:bUNI-V2: No coingeckoId
+      ,Skipped ethereum:0x4688a8b1F292FDaB17E9a90c8Bc379dC1DBd8713:COVER: No coingeckoId
+      20,Found 45 asset groups
+      21,Processed 1/45 asset groups
+      23,Processed 2/45 asset groups
+      24,Processed 3/45 asset groups
+      26,Processed 4/45 asset groups
+      27,Processed 5/45 asset groups
+      29,Processed 6/45 asset groups
+      30,Processed 7/45 asset groups
+      32,Processed 8/45 asset groups
+      34,Processed 9/45 asset groups
+      35,Processed 10/45 asset groups
+      37,Processed 11/45 asset groups
+      38,Processed 12/45 asset groups
+      40,Processed 13/45 asset groups
+      41,Processed 14/45 asset groups
+      43,Processed 15/45 asset groups
+      44,Processed 16/45 asset groups
+      46,Processed 17/45 asset groups
+      48,Processed 18/45 asset groups
+      49,Processed 19/45 asset groups
+      51,Processed 20/45 asset groups
+      52,Processed 21/45 asset groups
+      54,Processed 22/45 asset groups
+      55,Processed 23/45 asset groups
+      57,Processed 24/45 asset groups
+      58,Processed 25/45 asset groups
+      60,Processed 26/45 asset groups
+      62,Processed 27/45 asset groups
+      63,Processed 28/45 asset groups
+      65,Processed 29/45 asset groups
+      66,Processed 30/45 asset groups
+      68,Processed 31/45 asset groups
+      69,Processed 32/45 asset groups
+      71,Processed 33/45 asset groups
+      72,Processed 34/45 asset groups
+      74,Processed 35/45 asset groups
+      76,Processed 36/45 asset groups
+      77,Processed 37/45 asset groups
+      79,Processed 38/45 asset groups
+      80,Processed 39/45 asset groups
+      82,Processed 40/45 asset groups
+      83,Processed 41/45 asset groups
+      85,Processed 42/45 asset groups
+      86,Processed 43/45 asset groups
+      88,Processed 44/45 asset groups
+      90,Processed 45/45 asset groups
+      80,Trades computation completed
+      82,Processing 101 trades
+      82,Processed 1/101 trades
+      82,Processed 2/101 trades
+      82,Processed 3/101 trades
+      82,Processed 4/101 trades
+      82,Processed 5/101 trades
+      82,Processed 6/101 trades
+      83,Processed 7/101 trades
+      83,Processed 8/101 trades
+      83,Processed 9/101 trades
+      83,Processed 10/101 trades
+      83,Processed 11/101 trades
+      83,Processed 12/101 trades
+      84,Processed 13/101 trades
+      84,Processed 14/101 trades
+      84,Processed 15/101 trades
+      84,Processed 16/101 trades
+      84,Processed 17/101 trades
+      84,Processed 18/101 trades
+      85,Processed 19/101 trades
+      85,Processed 20/101 trades
+      85,Processed 21/101 trades
+      85,Processed 22/101 trades
+      85,Processed 23/101 trades
+      85,Processed 24/101 trades
+      85,Processed 25/101 trades
+      86,Processed 26/101 trades
+      86,Processed 27/101 trades
+      86,Processed 28/101 trades
+      86,Processed 29/101 trades
+      86,Processed 30/101 trades
+      86,Processed 31/101 trades
+      87,Processed 32/101 trades
+      87,Processed 33/101 trades
+      87,Processed 34/101 trades
+      87,Processed 35/101 trades
+      87,Processed 36/101 trades
+      87,Processed 37/101 trades
+      88,Processed 38/101 trades
+      88,Processed 39/101 trades
+      88,Processed 40/101 trades
+      88,Processed 41/101 trades
+      88,Processed 42/101 trades
+      88,Processed 43/101 trades
+      88,Processed 44/101 trades
+      89,Processed 45/101 trades
+      89,Processed 46/101 trades
+      89,Processed 47/101 trades
+      89,Processed 48/101 trades
+      89,Processed 49/101 trades
+      89,Processed 50/101 trades
+      90,Processed 51/101 trades
+      90,Processed 52/101 trades
+      90,Processed 53/101 trades
+      90,Processed 54/101 trades
+      90,Processed 55/101 trades
+      90,Processed 56/101 trades
+      91,Processed 57/101 trades
+      91,Processed 58/101 trades
+      91,Processed 59/101 trades
+      91,Processed 60/101 trades
+      91,Processed 61/101 trades
+      91,Processed 62/101 trades
+      91,Processed 63/101 trades
+      92,Processed 64/101 trades
+      92,Processed 65/101 trades
+      92,Processed 66/101 trades
+      92,Processed 67/101 trades
+      92,Processed 68/101 trades
+      92,Processed 69/101 trades
+      93,Processed 70/101 trades
+      93,Processed 71/101 trades
+      93,Processed 72/101 trades
+      93,Processed 73/101 trades
+      93,Processed 74/101 trades
+      93,Processed 75/101 trades
+      94,Processed 76/101 trades
+      94,Processed 77/101 trades
+      94,Processed 78/101 trades
+      94,Processed 79/101 trades
+      94,Processed 80/101 trades
+      94,Processed 81/101 trades
+      94,Processed 82/101 trades
+      95,Processed 83/101 trades
+      95,Processed 84/101 trades
+      95,Processed 85/101 trades
+      95,Processed 86/101 trades
+      95,Processed 87/101 trades
+      95,Processed 88/101 trades
+      96,Processed 89/101 trades
+      96,Processed 90/101 trades
+      96,Processed 91/101 trades
+      96,Processed 92/101 trades
+      96,Processed 93/101 trades
+      96,Processed 94/101 trades
+      97,Processed 95/101 trades
+      97,Processed 96/101 trades
+      97,Processed 97/101 trades
+      97,Processed 98/101 trades
+      97,Processed 99/101 trades
+      97,Processed 100/101 trades
+      98,Processed 101/101 trades
+      100,PnL computation completed"
     `)
   })
 
@@ -412,7 +516,7 @@ describe("should import 0x003dc via files", () => {
         `../__snapshots__/0x003dc/balances-${i}.ts.snap`
       )
     }
-    expect(trades.length).toMatchInlineSnapshot(`129`)
+    expect(trades.length).toMatchInlineSnapshot(`101`)
     for (let i = 0; i < trades.length; i += 5) {
       await expect(trades.slice(i, i + 5)).toMatchFileSnapshot(
         `../__snapshots__/0x003dc/trades-${i}.ts.snap`

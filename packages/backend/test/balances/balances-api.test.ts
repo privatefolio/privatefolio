@@ -129,6 +129,7 @@ it.sequential("should fetch latest balances with price data", async () => {
   // arrange
   await fetchDailyPrices(accountName, [
     {
+      coingeckoId: "bitcoin",
       id: "coinmama:BTC",
       priceApiId: "coinbase",
       symbol: "BTC",

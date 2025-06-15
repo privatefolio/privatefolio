@@ -199,9 +199,11 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
         } else if (activeType === "Baseline") {
           seriesRef.current = chartRef.current.addSeries(BaselineSeries, {
             baseLineColor: neutralColor,
+            // baseValue: { price: 0, type: "price" },
             bottomFillColor1: alpha(lossColor, 0),
-            bottomFillColor2: alpha(lossColor, 1),
-            lineWidth: 2,
+            bottomFillColor2: alpha(lossColor, 0.5),
+            bottomLineColor: lossColor,
+            lineWidth: 1,
             priceLineVisible: false,
             topFillColor1: alpha(profitColor, 1),
             topFillColor2: alpha(profitColor, 0),
@@ -213,7 +215,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
             bottomColor: alpha(profitColor, 0),
             lineColor: profitColor,
             // lineType: 2,
-            lineWidth: 2,
+            lineWidth: 1,
             priceLineVisible: false,
             topColor: alpha(profitColor, 1),
             ...seriesOptions,

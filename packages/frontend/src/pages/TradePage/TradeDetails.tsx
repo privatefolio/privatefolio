@@ -3,7 +3,7 @@ import { useStore } from "@nanostores/react"
 import Big from "big.js"
 import { formatDistance } from "date-fns"
 import React, { useEffect, useMemo, useState } from "react"
-import { AssetAmountBlocks, AssetAmountBlockValue } from "src/components/AssetAmountBlocks"
+import { AggregatableValue, AssetAmountsBlock } from "src/components/AssetAmountsBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TagManager } from "src/components/TagManager"
 import { TimestampBlock } from "src/components/TimestampBlock"
@@ -35,11 +35,13 @@ export function TradeDetails({ trade }: TradeDetailsProps) {
     rpc.getTagsForTrade(activeAccount, id).then(setTags)
   }, [id, activeAccount, rpc])
 
-  const costBasis = useMemo<AssetAmountBlockValue[]>(() => {
-    return cost.map(([assetId, amount, usdValue, exposure]) => [
+  const costBasis = useMemo<AggregatableValue[]>(() => {
+    return cost.map(([assetId, amount, usdValue, exposure, txId, txTimestamp]) => [
       assetId,
       Big(amount).div(`-${exposure}`).toString(),
       Big(usdValue).div(`-${exposure}`).toString(),
+      txId,
+      txTimestamp,
     ])
   }, [cost])
 
@@ -48,13 +50,13 @@ export function TradeDetails({ trade }: TradeDetailsProps) {
       <Typography variant="body2" component={Stack} gap={2}>
         <div>
           <SectionTitle>Opened at</SectionTitle>
-          <TimestampBlock timestamp={trade.createdAt} variant="simple" />
+          <TimestampBlock timestamp={trade.createdAt} />
         </div>
 
         {trade?.closedAt && (
           <div>
             <SectionTitle>Closed at</SectionTitle>
-            <TimestampBlock timestamp={trade.closedAt} variant="simple" />
+            <TimestampBlock timestamp={trade.closedAt} />
           </div>
         )}
 
@@ -69,19 +71,19 @@ export function TradeDetails({ trade }: TradeDetailsProps) {
 
         <div>
           <SectionTitle>Cost</SectionTitle>
-          <AssetAmountBlocks values={cost} showSign colorized />
+          <AssetAmountsBlock values={cost} showSign colorized />
         </div>
         <div>
           <SectionTitle>Cost Basis</SectionTitle>
-          <AssetAmountBlocks values={costBasis} aggregation="average" formatting="price" />
+          <AssetAmountsBlock values={costBasis} aggregation="average" formatting="price" />
         </div>
         <div>
           <SectionTitle>Fees</SectionTitle>
-          <AssetAmountBlocks values={fees} showSign colorized />
+          <AssetAmountsBlock values={fees} showSign colorized />
         </div>
         <div>
           <SectionTitle>Proceeds</SectionTitle>
-          <AssetAmountBlocks values={proceeds} showSign colorized />
+          <AssetAmountsBlock values={proceeds} showSign colorized />
         </div>
 
         {/* <div>
