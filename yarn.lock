@@ -9356,10 +9356,10 @@ lie@~3.3.0:
   dependencies:
     immediate "~3.0.5"
 
-lightweight-charts@^4.1.1:
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/lightweight-charts/-/lightweight-charts-4.2.3.tgz#0a0174793fc246b37bd8b96d1d4caadd2ecb329e"
-  integrity sha512-5kS/2hY3wNYNzhnS8Gb+GAS07DX8GPF2YVDnd2NMC85gJVQ6RLU6YrXNgNJ6eg0AnWPwCnvaGtYmGky3HiLQEw==
+lightweight-charts@^5.0.7:
+  version "5.0.7"
+  resolved "https://registry.yarnpkg.com/lightweight-charts/-/lightweight-charts-5.0.7.tgz#bef4ebbff871f5de7bceaab4a619352db34165ec"
+  integrity sha512-A4GqwYKRLhZREJEsSpORNNIWceOy5TS30s/WdAP2apKCDhAcIZDAI76TQHCCSf60oHwM7B92exXdQS9UykjXhw==
   dependencies:
     fancy-canvas "2.1.0"
 

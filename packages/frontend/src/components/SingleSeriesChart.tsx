@@ -22,7 +22,10 @@ import {
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import {
+  AreaSeries,
+  CandlestickSeries,
   DeepPartial,
+  HistogramSeries,
   IChartApi,
   ISeriesApi,
   MouseEventParams,
@@ -174,19 +177,19 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
         seriesRef.current = customSeries
       } else {
         if (activeType === "Candlestick") {
-          seriesRef.current = chartRef.current.addCandlestickSeries({
+          seriesRef.current = chartRef.current.addSeries(CandlestickSeries, {
             ...candleStickOptions,
             priceLineVisible: false,
             ...seriesOptions,
           })
         } else if (activeType === "Histogram") {
-          seriesRef.current = chartRef.current.addHistogramSeries({
+          seriesRef.current = chartRef.current.addSeries(HistogramSeries, {
             color: alpha(profitColor, 0.5),
             priceLineVisible: false,
             ...seriesOptions,
           })
         } else {
-          seriesRef.current = chartRef.current.addAreaSeries({
+          seriesRef.current = chartRef.current.addSeries(AreaSeries, {
             bottomColor: alpha(profitColor, 0),
             lineColor: profitColor,
             // lineType: 2,
