@@ -1,3 +1,5 @@
+import { isTestEnvironment } from "src/utils/environment-utils"
+
 const PRICE_API_IDS = ["coinbase", "binance", "defi-llama", "alchemy"] as const
 export type PriceApiId = (typeof PRICE_API_IDS)[number]
 
@@ -16,7 +18,7 @@ export const PRICE_APIS_META: Record<PriceApiId, PriceApiMeta> = {
   binance: {
     logoUrl: "$STATIC_ASSETS/extensions/binance.svg",
     name: "Binance",
-    priority: 2,
+    priority: isTestEnvironment ? 10 : 2,
   },
   coinbase: {
     logoUrl: "$STATIC_ASSETS/extensions/coinbase.svg",

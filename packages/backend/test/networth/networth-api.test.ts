@@ -5,7 +5,6 @@ import { fetchDailyPrices } from "src/api/account/daily-prices-api"
 import { importFile } from "src/api/account/file-imports-api"
 import { computeNetworth, getNetworth } from "src/api/account/networth-api"
 import { ProgressUpdate } from "src/interfaces"
-import { GITHUB_CI } from "src/server-env"
 import { beforeAll, expect, it, vi } from "vitest"
 
 const accountName = Math.random().toString(36).substring(7)
@@ -47,16 +46,13 @@ beforeAll(async () => {
     {
       coingeckoId: "bitcoin",
       id: "coinmama:BTC",
-      priceApiId: "binance",
+      priceApiId: "coinbase",
       symbol: "BTC",
     },
   ])
 })
 
-it.sequential("should compute historical networth", async (test) => {
-  if (GITHUB_CI) {
-    test.skip()
-  }
+it.sequential("should compute historical networth", async () => {
   // arrange
   // act
   const updates: ProgressUpdate[] = []
@@ -75,10 +71,7 @@ it.sequential("should compute historical networth", async (test) => {
   expect(networthArray).toMatchSnapshot()
 })
 
-it.sequential("should refresh networth", async (test) => {
-  if (GITHUB_CI) {
-    test.skip()
-  }
+it.sequential("should refresh networth", async () => {
   // arrange
   // act
   const updates: ProgressUpdate[] = []

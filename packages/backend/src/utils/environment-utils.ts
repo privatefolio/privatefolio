@@ -11,16 +11,16 @@ const runtime = !isServer
       ? "bun worker"
       : "bun"
 
-console.log(`Backend runtime is ${runtime}`)
-
 export const isDevelopment = isNode && process.env.NODE_ENV === "development"
 export const isTestEnvironment = isNode && process.env.NODE_ENV === "test"
 export const isProduction = isNode && process.env.NODE_ENV === "production"
 
 export const environment = isProduction ? "production" : isTestEnvironment ? "test" : "development"
 
-console.log(`Backend environment is ${environment}`)
-
 export const useBunSqlite = isNode && process.env.BUN_SQL !== "false"
 
-console.log(`Sqlite implementation is ${useBunSqlite ? "bun" : "sqlite3"}`)
+if (!isTestEnvironment) {
+  console.log(`Backend runtime is ${runtime}`)
+  console.log(`Backend environment is ${environment}`)
+  console.log(`Sqlite implementation is ${useBunSqlite ? "bun" : "sqlite3"}`)
+}
