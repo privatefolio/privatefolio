@@ -1,4 +1,4 @@
-import { isTestEnvironment } from "src/utils/environment-utils"
+import { isTestEnvironment } from "../utils/environment-utils"
 
 const PRICE_API_IDS = ["coinbase", "binance", "defi-llama", "alchemy"] as const
 export type PriceApiId = (typeof PRICE_API_IDS)[number]
