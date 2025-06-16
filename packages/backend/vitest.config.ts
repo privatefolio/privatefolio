@@ -11,6 +11,8 @@ export default defineConfig({
     diff: "./vitest.diff.ts",
     environment: "node",
     exclude: ["**/node_modules/**", "**/dist/**", "test/bun/**"],
+
+    globalSetup: ["./test/setup-tests.ts"],
     // TODO5
     // coverage: {
     //   reporter: ["text", "html"],
@@ -18,7 +20,6 @@ export default defineConfig({
     globals: true,
     maxConcurrency: 32,
     reporters: ["verbose"],
-    setupFiles: ["./test/setup-tests.ts"],
     testTimeout: 30 * 60_000,
   },
 })
