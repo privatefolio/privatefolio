@@ -18,6 +18,7 @@ export default defineConfig({
     globals: true,
     maxConcurrency: 32,
     reporters: ["verbose"],
+    setupFiles: ["./test/setup-tests.ts"],
     testTimeout: 30 * 60_000,
   },
 })

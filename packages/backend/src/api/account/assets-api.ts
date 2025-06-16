@@ -193,16 +193,21 @@ export async function findAssets(query: string, limit = 5): Promise<Asset[]> {
   return matchingAssets
 }
 
+export async function refetchAssets() {
+  const data = await getCoingeckoCoins()
+  await mkdir(`${CACHE_LOCATION}/coins`, { recursive: true })
+  await writeFile(`${CACHE_LOCATION}/coins/all.json`, JSON.stringify(data, null, 2))
+  return data
+}
+
 export function enqueueRefetchAssets(accountName: string, trigger: TaskTrigger) {
   return enqueueTask(accountName, {
     description: "Refetching assets.",
     function: async (progress) => {
-      const data = await getCoingeckoCoins()
-      await mkdir(`${CACHE_LOCATION}/coins`, { recursive: true })
-      await writeFile(`${CACHE_LOCATION}/coins/all.json`, JSON.stringify(data, null, 2))
-      await progress([undefined, `Refetched ${data.length} coins from coingecko.com.`])
+      const data = await refetchAssets()
       const account = await getAccount(accountName)
       account.eventEmitter.emit(SubscriptionChannel.AssetMetadata)
+      await progress([undefined, `Refetched ${data.length} coins from coingecko.com.`])
     },
     name: "Refetch assets",
     priority: TaskPriority.High,
