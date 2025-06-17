@@ -74,6 +74,7 @@ async function setupNetworthCronJob(accountName: string) {
       await writeApi.enqueueRefreshBalances(accountName, "cron")
       await writeApi.enqueueFetchPrices(accountName, "cron")
       await writeApi.enqueueRefreshNetworth(accountName, "cron")
+      await writeApi.enqueueRefreshTrades(accountName, "cron")
     })
     networthCronJobs[accountName] = cronJob
   } catch (error) {

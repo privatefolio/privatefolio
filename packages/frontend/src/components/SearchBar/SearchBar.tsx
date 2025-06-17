@@ -275,6 +275,7 @@ export const SearchBar = () => {
           rpc.enqueueFetchPrices(activeAccount, "user")
           rpc.enqueueRefreshBalances(activeAccount, "user")
           rpc.enqueueRefreshNetworth(activeAccount, "user")
+          rpc.enqueueRefreshTrades(activeAccount, "user")
         },
         priority: 1,
         section: { name: "Actions", priority: 10 },

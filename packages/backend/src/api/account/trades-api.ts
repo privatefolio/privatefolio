@@ -9,6 +9,7 @@ import {
   SubscriptionChannel,
   TaskPriority,
   TaskTrigger,
+  Timestamp,
   Trade,
   TRADE_TYPES,
   TradePnL,
@@ -251,21 +252,61 @@ function derivadeTradeId(assetId: string, createdAt: number) {
   return `${hashString(`${assetId}_${createdAt}`)}`
 }
 
+export async function invalidateTrades(accountName: string, newValue: Timestamp) {
+  const existing = (await getValue<Timestamp>(accountName, "tradesCursor", 0)) as Timestamp
+
+  if (newValue < existing) {
+    await setValue(accountName, "tradesCursor", newValue)
+  }
+}
+
+export type ComputeTradesRequest = {
+  since?: Timestamp
+}
+
 export async function computeTrades(
   accountName: string,
-  progress: ProgressCallback = noop
+  progress: ProgressCallback = noop,
+  request: ComputeTradesRequest = {},
+  _signal?: AbortSignal
 ): Promise<void> {
+  let { since } = request
+  if (since === undefined) {
+    since = (await getValue<Timestamp>(accountName, "tradesCursor", 0)) as Timestamp
+  }
+
   const account = await getAccountWithTrades(accountName)
 
-  await account.execute("DELETE FROM trade_audit_logs")
-  await account.execute("DELETE FROM trade_transactions")
-  await account.execute("DELETE FROM trade_pnl")
-  await account.execute("DELETE FROM trades")
+  // If since is not 0, we should only delete trades after that timestamp
+  if (since !== 0) {
+    await account.execute(
+      "DELETE FROM trade_audit_logs WHERE trade_id IN (SELECT id FROM trades WHERE createdAt >= ?)",
+      [since]
+    )
+    await account.execute(
+      "DELETE FROM trade_transactions WHERE trade_id IN (SELECT id FROM trades WHERE createdAt >= ?)",
+      [since]
+    )
+    await account.execute(
+      "DELETE FROM trade_pnl WHERE trade_id IN (SELECT id FROM trades WHERE createdAt >= ?)",
+      [since]
+    )
+    await account.execute("DELETE FROM trades WHERE createdAt >= ?", [since])
+    await progress([0, `Refreshing trades starting ${since}`])
+  } else {
+    await account.execute("DELETE FROM trade_audit_logs")
+    await account.execute("DELETE FROM trade_transactions")
+    await account.execute("DELETE FROM trade_pnl")
+    await account.execute("DELETE FROM trades")
+  }
 
   await progress([0, "Fetching audit logs"])
   const auditLogs = await getAuditLogs(
     accountName,
-    "SELECT * FROM audit_logs ORDER BY timestamp ASC, changeN ASC, id ASC"
+    since === 0
+      ? "SELECT * FROM audit_logs ORDER BY timestamp ASC, changeN ASC, id ASC"
+      : "SELECT * FROM audit_logs WHERE timestamp >= ? ORDER BY timestamp ASC, changeN ASC, id ASC",
+    since === 0 ? undefined : [since]
   )
 
   if (auditLogs.length === 0) {
@@ -505,18 +546,37 @@ export async function computeTrades(
     }
   }
 
+  // Set tradesCursor to the latest trade's createdAt
+  if (trades.length > 0) {
+    const latestCreatedAt = trades[trades.length - 1].createdAt
+    await setValue(accountName, "tradesCursor", latestCreatedAt)
+  }
+
   await progress([80, "Trades computation completed"])
   await computePnl(accountName, progress, trades)
 }
 
-export function enqueueComputeTrades(accountName: string, trigger: TaskTrigger) {
+export function enqueueRefreshTrades(accountName: string, trigger: TaskTrigger) {
   return enqueueTask(accountName, {
-    description: "Computing trades from audit logs.",
+    description: "Refreshing trades from audit logs.",
     determinate: true,
-    function: async (progress) => {
-      await computeTrades(accountName, progress)
+    function: async (progress, signal) => {
+      await computeTrades(accountName, progress, undefined, signal)
     },
-    name: "Compute trades",
+    name: "Refresh trades",
+    priority: TaskPriority.Medium,
+    trigger,
+  })
+}
+
+export function enqueueRecomputeTrades(accountName: string, trigger: TaskTrigger) {
+  return enqueueTask(accountName, {
+    description: "Recomputing trades from audit logs.",
+    determinate: true,
+    function: async (progress, signal) => {
+      await computeTrades(accountName, progress, { since: 0 }, signal)
+    },
+    name: "Recompute trades",
     priority: TaskPriority.Medium,
     trigger,
   })

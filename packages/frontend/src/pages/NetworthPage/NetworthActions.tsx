@@ -18,6 +18,7 @@ export function NetworthActions() {
             rpc.enqueueFetchPrices(activeAccount, "user")
             rpc.enqueueRefreshBalances(activeAccount, "user")
             rpc.enqueueRefreshNetworth(activeAccount, "user")
+            rpc.enqueueRefreshTrades(activeAccount, "user")
           }}
         >
           <CachedRounded fontSize="small" />
