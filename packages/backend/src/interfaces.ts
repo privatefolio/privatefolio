@@ -228,14 +228,8 @@ export type TradeCost = [
   txId: string,
   timestamp: Timestamp,
 ]
-export type TradeFee = [
-  assetId: string,
-  amount: string,
-  usdValue: string,
-  txId: string,
-  timestamp: Timestamp,
-]
-export type TradeProceeds = [
+
+export type TradeValue = [
   assetId: string,
   amount: string,
   usdValue: string,
@@ -251,10 +245,11 @@ export interface Trade {
   closedAt?: Timestamp
   cost: TradeCost[]
   createdAt: Timestamp
+  deposits: TradeValue[]
   duration?: number
-  fees: TradeFee[]
+  fees: TradeValue[]
   id: string
-  proceeds: TradeProceeds[]
+  proceeds: TradeValue[]
   tags?: number[]
   tradeNumber: number
   tradeStatus: "open" | "closed"
@@ -866,10 +861,11 @@ export type PlatformMeta = {
 
 export interface TradePnL {
   cost: number
+  deposits: number
   fees: number
   id: string
   /**
-   * Formula: positionValue - cost + proceeds - fees
+   * Formula: positionValue + cost + proceeds + fees - deposits
    */
   pnl: number
   positionValue: number

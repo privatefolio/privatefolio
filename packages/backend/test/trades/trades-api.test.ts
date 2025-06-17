@@ -196,6 +196,15 @@ describe("trades-api", () => {
           "closedAt": 1600200000000,
           "cost": [],
           "createdAt": 1600000000000,
+          "deposits": [
+            [
+              "ethereum:ETH",
+              "1.5",
+              "0",
+              "tx1",
+              1600000000000,
+            ],
+          ],
           "duration": 200000000,
           "fees": [
             [
@@ -240,6 +249,7 @@ describe("trades-api", () => {
           "balance": -1,
           "cost": [],
           "createdAt": 1600632000000,
+          "deposits": [],
           "fees": [],
           "id": "2551033095",
           "proceeds": [],
@@ -257,6 +267,7 @@ describe("trades-api", () => {
       [
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "id": "2097354210_1599868800000",
           "pnl": 0,
@@ -267,6 +278,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "id": "2097354210_1599955200000",
           "pnl": 1500,
@@ -277,6 +289,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "id": "2097354210_1600041600000",
           "pnl": 750,
@@ -287,6 +300,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "id": "2097354210_1600128000000",
           "pnl": 0,
@@ -302,6 +316,7 @@ describe("trades-api", () => {
       [
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "id": "2551033095_1600473600000",
           "pnl": 0,
@@ -312,6 +327,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "id": "2551033095_1600560000000",
           "pnl": -4500,
@@ -322,6 +338,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "id": "2551033095_1600646400000",
           "pnl": -5000,
@@ -332,6 +349,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "id": "2551033095_1600732800000",
           "pnl": -5500,
@@ -342,6 +360,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "id": "2551033095_1600819200000",
           "pnl": -6000,
@@ -357,6 +376,7 @@ describe("trades-api", () => {
       [
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "pnl": 0,
           "positionValue": 0,
@@ -365,6 +385,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "pnl": 1500,
           "positionValue": 1500,
@@ -373,6 +394,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "pnl": 750,
           "positionValue": 750,
@@ -381,6 +403,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "pnl": 0,
           "positionValue": 0,
@@ -389,6 +412,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "pnl": 0,
           "positionValue": 0,
@@ -397,6 +421,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "pnl": -4500,
           "positionValue": -4500,
@@ -405,6 +430,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "pnl": -5000,
           "positionValue": -5000,
@@ -413,6 +439,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "pnl": -5500,
           "positionValue": -5500,
@@ -421,6 +448,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "pnl": -6000,
           "positionValue": -6000,
@@ -470,6 +498,7 @@ describe("trades-api", () => {
       0,Fetching audit logs
       10,Processing 1 audit logs
       20,Found 1 asset groups
+      20,Found 1 open trades
       80,Processed 1/1 asset groups
       80,Trades computation completed
       80,Refreshing PnL starting Sep 23, 2020
@@ -494,6 +523,15 @@ describe("trades-api", () => {
           "closedAt": 1600200000000,
           "cost": [],
           "createdAt": 1600000000000,
+          "deposits": [
+            [
+              "ethereum:ETH",
+              "1.5",
+              "0",
+              "tx1",
+              1600000000000,
+            ],
+          ],
           "duration": 200000000,
           "fees": [
             [
@@ -538,6 +576,7 @@ describe("trades-api", () => {
           "balance": -1,
           "cost": [],
           "createdAt": 1600632000000,
+          "deposits": [],
           "fees": [],
           "id": "2551033095",
           "proceeds": [],
@@ -555,6 +594,7 @@ describe("trades-api", () => {
       [
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "id": "2097354210_1599868800000",
           "pnl": 0,
@@ -565,6 +605,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "id": "2097354210_1599955200000",
           "pnl": 1500,
@@ -575,6 +616,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "id": "2097354210_1600041600000",
           "pnl": 750,
@@ -585,6 +627,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "id": "2097354210_1600128000000",
           "pnl": 0,
@@ -600,6 +643,7 @@ describe("trades-api", () => {
       [
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "id": "2551033095_1600473600000",
           "pnl": 0,
@@ -610,6 +654,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "id": "2551033095_1600560000000",
           "pnl": -4500,
@@ -620,6 +665,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "id": "2551033095_1600646400000",
           "pnl": -5000,
@@ -630,6 +676,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "id": "2551033095_1600732800000",
           "pnl": -5500,
@@ -640,6 +687,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "id": "2551033095_1600819200000",
           "pnl": -6543,
@@ -655,6 +703,7 @@ describe("trades-api", () => {
       [
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "pnl": 0,
           "positionValue": 0,
@@ -663,6 +712,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "pnl": 1500,
           "positionValue": 1500,
@@ -671,6 +721,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "pnl": 750,
           "positionValue": 750,
@@ -679,6 +730,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "pnl": 0,
           "positionValue": 0,
@@ -687,6 +739,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "pnl": 0,
           "positionValue": 0,
@@ -695,6 +748,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "pnl": -4500,
           "positionValue": -4500,
@@ -703,6 +757,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "pnl": -5000,
           "positionValue": -5000,
@@ -711,6 +766,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "pnl": -5500,
           "positionValue": -5500,
@@ -719,6 +775,7 @@ describe("trades-api", () => {
         },
         {
           "cost": 0,
+          "deposits": 0,
           "fees": 0,
           "pnl": -6543,
           "positionValue": -6543,

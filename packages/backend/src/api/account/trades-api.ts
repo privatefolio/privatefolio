@@ -30,7 +30,7 @@ import { getValue, setValue } from "./kv-api"
 import { enqueueTask } from "./server-tasks-api"
 import { getTransaction } from "./transactions-api"
 
-const SCHEMA_VERSION = 14
+const SCHEMA_VERSION = 16
 
 async function getAccountWithTrades(accountName: string) {
   const schemaVersion = await getValue(accountName, `trade_schema_version`, 0)
@@ -59,6 +59,7 @@ async function getAccountWithTrades(accountName: string) {
         cost JSON,
         fees JSON,
         proceeds JSON,
+        deposits JSON,
         FOREIGN KEY (assetId) REFERENCES assets(id)
       );
     `)
@@ -102,6 +103,7 @@ async function getAccountWithTrades(accountName: string) {
         cost FLOAT NOT NULL,
         proceeds FLOAT NOT NULL,
         fees FLOAT NOT NULL,
+        deposits FLOAT NOT NULL,
         pnl FLOAT NOT NULL,
         FOREIGN KEY (trade_id) REFERENCES trades(id)
       );
@@ -150,8 +152,9 @@ export async function getTrades(
         cost: JSON.parse(String(row[10] || "[]")),
         fees: JSON.parse(String(row[11] || "[]")),
         proceeds: JSON.parse(String(row[12] || "[]")),
-        txIds: row[13] ? String(row[13]).split(",") : undefined,
-        auditLogIds: row[14] ? String(row[14]).split(",") : undefined,
+        deposits: JSON.parse(String(row[13] || "[]")),
+        txIds: row[14] ? String(row[14]).split(",") : undefined,
+        auditLogIds: row[15] ? String(row[15]).split(",") : undefined,
       }
       /* eslint-enable */
       transformNullsToUndefined(value)
@@ -173,8 +176,8 @@ export async function upsertTrades(accountName: string, trades: Trade[]): Promis
   try {
     await account.executeMany(
       `INSERT OR REPLACE INTO trades (
-        id, tradeNumber, assetId, amount, balance, createdAt, closedAt, duration, tradeStatus, tradeType, cost, fees, proceeds
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        id, tradeNumber, assetId, amount, balance, createdAt, closedAt, duration, tradeStatus, tradeType, cost, fees, proceeds, deposits
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       trades.map((trade) => [
         trade.id,
         trade.tradeNumber,
@@ -189,6 +192,7 @@ export async function upsertTrades(accountName: string, trades: Trade[]): Promis
         JSON.stringify(trade.cost || []),
         JSON.stringify(trade.fees || []),
         JSON.stringify(trade.proceeds || []),
+        JSON.stringify(trade.deposits || []),
       ])
     )
 
@@ -200,6 +204,37 @@ export async function upsertTrades(accountName: string, trades: Trade[]): Promis
 
 export async function upsertTrade(accountName: string, trade: Trade): Promise<void> {
   return upsertTrades(accountName, [trade])
+}
+
+export async function upsertTradePnls(accountName: string, tradePnls: TradePnL[]): Promise<void> {
+  const account = await getAccountWithTrades(accountName)
+
+  try {
+    await account.executeMany(
+      `INSERT OR REPLACE INTO trade_pnl (
+        id, trade_id, timestamp, positionValue, cost, proceeds, fees, deposits, pnl
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      tradePnls.map((pnl) => [
+        pnl.id,
+        pnl.tradeId,
+        pnl.timestamp,
+        pnl.positionValue,
+        pnl.cost,
+        pnl.proceeds,
+        pnl.fees,
+        pnl.deposits,
+        pnl.pnl,
+      ])
+    )
+
+    account.eventEmitter.emit(SubscriptionChannel.TradePnl, EventCause.Updated)
+  } catch (error) {
+    throw new Error(`Failed to add or replace trade pnl: ${error}`)
+  }
+}
+
+export async function upsertTradePnl(accountName: string, tradePnl: TradePnL): Promise<void> {
+  return upsertTradePnls(accountName, [tradePnl])
 }
 
 export async function patchTrade(
@@ -375,39 +410,55 @@ export async function computeTrades(
       throw new Error(`Transaction with id ${txId} not found`)
     }
 
+    // Deposits
+    if (
+      tx.incomingAsset &&
+      tx.incoming &&
+      tx.incomingAsset === assetId &&
+      log.operation === "Deposit"
+    ) {
+      const assetPrice = priceMap[tx.incomingAsset]?.value
+      if (!assetPrice && !isTestEnvironment)
+        throw new Error(`Price not found for asset ${tx.incomingAsset}`)
+      trade.deposits.push([
+        tx.incomingAsset,
+        tx.incoming,
+        assetPrice ? Big(assetPrice).mul(tx.incoming).toString() : "0",
+        txId,
+        tx.timestamp,
+      ])
+    }
+
+    // Cost
     if (tx.outgoingAsset && tx.outgoing && tx.incomingAsset === assetId) {
-      // Add outgoing as cost if it's a different asset OR if it's the same asset in a deposit
-      if (tx.outgoingAsset !== assetId || log.operation === "Deposit") {
-        const assetPrice = priceMap[tx.outgoingAsset]?.value
-        if (!assetPrice && !isTestEnvironment)
-          throw new Error(`Price not found for asset ${tx.outgoingAsset}`)
-        trade.cost.push([
-          tx.outgoingAsset,
-          `-${tx.outgoing}`,
-          assetPrice ? Big(assetPrice).mul(`-${tx.outgoing}`).toString() : "0",
-          log.change,
-          txId,
-          tx.timestamp,
-        ])
-      }
+      const assetPrice = priceMap[tx.outgoingAsset]?.value
+      if (!assetPrice && !isTestEnvironment)
+        throw new Error(`Price not found for asset ${tx.outgoingAsset}`)
+      trade.cost.push([
+        tx.outgoingAsset,
+        `-${tx.outgoing}`,
+        assetPrice ? Big(assetPrice).mul(`-${tx.outgoing}`).toString() : "0",
+        log.change,
+        txId,
+        tx.timestamp,
+      ])
     }
 
+    // Proceeds
     if (tx.incomingAsset && tx.incoming && tx.outgoingAsset === assetId) {
-      // Add incoming as proceeds if it's a different asset OR if it's the same asset in a withdraw
-      if (tx.incomingAsset !== assetId || log.operation === "Withdraw") {
-        const assetPrice = priceMap[tx.incomingAsset]?.value
-        if (!assetPrice && !isTestEnvironment)
-          throw new Error(`Price not found for asset ${tx.incomingAsset}`)
-        trade.proceeds.push([
-          tx.incomingAsset,
-          tx.incoming,
-          assetPrice ? Big(assetPrice).mul(tx.incoming).toString() : "0",
-          txId,
-          tx.timestamp,
-        ])
-      }
+      const assetPrice = priceMap[tx.incomingAsset]?.value
+      if (!assetPrice && !isTestEnvironment)
+        throw new Error(`Price not found for asset ${tx.incomingAsset}`)
+      trade.proceeds.push([
+        tx.incomingAsset,
+        tx.incoming,
+        assetPrice ? Big(assetPrice).mul(tx.incoming).toString() : "0",
+        txId,
+        tx.timestamp,
+      ])
     }
 
+    // Fees
     if (tx.feeAsset && tx.fee && tx.feeAsset === assetId) {
       const assetPrice = priceMap[tx.feeAsset]?.value
       if (!assetPrice && !isTestEnvironment)
@@ -443,6 +494,7 @@ export async function computeTrades(
           balance: balance.toNumber(),
           cost: [],
           createdAt: log.timestamp,
+          deposits: [],
           fees: [],
           id: tradeId,
           proceeds: [],
@@ -507,6 +559,7 @@ export async function computeTrades(
               balance: balance.toNumber(),
               cost: [],
               createdAt: log.timestamp,
+              deposits: [],
               fees: [],
               id: newTradeId,
               proceeds: [],
@@ -643,7 +696,8 @@ export async function getTradePnL(accountName: string, tradeId: string): Promise
       cost: row[4] as number,
       proceeds: row[5] as number,
       fees: row[6] as number,
-      pnl: row[7] as number,
+      deposits: row[7] as number,
+      pnl: row[8] as number,
     }))
     /* eslint-enable */
   } catch (error) {
@@ -665,6 +719,7 @@ export async function getAccountPnL(
         SUM(cost) as cost,
         SUM(proceeds) as proceeds,
         SUM(fees) as fees,
+        SUM(deposits) as deposits,
         SUM(pnl) as pnl
       FROM trade_pnl
     `
@@ -691,7 +746,8 @@ export async function getAccountPnL(
       cost: row[2] as number,
       proceeds: row[3] as number,
       fees: row[4] as number,
-      pnl: row[5] as number,
+      deposits: row[5] as number,
+      pnl: row[6] as number,
     }))
     /* eslint-enable */
   } catch (error) {
@@ -728,7 +784,7 @@ export async function computePnl(
 
   await progress([82, `Processing ${trades.length} trades`])
 
-  const pnlRecords: Array<[string, string, number, number, number, number, number, number]> = []
+  const tradePnls: TradePnL[] = []
   let processedTrades = 0
   let latestTimestamp = 0
 
@@ -742,7 +798,17 @@ export async function computePnl(
     // Add genesis entry (one day before trade creation)
     const genesisTime = startTime - ONE_DAY
     const genesisId = `${trade.id}_${genesisTime}`
-    pnlRecords.push([genesisId, trade.id, genesisTime, 0, 0, 0, 0, 0])
+    tradePnls.push({
+      cost: 0,
+      deposits: 0,
+      fees: 0,
+      id: genesisId,
+      pnl: 0,
+      positionValue: 0,
+      proceeds: 0,
+      timestamp: genesisTime,
+      tradeId: trade.id,
+    })
 
     const prices = await getPricesForAsset(
       accountName,
@@ -787,10 +853,25 @@ export async function computePnl(
           txTimestamp <= bucketEnd ? sum + Number(usdValue) : sum,
         0
       )
-      const pnl = positionValue + cost + proceeds + fees
+      const deposits = trade.deposits.reduce(
+        (sum, [_assetId, _amount, usdValue, _txId, txTimestamp]) =>
+          txTimestamp <= bucketEnd ? sum + Number(usdValue) : sum,
+        0
+      )
+      const pnl = positionValue + cost + proceeds + fees - deposits
 
       const pnlId = `${trade.id}_${bucketStart}`
-      pnlRecords.push([pnlId, trade.id, bucketStart, positionValue, cost, proceeds, fees, pnl])
+      tradePnls.push({
+        cost,
+        deposits,
+        fees,
+        id: pnlId,
+        pnl,
+        positionValue,
+        proceeds,
+        timestamp: bucketStart,
+        tradeId: trade.id,
+      })
     }
 
     processedTrades++
@@ -800,13 +881,8 @@ export async function computePnl(
     ])
   }
 
-  if (pnlRecords.length > 0) {
-    await account.executeMany(
-      "INSERT OR REPLACE INTO trade_pnl (id, trade_id, timestamp, positionValue, cost, proceeds, fees, pnl) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-      pnlRecords
-    )
-
-    account.eventEmitter.emit(SubscriptionChannel.TradePnl, EventCause.Updated)
+  if (tradePnls.length > 0) {
+    await upsertTradePnls(accountName, tradePnls)
   }
 
   if (latestTimestamp > 0) {

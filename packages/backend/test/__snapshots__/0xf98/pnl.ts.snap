@@ -1,6 +1,7 @@
 [
   {
     "cost": 0,
+    "deposits": 0,
     "fees": 0,
     "pnl": 0,
     "positionValue": 0,
@@ -9,6 +10,7 @@
   },
   {
     "cost": 0,
+    "deposits": 0,
     "fees": 0,
     "pnl": 0,
     "positionValue": 0,
@@ -17,6 +19,7 @@
   },
   {
     "cost": 0,
+    "deposits": 0,
     "fees": 0,
     "pnl": 0,
     "positionValue": 0,
@@ -25,6 +28,7 @@
   },
   {
     "cost": 0,
+    "deposits": 0,
     "fees": 0,
     "pnl": 0,
     "positionValue": 0,
@@ -33,6 +37,7 @@
   },
   {
     "cost": 0,
+    "deposits": 0,
     "fees": 0,
     "pnl": 0,
     "positionValue": 0,
@@ -41,6 +46,7 @@
   },
   {
     "cost": 0,
+    "deposits": 0,
     "fees": 0,
     "pnl": 0,
     "positionValue": 0,
