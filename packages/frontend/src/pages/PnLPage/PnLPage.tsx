@@ -4,7 +4,7 @@ import React, { useEffect } from "react"
 import { WorkInProgressCallout } from "src/components/WorkInProgressCallout"
 import { $activeAccount } from "src/stores/account-store"
 
-import { PnLChartNew } from "./PnLChartNew"
+import { PnLChart } from "./PnLChart"
 
 export function PnLPage() {
   const activeAccount = useStore($activeAccount)
@@ -15,7 +15,7 @@ export function PnLPage() {
 
   return (
     <Stack gap={1}>
-      <PnLChartNew />
+      <PnLChart />
       <WorkInProgressCallout />
     </Stack>
   )

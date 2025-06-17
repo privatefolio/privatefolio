@@ -21,7 +21,7 @@ import FourZeroFourPage from "../404"
 import { AssetBalanceHistory } from "../AssetPage/AssetBalanceHistory"
 import { AssetPriceHistory } from "../AssetPage/AssetPriceHistory"
 import { AuditLogTable } from "../AuditLogsPage/AuditLogTable"
-import { PnLChartNew } from "../PnLPage/PnLChartNew"
+import { PnLChart } from "../PnLPage/PnLChart"
 import { TradeActions } from "../TradesPage/TradeActions"
 import { TransactionTable } from "../TransactionsPage/TransactionTable"
 import { TradeDetails } from "./TradeDetails"
@@ -155,7 +155,7 @@ export default function TradePage() {
           <TradeActions />
         </Stack>
         {tab === "details" && <TradeDetails trade={trade} />}
-        {tab === "pnl" && <PnLChartNew trade={trade} />}
+        {tab === "pnl" && <PnLChart trade={trade} />}
         {tab === "exposure" && (
           <AssetBalanceHistory
             assetId={trade.assetId}
