@@ -48,3 +48,10 @@ const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform)
 export const MAIN_KEY = isMac ? "⌘" : "Ctrl"
 
 // https://github.com/jamiebuilds/tinykeys
+
+export function formatShortcut(shortcut: string) {
+  if (shortcut.startsWith("$mod")) {
+    return shortcut.replace("$mod", MAIN_KEY).replace("+", " + ")
+  }
+  return shortcut
+}

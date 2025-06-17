@@ -1,8 +1,6 @@
 import { Box, Stack, Tooltip, Typography, TypographyProps } from "@mui/material"
-import { useStore } from "@nanostores/react"
-import { getDecimalPrecision } from "privatefolio-backend/build/src/utils/formatting-utils"
+import { getAutoFormatDigits } from "privatefolio-backend/build/src/utils/formatting-utils"
 import React, { useMemo, useState } from "react"
-import { $debugMode } from "src/stores/app-store"
 import { MonoFont } from "src/theme"
 import { greenColor, redColor } from "src/utils/color-utils"
 import { EMPTY_OBJECT } from "src/utils/utils"
@@ -14,7 +12,6 @@ export type AmountBlockProps = TypographyProps & {
   colorized?: boolean
   currencySymbol?: string
   currencyTicker?: string
-  // formatOpts?: Intl.NumberFormatOptions
   maxDigits?: number
   placeholder?: string
   showSign?: boolean
@@ -32,7 +29,6 @@ export function AmountBlock(props: AmountBlockProps) {
     currencySymbol = "",
     significantDigits,
     tooltipMessage,
-    // formatOpts = EMPTY_OBJECT,
     placeholder = "Unknown",
     colorized,
     showTicker,
@@ -45,20 +41,12 @@ export function AmountBlock(props: AmountBlockProps) {
   const amountN = hasValue ? Number(amount) : undefined
   const formatOpts = showSign && amountN !== 0 ? showSignOpts : EMPTY_OBJECT
 
-  const debugMode = useStore($debugMode)
-
-  // let minimumFractionDigits = currencyTicker === "USDT" ? 2 : significantDigits TODO5 derive this from the ticker
-  let minimumFractionDigits = debugMode ? 4 : significantDigits
-  let maximumFractionDigits: number | undefined
-
-  // auto-adjust minimumFractionDigits
-  if (minimumFractionDigits === undefined && typeof amountN === "number") {
-    if (amountN > 10_000 || amountN < -10_000) minimumFractionDigits = 0
-    else if (amountN < 1 && amountN > -1)
-      minimumFractionDigits = Math.min(getDecimalPrecision(amountN), 6)
-
-    maximumFractionDigits = getDecimalPrecision(amountN)
-  }
+  const { minimumFractionDigits, maximumFractionDigits } = useMemo(() => {
+    if (typeof amountN !== "number") {
+      return { maximumFractionDigits: maxDigits, minimumFractionDigits: significantDigits }
+    }
+    return getAutoFormatDigits(amountN, significantDigits)
+  }, [amountN, significantDigits, maxDigits])
 
   const [copied, setCopied] = useState(false)
 
@@ -83,7 +71,7 @@ export function AmountBlock(props: AmountBlockProps) {
     })
   }, [amountN, formatOpts, minimumFractionDigits])
 
-  const fullLabel = useMemo(() => {
+  const compactLabel = useMemo(() => {
     if (typeof amountN !== "number") return ""
 
     let fullLabel = `${currencySymbol}${compactValue}`
@@ -132,7 +120,7 @@ export function AmountBlock(props: AmountBlockProps) {
         onClick={() => {
           if (!hasValue) return
 
-          const clipText = maxDigits ? (amountN as number).toFixed(maxDigits) : String(amount)
+          const clipText = String(amount)
           navigator.clipboard.writeText(clipText)
 
           setCopied(true)
@@ -144,7 +132,7 @@ export function AmountBlock(props: AmountBlockProps) {
         {...rest}
       >
         {typeof amountN === "number" ? (
-          fullLabel
+          compactLabel
         ) : (
           <Typography color="text.secondary" component="span" variant="inherit">
             {placeholder}

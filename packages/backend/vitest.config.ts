@@ -11,6 +11,8 @@ export default defineConfig({
     diff: "./vitest.diff.ts",
     environment: "node",
     exclude: ["**/node_modules/**", "**/dist/**", "test/bun/**"],
+
+    globalSetup: ["./test/setup-tests.ts"],
     // TODO5
     // coverage: {
     //   reporter: ["text", "html"],

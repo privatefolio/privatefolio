@@ -2,9 +2,9 @@
 import { darken } from "@mui/material"
 import { CanvasRenderingTarget2D, Size } from "fancy-canvas"
 import {
-  ISeriesPrimitivePaneRenderer,
-  ISeriesPrimitivePaneView,
-  SeriesPrimitivePaneViewZOrder,
+  IPrimitivePaneRenderer,
+  IPrimitivePaneView,
+  PrimitivePaneViewZOrder,
 } from "lightweight-charts"
 
 import { MainFont, MonoFont } from "../../../theme"
@@ -221,7 +221,7 @@ function calculateDrawingPositions(
   }
 }
 
-class DeltaTooltipPaneRenderer implements ISeriesPrimitivePaneRenderer {
+class DeltaTooltipPaneRenderer implements IPrimitivePaneRenderer {
   _data: DeltaTooltipData
   _options: CommonTooltipOptions
 
@@ -329,7 +329,7 @@ class DeltaTooltipPaneRenderer implements ISeriesPrimitivePaneRenderer {
   }
 }
 
-export class DeltaTooltipPaneView implements ISeriesPrimitivePaneView {
+export class DeltaTooltipPaneView implements IPrimitivePaneView {
   _data: DeltaTooltipData
   _options: CommonTooltipOptions
   constructor(data: Partial<DeltaTooltipData>, options: Partial<CommonTooltipOptions>) {
@@ -350,11 +350,11 @@ export class DeltaTooltipPaneView implements ISeriesPrimitivePaneView {
     }
   }
 
-  renderer(): ISeriesPrimitivePaneRenderer | null {
+  renderer(): IPrimitivePaneRenderer | null {
     return new DeltaTooltipPaneRenderer(this._data, this._options)
   }
 
-  zOrder(): SeriesPrimitivePaneViewZOrder {
+  zOrder(): PrimitivePaneViewZOrder {
     return "top"
   }
 }

@@ -22,13 +22,37 @@ const locale = typeof window !== "undefined" ? window.navigator.language : "en-U
  */
 export function getDecimalPrecision(num: number) {
   if (!isFinite(num)) return 0
-  let e = 1
-  let p = 0
-  while (Math.round(num * e) / e !== num) {
-    e *= 10
-    p++
+  let exponent = 1
+  let position = 0
+  while (Math.round(num * exponent) / exponent !== num) {
+    exponent *= 10
+    position++
   }
-  return p
+  return position
+}
+
+/**
+ * Returns the position of the first nonzero decimal digit.
+ *
+ * For example:
+ * 0.005 -> returns 3
+ * 0.1   -> returns 1
+ * 1.23  -> returns 1 (first nonzero decimal is in the first place)
+ * 42    -> returns 0 (no decimal part)
+ *
+ * @param num - The number to analyze.
+ * @returns The position (1-based) of the first nonzero decimal digit.
+ */
+export function getMinimumDecimalPrecision(num: number): number {
+  if (!isFinite(num) || Math.floor(Math.abs(num)) === Math.abs(num)) return 0
+  let exponent = 1
+  let position = 0
+  while (true) {
+    exponent *= 10
+    position++
+    const digit = Math.floor(Math.abs(num) * exponent) % 10
+    if (digit !== 0) return position
+  }
 }
 
 export function formatDuration(milliseconds: number, showMs = false) {
@@ -144,4 +168,55 @@ export function formatFileSize(bytes: number, longFormat = false) {
   return `${formatNumber(bytes / Math.pow(k, i), {
     maximumFractionDigits: longFormat ? undefined : 2,
   })} ${sizes[i]}`
+}
+
+export const ONE_DAY_TIME = 24 * 60 * 60
+export const ONE_DAY = ONE_DAY_TIME * 1000
+
+/**
+ * Calculates appropriate minimumFractionDigits and maximumFractionDigits for formatting a number.
+ *
+ * @param x - The number to format
+ * @param significantDigits - Optional override for minimumFractionDigits
+ * @returns Object with minimumFractionDigits and maximumFractionDigits
+ */
+export function getAutoFormatDigits(
+  x: number,
+  significantDigits?: number
+): { maximumFractionDigits?: number; minimumFractionDigits?: number } {
+  let minimumFractionDigits = significantDigits
+  let maximumFractionDigits: number | undefined
+
+  // auto-adjust minimumFractionDigits
+  if (minimumFractionDigits === undefined) {
+    if (x > 10_000 || x < -10_000) {
+      minimumFractionDigits = 0
+    } else if (x > 1000 || x < -1000) {
+      minimumFractionDigits = 2
+    } else if (x < 1 && x > -1) {
+      minimumFractionDigits = getMinimumDecimalPrecision(x) + 3
+    }
+  }
+
+  // auto-adjust maximumFractionDigits
+  if (minimumFractionDigits !== undefined) {
+    if (x > 10_000 || x < -10_000) {
+      maximumFractionDigits = Math.max(0, minimumFractionDigits)
+    } else if (x < 1 && x > -1) {
+      maximumFractionDigits = getMinimumDecimalPrecision(x) + 3
+    } else {
+      maximumFractionDigits = minimumFractionDigits
+    }
+  }
+
+  // fail guard
+  if (
+    typeof minimumFractionDigits === "number" &&
+    typeof maximumFractionDigits === "number" &&
+    minimumFractionDigits > maximumFractionDigits
+  ) {
+    maximumFractionDigits = minimumFractionDigits
+  }
+
+  return { maximumFractionDigits, minimumFractionDigits }
 }

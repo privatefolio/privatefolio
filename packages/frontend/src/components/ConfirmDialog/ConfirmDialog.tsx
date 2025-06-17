@@ -8,13 +8,14 @@ import {
   DialogTitle,
   Stack,
 } from "@mui/material"
-import React, { FormEvent, ReactNode, useCallback } from "react"
+import React, { FormEvent, ReactNode, useCallback, useEffect } from "react"
 import { noop } from "src/utils/utils"
 
 interface ConfirmDialogProps {
   confirmText?: string
   content: string | ReactNode
   dismissable?: boolean
+  focusInput?: string
   onClose: (confirmed: boolean, event?: FormEvent<HTMLFormElement>) => void
   open: boolean
   title: string
@@ -30,6 +31,7 @@ export function ConfirmDialog(props: ConfirmDialogProps) {
     variant,
     dismissable = true,
     confirmText = "Confirm",
+    focusInput,
   } = props
 
   const handleCancel = () => onClose(false)
@@ -42,6 +44,19 @@ export function ConfirmDialog(props: ConfirmDialogProps) {
     },
     [onClose]
   )
+
+  useEffect(() => {
+    if (focusInput && open) {
+      setTimeout(() => {
+        const input = document.querySelector(`input[name="${focusInput}"]`) as HTMLInputElement
+        if (input) {
+          input.focus()
+        } else {
+          console.warn(`Input with name "${focusInput}" not found`)
+        }
+      }, 200)
+    }
+  }, [focusInput, open])
 
   return (
     <Dialog open={open} onClose={dismissable ? handleCancel : noop}>

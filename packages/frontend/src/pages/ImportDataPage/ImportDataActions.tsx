@@ -1,9 +1,9 @@
 import {
   BackupRounded,
   CalculateOutlined,
+  CloudSyncRounded,
   MoreHoriz,
   RestoreRounded,
-  SyncRounded,
 } from "@mui/icons-material"
 import { IconButton, ListItemAvatar, ListItemText, Menu, MenuItem, Tooltip } from "@mui/material"
 import { useStore } from "@nanostores/react"
@@ -89,7 +89,7 @@ export function ImportDataActions() {
           }}
         >
           <ListItemAvatar>
-            <SyncRounded fontSize="small" />
+            <CloudSyncRounded fontSize="small" />
           </ListItemAvatar>
           <ListItemText>Sync all connections</ListItemText>
         </MenuItem>

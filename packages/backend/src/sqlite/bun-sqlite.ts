@@ -1,5 +1,5 @@
 import { Database } from "bun:sqlite"
-import { isDevelopment, isTestEnvironment } from "src/utils/environment-utils"
+import { isDebug, isDevelopment, isTestEnvironment } from "src/utils/environment-utils"
 import { getPrefix } from "src/utils/utils"
 
 export type SQLiteCompatibleType = boolean | string | number | null | Uint8Array
@@ -34,7 +34,7 @@ export async function createQueryExecutor(
       const end = process.hrtime.bigint() // End time in nanoseconds
       const durationMs = Number(end - start) / 1_000_000 // Convert nanoseconds to milliseconds
 
-      if (isDevelopment) {
+      if (isDevelopment && isDebug) {
         console.log(
           getPrefix(accountName),
           `Query took ${durationMs.toFixed(3)}ms`,

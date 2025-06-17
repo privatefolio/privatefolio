@@ -1,193 +1,206 @@
-import { Visibility } from "@mui/icons-material"
-import { IconButton, TableCell, TableRow, Tooltip, Typography } from "@mui/material"
+import { TableCell, TableRow, Tooltip } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import { formatDistance } from "date-fns"
-import React, { useEffect, useState } from "react"
-import { AmountBlock } from "src/components/AmountBlock"
+import Big from "big.js"
+import React, { useEffect, useMemo, useState } from "react"
+import { ActionBlock } from "src/components/ActionBlock"
+import { AppLink } from "src/components/AppLink"
+import { AssetAmountBlock } from "src/components/AssetAmountBlock"
+import { AggregatableValue, AssetAmountsBlock } from "src/components/AssetAmountsBlock"
 import { MyAssetBlock } from "src/components/MyAssetBlock"
-import { TagList } from "src/components/TagList"
+import { QuoteAmountBlock } from "src/components/QuoteAmountBlock"
 import { TimestampBlock } from "src/components/TimestampBlock"
-import { useBoolean } from "src/hooks/useBoolean"
-import { ChartData, Trade } from "src/interfaces"
+import { ChartData, SqlParam, Trade, TradePnL } from "src/interfaces"
 import { $showQuotedAmounts } from "src/stores/account-settings-store"
-import { $activeAccount } from "src/stores/account-store"
-import { getAssetTicker } from "src/utils/assets-utils"
+import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
+import { $inspectTime } from "src/stores/pages/balances-store"
 import { TableRowComponentProps } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
 
-import { TradeDrawer } from "./TradeDrawer"
-
 export function TradeTableRow({
   row,
-  headCells,
+  headCells: _headCells,
   isMobile: _isMobile,
-  isTablet,
+  isTablet: _isTablet,
   relativeTime,
 }: TableRowComponentProps<Trade>) {
   const {
     createdAt,
-    duration,
-    isOpen,
+    tradeStatus: status,
     assetId,
     amount,
-    soldAssets,
-    soldAmounts,
-    feeAssets,
-    feeAmounts,
+    tradeType,
+    cost,
+    tradeNumber,
+    closedAt,
   } = row
 
-  const { value: open, toggle: toggleOpen } = useBoolean(false)
   const [priceMap, setPriceMap] = useState<Record<string, ChartData>>()
   const showQuotedAmounts = useStore($showQuotedAmounts)
 
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
+  const activeAccountPath = useStore($activeAccountPath)
 
   useEffect(() => {
     if (priceMap) return
-    if (!showQuotedAmounts && !open) return
+    if (!showQuotedAmounts) return
 
-    rpc.getAssetPriceMap(activeAccount, createdAt).then((priceMap) => {
-      setPriceMap(priceMap)
-    })
+    rpc
+      .getAssetPriceMap(activeAccount, status === "closed" ? closedAt : undefined)
+      .then((priceMap) => {
+        setPriceMap(priceMap)
+      })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, showQuotedAmounts, createdAt, rpc, activeAccount])
+  }, [showQuotedAmounts, createdAt, rpc, activeAccount])
 
-  if (isTablet) {
-    return (
-      <>
-        <TableRow hover tabIndex={-1}>
-          <TableCell colSpan={headCells.length}>
-            <Typography variant="caption" color="text.secondary">
-              <TimestampBlock timestamp={createdAt} relative={relativeTime} />
-            </Typography>
+  // TODO9
+  // if (isTablet) {
+  //   return (
+  //     <>
+  //       <TableRow hover tabIndex={-1}>
+  //         <TableCell colSpan={headCells.length}>
+  //           <Typography variant="caption" color="text.secondary">
+  //             <TimestampBlock timestamp={createdAt} relative={relativeTime} />
+  //           </Typography>
 
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              <strong>Asset:</strong> <MyAssetBlock id={assetId} />
-            </Typography>
+  //           <Typography variant="body2" sx={{ mt: 1 }}>
+  //             <strong>Asset:</strong> <MyAssetBlock id={assetId} />
+  //           </Typography>
 
-            <Typography variant="body2">
-              <strong>Amount:</strong> {amount}
-            </Typography>
+  //           <Typography variant="body2">
+  //             <strong>Amount:</strong> {amount}
+  //           </Typography>
 
-            <Typography variant="body2">
-              <strong>Status:</strong> {isOpen ? "Open" : "Closed"}
-            </Typography>
+  //           <Typography variant="body2">
+  //             <strong>Direction:</strong> <ActionBlock action={tradeType} />
+  //             <strong>Status:</strong> {status}
+  //           </Typography>
 
-            {duration || isOpen ? (
-              <Typography variant="body2">
-                <strong>Duration:</strong>{" "}
-                {!duration
-                  ? isOpen
-                    ? formatDistance(new Date(createdAt), new Date(), { addSuffix: false })
-                    : "N/A"
-                  : formatDistance(0, duration, { includeSeconds: true })}
-              </Typography>
-            ) : null}
+  //           <Typography variant="body2">
+  //             <strong>Duration:</strong>{" "}
+  //             {!duration
+  //               ? formatDistance(new Date(createdAt), new Date(), { addSuffix: false })
+  //               : formatDistance(0, duration, { includeSeconds: true })}
+  //           </Typography>
 
-            {soldAssets && soldAssets.length > 0 ? (
-              <Typography variant="body2">
-                <strong>Cost:</strong>{" "}
-                {soldAssets
-                  .map((asset, index) => `${soldAmounts[index]} ${asset.split(":").pop()}`)
-                  .join(", ")}
-              </Typography>
-            ) : null}
+  //           {cost && cost.length > 0 ? (
+  //             <Typography variant="body2">
+  //               <strong>Cost:</strong>{" "}
+  //               {cost.map(([asset, amount]) => `${amount} ${asset.split(":").pop()}`).join(", ")}
+  //             </Typography>
+  //           ) : null}
 
-            {feeAssets && feeAssets.length > 0 ? (
-              <Typography variant="body2">
-                <strong>Fees:</strong>{" "}
-                {feeAssets
-                  .map((asset, index) => `${feeAmounts[index]} ${asset.split(":").pop()}`)
-                  .join(", ")}
-              </Typography>
-            ) : null}
+  //           {fees && fees.length > 0 ? (
+  //             <Typography variant="body2">
+  //               <strong>Fees:</strong>{" "}
+  //               {fees.map(([asset, amount]) => `${amount} ${asset.split(":").pop()}`).join(", ")}
+  //             </Typography>
+  //           ) : null}
 
-            <TagList itemId={row.id} itemType="trade" />
+  //           {proceeds && proceeds.length > 0 ? (
+  //             <Typography variant="body2">
+  //               <strong>Proceeds:</strong>{" "}
+  //               {proceeds.map(([asset, amount]) => `${amount} ${asset.split(":").pop()}`).join(", ")}
+  //             </Typography>
+  //           ) : null}
 
-            <Tooltip title="Inspect">
-              <IconButton size="small" color="secondary" onClick={toggleOpen} sx={{ mt: 1 }}>
-                <Visibility fontSize="inherit" />
-              </IconButton>
-            </Tooltip>
-          </TableCell>
-        </TableRow>
-        <TradeDrawer
-          key={row.id}
-          open={open}
-          toggleOpen={toggleOpen}
-          trade={row}
-          relativeTime={relativeTime}
-          priceMap={priceMap}
-          anchor="right"
-        />
-      </>
-    )
-  }
+  //           <Tooltip title="View Details">
+  //             <IconButton
+  //               size="small"
+  //               color="secondary"
+  //               component={AppLink}
+  //               to={`../trade/${row.id}`}
+  //               sx={{ mt: 1 }}
+  //             >
+  //               <Visibility fontSize="inherit" />
+  //             </IconButton>
+  //           </Tooltip>
+  //         </TableCell>
+  //       </TableRow>
+  //     </>
+  //   )
+  // }
+
+  const inspectTime = useStore($inspectTime)
+
+  const costBasis = useMemo<AggregatableValue[]>(() => {
+    return cost.map(([assetId, amount, usdValue, exposure, txId, txTimestamp]) => [
+      assetId,
+      Big(amount).div(`-${exposure}`).toString(),
+      Big(usdValue).div(`-${exposure}`).toString(),
+      txId,
+      txTimestamp,
+    ])
+  }, [cost])
+
+  const [tradePnl, setTradePnl] = useState<TradePnL | undefined | null>()
+
+  useEffect(() => {
+    const params: SqlParam[] = [row.id]
+    let query = "SELECT * FROM trade_pnl WHERE trade_id = ? ORDER BY timestamp DESC LIMIT 1"
+
+    if (inspectTime) {
+      query = `SELECT * FROM trade_pnl WHERE trade_id = ? AND timestamp <= ? ORDER BY timestamp DESC LIMIT 1`
+      params.push(inspectTime)
+    }
+
+    rpc
+      .getTradePnL(activeAccount, row.id, query, params)
+      .then((pnl) => {
+        if (pnl.length > 0) {
+          setTradePnl(pnl[0])
+        } else {
+          setTradePnl(null)
+        }
+      })
+      .catch((error) => {
+        console.error(error)
+        setTradePnl(null)
+      })
+  }, [activeAccount, rpc, row.id, inspectTime])
 
   return (
     <>
       <TableRow hover tabIndex={-1}>
-        <TableCell>
-          <TimestampBlock timestamp={createdAt} relative={relativeTime} />
+        <TableCell variant="clickable">
+          <Tooltip title="View trade">
+            <AppLink to={`${activeAccountPath}/trade/${row.id}`}>{tradeNumber}</AppLink>
+          </Tooltip>
         </TableCell>
-
-        <TableCell>
+        {/* <TableCell>
           {!duration
-            ? isOpen
+            ? status === "open"
               ? formatDistance(new Date(createdAt), new Date(), { addSuffix: false })
               : "N/A"
             : formatDistance(0, duration, { includeSeconds: true })}
+        </TableCell> */}
+        <TableCell>
+          <ActionBlock action={tradeType} />
         </TableCell>
-
+        <TableCell variant="clickable" align="right">
+          <AssetAmountBlock amount={amount} assetId={assetId} priceMap={priceMap} />
+        </TableCell>
         <TableCell>
           <MyAssetBlock id={assetId} />
         </TableCell>
 
-        <TableCell variant="clickable" align="right">
-          <AmountBlock amount={amount} currencyTicker={getAssetTicker(assetId)} />
-        </TableCell>
-
-        <TableCell>{isOpen ? "Open" : "Closed"}</TableCell>
-
         <TableCell>
-          {soldAssets && soldAssets.length > 0
-            ? soldAssets
-                .map((asset, index) => `${soldAmounts[index]} ${asset.split(":").pop()}`)
-                .join(", ")
-            : "Unknown"}
+          <AssetAmountsBlock values={costBasis} aggregation="average" formatting="price" />
         </TableCell>
-
         <TableCell>
-          {feeAssets && feeAssets.length > 0
-            ? feeAssets
-                .map((asset, index) => `${feeAmounts[index]} ${asset.split(":").pop()}`)
-                .join(", ")
-            : "None"}
+          <QuoteAmountBlock amount={priceMap?.[assetId]?.value} formatting="price" />
         </TableCell>
-
         <TableCell>
+          <QuoteAmountBlock amount={tradePnl?.pnl} showSign colorized />
+          {/* <AssetAmountsBlock values={proceeds} showSign colorized /> */}
+        </TableCell>
+        <TableCell>
+          <TimestampBlock timestamp={createdAt} relative={relativeTime} />
+        </TableCell>
+        {/* <TableCell>
           <TagList itemId={row.id} itemType="trade" />
-        </TableCell>
-
-        <TableCell variant="actionList">
-          <Tooltip title="Inspect">
-            <IconButton size="small" color="secondary" onClick={toggleOpen}>
-              <Visibility fontSize="inherit" />
-            </IconButton>
-          </Tooltip>
-        </TableCell>
+        </TableCell> */}
       </TableRow>
-
-      <TradeDrawer
-        key={row.id}
-        open={open}
-        toggleOpen={toggleOpen}
-        trade={row}
-        relativeTime={relativeTime}
-        priceMap={priceMap}
-        anchor="right"
-      />
     </>
   )
 }

@@ -21,7 +21,7 @@ export async function invalidateNetworth(accountName: string, newValue: Timestam
   const existing = (await getValue<Timestamp>(accountName, "networthCursor", 0)) as Timestamp
 
   if (newValue < existing) {
-    await setValue("networthCursor", newValue, accountName)
+    await setValue(accountName, "networthCursor", newValue)
   }
 }
 
@@ -100,7 +100,7 @@ export async function computeNetworth(
 
     const priceMap = await getAssetPriceMap(accountName, timestamp as Timestamp)
 
-    const totalValue = Object.keys(priceMap).reduce((acc, symbol) => {
+    let totalValue = Object.keys(priceMap).reduce((acc, symbol) => {
       const price = priceMap[symbol]
       const balance = balanceMap[symbol]
 
@@ -108,6 +108,9 @@ export async function computeNetworth(
 
       return acc + Math.round(price.value * Number(balance) * 100) / 100
     }, 0)
+
+    // ensure only 2 decimal places
+    totalValue = Math.round(totalValue * 100) / 100
 
     const networth: Networth = {
       change: 0,
@@ -149,7 +152,7 @@ export async function computeNetworth(
   if (balances.length > 0) {
     const cursor = balances[balances.length - 1].timestamp
     await progress([99, `Setting networth cursor to ${formatDate(cursor)}`])
-    await setValue("networthCursor", cursor, accountName)
+    await setValue(accountName, "networthCursor", cursor)
   }
 }
 

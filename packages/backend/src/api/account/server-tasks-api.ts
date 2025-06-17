@@ -13,7 +13,7 @@ import {
 import { TASK_LOGS_LOCATION } from "src/settings/settings"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { createSubscription } from "src/utils/sub-utils"
-import { getPrefix, sleep } from "src/utils/utils"
+import { getPrefix, isTestEnvironment, sleep } from "src/utils/utils"
 
 import { Account, getAccount } from "../accounts-api"
 
@@ -133,6 +133,7 @@ function createProgressCallback(account: Account, taskId: number): ProgressCallb
   return async (update: ProgressUpdate) => {
     try {
       if (entryCount >= 200) return
+      if (isTestEnvironment) return
 
       const logEntry = `${new Date().toISOString()} ${JSON.stringify(update)}\n`
       // save to file

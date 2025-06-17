@@ -1,4 +1,4 @@
-import { Paper, Stack, TableHead, useMediaQuery } from "@mui/material"
+import { Paper, Stack, TableHead, Typography, useMediaQuery } from "@mui/material"
 import Table from "@mui/material/Table"
 import TableBody from "@mui/material/TableBody"
 import TableCell from "@mui/material/TableCell"
@@ -78,6 +78,7 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
   const [loading, setLoading] = useState<boolean>(true)
   const [rows, setRows] = useState<T[]>([])
   const [orderBy, setOrderBy] = useState<keyof T>(initOrderBy)
+  const [error, setError] = useState<Error | null>(null)
 
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -175,11 +176,12 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
     const controller = new AbortController()
 
     setLoading(true)
-    try {
-      Promise.all([
-        queryFn(activeFilters, rowsPerPage, page, order, controller.signal),
-        sleep(10),
-      ]).then(([[rows, queryCount]]) => {
+    Promise.all([
+      queryFn(activeFilters, rowsPerPage, page, order, controller.signal),
+      sleep(10),
+      //
+    ])
+      .then(([[rows, queryCount]]) => {
         setLoading(false)
         setRows(rows)
         setQueryTime(Date.now() - start)
@@ -190,9 +192,13 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
           setRowCount(queryCount)
         }
       })
-    } finally {
-      setLoading(false)
-    }
+      .catch((error) => {
+        console.error(error)
+        setError(error)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
 
     return function cleanup() {
       controller.abort("Result no longer needed.")
@@ -318,7 +324,7 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
                     row={row}
                   />
                 ))}
-                {rows.length === 0 && !isEmpty && !loading && (
+                {rows.length === 0 && !isEmpty && !loading && !error && (
                   <TableRow>
                     <TableCell colSpan={headCells.length}>
                       No records match the current filters.
@@ -328,9 +334,27 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
                 {(isFirstLoading || isEmpty) && (
                   <TableRow>
                     <TableCell colSpan={headCells.length}>
-                      <Stack justifyContent="center" alignItems="center" sx={{ height: 260 }}>
+                      <Stack
+                        justifyContent="center"
+                        alignItems="center"
+                        sx={{ height: defaultRowsPerPage === 10 ? 100 : 260 }}
+                        gap={1}
+                      >
                         {isEmpty && !isFirstLoading && emptyContent}
-                        {isFirstLoading && <CircularSpinner color="secondary" />}
+                        {isFirstLoading && !error && <CircularSpinner color="secondary" />}
+                        {error && (
+                          <>
+                            <Typography>Error loading data</Typography>
+                            <Typography
+                              color="error"
+                              variant="body2"
+                              component="div"
+                              maxWidth={400}
+                            >
+                              <span>{error.message}</span>
+                            </Typography>
+                          </>
+                        )}
                       </Stack>
                     </TableCell>
                   </TableRow>

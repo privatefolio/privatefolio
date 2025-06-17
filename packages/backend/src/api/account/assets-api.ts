@@ -11,7 +11,6 @@ import {
 import { CACHE_LOCATION } from "src/settings/settings"
 import { getAssetContract, getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
-import { isTestEnvironment } from "src/utils/environment-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 
@@ -59,7 +58,7 @@ export async function getMyAssets(
       let cachedAsset = cachedAssets.find((asset) => asset.id === result.id)
       if (!cachedAsset) {
         cachedAsset = cachedAssets.find(
-          (asset) => getAssetTicker(asset.symbol) === getAssetTicker(result.symbol)
+          (asset) => getAssetTicker(asset.id) === getAssetTicker(result.id)
         )
       }
       return { ...cachedAsset, ...result }
@@ -72,7 +71,7 @@ export async function getMyAssets(
 const assets: Asset[] = []
 
 export async function getAssets(): Promise<Asset[]> {
-  if (assets.length > 0 || isTestEnvironment) {
+  if (assets.length > 0) {
     return assets
   }
 
@@ -122,6 +121,7 @@ export async function getAsset(accountName: string, id: string): Promise<MyAsset
       ) {
         return true
       }
+      if (x.symbol === id) return true
       return false
     })
   }
@@ -162,7 +162,7 @@ export async function patchAsset(accountName: string, id: string, patch: Partial
   await upsertAsset(accountName, newValue)
 }
 
-export async function findAssets(query: string, limit = 5): Promise<Asset[]> {
+export async function findAssets(query: string, limit = 5, strict = false): Promise<Asset[]> {
   const normalizedQuery = query.toLowerCase().trim()
 
   if (!normalizedQuery) {
@@ -178,14 +178,23 @@ export async function findAssets(query: string, limit = 5): Promise<Asset[]> {
     }
 
     if (
-      asset.name.toLowerCase().includes(normalizedQuery) ||
-      asset.id.toLowerCase().includes(normalizedQuery) ||
-      asset.coingeckoId?.toLowerCase().includes(normalizedQuery) ||
+      asset.id.toLowerCase() === normalizedQuery ||
+      asset.coingeckoId?.toLowerCase() === normalizedQuery ||
       asset.symbol.toLowerCase().includes(normalizedQuery) ||
       (asset.platforms &&
-        Object.values(asset.platforms).some((contract) =>
-          contract.toLowerCase().includes(normalizedQuery)
+        Object.values(asset.platforms).some(
+          (contract) => contract.toLowerCase() === normalizedQuery
         ))
+    ) {
+      matchingAssets.push(asset)
+    }
+
+    if (strict) continue
+
+    if (
+      asset.id.toLowerCase().includes(normalizedQuery) ||
+      asset.name.toLowerCase().includes(normalizedQuery) ||
+      asset.coingeckoId?.toLowerCase().includes(normalizedQuery)
     ) {
       matchingAssets.push(asset)
     }
@@ -194,16 +203,21 @@ export async function findAssets(query: string, limit = 5): Promise<Asset[]> {
   return matchingAssets
 }
 
+export async function refetchAssets() {
+  const data = await getCoingeckoCoins()
+  await mkdir(`${CACHE_LOCATION}/coins`, { recursive: true })
+  await writeFile(`${CACHE_LOCATION}/coins/all.json`, JSON.stringify(data, null, 2))
+  return data
+}
+
 export function enqueueRefetchAssets(accountName: string, trigger: TaskTrigger) {
   return enqueueTask(accountName, {
     description: "Refetching assets.",
     function: async (progress) => {
-      const data = await getCoingeckoCoins()
-      await mkdir(`${CACHE_LOCATION}/coins`, { recursive: true })
-      await writeFile(`${CACHE_LOCATION}/coins/all.json`, JSON.stringify(data, null, 2))
-      await progress([undefined, `Refetched ${data.length} coins from coingecko.com.`])
+      const data = await refetchAssets()
       const account = await getAccount(accountName)
       account.eventEmitter.emit(SubscriptionChannel.AssetMetadata)
+      await progress([undefined, `Refetched ${data.length} coins from coingecko.com.`])
     },
     name: "Refetch assets",
     priority: TaskPriority.High,

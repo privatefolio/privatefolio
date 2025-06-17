@@ -1,7 +1,7 @@
 import { getPair, mapToChartData, queryPrices } from "src/extensions/prices/llama-price-api"
 import { ResolutionString } from "src/interfaces"
 import { WETH_ASSET_ID } from "src/settings/settings"
-import { ONE_DAY } from "src/utils/test-utils"
+import { ONE_DAY } from "src/utils/formatting-utils"
 import { expect, it } from "vitest"
 
 it("should fetch WETH prices within a range", async () => {
