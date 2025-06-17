@@ -9,7 +9,7 @@ import {
   widget as Widget,
 } from "./charting_library/charting_library"
 import { datafeed } from "./datafeed"
-import { loadChartData, saveChartData } from "./utils"
+import { loadChartData, saveChartData } from "./pro-chart-utils"
 
 const containerId = "tv_chart_container"
 

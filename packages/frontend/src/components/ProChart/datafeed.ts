@@ -5,7 +5,7 @@ import { ChartData, ResolutionString } from "src/interfaces"
 import { $activeAccount } from "../../stores/account-store"
 import { $rpc } from "../../workers/remotes"
 import { Bar, IBasicDataFeed } from "./charting_library/charting_library"
-import { toLibrarySymbol, toSearchSymbol } from "./utils"
+import { toLibrarySymbol, toSearchSymbol } from "./pro-chart-utils"
 
 const defaultPriceApiId = allPriceApiIds[0]
 
@@ -137,13 +137,13 @@ export const datafeed: IBasicDataFeed = {
     onResult(symbols)
   },
   subscribeBars: (
-    symbolInfo,
-    resolution,
-    onRealtimeCallback,
-    subscriberUID,
-    onResetCacheNeededCallback
+    _symbolInfo,
+    _resolution,
+    _onRealtimeCallback,
+    _subscriberUID
+    // onResetCacheNeededCallback
   ) => {
-    console.log("📜 LOG >[subscribeBars]: Method call with subscriberUID:", subscriberUID)
+    // console.log("📜 LOG >[subscribeBars]: Method call with subscriberUID:", subscriberUID)
   },
   unsubscribeBars: (subscriberUID) => {
     console.log("📜 LOG >[unsubscribeBars]: Method call with subscriberUID:", subscriberUID)

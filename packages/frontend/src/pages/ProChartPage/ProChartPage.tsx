@@ -8,7 +8,7 @@ import { SPRING_CONFIGS } from "src/utils/utils"
 
 const AnimatedPaper = animated(Paper)
 
-export function ProChartPage({ show }: { show: boolean }) {
+export function ProChartPage({ show: _show }: { show: boolean }) {
   const [open, setOpen] = useState(false)
   const [screenHeight, setScreenHeight] = useState(0)
 

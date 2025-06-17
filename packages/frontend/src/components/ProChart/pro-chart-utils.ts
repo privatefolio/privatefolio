@@ -73,8 +73,11 @@ export const loadChartData = () => {
   const chartData = JSON.parse(rawChartData)
 
   // FIXME first time user
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   chartData.charts.forEach((chart: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     chart.panes.forEach((pane: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       pane.sources.forEach((source: any) => {
         if (source.type === "study_Volume") {
           source.state.palettes.volumePalette.colors = {
