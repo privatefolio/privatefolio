@@ -45,7 +45,7 @@ export function TradeActions() {
         <MenuItem
           dense
           onClick={() => {
-            rpc.enqueueComputeTrades(activeAccount, "user")
+            rpc.enqueueRecomputeTrades(activeAccount, "user")
             handleClose()
           }}
         >

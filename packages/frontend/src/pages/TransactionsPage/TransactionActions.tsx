@@ -1,4 +1,4 @@
-import { CallMergeRounded, DownloadRounded, MoreHoriz, RemoveCircle } from "@mui/icons-material"
+import { CallMergeRounded, DownloadRounded, MoreHoriz, PhishingRounded } from "@mui/icons-material"
 import {
   IconButton,
   ListItemAvatar,
@@ -108,7 +108,7 @@ export function TransactionActions(props: TransactionActionsProps) {
           }}
         >
           <ListItemAvatar>
-            <RemoveCircle fontSize="small" />
+            <PhishingRounded fontSize="small" />
           </ListItemAvatar>
           <ListItemText>Detect spam transactions</ListItemText>
         </MenuItem>

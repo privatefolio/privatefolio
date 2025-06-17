@@ -2,12 +2,15 @@ import {
   AccountBalanceRounded,
   AttachMoneyRounded,
   BackupRounded,
+  Bedtime,
+  CachedRounded,
+  CalculateOutlined,
   CallMergeRounded,
-  CandlestickChart,
+  CloudSyncRounded,
   DeleteForever,
   DownloadRounded,
+  PhishingRounded,
   RestoreRounded,
-  SyncRounded,
   Workspaces,
 } from "@mui/icons-material"
 import {
@@ -44,10 +47,19 @@ import { ExtensionAvatar } from "../ExtensionAvatar"
 import { TransactionIcon } from "../icons"
 import { PlatformAvatar } from "../PlatformAvatar"
 import { Truncate } from "../Truncate"
-import { Key, MAIN_KEY } from "./Key"
+import { formatShortcut, Key } from "./Key"
 import { SearchInput } from "./SearchInput"
 
 const SEARCH_PLACEHOLDER = "Search for assets, transactions, actions or anything else."
+
+const SECTIONS = {
+  actions: { name: "Actions", priority: 10 },
+  assets: { name: "Assets", priority: 8 },
+  blockchains: { name: "Blockchains", priority: 6 },
+  exchanges: { name: "Exchanges", priority: 7 },
+  extensions: { name: "Extensions", priority: 9 },
+  transactions: { name: "Transactions", priority: 11 },
+}
 
 export const SearchBar = () => {
   const navigate = useNavigate()
@@ -167,7 +179,7 @@ export const SearchBar = () => {
       keywords: txHash,
       name: `${tx.metadata.method || "Unknown"}`,
       perform: () => navigate(`${activeAccountPath}/transactions?id=${tx.id}`),
-      section: { name: "Transactions", priority: 11 },
+      section: SECTIONS.transactions,
       subtitle: `${formatDateRelative(tx.timestamp)} - ${formatPrivatefolioTxId(tx.id)}`, // Show at the very top
     }))
 
@@ -178,7 +190,7 @@ export const SearchBar = () => {
         keywords: txHash,
         name: "View all ",
         perform: () => navigate(`${activeAccountPath}/transactions?txHash=${txHash}`),
-        section: { name: "Transactions", priority: 11 },
+        section: SECTIONS.transactions,
         subtitle: `${actions.length} transactions linked to this tx hash`,
       })
     }
@@ -197,7 +209,7 @@ export const SearchBar = () => {
         name: blockchain.name,
         perform: () => navigate(`${activeAccountPath}/platform/${blockchain.id}`),
         priority: -(blockchain.chainId ?? Infinity),
-        section: { name: "Blockchains", priority: 6 },
+        section: SECTIONS.blockchains,
       })
     })
 
@@ -209,7 +221,7 @@ export const SearchBar = () => {
         name: exchange.name,
         perform: () => navigate(`${activeAccountPath}/platform/${exchange.id}`),
         priority: -(exchange.coingeckoTrustRank ?? Infinity),
-        section: { name: "Exchanges", priority: 7 },
+        section: SECTIONS.exchanges,
       })
     })
 
@@ -232,7 +244,7 @@ export const SearchBar = () => {
       name: asset.symbol.toUpperCase(),
       perform: () => navigate(`${activeAccountPath}/asset/${asset.id}`),
       priority: -(asset.marketCapRank ?? Infinity),
-      section: { name: "Assets", priority: 8 },
+      section: SECTIONS.assets,
       subtitle: asset.name,
     }))
   }, [assetsFound, navigate, activeAccountPath])
@@ -253,7 +265,7 @@ export const SearchBar = () => {
         keywords: `${extension.extensionName} ${extension.description} ${extension.authorGithub} extension`,
         name: extension.extensionName,
         perform: () => navigate(`${activeAccountPath}/extension/${extension.id}`),
-        section: { name: "Extensions", priority: 9 },
+        section: SECTIONS.extensions,
         subtitle: extension.description,
       })
     })
@@ -261,48 +273,33 @@ export const SearchBar = () => {
     return actions
   }, [extensionsFound, navigate, activeAccountPath])
 
-  const actions = useMemo<Action[]>(
-    () => [
-      ...txnsFoundActions,
-      ...platformActions,
-      ...assetActions,
-      ...extensionActions,
+  const appActions = useMemo<Action[]>(() => {
+    const actions: Action[] = [
       {
-        icon: <AttachMoneyRounded fontSize="small" />,
-        id: "action-refresh-networth",
-        name: "Refresh networth",
+        icon: <CachedRounded fontSize="small" />,
+        id: "action-refresh-all",
+        name: "Refresh all",
         perform: () => {
           rpc.enqueueFetchPrices(activeAccount, "user")
           rpc.enqueueRefreshBalances(activeAccount, "user")
           rpc.enqueueRefreshNetworth(activeAccount, "user")
           rpc.enqueueRefreshTrades(activeAccount, "user")
         },
-        priority: 1,
-        section: { name: "Actions", priority: 10 },
+        priority: 11,
+        section: SECTIONS.actions,
         shortcut: ["$mod+a"],
+        subtitle: "Refresh prices, networth, trades and more.",
       },
       {
-        icon: <CandlestickChart fontSize="small" />,
-        id: "action-refresh-trades",
-        name: "Refresh trades",
-        perform: () => {
-          rpc.enqueueComputeTrades(activeAccount, "user")
-        },
-        priority: 1,
-        section: { name: "Actions", priority: 10 },
-        shortcut: ["$mod+x"],
+        icon: <AttachMoneyRounded fontSize="small" />,
+        id: "action-fetch-asset-prices",
+        name: "Fetch asset prices",
+        perform: () => rpc.enqueueFetchPrices(activeAccount, "user"),
+        priority: 3,
+        section: SECTIONS.actions,
       },
-      // {
-      //   icon: <AttachMoneyRounded fontSize="small" />,
-      //   id: "action-fetch-asset-prices",
-      //   name: "Fetch asset prices",
-      //   perform: () => rpc.enqueueFetchPrices(activeAccount, "user"),
-      //   priority: 1,
-      //   section: { name: "Actions", priority: 10 },
-      //   shortcut: ["f", "p"],
-      // },
       {
-        icon: <SyncRounded fontSize="small" />,
+        icon: <CloudSyncRounded fontSize="small" />,
         id: "action-sync-all-connections",
         name: "Sync all connections",
         perform: () =>
@@ -311,16 +308,16 @@ export const SearchBar = () => {
               enqueueSnackbar("Could not sync connection", { variant: "error" })
             }
           }),
-        priority: 1,
-        section: { name: "Actions", priority: 10 },
+        priority: 10,
+        section: SECTIONS.actions,
       },
       {
-        icon: <AttachMoneyRounded fontSize="small" />,
+        icon: <PhishingRounded fontSize="small" />,
         id: "action-detect-spam-transactions",
         name: "Detect spam transactions",
         perform: () => rpc.enqueueDetectSpamTransactions(activeAccount, "user"),
         priority: 1,
-        section: { name: "Actions", priority: 10 },
+        section: SECTIONS.actions,
       },
       {
         icon: <CallMergeRounded fontSize="small" />,
@@ -328,7 +325,7 @@ export const SearchBar = () => {
         name: "Auto-merge transactions",
         perform: () => rpc.enqueueAutoMerge(activeAccount, "user"),
         priority: 1,
-        section: { name: "Actions", priority: 10 },
+        section: SECTIONS.actions,
       },
       {
         icon: <BackupRounded fontSize="small" />,
@@ -336,8 +333,8 @@ export const SearchBar = () => {
         keywords: "backup account restore",
         name: "Backup account",
         perform: () => handleBackupRequest(rpc, activeAccount),
-        priority: 1,
-        section: { name: "Actions", priority: 10 },
+        priority: 9,
+        section: SECTIONS.actions,
       },
       {
         icon: <RestoreRounded fontSize="small" />,
@@ -345,8 +342,8 @@ export const SearchBar = () => {
         keywords: "restore account backup",
         name: "Restore account",
         perform: () => onRestoreRequest(rpc, activeAccount, noop),
-        priority: 1,
-        section: { name: "Actions", priority: 10 },
+        priority: 9,
+        section: SECTIONS.actions,
       },
       {
         icon: <DownloadRounded fontSize="small" />,
@@ -354,8 +351,8 @@ export const SearchBar = () => {
         keywords: "export transactions",
         name: "Export transactions",
         perform: () => handleExportTransactionsRequest(rpc, activeAccount),
-        priority: 1,
-        section: { name: "Actions", priority: 10 },
+        priority: 5,
+        section: SECTIONS.actions,
       },
       {
         icon: <DownloadRounded fontSize="small" />,
@@ -363,35 +360,97 @@ export const SearchBar = () => {
         keywords: "export audit logs",
         name: "Export audit logs",
         perform: () => handleExportAuditLogsRequest(rpc, activeAccount),
-        priority: 1,
-        section: { name: "Actions", priority: 10 },
+        priority: 5,
+        section: SECTIONS.actions,
       },
       {
         icon: <AccountBalanceRounded fontSize="small" />,
         id: "action-refetch-platforms",
         name: "Refetch asset platforms",
         perform: () => rpc.enqueueRefetchPlatforms(activeAccount, "user"),
-        priority: 1,
-        section: { name: "Actions", priority: 10 },
-      },
-      {
-        icon: <Workspaces fontSize="small" />,
-        id: "action-refetch-assets",
-        name: "Refetch assets",
-        perform: () => rpc.enqueueRefetchAssets(activeAccount, "user"),
-        priority: 1,
-        section: { name: "Actions", priority: 10 },
+        priority: 2,
+        section: SECTIONS.actions,
       },
       {
         icon: <DeleteForever fontSize="small" />,
         id: "action-delete-asset-prices",
         name: "Delete asset prices",
         perform: () => rpc.enqueueDeleteAssetPrices(activeAccount, "user"),
-        priority: 1,
-        section: { name: "Actions", priority: 10 },
+        priority: 0,
+        section: SECTIONS.actions,
       },
+      {
+        icon: <CalculateOutlined fontSize="small" />,
+        id: "action-recompute-trades",
+        name: "Recompute trades",
+        perform: () => rpc.enqueueRecomputeTrades(activeAccount, "user"),
+        priority: 3,
+        section: SECTIONS.actions,
+      },
+      {
+        icon: <CalculateOutlined fontSize="small" />,
+        id: "action-recompute-balances",
+        name: "Recompute balances",
+        perform: () => rpc.enqueueRecomputeBalances(activeAccount, "user"),
+        priority: 3,
+        section: SECTIONS.actions,
+      },
+      {
+        icon: <CalculateOutlined fontSize="small" />,
+        id: "action-recompute-networth",
+        name: "Recompute networth",
+        perform: () => rpc.enqueueRecomputeNetworth(activeAccount, "user"),
+        priority: 3,
+        section: SECTIONS.actions,
+      },
+      {
+        icon: <DeleteForever fontSize="small" />,
+        id: "action-delete-balances",
+        name: "Delete balances",
+        perform: () => rpc.enqueueDeleteBalances(activeAccount, "user"),
+        priority: 0,
+        section: SECTIONS.actions,
+      },
+      {
+        icon: <Bedtime fontSize="small" />,
+        id: "action-sleep-1s",
+        name: "Sleep 1s",
+        perform: () => rpc.enqueueSleep(activeAccount, 1, 0.1),
+        priority: 0,
+        section: SECTIONS.actions,
+      },
+      {
+        icon: <Bedtime fontSize="small" />,
+        id: "action-sleep-50s",
+        name: "Sleep 50s",
+        perform: () => rpc.enqueueSleep(activeAccount, 50, 10, true),
+        priority: 0,
+        section: SECTIONS.actions,
+      },
+      {
+        icon: <Workspaces fontSize="small" />,
+        id: "action-refetch-all-assets",
+        name: "Refetch all assets",
+        perform: () => rpc.enqueueRefetchAssets(activeAccount, "user"),
+        priority: 2,
+        section: SECTIONS.actions,
+      },
+    ]
+
+    actions.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""))
+
+    return actions
+  }, [activeAccount, rpc])
+
+  const actions = useMemo<Action[]>(
+    () => [
+      ...txnsFoundActions,
+      ...platformActions,
+      ...assetActions,
+      ...extensionActions,
+      ...appActions,
     ],
-    [assetActions, txnsFoundActions, platformActions, extensionActions, rpc, activeAccount]
+    [txnsFoundActions, platformActions, assetActions, extensionActions, appActions]
   )
 
   useRegisterActions(actions, [actions])
@@ -464,12 +523,7 @@ function RenderResults({ loading }: { loading: boolean }) {
                   primary={
                     <>
                       {item.shortcut.map((x) => {
-                        if (x.startsWith("$mod")) {
-                          return (
-                            <Key key={x}>{x.replace("$mod", MAIN_KEY).replace("+", " + ")}</Key>
-                          )
-                        }
-                        return <Key key={x}>{x}</Key>
+                        return <Key key={x}>{formatShortcut(x)}</Key>
                       })}
                     </>
                   }
