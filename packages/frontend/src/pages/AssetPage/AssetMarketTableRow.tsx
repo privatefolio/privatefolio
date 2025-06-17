@@ -2,6 +2,7 @@ import { Box, Chip, TableCell, TableRow } from "@mui/material"
 import React from "react"
 import { AmountBlock } from "src/components/AmountBlock"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
+import { QuoteAmountBlock } from "src/components/QuoteAmountBlock"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { DEFAULT_CURRENCIES_MAP } from "src/stores/account-settings-store"
 import { TableRowComponentProps } from "src/utils/table-utils"
@@ -51,23 +52,13 @@ export function AssetMarketTableRow(props: TableRowComponentProps<TickerData>) {
         />
       </TableCell>
       <TableCell align="right" variant="clickable">
-        <AmountBlock
-          amount={row.price}
-          currencySymbol={currency.symbol}
-          currencyTicker={currency.id}
-        />
+        <QuoteAmountBlock amount={row.price} formatting="price" />
       </TableCell>
       <TableCell align="right" variant="clickable">
         <AmountBlock amount={row.spread} currencyTicker={"%"} />
       </TableCell>
       <TableCell align="right" variant="clickable">
-        <AmountBlock
-          amount={row.volume}
-          currencySymbol={currency.symbol}
-          significantDigits={currency.maxDigits}
-          maxDigits={currency.maxDigits}
-          currencyTicker={currency.id}
-        />
+        <QuoteAmountBlock amount={row.volume} />
       </TableCell>
       <TableCell>
         <Box

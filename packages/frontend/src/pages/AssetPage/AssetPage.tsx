@@ -8,12 +8,12 @@ import { BackButton } from "src/components/BackButton"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { NavTab } from "src/components/NavTab"
 import { PlatformBlock } from "src/components/PlatformBlock"
+import { QuoteAmountBlock } from "src/components/QuoteAmountBlock"
 import { QuoteCurrencyToggle } from "src/components/QuoteCurrencyToggle"
 import { SectionTitle } from "src/components/SectionTitle"
 import { Tabs } from "src/components/Tabs"
 import { UserWalletIcon } from "src/components/UserWalletIcon"
 import { Balance, CoingeckoMetadataFull, MyAsset } from "src/interfaces"
-import { $quoteCurrency } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
 import { getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
 import { $rpc } from "src/workers/remotes"
@@ -43,7 +43,6 @@ export default function AssetPage() {
 
   const activeAccount = useStore($activeAccount)
   const rpc = useStore($rpc)
-  const currency = useStore($quoteCurrency)
 
   const [asset, setAsset] = useState<MyAsset | undefined>()
 
@@ -145,23 +144,16 @@ export default function AssetPage() {
               {metadata.market_data?.current_price?.usd && (
                 <div>
                   <SectionTitle>Current Price</SectionTitle>
-                  <AmountBlock
+                  <QuoteAmountBlock
                     amount={metadata.market_data.current_price.usd}
-                    currencySymbol={currency.symbol}
-                    currencyTicker={currency.id}
+                    formatting="price"
                   />
                 </div>
               )}
               {metadata.market_data?.market_cap?.usd && (
                 <div>
                   <SectionTitle>Market Cap</SectionTitle>
-                  <AmountBlock
-                    amount={metadata.market_data.market_cap.usd}
-                    currencySymbol={currency.symbol}
-                    significantDigits={currency.maxDigits}
-                    maxDigits={currency.maxDigits}
-                    currencyTicker={currency.id}
-                  />
+                  <QuoteAmountBlock amount={metadata.market_data.market_cap.usd} />
                 </div>
               )}
             </>
@@ -187,13 +179,7 @@ export default function AssetPage() {
             {!balances ? (
               <Skeleton width="100%" />
             ) : (
-              <AmountBlock
-                amount={balance?.value || 0}
-                currencySymbol={currency.symbol}
-                significantDigits={currency.maxDigits}
-                maxDigits={currency.maxDigits}
-                currencyTicker={currency.id}
-              />
+              <QuoteAmountBlock amount={balance?.value || 0} />
             )}
           </div>
         </Stack>

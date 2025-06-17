@@ -337,7 +337,7 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
                       <Stack
                         justifyContent="center"
                         alignItems="center"
-                        sx={{ height: 260 }}
+                        sx={{ height: defaultRowsPerPage === 10 ? 100 : 260 }}
                         gap={1}
                       >
                         {isEmpty && !isFirstLoading && emptyContent}

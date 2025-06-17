@@ -90,7 +90,15 @@
       ],
     ],
     "createdAt": 1593638829000,
-    "deposits": [],
+    "deposits": [
+      [
+        "ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
+        "-4506.611832",
+        "0",
+        "4118854677_0x1ee00ef787754995138dd60f5916c540736e5d7c793d3de26b0123af59d99027_ERC20_248",
+        1593639109000,
+      ],
+    ],
     "duration": 280000,
     "fees": [],
     "id": "178378352",
@@ -128,10 +136,24 @@
     "deposits": [
       [
         "ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
+        "-1000",
+        "0",
+        "4118854677_0x16aa187a9077acfa3f40596922bfdb0bdedd9ecbf9e659b362acd7dc31430450_MERGED",
+        1594503166000,
+      ],
+      [
+        "ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
         "4620.96817",
         "0",
         "4118854677_0x57183b743c7db3ce7db411f7575d74c560573ea2a1ae546a64dd13a4b4a8c5bb_ERC20_254",
         1595880014000,
+      ],
+      [
+        "ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
+        "-5794.773921",
+        "0",
+        "4118854677_0x50b8b2280176aa2e7b884e57410f6ddcb9283ca96a5c511032455a3a6aec9a5a_MERGED",
+        1595880708000,
       ],
     ],
     "duration": 1377803000,

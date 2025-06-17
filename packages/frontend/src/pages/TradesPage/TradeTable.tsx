@@ -127,18 +127,15 @@ export function TradeTable(props: TradesTableProps) {
         sx: { maxWidth: 120, minWidth: 120, width: 120 },
       },
       {
-        key: "cost",
-        label: "Cost",
+        label: "Cost Basis",
         sx: { maxWidth: 240, minWidth: 240, width: 240 },
       },
       {
-        key: "fees",
-        label: "Fees",
+        label: "Price",
         sx: { maxWidth: 240, minWidth: 240, width: 240 },
       },
       {
-        key: "proceeds",
-        label: "Proceeds",
+        label: "Profit",
         sx: { maxWidth: 240, minWidth: 240, width: 240 },
       },
       // {
@@ -159,14 +156,12 @@ export function TradeTable(props: TradesTableProps) {
   )
 
   return (
-    <>
-      <RemoteTable
-        initOrderBy="createdAt"
-        headCells={headCells}
-        queryFn={queryFn}
-        TableRowComponent={TradeTableRow}
-        {...rest}
-      />
-    </>
+    <RemoteTable
+      initOrderBy="createdAt"
+      headCells={headCells}
+      queryFn={queryFn}
+      TableRowComponent={TradeTableRow}
+      {...rest}
+    />
   )
 }

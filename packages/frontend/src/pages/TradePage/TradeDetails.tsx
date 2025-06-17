@@ -4,10 +4,12 @@ import Big from "big.js"
 import { formatDistance } from "date-fns"
 import React, { useEffect, useMemo, useState } from "react"
 import { AggregatableValue, AssetAmountsBlock } from "src/components/AssetAmountsBlock"
+import { LearnMore } from "src/components/LearnMore"
+import { QuoteAmountBlock } from "src/components/QuoteAmountBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TagManager } from "src/components/TagManager"
 import { TimestampBlock } from "src/components/TimestampBlock"
-import { Tag, Trade } from "src/interfaces"
+import { Tag, Trade, TradePnL } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 import { $rpc } from "src/workers/remotes"
 
@@ -45,6 +47,35 @@ export function TradeDetails({ trade }: TradeDetailsProps) {
     ])
   }, [cost])
 
+  const [tradePnl, setTradePnl] = useState<TradePnL | undefined | null>()
+
+  useEffect(() => {
+    rpc
+      .getTradePnL(
+        activeAccount,
+        id,
+        "SELECT * FROM trade_pnl WHERE trade_id = ? ORDER BY timestamp DESC LIMIT 1"
+      )
+      .then((pnl) => {
+        if (pnl.length > 0) {
+          setTradePnl(pnl[0])
+        } else {
+          setTradePnl(null)
+        }
+      })
+      .catch(() => {
+        setTradePnl(null)
+      })
+  }, [activeAccount, rpc, id])
+
+  const deposits = useMemo<AggregatableValue[]>(() => {
+    return trade.deposits.filter(([_, amount]) => Big(amount).gt(0))
+  }, [trade.deposits])
+
+  const withdrawals = useMemo<AggregatableValue[]>(() => {
+    return trade.deposits.filter(([_, amount]) => Big(amount).lt(0))
+  }, [trade.deposits])
+
   return (
     <Paper sx={{ paddingX: 2, paddingY: 1 }}>
       <Typography variant="body2" component={Stack} gap={2}>
@@ -69,26 +100,61 @@ export function TradeDetails({ trade }: TradeDetailsProps) {
           </span>
         </div>
 
-        <div>
-          <SectionTitle>Cost</SectionTitle>
-          <AssetAmountsBlock values={cost} showSign colorized />
-        </div>
-        <div>
-          <SectionTitle>Cost Basis</SectionTitle>
-          <AssetAmountsBlock values={costBasis} aggregation="average" formatting="price" />
-        </div>
-        <div>
-          <SectionTitle>Fees</SectionTitle>
-          <AssetAmountsBlock values={fees} showSign colorized />
-        </div>
-        <div>
-          <SectionTitle>Proceeds</SectionTitle>
-          <AssetAmountsBlock values={proceeds} showSign colorized />
-        </div>
+        {deposits.length > 0 && (
+          <div>
+            <LearnMore title="These are the assets you deposited into this trade.">
+              <SectionTitle>Deposits</SectionTitle>
+            </LearnMore>
+            <AssetAmountsBlock values={deposits} showSign colorized />
+          </div>
+        )}
+        {withdrawals.length > 0 && (
+          <div>
+            <LearnMore title="These are the assets you withdrew from this trade.">
+              <SectionTitle>Withdrawals</SectionTitle>
+            </LearnMore>
+            <AssetAmountsBlock values={withdrawals} showSign colorized />
+          </div>
+        )}
+        {cost.length > 0 && (
+          <div>
+            <LearnMore title="These are the assets you sold in this trade.">
+              <SectionTitle>Cost</SectionTitle>
+            </LearnMore>
+            <AssetAmountsBlock values={cost} showSign colorized />
+          </div>
+        )}
+        {fees.length > 0 && (
+          <div>
+            <LearnMore title="These are the fees you paid in this trade.">
+              <SectionTitle>Fees</SectionTitle>
+            </LearnMore>
+            <AssetAmountsBlock values={fees} showSign colorized />
+          </div>
+        )}
+        {proceeds.length > 0 && (
+          <div>
+            <LearnMore title="These are the assets you received from this trade.">
+              <SectionTitle>Proceeds</SectionTitle>
+            </LearnMore>
+            <AssetAmountsBlock values={proceeds} showSign colorized />
+          </div>
+        )}
 
-        {/* <div>
-          <SectionTitle>Realized profit</SectionTitle>
-        </div> */}
+        {costBasis.length > 0 && (
+          <div>
+            <LearnMore title="Cost Basis is the average cost of the assets in the trade.">
+              <SectionTitle>Cost Basis</SectionTitle>
+            </LearnMore>
+            <AssetAmountsBlock values={costBasis} aggregation="average" formatting="price" />
+          </div>
+        )}
+        <div>
+          <LearnMore title="This is the profit you made from this trade.">
+            <SectionTitle>Profit</SectionTitle>
+          </LearnMore>
+          <QuoteAmountBlock amount={tradePnl?.pnl} showSign colorized />
+        </div>
 
         {/* TODO8 */}
         {/* {transactionIds && transactionIds.length > 0 && (

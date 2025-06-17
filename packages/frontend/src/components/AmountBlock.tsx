@@ -1,8 +1,5 @@
 import { Box, Stack, Tooltip, Typography, TypographyProps } from "@mui/material"
-import {
-  getDecimalPrecision,
-  getMinimumDecimalPrecision,
-} from "privatefolio-backend/build/src/utils/formatting-utils"
+import { getAutoFormatDigits } from "privatefolio-backend/build/src/utils/formatting-utils"
 import React, { useMemo, useState } from "react"
 import { MonoFont } from "src/theme"
 import { greenColor, redColor } from "src/utils/color-utils"
@@ -44,45 +41,12 @@ export function AmountBlock(props: AmountBlockProps) {
   const amountN = hasValue ? Number(amount) : undefined
   const formatOpts = showSign && amountN !== 0 ? showSignOpts : EMPTY_OBJECT
 
-  let minimumFractionDigits = significantDigits
-  let maximumFractionDigits: number | undefined = maxDigits
-
-  // auto-adjust minimumFractionDigits
-  if (minimumFractionDigits === undefined && typeof amountN === "number") {
-    if (amountN > 10_000 || amountN < -10_000) {
-      minimumFractionDigits = 0
-    } else if (amountN > 1000 || amountN < -1000) {
-      minimumFractionDigits = 2
-    } else if (amountN < 1 && amountN > -1) {
-      minimumFractionDigits = getMinimumDecimalPrecision(amountN) + 3
+  const { minimumFractionDigits, maximumFractionDigits } = useMemo(() => {
+    if (typeof amountN !== "number") {
+      return { maximumFractionDigits: maxDigits, minimumFractionDigits: significantDigits }
     }
-
-    maximumFractionDigits = getDecimalPrecision(amountN)
-  }
-
-  // auto-adjust maximumFractionDigits
-  if (
-    minimumFractionDigits !== undefined &&
-    maximumFractionDigits === undefined &&
-    typeof amountN === "number"
-  ) {
-    if (amountN > 10_000 || amountN < -10_000) {
-      maximumFractionDigits = Math.max(0, minimumFractionDigits)
-    } else if (amountN < 1 && amountN > -1) {
-      maximumFractionDigits = Math.max(minimumFractionDigits, getDecimalPrecision(amountN))
-    } else {
-      maximumFractionDigits = minimumFractionDigits
-    }
-  }
-
-  // fail guard
-  if (
-    typeof minimumFractionDigits === "number" &&
-    typeof maximumFractionDigits === "number" &&
-    minimumFractionDigits > maximumFractionDigits
-  ) {
-    maximumFractionDigits = minimumFractionDigits
-  }
+    return getAutoFormatDigits(amountN, significantDigits)
+  }, [amountN, significantDigits, maxDigits])
 
   const [copied, setCopied] = useState(false)
 
@@ -156,7 +120,7 @@ export function AmountBlock(props: AmountBlockProps) {
         onClick={() => {
           if (!hasValue) return
 
-          const clipText = maxDigits ? (amountN as number).toFixed(maxDigits) : String(amount)
+          const clipText = String(amount)
           navigator.clipboard.writeText(clipText)
 
           setCopied(true)

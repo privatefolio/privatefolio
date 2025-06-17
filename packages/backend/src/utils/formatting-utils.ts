@@ -172,3 +172,51 @@ export function formatFileSize(bytes: number, longFormat = false) {
 
 export const ONE_DAY_TIME = 24 * 60 * 60
 export const ONE_DAY = ONE_DAY_TIME * 1000
+
+/**
+ * Calculates appropriate minimumFractionDigits and maximumFractionDigits for formatting a number.
+ *
+ * @param x - The number to format
+ * @param significantDigits - Optional override for minimumFractionDigits
+ * @returns Object with minimumFractionDigits and maximumFractionDigits
+ */
+export function getAutoFormatDigits(
+  x: number,
+  significantDigits?: number
+): { maximumFractionDigits?: number; minimumFractionDigits?: number } {
+  let minimumFractionDigits = significantDigits
+  let maximumFractionDigits: number | undefined
+
+  // auto-adjust minimumFractionDigits
+  if (minimumFractionDigits === undefined) {
+    if (x > 10_000 || x < -10_000) {
+      minimumFractionDigits = 0
+    } else if (x > 1000 || x < -1000) {
+      minimumFractionDigits = 2
+    } else if (x < 1 && x > -1) {
+      minimumFractionDigits = getMinimumDecimalPrecision(x) + 3
+    }
+  }
+
+  // auto-adjust maximumFractionDigits
+  if (minimumFractionDigits !== undefined) {
+    if (x > 10_000 || x < -10_000) {
+      maximumFractionDigits = Math.max(0, minimumFractionDigits)
+    } else if (x < 1 && x > -1) {
+      maximumFractionDigits = getMinimumDecimalPrecision(x) + 3
+    } else {
+      maximumFractionDigits = minimumFractionDigits
+    }
+  }
+
+  // fail guard
+  if (
+    typeof minimumFractionDigits === "number" &&
+    typeof maximumFractionDigits === "number" &&
+    minimumFractionDigits > maximumFractionDigits
+  ) {
+    maximumFractionDigits = minimumFractionDigits
+  }
+
+  return { maximumFractionDigits, minimumFractionDigits }
+}

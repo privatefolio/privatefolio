@@ -84,6 +84,13 @@
     "deposits": [
       [
         "ethereum:0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359:SAI",
+        "-965.25",
+        "0",
+        "4118854677_0x5913b34d1a02fa8839bb737f4814fd71715ca01d55335dcd7d8736424e727643_MERGED",
+        1570089590000,
+      ],
+      [
+        "ethereum:0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359:SAI",
         "965.25",
         "0",
         "4118854677_0xd8f8197a5e445fd8775b9bcfd8beb6660f5c9e1aeff5b506ef77cb8bd9d28663_MERGED",
@@ -132,7 +139,15 @@
       ],
     ],
     "createdAt": 1572357141000,
-    "deposits": [],
+    "deposits": [
+      [
+        "ethereum:0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359:SAI",
+        "-1000",
+        "0",
+        "4118854677_0xa68586eaedd9d796f7a4c6fd0fbeb54517b2db42648790f1d99a4d8c769421bd_MERGED",
+        1572357369000,
+      ],
+    ],
     "duration": 228000,
     "fees": [],
     "id": "3381524775",
@@ -215,6 +230,20 @@
         "0",
         "4118854677_0x5b7ea76aa06b159e34097238889ec075605c2992c9f14e8f5ce5f589b0bce2c4_ERC20_109",
         1574096160000,
+      ],
+      [
+        "ethereum:0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359:SAI",
+        "-1",
+        "0",
+        "4118854677_0xaa1848cdd32258158e3e3016678448a5907af77f5536a32ef1e515a42456a81b_MERGED",
+        1574102791000,
+      ],
+      [
+        "ethereum:0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359:SAI",
+        "-999",
+        "0",
+        "4118854677_0xd8645f98ea81b76e6a6cb74f130a3721a1b1e314e80fb146f0d64bc9f4f40ff2_MERGED",
+        1574110196000,
       ],
     ],
     "duration": 235745000,

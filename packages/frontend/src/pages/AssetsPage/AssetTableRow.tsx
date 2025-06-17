@@ -12,13 +12,12 @@ import {
 import { useStore } from "@nanostores/react"
 import { allPriceApiIds } from "privatefolio-backend/src/settings/price-apis"
 import React from "react"
-import { AmountBlock } from "src/components/AmountBlock"
 import { AppLink } from "src/components/AppLink"
 import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { PlatformAvatar } from "src/components/PlatformAvatar"
 import { PlatformBlock } from "src/components/PlatformBlock"
+import { QuoteAmountBlock } from "src/components/QuoteAmountBlock"
 import { PRICE_APIS_META, PriceApiId } from "src/settings"
-import { $quoteCurrency } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
 import { $assetMap } from "src/stores/metadata-store"
 import { getAssetPlatform } from "src/utils/assets-utils"
@@ -38,7 +37,6 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
     ...rest
   } = props
   const { id: assetId, name, coingeckoId, priceApiId, price } = row
-  const currency = useStore($quoteCurrency)
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
 
@@ -104,11 +102,7 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
               {price === null ? (
                 <Skeleton sx={{ minWidth: 30 }}></Skeleton>
               ) : (
-                <AmountBlock
-                  amount={price?.value}
-                  currencySymbol={currency.symbol}
-                  currencyTicker={currency.id}
-                />
+                <QuoteAmountBlock amount={price?.value} formatting="price" />
               )}
             </Stack>
           </Stack>
@@ -141,11 +135,7 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
           {price === null ? (
             <Skeleton sx={{ margin: "0px 16px" }}></Skeleton>
           ) : (
-            <AmountBlock
-              amount={price?.value}
-              currencySymbol={currency.symbol}
-              currencyTicker={currency.id}
-            />
+            <QuoteAmountBlock amount={price?.value} formatting="price" />
           )}
         </TableCell>
       </TableRow>

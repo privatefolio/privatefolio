@@ -31,7 +31,7 @@ export function AssetBalanceHistory(props: AssetBalanceHistoryProps) {
   const rpc = useStore($rpc)
 
   const showQuotedAmounts = useStore($showQuotedAmounts)
-  const quoteCurrency = useStore($quoteCurrency)
+  const currency = useStore($quoteCurrency)
 
   const queryFn: QueryChartData = useCallback(
     async (interval) => {
@@ -107,19 +107,19 @@ export function AssetBalanceHistory(props: AssetBalanceHistoryProps) {
     () => ({
       localization: {
         priceFormatter: showQuotedAmounts
-          ? createValueFormatter(quoteCurrency)
+          ? createValueFormatter(currency)
           : createNativeAmountFormatter(getAssetTicker(assetId)),
       },
     }),
-    [showQuotedAmounts, quoteCurrency, assetId]
+    [showQuotedAmounts, currency, assetId]
   )
 
   const tooltipOptions = useMemo(
     () => ({
-      currencySymbol: showQuotedAmounts ? quoteCurrency.symbol : getAssetTicker(assetId),
-      significantDigits: showQuotedAmounts ? quoteCurrency.maxDigits : undefined,
+      currencySymbol: showQuotedAmounts ? currency.symbol : getAssetTicker(assetId),
+      significantDigits: showQuotedAmounts ? currency.maxDigits : undefined,
     }),
-    [assetId, showQuotedAmounts, quoteCurrency]
+    [assetId, showQuotedAmounts, currency]
   )
 
   return (

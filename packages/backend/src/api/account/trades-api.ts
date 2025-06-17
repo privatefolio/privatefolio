@@ -429,6 +429,25 @@ export async function computeTrades(
       ])
     }
 
+    // Withdrawals
+    if (
+      tx.outgoingAsset &&
+      tx.outgoing &&
+      tx.outgoingAsset === assetId &&
+      log.operation === "Withdraw"
+    ) {
+      const assetPrice = priceMap[tx.outgoingAsset]?.value
+      if (!assetPrice && !isTestEnvironment)
+        throw new Error(`Price not found for asset ${tx.outgoingAsset}`)
+      trade.deposits.push([
+        tx.outgoingAsset,
+        `-${tx.outgoing}`,
+        assetPrice ? Big(assetPrice).mul(`-${tx.outgoing}`).toString() : "0",
+        txId,
+        tx.timestamp,
+      ])
+    }
+
     // Cost
     if (tx.outgoingAsset && tx.outgoing && tx.incomingAsset === assetId) {
       const assetPrice = priceMap[tx.outgoingAsset]?.value
@@ -680,13 +699,14 @@ export async function getTradeTransactions(
   }
 }
 
-export async function getTradePnL(accountName: string, tradeId: string): Promise<TradePnL[]> {
+export async function getTradePnL(
+  accountName: string,
+  tradeId: string,
+  query = "SELECT * FROM trade_pnl WHERE trade_id = ? ORDER BY timestamp ASC"
+): Promise<TradePnL[]> {
   const account = await getAccountWithTrades(accountName)
   try {
-    const result = await account.execute(
-      "SELECT * FROM trade_pnl WHERE trade_id = ? ORDER BY timestamp ASC",
-      [tradeId]
-    )
+    const result = await account.execute(query, [tradeId])
     /* eslint-disable sort-keys-fix/sort-keys-fix */
     return result.map((row) => ({
       id: row[0] as string,

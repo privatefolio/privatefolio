@@ -1,15 +1,17 @@
 import { TableCell, TableRow, Tooltip } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React, { useEffect, useState } from "react"
+import Big from "big.js"
+import React, { useEffect, useMemo, useState } from "react"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AppLink } from "src/components/AppLink"
 import { AssetAmountBlock } from "src/components/AssetAmountBlock"
-import { AssetAmountsBlock } from "src/components/AssetAmountsBlock"
+import { AggregatableValue, AssetAmountsBlock } from "src/components/AssetAmountsBlock"
 import { MyAssetBlock } from "src/components/MyAssetBlock"
+import { QuoteAmountBlock } from "src/components/QuoteAmountBlock"
 import { TimestampBlock } from "src/components/TimestampBlock"
-import { ChartData, Trade } from "src/interfaces"
+import { ChartData, Trade, TradePnL } from "src/interfaces"
 import { $showQuotedAmounts } from "src/stores/account-settings-store"
-import { $activeAccount } from "src/stores/account-store"
+import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
 import { TableRowComponentProps } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
 
@@ -27,8 +29,6 @@ export function TradeTableRow({
     amount,
     tradeType,
     cost,
-    fees,
-    proceeds,
     tradeNumber,
     closedAt,
   } = row
@@ -38,6 +38,7 @@ export function TradeTableRow({
 
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
+  const activeAccountPath = useStore($activeAccountPath)
 
   useEffect(() => {
     if (priceMap) return
@@ -119,12 +120,43 @@ export function TradeTableRow({
   //   )
   // }
 
+  const costBasis = useMemo<AggregatableValue[]>(() => {
+    return cost.map(([assetId, amount, usdValue, exposure, txId, txTimestamp]) => [
+      assetId,
+      Big(amount).div(`-${exposure}`).toString(),
+      Big(usdValue).div(`-${exposure}`).toString(),
+      txId,
+      txTimestamp,
+    ])
+  }, [cost])
+
+  const [tradePnl, setTradePnl] = useState<TradePnL | undefined | null>()
+
+  useEffect(() => {
+    rpc
+      .getTradePnL(
+        activeAccount,
+        row.id,
+        "SELECT * FROM trade_pnl WHERE trade_id = ? ORDER BY timestamp DESC LIMIT 1"
+      )
+      .then((pnl) => {
+        if (pnl.length > 0) {
+          setTradePnl(pnl[0])
+        } else {
+          setTradePnl(null)
+        }
+      })
+      .catch(() => {
+        setTradePnl(null)
+      })
+  }, [activeAccount, rpc, row.id])
+
   return (
     <>
       <TableRow hover tabIndex={-1}>
         <TableCell variant="clickable">
           <Tooltip title="View trade">
-            <AppLink to={`../trade/${row.id}`}>{tradeNumber}</AppLink>
+            <AppLink to={`${activeAccountPath}/trade/${row.id}`}>{tradeNumber}</AppLink>
           </Tooltip>
         </TableCell>
         {/* <TableCell>
@@ -138,26 +170,21 @@ export function TradeTableRow({
           <ActionBlock action={tradeType} />
         </TableCell>
         <TableCell variant="clickable" align="right">
-          <AssetAmountBlock
-            amount={amount}
-            assetId={assetId}
-            priceMap={priceMap}
-            // colorized
-            // showSign
-          />
+          <AssetAmountBlock amount={amount} assetId={assetId} priceMap={priceMap} />
         </TableCell>
         <TableCell>
           <MyAssetBlock id={assetId} />
         </TableCell>
 
         <TableCell>
-          <AssetAmountsBlock values={cost} showSign colorized />
+          <AssetAmountsBlock values={costBasis} aggregation="average" formatting="price" />
         </TableCell>
         <TableCell>
-          <AssetAmountsBlock values={fees} showSign colorized />
+          <QuoteAmountBlock amount={priceMap?.[assetId]?.value} formatting="price" />
         </TableCell>
         <TableCell>
-          <AssetAmountsBlock values={proceeds} showSign colorized />
+          <QuoteAmountBlock amount={tradePnl?.pnl} showSign colorized />
+          {/* <AssetAmountsBlock values={proceeds} showSign colorized /> */}
         </TableCell>
         <TableCell>
           <TimestampBlock timestamp={createdAt} relative={relativeTime} />
