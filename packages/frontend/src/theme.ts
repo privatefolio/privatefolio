@@ -188,9 +188,9 @@ export const theme: CssVarsThemeOptions = {
         },
         accent: {
           // main: "rgb(136, 101, 160)",
-          dark: blue[800],
-          light: blue[400],
-          main: blue[600],
+          dark: blue[800], // #1565c0
+          light: blue[400], // #42a5f5
+          main: blue[600], // #1e88e5
         },
         background: {
           default: bgColor,
