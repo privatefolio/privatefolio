@@ -74,7 +74,9 @@ export function AssetAmountsBlock(props: AssetAmountsBlockProps) {
     )
   }, [values, aggregation])
 
-  const displayValues: Array<AggregatedValue | AggregatableValue> = isExpanded ? values : aggregatedValues
+  const displayValues: Array<AggregatedValue | AggregatableValue> = isExpanded
+    ? values
+    : aggregatedValues
 
   return (
     <Stack direction="row" gap={0.5} flexWrap="wrap" alignItems="center">

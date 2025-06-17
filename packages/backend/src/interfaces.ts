@@ -220,18 +220,41 @@ export interface Balance {
   value?: number
 }
 
+export type TradeCost = [
+  assetId: string,
+  amount: string,
+  usdValue: string,
+  exposure: string,
+  txId: string,
+  timestamp: Timestamp,
+]
+export type TradeFee = [
+  assetId: string,
+  amount: string,
+  usdValue: string,
+  txId: string,
+  timestamp: Timestamp,
+]
+export type TradeProceeds = [
+  assetId: string,
+  amount: string,
+  usdValue: string,
+  txId: string,
+  timestamp: Timestamp,
+]
+
 export interface Trade {
   amount: number
   assetId: string
   auditLogIds?: string[]
   balance: number
   closedAt?: Timestamp
-  cost: [string, string, string, string, string, Timestamp][] // Array of [assetId, amount, usdValue, exposure, txId, timestamp] pairs
+  cost: TradeCost[]
   createdAt: Timestamp
   duration?: number
-  fees: [string, string, string, string, Timestamp][] // Array of [assetId, amount, usdValue, txId, timestamp] pairs
+  fees: TradeFee[]
   id: string
-  proceeds: [string, string, string, string, Timestamp][] // Array of [assetId, amount, usdValue, txId, timestamp] pairs
+  proceeds: TradeProceeds[]
   tags?: number[]
   tradeNumber: number
   tradeStatus: "open" | "closed"
