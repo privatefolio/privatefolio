@@ -1,11 +1,9 @@
 import { Box, Stack, Tooltip, Typography, TypographyProps } from "@mui/material"
-import { useStore } from "@nanostores/react"
 import {
   getDecimalPrecision,
   getMinimumDecimalPrecision,
 } from "privatefolio-backend/build/src/utils/formatting-utils"
 import React, { useMemo, useState } from "react"
-import { $debugMode } from "src/stores/app-store"
 import { MonoFont } from "src/theme"
 import { greenColor, redColor } from "src/utils/color-utils"
 import { EMPTY_OBJECT } from "src/utils/utils"
@@ -46,10 +44,8 @@ export function AmountBlock(props: AmountBlockProps) {
   const amountN = hasValue ? Number(amount) : undefined
   const formatOpts = showSign && amountN !== 0 ? showSignOpts : EMPTY_OBJECT
 
-  const debugMode = useStore($debugMode)
-
-  let minimumFractionDigits = debugMode ? 4 : significantDigits
-  let maximumFractionDigits: number | undefined
+  let minimumFractionDigits = significantDigits
+  let maximumFractionDigits: number | undefined = maxDigits
 
   // auto-adjust minimumFractionDigits
   if (minimumFractionDigits === undefined && typeof amountN === "number") {
@@ -111,7 +107,7 @@ export function AmountBlock(props: AmountBlockProps) {
     })
   }, [amountN, formatOpts, minimumFractionDigits])
 
-  const fullLabel = useMemo(() => {
+  const compactLabel = useMemo(() => {
     if (typeof amountN !== "number") return ""
 
     let fullLabel = `${currencySymbol}${compactValue}`
@@ -172,7 +168,7 @@ export function AmountBlock(props: AmountBlockProps) {
         {...rest}
       >
         {typeof amountN === "number" ? (
-          fullLabel
+          compactLabel
         ) : (
           <Typography color="text.secondary" component="span" variant="inherit">
             {placeholder}

@@ -121,6 +121,7 @@ export async function getAsset(accountName: string, id: string): Promise<MyAsset
       ) {
         return true
       }
+      if (x.symbol === id) return true
       return false
     })
   }
@@ -161,7 +162,7 @@ export async function patchAsset(accountName: string, id: string, patch: Partial
   await upsertAsset(accountName, newValue)
 }
 
-export async function findAssets(query: string, limit = 5): Promise<Asset[]> {
+export async function findAssets(query: string, limit = 5, strict = false): Promise<Asset[]> {
   const normalizedQuery = query.toLowerCase().trim()
 
   if (!normalizedQuery) {
@@ -177,14 +178,23 @@ export async function findAssets(query: string, limit = 5): Promise<Asset[]> {
     }
 
     if (
-      asset.name.toLowerCase().includes(normalizedQuery) ||
-      asset.id.toLowerCase().includes(normalizedQuery) ||
-      asset.coingeckoId?.toLowerCase().includes(normalizedQuery) ||
+      asset.id.toLowerCase() === normalizedQuery ||
+      asset.coingeckoId?.toLowerCase() === normalizedQuery ||
       asset.symbol.toLowerCase().includes(normalizedQuery) ||
       (asset.platforms &&
-        Object.values(asset.platforms).some((contract) =>
-          contract.toLowerCase().includes(normalizedQuery)
+        Object.values(asset.platforms).some(
+          (contract) => contract.toLowerCase() === normalizedQuery
         ))
+    ) {
+      matchingAssets.push(asset)
+    }
+
+    if (strict) continue
+
+    if (
+      asset.id.toLowerCase().includes(normalizedQuery) ||
+      asset.name.toLowerCase().includes(normalizedQuery) ||
+      asset.coingeckoId?.toLowerCase().includes(normalizedQuery)
     ) {
       matchingAssets.push(asset)
     }

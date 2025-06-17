@@ -16,13 +16,19 @@ const pageLimit = 300
 // The granularity field must be one of the following values: {60, 300, 900, 3600, 21600, 86400}.
 // Otherwise, your request will be rejected. These values correspond to timeslices representing one minute,
 // five minutes, fifteen minutes, one hour, six hours, and one day, respectively.
-function getInterval(timeInterval: ResolutionString) {
-  if (timeInterval === "1m") return 60
-  if (timeInterval === "1h") return 3600
-  if (timeInterval === "1d") return 86400
-  // if (timeInterval === "1w") return 604800
+function getInterval(timeInterval: ResolutionString): number {
+  timeInterval = timeInterval.toUpperCase() as ResolutionString
+  const value = parseInt(timeInterval.slice(0, -1))
 
-  throw new Error(`Timeframe '${timeInterval}' is not supported for this metric.`)
+  // if (timeInterval.endsWith("T")) throw new Error("Ticks are not supported")
+  if (timeInterval.endsWith("S")) return Math.max(60, value)
+  if (!isNaN(Number(timeInterval))) return parseInt(timeInterval) * 60
+  if (timeInterval.endsWith("H")) return value * 3600
+  if (timeInterval.endsWith("D")) return value * 86400
+  // if (timeInterval.endsWith("W")) return value * 604800
+  // if (timeInterval.endsWith("M")) return value * 2592000
+
+  throw new Error(`Coinbase does not support the '${timeInterval}' time interval.`)
 }
 
 // https://docs.cloud.coinbase.com/exchange/reference/exchangerestapi_getproductcandles
@@ -31,6 +37,8 @@ export async function queryPrices(request: QueryRequest) {
   const { timeInterval, since, until, limit = pageLimit, pair } = request
   const coinbaseInterval = getInterval(timeInterval)
   const timestampOffset = coinbaseInterval * 1000
+
+  if (limit < 1) return []
 
   let apiUrl = `https://api.exchange.coinbase.com/products/${pair}/candles?granularity=${coinbaseInterval}`
 
