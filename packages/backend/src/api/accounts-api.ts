@@ -324,54 +324,6 @@ CREATE TABLE transaction_tags (
 `)
 
   await account.execute(sql`
-CREATE TABLE trades (
-  id VARCHAR PRIMARY KEY,
-  assetId VARCHAR NOT NULL,
-  amount FLOAT NOT NULL,
-  balance FLOAT NOT NULL,
-  createdAt INTEGER NOT NULL,
-  closedAt INTEGER,
-  duration INTEGER,
-  isOpen BOOLEAN NOT NULL DEFAULT 1,
-  soldAssets JSON,
-  soldAmounts JSON,
-  feeAssets JSON,
-  feeAmounts JSON,
-  FOREIGN KEY (assetId) REFERENCES assets(id)
-);
-`)
-
-  await account.execute(sql`
-CREATE TABLE trade_audit_logs (
-  trade_id VARCHAR NOT NULL,
-  audit_log_id VARCHAR NOT NULL,
-  PRIMARY KEY (trade_id, audit_log_id),
-  FOREIGN KEY (trade_id) REFERENCES trades(id),
-  FOREIGN KEY (audit_log_id) REFERENCES audit_logs(id)
-);
-`)
-
-  await account.execute(sql`
-CREATE TABLE trade_transactions (
-  trade_id VARCHAR NOT NULL,
-  transaction_id VARCHAR NOT NULL,
-  PRIMARY KEY (trade_id, transaction_id),
-  FOREIGN KEY (trade_id) REFERENCES trades(id),
-  FOREIGN KEY (transaction_id) REFERENCES transactions(id)
-);
-`)
-
-  await account.execute(sql`
-CREATE TABLE trade_tags (
-  trade_id VARCHAR NOT NULL,
-  tag_id INTEGER NOT NULL,
-  PRIMARY KEY (trade_id, tag_id),
-  FOREIGN KEY (trade_id) REFERENCES trades(id),
-  FOREIGN KEY (tag_id) REFERENCES tags(id)
-);
-`)
-
-  await account.execute(sql`
 CREATE TABLE balances (
   timestamp INTEGER PRIMARY KEY,
   data JSON
@@ -537,7 +489,7 @@ export async function getAccountNames() {
 
       if (!createdAt) {
         createdAt = stats.ctime.getTime()
-        await setValue(`account_createdAt`, createdAt, accountName)
+        await setValue(accountName, `account_createdAt`, createdAt)
       }
 
       return { createdAt, file }

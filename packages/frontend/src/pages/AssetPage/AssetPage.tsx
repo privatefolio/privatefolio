@@ -8,11 +8,12 @@ import { BackButton } from "src/components/BackButton"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { NavTab } from "src/components/NavTab"
 import { PlatformBlock } from "src/components/PlatformBlock"
+import { QuoteAmountBlock } from "src/components/QuoteAmountBlock"
+import { QuoteCurrencyToggle } from "src/components/QuoteCurrencyToggle"
 import { SectionTitle } from "src/components/SectionTitle"
 import { Tabs } from "src/components/Tabs"
 import { UserWalletIcon } from "src/components/UserWalletIcon"
 import { Balance, CoingeckoMetadataFull, MyAsset } from "src/interfaces"
-import { $quoteCurrency } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
 import { getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
 import { $rpc } from "src/workers/remotes"
@@ -22,6 +23,7 @@ import { $assetMap, $filterOptionsMap } from "../../stores/metadata-store"
 import { SerifFont } from "../../theme"
 import FourZeroFourPage from "../404"
 import { AuditLogTable } from "../AuditLogsPage/AuditLogTable"
+import { TradeTable } from "../TradesPage/TradeTable"
 import { TransactionTable } from "../TransactionsPage/TransactionTable"
 import { AssetBalanceHistory } from "./AssetBalanceHistory"
 import { AssetDetails } from "./AssetDetails"
@@ -41,7 +43,6 @@ export default function AssetPage() {
 
   const activeAccount = useStore($activeAccount)
   const rpc = useStore($rpc)
-  const currency = useStore($quoteCurrency)
 
   const [asset, setAsset] = useState<MyAsset | undefined>()
 
@@ -143,23 +144,16 @@ export default function AssetPage() {
               {metadata.market_data?.current_price?.usd && (
                 <div>
                   <SectionTitle>Current Price</SectionTitle>
-                  <AmountBlock
+                  <QuoteAmountBlock
                     amount={metadata.market_data.current_price.usd}
-                    currencySymbol={currency.symbol}
-                    currencyTicker={currency.id}
+                    formatting="price"
                   />
                 </div>
               )}
               {metadata.market_data?.market_cap?.usd && (
                 <div>
                   <SectionTitle>Market Cap</SectionTitle>
-                  <AmountBlock
-                    amount={metadata.market_data.market_cap.usd}
-                    currencySymbol={currency.symbol}
-                    significantDigits={currency.maxDigits}
-                    maxDigits={currency.maxDigits}
-                    currencyTicker={currency.id}
-                  />
+                  <QuoteAmountBlock amount={metadata.market_data.market_cap.usd} />
                 </div>
               )}
             </>
@@ -185,13 +179,7 @@ export default function AssetPage() {
             {!balances ? (
               <Skeleton width="100%" />
             ) : (
-              <AmountBlock
-                amount={balance?.value || 0}
-                currencySymbol={currency.symbol}
-                significantDigits={currency.maxDigits}
-                maxDigits={currency.maxDigits}
-                currencyTicker={currency.id}
-              />
+              <QuoteAmountBlock amount={balance?.value || 0} />
             )}
           </div>
         </Stack>
@@ -210,7 +198,15 @@ export default function AssetPage() {
               </span>
             }
           />
-          {/* <NavTab value="pnl" to={`?tab=pnl`} label="Profit & Loss"  /> */}
+          <NavTab
+            value="trades"
+            to={`?tab=trades`}
+            label={
+              <span>
+                <UserWalletIcon /> Trades
+              </span>
+            }
+          />
           <NavTab
             value="transactions"
             to={`?tab=transactions`}
@@ -233,61 +229,13 @@ export default function AssetPage() {
         {tab === "details" && <AssetDetails metadata={metadata} isLoading={isLoading} />}
         {tab === "price-history" && <AssetPriceHistory asset={asset} />}
         {tab === "markets" && <AssetMarketTable metadata={metadata} isLoading={isLoading} />}
-        {tab === "balance" && <AssetBalanceHistory assetId={assetId} />}
+        {tab === "trades" && <TradeTable assetId={assetId} defaultRowsPerPage={10} />}
+        {tab === "balance" && (
+          <AssetBalanceHistory assetId={assetId} extraSettings={<QuoteCurrencyToggle />} />
+        )}
         {tab === "transactions" && <TransactionTable assetId={assetId} defaultRowsPerPage={10} />}
         {tab === "audit-logs" && <AuditLogTable assetId={assetId} defaultRowsPerPage={10} />}
       </Stack>
-      {/* TODO5 */}
-      {/* <AssetInfo
-           assetSymbol={assetSymbol}
-           amountBought={amounts.amountBought.toNumber()}
-           amountSold={amounts.amountSold.toNumber()}
-           moneyIn={amounts.moneyIn.toNumber()}
-           moneyOut={amounts.moneyOut.toNumber()}
-           holdings={amounts.holdings.toNumber()}
-           costBasis={amounts.costBasis.toNumber()}
-           tradeHistory={tradeHistory}
-         /> */}
     </Stack>
   )
 }
-
-// {/* TODO5 */}
-// const [tradeHistory, setTradeHistory] = useState<Transaction[]>([])
-// const [amounts, setAmounts] = useState<any>({})
-
-// useEffect(() => {
-// readCsv<ParsedTransaction>(filePath, mexcParser).then((tradeHistory) => {
-//   const parsedTradeHistory = tradeHistory.filter((x) => x.symbol === assetSymbol)
-//   let amountBought = new Decimal(0)
-//   let amountSold = new Decimal(0)
-//   let moneyIn = new Decimal(0)
-//   let moneyOut = new Decimal(0)
-//   const frontendTradeHistory: Transaction[] = parsedTradeHistory.map((x) => {
-//     if (x.side === "BUY") {
-//       amountBought = amountBought.plus(x.amount)
-//       moneyIn = moneyIn.plus(x.total)
-//     } else {
-//       amountSold = amountSold.plus(x.amount)
-//       moneyOut = moneyOut.plus(x.total)
-//     }
-//     return {
-//       ...x,
-//       amount: x.amount.toNumber(),
-//       filledPrice: x.filledPrice.toNumber(),
-//       total: x.total.toNumber(),
-//     }
-//   })
-//   const holdings = amountBought.minus(amountSold)
-//   const costBasis = moneyIn.div(amountBought)
-//   setTradeHistory(frontendTradeHistory)
-//   setAmounts({
-//     amountBought,
-//     amountSold,
-//     costBasis,
-//     holdings,
-//     moneyIn,
-//     moneyOut,
-//   })
-// })
-// }, [])

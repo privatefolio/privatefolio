@@ -4,12 +4,12 @@ import { CanvasRenderingTarget2D } from "fancy-canvas"
 import {
   Coordinate,
   DataChangedScope,
+  IPrimitivePaneRenderer,
+  IPrimitivePaneView,
   ISeriesPrimitive,
-  ISeriesPrimitivePaneRenderer,
-  ISeriesPrimitivePaneView,
+  PrimitivePaneViewZOrder,
   SeriesAttachedParameter,
   SeriesDataItemTypeMap,
-  SeriesPrimitivePaneViewZOrder,
   SeriesType,
   Time,
 } from "lightweight-charts"
@@ -21,7 +21,7 @@ interface SessionHighlightingRendererData {
   color: string
 }
 
-class SessionHighlightingPaneRenderer implements ISeriesPrimitivePaneRenderer {
+class SessionHighlightingPaneRenderer implements IPrimitivePaneRenderer {
   _viewData: SessionHighlightingViewData
   constructor(data: SessionHighlightingViewData) {
     this._viewData = data
@@ -54,7 +54,7 @@ interface SessionHighlightingViewData {
   barWidth: number
 }
 
-class SessionHighlightingPaneView implements ISeriesPrimitivePaneView {
+class SessionHighlightingPaneView implements IPrimitivePaneView {
   _source: SessionHighlighting
   _data: SessionHighlightingViewData
 
@@ -86,7 +86,7 @@ class SessionHighlightingPaneView implements ISeriesPrimitivePaneView {
     return new SessionHighlightingPaneRenderer(this._data)
   }
 
-  zOrder(): SeriesPrimitivePaneViewZOrder {
+  zOrder(): PrimitivePaneViewZOrder {
     return "bottom"
   }
 }

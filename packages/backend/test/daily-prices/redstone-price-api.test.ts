@@ -1,6 +1,5 @@
 import { getPair, mapToChartData, queryPrices } from "src/extensions/prices/redstone-price-api"
 import { ResolutionString } from "src/interfaces"
-import { GITHUB_CI } from "src/server-env"
 import { WETH_ASSET_ID } from "src/settings/settings"
 import { describe, expect, it } from "vitest"
 
@@ -43,10 +42,7 @@ describe.skip("redstone price api", () => {
     expect(results.length).toBe(0)
   })
 
-  it.skip("should fetch WETH prices within a small range", async (test) => {
-    if (GITHUB_CI) {
-      test.skip()
-    }
+  it.skip("should fetch WETH prices within a small range", async () => {
     // act
     const result = await queryPrices({
       limit: 1,

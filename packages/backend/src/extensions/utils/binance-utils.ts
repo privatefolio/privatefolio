@@ -67,7 +67,7 @@ export function extractTransactions(logs: AuditLog[], fileImportId: string): Tra
       // Price
       const price =
         typeof incoming === "string" && typeof outgoing === "string"
-          ? Big(incoming).div(Big(outgoing)).toString()
+          ? Big(outgoing).div(Big(incoming)).toString()
           : undefined
       //
       const type = "Swap"

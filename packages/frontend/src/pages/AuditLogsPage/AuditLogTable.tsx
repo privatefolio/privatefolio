@@ -18,10 +18,11 @@ import { AuditLogTableRow } from "./AuditLogTableRow"
 interface AuditLogsTableProps extends Pick<RemoteTableProps<AuditLog>, "defaultRowsPerPage"> {
   assetId?: string
   tableDataRef?: MutableRefObject<AuditLog[]>
+  tradeId?: string
 }
 
 export function AuditLogTable(props: AuditLogsTableProps) {
-  const { assetId, tableDataRef, ...rest } = props
+  const { assetId, tableDataRef, tradeId, ...rest } = props
 
   const accountName = useStore($activeAccount)
   const [refresh, setRefresh] = useState(0)
@@ -75,6 +76,11 @@ export function AuditLogTable(props: AuditLogsTableProps) {
         filterConditions.push(`assetId = '${assetId}'`)
       }
 
+      if (tradeId) {
+        filterConditions.push(`trade_audit_logs.trade_id = '${tradeId}'`)
+        tradeJoin = "INNER JOIN trade_audit_logs ON audit_logs.id = trade_audit_logs.audit_log_id"
+      }
+
       // Construct the filterQuery
       let filterQuery = ""
       if (filterConditions.length > 0) {
@@ -101,7 +107,7 @@ export function AuditLogTable(props: AuditLogsTableProps) {
           ),
       ]
     },
-    [rpc, accountName, assetId, tableDataRef, refresh]
+    [rpc, accountName, assetId, tableDataRef, refresh, tradeId]
   )
 
   const headCells = useMemo<HeadCell<AuditLog>[]>(

@@ -3,6 +3,7 @@ import { throttle } from "lodash-es"
 import React, { MutableRefObject, useCallback, useEffect, useMemo, useState } from "react"
 import { SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
+import { $inspectTime } from "src/stores/pages/balances-store"
 import { closeSubscription } from "src/utils/browser-utils"
 
 import {
@@ -10,7 +11,7 @@ import {
   RemoteTable,
   RemoteTableProps,
 } from "../../components/EnhancedTable/RemoteTable"
-import { Trade } from "../../interfaces"
+import { Trade, TradeStatus } from "../../interfaces"
 import { HeadCell } from "../../utils/table-utils"
 import { $rpc } from "../../workers/remotes"
 import { TradeTableRow } from "./TradeTableRow"
@@ -18,15 +19,17 @@ import { TradeTableRow } from "./TradeTableRow"
 interface TradesTableProps extends Pick<RemoteTableProps<Trade>, "defaultRowsPerPage"> {
   assetId?: string
   tableDataRef?: MutableRefObject<Trade[]>
+  tradeStatus?: TradeStatus
 }
 
 export function TradeTable(props: TradesTableProps) {
-  const { assetId, tableDataRef, ...rest } = props
+  const { assetId, tradeStatus, tableDataRef, ...rest } = props
 
   const accountName = useStore($activeAccount)
   const [refresh, setRefresh] = useState(0)
   const connectionStatus = useStore($connectionStatus)
   const rpc = useStore($rpc)
+  const inspectTime = useStore($inspectTime)
 
   useEffect(() => {
     const subscription = rpc.subscribeToTrades(
@@ -58,12 +61,18 @@ export function TradeTable(props: TradesTableProps) {
         filterConditions.push(`${key} = '${filters[key]}'`)
       })
 
-      // Include the assetId condition
       if (assetId) {
         filterConditions.push(`assetId = '${assetId}'`)
       }
 
-      // Construct the filterQuery
+      if (tradeStatus && !inspectTime) {
+        filterConditions.push(`tradeStatus = '${tradeStatus}'`)
+      }
+
+      if (inspectTime) {
+        filterConditions.push(`createdAt <= ${inspectTime}`)
+      }
+
       let filterQuery = ""
       if (filterConditions.length > 0) {
         filterQuery = "WHERE " + filterConditions.join(" AND ")
@@ -85,29 +94,28 @@ export function TradeTable(props: TradesTableProps) {
         () => rpc.countTrades(accountName, `SELECT COUNT (*) FROM trades ${filterQuery}`),
       ]
     },
-    [accountName, assetId, refresh, tableDataRef, rpc]
+    [accountName, assetId, refresh, tableDataRef, rpc, tradeStatus, inspectTime]
   )
 
   const headCells = useMemo<HeadCell<Trade>[]>(
     () => [
       {
-        key: "createdAt",
-        label: "Created At",
+        key: "tradeNumber",
+        label: "#",
         sortable: true,
-        sx: { maxWidth: 180, minWidth: 180, width: 180 },
-        timestamp: true,
+        sx: { maxWidth: 80, minWidth: 80, width: 80 },
       },
-      {
-        key: "duration",
-        label: "Duration",
-        sortable: true,
-        sx: { maxWidth: 150, minWidth: 150, width: 150 },
-      },
+      // {
+      //   key: "duration",
+      //   label: "Duration",
+      //   sortable: true,
+      //   sx: { maxWidth: 150, minWidth: 150, width: 150 },
+      // },
       {
         filterable: true,
-        key: "assetId",
-        label: "Asset",
-        sx: { maxWidth: 140, minWidth: 140, width: 140 },
+        key: "tradeType",
+        label: "Type",
+        sx: { maxWidth: 90, minWidth: 90, width: 90 },
       },
       {
         key: "amount",
@@ -116,42 +124,47 @@ export function TradeTable(props: TradesTableProps) {
         sx: { maxWidth: 120, minWidth: 120, width: 120 },
       },
       {
-        key: "isOpen",
-        label: "Status",
-        sx: { maxWidth: 100, minWidth: 100, width: 100 },
-      },
-      {
-        key: "soldAssets",
-        label: "Cost",
-        sx: { maxWidth: 220, minWidth: 220, width: 220 },
-      },
-      {
-        key: "feeAssets",
-        label: "Fees",
-        sx: { maxWidth: 220, minWidth: 220, width: 220 },
-      },
-      {
         filterable: true,
-        key: "tags",
-        label: "Tags",
-        sx: { maxWidth: 200, minWidth: 200, width: 200 },
+        key: "assetId",
+        label: "Asset",
+        sx: { maxWidth: 120, minWidth: 120, width: 120 },
       },
       {
-        sx: { maxWidth: 60, minWidth: 60, width: 60 },
+        label: "Cost basis",
+        sx: { maxWidth: 240, minWidth: 240, width: 240 },
+      },
+      {
+        label: "Price",
+        sx: { maxWidth: 240, minWidth: 240, width: 240 },
+      },
+      {
+        label: "Profit",
+        sx: { maxWidth: 240, minWidth: 240, width: 240 },
+      },
+      // {
+      //   filterable: true,
+      //   key: "tags",
+      //   label: "Tags",
+      //   sx: { maxWidth: 200, minWidth: 200, width: 200 },
+      // },
+      {
+        key: "createdAt",
+        label: "Created At",
+        sortable: true,
+        sx: { maxWidth: 180, minWidth: 180, width: 180 },
+        timestamp: true,
       },
     ],
     []
   )
 
   return (
-    <>
-      <RemoteTable
-        initOrderBy="createdAt"
-        headCells={headCells}
-        queryFn={queryFn}
-        TableRowComponent={TradeTableRow}
-        {...rest}
-      />
-    </>
+    <RemoteTable
+      initOrderBy="createdAt"
+      headCells={headCells}
+      queryFn={queryFn}
+      TableRowComponent={TradeTableRow}
+      {...rest}
+    />
   )
 }

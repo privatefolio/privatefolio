@@ -27,17 +27,11 @@ export function TagManager({ tags, setTags, itemId, itemType }: TagManagerProps)
         <Stack gap={2} sx={{ minWidth: 300 }}>
           <div>
             <SectionTitle>Tag name</SectionTitle>
-            <TextField
-              autoFocus
-              variant="outlined"
-              fullWidth
-              size="small"
-              required
-              name="tagName"
-            />
+            <TextField variant="outlined" fullWidth size="small" required name="tagName" />
           </div>
         </Stack>
       ),
+      focusInput: "tagName",
       title: "Add new tag",
     })
 

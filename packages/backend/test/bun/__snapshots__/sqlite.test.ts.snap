@@ -6,17 +6,17 @@ exports[`0xf98 file import should compute balances 1`] = `
 90,Processed 1153 daily balances
 95,Setting networth cursor to Dec 31, 1969
 96,Filling balances to reach today
-100,Saved 1210 records to disk"
+100,Saved 1211 records to disk"
 `;
 
 exports[`0xf98 file import should compute networth 1`] = `
-"5,Computing networth for 1210 days
-10,Computing networth starting Sep 09, 2017
-28.59504132231405,Computing networth starting May 17, 2018
-47.1900826446281,Computing networth starting Jan 22, 2019
-65.78512396694215,Computing networth starting Sep 29, 2019
-84.3801652892562,Computing networth starting Jun 05, 2020
-95,Saving 1210 records to the database
+"5,Computing networth for 1211 days
+10,Computing networth starting Sep 08, 2017
+28.579686209744015,Computing networth starting May 16, 2018
+47.15937241948803,Computing networth starting Jan 21, 2019
+65.73905862923203,Computing networth starting Sep 28, 2019
+84.31874483897606,Computing networth starting Jun 04, 2020
+95,Saving 1211 records to the database
 99,Setting networth cursor to Dec 31, 2020"
 `;
 
@@ -531,6 +531,9 @@ exports[`0xf98 file import should save the correct data: audit logs 1`] = `
 
 exports[`0xf98 file import should save the correct data: balances - page 0 1`] = `
 [
+  {
+    "timestamp": 1504828800000,
+  },
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "1.99938096",
     "timestamp": 1504915200000,
@@ -1078,6 +1081,11 @@ exports[`0xf98 file import should save the correct data: balances - page 0 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1513382400000,
   },
+]
+`;
+
+exports[`0xf98 file import should save the correct data: balances - page 1 1`] = `
+[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.49851996",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -1086,11 +1094,6 @@ exports[`0xf98 file import should save the correct data: balances - page 0 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1513468800000,
   },
-]
-`;
-
-exports[`0xf98 file import should save the correct data: balances - page 1 1`] = `
-[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.49851996",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -1935,6 +1938,11 @@ exports[`0xf98 file import should save the correct data: balances - page 1 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1522022400000,
   },
+]
+`;
+
+exports[`0xf98 file import should save the correct data: balances - page 2 1`] = `
+[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -1945,11 +1953,6 @@ exports[`0xf98 file import should save the correct data: balances - page 1 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1522108800000,
   },
-]
-`;
-
-exports[`0xf98 file import should save the correct data: balances - page 2 1`] = `
-[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -2959,6 +2962,11 @@ exports[`0xf98 file import should save the correct data: balances - page 2 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1530662400000,
   },
+]
+`;
+
+exports[`0xf98 file import should save the correct data: balances - page 3 1`] = `
+[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -2970,11 +2978,6 @@ exports[`0xf98 file import should save the correct data: balances - page 2 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1530748800000,
   },
-]
-`;
-
-exports[`0xf98 file import should save the correct data: balances - page 3 1`] = `
-[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -4087,6 +4090,11 @@ exports[`0xf98 file import should save the correct data: balances - page 3 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1539302400000,
   },
+]
+`;
+
+exports[`0xf98 file import should save the correct data: balances - page 4 1`] = `
+[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -4099,11 +4107,6 @@ exports[`0xf98 file import should save the correct data: balances - page 3 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1539388800000,
   },
-]
-`;
-
-exports[`0xf98 file import should save the correct data: balances - page 4 1`] = `
-[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -5292,6 +5295,11 @@ exports[`0xf98 file import should save the correct data: balances - page 4 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1547942400000,
   },
+]
+`;
+
+exports[`0xf98 file import should save the correct data: balances - page 5 1`] = `
+[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -5304,11 +5312,6 @@ exports[`0xf98 file import should save the correct data: balances - page 4 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1548028800000,
   },
-]
-`;
-
-exports[`0xf98 file import should save the correct data: balances - page 5 1`] = `
-[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -6497,6 +6500,11 @@ exports[`0xf98 file import should save the correct data: balances - page 5 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1556582400000,
   },
+]
+`;
+
+exports[`0xf98 file import should save the correct data: balances - page 6 1`] = `
+[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -6509,11 +6517,6 @@ exports[`0xf98 file import should save the correct data: balances - page 5 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1556668800000,
   },
-]
-`;
-
-exports[`0xf98 file import should save the correct data: balances - page 6 1`] = `
-[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -7702,6 +7705,11 @@ exports[`0xf98 file import should save the correct data: balances - page 6 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1565222400000,
   },
+]
+`;
+
+exports[`0xf98 file import should save the correct data: balances - page 7 1`] = `
+[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -7714,11 +7722,6 @@ exports[`0xf98 file import should save the correct data: balances - page 6 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1565308800000,
   },
-]
-`;
-
-exports[`0xf98 file import should save the correct data: balances - page 7 1`] = `
-[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -8907,6 +8910,11 @@ exports[`0xf98 file import should save the correct data: balances - page 7 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1573862400000,
   },
+]
+`;
+
+exports[`0xf98 file import should save the correct data: balances - page 8 1`] = `
+[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -8919,11 +8927,6 @@ exports[`0xf98 file import should save the correct data: balances - page 7 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1573948800000,
   },
-]
-`;
-
-exports[`0xf98 file import should save the correct data: balances - page 8 1`] = `
-[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -10112,6 +10115,11 @@ exports[`0xf98 file import should save the correct data: balances - page 8 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1582502400000,
   },
+]
+`;
+
+exports[`0xf98 file import should save the correct data: balances - page 9 1`] = `
+[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -10124,11 +10132,6 @@ exports[`0xf98 file import should save the correct data: balances - page 8 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1582588800000,
   },
-]
-`;
-
-exports[`0xf98 file import should save the correct data: balances - page 9 1`] = `
-[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -11317,6 +11320,11 @@ exports[`0xf98 file import should save the correct data: balances - page 9 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1591142400000,
   },
+]
+`;
+
+exports[`0xf98 file import should save the correct data: balances - page 10 1`] = `
+[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -11329,11 +11337,6 @@ exports[`0xf98 file import should save the correct data: balances - page 9 1`] =
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1591228800000,
   },
-]
-`;
-
-exports[`0xf98 file import should save the correct data: balances - page 10 1`] = `
-[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -12522,6 +12525,11 @@ exports[`0xf98 file import should save the correct data: balances - page 10 1`] 
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1599782400000,
   },
+]
+`;
+
+exports[`0xf98 file import should save the correct data: balances - page 11 1`] = `
+[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -12534,11 +12542,6 @@ exports[`0xf98 file import should save the correct data: balances - page 10 1`] 
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1599868800000,
   },
-]
-`;
-
-exports[`0xf98 file import should save the correct data: balances - page 11 1`] = `
-[
   {
     "ethereum:0x0000000000000000000000000000000000000000:ETH": "0.468385338",
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
@@ -13680,6 +13683,11 @@ exports[`0xf98 file import should save the correct data: balances - page 11 1`] 
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1608422400000,
   },
+]
+`;
+
+exports[`0xf98 file import should save the correct data: balances - page 12 1`] = `
+[
   {
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
     "ethereum:0x1d462414fe14cf489c7A21CaC78509f4bF8CD7c0:CAN": "2",
@@ -13691,11 +13699,6 @@ exports[`0xf98 file import should save the correct data: balances - page 11 1`] 
     "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN": "319.22562200498686051",
     "timestamp": 1608508800000,
   },
-]
-`;
-
-exports[`0xf98 file import should save the correct data: balances - page 12 1`] = `
-[
   {
     "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA": "0.21165476692904842",
     "ethereum:0x1d462414fe14cf489c7A21CaC78509f4bF8CD7c0:CAN": "2",
@@ -13811,6 +13814,13 @@ exports[`0xf98 file import should save the correct data: balances - page 12 1`] 
 
 exports[`0xf98 file import should save the correct data: networth 1`] = `
 [
+  {
+    "change": 0,
+    "changePercentage": 0,
+    "time": 1504828800,
+    "timestamp": 1504828800000,
+    "value": 0,
+  },
   {
     "change": 0,
     "changePercentage": 0,

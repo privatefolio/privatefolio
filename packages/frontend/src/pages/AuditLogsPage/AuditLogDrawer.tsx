@@ -99,13 +99,12 @@ export function AuditLogDrawer(props: AuditLogDrawerProps) {
               amount={change}
               showSign
               currencyTicker={getAssetTicker(assetId)}
-              variant="body1"
             />
             <Button
               size="small"
               component={AppLink}
               to={`../asset/${encodeURI(assetId)}`}
-              sx={{ fontSize: "0.9rem", paddingX: 1 }}
+              sx={{ paddingX: 1 }}
             >
               <MyAssetBlock id={assetId} size="small" />
             </Button>
@@ -121,16 +120,12 @@ export function AuditLogDrawer(props: AuditLogDrawerProps) {
         <div>
           <SectionTitle>New balance</SectionTitle>
           <Stack direction="row" alignItems="center" gap={0.25}>
-            <AmountBlock
-              amount={balance}
-              currencyTicker={getAssetTicker(assetId)}
-              variant="body1"
-            />
+            <AmountBlock amount={balance} currencyTicker={getAssetTicker(assetId)} />
             <Button
               size="small"
               component={AppLink}
               to={`../asset/${encodeURI(assetId)}`}
-              sx={{ fontSize: "0.9rem", padding: 1 }}
+              sx={{ padding: 1 }}
             >
               <MyAssetBlock id={assetId} size="small" />
             </Button>

@@ -8,8 +8,17 @@ import {
   getFileImports,
   importFile,
 } from "src/api/account/file-imports-api"
-import { computeTrades, getTrades, getTradesFullQuery } from "src/api/account/trades-api"
-import { countTransactions, getTransactions } from "src/api/account/transactions-api"
+import {
+  computeTrades,
+  getAccountPnL,
+  getTrades,
+  getTradesFullQuery,
+} from "src/api/account/trades-api"
+import {
+  autoMergeTransactions,
+  countTransactions,
+  getTransactions,
+} from "src/api/account/transactions-api"
 import { ProgressUpdate } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
 import { describe, expect, it, vi } from "vitest"
@@ -166,11 +175,28 @@ describe("0xf98 file import", () => {
       90,Processed 1153 daily balances
       95,Setting networth cursor to Dec 31, 1969
       96,Filling balances to reach today
-      100,Saved 1210 records to disk"
+      100,Saved 1211 records to disk"
+    `)
+  })
+
+  it.sequential("should merge transactions", async () => {
+    // arrange
+    const updates: ProgressUpdate[] = []
+    // act
+    await autoMergeTransactions(accountName, async (state) => updates.push(state))
+    // assert
+    expect(updates.join("\n")).toMatchInlineSnapshot(`
+      "0,Fetching all transactions
+      25,Processing 17 (EVM) transactions
+      50,Saving 1 merged transactions
+      70,Updating the audit logs of 1 merged transactions
+      90,Deleting 2 deduplicated transactions
+      100,Done"
     `)
   })
 
   it.sequential("should compute trades from imported data", async () => {
+    mocks.readFile.mockImplementation(fs.promises.readFile)
     // act
     const updates: ProgressUpdate[] = []
     await computeTrades(accountName, async (state) => updates.push(state))
@@ -178,17 +204,26 @@ describe("0xf98 file import", () => {
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Fetching audit logs
       10,Processing 24 audit logs
-      20,Found 9 asset groups
-      27,Processed 1/9 asset groups
-      35,Processed 2/9 asset groups
-      43,Processed 3/9 asset groups
-      51,Processed 4/9 asset groups
-      58,Processed 5/9 asset groups
-      66,Processed 6/9 asset groups
-      74,Processed 7/9 asset groups
-      82,Processed 8/9 asset groups
-      90,Processed 9/9 asset groups
-      100,Trades computation completed"
+      ,Skipped ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN: No coingeckoId
+      ,Skipped ethereum:0x519475b31653E46D20cD09F9FdcF3B12BDAcB4f5:VIU: No coingeckoId
+      ,Skipped ethereum:0x7B2f9706CD8473B4F5B7758b0171a9933Fc6C4d6:HEALP: No coingeckoId
+      20,Found 6 asset groups
+      30,Processed 1/6 asset groups
+      40,Processed 2/6 asset groups
+      50,Processed 3/6 asset groups
+      60,Processed 4/6 asset groups
+      70,Processed 5/6 asset groups
+      80,Processed 6/6 asset groups
+      80,Setting trades cursor to Nov 04, 2020
+      80,Trades computation completed
+      82,Processing 6 trades
+      84,Processed 1/6 trades
+      87,Processed 2/6 trades
+      90,Processed 3/6 trades
+      92,Processed 4/6 trades
+      95,Processed 5/6 trades
+      98,Processed 6/6 trades
+      100,PnL computation completed"
     `)
   })
 
@@ -198,8 +233,9 @@ describe("0xf98 file import", () => {
     const transactions = await getTransactions(accountName)
     const balances = await getBalances(accountName)
     const trades = await getTrades(accountName, await getTradesFullQuery())
+    const pnl = await getAccountPnL(accountName)
     // assert
-    expect(transactions.length).toMatchInlineSnapshot(`17`)
+    expect(transactions.length).toMatchInlineSnapshot(`16`)
     await expect(transactions.map(normalizeTransaction)).toMatchFileSnapshot(
       "../__snapshots__/0xf98/transactions.ts.snap"
     )
@@ -207,14 +243,16 @@ describe("0xf98 file import", () => {
     await expect(auditLogs.map(sanitizeAuditLog)).toMatchFileSnapshot(
       "../__snapshots__/0xf98/audit-logs.ts.snap"
     )
-    expect(balances.length).toMatchInlineSnapshot(`1210`)
+    expect(balances.length).toMatchInlineSnapshot(`1211`)
     for (let i = 0; i < balances.length; i += 100) {
       await expect(balances.slice(i, i + 100)).toMatchFileSnapshot(
         `../__snapshots__/0xf98/balances-${i}.ts.snap`
       )
     }
-    expect(trades.length).toMatchInlineSnapshot(`9`)
+    expect(trades.length).toMatchInlineSnapshot(`6`)
     await expect(trades).toMatchFileSnapshot("../__snapshots__/0xf98/trades.ts.snap")
+    expect(pnl.length).toMatchInlineSnapshot(`6`)
+    await expect(pnl).toMatchFileSnapshot("../__snapshots__/0xf98/pnl.ts.snap")
   })
 
   it.sequential("should delete the file imports", async () => {
@@ -241,7 +279,7 @@ describe("0xf98 file import", () => {
       0,Removing 16 audit logs
       25,Setting balances cursor to Sep 08, 2017
       25,Setting networth cursor to Sep 08, 2017
-      50,Removing 9 transactions
+      50,Removing 8 transactions
       100,Removed file import with id 1151263496"
     `)
     expect(remainingAuditLogs).toMatchInlineSnapshot(`0`)

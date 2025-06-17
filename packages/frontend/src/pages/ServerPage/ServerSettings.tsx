@@ -1,9 +1,7 @@
-import { Info } from "@mui/icons-material"
 import {
   Button,
   FormControlLabel,
   FormHelperText,
-  IconButton,
   InputAdornment,
   Paper,
   Stack,
@@ -11,11 +9,11 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
-  Tooltip,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { enqueueSnackbar } from "notistack"
 import React, { MouseEvent, useEffect, useState } from "react"
+import { LearnMore } from "src/components/LearnMore"
 import { SectionTitle } from "src/components/SectionTitle"
 
 import { DEFAULT_SETTINGS } from "../../settings"
@@ -208,17 +206,12 @@ export function ServerSettings() {
     <Paper sx={{ paddingX: 2, paddingY: 2 }}>
       <Stack gap={2}>
         <Stack gap={1}>
-          <Stack direction="row" alignItems="center" spacing={1}>
+          <LearnMore
+            title={`How often the server will automatically refresh balances, prices, and networth.
+                    Default is ${DEFAULT_SETTINGS.networthRefreshInterval} minutes.`}
+          >
             <SectionTitle>Networth Refresh Interval</SectionTitle>
-            <Tooltip
-              title={`How often the server will automatically refresh balances, prices, and networth.
-                  Default is ${DEFAULT_SETTINGS.networthRefreshInterval} minutes.`}
-            >
-              <IconButton size="small" aria-label="Help with cron expressions" color="secondary">
-                <Info fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </Stack>
+          </LearnMore>
           <ToggleButtonGroup
             value={networthToggleValue}
             exclusive
@@ -267,16 +260,11 @@ export function ServerSettings() {
         </Stack>
 
         <Stack gap={1}>
-          <Stack direction="row" alignItems="center" spacing={1}>
+          <LearnMore
+            title={`How often the server will automatically refetch assets and platforms metadata.`}
+          >
             <SectionTitle>Metadata Refresh Interval</SectionTitle>
-            <Tooltip
-              title={`How often the server will automatically refetch assets and platforms metadata.`}
-            >
-              <IconButton size="small" aria-label="Help with cron expressions" color="secondary">
-                <Info fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </Stack>
+          </LearnMore>
           <ToggleButtonGroup
             value={metadataToggleValue}
             exclusive
@@ -324,14 +312,11 @@ export function ServerSettings() {
           )}
         </Stack>
         <Stack gap={1}>
-          <Stack direction="row" alignItems="center" spacing={1}>
+          <LearnMore
+            title={`When enabled, read operations are available to anyone without authentication. Write operations still require authentication.`}
+          >
             <SectionTitle>Kiosk Mode</SectionTitle>
-            <Tooltip title="When enabled, read operations are available to anyone without authentication. Write operations still require authentication.">
-              <IconButton size="small" aria-label="Help with kiosk mode" color="secondary">
-                <Info fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </Stack>
+          </LearnMore>
           <FormControlLabel
             sx={{
               "&:not(:hover)": {

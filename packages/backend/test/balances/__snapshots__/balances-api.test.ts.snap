@@ -3,6 +3,9 @@
 exports[`should fetch historical balances 2`] = `
 [
   {
+    "timestamp": 1504137600000,
+  },
+  {
     "coinmama:BTC": "0.035979259",
     "timestamp": 1504224000000,
   },

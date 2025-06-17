@@ -23,6 +23,14 @@ export const TRANSACTIONS_TYPES = [
 ] as const
 export type TransactionType = (typeof TRANSACTIONS_TYPES)[number]
 
+export const TRADE_TYPES = [
+  "Long",
+  "Short",
+  // "Borrow"
+] as const
+export type TradeType = (typeof TRADE_TYPES)[number]
+export type TradeStatus = "open" | "closed"
+
 // type ExchangeId = "mexc" | "binance"
 
 /**
@@ -63,6 +71,9 @@ export interface Transaction {
   outgoing?: string
   outgoingAsset?: string
   platform: string
+  /**
+   * outgoing / incoming
+   */
   price?: string
   role?: TransactionRole
   tags?: number[]
@@ -209,21 +220,40 @@ export interface Balance {
   value?: number
 }
 
+export type TradeCost = [
+  assetId: string,
+  amount: string,
+  usdValue: string,
+  exposure: string,
+  txId: string,
+  timestamp: Timestamp,
+]
+
+export type TradeValue = [
+  assetId: string,
+  amount: string,
+  usdValue: string,
+  txId: string,
+  timestamp: Timestamp,
+]
+
 export interface Trade {
   amount: number
   assetId: string
   auditLogIds?: string[]
   balance: number
   closedAt?: Timestamp
+  cost: TradeCost[]
   createdAt: Timestamp
+  deposits: TradeValue[]
   duration?: number
-  feeAmounts: string[]
-  feeAssets: string[]
+  fees: TradeValue[]
   id: string
-  isOpen: boolean
-  soldAmounts: string[]
-  soldAssets: string[]
+  proceeds: TradeValue[]
   tags?: number[]
+  tradeNumber: number
+  tradeStatus: "open" | "closed"
+  tradeType: TradeType
   txIds?: string[]
 }
 
@@ -648,6 +678,8 @@ export type FilterOptionsMap = {
   outgoingAsset: string[]
   platform: string[]
   tags: number[]
+  tradeStatus: string[]
+  tradeType: readonly TradeType[]
   trigger: string[]
   type: readonly TransactionType[]
   wallet: string[]
@@ -674,6 +706,7 @@ export enum SubscriptionChannel {
   ServerLog = "server-logs",
   Tags = "tags",
   Trades = "trades",
+  TradePnl = "trade-pnl",
 }
 
 export type SubscriptionListener = (...args: unknown[]) => void
@@ -824,4 +857,28 @@ export type PlatformMeta = {
   }
   chainId?: number
   nativeAssetId?: string
+}
+
+export interface TradePnL {
+  cost: number
+  deposits: number
+  fees: number
+  id: string
+  /**
+   * Formula: positionValue + cost + proceeds + fees - deposits
+   */
+  pnl: number
+  positionValue: number
+  proceeds: number
+  timestamp: number
+  tradeId: string
+}
+
+export interface AccountPnL {
+  cost: number
+  fees: number
+  pnl: number
+  positionValue: number
+  proceeds: number
+  timestamp: number
 }

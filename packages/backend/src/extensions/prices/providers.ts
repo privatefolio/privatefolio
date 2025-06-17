@@ -36,7 +36,8 @@ export async function getLivePricesForAsset(
   assetId: string,
   priceApiId: PriceApiId,
   // TODO8 allow more
-  limit = 300
+  limit = 300,
+  timeInterval = "1d" as ResolutionString
 ): Promise<ChartData[]> {
   const priceApi = PRICE_APIS[priceApiId]
   const priceMapper = PRICE_MAPPER[priceApiId]
@@ -55,7 +56,7 @@ export async function getLivePricesForAsset(
     limit,
     pair,
     since,
-    timeInterval: "1d" as ResolutionString,
+    timeInterval,
     until: today,
   })
 

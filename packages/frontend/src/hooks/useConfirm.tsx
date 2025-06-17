@@ -14,6 +14,7 @@ type ConfirmationRequest = {
   confirmText?: string
   content: string | ReactNode
   dismissable?: boolean
+  focusInput?: string
   title: string
   variant?: "danger" | "warning" | "info" | "success"
 }
@@ -63,6 +64,7 @@ export function ConfirmDialogProvider({ children }: PropsWithChildren) {
           variant={state.request.variant}
           dismissable={state.request.dismissable}
           confirmText={state.request.confirmText}
+          focusInput={state.request.focusInput}
         />
       )}
     </ConfirmDialogContext.Provider>

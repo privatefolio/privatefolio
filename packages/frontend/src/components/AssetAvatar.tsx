@@ -58,6 +58,7 @@ export function AssetAvatar(props: AssetAvatarProps) {
         lineHeight={1.5}
         fontFamily={MonoFont}
         color={color}
+        component="div"
       >
         {alt.slice(0, size === "small" ? 1 : 3)}
       </Typography>

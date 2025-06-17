@@ -156,7 +156,7 @@ export async function resetConnection(
   await progress([50, `Removing ${transactionsCount} transactions`])
   await account.execute(`DELETE FROM transactions WHERE connectionId = ?`, [connection.id])
 
-  await setValue(`cursor_${connection.id}`, 0, accountName)
+  await setValue(accountName, `cursor_${connection.id}`, 0)
 
   connection.meta = {
     assetIds: [],
@@ -278,7 +278,7 @@ export async function syncConnection(
   // Set cursor
   if (result.rows > 0) {
     await progress([90, `Setting cursor to ${result.newCursor}`])
-    await setValue(`cursor_${connection.id}`, result.newCursor, accountName)
+    await setValue(accountName, `cursor_${connection.id}`, result.newCursor)
   }
 
   return connection

@@ -202,7 +202,7 @@ export const theme: CssVarsThemeOptions = {
           main: blue[600],
         },
         primary: {
-          main: "rgb(80, 80, 80)",
+          main: "rgb(30, 30, 30)",
         },
         secondary: {
           main: "rgb(120, 120, 120)",

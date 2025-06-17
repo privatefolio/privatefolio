@@ -1,9 +1,7 @@
 import { Chip } from "@mui/material"
-import { useStore } from "@nanostores/react"
 import React from "react"
-import { $quoteCurrency } from "src/stores/account-settings-store"
 
-import { AmountBlock } from "./AmountBlock"
+import { QuoteAmountBlock } from "./QuoteAmountBlock"
 
 type ValueChipProps = {
   value?: number
@@ -11,8 +9,6 @@ type ValueChipProps = {
 
 export function ValueChip(props: ValueChipProps) {
   const { value } = props
-
-  const currency = useStore($quoteCurrency)
 
   return (
     <Chip
@@ -26,18 +22,9 @@ export function ValueChip(props: ValueChipProps) {
         },
         borderRadius: 2,
         color: "text.secondary",
-        fontSize: "0.9rem",
         marginX: 1,
       }}
-      label={
-        <AmountBlock
-          amount={value}
-          currencySymbol={currency.symbol}
-          currencyTicker={currency.id}
-          significantDigits={currency.maxDigits}
-          maxDigits={currency.maxDigits}
-        />
-      }
+      label={<QuoteAmountBlock amount={value} />}
     />
   )
 }

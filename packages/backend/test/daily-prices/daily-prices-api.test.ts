@@ -60,7 +60,7 @@ it("should fetch BTC prices using Binance", async (test) => {
   // act
   await fetchDailyPrices(
     accountName,
-    [{ id: "binance:BTC", priceApiId: "binance", symbol: "BTC" }],
+    [{ coingeckoId: "test", id: "binance:BTC", priceApiId: "binance", symbol: "BTC" }],
     async (state) => updates.push(state),
     undefined,
     { until: 1735682400000 }
@@ -136,6 +136,7 @@ it("should fetch BTC prices using Coinbase", async () => {
     accountName,
     [
       {
+        coingeckoId: "test",
         id: "coinbase:BTC",
         priceApiId: "coinbase",
         symbol: "BTC",
@@ -220,6 +221,7 @@ it("should fetch WBTC prices using DefiLlama", async () => {
     accountName,
     [
       {
+        coingeckoId: "test",
         id: "ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC-1",
         priceApiId: "defi-llama",
         symbol: "WBTC",
@@ -288,6 +290,7 @@ it("should fetch WBTC prices using Alchemy", async () => {
     accountName,
     [
       {
+        coingeckoId: "test",
         id: "ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC-2",
         priceApiId: "alchemy",
         symbol: "WBTC",

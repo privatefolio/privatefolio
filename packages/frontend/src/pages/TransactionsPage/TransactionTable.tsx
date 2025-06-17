@@ -22,10 +22,11 @@ interface TransactionsTableProps extends Pick<RemoteTableProps<Transaction>, "de
   assetId?: string
   tableDataRef?: MutableRefObject<Transaction[]>
   toggleAddTransactionDrawer?: () => void
+  tradeId?: string
 }
 
 export function TransactionTable(props: TransactionsTableProps) {
-  const { assetId, tableDataRef, toggleAddTransactionDrawer, ...rest } = props
+  const { assetId, tableDataRef, toggleAddTransactionDrawer, tradeId, ...rest } = props
 
   const accountName = useStore($activeAccount)
   const [refresh, setRefresh] = useState(0)
@@ -82,6 +83,12 @@ export function TransactionTable(props: TransactionsTableProps) {
         filterConditions.push(`(incomingAsset = '${assetId}' OR outgoingAsset = '${assetId}')`)
       }
 
+      if (tradeId) {
+        filterConditions.push(`trade_transactions.trade_id = '${tradeId}'`)
+        tradeJoin =
+          "INNER JOIN trade_transactions ON transactions.id = trade_transactions.transaction_id"
+      }
+
       // Construct the filterQuery
       let filterQuery = ""
       if (filterConditions.length > 0) {
@@ -109,7 +116,7 @@ export function TransactionTable(props: TransactionsTableProps) {
           ),
       ]
     },
-    [accountName, assetId, refresh, tableDataRef, rpc]
+    [accountName, assetId, refresh, tableDataRef, rpc, tradeId]
   )
 
   const headCells = useMemo<HeadCell<Transaction>[]>(
