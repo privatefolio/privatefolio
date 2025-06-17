@@ -702,11 +702,12 @@ export async function getTradeTransactions(
 export async function getTradePnL(
   accountName: string,
   tradeId: string,
-  query = "SELECT * FROM trade_pnl WHERE trade_id = ? ORDER BY timestamp ASC"
+  query = "SELECT * FROM trade_pnl WHERE trade_id = ? ORDER BY timestamp ASC",
+  params: SqlParam[] = [tradeId]
 ): Promise<TradePnL[]> {
   const account = await getAccountWithTrades(accountName)
   try {
-    const result = await account.execute(query, [tradeId])
+    const result = await account.execute(query, params)
     /* eslint-disable sort-keys-fix/sort-keys-fix */
     return result.map((row) => ({
       id: row[0] as string,

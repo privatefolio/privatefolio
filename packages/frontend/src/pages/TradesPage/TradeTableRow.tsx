@@ -9,9 +9,10 @@ import { AggregatableValue, AssetAmountsBlock } from "src/components/AssetAmount
 import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { QuoteAmountBlock } from "src/components/QuoteAmountBlock"
 import { TimestampBlock } from "src/components/TimestampBlock"
-import { ChartData, Trade, TradePnL } from "src/interfaces"
+import { ChartData, SqlParam, Trade, TradePnL } from "src/interfaces"
 import { $showQuotedAmounts } from "src/stores/account-settings-store"
 import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
+import { $inspectTime } from "src/stores/pages/balances-store"
 import { TableRowComponentProps } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
 
@@ -120,6 +121,8 @@ export function TradeTableRow({
   //   )
   // }
 
+  const inspectTime = useStore($inspectTime)
+
   const costBasis = useMemo<AggregatableValue[]>(() => {
     return cost.map(([assetId, amount, usdValue, exposure, txId, txTimestamp]) => [
       assetId,
@@ -133,12 +136,16 @@ export function TradeTableRow({
   const [tradePnl, setTradePnl] = useState<TradePnL | undefined | null>()
 
   useEffect(() => {
+    const params: SqlParam[] = [row.id]
+    let query = "SELECT * FROM trade_pnl WHERE trade_id = ? ORDER BY timestamp DESC LIMIT 1"
+
+    if (inspectTime) {
+      query = `SELECT * FROM trade_pnl WHERE trade_id = ? AND timestamp <= ? ORDER BY timestamp DESC LIMIT 1`
+      params.push(inspectTime)
+    }
+
     rpc
-      .getTradePnL(
-        activeAccount,
-        row.id,
-        "SELECT * FROM trade_pnl WHERE trade_id = ? ORDER BY timestamp DESC LIMIT 1"
-      )
+      .getTradePnL(activeAccount, row.id, query, params)
       .then((pnl) => {
         if (pnl.length > 0) {
           setTradePnl(pnl[0])
@@ -146,10 +153,11 @@ export function TradeTableRow({
           setTradePnl(null)
         }
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error(error)
         setTradePnl(null)
       })
-  }, [activeAccount, rpc, row.id])
+  }, [activeAccount, rpc, row.id, inspectTime])
 
   return (
     <>

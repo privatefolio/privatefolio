@@ -10,6 +10,7 @@ import { SectionTitle } from "src/components/SectionTitle"
 import { TagManager } from "src/components/TagManager"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { Tag, Trade, TradePnL } from "src/interfaces"
+import { $quoteCurrency } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
 import { $rpc } from "src/workers/remotes"
 
@@ -37,6 +38,14 @@ export function TradeDetails({ trade }: TradeDetailsProps) {
     rpc.getTagsForTrade(activeAccount, id).then(setTags)
   }, [id, activeAccount, rpc])
 
+  const deposits = useMemo<AggregatableValue[]>(() => {
+    return trade.deposits.filter(([_, amount]) => Big(amount).gt(0))
+  }, [trade.deposits])
+
+  const withdrawals = useMemo<AggregatableValue[]>(() => {
+    return trade.deposits.filter(([_, amount]) => Big(amount).lt(0))
+  }, [trade.deposits])
+
   const costBasis = useMemo<AggregatableValue[]>(() => {
     return cost.map(([assetId, amount, usdValue, exposure, txId, txTimestamp]) => [
       assetId,
@@ -46,6 +55,16 @@ export function TradeDetails({ trade }: TradeDetailsProps) {
       txTimestamp,
     ])
   }, [cost])
+
+  const currency = useStore($quoteCurrency)
+  const depositsCostBasis = useMemo<AggregatableValue[]>(
+    () =>
+      trade.deposits.map(([_assetId, amount, usdValue, txId, txTimestamp]) => {
+        const costBasis = Big(usdValue).div(amount).toString()
+        return [currency.id, costBasis, costBasis, txId, txTimestamp]
+      }),
+    [trade.deposits, currency]
+  )
 
   const [tradePnl, setTradePnl] = useState<TradePnL | undefined | null>()
 
@@ -63,18 +82,11 @@ export function TradeDetails({ trade }: TradeDetailsProps) {
           setTradePnl(null)
         }
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error(error)
         setTradePnl(null)
       })
   }, [activeAccount, rpc, id])
-
-  const deposits = useMemo<AggregatableValue[]>(() => {
-    return trade.deposits.filter(([_, amount]) => Big(amount).gt(0))
-  }, [trade.deposits])
-
-  const withdrawals = useMemo<AggregatableValue[]>(() => {
-    return trade.deposits.filter(([_, amount]) => Big(amount).lt(0))
-  }, [trade.deposits])
 
   return (
     <Paper sx={{ paddingX: 2, paddingY: 1 }}>
@@ -106,6 +118,18 @@ export function TradeDetails({ trade }: TradeDetailsProps) {
               <SectionTitle>Deposits</SectionTitle>
             </LearnMore>
             <AssetAmountsBlock values={deposits} showSign colorized />
+          </div>
+        )}
+        {depositsCostBasis.length > 0 && (
+          <div>
+            <LearnMore title="Cost basis is the average cost of the assets in the trade (calculated from deposits & withdrawals).">
+              <SectionTitle>Cost basis of deposits</SectionTitle>
+            </LearnMore>
+            <AssetAmountsBlock
+              values={depositsCostBasis}
+              aggregation="average"
+              formatting="price"
+            />
           </div>
         )}
         {withdrawals.length > 0 && (
@@ -140,11 +164,10 @@ export function TradeDetails({ trade }: TradeDetailsProps) {
             <AssetAmountsBlock values={proceeds} showSign colorized />
           </div>
         )}
-
         {costBasis.length > 0 && (
           <div>
-            <LearnMore title="Cost Basis is the average cost of the assets in the trade.">
-              <SectionTitle>Cost Basis</SectionTitle>
+            <LearnMore title="Cost basis is the average cost of the assets in the trade.">
+              <SectionTitle>Cost basis</SectionTitle>
             </LearnMore>
             <AssetAmountsBlock values={costBasis} aggregation="average" formatting="price" />
           </div>

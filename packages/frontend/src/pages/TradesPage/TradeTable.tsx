@@ -3,6 +3,7 @@ import { throttle } from "lodash-es"
 import React, { MutableRefObject, useCallback, useEffect, useMemo, useState } from "react"
 import { SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
+import { $inspectTime } from "src/stores/pages/balances-store"
 import { closeSubscription } from "src/utils/browser-utils"
 
 import {
@@ -28,6 +29,7 @@ export function TradeTable(props: TradesTableProps) {
   const [refresh, setRefresh] = useState(0)
   const connectionStatus = useStore($connectionStatus)
   const rpc = useStore($rpc)
+  const inspectTime = useStore($inspectTime)
 
   useEffect(() => {
     const subscription = rpc.subscribeToTrades(
@@ -59,17 +61,18 @@ export function TradeTable(props: TradesTableProps) {
         filterConditions.push(`${key} = '${filters[key]}'`)
       })
 
-      // Include the assetId condition
       if (assetId) {
         filterConditions.push(`assetId = '${assetId}'`)
       }
 
-      // Add active/closed condition
-      if (tradeStatus) {
+      if (tradeStatus && !inspectTime) {
         filterConditions.push(`tradeStatus = '${tradeStatus}'`)
       }
 
-      // Construct the filterQuery
+      if (inspectTime) {
+        filterConditions.push(`createdAt <= ${inspectTime}`)
+      }
+
       let filterQuery = ""
       if (filterConditions.length > 0) {
         filterQuery = "WHERE " + filterConditions.join(" AND ")
@@ -91,7 +94,7 @@ export function TradeTable(props: TradesTableProps) {
         () => rpc.countTrades(accountName, `SELECT COUNT (*) FROM trades ${filterQuery}`),
       ]
     },
-    [accountName, assetId, refresh, tableDataRef, rpc, tradeStatus]
+    [accountName, assetId, refresh, tableDataRef, rpc, tradeStatus, inspectTime]
   )
 
   const headCells = useMemo<HeadCell<Trade>[]>(
@@ -127,7 +130,7 @@ export function TradeTable(props: TradesTableProps) {
         sx: { maxWidth: 120, minWidth: 120, width: 120 },
       },
       {
-        label: "Cost Basis",
+        label: "Cost basis",
         sx: { maxWidth: 240, minWidth: 240, width: 240 },
       },
       {

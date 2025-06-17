@@ -107,7 +107,6 @@ export function PnLChart({ trade }: { trade?: Trade }) {
       tooltipOptions={tooltipOptions}
       chartOptions={chartOptions}
       initType="Baseline"
-      allowedCursorModes={["move"]}
     />
   )
 }
