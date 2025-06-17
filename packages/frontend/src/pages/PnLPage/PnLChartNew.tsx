@@ -26,7 +26,7 @@ export function PnLChartNew({ trade }: { trade?: Trade }) {
   const rpc = useStore($rpc)
 
   useEffect(() => {
-    const subscription = rpc.subscribeToTrades(
+    const subscription = rpc.subscribeToPnl(
       activeAccount,
       debounce(() => {
         setRefresh(Math.random())

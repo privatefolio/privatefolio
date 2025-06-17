@@ -208,12 +208,13 @@ describe("0xf98 file import", () => {
       ,Skipped ethereum:0x519475b31653E46D20cD09F9FdcF3B12BDAcB4f5:VIU: No coingeckoId
       ,Skipped ethereum:0x7B2f9706CD8473B4F5B7758b0171a9933Fc6C4d6:HEALP: No coingeckoId
       20,Found 6 asset groups
-      31,Processed 1/6 asset groups
-      43,Processed 2/6 asset groups
-      55,Processed 3/6 asset groups
-      66,Processed 4/6 asset groups
-      78,Processed 5/6 asset groups
-      90,Processed 6/6 asset groups
+      30,Processed 1/6 asset groups
+      40,Processed 2/6 asset groups
+      50,Processed 3/6 asset groups
+      60,Processed 4/6 asset groups
+      70,Processed 5/6 asset groups
+      80,Processed 6/6 asset groups
+      80,Setting trades cursor to Nov 04, 2020
       80,Trades computation completed
       82,Processing 6 trades
       84,Processed 1/6 trades

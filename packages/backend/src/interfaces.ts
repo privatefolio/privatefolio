@@ -711,6 +711,7 @@ export enum SubscriptionChannel {
   ServerLog = "server-logs",
   Tags = "tags",
   Trades = "trades",
+  TradePnl = "trade-pnl",
 }
 
 export type SubscriptionListener = (...args: unknown[]) => void

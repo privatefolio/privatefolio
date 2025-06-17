@@ -112,10 +112,11 @@ describe("should import 0xb6e via connection", () => {
       ,Skipped arbitrum-one:0xfAf87e196A29969094bE35DfB0Ab9d0b8518dB84:ACHIVX: No coingeckoId
       ,Skipped arbitrum-one:0xdf109e2b175038c66e074BfEacF37D7b0f3e426c:MaticSlot: No coingeckoId
       20,Found 4 asset groups
-      37,Processed 1/4 asset groups
-      55,Processed 2/4 asset groups
-      72,Processed 3/4 asset groups
-      90,Processed 4/4 asset groups
+      35,Processed 1/4 asset groups
+      50,Processed 2/4 asset groups
+      65,Processed 3/4 asset groups
+      80,Processed 4/4 asset groups
+      80,Setting trades cursor to Nov 26, 2024
       80,Trades computation completed
       82,Processing 6 trades
       84,Processed 1/6 trades
@@ -124,6 +125,7 @@ describe("should import 0xb6e via connection", () => {
       92,Processed 4/6 trades
       95,Processed 5/6 trades
       98,Processed 6/6 trades
+      98,Setting profit & loss cursor to Jun 14, 2025
       100,PnL computation completed"
     `)
   })

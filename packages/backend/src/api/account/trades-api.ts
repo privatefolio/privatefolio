@@ -17,7 +17,7 @@ import {
   TradeType,
 } from "src/interfaces"
 import { transformNullsToUndefined } from "src/utils/db-utils"
-import { ONE_DAY } from "src/utils/formatting-utils"
+import { formatDate, ONE_DAY } from "src/utils/formatting-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { hashString, isTestEnvironment, noop } from "src/utils/utils"
@@ -248,6 +248,10 @@ export async function subscribeToTrades(
   return createSubscription(accountName, SubscriptionChannel.Trades, callback)
 }
 
+export async function subscribeToPnl(accountName: string, callback: (cause: EventCause) => void) {
+  return createSubscription(accountName, SubscriptionChannel.TradePnl, callback)
+}
+
 function derivadeTradeId(assetId: string, createdAt: number) {
   return `${hashString(`${assetId}_${createdAt}`)}`
 }
@@ -257,6 +261,14 @@ export async function invalidateTrades(accountName: string, newValue: Timestamp)
 
   if (newValue < existing) {
     await setValue(accountName, "tradesCursor", newValue)
+  }
+}
+
+export async function invalidateTradePnl(accountName: string, newValue: Timestamp) {
+  const existing = (await getValue<Timestamp>(accountName, "tradePnlCursor", 0)) as Timestamp
+
+  if (newValue < existing) {
+    await setValue(accountName, "tradePnlCursor", newValue)
   }
 }
 
@@ -271,29 +283,17 @@ export async function computeTrades(
   _signal?: AbortSignal
 ): Promise<void> {
   let { since } = request
+
+  const account = await getAccountWithTrades(accountName)
   if (since === undefined) {
     since = (await getValue<Timestamp>(accountName, "tradesCursor", 0)) as Timestamp
   }
 
-  const account = await getAccountWithTrades(accountName)
-
-  // If since is not 0, we should only delete trades after that timestamp
   if (since !== 0) {
-    await account.execute(
-      "DELETE FROM trade_audit_logs WHERE trade_id IN (SELECT id FROM trades WHERE createdAt >= ?)",
-      [since]
-    )
-    await account.execute(
-      "DELETE FROM trade_transactions WHERE trade_id IN (SELECT id FROM trades WHERE createdAt >= ?)",
-      [since]
-    )
-    await account.execute(
-      "DELETE FROM trade_pnl WHERE trade_id IN (SELECT id FROM trades WHERE createdAt >= ?)",
-      [since]
-    )
-    await account.execute("DELETE FROM trades WHERE createdAt >= ?", [since])
-    await progress([0, `Refreshing trades starting ${since}`])
-  } else {
+    await progress([0, `Refreshing trades starting ${formatDate(since)}`])
+  }
+
+  if (since === 0) {
     await account.execute("DELETE FROM trade_audit_logs")
     await account.execute("DELETE FROM trade_transactions")
     await account.execute("DELETE FROM trade_pnl")
@@ -305,7 +305,7 @@ export async function computeTrades(
     accountName,
     since === 0
       ? "SELECT * FROM audit_logs ORDER BY timestamp ASC, changeN ASC, id ASC"
-      : "SELECT * FROM audit_logs WHERE timestamp >= ? ORDER BY timestamp ASC, changeN ASC, id ASC",
+      : "SELECT * FROM audit_logs WHERE timestamp > ? ORDER BY timestamp ASC, changeN ASC, id ASC",
     since === 0 ? undefined : [since]
   )
 
@@ -344,11 +344,23 @@ export async function computeTrades(
 
   await progress([20, `Found ${Object.keys(assetGroups).length} asset groups`])
 
-  const trades: Trade[] = []
+  const trades: Trade[] =
+    since === 0
+      ? []
+      : await getTrades(
+          accountName,
+          "SELECT * FROM trades WHERE tradeStatus = 'open' ORDER BY createdAt ASC"
+        )
+
+  if (trades.length > 0) {
+    await progress([20, `Found ${trades.length} open trades`])
+  }
+
   let processedGroups = 0
 
   const tradeAuditLogs: [string, string][] = []
   const tradeTransactions: [string, string][] = []
+  let oldestClosedTrade = 0
 
   async function processTransactionForTrade(
     trade: Trade,
@@ -480,6 +492,10 @@ export async function computeTrades(
           currentTrade.duration = log.timestamp - currentTrade.createdAt
           trades.push(currentTrade)
 
+          if (currentTrade.closedAt > oldestClosedTrade) {
+            oldestClosedTrade = currentTrade.closedAt
+          }
+
           // If balance is non-zero, start a new trade in the opposite direction
           if (!balance.eq(0)) {
             const newTradeId = derivadeTradeId(assetId, log.timestamp)
@@ -515,7 +531,7 @@ export async function computeTrades(
 
     processedGroups++
     await progress([
-      20 + Math.floor((processedGroups / Object.keys(assetGroups).length) * 70),
+      20 + Math.floor((processedGroups / Object.keys(assetGroups).length) * 60),
       `Processed ${processedGroups}/${Object.keys(assetGroups).length} asset groups`,
     ])
   }
@@ -546,14 +562,14 @@ export async function computeTrades(
     }
   }
 
-  // Set tradesCursor to the latest trade's createdAt
-  if (trades.length > 0) {
-    const latestCreatedAt = trades[trades.length - 1].createdAt
-    await setValue(accountName, "tradesCursor", latestCreatedAt)
+  if (oldestClosedTrade > 0) {
+    const newCursor = oldestClosedTrade
+    await progress([80, `Setting trades cursor to ${formatDate(newCursor)}`])
+    await setValue(accountName, "tradesCursor", newCursor)
   }
 
   await progress([80, "Trades computation completed"])
-  await computePnl(accountName, progress, trades)
+  await computePnl(accountName, progress, trades, since === 0 ? 0 : undefined)
 }
 
 export function enqueueRefreshTrades(accountName: string, trigger: TaskTrigger) {
@@ -686,10 +702,24 @@ export async function getAccountPnL(
 export async function computePnl(
   accountName: string,
   progress: ProgressCallback = noop,
-  trades: Trade[]
+  trades: Trade[],
+  since?: number
 ): Promise<void> {
   const account = await getAccountWithTrades(accountName)
-  await account.execute("DELETE FROM trade_pnl")
+
+  if (since === undefined) {
+    since = (await getValue<Timestamp>(accountName, "tradePnlCursor", 0)) as Timestamp
+  }
+
+  if (since !== 0) {
+    await progress([80, `Refreshing PnL starting ${formatDate(since)}`])
+    await account.execute(
+      "DELETE FROM trade_pnl WHERE trade_id IN (SELECT id FROM trades WHERE createdAt >= ?)",
+      [since]
+    )
+  } else {
+    await account.execute("DELETE FROM trade_pnl")
+  }
 
   if (trades.length === 0) {
     await progress([100, "No trades found"])
@@ -700,6 +730,7 @@ export async function computePnl(
 
   const pnlRecords: Array<[string, string, number, number, number, number, number, number]> = []
   let processedTrades = 0
+  let latestTimestamp = 0
 
   for (const trade of trades) {
     // Get daily prices for the asset during the trade period
@@ -733,6 +764,10 @@ export async function computePnl(
         [bucketEnd, trade.assetId]
       )
 
+      if (bucketStart > latestTimestamp) {
+        latestTimestamp = bucketStart
+      }
+
       const balance = latestLog ? Number(latestLog.balance) : 0
       const positionValue = price.value * balance
 
@@ -765,12 +800,18 @@ export async function computePnl(
     ])
   }
 
-  // Save PnL records
   if (pnlRecords.length > 0) {
     await account.executeMany(
-      "INSERT INTO trade_pnl (id, trade_id, timestamp, positionValue, cost, proceeds, fees, pnl) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT OR REPLACE INTO trade_pnl (id, trade_id, timestamp, positionValue, cost, proceeds, fees, pnl) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       pnlRecords
     )
+
+    account.eventEmitter.emit(SubscriptionChannel.TradePnl, EventCause.Updated)
+  }
+
+  if (latestTimestamp > 0) {
+    await progress([98, `Setting profit & loss cursor to ${formatDate(latestTimestamp)}`])
+    await setValue(accountName, "tradePnlCursor", latestTimestamp)
   }
 
   await progress([100, "PnL computation completed"])

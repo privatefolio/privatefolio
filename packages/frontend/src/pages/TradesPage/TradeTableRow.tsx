@@ -157,7 +157,7 @@ export function TradeTableRow({
           <AssetAmountsBlock values={fees} showSign colorized />
         </TableCell>
         <TableCell>
-          <AssetAmountsBlock values={proceeds} />
+          <AssetAmountsBlock values={proceeds} showSign colorized />
         </TableCell>
         <TableCell>
           <TimestampBlock timestamp={createdAt} relative={relativeTime} />

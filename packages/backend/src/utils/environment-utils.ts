@@ -24,3 +24,5 @@ if (!isTestEnvironment) {
   console.log(`Backend environment is ${environment}`)
   console.log(`Sqlite implementation is ${useBunSqlite ? "bun" : "sqlite3"}`)
 }
+
+export const isDebug = false

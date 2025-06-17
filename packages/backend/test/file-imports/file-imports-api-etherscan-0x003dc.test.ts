@@ -344,50 +344,51 @@ describe("should import 0x003dc via files", () => {
       ,Skipped ethereum:0x4688a8b1F292FDaB17E9a90c8Bc379dC1DBd8713:COVER: No coingeckoId
       20,Found 45 asset groups
       21,Processed 1/45 asset groups
-      23,Processed 2/45 asset groups
+      22,Processed 2/45 asset groups
       24,Processed 3/45 asset groups
-      26,Processed 4/45 asset groups
-      27,Processed 5/45 asset groups
-      29,Processed 6/45 asset groups
-      30,Processed 7/45 asset groups
-      32,Processed 8/45 asset groups
-      34,Processed 9/45 asset groups
-      35,Processed 10/45 asset groups
-      37,Processed 11/45 asset groups
-      38,Processed 12/45 asset groups
-      40,Processed 13/45 asset groups
-      41,Processed 14/45 asset groups
-      43,Processed 15/45 asset groups
-      44,Processed 16/45 asset groups
-      46,Processed 17/45 asset groups
-      48,Processed 18/45 asset groups
-      49,Processed 19/45 asset groups
-      51,Processed 20/45 asset groups
-      52,Processed 21/45 asset groups
-      54,Processed 22/45 asset groups
-      55,Processed 23/45 asset groups
-      57,Processed 24/45 asset groups
-      58,Processed 25/45 asset groups
-      60,Processed 26/45 asset groups
-      62,Processed 27/45 asset groups
-      63,Processed 28/45 asset groups
-      65,Processed 29/45 asset groups
-      66,Processed 30/45 asset groups
-      68,Processed 31/45 asset groups
-      69,Processed 32/45 asset groups
-      71,Processed 33/45 asset groups
-      72,Processed 34/45 asset groups
-      74,Processed 35/45 asset groups
-      76,Processed 36/45 asset groups
-      77,Processed 37/45 asset groups
-      79,Processed 38/45 asset groups
-      80,Processed 39/45 asset groups
-      82,Processed 40/45 asset groups
-      83,Processed 41/45 asset groups
-      85,Processed 42/45 asset groups
-      86,Processed 43/45 asset groups
-      88,Processed 44/45 asset groups
-      90,Processed 45/45 asset groups
+      25,Processed 4/45 asset groups
+      26,Processed 5/45 asset groups
+      28,Processed 6/45 asset groups
+      29,Processed 7/45 asset groups
+      30,Processed 8/45 asset groups
+      32,Processed 9/45 asset groups
+      33,Processed 10/45 asset groups
+      34,Processed 11/45 asset groups
+      36,Processed 12/45 asset groups
+      37,Processed 13/45 asset groups
+      38,Processed 14/45 asset groups
+      40,Processed 15/45 asset groups
+      41,Processed 16/45 asset groups
+      42,Processed 17/45 asset groups
+      44,Processed 18/45 asset groups
+      45,Processed 19/45 asset groups
+      46,Processed 20/45 asset groups
+      48,Processed 21/45 asset groups
+      49,Processed 22/45 asset groups
+      50,Processed 23/45 asset groups
+      52,Processed 24/45 asset groups
+      53,Processed 25/45 asset groups
+      54,Processed 26/45 asset groups
+      56,Processed 27/45 asset groups
+      57,Processed 28/45 asset groups
+      58,Processed 29/45 asset groups
+      60,Processed 30/45 asset groups
+      61,Processed 31/45 asset groups
+      62,Processed 32/45 asset groups
+      64,Processed 33/45 asset groups
+      65,Processed 34/45 asset groups
+      66,Processed 35/45 asset groups
+      68,Processed 36/45 asset groups
+      69,Processed 37/45 asset groups
+      70,Processed 38/45 asset groups
+      72,Processed 39/45 asset groups
+      73,Processed 40/45 asset groups
+      74,Processed 41/45 asset groups
+      76,Processed 42/45 asset groups
+      77,Processed 43/45 asset groups
+      78,Processed 44/45 asset groups
+      80,Processed 45/45 asset groups
+      80,Setting trades cursor to Sep 20, 2022
       80,Trades computation completed
       82,Processing 101 trades
       82,Processed 1/101 trades

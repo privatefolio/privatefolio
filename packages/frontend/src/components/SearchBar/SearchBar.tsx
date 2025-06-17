@@ -283,7 +283,7 @@ export const SearchBar = () => {
           rpc.enqueueFetchPrices(activeAccount, "user")
           rpc.enqueueRefreshBalances(activeAccount, "user")
           rpc.enqueueRefreshNetworth(activeAccount, "user")
-          rpc.enqueueRefreshTrades(activeAccount, "user")
+          // rpc.enqueueRefreshTrades(activeAccount, "user") // TODO9: currently broken
         },
         priority: 11,
         section: SECTIONS.actions,
@@ -386,6 +386,7 @@ export const SearchBar = () => {
         perform: () => rpc.enqueueRecomputeTrades(activeAccount, "user"),
         priority: 3,
         section: SECTIONS.actions,
+        shortcut: ["$mod+x"],
       },
       {
         icon: <CalculateOutlined fontSize="small" />,

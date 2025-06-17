@@ -107,7 +107,7 @@ export async function computeBalances(
   signal?: AbortSignal
 ) {
   const { pageSize = DB_OPERATION_PAGE_SIZE, until = Date.now() } = request
-  let since = request.since
+  let { since } = request
 
   // TODO8 skip assets tagged as spam
 
