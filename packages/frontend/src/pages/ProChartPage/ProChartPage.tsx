@@ -35,7 +35,7 @@ export function ProChartPage({ show: _show }: { show: boolean }) {
   useEffect(() => {
     setTimeout(() => {
       setOpen(true)
-    }, 750)
+    }, 1_000)
   }, [])
 
   return (

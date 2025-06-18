@@ -165,13 +165,13 @@ export async function patchAsset(accountName: string, id: string, patch: Partial
 export async function findAssets(query: string, limit = 5, strict = false): Promise<Asset[]> {
   const normalizedQuery = query.toLowerCase().trim()
 
-  if (!normalizedQuery) {
-    return []
+  const assets = await getAssets()
+
+  if (normalizedQuery === "") {
+    return assets.slice(0, limit)
   }
 
-  const assets = await getAssets()
   const matchingAssets: Asset[] = []
-
   for (const asset of assets) {
     if (matchingAssets.length >= limit) {
       break

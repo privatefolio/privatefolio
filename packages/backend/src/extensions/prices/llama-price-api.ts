@@ -1,6 +1,8 @@
-import { ChartData, LlamaPrice, QueryRequest, Time } from "src/interfaces"
+import { ChartData, LlamaPrice, QueryRequest, ResolutionString, Time } from "src/interfaces"
 import { PriceApiId } from "src/settings/settings"
-import { getAssetContract, getAssetPlatform } from "src/utils/assets-utils"
+import { getAssetContract, getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
+
+import { approximateTimestamp, ensureValidBuckets } from "../../utils/utils"
 
 export const Identifier: PriceApiId = "defi-llama"
 
@@ -8,9 +10,32 @@ export function getPair(assetId: string) {
   return `${getAssetPlatform(assetId)}:${getAssetContract(assetId)}`
 }
 
-function approximateTimestamp(timestamp: Time) {
-  const remainder = timestamp % 86400
-  return remainder > 43200 ? timestamp - remainder + 86400 : timestamp - remainder
+export function getPairDescription(assetId: string) {
+  const ticker = getAssetTicker(assetId)
+  return [ticker, `${ticker} / US Dollar`]
+}
+
+// Strings accepted by period and searchWidth: Can use regular chart candle notion like ‘4h’ etc where: W = week, D = day, H = hour, M = minute (not case sensitive)
+function getInterval(timeInterval: ResolutionString) {
+  timeInterval = timeInterval.toUpperCase() as ResolutionString
+
+  // Minutes
+  if (timeInterval === "1") return "1m"
+  if (timeInterval === "3") return "3m"
+  if (timeInterval === "5") return "5m"
+  if (timeInterval === "15") return "15m"
+  if (timeInterval === "30") return "30m"
+
+  // Hours
+  if (timeInterval === "60") return "1h"
+  if (timeInterval === "120") return "2h"
+  if (timeInterval === "240") return "4h"
+
+  // Days/Weeks
+  if (timeInterval === "1D") return "1d"
+  if (timeInterval === "1W") return "1w"
+
+  throw new Error(`DefiLlama does not support the '${timeInterval}' time interval.`)
 }
 
 // https://docs.llama.fi/coin-prices-api
@@ -18,7 +43,7 @@ function approximateTimestamp(timestamp: Time) {
 export async function queryPrices(request: QueryRequest) {
   const { timeInterval, since, until, limit = 900, pair } = request
 
-  let apiUrl = `https://coins.llama.fi/chart/${pair}?period=${timeInterval}&span=${limit}`
+  let apiUrl = `https://coins.llama.fi/chart/${pair}?period=${getInterval(timeInterval)}&span=${limit}`
 
   if (since && until) {
     apiUrl = `${apiUrl}&start=${Math.floor(since / 1000)}`
@@ -53,37 +78,17 @@ export async function queryPrices(request: QueryRequest) {
   const { coins } = await res.json()
 
   const data = coins[pair]
-
-  if (!data) {
-    return []
-  }
+  if (!data) return []
 
   const prices = data.prices as LlamaPrice[]
 
-  const patched: ChartData[] = []
-
-  let prevRecord: ChartData | undefined
-  for (let i = 0; i < prices.length; i++) {
-    const time = approximateTimestamp(prices[i].timestamp) as Time
-    const value = prices[i].price
-    const record = { time, value }
-
-    const daysDiff = prevRecord ? (record.time - (prevRecord.time as number)) / 86400 : 0
-
-    if (daysDiff > 1) {
-      // fill the daily gaps
-      for (let i = 1; i < daysDiff; i++) {
-        const gapDay = ((prevRecord as ChartData).time as number) + i * 86400
-        patched.push({
-          time: gapDay as Time,
-          value: (prevRecord as ChartData).value,
-        })
-      }
-    }
-
-    patched.push(record)
-    prevRecord = record
-  }
+  const patched = ensureValidBuckets(
+    prices.map((price) => ({
+      time: approximateTimestamp(price.timestamp, timeInterval) as Time,
+      value: price.price,
+    })),
+    timeInterval
+  )
 
   return patched
 }
@@ -91,30 +96,3 @@ export async function queryPrices(request: QueryRequest) {
 export function mapToChartData(data: ChartData): ChartData {
   return data
 }
-
-// export function createBinanceSubscribe(query: QueryFn) {
-//   return function subscribe(request: SubscribeRequest): SubscribeResult {
-//     const {
-//       timeframe,
-//       since,
-//       onNewData,
-//       priceUnit,
-//       pollingInterval = DEFAULT_POLLING_INTERVAL,
-//       variant,
-//     } = request
-//     let lastTimestamp = since
-
-//     const intervalId = setInterval(async () => {
-//       const data = await query({ priceUnit, since: lastTimestamp, timeframe, variant })
-
-//       if (data.length) {
-//         lastTimestamp = data[data.length - 1].timestamp
-//         data.forEach(onNewData)
-//       }
-//     }, pollingInterval)
-
-//     return function cleanup() {
-//       clearInterval(intervalId)
-//     }
-//   }
-// }

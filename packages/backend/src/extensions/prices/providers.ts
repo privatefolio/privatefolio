@@ -1,5 +1,6 @@
 import { ChartData, QueryRequest, ResolutionString, Timestamp } from "../../interfaces"
-import { PRICE_APIS_META, PriceApiId } from "../../settings/settings"
+import { PRICE_API_PAGINATION, PriceApiId } from "../../settings/settings"
+import { getBucketSize } from "../../utils/utils"
 import * as alchemy from "./alchemy-price-api"
 import * as binance from "./binance-price-api"
 import * as coinbase from "./coinbase-price-api"
@@ -11,58 +12,51 @@ type PairMapper = (symbol: string) => string
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PriceApi = (request: QueryRequest) => Promise<any>
 
-export const PRICE_MAPPER: Record<PriceApiId, PriceMapper> = {
-  alchemy: alchemy.mapToChartData,
-  binance: binance.mapToChartData,
-  coinbase: coinbase.mapToChartData,
-  "defi-llama": llama.mapToChartData,
+type PriceApiExtension = {
+  getPair: PairMapper
+  getPairDescription: (assetId: string) => string[]
+  mapToChartData: PriceMapper
+  queryPrices: PriceApi
 }
 
-export const PRICE_APIS: Record<PriceApiId, PriceApi> = {
-  alchemy: alchemy.queryPrices,
-  binance: binance.queryPrices,
-  coinbase: coinbase.queryPrices,
-  "defi-llama": llama.queryPrices,
-}
-
-export const PAIR_MAPPER: Record<PriceApiId, PairMapper> = {
-  alchemy: alchemy.getPair,
-  binance: binance.getPair,
-  coinbase: coinbase.getPair,
-  "defi-llama": llama.getPair,
+export const PRICE_API_MATCHER: Record<PriceApiId, PriceApiExtension> = {
+  alchemy,
+  binance,
+  coinbase,
+  "defi-llama": llama,
 }
 
 export async function getLivePricesForAsset(
   assetId: string,
   priceApiId: PriceApiId,
-  // TODO8 allow more
-  limit = 300,
-  timeInterval = "1d" as ResolutionString
+  limit = PRICE_API_PAGINATION,
+  timeInterval = "1d" as ResolutionString,
+  since?: Timestamp,
+  until?: Timestamp
 ): Promise<ChartData[]> {
-  const priceApi = PRICE_APIS[priceApiId]
-  const priceMapper = PRICE_MAPPER[priceApiId]
-  const pairMapper = PAIR_MAPPER[priceApiId]
+  const priceApi = PRICE_API_MATCHER[priceApiId]
 
-  if (!priceApi || !priceMapper || !pairMapper) {
+  if (!priceApi) {
     throw new Error(`Price API "${priceApiId}" is not supported`)
   }
 
-  const pair = pairMapper(assetId)
-  const now = Date.now()
-  const today: Timestamp = now - (now % 86400000)
-  const since = today - 86400000 * (limit - 1)
+  const pair = priceApi.getPair(assetId)
 
-  const results = await priceApi({
+  if (!since && !until) {
+    const bucketSize = getBucketSize(timeInterval)
+    const bucketSizeInMs = bucketSize * 1000
+    const now = Date.now()
+    until = now - (now % bucketSizeInMs)
+    since = until - bucketSizeInMs * (limit - 1)
+  }
+
+  const results = await priceApi.queryPrices({
     limit,
     pair,
     since,
     timeInterval,
-    until: today,
+    until,
   })
 
-  if (results.length === 0) {
-    throw new Error(`${PRICE_APIS_META[priceApiId].name}: EmptyResponse`)
-  }
-
-  return results.map(priceMapper)
+  return results.map(priceApi.mapToChartData)
 }

@@ -1,5 +1,13 @@
 import chalk from "chalk"
-import { Blockchain, Exchange, Platform, ProgressLog } from "src/interfaces"
+import {
+  Blockchain,
+  ChartData,
+  Exchange,
+  Platform,
+  ProgressLog,
+  ResolutionString,
+  Time,
+} from "src/interfaces"
 
 import { isBunWorker } from "./environment-utils"
 
@@ -53,24 +61,24 @@ export function getCronExpression(minutes: number): string {
     throw new Error("Minutes must be greater than 0")
   }
 
-  // If it’s an exact number of days
+  // If it's an exact number of days
   if (minutes % 1440 === 0) {
     const days = minutes / 1440
     return `0 0 */${days} * *`
   }
 
-  // If it’s an exact number of hours (but less than a day)
+  // If it's an exact number of hours (but less than a day)
   if (minutes % 60 === 0) {
     const hours = minutes / 60
     return `0 */${hours} * * *`
   }
 
-  // If it’s less than 60 minutes
+  // If it's less than 60 minutes
   if (minutes < 60) {
     return `*/${minutes} * * * *`
   }
 
-  // Otherwise, a strictly “every N minutes” schedule cannot be represented
+  // Otherwise, a strictly "every N minutes" schedule cannot be represented
   // by a single standard cron line. Throw to let caller know.
   throw new Error(
     `Interval must evenly divide 60 or 1440 (i.e. a whole number of hours or days). Received: ${minutes}`
@@ -129,3 +137,97 @@ export function getPrefix(accountName: string, isCron = false): string {
 
 export const isExchange = (x: Platform): x is Exchange => "coingeckoTrustScore" in x
 export const isBlockchain = (x: Platform): x is Blockchain => !("coingeckoTrustScore" in x)
+
+export function getBucketSize(timeInterval: ResolutionString): Time {
+  timeInterval = timeInterval.toUpperCase() as ResolutionString
+
+  // Seconds
+  if (timeInterval === "1S") return 1
+
+  // Minutes
+  if (timeInterval === "1") return 60
+  if (timeInterval === "3") return 180
+  if (timeInterval === "5") return 300
+  if (timeInterval === "15") return 900
+  if (timeInterval === "30") return 1800
+
+  // Hours
+  if (timeInterval === "60") return 3600
+  if (timeInterval === "120") return 7200
+  if (timeInterval === "240") return 14400
+
+  // Days/Weeks/Months
+  if (timeInterval === "1D") return 86400
+  if (timeInterval === "1W") return 604800
+  if (timeInterval === "1M") return 2592000
+
+  throw new Error(`Unsupported time interval: ${timeInterval}`)
+}
+
+export function approximateTimestamp(timestamp: Time, timeInterval: ResolutionString) {
+  const bucketSize = getBucketSize(timeInterval)
+  const remainder = timestamp % bucketSize
+  return remainder > bucketSize / 2 ? timestamp - remainder + bucketSize : timestamp - remainder
+}
+
+export function ensureValidBuckets(
+  prices: ChartData[],
+  timeInterval: ResolutionString
+): ChartData[] {
+  const bucketSize = getBucketSize(timeInterval)
+  const patched: ChartData[] = []
+
+  let prevRecord: ChartData | undefined
+  for (let i = 0; i < prices.length; i++) {
+    const record = prices[i]
+
+    const intervalsDiff = prevRecord ? (record.time - (prevRecord.time as number)) / bucketSize : 0
+
+    if (intervalsDiff > 1) {
+      // fill the gaps between data points
+      for (let i = 1; i < intervalsDiff; i++) {
+        const gapTime = ((prevRecord as ChartData).time as number) + i * bucketSize
+        patched.push({
+          time: gapTime as Time,
+          value: (prevRecord as ChartData).value,
+        })
+      }
+    }
+
+    patched.push(record)
+    prevRecord = record
+  }
+
+  return patched
+}
+
+/**
+ * Generic pagination utility for price APIs that handle time-based pagination.
+ * Automatically splits requests that exceed the page limit into multiple requests.
+ *
+ * @param options Configuration for pagination
+ * @returns Object containing validSince timestamp and previousPage data
+ */
+export async function paginatePriceRequest<T>(options: {
+  bucketSizeInMs: number
+  limit: number
+  pageLimit: number
+  queryFn: (since: number, until: number, limit: number) => Promise<T[]>
+  since: number
+  until: number
+}): Promise<{ previousPage: T[]; validSince: number }> {
+  const { since, until, limit, pageLimit, bucketSizeInMs, queryFn } = options
+
+  let validSince = since
+  let previousPage: T[] = []
+
+  if (since && until) {
+    const records = Math.floor((until - since) / bucketSizeInMs)
+    if (records > pageLimit) {
+      validSince = until - pageLimit * bucketSizeInMs
+      previousPage = await queryFn(since, validSince, limit - pageLimit)
+    }
+  }
+
+  return { previousPage, validSince }
+}

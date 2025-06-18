@@ -1,4 +1,4 @@
-import { PAIR_MAPPER, PRICE_APIS, PRICE_MAPPER } from "src/extensions/prices/providers"
+import { PRICE_API_MATCHER } from "src/extensions/prices/providers"
 import {
   ChartData,
   DailyPrice,
@@ -205,15 +205,13 @@ export async function fetchDailyPrices(
       for (const priceApiId of priceApiIds) {
         try {
           while (true) {
-            const priceApi = PRICE_APIS[priceApiId]
-            const priceMapper = PRICE_MAPPER[priceApiId]
-            const pairMapper = PAIR_MAPPER[priceApiId]
+            const priceApi = PRICE_API_MATCHER[priceApiId]
 
-            if (!priceApi || !priceMapper || !pairMapper) {
+            if (!priceApi) {
               throw new Error(`Price API "${priceApiId}" is not supported`)
             }
 
-            const pair = pairMapper(asset.id)
+            const pair = priceApi.getPair(asset.id)
 
             const request = {
               limit: PRICE_API_PAGINATION,
@@ -225,7 +223,7 @@ export async function fetchDailyPrices(
 
             // console.log("Daily price api request:", request)
 
-            const results = await priceApi(request)
+            const results = await priceApi.queryPrices(request)
 
             if (!preferredPriceApiId && results.length > 0) {
               patchAsset(accountName, asset.id, { priceApiId })
@@ -238,7 +236,7 @@ export async function fetchDailyPrices(
             }
 
             const documents = results.map((result) => {
-              const price = priceMapper(result)
+              const price = priceApi.mapToChartData(result)
               const timestamp = (price.time as number) * 1000
 
               const doc: NewDailyPrice = {
@@ -254,8 +252,8 @@ export async function fetchDailyPrices(
 
             await upsertDailyPrices(accountName, documents)
 
-            const start = (priceMapper(results[0]).time as number) * 1000
-            const end = (priceMapper(results[results.length - 1]).time as number) * 1000
+            const start = (priceApi.mapToChartData(results[0]).time as number) * 1000
+            const end = (priceApi.mapToChartData(results[results.length - 1]).time as number) * 1000
 
             await progress([
               undefined,

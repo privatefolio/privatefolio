@@ -1,48 +1,50 @@
-import { PAIR_MAPPER } from "privatefolio-backend/src/extensions/prices/providers"
+import { PRICE_API_MATCHER } from "privatefolio-backend/src/extensions/prices/providers"
+import { getBucketSize } from "privatefolio-backend/src/utils/utils"
 import { MyAsset, ResolutionString } from "src/interfaces"
-import { PRICE_APIS_META } from "src/settings"
+import { PRICE_APIS_META, PriceApiId } from "src/settings"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { candleStickOptions } from "src/utils/chart-utils"
 import { resolveUrl } from "src/utils/utils"
 
 import { LibrarySymbolInfo, SearchSymbolResultItem } from "./charting_library/charting_library"
 
-export function toSearchSymbol(asset: MyAsset): SearchSymbolResultItem {
+export const EXCHANGE_DELIMITER = "_"
+
+export function toSearchSymbol(asset: MyAsset, priceApiId: PriceApiId): SearchSymbolResultItem {
   const name = asset.name || asset.symbol
-  const priceApiId = asset.priceApiId || "coinbase"
   const exchange = PRICE_APIS_META[priceApiId]
-  const pairMapper = PAIR_MAPPER[priceApiId]
-  const pair = pairMapper(asset.id)
+  const priceApi = PRICE_API_MATCHER[priceApiId]
+  const [pairShort, pairLong] = priceApi.getPairDescription(asset.id)
 
   const result: SearchSymbolResultItem = {
-    description: `${name} / US Dollar`,
+    description: pairLong,
     exchange: exchange.name,
     exchange_logo: resolveUrl(exchange.logoUrl),
     full_name: name,
     logo_urls: asset.logoUrl ? [asset.logoUrl] : undefined,
-    symbol: pair,
-    ticker: asset.id,
+    symbol: pairShort,
+    ticker: `${priceApiId}${EXCHANGE_DELIMITER}${asset.id}`,
     type: "spot crypto",
   }
 
   return result
 }
 
-export function toLibrarySymbol(asset: MyAsset): LibrarySymbolInfo {
+export function toLibrarySymbol(asset: MyAsset, priceApiId: PriceApiId): LibrarySymbolInfo {
   const ticker = getAssetTicker(asset.id)
-  const priceApiId = asset.priceApiId || "coinbase"
   const exchange = PRICE_APIS_META[priceApiId]
 
   const priceScale = 100 // Default scale for price display
   const minMove = 100 / priceScale
 
   const result: LibrarySymbolInfo = {
-    ...toSearchSymbol(asset),
+    ...toSearchSymbol(asset, priceApiId),
     currency_code: "USD",
     data_status: "streaming",
     format: "price",
     has_daily: true,
     has_intraday: true,
+    has_seconds: true,
     has_weekly_and_monthly: true,
     industry: "Blockchain",
     listed_exchange: exchange.name,
@@ -50,9 +52,9 @@ export function toLibrarySymbol(asset: MyAsset): LibrarySymbolInfo {
     name: ticker,
     pricescale: priceScale,
     session: "24x7",
-    supported_resolutions: ["1", "60", "1D", "1W", "1M"] as ResolutionString[],
+    supported_resolutions: exchange.supportedResolutions,
     timezone: "Etc/UTC",
-    visible_plots_set: "ohlcv",
+    visible_plots_set: exchange.hasCandles ? "ohlcv" : "c",
     volume_precision: 8,
   }
 
@@ -98,4 +100,10 @@ export const loadChartData = () => {
   })
 
   return chartData
+}
+
+export function computeLimit(start: number, end: number, resolution: ResolutionString) {
+  const bucketSize = getBucketSize(resolution)
+  const limit = Math.floor((end - start) / bucketSize)
+  return limit
 }

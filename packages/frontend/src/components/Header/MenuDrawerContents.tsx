@@ -192,8 +192,8 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
           <NavMenuItem
             value="pro-chart"
             to={`${activeAccountPath}/pro-chart`}
-            label="Pro Chart"
-            aria-label="Visit Pro Chart"
+            label="Pro chart"
+            aria-label="Visit Pro chart"
             onClick={toggleOpen}
             shortcutKey="p"
             avatar={<TimelineRounded fontSize="small" />}

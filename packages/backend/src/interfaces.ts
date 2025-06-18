@@ -365,6 +365,18 @@ export type LlamaPrice = {
   timestamp: Time
 }
 
+/**
+ * @example
+ * {
+ *   "value": "105384.7422814993",
+ *   "timestamp": "2025-06-14T02:50:30Z"
+ * }
+ */
+export type AlchemyPrice = {
+  timestamp: string
+  value: string
+}
+
 export type QueryRequest = {
   /**
    * @default 900 (PRICE_API_PAGINATION)

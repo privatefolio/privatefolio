@@ -9,7 +9,7 @@ import {
   widget as Widget,
 } from "./charting_library/charting_library"
 import { datafeed } from "./datafeed"
-import { loadChartData, saveChartData } from "./pro-chart-utils"
+import { EXCHANGE_DELIMITER, loadChartData, saveChartData } from "./pro-chart-utils"
 
 const containerId = "tv_chart_container"
 
@@ -52,12 +52,14 @@ export default function ProChart() {
         "show_symbol_logo_in_legend",
         "show_symbol_logo_for_compare_studies",
         "timeframes_toolbar",
+        "seconds_resolution",
         "pricescale_currency",
       ],
       favorites: {
-        intervals: ["1", "60", "1D", "1W"] as ResolutionString[],
+        chartTypes: ["Area", "Candles", "LineWithMarkers", "Baseline"],
+        intervals: ["1S", "1", "60", "1D", "1W", "1M"] as ResolutionString[],
       },
-      interval: "60" as ResolutionString,
+      interval: "1D" as ResolutionString,
       library_path: "/charting_library/",
       loading_screen: {
         backgroundColor: theme.palette.background.default,
@@ -66,7 +68,7 @@ export default function ProChart() {
       locale: "en",
       overrides: chartOverrides,
       saved_data: savedData,
-      symbol: `eth`,
+      symbol: `binance${EXCHANGE_DELIMITER}coingecko:ethereum:eth`,
       theme: theme.palette.mode,
       time_frames: [
         {
@@ -162,6 +164,8 @@ export default function ProChart() {
     widgetRef.current.onChartReady(async () => {
       await widgetRef.current?.changeTheme(theme.palette.mode)
       widgetRef.current?.applyOverrides(chartOverrides)
+      // widgetRef.current?.activeChart().removeAllStudies()
+      // await widgetRef.current?.activeChart().createStudy("Volume", true)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme])

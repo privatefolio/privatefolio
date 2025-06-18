@@ -10,7 +10,7 @@ We use these APIs to get historical price data for assets, usually in a candlest
 | --------- | ---------------------------- | --------------------- | --------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | Binance   | 2400 calls per minute        | 2400 calls per minute | 25ms                  | 1000                         | [link](https://www.binance.com/en/support/faq/rate-limits-on-binance-futures-281596e222414cdd9051664ea621cdc3) |
 | Coinbase  | 10 calls per second          | 600 calls per minute  | 100ms                 | 300                          | [link](https://docs.cloud.coinbase.com/advanced-trade-api/docs/rest-api-rate-limits)                           |
-| DeFiLlama | ???                          | ???                   | ???                   | ???                          | [link](https://defillama.com/docs/api)                                                                         |
+| DefiLlama | ???                          | ???                   | ???                   | ???                          | [link](https://defillama.com/docs/api)                                                                         |
 
 ### Asset metadata API
 
