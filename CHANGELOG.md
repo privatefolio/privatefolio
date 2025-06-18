@@ -3,6 +3,18 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.3 - 2025/06/18
+
+### 💡 Feature updates
+
+- New `Trades` feature, allowing users to view their trades (including their cost basis, deposits, withdrawals, etc)
+- New `PnL` (profit & loss) feature, allowing users to view historical PnL on trades and on their whole account.
+- Shortcuts for navigating between pages
+
+### 🐛 Bug Fixes
+
+- Fix app routing for accounts (local & cloud)
+
 ## v2.0.0-beta.2 - 2025/06/11
 
 ### 💡 Feature updates
