@@ -9,9 +9,10 @@ import {
   widget as Widget,
 } from "./charting_library/charting_library"
 import { datafeed } from "./datafeed"
-import { EXCHANGE_DELIMITER, loadChartData, saveChartData } from "./pro-chart-utils"
+import { EXCHANGE_DELIMITER, loadChartData, resetChartData, saveChartData } from "./pro-chart-utils"
 
 const containerId = "tv_chart_container"
+const defaultSymbol = `privatefolio${EXCHANGE_DELIMITER}NETWORTH`
 
 // https://www.tradingview.com/charting-library-docs/latest/getting_started/
 export default function ProChart() {
@@ -25,7 +26,7 @@ export default function ProChart() {
     "mainSeriesProperties.candleStyle.wickDownColor": candleStickOptions.wickDownColor,
     "mainSeriesProperties.candleStyle.wickUpColor": candleStickOptions.wickUpColor,
     "mainSeriesProperties.highLowAvgPrice.highLowPriceLabelsVisible": true,
-    "mainSeriesProperties.priceAxisProperties.log": true,
+    // "mainSeriesProperties.priceAxisProperties.log": true, // TODO8 turn into atom
     // "mainSeriesProperties.style": 1,
     "paneProperties.background": theme.palette.background.paper,
     "paneProperties.backgroundType": "solid",
@@ -68,7 +69,7 @@ export default function ProChart() {
       locale: "en",
       overrides: chartOverrides,
       saved_data: savedData,
-      symbol: `binance${EXCHANGE_DELIMITER}coingecko:ethereum:eth`,
+      symbol: defaultSymbol,
       theme: theme.palette.mode,
       time_frames: [
         {
@@ -131,22 +132,21 @@ export default function ProChart() {
     widgetRef.current?.subscribe("onAutoSaveNeeded", handleAutoSave)
     // widgetRef.current?.subscribe("onPlusClick", console.log)
 
-    // widgetRef.current.headerReady().then(function () {
-    //   const button = widgetRef.current?.createButton({
-    //     align: "right",
-    //     onClick: alert,
-    //     text: "bnoo",
-    //     title: "yeee",
-    //     useTradingViewStyle: true,
-    //   })
-    //   // if (button) {
-    //   //   button.setAttribute("title", "My custom button tooltip")
-    //   //   button.addEventListener("click", function () {
-    //   //     alert("My custom button pressed!")
-    //   //   })
-    //   //   button.textContent = "My custom button caption"
-    //   // }
-    // })
+    widgetRef.current.headerReady().then(function () {
+      widgetRef.current?.createButton({
+        align: "left",
+        onClick: () => {
+          resetChartData()
+          // TODO9
+          widgetRef.current?.activeChart().removeAllStudies()
+          widgetRef.current?.activeChart().setSymbol(defaultSymbol)
+          widgetRef.current?.activeChart().createStudy("Volume", true)
+        },
+        text: "Reset chart",
+        title: "Reset the chart's auto saved state",
+        useTradingViewStyle: true,
+      })
+    })
 
     return () => {
       try {
@@ -165,7 +165,6 @@ export default function ProChart() {
       await widgetRef.current?.changeTheme(theme.palette.mode)
       widgetRef.current?.applyOverrides(chartOverrides)
       // widgetRef.current?.activeChart().removeAllStudies()
-      // await widgetRef.current?.activeChart().createStudy("Volume", true)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme])

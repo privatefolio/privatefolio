@@ -6,10 +6,12 @@ import {
   SUPPORTED_RESOLUTIONS,
 } from "privatefolio-backend/src/settings/price-apis"
 import { ChartData } from "src/interfaces"
+import { aggregateByWeek } from "src/utils/chart-utils"
 
 import { $activeAccount } from "../../stores/account-store"
 import { $rpc } from "../../workers/remotes"
 import { Bar, IBasicDataFeed, SearchSymbolResultItem } from "./charting_library/charting_library"
+import { findPersonalDataSymbol, getPersonalDataSymbol } from "./personal-data-symbols"
 import {
   computeLimit,
   EXCHANGE_DELIMITER,
@@ -17,16 +19,14 @@ import {
   toSearchSymbol,
 } from "./pro-chart-utils"
 
-export function createCandleMapper() {
-  return function customMapper(candle: ChartData): Bar {
-    return {
-      close: candle.close || candle.value,
-      high: candle.high || candle.value,
-      low: candle.low || candle.value,
-      open: candle.open || candle.value,
-      time: candle.time * 1000,
-      volume: candle.volume,
-    }
+export function mapChartDataToBars(candle: ChartData): Bar {
+  return {
+    close: candle.close || candle.value,
+    high: candle.high || candle.value,
+    low: candle.low || candle.value,
+    open: candle.open || candle.value,
+    time: candle.time * 1000,
+    volume: candle.volume,
   }
 }
 
@@ -36,51 +36,45 @@ export const datafeed: IBasicDataFeed = {
 
     try {
       const limit = computeLimit(start, end, resolution)
-      const [priceApiId, assetId] = symbolInfo.ticker!.split(EXCHANGE_DELIMITER)
-      console.log(
-        "📜 LOG > getBars > assetId:",
-        assetId,
-        start,
-        end,
-        resolution.toLowerCase(),
-        priceApiId,
-        limit
-      )
+      const [exchange, id] = symbolInfo.ticker!.split(EXCHANGE_DELIMITER)
+      // console.log("📜 LOG > getBars > assetId:", id, start, end, resolution, exchange, limit)
 
       if (start <= 0) {
-        onResult([], {
-          noData: true,
-        })
+        onResult([], { noData: true })
         return
       }
 
-      const useDatabaseCache = false // asset.priceApiId === null && !!asset.priceApiId
       const rpc = $rpc.get()
       const activeAccount = $activeAccount.get()
 
-      const candles = useDatabaseCache
-        ? await rpc.getPricesForAsset(activeAccount, assetId, undefined, start, end)
-        : await getLivePricesForAsset(
-            assetId,
-            priceApiId as PriceApiId,
-            limit,
-            resolution,
-            start * 1000,
-            end * 1000
-          )
+      if (exchange === "privatefolio") {
+        if (!periodParams.firstDataRequest) {
+          onResult([], { noData: true })
+          return
+        }
+        const networth = await rpc.getNetworth(activeAccount)
+        const data = resolution === "1W" ? aggregateByWeek(networth) : networth
+        const bars = data.map(mapChartDataToBars)
+        onResult(bars, { noData: false })
+        return
 
-      console.log(
-        "📜 LOG > getBars > candles:",
-        candles.length,
-        candles[0]?.time,
-        candles[candles.length - 1]?.time
+        // TODO5
+        // rpc.getPricesForAsset(activeAccount, id, undefined, start, end)
+        // const useDatabaseCache = false // asset.priceApiId === null && !!asset.priceApiId
+      }
+
+      const data = await getLivePricesForAsset(
+        id,
+        exchange as PriceApiId,
+        limit,
+        resolution,
+        start * 1000,
+        end * 1000
       )
-      const parsed = candles.map(createCandleMapper())
-      onResult(parsed as Bar[], {
-        noData: parsed.length === 0,
-      })
+
+      const bars = data.map(mapChartDataToBars)
+      onResult(bars, { noData: bars.length === 0 })
     } catch (error: unknown) {
-      console.log("📜 LOG > datafeed error", error)
       console.error(error)
       onError(error instanceof Error ? error.message : String(error))
     }
@@ -130,8 +124,7 @@ export const datafeed: IBasicDataFeed = {
   },
   resolveSymbol: (query, onResolve, onError) => {
     query = query.toLowerCase()
-    console.log("📜 LOG > datafeed > resolveSymbol", query)
-    const [exchange, symbol] = query.split(EXCHANGE_DELIMITER)
+    const [exchange, id] = query.split(EXCHANGE_DELIMITER)
 
     setTimeout(async () => {
       const rpc = $rpc.get()
@@ -139,11 +132,10 @@ export const datafeed: IBasicDataFeed = {
 
       try {
         if (exchange === "privatefolio") {
-          // const personalDataSymbol = getPersonalDataSymbol(symbol)
-          // console.log("📜 LOG > setTimeout > personalDataSymbol:", personalDataSymbol)
-          // if (personalDataSymbol) onResolve(personalDataSymbol)
+          const personalDataSymbol = getPersonalDataSymbol(id)
+          if (personalDataSymbol) onResolve(personalDataSymbol)
         } else {
-          const asset = await rpc.getAsset(activeAccount, symbol)
+          const asset = await rpc.getAsset(activeAccount, id)
           if (asset) onResolve(toLibrarySymbol(asset, exchange as PriceApiId))
         }
 
@@ -154,15 +146,14 @@ export const datafeed: IBasicDataFeed = {
     }, 0)
   },
   searchSymbols: async (userInput, exchange, symbolType, onResult) => {
-    console.log("📜 LOG > datafeed > searchSymbols:", userInput, exchange, symbolType)
     userInput = userInput.toLowerCase()
 
     const symbols: SearchSymbolResultItem[] = []
 
-    // if (symbolType !== "spot crypto" && (exchange === "all" || exchange === "privatefolio")) {
-    //   const personalDataSymbols = findPersonalDataSymbol(userInput, 100)
-    //   symbols.push(...personalDataSymbols)
-    // }
+    if (symbolType !== "spot crypto" && (exchange === "all" || exchange === "privatefolio")) {
+      const personalDataSymbols = findPersonalDataSymbol(userInput, 100)
+      symbols.push(...personalDataSymbols)
+    }
 
     const rpc = $rpc.get()
     const assets = await rpc.findAssets(userInput, 100, true)

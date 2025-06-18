@@ -63,6 +63,10 @@ export function toLibrarySymbol(asset: MyAsset, priceApiId: PriceApiId): Library
 
 export const CHART_DATA_KEY = "PRO_CHART_DATA"
 
+export const resetChartData = () => {
+  window.localStorage.removeItem(CHART_DATA_KEY)
+}
+
 export const saveChartData = (state: object) => {
   window.localStorage.setItem(CHART_DATA_KEY, JSON.stringify(state))
 }
@@ -74,7 +78,7 @@ export const loadChartData = () => {
 
   const chartData = JSON.parse(rawChartData)
 
-  // FIXME first time user
+  // TODO8 FIXME first time user
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   chartData.charts.forEach((chart: any) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
