@@ -7,6 +7,7 @@ Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ### 💡 Feature updates
 
+- New `Kiosk` setting, to make your portfolio public in a read-only fashion.
 - New `Trades` feature, allowing users to view their trades (including their cost basis, deposits, withdrawals, etc)
 - New `PnL` (profit & loss) feature, allowing users to view historical PnL on trades and on their whole account.
 - Shortcuts for navigating between pages
