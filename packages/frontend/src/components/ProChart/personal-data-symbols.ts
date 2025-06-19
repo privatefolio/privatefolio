@@ -1,4 +1,5 @@
-import { ResolutionString } from "src/interfaces"
+import { ChartData, ResolutionString, Time } from "src/interfaces"
+import { RPC } from "src/workers/remotes"
 
 import { LibrarySymbolInfo, SearchSymbolResultItem } from "./charting_library/charting_library"
 import { EXCHANGE_DELIMITER } from "./pro-chart-utils"
@@ -17,6 +18,26 @@ const PRIVATEFOLIO_SYMBOLS: SearchSymbolResultItem[] = [
     logo_urls: [logoUrl],
     symbol: "NETWORTH",
     ticker: `privatefolio${EXCHANGE_DELIMITER}NETWORTH`,
+    type,
+  },
+  {
+    description: "Portfolio profit & loss in USD",
+    exchange,
+    exchange_logo: logoUrl,
+    full_name: "PnL",
+    logo_urls: [logoUrl],
+    symbol: "PNL",
+    ticker: `privatefolio${EXCHANGE_DELIMITER}PNL`,
+    type,
+  },
+  {
+    description: "Portfolio deposits in USD",
+    exchange,
+    exchange_logo: logoUrl,
+    full_name: "Deposits",
+    logo_urls: [logoUrl],
+    symbol: "DEPOSITS",
+    ticker: `privatefolio${EXCHANGE_DELIMITER}DEPOSITS`,
     type,
   },
 ]
@@ -57,4 +78,33 @@ export function getPersonalDataSymbol(id: string): LibrarySymbolInfo | undefined
     // visible_plots_set: hasCandles ? "ohlc" : "c",
     volume_precision: 8,
   }
+}
+
+export async function getPersonalSymbolChartData(
+  id: string,
+  rpc: RPC,
+  activeAccount: string
+): Promise<ChartData[] | undefined> {
+  if (id === "NETWORTH") {
+    const data = await rpc.getNetworth(activeAccount)
+    return data
+  }
+
+  if (id === "PNL") {
+    const data = await rpc.getAccountPnL(activeAccount)
+    return data.map((x) => ({
+      time: (x.timestamp / 1000) as Time,
+      value: Number(x.pnl),
+    }))
+  }
+
+  if (id === "DEPOSITS") {
+    const data = await rpc.getAccountPnL(activeAccount)
+    return data.map((x) => ({
+      time: (x.timestamp / 1000) as Time,
+      value: Number(x.deposits),
+    }))
+  }
+
+  return undefined
 }

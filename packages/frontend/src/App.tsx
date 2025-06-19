@@ -236,7 +236,7 @@ export default function App() {
           }}
         /> */}
         <Header />
-        <Container disableGutters maxWidth="xl" sx={{ paddingTop: 2, paddingX: { xs: 2 } }}>
+        <Container disableGutters maxWidth="xl" sx={{ paddingX: { xs: 2 }, paddingY: 2 }}>
           <ErrorBoundary>
             <Routes>
               <Route index element={<AccountsPage />} />

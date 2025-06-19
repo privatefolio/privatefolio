@@ -227,7 +227,7 @@ export const theme: CssVarsThemeOptions = {
     MuiAlertTitle: {
       styleOverrides: {
         root: {
-          fontSize: "0.85rem",
+          fontSize: "0.875rem",
         },
       },
     },

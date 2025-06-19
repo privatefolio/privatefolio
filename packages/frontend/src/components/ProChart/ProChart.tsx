@@ -134,7 +134,7 @@ export default function ProChart() {
 
     widgetRef.current.headerReady().then(function () {
       widgetRef.current?.createButton({
-        align: "left",
+        align: "right",
         onClick: () => {
           resetChartData()
           // TODO9

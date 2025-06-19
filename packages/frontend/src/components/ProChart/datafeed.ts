@@ -11,7 +11,11 @@ import { aggregateByWeek } from "src/utils/chart-utils"
 import { $activeAccount } from "../../stores/account-store"
 import { $rpc } from "../../workers/remotes"
 import { Bar, IBasicDataFeed, SearchSymbolResultItem } from "./charting_library/charting_library"
-import { findPersonalDataSymbol, getPersonalDataSymbol } from "./personal-data-symbols"
+import {
+  findPersonalDataSymbol,
+  getPersonalDataSymbol,
+  getPersonalSymbolChartData,
+} from "./personal-data-symbols"
 import {
   computeLimit,
   EXCHANGE_DELIMITER,
@@ -52,8 +56,12 @@ export const datafeed: IBasicDataFeed = {
           onResult([], { noData: true })
           return
         }
-        const networth = await rpc.getNetworth(activeAccount)
-        const data = resolution === "1W" ? aggregateByWeek(networth) : networth
+        const chartData = await getPersonalSymbolChartData(id, rpc, activeAccount)
+        if (!chartData) {
+          onError(`Unknown privatefolio symbol ${id}`)
+          return
+        }
+        const data = resolution === "1W" ? aggregateByWeek(chartData) : chartData
         const bars = data.map(mapChartDataToBars)
         onResult(bars, { noData: false })
         return
