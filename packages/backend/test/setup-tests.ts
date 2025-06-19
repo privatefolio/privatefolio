@@ -1,8 +1,8 @@
-import { refetchAssets } from "src/api/account/assets-api"
+import { refetchAssetsWithRetry } from "src/api/account/assets-api"
 
 export async function setup() {
   console.log("Setting up tests...")
-  await refetchAssets()
+  await refetchAssetsWithRetry()
   console.log("Tests setup complete.")
 }
 
