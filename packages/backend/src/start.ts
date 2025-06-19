@@ -37,22 +37,34 @@ const metadataCronJobs: Record<string, Cron> = {}
 const settingsSubscriptions: Record<string, SubscriptionId> = {}
 let server: BackendServer<Api>
 
-async function handleMainAccountChange() {
+function startServer() {
+  server?.close()
+  server = new BackendServer(api, writeApi as Api, false, kioskMode, function shutdown() {
+    console.log("Shutting down server.")
+    worker.terminate()
+    if (!isDevelopment) process.exit()
+  })
+
+  const port = Number(process.env.PORT)
+  server.start(isNaN(port) ? 4001 : port)
+}
+
+async function handleAccountsSideEffects() {
   const accounts = await writeApi.getAccountNames()
   if (accounts.length === 0) return
 
-  await writeApi.subscribeToSettings(
-    accounts[0],
-    proxy(async (settings) => {
-      if (kioskMode !== settings.kioskMode) {
-        kioskMode = settings.kioskMode
-        // Restart server with new kiosk mode
-        server?.close()
-        server = new BackendServer(api, writeApi as Api, false, kioskMode)
-        server.start(isNaN(port) ? 4001 : port)
-      }
-    })
-  )
+  for (const accountName of accounts) {
+    await writeApi.subscribeToSettings(
+      accountName,
+      proxy(async (settings) => {
+        if (settings.kioskMode) {
+          kioskMode = true
+          // Restart server with new kiosk mode
+          startServer()
+        }
+      })
+    )
+  }
 }
 
 async function setupNetworthCronJob(accountName: string) {
@@ -201,7 +213,7 @@ await writeApi.subscribeToAccounts(
 
     if (cause === EventCause.Created) {
       await setupSideEffects(accountName)
-      await handleMainAccountChange()
+      await handleAccountsSideEffects()
     }
   })
 )
@@ -210,16 +222,9 @@ for (const accountName of accountNames) {
   await setupSideEffects(accountName)
 }
 
-await handleMainAccountChange()
+await handleAccountsSideEffects()
 
-server = new BackendServer(api, writeApi as Api, false, kioskMode, function shutdown() {
-  console.log("Shutting down server.")
-  worker.terminate()
-  if (!isDevelopment) process.exit()
-})
-
-const port = Number(process.env.PORT)
-server.start(isNaN(port) ? 4001 : port)
+startServer()
 
 process.on("SIGINT", () => {
   console.log("Shutting down server.")
