@@ -59,7 +59,7 @@ export function AddressBookTable() {
     const { confirmed, event } = await confirm({
       confirmText: "Add",
       content: (
-        <Stack gap={2} sx={{ minWidth: 464 }}>
+        <Stack gap={2} sx={{ "@media (min-width: 900px)": { minWidth: 520 } }}>
           <div>
             <SectionTitle>Address</SectionTitle>
             <AddressInputUncontrolled

@@ -224,6 +224,13 @@ export const theme: CssVarsThemeOptions = {
         variant: "outlined",
       },
     },
+    MuiAlertTitle: {
+      styleOverrides: {
+        root: {
+          fontSize: "0.85rem",
+        },
+      },
+    },
     MuiBackdrop: {
       styleOverrides: {
         root: {
@@ -736,6 +743,9 @@ export const theme: CssVarsThemeOptions = {
             ".MuiTableRow-root:hover & .MuiIconButton-root": {
               visibility: "visible",
             },
+            alignItems: "center",
+            display: "flex",
+            justifyContent: "flex-end",
           },
         },
       ],

@@ -1,5 +1,6 @@
 import { Visibility } from "@mui/icons-material"
 import {
+  Box,
   IconButton,
   Skeleton,
   Stack,
@@ -30,7 +31,7 @@ export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
       <>
         <TableRow hover {...rest}>
           <TableCell colSpan={headCells.length} onClick={toggleOpen} sx={{ cursor: "pointer" }}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Stack gap={1} direction="row" justifyContent="space-between" alignItems="flex-start">
               <Stack gap={0.5} marginY={0.5}>
                 <Stack direction="row" gap={1} alignItems="center" component="div">
                   {platformId ? (
@@ -39,20 +40,14 @@ export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
                     <Skeleton height={20} width={80} />
                   )}
                   <Tooltip title={address}>
-                    <Truncate sx={{ fontFamily: MonoFont, maxWidth: 200 }}>{address}</Truncate>
+                    <Truncate sx={{ fontFamily: MonoFont, maxWidth: 160 }}>{address}</Truncate>
                   </Tooltip>
                 </Stack>
-                <Stack
-                  direction="row"
-                  gap={1}
-                  alignItems="center"
-                  component="div"
-                  sx={{ color: "text.secondary", fontSize: "0.75rem" }}
-                >
+                <Box sx={{ color: "text.secondary", fontSize: "0.75rem" }}>
                   {timestamp ? (
-                    <TimestampBlock timestamp={timestamp} relative={relativeTime} />
+                    <TimestampBlock timestamp={timestamp} relative={relativeTime} hideTime />
                   ) : (
-                    <Skeleton height={20} width={80} />
+                    <Skeleton height={20} width={80} sx={{ display: "inline-block" }} />
                   )}
                   {" • "}
                   {!syncedAt ? (
@@ -62,12 +57,12 @@ export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
                   ) : (
                     <span>
                       <span>Synced</span>{" "}
-                      <TimestampBlock timestamp={syncedAt} relative={relativeTime} />
+                      <TimestampBlock timestamp={syncedAt} relative={relativeTime} hideTime />
                     </span>
                   )}
-                </Stack>
+                </Box>
               </Stack>
-              <Stack gap={0.5} alignItems={"flex-end"} sx={{ fontSize: "0.75rem" }}>
+              <Stack gap={0.5} alignItems={"flex-end"} sx={{ fontSize: "0.75rem", minWidth: 90 }}>
                 {!meta ? (
                   <Skeleton height={20} width={80} />
                 ) : (

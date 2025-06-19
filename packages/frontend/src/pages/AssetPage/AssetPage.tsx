@@ -11,6 +11,7 @@ import { PlatformBlock } from "src/components/PlatformBlock"
 import { QuoteAmountBlock } from "src/components/QuoteAmountBlock"
 import { QuoteCurrencyToggle } from "src/components/QuoteCurrencyToggle"
 import { SectionTitle } from "src/components/SectionTitle"
+import { SubtitleText } from "src/components/SubtitleText"
 import { Tabs } from "src/components/Tabs"
 import { UserWalletIcon } from "src/components/UserWalletIcon"
 import { Balance, CoingeckoMetadataFull, MyAsset } from "src/interfaces"
@@ -118,17 +119,10 @@ export default function AssetPage() {
             <Typography variant="h6" fontFamily={SerifFont} sx={{ marginBottom: -0.5 }}>
               <span>{getAssetTicker(assetId)}</span>
             </Typography>
-            <Typography
-              color="text.secondary"
-              variant="subtitle2"
-              fontWeight={400}
-              letterSpacing={0.5}
-            >
-              {asset?.name || metadata?.name}
-            </Typography>
+            <SubtitleText>{asset?.name || metadata?.name}</SubtitleText>
           </Stack>
         </Stack>
-        <Stack gap={6} direction="row">
+        <Stack gap={6} direction="row" flexWrap="wrap">
           {getAssetPlatform(assetId) && getAssetPlatform(assetId) !== "coingecko" && (
             <div>
               <SectionTitle>Platform</SectionTitle>

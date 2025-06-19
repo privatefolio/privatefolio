@@ -6,12 +6,14 @@ import { MonoFont } from "../theme"
 import { stringToColor } from "../utils/color-utils"
 
 const StyledAvatar = styled(Avatar)`
+  border-radius: unset;
   & img {
     object-fit: contain;
   }
   &.MuiAvatar-colorDefault {
     border: 1px solid ${({ color = "#fff" }) => alpha(color, 0.25)};
     background: ${({ color = "#fff" }) => alpha(color, 0.15)};
+    border-radius: 50%;
   }
 `
 

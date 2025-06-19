@@ -1,10 +1,10 @@
-import { Box, Chip, TableCell, TableRow } from "@mui/material"
+import { Box, Chip, Stack, TableCell, TableRow } from "@mui/material"
 import React from "react"
 import { AmountBlock } from "src/components/AmountBlock"
+import { CaptionText } from "src/components/CaptionText"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
 import { QuoteAmountBlock } from "src/components/QuoteAmountBlock"
 import { TimestampBlock } from "src/components/TimestampBlock"
-import { DEFAULT_CURRENCIES_MAP } from "src/stores/account-settings-store"
 import { TableRowComponentProps } from "src/utils/table-utils"
 
 export interface TickerData {
@@ -23,15 +23,45 @@ export interface TickerData {
 }
 
 export function AssetMarketTableRow(props: TableRowComponentProps<TickerData>) {
-  const { row, relativeTime } = props
+  const { row, relativeTime, headCells, isTablet, isMobile: _isMobile, ...rest } = props
 
-  const currency = DEFAULT_CURRENCIES_MAP.USD
+  if (isTablet) {
+    return (
+      <TableRow hover {...rest}>
+        <TableCell colSpan={headCells.length}>
+          <Stack direction="row" justifyContent="space-between" alignItems="flex-start" gap={1}>
+            <Stack gap={0.5} alignItems="flex-start">
+              <IdentifierBlock
+                label={row.exchangeName}
+                id={row.exchangeId}
+                href={`https://www.coingecko.com/en/exchanges/${row.exchangeId}`}
+                size="small"
+                linkText="View exchange on Coingecko"
+              />
+              <IdentifierBlock
+                label={row.pair}
+                id={row.pair}
+                href={row.tradeUrl}
+                size="small"
+                linkText={`Trade pair on ${row.exchangeName}`}
+              />
+            </Stack>
+            <Stack alignItems="flex-end" gap={0.5} sx={{ minWidth: 120 }}>
+              <QuoteAmountBlock amount={row.price} formatting="price" />
+              {row.spread !== undefined && (
+                <CaptionText>
+                  <QuoteAmountBlock amount={row.volume} />
+                </CaptionText>
+              )}
+            </Stack>
+          </Stack>
+        </TableCell>
+      </TableRow>
+    )
+  }
 
   return (
-    <TableRow key={row.id}>
-      <TableCell>
-        <Chip label={row.exchangeType} size="small" sx={{ borderRadius: 2 }} />
-      </TableCell>
+    <TableRow key={row.id} {...rest}>
       <TableCell>
         <IdentifierBlock
           label={row.exchangeName}
@@ -75,6 +105,9 @@ export function AssetMarketTableRow(props: TableRowComponentProps<TickerData>) {
             width: 20,
           }}
         />
+      </TableCell>
+      <TableCell>
+        <Chip label={row.exchangeType} size="small" sx={{ borderRadius: 2 }} />
       </TableCell>
       <TableCell align="right">
         {row.timestamp !== 0 ? (

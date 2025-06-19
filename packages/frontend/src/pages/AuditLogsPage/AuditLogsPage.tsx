@@ -29,7 +29,7 @@ export default function AuditLogsPage({ show }: { show: boolean }) {
         <AuditLogTable tableDataRef={tableDataRef} />
       </div>
       <Callout>
-        <AlertTitle sx={{ fontSize: "0.85rem" }}>What are audit logs?</AlertTitle>
+        <AlertTitle>What are audit logs?</AlertTitle>
         <Box>
           An audit log is a single balance change on your account.
           <br />

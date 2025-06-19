@@ -103,7 +103,7 @@ export default function ExtensionsPage({ show }: { show: boolean }) {
         />
       </div>
       <Callout>
-        <AlertTitle sx={{ fontSize: "0.85rem" }}>What are extensions?</AlertTitle>
+        <AlertTitle>What are extensions?</AlertTitle>
         <Box>
           Extensions allow developers to extend the functionality of Privatefolio.
           <br />
@@ -113,7 +113,7 @@ export default function ExtensionsPage({ show }: { show: boolean }) {
       </Callout>
       <WorkInProgressCallout />
       <Callout icon={<ConstructionRounded fontSize="inherit" />}>
-        <AlertTitle sx={{ fontSize: "0.85rem" }}>
+        <AlertTitle>
           Build extensions, earn money!{" "}
           <Chip size="small" sx={{ fontSize: "0.625rem", height: 20 }} label="New" />
         </AlertTitle>

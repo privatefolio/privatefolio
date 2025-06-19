@@ -2,6 +2,7 @@ import { Stack, TableCell, TableRow, Typography } from "@mui/material"
 import React from "react"
 import { AmountBlock } from "src/components/AmountBlock"
 import { AppLink } from "src/components/AppLink"
+import { CaptionText } from "src/components/CaptionText"
 import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { QuoteAmountBlock } from "src/components/QuoteAmountBlock"
 import { getAssetTicker } from "src/utils/assets-utils"
@@ -13,7 +14,7 @@ export function NetworthTableRow(props: TableRowComponentProps<Balance>) {
   const {
     row,
     isTablet,
-    headCells: _headCells,
+    headCells,
     isMobile: _isMobile,
     relativeTime: _relativeTime,
     ...rest
@@ -23,26 +24,21 @@ export function NetworthTableRow(props: TableRowComponentProps<Balance>) {
   if (isTablet) {
     return (
       <TableRow hover {...rest}>
-        <TableCell sx={{ width: "100%" }} variant="clickable">
+        <TableCell colSpan={headCells.length} variant="clickable">
           <AppLink to={`./asset/${encodeURI(assetId)}`}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Stack gap={1} direction="row" justifyContent="space-between" alignItems="flex-start">
               <MyAssetBlock
                 id={assetId}
                 size="medium"
-                secondary={<AmountBlock amount={balance} />}
+                secondary={<QuoteAmountBlock amount={price?.value} formatting="price" />}
               />
               <Stack alignItems="flex-end">
                 <Typography variant="body1">
                   <QuoteAmountBlock amount={value} />
                 </Typography>
-                <Typography
-                  color="text.secondary"
-                  variant="caption"
-                  fontWeight={300}
-                  letterSpacing={0.5}
-                >
-                  <QuoteAmountBlock amount={price?.value} formatting="price" />
-                </Typography>
+                <CaptionText>
+                  <AmountBlock amount={balance} />
+                </CaptionText>
               </Stack>
             </Stack>
           </AppLink>

@@ -2,6 +2,7 @@ import { CancelOutlined, Visibility } from "@mui/icons-material"
 import { IconButton, Stack, TableCell, TableRow, Tooltip, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React from "react"
+import { CaptionText } from "src/components/CaptionText"
 import { TaskDetailsDialog } from "src/components/Tasks/TaskDetailsDialog"
 import { TaskDuration } from "src/components/Tasks/TaskDuration"
 import { TaskStatusIcon } from "src/components/Tasks/TaskStatusIcon"
@@ -15,20 +16,74 @@ import { TableRowComponentProps } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
 
 export function ServerTaskTableRow(props: TableRowComponentProps<ServerTask>) {
-  const {
-    row,
-    relativeTime,
-    headCells: _headCells,
-    isMobile: _isMobile,
-    isTablet: _isTablet,
-    ...rest
-  } = props
+  const { row, relativeTime, headCells, isMobile: _isMobile, isTablet, ...rest } = props
 
   const { description, id, name, priority, createdAt, trigger, status } = row
 
   const { value: open, toggle: toggleOpen } = useBoolean(false)
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
+
+  if (isTablet) {
+    return (
+      <>
+        <TableRow hover {...rest}>
+          <TableCell colSpan={headCells.length} variant="clickable">
+            <Stack direction="row" justifyContent="space-between" alignItems="flex-start" gap={1}>
+              <Stack gap={0.5} marginY={0.5} sx={{ maxWidth: 400 }}>
+                <Typography variant="body1" fontFamily={MonoFont} component="div">
+                  <Truncate>{name}</Truncate>
+                </Typography>
+                <CaptionText>
+                  <Truncate>{description}</Truncate>
+                </CaptionText>
+                <CaptionText>
+                  <TimestampBlock timestamp={createdAt} relative={relativeTime} />
+                </CaptionText>
+              </Stack>
+              <Stack gap={0.5} alignItems="flex-end">
+                <Stack direction="row" alignItems="center" gap={1}>
+                  <TaskStatusIcon task={row} />
+                  <Typography
+                    component="span"
+                    variant="inherit"
+                    sx={{ textTransform: "capitalize" }}
+                  >
+                    {status}
+                  </Typography>
+                </Stack>
+                <CaptionText>
+                  {status !== "queued" ? <TaskDuration task={row} /> : "Queued"}
+                </CaptionText>
+                <Stack direction="row" alignItems="center" gap={1}>
+                  {(status === "queued" || status === "running") && (
+                    <Tooltip title={status === "queued" ? "Cancel" : "Abort"}>
+                      <IconButton
+                        aria-label="Cancel Task"
+                        size="small"
+                        color="secondary"
+                        onClick={() => rpc.cancelTask(activeAccount, id)}
+                      >
+                        <CancelOutlined fontSize="inherit" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {status !== "queued" && (
+                    <Tooltip title="Inspect">
+                      <IconButton size="small" color="secondary" onClick={toggleOpen}>
+                        <Visibility fontSize="inherit" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </Stack>
+              </Stack>
+            </Stack>
+          </TableCell>
+        </TableRow>
+        {open && <TaskDetailsDialog open onClose={toggleOpen} task={row} />}
+      </>
+    )
+  }
 
   return (
     <>
@@ -101,27 +156,25 @@ export function ServerTaskTableRow(props: TableRowComponentProps<ServerTask>) {
           </Stack>
         </TableCell>
         <TableCell variant="actionList">
-          <Stack direction="row" alignItems="center" justifyContent="flex-end">
-            {(status === "queued" || status === "running") && (
-              <Tooltip title={status === "queued" ? "Cancel" : "Abort"}>
-                <IconButton
-                  aria-label="Cancel Task"
-                  size="small"
-                  color="secondary"
-                  onClick={() => rpc.cancelTask(activeAccount, id)}
-                >
-                  <CancelOutlined fontSize="inherit" />
-                </IconButton>
-              </Tooltip>
-            )}
-            {status !== "queued" && (
-              <Tooltip title="Inspect">
-                <IconButton size="small" color="secondary" onClick={toggleOpen}>
-                  <Visibility fontSize="inherit" />
-                </IconButton>
-              </Tooltip>
-            )}
-          </Stack>
+          {(status === "queued" || status === "running") && (
+            <Tooltip title={status === "queued" ? "Cancel" : "Abort"}>
+              <IconButton
+                aria-label="Cancel Task"
+                size="small"
+                color="secondary"
+                onClick={() => rpc.cancelTask(activeAccount, id)}
+              >
+                <CancelOutlined fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
+          )}
+          {status !== "queued" && (
+            <Tooltip title="Inspect">
+              <IconButton size="small" color="secondary" onClick={toggleOpen}>
+                <Visibility fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
+          )}
         </TableCell>
       </TableRow>
       {open && <TaskDetailsDialog open onClose={toggleOpen} task={row} />}

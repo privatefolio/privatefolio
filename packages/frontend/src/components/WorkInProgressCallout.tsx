@@ -7,7 +7,7 @@ import { Callout } from "./Callout"
 export function WorkInProgressCallout() {
   return (
     <Callout icon={<ConstructionRounded fontSize="inherit" />}>
-      <AlertTitle sx={{ fontSize: "0.85rem" }}>This feature is still being developed.</AlertTitle>
+      <AlertTitle>This feature is still being developed.</AlertTitle>
       If you have any ideas on how we can improve it, please let us know on{" "}
       <Link target="_blank" href="https://github.com/privatefolio/privatefolio/issues/new">
         GitHub

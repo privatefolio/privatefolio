@@ -10,5 +10,15 @@ const BORDER_RADIUS_MAP: Record<NonNullable<AssetAvatarProps["size"]>, string> =
 }
 
 export function PlatformAvatar(props: AssetAvatarProps) {
-  return <AssetAvatar sx={{ borderRadius: BORDER_RADIUS_MAP[props.size || "medium"] }} {...props} />
+  return (
+    <AssetAvatar
+      sx={{
+        "&.MuiAvatar-colorDefault": {
+          borderRadius: BORDER_RADIUS_MAP[props.size || "medium"],
+        },
+        borderRadius: BORDER_RADIUS_MAP[props.size || "medium"],
+      }}
+      {...props}
+    />
+  )
 }

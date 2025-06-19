@@ -75,7 +75,7 @@ export function TagsTable() {
     const { confirmed, event } = await confirm({
       confirmText: "Add",
       content: (
-        <Stack gap={2} sx={{ minWidth: 464 }}>
+        <Stack gap={2} sx={{ "@media (min-width: 900px)": { minWidth: 520 } }}>
           <div>
             <SectionTitle>Tag name</SectionTitle>
             <TextField variant="outlined" fullWidth size="small" required name="tagName" />

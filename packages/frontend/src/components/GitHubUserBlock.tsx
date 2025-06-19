@@ -30,7 +30,7 @@ export function GitHubUserBlock({ username, size, ...props }: GitHubUserBlockPro
         <AssetAvatar
           src={avatar}
           alt={displayName}
-          sx={{ borderRadius: 1 }}
+          sx={{ "&.MuiAvatar-colorDefault": { borderRadius: 1 }, borderRadius: 1 }}
           size={size === "small" ? "small" : "snug"}
           {...props}
         />

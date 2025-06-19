@@ -35,6 +35,7 @@ export function DepositsPage() {
             </span>
             <TradeActions />
           </Subheading>
+          {/* TODO8: filter by deposit/withdrawal/unknown */}
           <TransactionTable defaultRowsPerPage={10} />
         </div>
         <WorkInProgressCallout />

@@ -13,6 +13,7 @@ import { IdentifierBlock } from "src/components/IdentifierBlock"
 import { NavTab } from "src/components/NavTab"
 import { PlatformAvatar } from "src/components/PlatformAvatar"
 import { SectionTitle } from "src/components/SectionTitle"
+import { SubtitleText } from "src/components/SubtitleText"
 import { Tabs } from "src/components/Tabs"
 import { TrustScoreIndicator } from "src/components/TrustScoreIndicator"
 import { Platform } from "src/interfaces"
@@ -83,14 +84,7 @@ export default function PlatformPage() {
             <Typography variant="h6" fontFamily={SerifFont} sx={{ marginBottom: -0.5 }}>
               <span>{name}</span>
             </Typography>
-            <Typography
-              color="text.secondary"
-              variant="subtitle2"
-              fontWeight={400}
-              letterSpacing={0.5}
-            >
-              {platform.id}
-            </Typography>
+            <SubtitleText>{platform.id}</SubtitleText>
           </Stack>
         </Stack>
         <Stack gap={6} direction="row" alignItems="center">

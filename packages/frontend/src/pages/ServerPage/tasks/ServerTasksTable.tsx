@@ -143,7 +143,7 @@ export function ServerTasksTable() {
       />
       <Stack paddingTop={1}>
         <Callout>
-          <AlertTitle sx={{ fontSize: "0.85rem" }}>What are server tasks?</AlertTitle>
+          <AlertTitle>What are server tasks?</AlertTitle>
           <Box sx={{ maxWidth: 590 }}>
             Server tasks allow you to monitor and manage your server.
             <br /> Common tasks include importing transactions, fetching prices or computing your

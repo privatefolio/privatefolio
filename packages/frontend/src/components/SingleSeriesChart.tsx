@@ -455,8 +455,11 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
           justifyContent="space-between"
           paddingX={1.5}
           direction="row"
+          flexWrap="wrap"
+          gap={0.5}
+          paddingY={0.5}
         >
-          <Stack direction="row" gap={1}>
+          <Stack direction="row" gap={1} flexWrap="wrap">
             <Stack direction="row">
               <Tooltip
                 title={
@@ -632,6 +635,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
                 </span>
               </Tooltip>
             </Stack>
+            <Divider orientation="vertical" flexItem />
           </Stack>
           {extraSettings}
           {/* <Stack direction="row">

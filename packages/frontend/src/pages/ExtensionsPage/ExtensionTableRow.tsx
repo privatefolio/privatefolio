@@ -1,11 +1,15 @@
 import { Chip, Stack, TableCell, TableRow, Tooltip, Typography } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React, { useState } from "react"
 import { ActionBlock } from "src/components/ActionBlock"
+import { AppLink } from "src/components/AppLink"
+import { CaptionText } from "src/components/CaptionText"
 import { ExtensionBlock } from "src/components/ExtensionBlock"
 import { GitHubUserBlock } from "src/components/GitHubUserBlock"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { Truncate } from "src/components/Truncate"
 import { RichExtension } from "src/interfaces"
+import { $activeAccountPath } from "src/stores/account-store"
 import { getFilterValueLabel } from "src/stores/metadata-store"
 import { MonoFont } from "src/theme"
 import { TableRowComponentProps } from "src/utils/table-utils"
@@ -16,9 +20,9 @@ export function ExtensionTableRow(props: TableRowComponentProps<RichExtension>) 
   const {
     row,
     relativeTime: _relativeTime,
-    headCells: _headCells,
+    headCells,
     isMobile: _isMobile,
-    isTablet: _isTablet,
+    isTablet,
     ...rest
   } = props
 
@@ -33,8 +37,36 @@ export function ExtensionTableRow(props: TableRowComponentProps<RichExtension>) 
   } = row
 
   const [showAllPlatforms, setShowAllPlatforms] = useState(false)
+  const activeAccountPath = useStore($activeAccountPath)
 
-  // TODO: add mobile view
+  if (isTablet) {
+    return (
+      <TableRow hover {...rest}>
+        <TableCell colSpan={headCells.length} variant="clickable">
+          <AppLink to={`${activeAccountPath}/extension/${row.id}`}>
+            <Stack direction="row" justifyContent="space-between" alignItems="flex-start" gap={1}>
+              <Stack gap={0.5} marginY={0.5} flexGrow={1} minWidth={0}>
+                <ExtensionBlock
+                  variant="tablecell"
+                  label={<Truncate sx={{ maxWidth: 220 }}>{extensionName}</Truncate>}
+                  extension={row}
+                />
+                <CaptionText>
+                  <Truncate>{description}</Truncate>
+                </CaptionText>
+              </Stack>
+              <Stack alignItems="flex-end" gap={0.5} sx={{ minWidth: 120 }}>
+                <ActionBlock action={getFilterValueLabel(extensionType)} />
+                <CaptionText fontFamily={MonoFont}>
+                  {priceUsd && priceUsd > 0 ? `$${priceUsd.toFixed(2)}` : "Free"}
+                </CaptionText>
+              </Stack>
+            </Stack>
+          </AppLink>
+        </TableCell>
+      </TableRow>
+    )
+  }
 
   return (
     <TableRow hover {...rest}>

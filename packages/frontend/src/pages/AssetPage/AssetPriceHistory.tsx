@@ -6,7 +6,7 @@ import { getLivePricesForAsset } from "privatefolio-backend/build/src/extensions
 import { allPriceApiIds } from "privatefolio-backend/src/settings/price-apis"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useSearchParams } from "react-router-dom"
-import { PlatformAvatar } from "src/components/PlatformAvatar"
+import { ExtensionAvatar } from "src/components/ExtensionAvatar"
 import { MyAsset } from "src/interfaces"
 import { DEFAULT_DEBOUNCE_DURATION, PRICE_APIS_META, PriceApiId } from "src/settings"
 import { $quoteCurrency } from "src/stores/account-settings-store"
@@ -140,7 +140,7 @@ export function AssetPriceHistory(props: AssetPriceHistoryProps) {
           {allPriceApiIds.map((priceApiId) => (
             <MenuItem key={priceApiId} value={priceApiId}>
               <Stack direction="row" alignItems={"center"} gap={1}>
-                <PlatformAvatar
+                <ExtensionAvatar
                   size="small"
                   src={resolveUrl(PRICE_APIS_META[priceApiId].logoUrl)}
                   alt={priceApiId}

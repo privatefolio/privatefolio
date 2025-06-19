@@ -47,13 +47,6 @@ export function AssetMarketTable({ metadata, isLoading }: AssetMarketsProps) {
   const headCells = useMemo<HeadCell<TickerData>[]>(
     () => [
       {
-        filterable: true,
-        key: "exchangeType",
-        label: "Type",
-        sortable: true,
-        sx: { maxWidth: 100, minWidth: 100, width: 100 },
-      },
-      {
         key: "exchangeName",
         label: "Exchange",
         sortable: true,
@@ -88,6 +81,13 @@ export function AssetMarketTable({ metadata, isLoading }: AssetMarketsProps) {
       {
         key: "trustScore",
         label: "Trust",
+        sortable: true,
+        sx: { maxWidth: 100, minWidth: 100, width: 100 },
+      },
+      {
+        filterable: true,
+        key: "exchangeType",
+        label: "Type",
         sortable: true,
         sx: { maxWidth: 100, minWidth: 100, width: 100 },
       },

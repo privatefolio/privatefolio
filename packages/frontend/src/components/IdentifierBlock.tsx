@@ -25,7 +25,7 @@ export type IdentifierBlockProps = {
    * @default "Open in new tab"
    */
   linkText?: ReactNode
-  size?: "small" | "medium"
+  size?: "small" | "medium" // TODO9 | "large" | "snug"
   /**
    * @default "chip"
    */

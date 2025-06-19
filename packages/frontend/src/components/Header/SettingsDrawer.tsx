@@ -1,21 +1,11 @@
-import { Drawer, styled, SwipeableDrawer, Typography, useMediaQuery } from "@mui/material"
-import { grey } from "@mui/material/colors"
+import { Drawer, SwipeableDrawer, Typography, useMediaQuery } from "@mui/material"
 import React from "react"
 import { APP_VERSION, GIT_HASH } from "src/env"
 import { PopoverToggleProps } from "src/stores/app-store"
 
 import { DrawerHeader } from "../DrawerHeader"
+import { Puller } from "../Puller"
 import { SettingsDrawerContents } from "./SettingsDrawerContents"
-
-const Puller = styled("div")(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "light" ? grey[300] : grey[900],
-  borderRadius: 3,
-  height: 6,
-  left: "calc(50% - 15px)",
-  position: "absolute",
-  top: 8,
-  width: 30,
-}))
 
 export function SettingsDrawer(props: PopoverToggleProps) {
   const { open, toggleOpen } = props

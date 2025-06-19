@@ -30,12 +30,16 @@ export function formatTicker(ticker?: string) {
 }
 
 export const getAssetPlatform = memoize(function getAssetPlatform(assetId: string) {
-  return assetId.split(":")[0]
+  try {
+    return assetId.split(":")[0]
+  } catch {}
 })
 
-export const getAssetContract = memoize(function getAssetPlatform(assetId: string) {
-  const contractAddress = assetId.split(":")[1]
-  return formatAddress(contractAddress) as Web3Address
+export const getAssetContract = memoize(function getAssetContract(assetId: string) {
+  try {
+    const contractAddress = assetId.split(":")[1]
+    return formatAddress(contractAddress) as Web3Address
+  } catch {}
 })
 
 export const isEvmPlatform = memoize(function isEvmPlatform(platformId: string) {

@@ -194,7 +194,9 @@ export function getAutoFormatDigits(
     } else if (x > 1000 || x < -1000) {
       minimumFractionDigits = 2
     } else if (x < 1 && x > -1) {
-      minimumFractionDigits = getMinimumDecimalPrecision(x) + 3
+      const max = getDecimalPrecision(x)
+      const min = getMinimumDecimalPrecision(x)
+      minimumFractionDigits = Math.min(min + 3, max)
     }
   }
 
@@ -203,7 +205,9 @@ export function getAutoFormatDigits(
     if (x > 10_000 || x < -10_000) {
       maximumFractionDigits = Math.max(0, minimumFractionDigits)
     } else if (x < 1 && x > -1) {
-      maximumFractionDigits = getMinimumDecimalPrecision(x) + 3
+      const max = getDecimalPrecision(x)
+      const min = getMinimumDecimalPrecision(x)
+      maximumFractionDigits = Math.min(min + 3, max)
     } else {
       maximumFractionDigits = minimumFractionDigits
     }

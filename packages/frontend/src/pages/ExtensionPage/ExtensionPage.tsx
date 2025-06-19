@@ -20,6 +20,7 @@ import { GitHubUserBlock } from "src/components/GitHubUserBlock"
 import { NavTab } from "src/components/NavTab"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
+import { SubtitleText } from "src/components/SubtitleText"
 import { Tabs } from "src/components/Tabs"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { RichExtension } from "src/interfaces"
@@ -112,17 +113,10 @@ export default function ExtensionPage() {
             <Typography variant="h6" fontFamily={SerifFont} sx={{ marginBottom: -0.5 }}>
               <span>{extensionName}</span>
             </Typography>
-            <Typography
-              color="text.secondary"
-              variant="subtitle2"
-              fontWeight={400}
-              letterSpacing={0.5}
-            >
-              {extension.id}
-            </Typography>
+            <SubtitleText>{extension.id}</SubtitleText>
           </Stack>
         </Stack>
-        <Stack gap={6} direction="row">
+        <Stack gap={6} direction="row" flexWrap="wrap">
           <div>
             <SectionTitle>Price</SectionTitle>
             <Typography fontFamily={MonoFont} variant="body2" paddingTop={0.5}>

@@ -20,7 +20,7 @@ export function TagsTableRow({ row }: TagsTableRowProps) {
     const { confirmed, event } = await confirm({
       confirmText: "Save",
       content: (
-        <Stack gap={2} sx={{ minWidth: 464 }}>
+        <Stack gap={2} sx={{ "@media (min-width: 900px)": { minWidth: 520 } }}>
           <div>
             <TextField
               variant="outlined"
@@ -63,18 +63,16 @@ export function TagsTableRow({ row }: TagsTableRowProps) {
     <TableRow hover>
       <TableCell>{row.name}</TableCell>
       <TableCell variant="actionList">
-        <Stack direction="row" alignItems="center" justifyContent="flex-end">
-          <Tooltip title="Edit tag">
-            <IconButton size="small" onClick={handleEdit}>
-              <Edit fontSize="inherit" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Delete tag">
-            <IconButton size="small" onClick={handleDelete}>
-              <Delete fontSize="inherit" />
-            </IconButton>
-          </Tooltip>
-        </Stack>
+        <Tooltip title="Edit tag">
+          <IconButton size="small" onClick={handleEdit}>
+            <Edit fontSize="inherit" />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Delete tag">
+          <IconButton size="small" onClick={handleDelete}>
+            <Delete fontSize="inherit" />
+          </IconButton>
+        </Tooltip>
       </TableCell>
     </TableRow>
   )

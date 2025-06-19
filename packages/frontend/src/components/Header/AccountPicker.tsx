@@ -1,19 +1,9 @@
-import { Menu, MenuList, styled, SwipeableDrawer, Typography, useMediaQuery } from "@mui/material"
-import { grey } from "@mui/material/colors"
+import { Menu, MenuList, SwipeableDrawer, Typography, useMediaQuery } from "@mui/material"
 import React from "react"
 import { noop } from "src/utils/utils"
 
+import { Puller } from "../Puller"
 import { AccountPickerContents } from "./AccountPickerContents"
-
-const Puller = styled("div")(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "light" ? grey[300] : grey[900],
-  borderRadius: 3,
-  height: 6,
-  left: "calc(50% - 15px)",
-  position: "absolute",
-  top: 8,
-  width: 30,
-}))
 
 export interface AccountPickerProps {
   anchorEl?: HTMLButtonElement

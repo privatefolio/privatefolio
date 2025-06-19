@@ -43,8 +43,8 @@ it("getAutoFormatDigits should work", () => {
   `)
   expect(getAutoFormatDigits(0.005)).toMatchInlineSnapshot(`
     {
-      "maximumFractionDigits": 6,
-      "minimumFractionDigits": 6,
+      "maximumFractionDigits": 3,
+      "minimumFractionDigits": 3,
     }
   `)
   expect(getAutoFormatDigits(0.00000690108)).toMatchInlineSnapshot(`
@@ -61,14 +61,14 @@ it("getAutoFormatDigits should work", () => {
   `)
   expect(getAutoFormatDigits(0.005, 2)).toMatchInlineSnapshot(`
     {
-      "maximumFractionDigits": 6,
+      "maximumFractionDigits": 3,
       "minimumFractionDigits": 2,
     }
   `)
   expect(getAutoFormatDigits(0)).toMatchInlineSnapshot(`
     {
-      "maximumFractionDigits": 3,
-      "minimumFractionDigits": 3,
+      "maximumFractionDigits": 0,
+      "minimumFractionDigits": 0,
     }
   `)
   expect(getAutoFormatDigits(123.45)).toMatchInlineSnapshot(`
@@ -154,6 +154,12 @@ it("getAutoFormatDigits should work", () => {
     {
       "maximumFractionDigits": 2,
       "minimumFractionDigits": 2,
+    }
+  `)
+  expect(getAutoFormatDigits(0.000005)).toMatchInlineSnapshot(`
+    {
+      "maximumFractionDigits": 6,
+      "minimumFractionDigits": 6,
     }
   `)
   // expect(getAutoFormatDigits(0)).toMatchInlineSnapshot()

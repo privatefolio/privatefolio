@@ -10,7 +10,7 @@ export function LogoText(props: TypographyProps) {
       variant="h5"
       fontFamily={SerifFont}
       fontWeight={600}
-      letterSpacing={0.5}
+      letterSpacing="0.03125rem"
       padding={0}
       {...rest}
     >

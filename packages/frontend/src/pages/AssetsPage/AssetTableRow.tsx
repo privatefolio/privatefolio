@@ -13,8 +13,8 @@ import { useStore } from "@nanostores/react"
 import { allPriceApiIds } from "privatefolio-backend/src/settings/price-apis"
 import React from "react"
 import { AppLink } from "src/components/AppLink"
+import { ExtensionAvatar } from "src/components/ExtensionAvatar"
 import { MyAssetBlock } from "src/components/MyAssetBlock"
-import { PlatformAvatar } from "src/components/PlatformAvatar"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { QuoteAmountBlock } from "src/components/QuoteAmountBlock"
 import { PRICE_APIS_META, PriceApiId } from "src/settings"
@@ -70,7 +70,7 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
       {allPriceApiIds.map((priceApiId) => (
         <MenuItem key={priceApiId} value={priceApiId}>
           <Stack direction="row" alignItems={"center"} gap={1}>
-            <PlatformAvatar
+            <ExtensionAvatar
               size="small"
               src={resolveUrl(PRICE_APIS_META[priceApiId].logoUrl)}
               alt={priceApiId}
@@ -87,7 +87,7 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
       <TableRow hover {...rest}>
         <TableCell colSpan={headCells.length} variant="clickable">
           <Stack direction="row" gap={1} justifyContent="space-between" flexWrap="nowrap">
-            <AppLink to={`../asset/${encodeURI(assetId)}`}>
+            <AppLink to={`../asset/${encodeURI(assetId)}`} flexGrow={1}>
               <Stack sx={{ height: 52 }} alignItems="center" direction="row" gap={1}>
                 <MyAssetBlock id={assetId} secondary={name} size="medium" />
                 {!coingeckoId && (

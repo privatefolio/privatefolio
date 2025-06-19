@@ -120,7 +120,7 @@ export function ConnectionsTable() {
       />
       <Stack paddingTop={1}>
         <Callout>
-          <AlertTitle sx={{ fontSize: "0.85rem" }}>What are connections?</AlertTitle>
+          <AlertTitle>What are connections?</AlertTitle>
           <Box sx={{ maxWidth: 590 }}>
             Connections allow you to import data without having to manually upload <code>.csv</code>{" "}
             files.

@@ -40,7 +40,6 @@ export function AssetAmountBlock(props: AssetAmountBlockProps) {
       amount={usdValue || (price && amount ? price * Number(amount) : undefined)}
       placeholder={assetId && !price ? undefined : placeholder}
       {...rest}
-      showTicker={false} // TODO9
     />
   )
 }

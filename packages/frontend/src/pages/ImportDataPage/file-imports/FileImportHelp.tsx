@@ -10,17 +10,14 @@ import {
   Typography,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React, { useEffect, useState } from "react"
+import React, { lazy, Suspense, useEffect, useMemo, useState } from "react"
 import { Callout } from "src/components/Callout"
-import { PlatformAvatar } from "src/components/PlatformAvatar"
+import { DefaultSpinner } from "src/components/DefaultSpinner"
+import { ExtensionAvatar } from "src/components/ExtensionAvatar"
 import { Tabs } from "src/components/Tabs"
 import { useBoolean } from "src/hooks/useBoolean"
 import { RichExtension } from "src/interfaces"
 import { $rpc } from "src/workers/remotes"
-
-import BinanceHelp from "./help/BinanceHelp"
-import EtherscanHelp from "./help/EtherscanHelp"
-import PrivatefolioHelp from "./help/PrivatefolioHelp"
 
 export function FileImportHelp() {
   const { value: modalOpen, toggle: toggleModalOpen } = useBoolean(false)
@@ -34,6 +31,12 @@ export function FileImportHelp() {
     rpc.getExtensions(true).then(setExtensions)
   }, [rpc])
 
+  const HowToComponent = useMemo(() => {
+    const extension = extensions.find((x) => x.id === tab)
+    if (!extension?.howTo) return null
+    return lazy(() => import(/* @vite-ignore */ extension.howTo!))
+  }, [extensions, tab])
+
   return (
     <>
       <Callout
@@ -45,7 +48,7 @@ export function FileImportHelp() {
           cursor: "pointer",
         }}
       >
-        <AlertTitle sx={{ fontSize: "0.85rem" }}>How to create file imports?</AlertTitle>
+        <AlertTitle>How to create file imports?</AlertTitle>
         <Typography variant="body2" color="text.secondary">
           Click here to learn how to export your data from Etherscan or Binance.
         </Typography>
@@ -70,7 +73,7 @@ export function FileImportHelp() {
                   value={extension.id}
                   label={
                     <Stack direction="row" alignItems={"center"} gap={0.5}>
-                      <PlatformAvatar
+                      <ExtensionAvatar
                         size="small"
                         src={extension.extensionLogoUrl}
                         alt={extension.extensionName}
@@ -81,10 +84,11 @@ export function FileImportHelp() {
                 />
               ))}
             </Tabs>
-            {tab === "binance-account-statement" && <BinanceHelp />}
-            {/* {tab === "binance-spot-history" && <BinanceSpotHelp />} */}
-            {tab === "etherscan" && <EtherscanHelp />}
-            {tab === "privatefolio" && <PrivatefolioHelp />}
+            {HowToComponent && (
+              <Suspense fallback={<DefaultSpinner />}>
+                <HowToComponent />
+              </Suspense>
+            )}
           </div>
         </DialogContent>
         <DialogActions>

@@ -118,7 +118,7 @@ export async function getAsset(accountName: string, id: string): Promise<MyAsset
       if (
         x.platforms &&
         x.platforms[platform] &&
-        x.platforms[platform] === contract.toLowerCase()
+        x.platforms[platform] === contract?.toLowerCase()
       ) {
         return true
       }

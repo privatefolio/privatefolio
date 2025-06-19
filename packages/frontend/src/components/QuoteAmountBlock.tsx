@@ -19,6 +19,7 @@ export function QuoteAmountBlock(props: QuoteAmountBlockProps) {
       maxDigits={formatting === "value" ? currency.maxDigits : undefined}
       currencyTicker={currency.id}
       {...props}
+      showTicker={false}
     />
   )
 }

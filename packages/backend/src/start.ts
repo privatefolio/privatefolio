@@ -22,11 +22,13 @@ console.log("Started worker...")
 
 const accountNames = await writeApi.getAccountNames()
 
-// Get kiosk mode from first account's settings
 let kioskMode = false
-if (accountNames.length > 0) {
-  const settings = await writeApi.getSettings(accountNames[0])
-  kioskMode = settings.kioskMode
+for (const accountName of accountNames) {
+  const accountSettings = await writeApi.getSettings(accountName)
+  if (accountSettings.kioskMode) {
+    kioskMode = true
+    break
+  }
 }
 
 const sideEffects: Record<string, SubscriptionId> = {}
