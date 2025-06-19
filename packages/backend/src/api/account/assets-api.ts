@@ -94,8 +94,7 @@ export async function getAssets(): Promise<Asset[]> {
     )
     list.sort((a, b) => (a.marketCapRank ?? Infinity) - (b.marketCapRank ?? Infinity))
     return list
-  } catch (error) {
-    console.error(error)
+  } catch {
     return []
   }
 }
@@ -224,6 +223,17 @@ export async function refetchAssetsWithRetry(retries = 3) {
       await sleep(1000)
     }
   }
+}
+
+export async function refetchAssetsIfNeeded() {
+  console.log(`Coingecko assets checking...`)
+  const assets = await getAssets()
+  if (assets.length === 0) {
+    console.log(`Coingecko assets fetching...`)
+    return await refetchAssetsWithRetry()
+  }
+  console.log(`Coingecko assets already exist.`)
+  return assets
 }
 
 export function enqueueRefetchAssets(accountName: string, trigger: TaskTrigger) {

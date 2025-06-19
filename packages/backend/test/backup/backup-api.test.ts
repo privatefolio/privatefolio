@@ -7,7 +7,7 @@ import { importFile } from "src/api/account/file-imports-api"
 import { getTransactions } from "src/api/account/transactions-api"
 import { ProgressUpdate } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
-import { describe, expect, it, vi } from "vitest"
+import { beforeAll, describe, expect, it, vi } from "vitest"
 
 const accountName = Math.random().toString(36).substring(7)
 
@@ -18,13 +18,15 @@ const mocks = vi.hoisted(() => {
   }
 })
 
-vi.mock("fs/promises", () => ({
-  ...fs.promises,
-  access: mocks.access,
-  readFile: mocks.readFile,
-}))
-
 describe.todo("should backup and restore", () => {
+  beforeAll(async () => {
+    vi.mock("fs/promises", () => ({
+      ...fs.promises,
+      access: mocks.access,
+      readFile: mocks.readFile,
+    }))
+  })
+
   it("should add a file import", async () => {
     // arrange
     const fileName = "0xf98/etherscan.csv"

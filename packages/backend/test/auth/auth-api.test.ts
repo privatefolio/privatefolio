@@ -1,5 +1,5 @@
 import * as fsPromises from "fs/promises"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest"
 
 import {
   AuthSecrets,
@@ -15,13 +15,15 @@ import {
 } from "../../src/api/auth-http-api"
 import { extractJwt, generateJwt, verifyJwt } from "../../src/utils/jwt-utils"
 
-// Mock the fs/promises module
-vi.mock("fs/promises", () => ({
-  access: vi.fn().mockResolvedValue(true),
-  mkdir: vi.fn(),
-  readFile: vi.fn(),
-  writeFile: vi.fn(),
-}))
+beforeAll(async () => {
+  // Mock the fs/promises module
+  vi.mock("fs/promises", () => ({
+    access: vi.fn().mockResolvedValue(true),
+    mkdir: vi.fn(),
+    readFile: vi.fn(),
+    writeFile: vi.fn(),
+  }))
+})
 
 describe("JWT utils", () => {
   it("should generate a valid JWT", async () => {

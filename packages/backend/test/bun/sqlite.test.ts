@@ -16,6 +16,7 @@ import { getAccount, resetAccount } from "src/api/accounts-api"
 import { ProgressUpdate, TaskPriority } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
 import { sleep } from "src/utils/utils"
+import { beforeAll } from "vitest"
 
 const accountName = Math.random().toString(36).substring(7)
 
@@ -24,13 +25,15 @@ const mocks = {
   readFile: mock(),
 }
 
-mock.module("fs/promises", () => ({
-  ...fs.promises,
-  access: mocks.access,
-  readFile: mocks.readFile,
-}))
-
 describe("0xf98 file import", () => {
+  beforeAll(async () => {
+    mock.module("fs/promises", () => ({
+      ...fs.promises,
+      access: mocks.access,
+      readFile: mocks.readFile,
+    }))
+  })
+
   it("should add a file import", async () => {
     const fileName = "0xf98/etherscan.csv"
     const filePath = join("test/files", fileName)

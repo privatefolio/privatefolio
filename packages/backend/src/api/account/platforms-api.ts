@@ -58,8 +58,7 @@ export async function getExchanges(): Promise<Exchange[]> {
     list.sort((a, b) => (a.coingeckoTrustRank ?? Infinity) - (b.coingeckoTrustRank ?? Infinity))
     exchanges = list
     return [...exchanges, ...customExchanges]
-  } catch (error) {
-    console.error(error)
+  } catch {
     return customExchanges
   }
 }
@@ -85,10 +84,26 @@ export async function getBlockchains(): Promise<Blockchain[]> {
     list.sort((a, b) => (a.chainId ?? Infinity) - (b.chainId ?? Infinity))
     blockchains = list
     return blockchains
-  } catch (error) {
-    console.error(error)
+  } catch {
     return []
   }
+}
+
+async function refetchPlatforms() {
+  const data = await getCoingeckoAssetPlatforms()
+  await mkdir(`${CACHE_LOCATION}/asset-platforms`, { recursive: true })
+  await writeFile(`${CACHE_LOCATION}/asset-platforms/all.json`, JSON.stringify(data, null, 2))
+  blockchains = []
+  exchanges = []
+  return data
+}
+
+async function refetchExchanges() {
+  const data = await getCoingeckoExchanges()
+  await mkdir(`${CACHE_LOCATION}/exchanges`, { recursive: true })
+  await writeFile(`${CACHE_LOCATION}/exchanges/all.json`, JSON.stringify(data, null, 2))
+  exchanges = []
+  return data
 }
 
 export function enqueueRefetchPlatforms(accountName: string, trigger: TaskTrigger) {
@@ -96,21 +111,12 @@ export function enqueueRefetchPlatforms(accountName: string, trigger: TaskTrigge
     description: "Refetching asset platforms.",
     function: async (progress) => {
       await Promise.all([
-        (async function refetchPlatforms() {
-          const data = await getCoingeckoAssetPlatforms()
-          await mkdir(`${CACHE_LOCATION}/asset-platforms`, { recursive: true })
-          await writeFile(
-            `${CACHE_LOCATION}/asset-platforms/all.json`,
-            JSON.stringify(data, null, 2)
-          )
-          blockchains = []
-          exchanges = []
+        (async function first() {
+          const data = await refetchPlatforms()
           await progress([undefined, `Refetched ${data.length} blockchains`])
         })(),
-        (async function refetchExchanges() {
-          const data = await getCoingeckoExchanges()
-          await mkdir(`${CACHE_LOCATION}/exchanges`, { recursive: true })
-          await writeFile(`${CACHE_LOCATION}/exchanges/all.json`, JSON.stringify(data, null, 2))
+        (async function second() {
+          const data = await refetchExchanges()
           await progress([undefined, `Refetched ${data.length} exchanges`])
         })(),
       ])
@@ -195,4 +201,16 @@ export async function getPlatformsByIds(ids: string[]): Promise<Platform[]> {
 export async function getMyPlatforms(accountName: string) {
   const platformIds = await getMyPlatformIds(accountName)
   return getPlatformsByIds(platformIds)
+}
+
+export async function refetchPlatformsIfNeeded() {
+  console.log(`Coingecko platforms checking...`)
+  const blockchains = await getBlockchains()
+  const exchanges = await getExchanges()
+  if (blockchains.length === 0 || exchanges.length === 0) {
+    console.log(`Coingecko platforms fetching...`)
+    return await Promise.all([refetchPlatforms(), refetchExchanges()])
+  }
+  console.log(`Coingecko platforms already exist.`)
+  return { blockchains, exchanges }
 }

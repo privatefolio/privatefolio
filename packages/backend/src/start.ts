@@ -4,6 +4,8 @@ import { proxy, wrap } from "comlink"
 import { Cron } from "croner"
 import { throttle } from "lodash-es"
 
+import { refetchAssetsIfNeeded } from "./api/account/assets-api"
+import { refetchPlatformsIfNeeded } from "./api/account/platforms-api"
 import { Api, api } from "./api/api"
 import { BackendServer } from "./backend-server"
 import { EventCause, SubscriptionId } from "./interfaces"
@@ -223,6 +225,8 @@ for (const accountName of accountNames) {
 }
 
 await handleAccountsSideEffects()
+await refetchAssetsIfNeeded()
+await refetchPlatformsIfNeeded()
 
 startServer()
 

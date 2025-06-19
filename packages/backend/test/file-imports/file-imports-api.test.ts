@@ -3,7 +3,7 @@ import { join } from "path"
 import { importFile, subscribeToFileImports } from "src/api/account/file-imports-api"
 import { getAccount, unsubscribe } from "src/api/accounts-api"
 import { EventCause, FileImport, SubscriptionChannel } from "src/interfaces"
-import { expect, it, vi } from "vitest"
+import { beforeAll, expect, it, vi } from "vitest"
 
 const accountName = Math.random().toString(36).substring(7)
 
@@ -14,13 +14,15 @@ const mocks = vi.hoisted(() => {
   }
 })
 
-vi.mock("fs/promises", () => ({
-  ...fs.promises,
-  access: mocks.access,
-  readFile: mocks.readFile,
-}))
-
 it("should add a file import", async () => {
+  beforeAll(async () => {
+    vi.mock("fs/promises", () => ({
+      ...fs.promises,
+      access: mocks.access,
+      readFile: mocks.readFile,
+    }))
+  })
+
   // arrange
   const fileName = "coinmama.csv"
   const filePath = join("test/files", fileName)
