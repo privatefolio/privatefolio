@@ -30,7 +30,7 @@ import { getValue, setValue } from "./kv-api"
 import { enqueueTask } from "./server-tasks-api"
 import { getTransaction } from "./transactions-api"
 
-const SCHEMA_VERSION = 16
+const SCHEMA_VERSION = 17
 
 async function getAccountWithTrades(accountName: string) {
   const schemaVersion = await getValue(accountName, `trade_schema_version`, 0)
@@ -49,8 +49,8 @@ async function getAccountWithTrades(accountName: string) {
         id VARCHAR PRIMARY KEY,
         tradeNumber INTEGER NOT NULL,
         assetId VARCHAR NOT NULL,
-        amount FLOAT NOT NULL,
-        balance FLOAT NOT NULL,
+        amount VARCHAR NOT NULL,
+        balance VARCHAR NOT NULL,
         createdAt INTEGER NOT NULL,
         closedAt INTEGER,
         duration INTEGER,
@@ -99,12 +99,12 @@ async function getAccountWithTrades(accountName: string) {
         id VARCHAR PRIMARY KEY,
         trade_id VARCHAR NOT NULL,
         timestamp INTEGER NOT NULL,
-        positionValue FLOAT NOT NULL,
-        cost FLOAT NOT NULL,
-        proceeds FLOAT NOT NULL,
-        fees FLOAT NOT NULL,
-        deposits FLOAT NOT NULL,
-        pnl FLOAT NOT NULL,
+        positionValue VARCHAR NOT NULL,
+        cost VARCHAR NOT NULL,
+        proceeds VARCHAR NOT NULL,
+        fees VARCHAR NOT NULL,
+        deposits VARCHAR NOT NULL,
+        pnl VARCHAR NOT NULL,
         FOREIGN KEY (trade_id) REFERENCES trades(id)
       );
     `)
@@ -713,12 +713,12 @@ export async function getTradePnL(
       id: row[0] as string,
       tradeId: row[1] as string,
       timestamp: row[2] as number,
-      positionValue: row[3] as number,
-      cost: row[4] as number,
-      proceeds: row[5] as number,
-      fees: row[6] as number,
-      deposits: row[7] as number,
-      pnl: row[8] as number,
+      positionValue: row[3] as string,
+      cost: row[4] as string,
+      proceeds: row[5] as string,
+      fees: row[6] as string,
+      deposits: row[7] as string,
+      pnl: row[8] as string,
     }))
     /* eslint-enable */
   } catch (error) {
@@ -733,17 +733,7 @@ export async function getAccountPnL(
 ): Promise<AccountPnL[]> {
   const account = await getAccountWithTrades(accountName)
   try {
-    let query = `
-      SELECT 
-        timestamp,
-        SUM(positionValue) as positionValue,
-        SUM(cost) as cost,
-        SUM(proceeds) as proceeds,
-        SUM(fees) as fees,
-        SUM(deposits) as deposits,
-        SUM(pnl) as pnl
-      FROM trade_pnl
-    `
+    let query = "SELECT * FROM trade_pnl"
     const params: SqlParam[] = []
 
     if (start && end) {
@@ -757,20 +747,66 @@ export async function getAccountPnL(
       params.push(end)
     }
 
-    query += " GROUP BY timestamp ORDER BY timestamp ASC"
+    query += " ORDER BY timestamp ASC"
 
     const result = await account.execute(query, params)
     /* eslint-disable sort-keys-fix/sort-keys-fix */
-    return result.map((row) => ({
-      timestamp: row[0] as number,
-      positionValue: row[1] as number,
-      cost: row[2] as number,
-      proceeds: row[3] as number,
-      fees: row[4] as number,
-      deposits: row[5] as number,
-      pnl: row[6] as number,
+    const tradePnls: TradePnL[] = result.map((row) => ({
+      id: row[0] as string,
+      tradeId: row[1] as string,
+      timestamp: row[2] as number,
+      positionValue: row[3] as string,
+      cost: row[4] as string,
+      proceeds: row[5] as string,
+      fees: row[6] as string,
+      deposits: row[7] as string,
+      pnl: row[8] as string,
     }))
     /* eslint-enable */
+
+    // Group by timestamp and carry forward latest values for each trade
+    const timestampMap = new Map<number, AccountPnL>()
+    const latestTradeValues = new Map<string, TradePnL>()
+
+    // Get all unique timestamps
+    const timestamps = Array.from(new Set(tradePnls.map((p) => p.timestamp))).sort()
+
+    for (const timestamp of timestamps) {
+      // Update latest values for trades that have records at this timestamp
+      const recordsAtTimestamp = tradePnls.filter((p) => p.timestamp === timestamp)
+      for (const record of recordsAtTimestamp) {
+        latestTradeValues.set(record.tradeId, record)
+      }
+
+      // Sum up the latest values from all trades using Big.js
+      let positionValue = new Big(0)
+      let cost = new Big(0)
+      let proceeds = new Big(0)
+      let fees = new Big(0)
+      let deposits = new Big(0)
+      let pnl = new Big(0)
+
+      for (const tradeRecord of latestTradeValues.values()) {
+        positionValue = positionValue.plus(tradeRecord.positionValue)
+        cost = cost.plus(tradeRecord.cost)
+        proceeds = proceeds.plus(tradeRecord.proceeds)
+        fees = fees.plus(tradeRecord.fees)
+        deposits = deposits.plus(tradeRecord.deposits)
+        pnl = pnl.plus(tradeRecord.pnl)
+      }
+
+      timestampMap.set(timestamp, {
+        cost: cost.toString(),
+        deposits: deposits.toString(),
+        fees: fees.toString(),
+        pnl: pnl.toString(),
+        positionValue: positionValue.toString(),
+        proceeds: proceeds.toString(),
+        timestamp,
+      })
+    }
+
+    return Array.from(timestampMap.values()).sort((a, b) => a.timestamp - b.timestamp)
   } catch (error) {
     throw new Error(`Failed to get account pnl: ${error}`)
   }
@@ -820,13 +856,13 @@ export async function computePnl(
     const genesisTime = startTime - ONE_DAY
     const genesisId = `${trade.id}_${genesisTime}`
     tradePnls.push({
-      cost: 0,
-      deposits: 0,
-      fees: 0,
+      cost: "0",
+      deposits: "0",
+      fees: "0",
       id: genesisId,
-      pnl: 0,
-      positionValue: 0,
-      proceeds: 0,
+      pnl: "0",
+      positionValue: "0",
+      proceeds: "0",
       timestamp: genesisTime,
       tradeId: trade.id,
     })
@@ -855,41 +891,41 @@ export async function computePnl(
         latestTimestamp = bucketStart
       }
 
-      const balance = latestLog ? Number(latestLog.balance) : 0
-      const positionValue = price.value * balance
+      const balance = latestLog ? new Big(latestLog.balance) : new Big(0)
+      const positionValue = new Big(price.value).mul(balance)
 
-      // Calculate total cost and proceeds in USD
+      // Calculate total cost and proceeds in USD using Big.js
       const cost = trade.cost.reduce(
         (sum, [_assetId, _amount, usdValue, _exposure, _txId, txTimestamp]) =>
-          txTimestamp <= bucketEnd ? sum + Number(usdValue) : sum,
-        0
+          txTimestamp <= bucketEnd ? sum.plus(usdValue) : sum,
+        new Big(0)
       )
       const proceeds = trade.proceeds.reduce(
         (sum, [_assetId, _amount, usdValue, _txId, txTimestamp]) =>
-          txTimestamp <= bucketEnd ? sum + Number(usdValue) : sum,
-        0
+          txTimestamp <= bucketEnd ? sum.plus(usdValue) : sum,
+        new Big(0)
       )
       const fees = trade.fees.reduce(
         (sum, [_assetId, _amount, usdValue, _txId, txTimestamp]) =>
-          txTimestamp <= bucketEnd ? sum + Number(usdValue) : sum,
-        0
+          txTimestamp <= bucketEnd ? sum.plus(usdValue) : sum,
+        new Big(0)
       )
       const deposits = trade.deposits.reduce(
         (sum, [_assetId, _amount, usdValue, _txId, txTimestamp]) =>
-          txTimestamp <= bucketEnd ? sum + Number(usdValue) : sum,
-        0
+          txTimestamp <= bucketEnd ? sum.plus(usdValue) : sum,
+        new Big(0)
       )
-      const pnl = positionValue + cost + proceeds + fees - deposits
+      const pnl = positionValue.plus(cost).plus(proceeds).plus(fees).minus(deposits)
 
       const pnlId = `${trade.id}_${bucketStart}`
       tradePnls.push({
-        cost,
-        deposits,
-        fees,
+        cost: cost.toString(),
+        deposits: deposits.toString(),
+        fees: fees.toString(),
         id: pnlId,
-        pnl,
-        positionValue,
-        proceeds,
+        pnl: pnl.toString(),
+        positionValue: positionValue.toString(),
+        proceeds: proceeds.toString(),
         timestamp: bucketStart,
         tradeId: trade.id,
       })

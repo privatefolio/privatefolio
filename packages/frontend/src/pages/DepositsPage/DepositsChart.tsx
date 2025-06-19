@@ -2,7 +2,7 @@ import { useMediaQuery } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { debounce } from "lodash-es"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { ChartData, Time, Trade } from "src/interfaces"
+import { ChartData, Time } from "src/interfaces"
 import { DEFAULT_DEBOUNCE_DURATION } from "src/settings"
 import { $quoteCurrency } from "src/stores/account-settings-store"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
@@ -19,7 +19,7 @@ import {
 import { QueryChartData, SingleSeriesChart, TooltipOpts } from "../../components/SingleSeriesChart"
 import { $rpc } from "../../workers/remotes"
 
-export function PnLChart({ trade }: { trade?: Trade }) {
+export function DepositsChart() {
   const activeAccount = useStore($activeAccount)
   const [refresh, setRefresh] = useState(0)
   const connectionStatus = useStore($connectionStatus)
@@ -39,29 +39,16 @@ export function PnLChart({ trade }: { trade?: Trade }) {
   const queryFn: QueryChartData = useCallback(
     async (interval) => {
       const _refresh = refresh // reference the dependency for eslint(react-hooks/exhaustive-deps)
-      let values: ChartData[]
 
-      if (trade) {
-        const pnlData = await rpc.getTradePnL(activeAccount, trade.id)
-        values = pnlData.map((pnl) => {
-          const pnlValue = Number(pnl.pnl)
-          return {
-            color: pnlValue === 0 ? neutralColor : pnlValue > 0 ? profitColor : lossColor,
-            time: (pnl.timestamp / 1000) as Time,
-            value: pnlValue,
-          }
-        })
-      } else {
-        const pnlData = await rpc.getAccountPnL(activeAccount)
-        values = pnlData.map((pnl) => {
-          const pnlValue = Number(pnl.pnl)
-          return {
-            color: pnlValue === 0 ? neutralColor : pnlValue > 0 ? profitColor : lossColor,
-            time: (pnl.timestamp / 1000) as Time,
-            value: pnlValue,
-          }
-        })
-      }
+      const pnlData = await rpc.getAccountPnL(activeAccount)
+      const values = pnlData.map((pnl) => {
+        const depositsValue = Number(pnl.deposits)
+        return {
+          color: depositsValue === 0 ? neutralColor : depositsValue > 0 ? profitColor : lossColor,
+          time: (pnl.timestamp / 1000) as Time,
+          value: depositsValue,
+        }
+      })
 
       let result: ChartData[]
 
@@ -76,7 +63,7 @@ export function PnLChart({ trade }: { trade?: Trade }) {
 
       return result
     },
-    [activeAccount, refresh, rpc, trade]
+    [activeAccount, refresh, rpc]
   )
 
   const currency = useStore($quoteCurrency)

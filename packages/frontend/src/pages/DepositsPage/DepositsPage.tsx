@@ -8,25 +8,25 @@ import { $inspectTime } from "src/stores/pages/balances-store"
 import { formatDate } from "src/utils/formatting-utils"
 
 import { TradeActions } from "../TradesPage/TradeActions"
-import { TradeTable } from "../TradesPage/TradeTable"
-import { PnLChart } from "./PnLChart"
+import { TransactionTable } from "../TransactionsPage/TransactionTable"
+import { DepositsChart } from "./DepositsChart"
 
-export function PnLPage() {
+export function DepositsPage() {
   const activeAccount = useStore($activeAccount)
   const inspectTime = useStore($inspectTime)
 
   useEffect(() => {
-    document.title = `Profit & loss - ${activeAccount} - Privatefolio`
+    document.title = `Deposits & withdrawals - ${activeAccount} - Privatefolio`
   }, [activeAccount])
 
   return (
     <Stack gap={4}>
-      <PnLChart />
+      <DepositsChart />
       <Stack gap={1}>
         <div>
           <Subheading>
             <span>
-              Trades{" "}
+              Transactions{" "}
               {inspectTime !== undefined && (
                 <Typography variant="caption" color="text.secondary">
                   on {formatDate(inspectTime)}
@@ -35,7 +35,7 @@ export function PnLPage() {
             </span>
             <TradeActions />
           </Subheading>
-          <TradeTable defaultRowsPerPage={10} tradeStatus="open" />
+          <TransactionTable defaultRowsPerPage={10} />
         </div>
         <WorkInProgressCallout />
       </Stack>

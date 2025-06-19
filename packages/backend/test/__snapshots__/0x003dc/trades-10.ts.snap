@@ -1,13 +1,13 @@
 [
   {
-    "amount": 1927.5,
+    "amount": "1927.5",
     "assetId": "ethereum:0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359:SAI",
     "auditLogIds": [
       "4118854677_0x802e3fa49c178ee1d626dcb17f7f6c9b14f8388f80f95bd52df6452304407d6c_ERC20_17_TRANSFER_17",
       "4118854677_0xc7ae0341a01440a6c81937f4d035afe6e4ecc31144a47862b90fff93eb18a072_ERC20_16_TRANSFER_16",
       "4118854677_0xfc7f43c2abd1ebbb104f6c42e5a51518f2a6c152fcc7030e2646d00f1350f830_ERC20_15_TRANSFER_15",
     ],
-    "balance": 0,
+    "balance": "0",
     "closedAt": 1548167188000,
     "cost": [],
     "createdAt": 1546874315000,
@@ -49,7 +49,7 @@
     ],
   },
   {
-    "amount": 9462.77,
+    "amount": "9462.77",
     "assetId": "ethereum:0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359:SAI",
     "auditLogIds": [
       "4118854677_0x14fba9395af9906edfdb4257a7c00269746d0e1001f17d3d0c8e8ec9157bdfbe_ERC20_33_TRANSFER_33",
@@ -62,7 +62,7 @@
       "4118854677_0xb6e7db4a39a2ca1cd011d79301d81796a80ed7a18441e1fdfb71abe1591cbe41_ERC20_26_TRANSFER_26",
       "4118854677_0xf26563d29c69517a584efce13331a8e338c4fef4d92c611ae0eb3e1ad1b43580_ERC20_19_TRANSFER_19",
     ],
-    "balance": 0,
+    "balance": "0",
     "closedAt": 1555248455000,
     "cost": [],
     "createdAt": 1550248174000,
@@ -152,13 +152,13 @@
     ],
   },
   {
-    "amount": 8,
+    "amount": "8",
     "assetId": "ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2:WETH",
     "auditLogIds": [
       "2523657605_0xbfb2e750b3b33f1d0ae56bffb312bb67a8838b4ca7772c223b01ff99060239fd_INTERNAL_8_WETH_8",
       "4118854677_0xa2b96dab700c4547683818b6fd1fe580382c2e8d8697966efe4f25522c633499_ERC20_21_TRANSFER_21",
     ],
-    "balance": 0,
+    "balance": "0",
     "closedAt": 1554384344000,
     "cost": [
       [
@@ -193,7 +193,7 @@
     ],
   },
   {
-    "amount": 47,
+    "amount": "47",
     "assetId": "ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2:WETH",
     "auditLogIds": [
       "2523657605_0xc4784a2391cad0f9287dbd8a26fd5f2a314f3b5e0ab86885442228249c68a6d4_INTERNAL_9_WETH_9",
@@ -201,7 +201,7 @@
       "4118854677_0xaa038b39e46b4c9c3b1378b531f63ce2442e8c0ff066ae239d2a06a1be3122ad_ERC20_30_TRANSFER_30",
       "4118854677_0xaafc3c517b4ab9f8c7f8b456c58a83288343dcb9093d791094da58705c9ec483_ERC20_32_TRANSFER_32",
     ],
-    "balance": 0,
+    "balance": "0",
     "closedAt": 1555248401000,
     "cost": [
       [
@@ -253,7 +253,7 @@
     ],
   },
   {
-    "amount": 2911,
+    "amount": "2911",
     "assetId": "ethereum:0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359:SAI",
     "auditLogIds": [
       "4118854677_0x26e9439fbde2ba2d2f7e55f8057cc1cec4d9e103fe3016acf256ab2c3cf7e1ec_ERC20_39_TRANSFER_39",
@@ -262,7 +262,7 @@
       "4118854677_0xb402608b0fd6d775e6275e4c069898ce90f3ef49a0ea034f61b6538a148349e4_ERC20_40_TRANSFER_40",
       "4118854677_0xe8a8ea3a2f8b6955c601db14f6940144080aaa6af47de0ce52170024a16ca14b_ERC20_36_TRANSFER_36",
     ],
-    "balance": 0,
+    "balance": "0",
     "closedAt": 1557819776000,
     "cost": [],
     "createdAt": 1556350088000,

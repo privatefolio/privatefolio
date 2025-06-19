@@ -252,7 +252,7 @@ describe("0xf98 file import", () => {
     expect(trades.length).toMatchInlineSnapshot(`6`)
     await expect(trades).toMatchFileSnapshot("../__snapshots__/0xf98/trades.ts.snap")
     expect(pnl.length).toMatchInlineSnapshot(`6`)
-    await expect(pnl).toMatchFileSnapshot("../__snapshots__/0xf98/pnl.ts.snap")
+    await expect(pnl).toMatchFileSnapshot("../__snapshots__/0xf98/account-pnl.ts.snap")
   })
 
   it.sequential("should delete the file imports", async () => {

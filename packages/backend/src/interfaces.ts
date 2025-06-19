@@ -860,25 +860,26 @@ export type PlatformMeta = {
 }
 
 export interface TradePnL {
-  cost: number
-  deposits: number
-  fees: number
+  cost: string
+  deposits: string
+  fees: string
   id: string
   /**
    * Formula: positionValue + cost + proceeds + fees - deposits
    */
-  pnl: number
-  positionValue: number
-  proceeds: number
+  pnl: string
+  positionValue: string
+  proceeds: string
   timestamp: number
   tradeId: string
 }
 
 export interface AccountPnL {
-  cost: number
-  fees: number
-  pnl: number
-  positionValue: number
-  proceeds: number
+  cost: string
+  deposits: string
+  fees: string
+  pnl: string
+  positionValue: string
+  proceeds: string
   timestamp: number
 }

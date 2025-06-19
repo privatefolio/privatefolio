@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom"
 import { NavTab } from "src/components/NavTab"
 import { Tabs } from "src/components/Tabs"
 
+import { DepositsPage } from "../DepositsPage/DepositsPage"
 import { BreakdownChart } from "../NetworthPage/BreakdownChart"
 import { NetworthActions } from "../NetworthPage/NetworthActions"
 import NetworthPage from "../NetworthPage/NetworthPage"
@@ -20,12 +21,14 @@ export default function HomePage() {
           <NavTab value="networth" to="?tab=networth" label="Net worth" />
           <NavTab value="breakdown" to="?tab=breakdown" label="Breakdown" />
           <NavTab value="pnl" to="?tab=pnl" label="Profit & loss" />
+          <NavTab value="deposits" to="?tab=deposits" label="Deposits" />
         </Tabs>
         {tab === "networth" && <NetworthActions />}
       </Stack>
       {tab === "networth" && <NetworthPage />}
       {tab === "pnl" && <PnLPage />}
       {tab === "breakdown" && <BreakdownChart />}
+      {tab === "deposits" && <DepositsPage />}
     </main>
   )
 }

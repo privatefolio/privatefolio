@@ -1,6 +1,6 @@
-import { Stack, Tooltip, Typography } from "@mui/material"
+import { Box, Stack, Tooltip, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React from "react"
+import React, { useState } from "react"
 
 import { Timestamp } from "../interfaces"
 import { $debugMode } from "../stores/app-store"
@@ -22,6 +22,7 @@ export function TimestampBlock(props: TimestampBlockProps) {
   const { timestamp, hideTime = false, relative, variant = "default" } = props
 
   const debugMode = useStore($debugMode)
+  const [copied, setCopied] = useState(false)
 
   if (variant === "simple") {
     return (
@@ -55,14 +56,34 @@ export function TimestampBlock(props: TimestampBlockProps) {
             })}
           </span>
           {debugMode && (
-            <span>
-              {timestamp} <span className="secondary">unix timestamp</span>
-            </span>
+            <>
+              <span>
+                {timestamp} <span className="secondary">unix timestamp</span>
+              </span>
+              <span className="secondary">({copied ? "copied" : "copy to clipboard"})</span>
+            </>
           )}
         </Stack>
       }
     >
-      <span>
+      <Box
+        component="span"
+        sx={{
+          cursor: debugMode ? "pointer" : undefined,
+        }}
+        onClick={() => {
+          if (!debugMode) return
+
+          const clipText = String(timestamp)
+          navigator.clipboard.writeText(clipText)
+
+          setCopied(true)
+
+          setTimeout(() => {
+            setCopied(false)
+          }, 1_000)
+        }}
+      >
         {relative ? (
           <span>{formatDateRelative(timestamp)}</span>
         ) : (
@@ -75,7 +96,7 @@ export function TimestampBlock(props: TimestampBlockProps) {
             )}
           </>
         )}
-      </span>
+      </Box>
     </Tooltip>
   )
 }

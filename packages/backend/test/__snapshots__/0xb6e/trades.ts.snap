@@ -1,6 +1,6 @@
 [
   {
-    "amount": 0.05579850139,
+    "amount": "0.05579850139",
     "assetId": "arbitrum-one:0x0000000000000000000000000000000000000000:ETH",
     "auditLogIds": [
       "3583443605_0x00754db826a7bd4015bad25889c74ab4ea7ca8833580bbd17647e5f45f13a4d1_INTERNAL_62_VALUE_0",
@@ -98,7 +98,7 @@
       "3583443605_0xf602ee58b2a159ba344fb51a79a2d0c0a862b95fc5bca1bb705f39162d4bc0a4_INTERNAL_31_VALUE_0",
       "3583443605_0xf7480d4bda2c66345b675b2349bf3bd5ef24a49c7ba637c55f0220ecbd85c0c0_INTERNAL_66_VALUE_0",
     ],
-    "balance": 0.05579850139,
+    "balance": "0.05579850139",
     "cost": [],
     "createdAt": 1709544417000,
     "deposits": [
@@ -866,7 +866,7 @@
     ],
   },
   {
-    "amount": 1861.1648677664375,
+    "amount": "1861.16486776644",
     "assetId": "arbitrum-one:0x912CE59144191C1204E64559FE8253a0e49E6548:ARB",
     "auditLogIds": [
       "3583443605_0x03c47a3c8f7194ac3b5c230112d3928d9fbb33f2807a3f0ec72475be5c1f0613_ERC20_61_TRANSFER_61",
@@ -891,7 +891,7 @@
       "3583443605_0xebd595fb635f38e339e4d9c1b94c8b6e24371d4493564895b38c0bf6120d21a7_ERC20_36_TRANSFER_36",
       "3583443605_0xee2bd91753e6b5c497073c8c504eb172cce026bcd29c0778b7b2a1b26a8461f9_ERC20_49_TRANSFER_49",
     ],
-    "balance": 1861.1648677664375,
+    "balance": "1861.16486776644",
     "cost": [
       [
         "arbitrum-one:0xaf88d065e77c8cC2239327C5EDb3A432268e5831:USDC",
@@ -1077,7 +1077,7 @@
     ],
   },
   {
-    "amount": 487.130424,
+    "amount": "487.130424",
     "assetId": "arbitrum-one:0xaf88d065e77c8cC2239327C5EDb3A432268e5831:USDC",
     "auditLogIds": [
       "3583443605_0x17274646e636459732661a66b1963f1681fb68583b9f0e87813eafb92bb3d03e_ERC20_16_TRANSFER_16",
@@ -1097,7 +1097,7 @@
       "3583443605_0xf95d4e5c5b6f56f5419e7ff37d53d07435c24e89e624cf4e4f8c5b4c00aa1290_ERC20_3_TRANSFER_3",
       "3583443605_0xfd0413148906a8a4e47260b1ac0e9891b4a56aa0eeec309fdff27bf4dca7f733_ERC20_5_TRANSFER_5",
     ],
-    "balance": 0,
+    "balance": "0",
     "closedAt": 1728040374000,
     "cost": [],
     "createdAt": 1713907691000,
@@ -1243,7 +1243,7 @@
     ],
   },
   {
-    "amount": 807.641687,
+    "amount": "807.641687",
     "assetId": "arbitrum-one:0xaf88d065e77c8cC2239327C5EDb3A432268e5831:USDC",
     "auditLogIds": [
       "3583443605_0x03c47a3c8f7194ac3b5c230112d3928d9fbb33f2807a3f0ec72475be5c1f0613_ERC20_60_TRANSFER_60",
@@ -1271,7 +1271,7 @@
       "3583443605_0xf82e602bb813985a9ccd85a8e8c0143093565554387137dbe00c7b2452698e97_ERC20_40_TRANSFER_40",
       "3583443605_0xfa7033698a97c1a7a5d1432f0ea99878a367069c45f9b881d48e053f59ec36d0_ERC20_46_TRANSFER_46",
     ],
-    "balance": 0,
+    "balance": "0",
     "closedAt": 1732631367000,
     "cost": [],
     "createdAt": 1729748434000,
@@ -1481,7 +1481,7 @@
     ],
   },
   {
-    "amount": 14.717481,
+    "amount": "14.717481",
     "assetId": "arbitrum-one:0xaf88d065e77c8cC2239327C5EDb3A432268e5831:USDC",
     "auditLogIds": [
       "3583443605_0x49e462a94fdfbeb7ac256da2206f0f1c319e2bab7d8a0dfe98bab1330f3d0748_ERC20_80_TRANSFER_80",
@@ -1492,7 +1492,7 @@
       "3583443605_0xeae452fc2548cd2328db54eeeede9cd0785a73b821d881572549d5d527583974_ERC20_72_TRANSFER_72",
       "3583443605_0xf63b5a43911ddd69b9f6c2fc05b0e2785b7c7adcf05eacae525e739cdbf84d38_ERC20_74_TRANSFER_74",
     ],
-    "balance": 14.717481,
+    "balance": "14.717481",
     "cost": [],
     "createdAt": 1743799729000,
     "deposits": [
@@ -1563,13 +1563,13 @@
     ],
   },
   {
-    "amount": 2.01,
+    "amount": "2.01",
     "assetId": "arbitrum-one:0x4F604735c1cF31399C6E711D5962b2B3E0225AD3:USDGLO",
     "auditLogIds": [
       "3583443605_0x49b42e87926fe90831eac418357f69ba44a205c2b93e82332d1b579da0e066f5_ERC20_76_TRANSFER_76",
       "3583443605_0x9b2f8728100accd8d9ad519b0e3ec5da5cfc359e94d4e6fb66a8a592616d832b_ERC20_77_TRANSFER_77",
     ],
-    "balance": 2.01,
+    "balance": "2.01",
     "cost": [],
     "createdAt": 1744711497000,
     "deposits": [

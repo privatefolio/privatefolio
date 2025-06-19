@@ -6,7 +6,9 @@ import React, { MutableRefObject, useCallback, useEffect, useMemo, useState } fr
 import { AttentionBlock } from "src/components/AttentionBlock"
 import { SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
+import { $inspectTime } from "src/stores/pages/balances-store"
 import { closeSubscription } from "src/utils/browser-utils"
+import { ONE_DAY } from "src/utils/formatting-utils"
 
 import {
   QueryTableData,
@@ -32,6 +34,7 @@ export function TransactionTable(props: TransactionsTableProps) {
   const [refresh, setRefresh] = useState(0)
   const connectionStatus = useStore($connectionStatus)
   const rpc = useStore($rpc)
+  const inspectTime = useStore($inspectTime)
 
   useEffect(() => {
     const subscription = rpc.subscribeToTransactions(
@@ -89,6 +92,11 @@ export function TransactionTable(props: TransactionsTableProps) {
           "INNER JOIN trade_transactions ON transactions.id = trade_transactions.transaction_id"
       }
 
+      if (inspectTime) {
+        filterConditions.push(`timestamp <= ${inspectTime + ONE_DAY}`)
+        filterConditions.push(`timestamp >= ${inspectTime}`)
+      }
+
       // Construct the filterQuery
       let filterQuery = ""
       if (filterConditions.length > 0) {
@@ -116,7 +124,7 @@ export function TransactionTable(props: TransactionsTableProps) {
           ),
       ]
     },
-    [accountName, assetId, refresh, tableDataRef, rpc, tradeId]
+    [accountName, assetId, refresh, tableDataRef, rpc, tradeId, inspectTime]
   )
 
   const headCells = useMemo<HeadCell<Transaction>[]>(

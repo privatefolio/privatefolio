@@ -1,11 +1,11 @@
 [
   {
-    "amount": 0.001196905052533791,
+    "amount": "0.00119690505253379",
     "assetId": "ethereum:0xdb25cA703181E7484a155DD612b06f57E12Be5F0:yvYFI",
     "auditLogIds": [
       "4118854677_0xd5c5e34d06b4bc5f39a4d86b30196ad2d17fad786138d4056ea102dfd17769b2_ERC20_427_TRANSFER_427",
     ],
-    "balance": 0.001196905052533791,
+    "balance": "0.00119690505253379",
     "cost": [
       [
         "ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2:WETH",

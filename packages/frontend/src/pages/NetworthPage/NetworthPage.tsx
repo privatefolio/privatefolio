@@ -96,7 +96,7 @@ export default function NetworthPage() {
               Balances{" "}
               {inspectTime !== undefined && (
                 <Typography variant="caption" color="text.secondary">
-                  at {formatDate(inspectTime)}
+                  on {formatDate(inspectTime)}
                 </Typography>
               )}
             </span>
