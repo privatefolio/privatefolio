@@ -3,6 +3,16 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.5 - 2025/06/20
+
+### 💡 Feature updates
+
+- Split app bundle into multiple files to improve loading performance.
+
+### 🐛 Bug Fixes
+
+- Fix bug in `ExtensionPage` where the help (How to use) section was not rendering at all.
+
 ## v2.0.0-beta.4 - 2025/06/20
 
 ### 💡 Feature updates
