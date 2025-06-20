@@ -14,7 +14,7 @@ export function Subheading({ sx = {}, ...rest }: TypographyProps) {
           paddingY: 0.25,
         },
         fontWeight: 500,
-        letterSpacing: 0.66,
+        letterSpacing: { sm: "0.0375rem", xs: 0 },
         minHeight: 45,
         paddingLeft: 2,
         ...sx,

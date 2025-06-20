@@ -840,6 +840,9 @@ export const theme: CssVarsThemeOptions = {
         h5: {
           lineHeight: 1.25,
         },
+        h6: {
+          fontSize: "1.125rem",
+        },
       },
     },
   },

@@ -1,3 +1,4 @@
+import { useMediaQuery } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useCallback, useMemo } from "react"
 import { SqlParam, Time, Timestamp } from "src/interfaces"
@@ -103,15 +104,17 @@ export function AssetBalanceHistory(props: AssetBalanceHistoryProps) {
     [rpc, activeAccount, assetId, start, end, showQuotedAmounts]
   )
 
+  const isMobile = useMediaQuery("(max-width: 599px)")
+
   const chartOptions = useMemo(
     () => ({
       localization: {
         priceFormatter: showQuotedAmounts
-          ? createValueFormatter(currency)
+          ? createValueFormatter(currency, isMobile)
           : createNativeAmountFormatter(getAssetTicker(assetId)),
       },
     }),
-    [showQuotedAmounts, currency, assetId]
+    [showQuotedAmounts, currency, assetId, isMobile]
   )
 
   const tooltipOptions = useMemo(

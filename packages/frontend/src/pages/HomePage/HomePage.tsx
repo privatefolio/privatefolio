@@ -23,7 +23,7 @@ export default function HomePage() {
           <NavTab value="pnl" to="?tab=pnl" label="Profit & loss" />
           <NavTab value="deposits" to="?tab=deposits" label="Deposits" />
         </Tabs>
-        {tab === "networth" && <NetworthActions />}
+        <NetworthActions />
       </Stack>
       {tab === "networth" && <NetworthPage />}
       {tab === "pnl" && <PnLPage />}

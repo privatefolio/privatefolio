@@ -33,10 +33,10 @@ export function BreakdownChart() {
   const chartOptions = useMemo(
     () => ({
       localization: {
-        priceFormatter: createValueFormatter(currency),
+        priceFormatter: createValueFormatter(currency, isMobile),
       },
     }),
-    [currency]
+    [currency, isMobile]
   )
 
   const debugMode = useStore($debugMode)
