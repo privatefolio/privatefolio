@@ -42,7 +42,8 @@ const defaultOptions: DeltaTooltipPrimitiveOptions = {
       return [0, ""]
     }
 
-    const minimumFractionDigits = significantDigits || getDecimalPrecision(value)
+    const minimumFractionDigits =
+      typeof significantDigits === "number" ? significantDigits : getDecimalPrecision(value)
 
     return [
       value,

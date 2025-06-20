@@ -86,7 +86,8 @@ const defaultOptions: TooltipPrimitiveOptions = {
       return ""
     }
 
-    const minimumFractionDigits = significantDigits || getDecimalPrecision(value)
+    const minimumFractionDigits =
+      typeof significantDigits === "number" ? significantDigits : getDecimalPrecision(value)
 
     return formatNumber(value, {
       maximumFractionDigits: minimumFractionDigits,

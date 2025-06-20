@@ -79,7 +79,8 @@ const defaultOptions: TooltipPrimitiveOptions = {
         const assetName = d.assets[index]
         const assetColor = stringToColor(assetName)
 
-        const minimumFractionDigits = significantDigits || getDecimalPrecision(value)
+        const minimumFractionDigits =
+          typeof significantDigits === "number" ? significantDigits : getDecimalPrecision(value)
         const formattedValue = formatNumber(value, {
           maximumFractionDigits: minimumFractionDigits,
           minimumFractionDigits,
