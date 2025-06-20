@@ -11,7 +11,7 @@ export const $filterOptionsMap = map<FilterOptionsMap>()
 export const $assetMap = map<Record<string, MyAsset>>({})
 export const $addressBook = map<Record<string, string>>({})
 export const $tags = map<Record<string, string>>({})
-export const $myPlatforms = map<Record<string, Platform>>({})
+export const $platformMap = map<Record<string, Platform>>({})
 
 export const $inMemoryDataQueryTime = atom<number | null>(null)
 
@@ -19,7 +19,7 @@ keepMount($assetMap)
 keepMount($filterOptionsMap)
 keepMount($addressBook)
 
-logAtoms({ $addressBook, $assetMap, $filterOptionsMap, $myPlatforms })
+logAtoms({ $addressBook, $assetMap, $filterOptionsMap, $platformMap })
 
 export async function fetchInMemoryData(rpc: RPC, accountName: string) {
   const start = Date.now()
@@ -37,11 +37,11 @@ export async function fetchInMemoryData(rpc: RPC, accountName: string) {
 
   $inMemoryDataQueryTime.set(Date.now() - start)
 
-  const assetsMap: Record<string, MyAsset> = assets.reduce((acc, asset) => {
+  const assetMap: Record<string, MyAsset> = assets.reduce((acc, asset) => {
     acc[asset.id] = asset
     return acc
   }, {})
-  $assetMap.set(assetsMap)
+  $assetMap.set(assetMap)
 
   const assetIds = assets
     .map((x) => x.id)
@@ -59,11 +59,11 @@ export async function fetchInMemoryData(rpc: RPC, accountName: string) {
   }, {})
   $tags.set(tagsMap)
 
-  const platformsMap: Record<string, Platform> = platforms.reduce((acc, platform) => {
+  const platformMap: Record<string, Platform> = platforms.reduce((acc, platform) => {
     acc[platform.id] = platform
     return acc
   }, {})
-  $myPlatforms.set(platformsMap)
+  $platformMap.set(platformMap)
 
   const map: FilterOptionsMap = {
     assetId: assetIds,
@@ -125,8 +125,8 @@ export function getAddressBookEntry(value: string) {
 export function getFilterValueLabel(value: string | number | undefined) {
   if (value === undefined) return ""
 
-  if (value in $myPlatforms.get()) {
-    return $myPlatforms.get()[value].name
+  if (value in $platformMap.get()) {
+    return $platformMap.get()[value].name
   }
 
   if (typeof value === "number" || parseInt(value) in $tags.get()) {
@@ -145,6 +145,7 @@ export function getFilterValueLabel(value: string | number | undefined) {
   if (value === "connection") return "Connection"
   if (value === "price-api") return "Price API"
   if (value === "metadata") return "Metadata"
+  if (value === "coingecko") return "Coingecko"
 
   if (value === "open") return "Open"
   if (value === "closed") return "Closed"

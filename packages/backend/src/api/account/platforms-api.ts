@@ -1,5 +1,6 @@
 import { access, mkdir, readFile, writeFile } from "fs/promises"
 import { CACHE_LOCATION } from "src/settings/settings"
+import { isBlockchain, isExchange } from "src/utils/utils"
 
 import {
   getCoingeckoAssetPlatforms,
@@ -127,14 +128,28 @@ export function enqueueRefetchPlatforms(accountName: string, trigger: TaskTrigge
   })
 }
 
-export async function findPlatforms(query: string, limit = 5): Promise<FindPlatformsResult> {
+export async function findPlatforms(
+  accountName: string,
+  query: string,
+  limit = 5,
+  searchSet: "coingecko" | "my-platforms" = "coingecko"
+): Promise<FindPlatformsResult> {
   const normalizedQuery = query.toLowerCase().trim()
 
   if (!normalizedQuery) {
     return { blockchains: [], exchanges: [] }
   }
 
-  const [blockchains, exchanges] = await Promise.all([getBlockchains(), getExchanges()])
+  let blockchains: Blockchain[] = []
+  let exchanges: Exchange[] = []
+
+  if (searchSet === "coingecko") {
+    [blockchains, exchanges] = await Promise.all([getBlockchains(), getExchanges()])
+  } else {
+    const myPlatforms = await getMyPlatforms(accountName)
+    blockchains = myPlatforms.filter((platform) => isBlockchain(platform))
+    exchanges = myPlatforms.filter((platform) => isExchange(platform))
+  }
 
   const matchingBlockchains: Blockchain[] = []
   for (const blockchain of blockchains) {

@@ -17,7 +17,7 @@ import { DrawerHeader } from "src/components/DrawerHeader"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TRANSACTIONS_TYPES, TransactionType } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
-import { $assetMap, $myPlatforms } from "src/stores/metadata-store"
+import { $assetMap, $platformMap } from "src/stores/metadata-store"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { asUTC } from "src/utils/formatting-utils"
 import { $rpc } from "src/workers/remotes"
@@ -113,8 +113,8 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
     ]
   )
 
-  const platformsMap = useStore($myPlatforms)
-  const platforms = useMemo(() => Object.values(platformsMap), [platformsMap])
+  const platformMap = useStore($platformMap)
+  const platforms = useMemo(() => Object.values(platformMap), [platformMap])
 
   useEffect(() => {
     if (open) return

@@ -11,6 +11,7 @@ import {
   DownloadRounded,
   PhishingRounded,
   RestoreRounded,
+  StarRounded,
   Workspaces,
 } from "@mui/icons-material"
 import {
@@ -31,6 +32,7 @@ import { useNavigate } from "react-router-dom"
 import { Asset, FindPlatformsResult, RichExtension, Transaction } from "src/interfaces"
 import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
+import { getAssetPlatform } from "src/utils/assets-utils"
 import {
   handleBackupRequest,
   handleExportAuditLogsRequest,
@@ -42,6 +44,7 @@ import { normalizeTxHash } from "src/utils/parsing-utils"
 import { noop } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
+import { $assetMap, $platformMap, getFilterValueLabel } from "../../stores/metadata-store"
 import { AssetAvatar } from "../AssetAvatar"
 import { ExtensionAvatar } from "../ExtensionAvatar"
 import { TransactionIcon } from "../icons"
@@ -57,7 +60,7 @@ const SECTIONS = {
   assets: { name: "Assets", priority: 8 },
   blockchains: { name: "Blockchains", priority: 6 },
   exchanges: { name: "Exchanges", priority: 7 },
-  extensions: { name: "Extensions", priority: 9 },
+  extensions: { name: "Extensions", priority: 5 },
   transactions: { name: "Transactions", priority: 11 },
 }
 
@@ -66,6 +69,8 @@ export const SearchBar = () => {
   const activeAccountPath = useStore($activeAccountPath)
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
+  const assetMap = useStore($assetMap)
+  const platformMap = useStore($platformMap)
 
   const {
     showing,
@@ -101,15 +106,16 @@ export const SearchBar = () => {
 
       try {
         setAssetsLoading(true)
-        const assets = await rpc.findAssets(searchQuery)
-        setAssetsFound(assets)
+        const assets = await rpc.findAssets(activeAccount, searchQuery, 5, false, "coingecko")
+        const myAssets = await rpc.findAssets(activeAccount, searchQuery, 5, false, "my-assets")
+        setAssetsFound([...myAssets, ...assets])
       } catch {
         setAssetsFound([])
       } finally {
         setAssetsLoading(false)
       }
     })()
-  }, [searchQuery, rpc])
+  }, [searchQuery, rpc, activeAccount])
 
   useEffect(() => {
     setTxnsFound([])
@@ -139,15 +145,19 @@ export const SearchBar = () => {
 
       try {
         setPlatformsLoading(true)
-        const platforms = await rpc.findPlatforms(searchQuery)
-        setPlatformsFound(platforms)
+        const platforms = await rpc.findPlatforms(activeAccount, searchQuery, 5, "coingecko")
+        const myPlatforms = await rpc.findPlatforms(activeAccount, searchQuery, 5, "my-platforms")
+        setPlatformsFound({
+          blockchains: [...myPlatforms.blockchains, ...platforms.blockchains],
+          exchanges: [...myPlatforms.exchanges, ...platforms.exchanges],
+        })
       } catch {
         setPlatformsFound({ blockchains: [], exchanges: [] })
       } finally {
         setPlatformsLoading(false)
       }
     })()
-  }, [searchQuery, rpc])
+  }, [searchQuery, rpc, activeAccount])
 
   useEffect(() => {
     setExtensionsFound([])
@@ -205,7 +215,7 @@ export const SearchBar = () => {
       actions.push({
         icon: <PlatformAvatar src={blockchain.image} alt={blockchain.name} size="snug" />,
         id: `blockchain-${blockchain.id}`,
-        keywords: `${blockchain.name} ${blockchain.id} ${blockchain.chainId} blockchain`,
+        keywords: `${blockchain.name} ${blockchain.id} ${blockchain.chainId} blockchain ${platformMap[blockchain.id] ? "favorite" : ""}`,
         name: blockchain.name,
         perform: () => navigate(`${activeAccountPath}/platform/${blockchain.id}`),
         priority: -(blockchain.chainId ?? Infinity),
@@ -217,7 +227,7 @@ export const SearchBar = () => {
       actions.push({
         icon: <PlatformAvatar src={exchange.image} alt={exchange.name} size="snug" />,
         id: `exchange-${exchange.id}`,
-        keywords: `${exchange.name} ${exchange.id} exchange`, // ${exchange.country} TODO7
+        keywords: `${exchange.name} ${exchange.id} exchange ${platformMap[exchange.id] ? "favorite" : ""}`, // ${exchange.country} TODO7
         name: exchange.name,
         perform: () => navigate(`${activeAccountPath}/platform/${exchange.id}`),
         priority: -(exchange.coingeckoTrustRank ?? Infinity),
@@ -226,13 +236,14 @@ export const SearchBar = () => {
     })
 
     return actions
-  }, [platformsFound, navigate, activeAccountPath])
+  }, [platformsFound, navigate, activeAccountPath, platformMap])
 
   const assetActions = useMemo<Action[]>(() => {
     return assetsFound.map((asset) => ({
       icon: <AssetAvatar src={asset.logoUrl} alt={asset.symbol} size="snug" />,
       id: `asset-${asset.id}`,
       keywords: [
+        assetMap[asset.id] ? "favorite" : "",
         asset.name,
         asset.id,
         asset.symbol,
@@ -243,11 +254,13 @@ export const SearchBar = () => {
         .join(" "),
       name: asset.symbol.toUpperCase(),
       perform: () => navigate(`${activeAccountPath}/asset/${asset.id}`),
-      priority: -(asset.marketCapRank ?? Infinity),
+      priority: -(asset.marketCapRank ?? Infinity) + (assetMap[asset.id] ? 1 : 0),
       section: SECTIONS.assets,
-      subtitle: asset.name,
+      subtitle: assetMap[asset.id]
+        ? `${asset.name || "Unknown"} • ${getFilterValueLabel(getAssetPlatform(asset.id))}`
+        : asset.name,
     }))
-  }, [assetsFound, navigate, activeAccountPath])
+  }, [assetsFound, navigate, activeAccountPath, assetMap])
 
   const extensionActions = useMemo<Action[]>(() => {
     const actions: Action[] = []
@@ -528,6 +541,13 @@ function RenderResults({ loading }: { loading: boolean }) {
                       })}
                     </>
                   }
+                  primaryTypographyProps={{ variant: "caption" }}
+                  sx={{ textAlign: "right" }}
+                />
+              )}
+              {item.keywords && item.keywords.includes("favorite") && (
+                <ListItemText
+                  primary={<StarRounded sx={{ fontSize: "1rem" }} />}
                   primaryTypographyProps={{ variant: "caption" }}
                   sx={{ textAlign: "right" }}
                 />

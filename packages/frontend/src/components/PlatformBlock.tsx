@@ -2,7 +2,7 @@ import { Box, Stack } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { Platform } from "src/interfaces"
-import { $myPlatforms } from "src/stores/metadata-store"
+import { $platformMap } from "src/stores/metadata-store"
 import { MonoFont } from "src/theme"
 import { $rpc } from "src/workers/remotes"
 
@@ -20,20 +20,20 @@ export function PlatformBlock(props: PlatformBlockProps) {
   const [platform, setPlatform] = useState<Platform | undefined>(cachedValue)
   const rpc = useStore($rpc)
 
-  const platformsMap = useStore($myPlatforms)
+  const platformMap = useStore($platformMap)
 
   useEffect(() => {
     if (!id) return
 
-    if (platformsMap[id]) {
-      setPlatform(platformsMap[id])
+    if (platformMap[id]) {
+      setPlatform(platformMap[id])
       return
     }
 
     if (!cachedValue) {
       rpc.getPlatform(id).then(setPlatform)
     }
-  }, [id, cachedValue, rpc, platformsMap])
+  }, [id, cachedValue, rpc, platformMap])
 
   if (!platform) return null
 

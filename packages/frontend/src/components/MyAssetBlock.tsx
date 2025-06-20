@@ -1,7 +1,7 @@
 import { Stack } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { ReactNode } from "react"
-import { $assetMap, $myPlatforms } from "src/stores/metadata-store"
+import { $assetMap, $platformMap } from "src/stores/metadata-store"
 import { getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
 
 import { AssetAvatar, AssetAvatarProps } from "./AssetAvatar"
@@ -22,7 +22,7 @@ export function MyAssetBlock(props: MyAssetBlockProps) {
   const { id: assetId, primary = getAssetTicker(assetId), secondary, showPlatform, ...rest } = props
 
   const assetMap = useStore($assetMap, { keys: assetId ? [assetId] : [] })
-  const myPlatforms = useStore($myPlatforms, { keys: assetId ? [getAssetPlatform(assetId)] : [] })
+  const platformMap = useStore($platformMap, { keys: assetId ? [getAssetPlatform(assetId)!] : [] })
 
   return (
     <Stack
@@ -42,7 +42,7 @@ export function MyAssetBlock(props: MyAssetBlockProps) {
         <Truncate>
           {primary}
           {showPlatform && assetId && getAssetPlatform(assetId) !== "ethereum" && (
-            <CaptionText> - {myPlatforms[getAssetPlatform(assetId)]?.name}</CaptionText>
+            <CaptionText> - {platformMap[getAssetPlatform(assetId)!]?.name}</CaptionText>
           )}
         </Truncate>
         {secondary && <CaptionText>{secondary}</CaptionText>}

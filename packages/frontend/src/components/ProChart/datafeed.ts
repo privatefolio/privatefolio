@@ -164,7 +164,7 @@ export const datafeed: IBasicDataFeed = {
     }
 
     const rpc = $rpc.get()
-    const assets = await rpc.findAssets(userInput, 100, true)
+    const assets = await rpc.findAssets($activeAccount.get(), userInput, 100, true)
 
     for (const asset of assets) {
       for (const priceApiId of allPriceApiIds) {

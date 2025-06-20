@@ -162,10 +162,16 @@ export async function patchAsset(accountName: string, id: string, patch: Partial
   await upsertAsset(accountName, newValue)
 }
 
-export async function findAssets(query: string, limit = 5, strict = false): Promise<Asset[]> {
+export async function findAssets(
+  accountName: string,
+  query: string,
+  limit = 5,
+  strict = false,
+  searchSet: "coingecko" | "my-assets" = "coingecko"
+): Promise<Asset[]> {
   const normalizedQuery = query.toLowerCase().trim()
 
-  const assets = await getAssets()
+  const assets = searchSet === "coingecko" ? await getAssets() : await getMyAssets(accountName)
 
   if (normalizedQuery === "") {
     return assets.slice(0, limit)
@@ -193,7 +199,7 @@ export async function findAssets(query: string, limit = 5, strict = false): Prom
 
     if (
       asset.id.toLowerCase().includes(normalizedQuery) ||
-      asset.name.toLowerCase().includes(normalizedQuery) ||
+      asset.name?.toLowerCase().includes(normalizedQuery) ||
       asset.coingeckoId?.toLowerCase().includes(normalizedQuery)
     ) {
       matchingAssets.push(asset)
