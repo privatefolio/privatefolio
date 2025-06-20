@@ -3,6 +3,15 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.4 - 2025/06/20
+
+### 💡 Feature updates
+
+- New `Pro Chart` feature, allowing users to use advanced tradingview features like drawing tools, indicators, etc.
+- New `Deposits` feature, allowing users to view their historical deposits and withdrawals.
+- Improve search bar to highlight assets and platforms from the user's portfolio.
+- Improve mobile UI/UX and responsiveness across the app.
+
 ## v2.0.0-beta.3 - 2025/06/18
 
 ### 💡 Feature updates
