@@ -118,15 +118,6 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             avatar={<HomeRounded fontSize="small" />}
           />
           <NavMenuItem
-            value="assets"
-            to={`${activeAccountPath}/assets`}
-            label="Assets"
-            aria-label="Visit Assets"
-            onClick={toggleOpen}
-            shortcutKey="a"
-            avatar={<Workspaces fontSize="small" />}
-          />
-          <NavMenuItem
             value="trades"
             to={`${activeAccountPath}/trades`}
             label="Trades"
@@ -134,6 +125,15 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             onClick={toggleOpen}
             shortcutKey="r"
             avatar={<CandlestickChartRounded fontSize="small" />}
+          />
+          <NavMenuItem
+            value="assets"
+            to={`${activeAccountPath}/assets`}
+            label="Assets"
+            aria-label="Visit Assets"
+            onClick={toggleOpen}
+            shortcutKey="a"
+            avatar={<Workspaces fontSize="small" />}
           />
           <NavMenuItem
             value="transactions"
