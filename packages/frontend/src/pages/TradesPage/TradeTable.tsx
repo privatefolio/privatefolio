@@ -71,6 +71,7 @@ export function TradeTable(props: TradesTableProps) {
 
       if (inspectTime) {
         filterConditions.push(`createdAt <= ${inspectTime}`)
+        filterConditions.push(`(closedAt >= ${inspectTime} OR closedAt IS NULL)`)
       }
 
       let filterQuery = ""
