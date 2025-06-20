@@ -1,5 +1,5 @@
 import {
-  Link,
+  Chip,
   Paper,
   Stack,
   Table,
@@ -8,6 +8,7 @@ import {
   TableHead,
   TableRow,
   Typography,
+  useMediaQuery,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { lazy, Suspense, useEffect, useMemo, useState } from "react"
@@ -16,6 +17,7 @@ import { ActionBlock } from "src/components/ActionBlock"
 import { BackButton } from "src/components/BackButton"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { ExtensionAvatar } from "src/components/ExtensionAvatar"
+import { ExternalLink } from "src/components/ExternalLink"
 import { GitHubUserBlock } from "src/components/GitHubUserBlock"
 import { NavTab } from "src/components/NavTab"
 import { PlatformBlock } from "src/components/PlatformBlock"
@@ -36,6 +38,7 @@ export default function ExtensionPage() {
   const { extensionId } = useParams<{ extensionId: string }>()
   const [searchParams] = useSearchParams()
   const tab = searchParams.get("tab") || "details"
+  const isTablet = useMediaQuery("(max-width: 899px)")
 
   const [extension, setExtension] = useState<RichExtension | null | undefined>(undefined)
   const [isLoading, setIsLoading] = useState(true)
@@ -183,39 +186,53 @@ export default function ExtensionPage() {
         {tab === "source" && (
           <>
             {extension.sources && extension.sources.length > 0 ? (
-              <Paper sx={{ alignSelf: "flex-start", paddingY: 0.5 }}>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ minWidth: 300, width: 400 }}>
-                        <SectionTitle>Link</SectionTitle>
-                      </TableCell>
-                      <TableCell sx={{ minWidth: 150, width: 200 }}>
-                        <SectionTitle>Tags</SectionTitle>
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {extension.sources.map((source, index) => (
-                      <TableRow key={index}>
-                        <TableCell>
-                          <Link
-                            href={source.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            underline="hover"
-                          >
-                            {prettifyUrl(source.url)}
-                          </Link>
+              isTablet ? (
+                <Stack gap={0.5}>
+                  {extension.sources.map((source, index) => (
+                    <Paper key={index} sx={{ padding: 1 }}>
+                      <Stack gap={1}>
+                        <ExternalLink href={source.url}>{prettifyUrl(source.url)}</ExternalLink>
+                        {source.tags && source.tags.length > 0 && (
+                          <div>
+                            <Chip
+                              size="small"
+                              sx={{ borderRadius: 2 }}
+                              label={source.tags.join(", ")}
+                            />
+                          </div>
+                        )}
+                      </Stack>
+                    </Paper>
+                  ))}
+                </Stack>
+              ) : (
+                <Paper>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell sx={{ width: "70%" }}>
+                          <SectionTitle>Link</SectionTitle>
                         </TableCell>
-                        <TableCell>
-                          {source.tags && source.tags.length > 0 ? source.tags.join(", ") : "-"}
+                        <TableCell sx={{ width: "30%" }}>
+                          <SectionTitle>Tags</SectionTitle>
                         </TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Paper>
+                    </TableHead>
+                    <TableBody>
+                      {extension.sources.map((source, index) => (
+                        <TableRow key={index}>
+                          <TableCell>
+                            <ExternalLink href={source.url}>{prettifyUrl(source.url)}</ExternalLink>
+                          </TableCell>
+                          <TableCell>
+                            {source.tags && source.tags.length > 0 ? source.tags.join(", ") : "-"}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Paper>
+              )
             ) : (
               <Paper sx={{ paddingX: 2, paddingY: 1 }}>
                 <Typography>Source code not available.</Typography>

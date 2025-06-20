@@ -34,6 +34,20 @@ export const extensions: Extension[] = [
     id: "coingecko-metadata",
     platformIds: [],
     publishedAt: new Date("2025-06-01").getTime(),
+    sources: [
+      {
+        tags: ["assets"],
+        url: "https://github.com/privatefolio/privatefolio/tree/main/packages/backend/src/api/account/assets-api.ts",
+      },
+      {
+        tags: ["platforms"],
+        url: "https://github.com/privatefolio/privatefolio/tree/main/packages/backend/src/api/account/platforms-api.ts",
+      },
+      {
+        tags: ["cache"],
+        url: "https://github.com/privatefolio/coingecko",
+      },
+    ],
     updatedAt: new Date("2025-06-01").getTime(),
   },
   {
@@ -244,6 +258,20 @@ export const extensions: Extension[] = [
     id: "binance-price-api",
     platformIds: ["binance"],
     publishedAt: new Date("2025-06-01").getTime(),
+    sources: [
+      {
+        tags: ["root"],
+        url: "https://github.com/privatefolio/privatefolio/tree/main/packages/backend/src/extensions/prices/binance-price-api.ts",
+      },
+      {
+        tags: ["config"],
+        url: "https://github.com/privatefolio/privatefolio/tree/main/packages/backend/src/settings/price-apis.ts",
+      },
+      {
+        tags: ["tests"],
+        url: "https://github.com/privatefolio/privatefolio/tree/main/packages/backend/test/daily-prices/binance-price-api.test.ts",
+      },
+    ],
     updatedAt: new Date("2025-06-01").getTime(),
   },
   {
@@ -257,6 +285,20 @@ export const extensions: Extension[] = [
     id: "coinbase-price-api",
     platformIds: ["gdax"],
     publishedAt: new Date("2025-06-01").getTime(),
+    sources: [
+      {
+        tags: ["root"],
+        url: "https://github.com/privatefolio/privatefolio/tree/main/packages/backend/src/extensions/prices/coinbase-price-api.ts",
+      },
+      {
+        tags: ["config"],
+        url: "https://github.com/privatefolio/privatefolio/tree/main/packages/backend/src/settings/price-apis.ts",
+      },
+      {
+        tags: ["tests"],
+        url: "https://github.com/privatefolio/privatefolio/tree/main/packages/backend/test/daily-prices/coinbase-price-api.test.ts",
+      },
+    ],
     updatedAt: new Date("2025-06-01").getTime(),
   },
   {
@@ -270,6 +312,20 @@ export const extensions: Extension[] = [
     id: "defi-llama-price-api",
     platformIds: [],
     publishedAt: new Date("2025-06-01").getTime(),
+    sources: [
+      {
+        tags: ["root"],
+        url: "https://github.com/privatefolio/privatefolio/tree/main/packages/backend/src/extensions/prices/llama-price-api.ts",
+      },
+      {
+        tags: ["config"],
+        url: "https://github.com/privatefolio/privatefolio/tree/main/packages/backend/src/settings/price-apis.ts",
+      },
+      {
+        tags: ["tests"],
+        url: "https://github.com/privatefolio/privatefolio/tree/main/packages/backend/test/daily-prices/llama-price-api.test.ts",
+      },
+    ],
     updatedAt: new Date("2025-06-01").getTime(),
   },
   {
@@ -284,6 +340,20 @@ export const extensions: Extension[] = [
     id: "alchemy-price-api",
     platformIds: [],
     publishedAt: new Date("2025-06-11").getTime(),
+    sources: [
+      {
+        tags: ["root"],
+        url: "https://github.com/privatefolio/privatefolio/tree/main/packages/backend/src/extensions/prices/alchemy-price-api.ts",
+      },
+      {
+        tags: ["config"],
+        url: "https://github.com/privatefolio/privatefolio/tree/main/packages/backend/src/settings/price-apis.ts",
+      },
+      {
+        tags: ["tests"],
+        url: "https://github.com/privatefolio/privatefolio/tree/main/packages/backend/test/daily-prices/alchemy-price-api.test.ts",
+      },
+    ],
     updatedAt: new Date("2025-06-11").getTime(),
   },
 ]
