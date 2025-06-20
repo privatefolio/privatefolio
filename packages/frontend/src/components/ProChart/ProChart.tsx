@@ -1,4 +1,5 @@
 import { Box, useTheme } from "@mui/material"
+import { enqueueSnackbar } from "notistack"
 import React, { useEffect, useRef } from "react"
 
 import { candleStickOptions } from "../../utils/chart-utils"
@@ -9,7 +10,13 @@ import {
   widget as Widget,
 } from "./charting_library/charting_library"
 import { datafeed } from "./datafeed"
-import { EXCHANGE_DELIMITER, loadChartData, resetChartData, saveChartData } from "./pro-chart-utils"
+import {
+  EXCHANGE_DELIMITER,
+  loadChartData,
+  removeChartData,
+  resetWidget,
+  saveChartData,
+} from "./pro-chart-utils"
 
 const containerId = "tv_chart_container"
 const defaultSymbol = `privatefolio${EXCHANGE_DELIMITER}NETWORTH`
@@ -125,32 +132,65 @@ export default function ProChart() {
       // },
     })
 
-    const handleAutoSave = () => {
-      widgetRef.current?.save(saveChartData)
-    }
+    // const handleAutoSave = () => {
+    //   widgetRef.current?.save(saveChartData)
+    // }
 
-    widgetRef.current?.subscribe("onAutoSaveNeeded", handleAutoSave)
+    // widgetRef.current?.subscribe("onAutoSaveNeeded", handleAutoSave)
     // widgetRef.current?.subscribe("onPlusClick", console.log)
 
     widgetRef.current.headerReady().then(function () {
       widgetRef.current?.createButton({
         align: "right",
         onClick: () => {
-          resetChartData()
-          // TODO9
-          widgetRef.current?.activeChart().removeAllStudies()
-          widgetRef.current?.activeChart().setSymbol(defaultSymbol)
-          widgetRef.current?.activeChart().createStudy("Volume", true)
+          widgetRef.current?.save((chartData) => {
+            try {
+              saveChartData(chartData)
+              enqueueSnackbar("Chart layout saved", { variant: "success" })
+            } catch (error) {
+              console.error("Failed to save chart layout:", error)
+              enqueueSnackbar("Failed to save chart layout", { variant: "error" })
+            }
+          })
         },
-        text: "Reset chart",
-        title: "Reset the chart's auto saved state",
+        text: "Save",
+        title: "Save the chart state to local storage",
+        useTradingViewStyle: true,
+      })
+
+      widgetRef.current?.createButton({
+        align: "right",
+        onClick: () => {
+          try {
+            const savedData = loadChartData()
+            widgetRef.current?.load(savedData)
+            enqueueSnackbar("Chart layout loaded", { variant: "success" })
+          } catch (error) {
+            console.error("Failed to load chart layout:", error)
+            enqueueSnackbar("Could not load chart layout. Resetting.", { variant: "error" })
+            removeChartData()
+            resetWidget(widgetRef.current, defaultSymbol)
+          }
+        },
+        text: "Load",
+        title: "Load the chart state from local storage",
+        useTradingViewStyle: true,
+      })
+
+      widgetRef.current?.createButton({
+        align: "right",
+        onClick: () => {
+          resetWidget(widgetRef.current, defaultSymbol)
+        },
+        text: "Reset",
+        title: "Reset the chart state to its default values",
         useTradingViewStyle: true,
       })
     })
 
     return () => {
       try {
-        widgetRef.current?.unsubscribe("onAutoSaveNeeded", handleAutoSave)
+        // widgetRef.current?.unsubscribe("onAutoSaveNeeded", handleAutoSave)
         widgetRef.current?.remove()
         widgetRef.current = null
       } catch {}

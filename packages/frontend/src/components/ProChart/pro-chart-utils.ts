@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PRICE_API_MATCHER } from "privatefolio-backend/src/extensions/prices/providers"
 import { getBucketSize } from "privatefolio-backend/src/utils/utils"
 import { MyAsset, ResolutionString } from "src/interfaces"
@@ -6,7 +7,11 @@ import { getAssetTicker } from "src/utils/assets-utils"
 import { candleStickOptions } from "src/utils/chart-utils"
 import { resolveUrl } from "src/utils/utils"
 
-import { LibrarySymbolInfo, SearchSymbolResultItem } from "./charting_library/charting_library"
+import {
+  IChartingLibraryWidget,
+  LibrarySymbolInfo,
+  SearchSymbolResultItem,
+} from "./charting_library/charting_library"
 
 export const EXCHANGE_DELIMITER = "_"
 
@@ -63,7 +68,7 @@ export function toLibrarySymbol(asset: MyAsset, priceApiId: PriceApiId): Library
 
 export const CHART_DATA_KEY = "PRO_CHART_DATA"
 
-export const resetChartData = () => {
+export const removeChartData = () => {
   window.localStorage.removeItem(CHART_DATA_KEY)
 }
 
@@ -78,12 +83,8 @@ export const loadChartData = () => {
 
   const chartData = JSON.parse(rawChartData)
 
-  // TODO8 FIXME first time user
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   chartData.charts.forEach((chart: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     chart.panes.forEach((pane: any) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       pane.sources.forEach((source: any) => {
         if (source.type === "study_Volume") {
           source.state.palettes.volumePalette.colors = {
@@ -104,6 +105,14 @@ export const loadChartData = () => {
   })
 
   return chartData
+}
+
+export const resetWidget = (widget: IChartingLibraryWidget | null, defaultSymbol: string) => {
+  if (!widget) return
+  widget.activeChart().removeAllStudies()
+  widget.activeChart().setChartType(3)
+  widget.activeChart().setSymbol(defaultSymbol)
+  widget.activeChart().createStudy("Volume", true)
 }
 
 export function computeLimit(start: number, end: number, resolution: ResolutionString) {
