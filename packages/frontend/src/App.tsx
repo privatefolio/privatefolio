@@ -2,11 +2,12 @@ import { Box, Paper, Stack } from "@mui/material"
 import Container from "@mui/material/Container"
 import { useStore } from "@nanostores/react"
 import { throttle } from "lodash-es"
-import React, { useEffect } from "react"
+import React, { lazy, Suspense, useEffect } from "react"
 import { Navigate, Route, Routes } from "react-router-dom"
 
 import { AccountRouteGuard } from "./AccountRouteGuard"
 import { CircularSpinner } from "./components/CircularSpinner"
+import { DefaultSpinner } from "./components/DefaultSpinner"
 import { ErrorBoundary } from "./components/ErrorBoundary"
 import { ConnectionBanner } from "./components/Header/ConnectionBanner"
 import { Header } from "./components/Header/Header"
@@ -15,21 +16,8 @@ import { APP_VERSION, GIT_HASH } from "./env"
 import FourZeroFourPage from "./pages/404"
 import AccountsPage from "./pages/AccountsPage/AccountsPage"
 import LocalAuthPage from "./pages/AccountsPage/LocalAuthPage"
-import AssetPage from "./pages/AssetPage/AssetPage"
-import AssetsPage from "./pages/AssetsPage/AssetsPage"
-import AuditLogsPage from "./pages/AuditLogsPage/AuditLogsPage"
 import CloudUserPage from "./pages/CloudUserPage/CloudUserPage"
-import ExtensionPage from "./pages/ExtensionPage/ExtensionPage"
-import ExtensionsPage from "./pages/ExtensionsPage/ExtensionsPage"
 import HomePage from "./pages/HomePage/HomePage"
-import ImportDataPage from "./pages/ImportDataPage/ImportDataPage"
-import PlatformPage from "./pages/PlatformPage/PlatformPage"
-import PlatformsPage from "./pages/PlatformsPage/PlatformsPage"
-import { ProChartPage } from "./pages/ProChartPage/ProChartPage"
-import ServerPage from "./pages/ServerPage/ServerPage"
-import TradePage from "./pages/TradePage/TradePage"
-import TradesPage from "./pages/TradesPage/TradesPage"
-import TransactionsPage from "./pages/TransactionsPage/TransactionsPage"
 import { SHORT_THROTTLE_DURATION } from "./settings"
 import {
   $activeAccount,
@@ -56,6 +44,20 @@ import { fetchInMemoryData } from "./stores/metadata-store"
 import { closeSubscription } from "./utils/browser-utils"
 import { localServerEnabled, noop } from "./utils/utils"
 import { $cloudRest, $cloudRpc, $localRest, $localRpc, $rpc } from "./workers/remotes"
+
+const AssetPage = lazy(() => import("./pages/AssetPage/AssetPage"))
+const AssetsPage = lazy(() => import("./pages/AssetsPage/AssetsPage"))
+const AuditLogsPage = lazy(() => import("./pages/AuditLogsPage/AuditLogsPage"))
+const ExtensionPage = lazy(() => import("./pages/ExtensionPage/ExtensionPage"))
+const ExtensionsPage = lazy(() => import("./pages/ExtensionsPage/ExtensionsPage"))
+const ImportDataPage = lazy(() => import("./pages/ImportDataPage/ImportDataPage"))
+const PlatformPage = lazy(() => import("./pages/PlatformPage/PlatformPage"))
+const PlatformsPage = lazy(() => import("./pages/PlatformsPage/PlatformsPage"))
+const ProChartPage = lazy(() => import("./pages/ProChartPage/ProChartPage"))
+const ServerPage = lazy(() => import("./pages/ServerPage/ServerPage"))
+const TradePage = lazy(() => import("./pages/TradePage/TradePage"))
+const TradesPage = lazy(() => import("./pages/TradesPage/TradesPage"))
+const TransactionsPage = lazy(() => import("./pages/TransactionsPage/TransactionsPage"))
 
 export default function App() {
   const localAuth = useStore($localAuth)
@@ -238,28 +240,30 @@ export default function App() {
         <Header />
         <Container disableGutters maxWidth="xl" sx={{ paddingX: { xs: 2 }, paddingY: 2 }}>
           <ErrorBoundary>
-            <Routes>
-              <Route index element={<AccountsPage />} />
-              <Route path="/cloud" element={<CloudUserPage show />} />
-              <Route path="/:accountType/:accountIndex" element={<AccountRouteGuard />}>
-                <Route index element={<HomePage />} />
-                <Route path="trades" element={<TradesPage show />} />
-                <Route path="trade/:tradeId" element={<TradePage />} />
-                <Route path="assets" element={<AssetsPage show />} />
-                <Route path="asset/:assetId" element={<AssetPage />} />
-                <Route path="transactions" element={<TransactionsPage show />} />
-                <Route path="audit-logs" element={<AuditLogsPage show />} />
-                <Route path="import-data" element={<ImportDataPage show />} />
-                <Route path="server" element={<ServerPage show />} />
-                <Route path="extensions" element={<ExtensionsPage show />} />
-                <Route path="extension/:extensionId" element={<ExtensionPage />} />
-                <Route path="platforms" element={<PlatformsPage show />} />
-                <Route path="platform/:platformId" element={<PlatformPage />} />
-                <Route path="pro-chart" element={<ProChartPage show />} />
-                <Route path="*" element={<FourZeroFourPage show />} />
-              </Route>
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+            <Suspense fallback={<DefaultSpinner />}>
+              <Routes>
+                <Route index element={<AccountsPage />} />
+                <Route path="/cloud" element={<CloudUserPage show />} />
+                <Route path="/:accountType/:accountIndex" element={<AccountRouteGuard />}>
+                  <Route index element={<HomePage />} />
+                  <Route path="trades" element={<TradesPage show />} />
+                  <Route path="trade/:tradeId" element={<TradePage />} />
+                  <Route path="assets" element={<AssetsPage show />} />
+                  <Route path="asset/:assetId" element={<AssetPage />} />
+                  <Route path="transactions" element={<TransactionsPage show />} />
+                  <Route path="audit-logs" element={<AuditLogsPage show />} />
+                  <Route path="import-data" element={<ImportDataPage show />} />
+                  <Route path="server" element={<ServerPage show />} />
+                  <Route path="extensions" element={<ExtensionsPage show />} />
+                  <Route path="extension/:extensionId" element={<ExtensionPage />} />
+                  <Route path="platforms" element={<PlatformsPage show />} />
+                  <Route path="platform/:platformId" element={<PlatformPage />} />
+                  <Route path="pro-chart" element={<ProChartPage show />} />
+                  <Route path="*" element={<FourZeroFourPage show />} />
+                </Route>
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
           </ErrorBoundary>
           <Stack
             sx={{
