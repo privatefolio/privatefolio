@@ -3,6 +3,16 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.6 - 2025/06/20
+
+### 💡 Feature updates
+
+- Improve UI UX for mobile devices.
+
+### 🐛 Bug Fixes
+
+- Fix bug when time traveling through trades
+
 ## v2.0.0-beta.5 - 2025/06/20
 
 ### 💡 Feature updates
