@@ -18,7 +18,10 @@
     "dist/**/*",
     "out/**/*",
     "package-lock.json",
-    "yarn.lock"
+    "yarn.lock",
+    "public/charting_library",
+    "src/components/ProChart/charting_library",
+    "analyze*"
   ],
   "parserOptions": {
     "ecmaFeatures": {

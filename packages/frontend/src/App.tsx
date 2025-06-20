@@ -25,6 +25,7 @@ import HomePage from "./pages/HomePage/HomePage"
 import ImportDataPage from "./pages/ImportDataPage/ImportDataPage"
 import PlatformPage from "./pages/PlatformPage/PlatformPage"
 import PlatformsPage from "./pages/PlatformsPage/PlatformsPage"
+import { ProChartPage } from "./pages/ProChartPage/ProChartPage"
 import ServerPage from "./pages/ServerPage/ServerPage"
 import TradePage from "./pages/TradePage/TradePage"
 import TradesPage from "./pages/TradesPage/TradesPage"
@@ -235,7 +236,7 @@ export default function App() {
           }}
         /> */}
         <Header />
-        <Container disableGutters maxWidth="xl" sx={{ paddingTop: 2, paddingX: { xs: 2 } }}>
+        <Container disableGutters maxWidth="xl" sx={{ paddingX: { xs: 2 }, paddingY: 2 }}>
           <ErrorBoundary>
             <Routes>
               <Route index element={<AccountsPage />} />
@@ -254,6 +255,7 @@ export default function App() {
                 <Route path="extension/:extensionId" element={<ExtensionPage />} />
                 <Route path="platforms" element={<PlatformsPage show />} />
                 <Route path="platform/:platformId" element={<PlatformPage />} />
+                <Route path="pro-chart" element={<ProChartPage show />} />
                 <Route path="*" element={<FourZeroFourPage show />} />
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />

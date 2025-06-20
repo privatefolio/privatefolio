@@ -6,6 +6,7 @@ import {
   HomeRounded,
   ReceiptLong,
   SdStorageRounded,
+  TimelineRounded,
   Workspaces,
 } from "@mui/icons-material"
 import { MenuItem, Stack } from "@mui/material"
@@ -187,6 +188,15 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             onClick={toggleOpen}
             shortcutKey="s"
             avatar={<CloudRounded fontSize="small" />}
+          />
+          <NavMenuItem
+            value="pro-chart"
+            to={`${activeAccountPath}/pro-chart`}
+            label="Pro chart"
+            aria-label="Visit Pro chart"
+            onClick={toggleOpen}
+            shortcutKey="p"
+            avatar={<TimelineRounded fontSize="small" />}
           />
         </Stack>
         <Stack>

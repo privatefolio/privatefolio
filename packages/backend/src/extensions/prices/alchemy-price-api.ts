@@ -1,4 +1,11 @@
-import { ChartData, QueryRequest, ResolutionString, Time, Timestamp } from "../../interfaces"
+import {
+  AlchemyPrice,
+  ChartData,
+  QueryRequest,
+  ResolutionString,
+  Time,
+  Timestamp,
+} from "../../interfaces"
 import { PriceApiId } from "../../settings/settings"
 import {
   getAssetContract,
@@ -7,6 +14,12 @@ import {
   isNativeAsset,
 } from "../../utils/assets-utils"
 import { isServer } from "../../utils/environment-utils"
+import {
+  approximateTimestamp,
+  ensureValidBuckets,
+  getBucketSize,
+  paginatePriceRequest,
+} from "../../utils/utils"
 
 export const Identifier: PriceApiId = "alchemy"
 
@@ -31,16 +44,19 @@ export function getPair(assetId: string) {
   return `${network}:${contract}`
 }
 
-function approximateTimestamp(timestamp: Time) {
-  const remainder = timestamp % 86400
-  return remainder > 43200 ? timestamp - remainder + 86400 : timestamp - remainder
+export function getPairDescription(assetId: string) {
+  const ticker = getAssetTicker(assetId)
+  return [ticker, `${ticker} / US Dollar`]
 }
 
 function getInterval(timeInterval: ResolutionString) {
-  if (timeInterval === "1m") return "5m" // closest to 1m
-  if (timeInterval === "1h") return "1h"
-  if (timeInterval === "1d") return "1d"
-  return "1d" // default
+  timeInterval = timeInterval.toUpperCase() as ResolutionString
+
+  if (timeInterval === "5") return "5m"
+  if (timeInterval === "60") return "1h"
+  if (timeInterval === "1D") return "1d"
+
+  throw new Error(`Alchemy does not support the '${timeInterval}' time interval.`)
 }
 
 function getNetwork(platform: string) {
@@ -52,12 +68,21 @@ function getNetwork(platform: string) {
   return ""
 }
 
-// Alchemy only allows 365 days of data per request when using the 1d interval
-const pageLimit = 300
+// Alchemy only allows
+// 365 days of data per request when using the 1d interval
+// 30 days of data per request when using the 1h interval (720 data points)
+// 7 days of data per request when using the 5m interval (2016 data points)
+const getPageLimit = (timeInterval: ResolutionString) => {
+  if (timeInterval === "1h") return 720
+  if (timeInterval === "5m") return 2016
+  return 365
+}
 
 // https://www.alchemy.com/docs/data/prices-api/prices-api-endpoints/prices-api-endpoints/get-historical-token-prices
 export async function queryPrices(request: QueryRequest) {
-  const { timeInterval, limit = pageLimit, pair } = request
+  const { timeInterval, pair } = request
+  const pageLimit = getPageLimit(timeInterval)
+  const limit = request.limit || pageLimit
 
   let address: string, network: string, ticker: string
 
@@ -73,32 +98,28 @@ export async function queryPrices(request: QueryRequest) {
     return []
   }
 
+  const bucketSize = getBucketSize(timeInterval)
+  const bucketSizeInMs = bucketSize * 1000
+
   // until & since always need to be set
   const now = Date.now()
-  const today: Timestamp = now - (now % 86400000)
+  const today: Timestamp = now - (now % bucketSizeInMs)
 
   const until = request.until || today
-  const since = request.since || until - 86400000 * (limit || pageLimit)
+  const since = request.since || until - bucketSizeInMs * limit
 
   const apiKey = (isServer && process.env.ALCHEMY_API_KEY) || "BMARMYOT5kqVmbLXs_kz-"
   const apiUrl = `https://api.g.alchemy.com/prices/v1/${apiKey}/tokens/historical`
 
-  let validSince = since
-  let previousPage: ChartData[] = []
-
-  if (since && until) {
-    const records = Math.floor((until - since) / (24 * 60 * 60 * 1000))
-    if (records > pageLimit) {
-      validSince = until - pageLimit * 24 * 60 * 60 * 1000
-      previousPage = await queryPrices({
-        limit: limit - pageLimit,
-        pair,
-        since,
-        timeInterval,
-        until: validSince,
-      })
-    }
-  }
+  const { validSince, previousPage } = await paginatePriceRequest<ChartData>({
+    bucketSizeInMs,
+    limit,
+    pageLimit,
+    queryFn: async (since, until, limit) =>
+      queryPrices({ limit, pair, since, timeInterval, until }),
+    since,
+    until,
+  })
 
   const payload = {
     address,
@@ -123,33 +144,17 @@ export async function queryPrices(request: QueryRequest) {
     throw new Error(`Alchemy: ${res.statusText} ${text}`)
   }
 
-  const data = await res.json()
-  const prices = (data.data || []).slice(-pageLimit)
+  const { data } = await res.json()
+  if (!data) return []
+  const prices = data.slice(-pageLimit) as AlchemyPrice[]
 
-  const patched: ChartData[] = []
-
-  let prevRecord: ChartData | undefined
-  for (let i = 0; i < prices.length; i++) {
-    const time = approximateTimestamp(new Date(prices[i].timestamp).getTime() / 1000) as Time
-    const value = parseFloat(prices[i].value)
-    const record = { time, value }
-
-    const daysDiff = prevRecord ? (record.time - (prevRecord.time as number)) / 86400 : 0
-
-    if (daysDiff > 1) {
-      // fill the daily gaps
-      for (let i = 1; i < daysDiff; i++) {
-        const gapDay = ((prevRecord as ChartData).time as number) + i * 86400
-        patched.push({
-          time: gapDay as Time,
-          value: (prevRecord as ChartData).value,
-        })
-      }
-    }
-
-    patched.push(record)
-    prevRecord = record
-  }
+  const patched = ensureValidBuckets(
+    prices.map((price) => ({
+      time: approximateTimestamp(new Date(price.timestamp).getTime() / 1000, timeInterval) as Time,
+      value: parseFloat(price.value),
+    })),
+    timeInterval
+  )
 
   return previousPage.concat(patched).slice(0, limit)
 }

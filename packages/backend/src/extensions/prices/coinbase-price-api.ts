@@ -1,6 +1,7 @@
 import { ChartData, CoinbaseBucket, QueryRequest, ResolutionString, Time } from "../../interfaces"
 import { PriceApiId, WETH_ASSET_ID } from "../../settings/settings"
 import { getAssetTicker } from "../../utils/assets-utils"
+import { paginatePriceRequest } from "../../utils/utils"
 
 export const Identifier: PriceApiId = "coinbase"
 
@@ -9,26 +10,36 @@ export function getPair(assetId: string) {
   return `${getAssetTicker(assetId)}-USD`
 }
 
+export function getPairDescription(assetId: string) {
+  const ticker = getAssetTicker(assetId)
+  return [`${ticker}USD`, `${ticker} / US Dollar`]
+}
+
 // Coinbase only allows 300 records per request
 const pageLimit = 300
 
-// https://docs.cloud.coinbase.com/exchange/docs/apis/get-product-candles#details
+// https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductcandles
 // The granularity field must be one of the following values: {60, 300, 900, 3600, 21600, 86400}.
 // Otherwise, your request will be rejected. These values correspond to timeslices representing one minute,
 // five minutes, fifteen minutes, one hour, six hours, and one day, respectively.
 function getInterval(timeInterval: ResolutionString): number {
   timeInterval = timeInterval.toUpperCase() as ResolutionString
-  const value = parseInt(timeInterval.slice(0, -1))
 
-  // if (timeInterval.endsWith("T")) throw new Error("Ticks are not supported")
-  if (timeInterval.endsWith("S")) return Math.max(60, value)
-  if (!isNaN(Number(timeInterval))) return parseInt(timeInterval) * 60
-  if (timeInterval.endsWith("H")) return value * 3600
-  if (timeInterval.endsWith("D")) return value * 86400
-  // if (timeInterval.endsWith("W")) return value * 604800
-  // if (timeInterval.endsWith("M")) return value * 2592000
+  // Minutes
+  if (timeInterval === "1") return 60
+  if (timeInterval === "5") return 300
+  if (timeInterval === "15") return 900
 
-  throw new Error(`Coinbase does not support the '${timeInterval}' time interval.`)
+  // Hours
+  if (timeInterval === "60") return 3600
+  if (timeInterval === "360") return 21600
+
+  // Days
+  if (timeInterval === "1D") return 86400
+
+  throw new Error(
+    `Coinbase does not support the '${timeInterval}' time interval. Supported intervals: 1m, 5m, 15m, 1h, 6h, 1d`
+  )
 }
 
 // https://docs.cloud.coinbase.com/exchange/reference/exchangerestapi_getproductcandles
@@ -42,22 +53,15 @@ export async function queryPrices(request: QueryRequest) {
 
   let apiUrl = `https://api.exchange.coinbase.com/products/${pair}/candles?granularity=${coinbaseInterval}`
 
-  let validSince = since
-  let previousPage: CoinbaseBucket[] = []
-
-  if (since && until) {
-    const records = Math.floor((until - since) / timestampOffset)
-    if (records > pageLimit) {
-      validSince = until - timestampOffset * pageLimit
-      previousPage = await queryPrices({
-        limit: limit - pageLimit,
-        pair,
-        since,
-        timeInterval,
-        until: validSince,
-      })
-    }
-  }
+  const { validSince, previousPage } = await paginatePriceRequest<CoinbaseBucket>({
+    bucketSizeInMs: timestampOffset,
+    limit,
+    pageLimit,
+    queryFn: async (since, until, limit) =>
+      queryPrices({ limit, pair, since, timeInterval, until }),
+    since,
+    until,
+  })
 
   if (validSince) {
     apiUrl = `${apiUrl}&start=${validSince}`
