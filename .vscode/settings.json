@@ -13,6 +13,7 @@
   ],
   "search.exclude": {
     // "**/packages/*/build": true,
+    "**/charting_library/**/*": true,
     "public/app-data/assets/**/*": true,
     "/**/*.snap": true
   },
