@@ -34,7 +34,7 @@ export function FileImportHelp() {
   const HowToComponent = useMemo(() => {
     const extension = extensions.find((x) => x.id === tab)
     if (!extension?.howTo) return null
-    return lazy(() => import(/* @vite-ignore */ extension.howTo!))
+    return lazy(() => import(`../../../extensions/${extension.howTo}.tsx`))
   }, [extensions, tab])
 
   return (

@@ -73,7 +73,7 @@ export default function ExtensionPage() {
 
   const HowToComponent = useMemo(() => {
     if (!extension?.howTo) return null
-    return lazy(() => import(/* @vite-ignore */ extension.howTo!))
+    return lazy(() => import(`../../extensions/${extension.howTo}.tsx`))
   }, [extension?.howTo])
 
   if (isLoading) return <DefaultSpinner />
