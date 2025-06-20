@@ -146,10 +146,10 @@ export default function ProChart() {
           widgetRef.current?.save((chartData) => {
             try {
               saveChartData(chartData)
-              enqueueSnackbar("Chart layout saved", { variant: "success" })
+              enqueueSnackbar("Chart saved", { variant: "success" })
             } catch (error) {
-              console.error("Failed to save chart layout:", error)
-              enqueueSnackbar("Failed to save chart layout", { variant: "error" })
+              console.error("Failed to save chart:", error)
+              enqueueSnackbar("Failed to save chart", { variant: "error" })
             }
           })
         },
@@ -164,10 +164,10 @@ export default function ProChart() {
           try {
             const savedData = loadChartData()
             widgetRef.current?.load(savedData)
-            enqueueSnackbar("Chart layout loaded", { variant: "success" })
+            enqueueSnackbar("Chart loaded", { variant: "success" })
           } catch (error) {
-            console.error("Failed to load chart layout:", error)
-            enqueueSnackbar("Could not load chart layout. Resetting.", { variant: "error" })
+            console.error("Failed to load chart:", error)
+            enqueueSnackbar("Could not load chart. Resetting.", { variant: "error" })
             removeChartData()
             resetWidget(widgetRef.current, defaultSymbol)
           }
