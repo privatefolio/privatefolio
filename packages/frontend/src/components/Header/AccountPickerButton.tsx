@@ -30,12 +30,24 @@ export function AccountPickerButton(props: { onClose?: () => void }) {
 
   return (
     <>
-      <Tooltip title="Account">
+      <Tooltip title="Switch account">
         <MenuItem
           component={Button}
           onClick={handleClick}
           color="secondary"
           sx={{
+            "@media (min-width: 990px) and (max-width: 1836px)": {
+              "& .MuiAvatar-root": {
+                height: 24,
+                width: 24,
+              },
+              "& .MuiStack-root": {
+                flexDirection: "column",
+                gap: 0.5,
+              },
+              "& svg": { display: "none" },
+              marginY: 0,
+            },
             borderRadius: 0.5,
             gap: 0.5,
             justifyContent: "flex-start",
@@ -46,7 +58,12 @@ export function AccountPickerButton(props: { onClose?: () => void }) {
             textTransform: "none",
           }}
         >
-          <Stack direction="row" alignItems="center" sx={{ overflow: "hidden" }} gap={2}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            sx={{ maxWidth: "100%", overflow: "hidden" }}
+            gap={2}
+          >
             <AccountAvatar alt={activeAccount} size="small" type={activeAccountType} />
             <Typography
               variant="subtitle1"
@@ -54,7 +71,7 @@ export function AccountPickerButton(props: { onClose?: () => void }) {
               component={Truncate}
               // color="text.primary"
               fontWeight={700}
-              sx={{ lineHeight: 1 }}
+              sx={{ lineHeight: 1, maxWidth: "100%" }}
             >
               {activeAccount}
             </Typography>

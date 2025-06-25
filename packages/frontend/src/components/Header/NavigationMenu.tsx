@@ -9,9 +9,9 @@ import { MenuDrawerContents } from "./MenuDrawerContents"
 export function NavigationMenu() {
   const { value: open, toggle: toggleOpen } = useBoolean(false)
 
-  const isDesktop = useMediaQuery("(min-width: 1836px)")
+  const isLaptop = useMediaQuery("(min-width: 990px)")
 
-  if (isDesktop) return
+  if (isLaptop) return
 
   return (
     <>

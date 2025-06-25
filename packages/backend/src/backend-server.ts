@@ -187,7 +187,7 @@ export class BackendServer<T extends BackendApiShape> {
             // In kiosk mode, only allow read operations without auth
             if (kioskMode && !isAuthenticated && !isReadMethod && !isSubcribeMethod) {
               response = {
-                error: "Write operations require authentication in kiosk mode",
+                error: "Login or sign up to continue.",
                 id,
                 method,
               }

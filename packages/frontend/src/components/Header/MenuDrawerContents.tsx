@@ -9,7 +9,7 @@ import {
   TimelineRounded,
   Workspaces,
 } from "@mui/icons-material"
-import { MenuItem, Stack } from "@mui/material"
+import { MenuItem, Stack, Tooltip } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React from "react"
 import { Link } from "react-router-dom"
@@ -17,6 +17,7 @@ import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
 
 import { AppVerProps, PopoverToggleProps } from "../../stores/app-store"
 import { TransactionIcon } from "../icons"
+import { Logo } from "../Logo"
 import { NavMenuItem } from "../NavMenuItem"
 import { AccountPickerButton } from "./AccountPickerButton"
 import { LogoText } from "./LogoText"
@@ -65,25 +66,74 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
   return (
     <>
       <Stack
-        paddingX={2}
-        paddingY={1}
-        gap={1}
-        sx={{ height: "100%", width: "100%" }}
+        sx={{
+          "& .MuiListItemAvatar-root svg": {
+            fontSize: "1.25rem",
+          },
+          "@media (min-width: 990px) and (max-width: 1836px)": {
+            "& .MuiListItemAvatar-root": {
+              fontSize: "1.5rem",
+              marginRight: 0,
+            },
+            "& .MuiMenuItem-root": {
+              alignItems: "center",
+              flexDirection: "column",
+              gap: 0.5,
+              justifyContent: "center",
+              minHeight: 64,
+              paddingX: 0.5,
+              paddingY: 1.5,
+            },
+            "& .MuiTypography-root": {
+              fontSize: "0.75rem",
+            },
+            gap: "16px",
+            paddingX: 0.5,
+            paddingY: 1,
+          },
+          gap: 1,
+          height: "100%",
+          paddingX: 2,
+          paddingY: 1,
+          width: "100%",
+        }}
         justifyContent="space-between"
       >
         <Stack gap={0.25}>
-          <MenuItem
-            color="secondary"
-            to="/"
-            component={Link}
-            sx={{
-              borderRadius: 0.5,
-              justifyContent: "flex-start",
-              paddingX: 2,
-            }}
-          >
-            <LogoText />
-          </MenuItem>
+          <Tooltip title="Visit Welcome">
+            <MenuItem
+              color="secondary"
+              to="/"
+              component={Link}
+              sx={{
+                borderRadius: 0.5,
+                justifyContent: "flex-start",
+                paddingX: 2,
+              }}
+            >
+              <LogoText
+                sx={{
+                  display: {
+                    md: "none",
+                    xs: "inline-flex",
+                    xxl: "inline-flex",
+                  },
+                }}
+              />
+              <Logo
+                color="var(--mui-palette-primary-main)"
+                width={24}
+                height={24}
+                sx={{
+                  display: {
+                    md: "inline-flex",
+                    xs: "none",
+                    xxl: "none",
+                  },
+                }}
+              />
+            </MenuItem>
+          </Tooltip>
           {/* <Stack direction="row" alignItems="center" justifyContent="space-between"> */}
           <AccountPickerButton onClose={toggleOpen} />
           {/* <Tooltip title="Create">
@@ -115,7 +165,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             aria-label="Visit Home"
             onClick={toggleOpen}
             shortcutKey="h"
-            avatar={<HomeRounded fontSize="small" />}
+            avatar={<HomeRounded />}
           />
           <NavMenuItem
             value="trades"
@@ -124,7 +174,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             aria-label="Visit Trades"
             onClick={toggleOpen}
             shortcutKey="r"
-            avatar={<CandlestickChartRounded fontSize="small" />}
+            avatar={<CandlestickChartRounded />}
           />
           <NavMenuItem
             value="assets"
@@ -133,7 +183,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             aria-label="Visit Assets"
             onClick={toggleOpen}
             shortcutKey="a"
-            avatar={<Workspaces fontSize="small" />}
+            avatar={<Workspaces />}
           />
           <NavMenuItem
             value="transactions"
@@ -142,7 +192,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             aria-label="Visit Transactions"
             onClick={toggleOpen}
             shortcutKey="t"
-            avatar={<TransactionIcon fontSize="small" />}
+            avatar={<TransactionIcon />}
           />
           <NavMenuItem
             value="audit-logs"
@@ -151,7 +201,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             aria-label="Visit Audit logs"
             onClick={toggleOpen}
             shortcutKey="u"
-            avatar={<ReceiptLong fontSize="small" />}
+            avatar={<ReceiptLong />}
           />
           <NavMenuItem
             value="platforms"
@@ -160,7 +210,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             aria-label="Visit Platforms"
             onClick={toggleOpen}
             shortcutKey="p"
-            avatar={<AccountBalanceRounded fontSize="small" />}
+            avatar={<AccountBalanceRounded />}
           />
           <NavMenuItem
             value="extensions"
@@ -169,7 +219,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             aria-label="Visit Extensions"
             onClick={toggleOpen}
             shortcutKey="e"
-            avatar={<ExtensionRounded fontSize="small" />}
+            avatar={<ExtensionRounded />}
           />
           <NavMenuItem
             value="import-data"
@@ -178,7 +228,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             aria-label="Visit Data"
             onClick={toggleOpen}
             shortcutKey="d"
-            avatar={<SdStorageRounded fontSize="small" />}
+            avatar={<SdStorageRounded />}
           />
           <NavMenuItem
             value="server"
@@ -187,7 +237,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             aria-label="Visit Server"
             onClick={toggleOpen}
             shortcutKey="s"
-            avatar={<CloudRounded fontSize="small" />}
+            avatar={<CloudRounded />}
           />
           <NavMenuItem
             value="pro-chart"
@@ -196,7 +246,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             aria-label="Visit Pro chart"
             onClick={toggleOpen}
             shortcutKey="p"
-            avatar={<TimelineRounded fontSize="small" />}
+            avatar={<TimelineRounded />}
           />
         </Stack>
         <Stack>
