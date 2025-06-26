@@ -24,7 +24,7 @@ import { hashString, isTestEnvironment, noop } from "src/utils/utils"
 
 import { getAccount } from "../accounts-api"
 import { getMyAssets } from "./assets-api"
-import { getAuditLogs } from "./audit-logs-api"
+import { getAuditLogOrderQuery, getAuditLogs } from "./audit-logs-api"
 import { getAssetPriceMap, getPricesForAsset } from "./daily-prices-api"
 import { getValue, setValue } from "./kv-api"
 import { enqueueTask } from "./server-tasks-api"
@@ -336,11 +336,12 @@ export async function computeTrades(
   }
 
   await progress([0, "Fetching audit logs"])
+  const orderQuery = await getAuditLogOrderQuery(true)
   const auditLogs = await getAuditLogs(
     accountName,
     since === 0
-      ? "SELECT * FROM audit_logs ORDER BY timestamp ASC, changeN ASC, id ASC"
-      : "SELECT * FROM audit_logs WHERE timestamp > ? ORDER BY timestamp ASC, changeN ASC, id ASC",
+      ? `SELECT * FROM audit_logs ${orderQuery}`
+      : `SELECT * FROM audit_logs WHERE timestamp > ? ${orderQuery}`,
     since === 0 ? undefined : [since]
   )
 
@@ -845,6 +846,7 @@ export async function computePnl(
   const tradePnls: TradePnL[] = []
   let processedTrades = 0
   let latestTimestamp = 0
+  const orderQuery = await getAuditLogOrderQuery()
 
   for (const trade of trades) {
     // Get daily prices for the asset during the trade period
@@ -884,7 +886,7 @@ export async function computePnl(
       // Find the latest audit log before or at this timestamp to get the balance
       const [latestLog] = await getAuditLogs(
         accountName,
-        "SELECT * FROM audit_logs WHERE timestamp <= ? AND assetId = ? ORDER BY timestamp DESC LIMIT 1",
+        `SELECT * FROM audit_logs WHERE timestamp <= ? AND assetId = ? ${orderQuery} LIMIT 1`,
         [bucketEnd, trade.assetId]
       )
 

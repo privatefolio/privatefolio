@@ -17,17 +17,21 @@ import {
   SyncResult,
   TaskPriority,
   TaskTrigger,
+  Timestamp,
 } from "../../interfaces"
+import { formatDate } from "../../utils/formatting-utils"
 import { hashString, noop } from "../../utils/utils"
 import { getAccount } from "../accounts-api"
 import { countAuditLogs, upsertAuditLogs } from "./audit-logs-api"
+import { invalidateBalances } from "./balances-api"
 import { getExtension } from "./extensions-api"
 import { getValue, setValue } from "./kv-api"
+import { invalidateNetworth } from "./networth-api"
 import { getPlatform } from "./platforms-api"
 import { enqueueTask } from "./server-tasks-api"
 import { countTransactions, upsertTransactions } from "./transactions-api"
 
-const SCHEMA_VERSION = 5
+const SCHEMA_VERSION = 6
 
 async function getAccountWithConnections(accountName: string) {
   const schemaVersion = await getValue(accountName, `connections_schema_version`, 0)
@@ -46,7 +50,7 @@ async function getAccountWithConnections(accountName: string) {
         meta JSON,
         options JSON,
         extensionId VARCHAR NOT NULL,
-        platform VARCHAR NOT NULL,
+        platformId VARCHAR NOT NULL,
         secret VARCHAR,
         syncedAt INTEGER,
         timestamp INTEGER NOT NULL
@@ -136,7 +140,7 @@ export async function upsertConnections(accountName: string, records: NewConnect
     const seq = await getValue(accountName, "connection_seq", 0)
     await account.executeMany(
       `INSERT OR REPLACE INTO connections (
-        id, connectionNumber, address, key, meta, options, extensionId, platform, secret, syncedAt, timestamp
+        id, connectionNumber, address, key, meta, options, extensionId, platformId, secret, syncedAt, timestamp
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       records.map((record, index) => [
         record.id || deriveConnectionId(record),
@@ -189,6 +193,13 @@ export async function resetConnection(
   const account = await getAccountWithConnections(accountName)
   const connection = await getConnection(accountName, connectionId)
 
+  const oldestTimestamp = (
+    await account.execute(
+      `SELECT timestamp FROM audit_logs WHERE connectionId = ? ORDER BY timestamp ASC LIMIT 1`,
+      [connection.id]
+    )
+  )[0]?.[0] as Timestamp | undefined
+
   const auditLogsCount = await countAuditLogs(
     accountName,
     `SELECT COUNT(*) FROM audit_logs WHERE connectionId = ?`,
@@ -196,6 +207,14 @@ export async function resetConnection(
   )
   await progress([0, `Removing ${auditLogsCount} audit logs`])
   await account.execute(`DELETE FROM audit_logs WHERE connectionId = ?`, [connection.id])
+
+  if (oldestTimestamp) {
+    const newCursor = oldestTimestamp - (oldestTimestamp % 86400000) - 86400000
+    await progress([25, `Setting balances cursor to ${formatDate(newCursor)}`])
+    await invalidateBalances(accountName, newCursor)
+    await progress([25, `Setting networth cursor to ${formatDate(newCursor)}`])
+    await invalidateNetworth(accountName, newCursor)
+  }
 
   const transactionsCount = await countTransactions(
     accountName,
@@ -297,6 +316,23 @@ export async function syncConnection(
     await upsertTransactions(accountName, Object.values(result.txMap))
   }
 
+  // Invalidate balances and networth if we have new data
+  if (logIds.length > 0) {
+    let oldestTimestamp: Timestamp | undefined
+    for (const log of Object.values(result.logMap)) {
+      if (!oldestTimestamp || log.timestamp < oldestTimestamp) {
+        oldestTimestamp = log.timestamp
+      }
+    }
+
+    if (oldestTimestamp) {
+      const newCursor = oldestTimestamp - (oldestTimestamp % 86400000) - 86400000
+      await progress([75, `Setting balances cursor to ${formatDate(newCursor)}`])
+      await invalidateBalances(accountName, newCursor)
+      await invalidateNetworth(accountName, newCursor)
+    }
+  }
+
   // Save metadata
   const metadata: Connection["meta"] = {
     assetIds: Object.keys(result.assetMap),
@@ -336,13 +372,20 @@ export async function syncConnection(
 export async function enqueueSyncAllConnections(
   accountName: string,
   trigger: TaskTrigger,
-  debugMode?: boolean,
-  onCompletion?: TaskCompletionCallback
+  debugMode?: boolean
 ) {
   const connections = await getConnections(accountName)
 
   for (const connection of connections) {
-    await enqueueSyncConnection(accountName, trigger, connection.id, debugMode, onCompletion)
+    await enqueueSyncConnection(accountName, trigger, connection.id, debugMode)
+  }
+}
+
+export async function enqueueResetAllConnections(accountName: string, trigger: TaskTrigger) {
+  const connections = await getConnections(accountName)
+
+  for (const connection of connections) {
+    await enqueueResetConnection(accountName, trigger, connection.id)
   }
 }
 

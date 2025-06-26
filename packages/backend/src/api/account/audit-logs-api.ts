@@ -3,18 +3,68 @@ import { transformAuditLogsToCsv } from "src/utils/csv-export-utils"
 import { createCsvString } from "src/utils/csv-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { saveFile } from "src/utils/file-utils"
+import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 
 import { AuditLog, AuditLogOperation, SubscriptionChannel } from "../../interfaces"
 import { getAccount } from "../accounts-api"
+import { getValue, setValue } from "./kv-api"
 import { enqueueTask } from "./server-tasks-api"
+
+const SCHEMA_VERSION = 3
+
+async function getAccountWithAuditLogs(accountName: string) {
+  const schemaVersion = await getValue(accountName, `audit_logs_schema_version`, 0)
+  const account = await getAccount(accountName)
+
+  if (schemaVersion < SCHEMA_VERSION) {
+    // Drop existing table to recreate with new schema
+    await account.execute(sql`DROP TABLE IF EXISTS audit_logs`)
+
+    await account.execute(sql`
+      CREATE TABLE audit_logs (
+        id VARCHAR PRIMARY KEY,
+        assetId VARCHAR NOT NULL,
+        balance VARCHAR,
+        balanceN FLOAT GENERATED ALWAYS AS (CAST(balance AS REAL)) STORED,
+        balanceWallet VARCHAR,
+        balanceWalletN FLOAT GENERATED ALWAYS AS (CAST(balanceWallet AS REAL)) STORED,
+        change VARCHAR NOT NULL,
+        changeN FLOAT GENERATED ALWAYS AS (CAST(change AS REAL)) STORED,
+        fileImportId VARCHAR,
+        connectionId VARCHAR,
+        importIndex INTEGER NOT NULL,
+        operation VARCHAR NOT NULL,
+        platformId VARCHAR NOT NULL,
+        timestamp INTEGER NOT NULL,
+        txId VARCHAR,
+        wallet VARCHAR NOT NULL,
+        FOREIGN KEY (assetId) REFERENCES assets(id),
+        FOREIGN KEY (connectionId) REFERENCES connections(id),
+        FOREIGN KEY (fileImportId) REFERENCES fileImports(id),
+        FOREIGN KEY (txId) REFERENCES transactions(id)
+      );
+    `)
+
+    await setValue(accountName, `audit_logs_schema_version`, SCHEMA_VERSION)
+  }
+
+  return account
+}
+
+export async function getAuditLogOrderQuery(ascending = false) {
+  if (ascending) {
+    return "ORDER BY timestamp ASC, changeN ASC, id ASC"
+  }
+  return "ORDER BY timestamp DESC, changeN DESC, id DESC"
+}
 
 export async function getAuditLogs(
   accountName: string,
   query = "SELECT * FROM audit_logs ORDER BY timestamp DESC, changeN DESC, id DESC",
   params?: SqlParam[]
 ): Promise<AuditLog[]> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithAuditLogs(accountName)
 
   try {
     const result = await account.execute(query, params)
@@ -24,15 +74,16 @@ export async function getAuditLogs(
         id: row[0],
         assetId: row[1],
         balance: row[2],
-        change: row[4],
-        fileImportId: row[6],
-        connectionId: row[7],
-        importIndex: row[8],
-        operation: row[9],
-        platformId: row[10],
-        timestamp: row[11],
-        txId: row[12],
-        wallet: row[13],
+        balanceWallet: row[4],
+        change: row[6],
+        fileImportId: row[8],
+        connectionId: row[9],
+        importIndex: row[10],
+        operation: row[11],
+        platformId: row[12],
+        timestamp: row[13],
+        txId: row[14],
+        wallet: row[15],
       }
       /* eslint-enable */
       transformNullsToUndefined(value)
@@ -53,18 +104,19 @@ export async function getAuditLogsByTxId(accountName: string, txId: string) {
 }
 
 export async function upsertAuditLogs(accountName: string, records: AuditLog[]) {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithAuditLogs(accountName)
 
   try {
     await account.executeMany(
       `INSERT OR REPLACE INTO audit_logs (
-      id, assetId, balance, change, fileImportId, connectionId, 
-      importIndex, operation, platform, timestamp, txId, wallet
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      id, assetId, balance, balanceWallet, change, fileImportId, connectionId, 
+      importIndex, operation, platformId, timestamp, txId, wallet
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       records.map((record) => [
         record.id,
         record.assetId,
         record.balance || null,
+        record.balanceWallet || null,
         record.change,
         record.fileImportId || null,
         record.connectionId || null,
@@ -105,7 +157,7 @@ export async function countAuditLogs(
   query = "SELECT COUNT(*) FROM audit_logs",
   params?: SqlParam[]
 ): Promise<number> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithAuditLogs(accountName)
 
   try {
     const result = await account.execute(query, params)
@@ -124,10 +176,10 @@ export async function subscribeToAuditLogs(
 
 export async function getMyPlatformIds(
   accountName: string,
-  query = "SELECT DISTINCT platform FROM audit_logs ORDER BY platform ASC",
+  query = "SELECT DISTINCT platformId FROM audit_logs ORDER BY platformId ASC",
   params?: SqlParam[]
 ): Promise<string[]> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithAuditLogs(accountName)
 
   try {
     const result = await account.execute(query, params)
@@ -142,7 +194,7 @@ export async function getWallets(
   query = "SELECT DISTINCT wallet FROM audit_logs ORDER BY wallet ASC",
   params?: SqlParam[]
 ): Promise<string[]> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithAuditLogs(accountName)
 
   try {
     const result = await account.execute(query, params)
@@ -157,7 +209,7 @@ export async function getOperations(
   query = "SELECT DISTINCT operation FROM audit_logs ORDER BY operation ASC",
   params?: SqlParam[]
 ): Promise<AuditLogOperation[]> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithAuditLogs(accountName)
 
   try {
     const result = await account.execute(query, params)

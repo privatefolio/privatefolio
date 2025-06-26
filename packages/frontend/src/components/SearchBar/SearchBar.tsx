@@ -338,6 +338,14 @@ export const SearchBar = () => {
         section: SECTIONS.actions,
       },
       {
+        icon: <CloudSyncRounded fontSize="small" />,
+        id: "action-reset-all-connections",
+        name: "Reset all connections",
+        perform: () => rpc.enqueueResetAllConnections(activeAccount, "user"),
+        priority: 10,
+        section: SECTIONS.actions,
+      },
+      {
         icon: <PhishingRounded fontSize="small" />,
         id: "action-detect-spam-transactions",
         name: "Detect spam transactions",

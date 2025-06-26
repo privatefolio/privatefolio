@@ -242,61 +242,6 @@ CREATE TABLE file_imports (
 `)
 
   await account.execute(sql`
-CREATE TABLE audit_logs (
-  id VARCHAR PRIMARY KEY,
-  assetId VARCHAR NOT NULL,
-  balance VARCHAR,
-  balanceN FLOAT GENERATED ALWAYS AS (CAST(balance AS REAL)) STORED,
-  change VARCHAR NOT NULL,
-  changeN FLOAT GENERATED ALWAYS AS (CAST(change AS REAL)) STORED,
-  fileImportId VARCHAR,
-  connectionId VARCHAR,
-  importIndex INTEGER NOT NULL,
-  operation VARCHAR NOT NULL,
-  platform VARCHAR NOT NULL,
-  timestamp INTEGER NOT NULL,
-  txId VARCHAR,
-  wallet VARCHAR NOT NULL,
-  FOREIGN KEY (assetId) REFERENCES assets(id),
-  FOREIGN KEY (connectionId) REFERENCES connections(id),
-  FOREIGN KEY (fileImportId) REFERENCES fileImports(id),
-  FOREIGN KEY (txId) REFERENCES transactions(id)
-);
-`)
-
-  await account.execute(sql`
-CREATE TABLE transactions (
-  id VARCHAR PRIMARY KEY,
-  incomingAsset VARCHAR,
-  incoming VARCHAR,
-  incomingN FLOAT GENERATED ALWAYS AS (CAST(incoming AS REAL)) STORED,
-  feeAsset VARCHAR,
-  fee VARCHAR,
-  feeN FLOAT GENERATED ALWAYS AS (CAST(fee AS REAL)) STORED,
-  fileImportId VARCHAR,
-  connectionId VARCHAR,
-  importIndex INTEGER,
-  outgoingAsset VARCHAR,
-  outgoing VARCHAR,
-  outgoingN FLOAT GENERATED ALWAYS AS (CAST(outgoing AS REAL)) STORED,
-  notes VARCHAR,
-  platform VARCHAR NOT NULL,
-  price VARCHAR,
-  priceN FLOAT GENERATED ALWAYS AS (CAST(price AS REAL)) STORED,
-  role VARCHAR,
-  timestamp INTEGER NOT NULL,
-  type VARCHAR NOT NULL,
-  wallet VARCHAR NOT NULL,
-  metadata JSON,
-  FOREIGN KEY (feeAsset) REFERENCES assets(id),
-  FOREIGN KEY (incomingAsset) REFERENCES assets(id),
-  FOREIGN KEY (outgoingAsset) REFERENCES assets(id),
-  FOREIGN KEY (connectionId) REFERENCES connections(id),
-  FOREIGN KEY (fileImportId) REFERENCES fileImports(id)
-);
-`)
-
-  await account.execute(sql`
 CREATE TABLE tags (
   id INTEGER PRIMARY KEY,
   name VARCHAR UNIQUE NOT NULL

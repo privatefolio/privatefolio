@@ -157,7 +157,14 @@ export type Platform = Exchange | Blockchain
 
 export interface AuditLog {
   assetId: string
+  /**
+   * Cumulative balance of all wallets
+   */
   balance?: string
+  /**
+   * Balance of the wallet
+   */
+  balanceWallet?: string
   change: string
   connectionId?: string
   fileImportId?: string

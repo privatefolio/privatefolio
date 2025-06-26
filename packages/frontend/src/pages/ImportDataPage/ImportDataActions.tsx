@@ -7,7 +7,6 @@ import {
 } from "@mui/icons-material"
 import { IconButton, ListItemAvatar, ListItemText, Menu, MenuItem, Tooltip } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import { enqueueSnackbar } from "notistack"
 import React from "react"
 import { ActionId, APP_ACTIONS } from "src/AppActions"
 import { $activeAccount } from "src/stores/account-store"
@@ -86,13 +85,18 @@ export function ImportDataActions() {
         <MenuItem
           dense
           onClick={() => {
-            rpc.enqueueSyncAllConnections(activeAccount, "user", $debugMode.get(), (error) => {
-              if (error) {
-                enqueueSnackbar(`Could not sync connections: ${error}`, { variant: "error" })
-              } else {
-                enqueueSnackbar("Synced all connections", { variant: "success" })
-              }
-            })
+            rpc.enqueueSyncAllConnections(
+              activeAccount,
+              "user",
+              $debugMode.get()
+              //  (error) => {
+              //   if (error) {
+              //     enqueueSnackbar(`Could not sync connections: ${error}`, { variant: "error" })
+              //   } else {
+              //     enqueueSnackbar("Synced all connections", { variant: "success" })
+              //   }
+              // }
+            )
             handleClose()
           }}
         >

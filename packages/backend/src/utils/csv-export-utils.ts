@@ -25,7 +25,7 @@ const auditLogsHeader = [
   "Operation",
   "Change",
   "Asset",
-  "New Balance",
+  "Wallet balance",
 ]
 
 export function transformTransactionsToCsv(transactions: Transaction[]): CsvData {

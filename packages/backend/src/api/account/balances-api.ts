@@ -1,5 +1,8 @@
 import Big from "big.js"
+import { getErc20Balance, getNativeBalance } from "src/extensions/utils/evm-utils"
 import { EventCause, SqlParam } from "src/interfaces"
+import { PLATFORMS_META } from "src/settings/platforms"
+import { getAssetContract, getAssetPlatform, isEvmPlatform } from "src/utils/assets-utils"
 import { formatDate, ONE_DAY } from "src/utils/formatting-utils"
 import { noop } from "src/utils/utils"
 
@@ -14,10 +17,12 @@ import {
 } from "../../interfaces"
 import { DB_OPERATION_PAGE_SIZE } from "../../settings/settings"
 import { getAccount } from "../accounts-api"
-import { countAuditLogs, getAuditLogs } from "./audit-logs-api"
+import { getMyAssets } from "./assets-api"
+import { countAuditLogs, getAuditLogOrderQuery, getAuditLogs, getWallets } from "./audit-logs-api"
 import { getPricesForAsset } from "./daily-prices-api"
 import { getValue, setValue } from "./kv-api"
 import { invalidateNetworth } from "./networth-api"
+import { getPlatform } from "./platforms-api"
 import { enqueueTask } from "./server-tasks-api"
 
 export async function getBalances(
@@ -128,8 +133,12 @@ export async function computeBalances(
         ])
   await progress([0, `Computing balances for ${count} audit logs`])
 
+  const orderQueryAsc = await getAuditLogOrderQuery(true)
+  const orderQueryDesc = await getAuditLogOrderQuery()
+
   let recordsLength = 0
   let latestBalances: Omit<BalanceMap, "timestamp"> = {}
+  const walletBalances: Record<string, Record<string, string>> = {} // wallet -> assetId -> balance
 
   let genesisDay: Timestamp = -1
 
@@ -140,6 +149,22 @@ export async function computeBalances(
       ])
       const data = result[0][0]
       latestBalances = typeof data === "string" ? JSON.parse(data) : latestBalances
+
+      // initialize walletBalances; going through each balance and each wallet
+      const wallets = await getWallets(accountName)
+      for (const balance of Object.keys(latestBalances)) {
+        for (const wallet of wallets) {
+          const [latestLog] = await getAuditLogs(
+            accountName,
+            `SELECT * FROM audit_logs WHERE wallet = ? AND assetId = ? AND timestamp <= ? ${orderQueryDesc} LIMIT 1`,
+            [wallet, balance, since]
+          )
+          if (!walletBalances[wallet]) {
+            walletBalances[wallet] = {}
+          }
+          walletBalances[wallet][balance] = latestLog?.balanceWallet || "0"
+        }
+      }
     } catch {
       // ignore
     }
@@ -160,12 +185,12 @@ export async function computeBalances(
     await progress([Math.floor((i * 90) / count), `Processing logs ${firstIndex} to ${lastIndex}`])
     const logs = await getAuditLogs(
       accountName,
-      "SELECT * FROM audit_logs WHERE timestamp >= ? ORDER BY timestamp ASC, changeN ASC, id ASC LIMIT ? OFFSET ?",
+      `SELECT * FROM audit_logs WHERE timestamp >= ? ${orderQueryAsc} LIMIT ? OFFSET ?`,
       [since, pageSize, i]
     )
 
     for (const log of logs) {
-      const { assetId, change, timestamp } = log
+      const { assetId, change, timestamp, wallet } = log
 
       if (genesisDay === 0) {
         genesisDay = timestamp - (timestamp % 86400000)
@@ -184,17 +209,37 @@ export async function computeBalances(
         }
       }
 
-      // update balance
+      // Initialize wallet balances if needed
+      if (!walletBalances[wallet]) {
+        walletBalances[wallet] = {}
+      }
+
+      // Update per-wallet balance
+      if (!walletBalances[wallet][assetId]) {
+        walletBalances[wallet][assetId] = change
+      } else {
+        walletBalances[wallet][assetId] = new Big(walletBalances[wallet][assetId])
+          .plus(new Big(change))
+          .toFixed()
+      }
+
+      // Update cumulative balance (for historical balances table)
       if (!latestBalances[assetId]) {
         latestBalances[assetId] = change
       } else {
         latestBalances[assetId] = new Big(latestBalances[assetId]).plus(new Big(change)).toFixed()
       }
 
-      // update audit log
+      // Update audit log
       log.balance = latestBalances[assetId] as string
+      log.balanceWallet = walletBalances[wallet][assetId] as string
 
-      // remove zero balances
+      // Remove zero wallet balances
+      if (walletBalances[wallet][assetId] === "0") {
+        delete walletBalances[wallet][assetId]
+      }
+
+      // remove zero balances from cumulative
       if (latestBalances[assetId] === "0") {
         delete latestBalances[assetId]
       }
@@ -210,8 +255,8 @@ export async function computeBalances(
     }
 
     await account.executeMany(
-      "UPDATE audit_logs SET balance = ? WHERE id = ?",
-      logs.map((log) => [log.balance as string, log.id])
+      "UPDATE audit_logs SET balance = ?, balanceWallet = ? WHERE id = ?",
+      logs.map((log) => [log.balance as string, log.balanceWallet as string, log.id])
     )
     account.eventEmitter.emit(SubscriptionChannel.AuditLogs, EventCause.Updated)
 
@@ -300,7 +345,7 @@ export function enqueueRefreshBalances(accountName: string, trigger: TaskTrigger
 export async function deleteBalances(accountName: string) {
   const account = await getAccount(accountName)
   await account.execute("DELETE FROM balances")
-  await account.execute("UPDATE audit_logs SET balance=null")
+  await account.execute("UPDATE audit_logs SET balance=null, balanceWallet=null")
   account.eventEmitter.emit(SubscriptionChannel.AuditLogs, EventCause.Updated)
   account.eventEmitter.emit(SubscriptionChannel.Balances)
 }
@@ -313,6 +358,138 @@ export function enqueueDeleteBalances(accountName: string, trigger: TaskTrigger)
       await deleteBalances(accountName)
     },
     name: "Delete balances",
+    priority: TaskPriority.Low,
+    trigger,
+  })
+}
+
+/**
+ * Checks on-chain balances for all wallets/assets and compares to stored balances.
+ * Returns a list of discrepancies: { wallet, assetId, onChain, stored }
+ */
+export async function verifyBalances(
+  accountName: string,
+  progress: ProgressCallback = noop,
+  signal?: AbortSignal
+) {
+  await progress([0, "Loading wallets and assets"])
+  const wallets = await getWallets(accountName)
+  const assets = await getMyAssets(accountName)
+
+  if (signal?.aborted) throw new Error(signal.reason)
+
+  // Filter to only EVM assets with coingeckoId
+  const evmAssets = assets.filter((asset) => {
+    if (!asset.coingeckoId) return false
+    const platform = getAssetPlatform(asset.id)
+    return platform && isEvmPlatform(platform) && PLATFORMS_META[platform]?.chainId
+  })
+
+  const totalChecks = wallets.length * evmAssets.length
+  await progress([5, `Checking ${totalChecks} wallet/asset combinations`])
+
+  const discrepancies: Array<{
+    assetId: string
+    onChain: string
+    platform: string
+    stored: string | undefined
+    wallet: string
+  }> = []
+
+  let currentCheck = 0
+  const orderQuery = await getAuditLogOrderQuery()
+
+  for (const wallet of wallets) {
+    for (const asset of evmAssets) {
+      if (signal?.aborted) throw new Error(signal.reason)
+
+      currentCheck++
+      const progressPercent = 5 + Math.floor((currentCheck * 85) / totalChecks)
+
+      if (currentCheck % 10 === 0) {
+        await progress([
+          progressPercent,
+          // `Checking ${asset.symbol || asset.id} balance for wallet ${wallet} (${currentCheck}/${totalChecks})`,
+        ])
+      }
+
+      const assetId = asset.id
+      const platformId = getAssetPlatform(assetId)
+      const platform = await getPlatform(platformId)
+      const meta = PLATFORMS_META[platformId]
+      const contract = getAssetContract(assetId)
+      let onChain: string | undefined
+
+      try {
+        if (contract === "0x0000000000000000000000000000000000000000") {
+          // Native asset
+          onChain = await getNativeBalance(wallet, meta.chainId)
+        } else {
+          // ERC-20
+          const { balance } = await getErc20Balance(contract, wallet, meta.chainId)
+          onChain = balance
+        }
+      } catch (error) {
+        await progress([
+          progressPercent,
+          `Error fetching ${asset.symbol || asset.id} for ${wallet}: ${error instanceof Error ? error.message : error}`,
+        ])
+        continue
+      }
+
+      // Get the latest balance for this wallet/asset combination
+      const [latestLog] = await getAuditLogs(
+        accountName,
+        `SELECT * FROM audit_logs WHERE wallet = ? AND assetId = ? ${orderQuery} LIMIT 1`,
+        [wallet, assetId]
+      )
+      if (!latestLog) continue
+      if (latestLog && !latestLog.balanceWallet) {
+        throw new Error(`No balance found on audit log. Did you forget to call "computeBalances"?`)
+      }
+      const stored = latestLog.balanceWallet
+
+      const onChainBig = onChain ? new Big(onChain) : new Big(0)
+      const storedBig = stored ? new Big(stored) : new Big(0)
+
+      const difference = onChainBig.minus(storedBig)
+
+      if (difference.gt(0) || difference.lt(0)) {
+        const onChainStr = onChainBig.toFixed()
+        const storedStr = storedBig.toFixed()
+        const diffStr = difference.toFixed()
+
+        const gravity = difference.lt(0) ? "Error" : "Warning"
+
+        await progress([
+          progressPercent,
+          `${gravity}: ${platform.name} wallet ${wallet} has a mismatch of ${asset.symbol || asset.id}: expected ${storedStr} but got ${onChainStr} (diff: ${diffStr})`,
+        ])
+
+        discrepancies.push({
+          assetId,
+          onChain: onChainStr,
+          platform: platformId,
+          stored: storedStr,
+          wallet,
+        })
+      }
+    }
+  }
+
+  await progress([undefined, `Found ${discrepancies.length} balance discrepancies`])
+  await progress([100, `Verification complete - ${discrepancies.length} discrepancies found`])
+  return discrepancies
+}
+
+export function enqueueVerifyBalances(accountName: string, trigger: TaskTrigger) {
+  return enqueueTask(accountName, {
+    description: "Verifying balances of owned assets.",
+    determinate: true,
+    function: async (progress, signal) => {
+      await verifyBalances(accountName, progress, signal)
+    },
+    name: "Verify balances",
     priority: TaskPriority.Low,
     trigger,
   })

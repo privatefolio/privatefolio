@@ -87,7 +87,7 @@ export function AuditLogTable(props: AuditLogsTableProps) {
         filterQuery = "WHERE " + filterConditions.join(" AND ")
       }
 
-      const orderQuery = `ORDER BY timestamp ${order}`
+      const orderQuery = await rpc.getAuditLogOrderQuery(order === "asc")
       const limitQuery = `LIMIT ${rowsPerPage} OFFSET ${page * rowsPerPage}`
 
       const query = `SELECT audit_logs.* FROM audit_logs ${tagJoin} ${tradeJoin} ${filterQuery} ${orderQuery} ${limitQuery}`
@@ -149,7 +149,7 @@ export function AuditLogTable(props: AuditLogsTableProps) {
       },
       {
         key: "balance",
-        label: "New balance",
+        label: "Wallet balance",
         numeric: true,
         sx: { width: "50%" },
       },

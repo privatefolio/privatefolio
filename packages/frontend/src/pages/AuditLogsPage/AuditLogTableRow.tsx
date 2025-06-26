@@ -22,7 +22,7 @@ import { AuditLogDrawer } from "./AuditLogDrawer"
 
 function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
   const { row, relativeTime, headCells, isMobile: _isMobile, isTablet, ...rest } = props
-  const { assetId, change, balance, operation, timestamp, platformId, wallet, id } = row
+  const { assetId, change, balanceWallet, operation, timestamp, platformId, wallet, id } = row
 
   const changeN = Number(change)
   const changeColor = changeN < 0 ? redColor : greenColor
@@ -143,9 +143,9 @@ function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
         <TableCell align="right" variant="clickable">
           <AssetAmountBlock
             assetId={assetId}
-            amount={balance}
+            amount={balanceWallet}
             priceMap={priceMap}
-            tooltipMessage="Use the 'Compute balances' action to compute these values."
+            tooltipMessage="Use the 'Compute balances' action to see these values."
           />
         </TableCell>
         <TableCell>

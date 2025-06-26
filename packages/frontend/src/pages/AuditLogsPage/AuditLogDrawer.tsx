@@ -110,7 +110,7 @@ export function AuditLogDrawer(props: AuditLogDrawerProps) {
           </Stack>
         </div>
         <div>
-          <SectionTitle>New balance</SectionTitle>
+          <SectionTitle>Wallet balance</SectionTitle>
           <Stack direction="row" alignItems="center" gap={0.25}>
             <AmountBlock amount={balance} currencyTicker={getAssetTicker(assetId)} />
             <AssetBlock id={assetId} variant="button" />

@@ -1,4 +1,4 @@
-import { DeleteForever, DownloadRounded, RestoreRounded } from "@mui/icons-material"
+import { CachedRounded, DeleteForever, DownloadRounded, RestoreRounded } from "@mui/icons-material"
 import { ActionSection } from "kbar"
 import { Priority } from "kbar/lib/types"
 import { enqueueSnackbar } from "notistack"
@@ -13,6 +13,7 @@ export enum ActionId {
   RESTORE_ADDRESS_BOOK = "action-restore-address-book",
   DELETE_ASSET_PRICES = "action-delete-asset-prices",
   DELETE_ASSET_PREFERENCES = "action-delete-asset-preferences",
+  VERIFY_BALANCES = "action-verify-balances",
 }
 
 const section: ActionSection = { name: "Actions", priority: 10 }
@@ -97,6 +98,19 @@ export const APP_ACTIONS: Record<ActionId, Action> = {
       const rpc = $rpc.get()
       await rpc.enqueueDeleteAssetPreferences(activeAccount, "user")
       await fetchInMemoryData(rpc, activeAccount)
+    },
+    priority: 0,
+    section,
+  },
+  [ActionId.VERIFY_BALANCES]: {
+    icon: <CachedRounded fontSize="small" />,
+    id: ActionId.VERIFY_BALANCES,
+    keywords: "verify balances",
+    name: "Verify balances",
+    perform: async () => {
+      const activeAccount = $activeAccount.get()
+      const rpc = $rpc.get()
+      await rpc.enqueueVerifyBalances(activeAccount, "user")
     },
     priority: 0,
     section,

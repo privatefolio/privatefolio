@@ -35,12 +35,7 @@ import { $rpc } from "src/workers/remotes"
 
 import { AddressInput } from "../../../components/AddressInput"
 import { SectionTitle } from "../../../components/SectionTitle"
-import {
-  BinanceConnectionOptions,
-  Connection,
-  ConnectionOptions,
-  RichExtension,
-} from "../../../interfaces"
+import { BinanceConnectionOptions, ConnectionOptions, RichExtension } from "../../../interfaces"
 import { $debugMode } from "../../../stores/app-store"
 
 export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
@@ -161,26 +156,25 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
        */
       setLoading(true)
       try {
-        const connections: Connection[] = []
+        const platformIds = platformId === "all" ? extension.platformIds! : [platformId]
 
-        for (const x of platformId === "all" ? extension.platformIds! : [platformId]) {
-          const connection = await rpc.upsertConnection(activeAccount, {
-            address,
-            apiKey,
-            apiSecret,
-            extensionId,
-            options,
-            platformId: x,
+        await Promise.all(
+          platformIds.map(async (platformId) => {
+            const connection = await rpc.upsertConnection(activeAccount, {
+              address,
+              apiKey,
+              apiSecret,
+              extensionId,
+              options,
+              platformId,
+            })
+            await rpc.enqueueSyncConnection(activeAccount, "user", connection.id, debugMode)
           })
-          connections.push(connection)
-        }
+        )
 
-        for (const connection of connections) {
-          atom.set(false)
-          rpc.enqueueSyncConnection(activeAccount, "user", connection.id, debugMode)
-        }
+        atom.set(false)
         enqueueSnackbar(
-          `${connections.length > 1 ? "Connections" : "Connection"} added, syncing...`,
+          `${platformIds.length > 1 ? "Connections" : "Connection"} added, syncing...`,
           { variant: "success" }
         )
       } catch (error) {

@@ -10,7 +10,7 @@ import {
   TaskCompletionCallback,
   TaskStatus,
 } from "src/interfaces"
-import { TASK_LOGS_LOCATION } from "src/settings/settings"
+import { TASK_LOG_CHAR_LIMIT, TASK_LOG_LINE_LIMIT, TASK_LOGS_LOCATION } from "src/settings/settings"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { getPrefix, isTestEnvironment, sleep } from "src/utils/utils"
@@ -132,7 +132,7 @@ function createProgressCallback(account: Account, taskId: number): ProgressCallb
 
   return async (update: ProgressUpdate) => {
     try {
-      if (entryCount >= 200) return
+      if (entryCount >= TASK_LOG_LINE_LIMIT) return
       if (isTestEnvironment) return
 
       const logEntry = `${new Date().toISOString()} ${JSON.stringify(update)}\n`
@@ -312,8 +312,8 @@ export async function getServerTaskLog(accountName: string, taskId: number) {
   try {
     await access(logFilePath)
     const lines = await readFile(logFilePath, "utf-8")
-    if (lines.length > 10_000) {
-      return lines.slice(0, 10_000)
+    if (lines.length > TASK_LOG_CHAR_LIMIT) {
+      return lines.slice(0, TASK_LOG_CHAR_LIMIT)
     } else {
       return lines
     }
