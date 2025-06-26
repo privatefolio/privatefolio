@@ -319,7 +319,9 @@ export const SearchBar = () => {
         perform: () =>
           rpc.enqueueSyncAllConnections(activeAccount, "user", $debugMode.get(), (error) => {
             if (error) {
-              enqueueSnackbar("Could not sync connection", { variant: "error" })
+              enqueueSnackbar(`Connections sync failed: ${error}`, { variant: "error" })
+            } else {
+              enqueueSnackbar("Connections synced", { variant: "success" })
             }
           }),
         priority: 10,

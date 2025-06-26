@@ -220,7 +220,7 @@ async function processQueue(accountName: string) {
             account.pendingTask = undefined
           }
           if (task.onCompletion) {
-            task.onCompletion(errorMessage ? new Error(errorMessage) : undefined)
+            task.onCompletion(errorMessage || undefined)
           }
         }
       }

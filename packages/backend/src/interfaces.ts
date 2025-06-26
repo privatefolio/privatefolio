@@ -20,8 +20,11 @@ export const TRANSACTIONS_TYPES = [
   "Unwrap",
   "Wrap",
   "Approve",
+  "Other",
 ] as const
 export type TransactionType = (typeof TRANSACTIONS_TYPES)[number]
+
+export const MANUAL_TX_TYPES: TransactionType[] = ["Swap", "Deposit", "Withdraw", "Other"]
 
 export const TRADE_TYPES = [
   "Long",
@@ -800,7 +803,7 @@ export interface NewServerTask extends Omit<ServerTask, "id"> {
   id?: number
 }
 
-export type TaskCompletionCallback = (error: Error | undefined) => void
+export type TaskCompletionCallback = (error: string | undefined) => void
 
 /**
  * First value represents a percentage (0-100), second value is a message

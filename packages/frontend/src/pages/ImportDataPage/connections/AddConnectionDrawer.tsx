@@ -1,4 +1,3 @@
-import { LoadingButton } from "@mui/lab"
 import {
   Checkbox,
   Chip,
@@ -26,6 +25,7 @@ import {
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { DrawerHeader } from "src/components/DrawerHeader"
 import { ExtensionAvatar } from "src/components/ExtensionAvatar"
+import { LoadingButton } from "src/components/LoadingButton"
 import { PlatformAvatar } from "src/components/PlatformAvatar"
 import { $activeAccount } from "src/stores/account-store"
 import { MonoFont } from "src/theme"
@@ -104,7 +104,6 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
   const handleSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault()
-
       const formData = new FormData(event.target as HTMLFormElement)
 
       /**
@@ -447,7 +446,12 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
           </div>
           {error && <FormHelperText error>{error}</FormHelperText>}
           <div>
-            <LoadingButton variant="contained" type="submit" loading={loading}>
+            <LoadingButton
+              loading={loading}
+              loadingText="Adding connection…"
+              variant="contained"
+              type="submit"
+            >
               Add connection
             </LoadingButton>
           </div>

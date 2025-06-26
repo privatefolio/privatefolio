@@ -156,25 +156,27 @@ export function ServerTaskTableRow(props: TableRowComponentProps<ServerTask>) {
           </Stack>
         </TableCell>
         <TableCell variant="actionList">
-          {(status === "queued" || status === "running") && (
-            <Tooltip title={status === "queued" ? "Cancel" : "Abort"}>
-              <IconButton
-                aria-label="Cancel Task"
-                size="small"
-                color="secondary"
-                onClick={() => rpc.cancelTask(activeAccount, id)}
-              >
-                <CancelOutlined fontSize="inherit" />
-              </IconButton>
-            </Tooltip>
-          )}
-          {status !== "queued" && (
-            <Tooltip title="Inspect">
-              <IconButton size="small" color="secondary" onClick={toggleOpen}>
-                <Visibility fontSize="inherit" />
-              </IconButton>
-            </Tooltip>
-          )}
+          <Stack direction="row" justifyContent="flex-end">
+            {(status === "queued" || status === "running") && (
+              <Tooltip title={status === "queued" ? "Cancel" : "Abort"}>
+                <IconButton
+                  aria-label="Cancel Task"
+                  size="small"
+                  color="secondary"
+                  onClick={() => rpc.cancelTask(activeAccount, id)}
+                >
+                  <CancelOutlined fontSize="inherit" />
+                </IconButton>
+              </Tooltip>
+            )}
+            {status !== "queued" && (
+              <Tooltip title="Inspect">
+                <IconButton size="small" color="secondary" onClick={toggleOpen}>
+                  <Visibility fontSize="inherit" />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Stack>
         </TableCell>
       </TableRow>
       {open && <TaskDetailsDialog open onClose={toggleOpen} task={row} />}

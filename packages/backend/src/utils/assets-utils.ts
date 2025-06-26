@@ -31,6 +31,7 @@ export function formatTicker(ticker?: string) {
 
 export const getAssetPlatform = memoize(function getAssetPlatform(assetId: string) {
   try {
+    if (!assetId.includes(":")) return undefined
     return assetId.split(":")[0]
   } catch {}
 })

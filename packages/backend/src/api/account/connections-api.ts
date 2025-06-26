@@ -386,7 +386,8 @@ export async function enqueueSyncConnection(
 export async function enqueueResetConnection(
   accountName: string,
   trigger: TaskTrigger,
-  connectionId: string
+  connectionId: string,
+  onCompletion?: TaskCompletionCallback
 ) {
   const connection = await getConnection(accountName, connectionId)
   const addressBook = JSON.parse(await getValue(accountName, "address_book", "{}"))
@@ -404,6 +405,7 @@ export async function enqueueResetConnection(
       await resetConnection(accountName, connectionId, progress)
     },
     name: `Reset connection #${connection.connectionNumber}`,
+    onCompletion,
     priority: TaskPriority.VeryHigh,
     trigger,
   })

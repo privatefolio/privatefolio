@@ -63,16 +63,18 @@ export function TagsTableRow({ row }: TagsTableRowProps) {
     <TableRow hover>
       <TableCell>{row.name}</TableCell>
       <TableCell variant="actionList">
-        <Tooltip title="Edit tag">
-          <IconButton size="small" onClick={handleEdit}>
-            <Edit fontSize="inherit" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Delete tag">
-          <IconButton size="small" onClick={handleDelete}>
-            <Delete fontSize="inherit" />
-          </IconButton>
-        </Tooltip>
+        <Stack direction="row" justifyContent="flex-end">
+          <Tooltip title="Edit tag">
+            <IconButton size="small" onClick={handleEdit}>
+              <Edit fontSize="inherit" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete tag">
+            <IconButton size="small" onClick={handleDelete}>
+              <Delete fontSize="inherit" />
+            </IconButton>
+          </Tooltip>
+        </Stack>
       </TableCell>
     </TableRow>
   )

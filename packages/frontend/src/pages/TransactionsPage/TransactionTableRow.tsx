@@ -167,7 +167,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
             placeholder=""
           />
         </TableCell>
-        <TableCell>
+        <TableCell variant="clickable">
           <AssetBlock id={outgoingAsset} variant="tablecell" />
         </TableCell>
         <TableCell align="right" variant="clickable">
@@ -180,7 +180,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
             placeholder=""
           />
         </TableCell>
-        <TableCell>
+        <TableCell variant="clickable">
           <AssetBlock id={incomingAsset} variant="tablecell" />
         </TableCell>
         <TableCell align="right" variant="clickable">
@@ -193,7 +193,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
             placeholder=""
           />
         </TableCell>
-        <TableCell>
+        <TableCell variant="clickable">
           <AssetBlock id={feeAsset} variant="tablecell" />
         </TableCell>
         <TableCell>

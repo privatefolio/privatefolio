@@ -1,6 +1,6 @@
-import { LoadingButton } from "@mui/lab"
 import {
   Autocomplete,
+  Box,
   Drawer,
   ListItemAvatar,
   ListItemText,
@@ -9,17 +9,20 @@ import {
   Stack,
   TextField,
 } from "@mui/material"
-import { DatePicker } from "@mui/x-date-pickers"
+import { DatePicker, TimePicker } from "@mui/x-date-pickers"
 import { useStore } from "@nanostores/react"
 import { WritableAtom } from "nanostores"
+import { enqueueSnackbar } from "notistack"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
+import { AddressInput } from "src/components/AddressInput"
+import { AssetBlock } from "src/components/AssetBlock"
 import { DrawerHeader } from "src/components/DrawerHeader"
+import { LoadingButton } from "src/components/LoadingButton"
 import { SectionTitle } from "src/components/SectionTitle"
-import { TRANSACTIONS_TYPES, TransactionType } from "src/interfaces"
+import { MANUAL_TX_TYPES, TransactionType } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 import { $assetMap, $platformMap } from "src/stores/metadata-store"
-import { getAssetTicker } from "src/utils/assets-utils"
-import { asUTC } from "src/utils/formatting-utils"
+import { formatTicker, getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
 import { $rpc } from "src/workers/remotes"
 
 import { PlatformAvatar } from "../../components/PlatformAvatar"
@@ -31,10 +34,6 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
 
   const [loading, setLoading] = useState(false)
 
-  const [feeAsset, setFeeAsset] = useState<string | null>(null)
-  const [incomingAsset, setIncomingAsset] = useState<string | null>(null)
-  const [outgoingAsset, setOutgoingAsset] = useState<string | null>(null)
-
   const [platformId, setPlatform] = useState<string>("ethereum")
   const [type, setType] = useState<TransactionType>("Swap")
   const [binanceWallet, setBinanceWallet] = useState("Spot")
@@ -43,7 +42,10 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
 
   const assetMap = useStore($assetMap)
 
-  const assetsIds: string[] = useMemo(() => Object.keys(assetMap), [assetMap])
+  const assetsIds: string[] = useMemo(
+    () => Object.keys(assetMap).filter((x) => getAssetPlatform(x) === platformId),
+    [assetMap, platformId]
+  )
 
   const handleTextInputChange = (event) => {
     const newValue = event.target.value.replace("\n", "")
@@ -63,14 +65,38 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
 
   const handleSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault()
       const formData = new FormData(event.target as HTMLFormElement)
 
-      const timestamp = asUTC(new Date(formData.get("timestamp") as string))
+      const dateAndTime = new Date(formData.get("date") as string)
+      const timeValue = formData.get("time") as string
+      const [hrs, minutes] = timeValue.split(":")
+      dateAndTime.setHours(parseInt(hrs))
+      dateAndTime.setMinutes(parseInt(minutes))
+      dateAndTime.setSeconds(0)
+      const timestamp = dateAndTime.getTime()
+
       const wallet =
-        platformId === "binance" ? binanceWallet : (formData.get("tx-wallet") as string)
+        platformId === "binance" ? binanceWallet : (formData.get("walletAddr") as string)
+
       const incoming = formData.get("incoming") as string
       const outgoing = formData.get("outgoing") as string
       const fee = formData.get("fee") as string
+
+      let incomingAsset = formData.get("incomingAsset") as string
+      let outgoingAsset = formData.get("outgoingAsset") as string
+      let feeAsset = formData.get("feeAsset") as string
+
+      // if assets don't have a platforms (free solo), set it to platformId
+      if (incomingAsset && !getAssetPlatform(incomingAsset)) {
+        incomingAsset = `${platformId}:${formatTicker(incomingAsset)}`
+      }
+      if (outgoingAsset && !getAssetPlatform(outgoingAsset)) {
+        outgoingAsset = `${platformId}:${formatTicker(outgoingAsset)}`
+      }
+      if (feeAsset && !getAssetPlatform(feeAsset)) {
+        feeAsset = `${platformId}:${formatTicker(feeAsset)}`
+      }
 
       if (!incoming && !outgoing && !fee) return
 
@@ -79,13 +105,13 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
         .addTransaction(
           {
             fee,
-            feeAsset: feeAsset || undefined,
+            feeAsset,
             incoming,
-            incomingAsset: incomingAsset || undefined,
+            incomingAsset,
             metadata: {},
             notes,
             outgoing,
-            outgoingAsset: outgoingAsset || undefined,
+            outgoingAsset,
             platformId,
             timestamp,
             type,
@@ -95,23 +121,14 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
         )
         .then(() => {
           atom.set(false)
+          enqueueSnackbar("Transaction added", { variant: "success" })
         })
-        .catch(() => {
+        .catch((error) => {
+          enqueueSnackbar(error.message, { variant: "error" })
           setLoading(false)
         })
     },
-    [
-      atom,
-      platformId,
-      binanceWallet,
-      type,
-      incomingAsset,
-      outgoingAsset,
-      feeAsset,
-      notes,
-      rpc,
-      activeAccount,
-    ]
+    [atom, platformId, binanceWallet, type, notes, rpc, activeAccount]
   )
 
   const platformMap = useStore($platformMap)
@@ -124,11 +141,16 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
     setBinanceWallet("Spot")
     setType("Swap")
     setNotes("")
-    setFeeAsset(null)
-    setIncomingAsset(null)
-    setOutgoingAsset(null)
     setLoading(false)
   }, [open])
+
+  const renderOption = (props, option) => (
+    <Box component="li" {...props} key={option}>
+      <AssetBlock id={option} variant="tablecell" href={undefined} hideTooltip />
+    </Box>
+  )
+
+  const getOptionLabel = (option: string) => (!option ? "" : getAssetTicker(option))
 
   return (
     <Drawer open={open} onClose={() => atom.set(false)}>
@@ -173,13 +195,14 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
                 ))}
               </Select>
             ) : (
-              <TextField
-                name="tx-wallet"
+              <AddressInput
+                name="walletAddr"
                 autoComplete="off"
                 variant="outlined"
                 fullWidth
                 size="small"
                 required
+                showAddressBook
               />
             )}
           </div>
@@ -193,7 +216,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
               value={type}
               onChange={(event) => setType(event.target.value as TransactionType)}
             >
-              {TRANSACTIONS_TYPES.map((x) => (
+              {MANUAL_TX_TYPES.map((x) => (
                 <MenuItem key={x} value={x}>
                   <ListItemText primary={x} />
                 </MenuItem>
@@ -201,8 +224,8 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
             </Select>
           </div>
           {type !== "Withdraw" ? (
-            <Stack direction="row" gap={1}>
-              <Stack width="60%">
+            <Stack direction="row" gap={1} alignItems="flex-end">
+              <Stack width="50%">
                 <SectionTitle>Incoming</SectionTitle>
                 <TextField
                   name="incoming"
@@ -214,27 +237,24 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
                   inputProps={{ inputMode: "decimal", pattern: "[0-9]*[.]?[0-9]*" }}
                 />
               </Stack>
-              <Stack width="40%">
-                <SectionTitle>Incoming Asset</SectionTitle>
+              <Stack width="50%">
                 <Autocomplete
-                  // disablePortal
+                  freeSolo
+                  disableClearable
+                  openOnFocus
                   fullWidth
-                  // disableClearable
                   options={assetsIds}
-                  getOptionLabel={(option) => getAssetTicker(option)}
-                  value={incomingAsset}
+                  renderOption={renderOption}
+                  getOptionLabel={getOptionLabel}
                   size="small"
-                  onChange={(event, newValue) => {
-                    setIncomingAsset(newValue)
-                  }}
-                  renderInput={(params) => <TextField {...params} required={true} />}
+                  renderInput={(params) => <TextField name="incomingAsset" {...params} required />}
                 />
               </Stack>
             </Stack>
           ) : null}
-          {type !== "Deposit" && type !== "Reward" ? (
-            <Stack direction="row" gap={1}>
-              <Stack width="60%">
+          {type !== "Deposit" ? (
+            <Stack direction="row" gap={1} alignItems="flex-end">
+              <Stack width="50%">
                 <SectionTitle>Outgoing</SectionTitle>
                 <TextField
                   name="outgoing"
@@ -246,26 +266,23 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
                   inputProps={{ inputMode: "decimal", pattern: "[0-9]*[.]?[0-9]*" }}
                 />
               </Stack>
-              <Stack width="40%">
-                <SectionTitle>Outgoing Asset</SectionTitle>
+              <Stack width="50%">
                 <Autocomplete
-                  // disablePortal
+                  freeSolo
+                  disableClearable
+                  openOnFocus
                   fullWidth
-                  // disableClearable
                   options={assetsIds}
-                  getOptionLabel={(option) => getAssetTicker(option)}
-                  value={outgoingAsset}
+                  renderOption={renderOption}
+                  getOptionLabel={getOptionLabel}
                   size="small"
-                  onChange={(event, newValue) => {
-                    setOutgoingAsset(newValue)
-                  }}
-                  renderInput={(params) => <TextField {...params} required={true} />}
+                  renderInput={(params) => <TextField name="outgoingAsset" {...params} required />}
                 />
               </Stack>
             </Stack>
           ) : null}
-          <Stack direction="row" gap={1}>
-            <Stack width="60%">
+          <Stack direction="row" gap={1} alignItems="flex-end">
+            <Stack width="50%">
               <SectionTitle>Fee</SectionTitle>
               <TextField
                 name="fee"
@@ -277,20 +294,17 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
                 inputProps={{ inputMode: "decimal", pattern: "[0-9]*[.]?[0-9]*" }}
               />
             </Stack>
-            <Stack width="40%">
-              <SectionTitle>Fee Asset</SectionTitle>
+            <Stack width="50%">
               <Autocomplete
-                // disablePortal
+                freeSolo
+                disableClearable
+                openOnFocus
                 fullWidth
-                // disableClearable
                 options={assetsIds}
-                getOptionLabel={(option) => getAssetTicker(option)}
-                value={feeAsset}
+                renderOption={renderOption}
+                getOptionLabel={getOptionLabel}
                 size="small"
-                onChange={(event, newValue) => {
-                  setFeeAsset(newValue)
-                }}
-                renderInput={(params) => <TextField {...params} required={true} />}
+                renderInput={(params) => <TextField name="feeAsset" {...params} />}
               />
             </Stack>
           </Stack>
@@ -298,8 +312,10 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
           <div>
             <SectionTitle>Date</SectionTitle>
             <DatePicker
-              name="timestamp"
+              name="date"
+              defaultValue={new Date()}
               slotProps={{
+                // desktopPaper: { transparent: "off" },
                 openPickerButton: {
                   color: "secondary",
                   size: "small",
@@ -307,6 +323,24 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
                 textField: {
                   fullWidth: true,
                   required: true,
+                  size: "small",
+                },
+              }}
+            />
+          </div>
+          <div>
+            <SectionTitle>Time</SectionTitle>
+            <TimePicker
+              ampm={false}
+              name="time"
+              defaultValue={new Date()}
+              slotProps={{
+                openPickerButton: {
+                  color: "secondary",
+                  size: "small",
+                },
+                textField: {
+                  fullWidth: true,
                   size: "small",
                 },
               }}
@@ -325,7 +359,12 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
             />
           </div>
           <div>
-            <LoadingButton variant="contained" type="submit" loading={loading}>
+            <LoadingButton
+              loading={loading}
+              loadingText="Adding transaction…"
+              variant="contained"
+              type="submit"
+            >
               Add Transaction
             </LoadingButton>
           </div>

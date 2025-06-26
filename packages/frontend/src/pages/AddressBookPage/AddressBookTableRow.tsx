@@ -1,5 +1,5 @@
 import { EditRounded, HighlightOffRounded } from "@mui/icons-material"
-import { IconButton, TableCell, TableRow, Tooltip } from "@mui/material"
+import { IconButton, Stack, TableCell, TableRow, Tooltip } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React from "react"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
@@ -35,50 +35,56 @@ export function AddressBookTableRow(props: TableRowComponentProps<LabeledAddress
         </TableCell>
         <TableCell>{label}</TableCell>
         <TableCell variant="actionList">
-          <Tooltip title="Edit label">
-            <IconButton
-              size="small"
-              color="secondary"
-              onClick={async () => {
-                const { confirmed, event } = await confirm({
-                  confirmText: "Save",
-                  content: <AddressBookForm address={wallet} label={label} />,
-                  focusInput: "label",
-                  title: "Edit address book",
-                })
+          <Stack direction="row" justifyContent="flex-end">
+            <Tooltip title="Edit label">
+              <IconButton
+                size="small"
+                color="secondary"
+                onClick={async () => {
+                  const { confirmed, event } = await confirm({
+                    confirmText: "Save",
+                    content: <AddressBookForm address={wallet} label={label} />,
+                    focusInput: "label",
+                    title: "Edit address book",
+                  })
 
-                if (confirmed && event) {
-                  const formData = new FormData(event.target as HTMLFormElement)
-                  const newLabel = (formData.get("label") as string).trim()
+                  if (confirmed && event) {
+                    const formData = new FormData(event.target as HTMLFormElement)
+                    const newLabel = (formData.get("label") as string).trim()
 
-                  if (!newLabel || newLabel === label) return
+                    if (!newLabel || newLabel === label) return
 
+                    const addressBook = $addressBook.get()
+                    const newAddressBook = { ...addressBook, [wallet]: newLabel }
+                    await rpc.setValue(
+                      activeAccount,
+                      "address_book",
+                      JSON.stringify(newAddressBook)
+                    )
+                    $addressBook.set(newAddressBook)
+                  }
+                }}
+              >
+                <EditRounded fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Remove">
+              <IconButton
+                size="small"
+                color="secondary"
+                onClick={async () => {
                   const addressBook = $addressBook.get()
-                  const newAddressBook = { ...addressBook, [wallet]: newLabel }
+                  const newAddressBook = Object.assign({}, addressBook)
+                  delete newAddressBook[wallet]
+
                   await rpc.setValue(activeAccount, "address_book", JSON.stringify(newAddressBook))
                   $addressBook.set(newAddressBook)
-                }
-              }}
-            >
-              <EditRounded fontSize="inherit" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Remove">
-            <IconButton
-              size="small"
-              color="secondary"
-              onClick={async () => {
-                const addressBook = $addressBook.get()
-                const newAddressBook = Object.assign({}, addressBook)
-                delete newAddressBook[wallet]
-
-                await rpc.setValue(activeAccount, "address_book", JSON.stringify(newAddressBook))
-                $addressBook.set(newAddressBook)
-              }}
-            >
-              <HighlightOffRounded fontSize="inherit" />
-            </IconButton>
-          </Tooltip>
+                }}
+              >
+                <HighlightOffRounded fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
+          </Stack>
         </TableCell>
       </TableRow>
     </>
