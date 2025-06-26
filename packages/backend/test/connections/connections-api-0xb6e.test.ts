@@ -181,6 +181,8 @@ describe("should import 0xb6e via connection", () => {
     //
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Removing 166 audit logs
+      25,Setting balances cursor to Mar 03, 2024
+      25,Setting networth cursor to Mar 03, 2024
       50,Removing 162 transactions"
     `)
     expect(remainingAuditLogs).toMatchInlineSnapshot(`0`)

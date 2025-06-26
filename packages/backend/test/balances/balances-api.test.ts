@@ -183,7 +183,6 @@ it.sequential("should delete all balances", async () => {
     [
       {
         "assetId": "coinmama:BTC",
-        "balanceWallet": "0.072958518",
         "change": "0.036979259",
         "fileImportId": "2702913076",
         "id": "2702913076_3604660326_0",
@@ -195,7 +194,6 @@ it.sequential("should delete all balances", async () => {
       },
       {
         "assetId": "coinmama:BTC",
-        "balanceWallet": "0.035979259",
         "change": "0.035979259",
         "fileImportId": "2702913076",
         "id": "2702913076_1607323056_0",

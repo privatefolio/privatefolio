@@ -59,6 +59,7 @@ describe("should import 0x003dc via connection", () => {
       50,Parsing all transactions
       60,Saving 1025 audit logs to disk
       70,Saving 949 transactions to disk
+      75,Setting balances cursor to Oct 06, 2017
       80,Saving metadata
       90,Setting cursor to 16727787"
     `)
@@ -137,6 +138,8 @@ describe("should import 0x003dc via connection", () => {
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Removing connection with id 179372894
       0,Removing 1025 audit logs
+      25,Setting balances cursor to Oct 06, 2017
+      25,Setting networth cursor to Oct 06, 2017
       50,Removing 667 transactions
       100,Removal complete"
     `)
