@@ -8,6 +8,7 @@ import {
 import { IconButton, ListItemAvatar, ListItemText, Menu, MenuItem, Tooltip } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React from "react"
+import { ActionId, APP_ACTIONS } from "src/AppActions"
 import { $activeAccount } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
 import { handleBackupRequest, onRestoreRequest } from "src/utils/backup-utils"
@@ -92,6 +93,26 @@ export function ImportDataActions() {
             <CloudSyncRounded fontSize="small" />
           </ListItemAvatar>
           <ListItemText>Sync all connections</ListItemText>
+        </MenuItem>
+        <MenuItem
+          dense
+          onClick={async () => {
+            await APP_ACTIONS[ActionId.EXPORT_ADDRESS_BOOK].perform()
+            handleClose()
+          }}
+        >
+          <ListItemAvatar>{APP_ACTIONS[ActionId.EXPORT_ADDRESS_BOOK].icon}</ListItemAvatar>
+          <ListItemText>{APP_ACTIONS[ActionId.EXPORT_ADDRESS_BOOK].name}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          dense
+          onClick={async () => {
+            await APP_ACTIONS[ActionId.RESTORE_ADDRESS_BOOK].perform()
+            handleClose()
+          }}
+        >
+          <ListItemAvatar>{APP_ACTIONS[ActionId.RESTORE_ADDRESS_BOOK].icon}</ListItemAvatar>
+          <ListItemText>{APP_ACTIONS[ActionId.RESTORE_ADDRESS_BOOK].name}</ListItemText>
         </MenuItem>
       </Menu>
     </>

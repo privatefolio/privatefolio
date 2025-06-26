@@ -401,7 +401,8 @@ export async function computeTrades(
     trade: Trade,
     txId: string,
     assetId: string,
-    log: AuditLog
+    log: AuditLog,
+    progress: ProgressCallback
   ): Promise<void> {
     const tx = await getTransaction(accountName, txId)
     const priceMap = await getAssetPriceMap(accountName, tx.timestamp)
@@ -417,9 +418,9 @@ export async function computeTrades(
       tx.incomingAsset === assetId &&
       log.operation === "Deposit"
     ) {
-      const assetPrice = priceMap[tx.incomingAsset]?.value
+      const assetPrice = priceMap[tx.incomingAsset]?.value || 0
       if (!assetPrice && !isTestEnvironment)
-        throw new Error(`Price not found for asset ${tx.incomingAsset}`)
+        await progress([undefined, `Warning: price not found for ${tx.incomingAsset}`])
       trade.deposits.push([
         tx.incomingAsset,
         tx.incoming,
@@ -436,9 +437,9 @@ export async function computeTrades(
       tx.outgoingAsset === assetId &&
       log.operation === "Withdraw"
     ) {
-      const assetPrice = priceMap[tx.outgoingAsset]?.value
+      const assetPrice = priceMap[tx.outgoingAsset]?.value || 0
       if (!assetPrice && !isTestEnvironment)
-        throw new Error(`Price not found for asset ${tx.outgoingAsset}`)
+        await progress([undefined, `Warning: price not found for ${tx.outgoingAsset}`])
       trade.deposits.push([
         tx.outgoingAsset,
         `-${tx.outgoing}`,
@@ -450,9 +451,9 @@ export async function computeTrades(
 
     // Cost
     if (tx.outgoingAsset && tx.outgoing && tx.incomingAsset === assetId) {
-      const assetPrice = priceMap[tx.outgoingAsset]?.value
+      const assetPrice = priceMap[tx.outgoingAsset]?.value || 0
       if (!assetPrice && !isTestEnvironment)
-        throw new Error(`Price not found for asset ${tx.outgoingAsset}`)
+        await progress([undefined, `Warning: price not found for ${tx.outgoingAsset}`])
       trade.cost.push([
         tx.outgoingAsset,
         `-${tx.outgoing}`,
@@ -465,9 +466,9 @@ export async function computeTrades(
 
     // Proceeds
     if (tx.incomingAsset && tx.incoming && tx.outgoingAsset === assetId) {
-      const assetPrice = priceMap[tx.incomingAsset]?.value
+      const assetPrice = priceMap[tx.incomingAsset]?.value || 0
       if (!assetPrice && !isTestEnvironment)
-        throw new Error(`Price not found for asset ${tx.incomingAsset}`)
+        await progress([undefined, `Warning: price not found for ${tx.incomingAsset}`])
       trade.proceeds.push([
         tx.incomingAsset,
         tx.incoming,
@@ -479,9 +480,9 @@ export async function computeTrades(
 
     // Fees
     if (tx.feeAsset && tx.fee && tx.feeAsset === assetId) {
-      const assetPrice = priceMap[tx.feeAsset]?.value
+      const assetPrice = priceMap[tx.feeAsset]?.value || 0
       if (!assetPrice && !isTestEnvironment)
-        throw new Error(`Price not found for asset ${tx.feeAsset}`)
+        await progress([undefined, `Warning: price not found for ${tx.feeAsset}`])
       trade.fees.push([
         tx.feeAsset,
         tx.fee,
@@ -526,7 +527,7 @@ export async function computeTrades(
         if (log.txId) {
           tradeTransactions.push([tradeId, log.txId])
           // Track transactions for cost/proceeds/fees
-          await processTransactionForTrade(currentTrade, log.txId, assetId, log)
+          await processTransactionForTrade(currentTrade, log.txId, assetId, log, progress)
         }
       }
       // If we have an active trade, update it
@@ -548,7 +549,7 @@ export async function computeTrades(
         if (log.txId) {
           tradeTransactions.push([currentTrade.id, log.txId])
           // Update cost, proceeds and fees if this is a transaction
-          await processTransactionForTrade(currentTrade, log.txId, assetId, log)
+          await processTransactionForTrade(currentTrade, log.txId, assetId, log, progress)
         }
 
         // Check if we need to close the current trade and start a new one

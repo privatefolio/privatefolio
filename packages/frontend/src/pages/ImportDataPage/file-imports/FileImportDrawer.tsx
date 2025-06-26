@@ -105,7 +105,7 @@ export function FileImportDrawer(props: FileImportDrawerProps) {
         </div>
         <div>
           <SectionTitle>Platform</SectionTitle>
-          {!meta ? <Skeleton height={20} width={80} /> : <PlatformBlock id={meta.platform} />}
+          {!meta ? <Skeleton height={20} width={80} /> : <PlatformBlock id={meta.platformId} />}
         </div>
         <div>
           <SectionTitle>Imported</SectionTitle>

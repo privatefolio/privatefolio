@@ -22,7 +22,7 @@ import { AuditLogDrawer } from "./AuditLogDrawer"
 
 function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
   const { row, relativeTime, headCells, isMobile: _isMobile, isTablet, ...rest } = props
-  const { assetId, change, balance, operation, timestamp, platform, wallet, id } = row
+  const { assetId, change, balance, operation, timestamp, platformId, wallet, id } = row
 
   const changeN = Number(change)
   const changeColor = changeN < 0 ? redColor : greenColor
@@ -109,7 +109,7 @@ function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
           <TimestampBlock timestamp={timestamp} relative={relativeTime} />
         </TableCell>
         <TableCell>
-          <PlatformBlock id={platform} hideName />
+          <PlatformBlock id={platformId} hideName />
         </TableCell>
         <TableCell variant="clickable">
           <IdentifierBlock id={wallet} variant="tablecell" label={getAddressBookEntry(wallet)} />

@@ -396,9 +396,9 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
         setLoading(false)
         setQueryTime(Date.now() - start)
       })
-      .catch((err) => {
-        console.error(err)
-        setError(err)
+      .catch((error) => {
+        console.error(error)
+        setError(error as Error)
         setLoading(false)
       })
   }, [queryFn, activeInterval])

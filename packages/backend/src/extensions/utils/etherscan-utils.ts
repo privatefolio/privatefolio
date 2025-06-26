@@ -46,13 +46,13 @@ function validTransactionGrouping(transactions: EtherscanTransaction[]) {
 }
 
 export function sortTransactions(
-  a: Pick<Transaction, "timestamp" | "platform" | "id">,
-  b: Pick<Transaction, "timestamp" | "platform" | "id">
+  a: Pick<Transaction, "timestamp" | "platformId" | "id">,
+  b: Pick<Transaction, "timestamp" | "platformId" | "id">
 ) {
   const delta = b.timestamp - a.timestamp
 
-  if (delta === 0 && a.platform === "ethereum") {
-    return trimTxId(a.id, a.platform).localeCompare(trimTxId(b.id, b.platform))
+  if (delta === 0 && a.platformId === "ethereum") {
+    return trimTxId(a.id, a.platformId).localeCompare(trimTxId(b.id, b.platformId))
   }
 
   return delta

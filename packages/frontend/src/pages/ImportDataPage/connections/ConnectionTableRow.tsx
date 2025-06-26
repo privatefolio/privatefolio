@@ -10,11 +10,13 @@ import {
   Typography,
 } from "@mui/material"
 import React from "react"
+import { IdentifierBlock } from "src/components/IdentifierBlock"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { Truncate } from "src/components/Truncate"
 import { useBoolean } from "src/hooks/useBoolean"
 import { Connection } from "src/interfaces"
+import { getAddressBookEntry } from "src/stores/metadata-store"
 import { MonoFont } from "src/theme"
 import { formatNumber } from "src/utils/formatting-utils"
 import { TableRowComponentProps } from "src/utils/table-utils"
@@ -23,8 +25,10 @@ import { ConnectionDrawer } from "./ConnectionDrawer"
 
 export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
   const { row, relativeTime, headCells, isMobile: _isMobile, isTablet, ...rest } = props
-  const { key, address, timestamp, syncedAt, platform: platformId, label, meta } = row
+  const { apiKey: key, address, timestamp, syncedAt, platformId, meta, connectionNumber } = row
   const { value: open, toggle: toggleOpen } = useBoolean(false)
+
+  const wallet = (address ?? key) as string
 
   if (isTablet) {
     return (
@@ -63,16 +67,8 @@ export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
                 </Box>
               </Stack>
               <Stack gap={0.5} alignItems={"flex-end"} sx={{ fontSize: "0.75rem", minWidth: 90 }}>
-                {!meta ? (
-                  <Skeleton height={20} width={80} />
-                ) : (
-                  <span>{formatNumber(meta.logs)} audit logs</span>
-                )}
-                {!meta ? (
-                  <Skeleton height={20} width={80} />
-                ) : (
-                  <span>{formatNumber(meta.transactions)} txns</span>
-                )}
+                <span>{formatNumber(meta?.logs || 0)} audit logs</span>
+                <span>{formatNumber(meta?.transactions || 0)} txns</span>
               </Stack>
             </Stack>
           </TableCell>
@@ -91,10 +87,8 @@ export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
   return (
     <>
       <TableRow hover {...rest}>
-        <TableCell sx={{ maxWidth: 180, minWidth: 180, width: 180 }}>
-          <TimestampBlock timestamp={timestamp} relative={relativeTime} />
-        </TableCell>
-        <TableCell sx={{ maxWidth: 180, minWidth: 180, width: 180 }}>
+        <TableCell>{connectionNumber}</TableCell>
+        <TableCell>
           {!syncedAt ? (
             <Typography color="text.secondary" component="span" variant="inherit">
               Not synced
@@ -103,71 +97,33 @@ export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
             <TimestampBlock timestamp={syncedAt} relative={relativeTime} />
           )}
         </TableCell>
-        <TableCell sx={{ maxWidth: 420, minWidth: 300, width: 420 }}>
-          <Stack spacing={1} direction="row" sx={{ fontFamily: MonoFont }}>
-            {platformId ? <PlatformBlock id={platformId} hideName /> : <Skeleton></Skeleton>}
-            {address ? (
-              <Tooltip title={address}>
-                <Truncate>{address}</Truncate>
-              </Tooltip>
-            ) : (
-              <Tooltip title={key}>
-                <Truncate>{key}</Truncate>
-              </Tooltip>
-            )}
-            <Typography color="text.secondary" component="span" variant="inherit">
-              {" "}
-              {label}
-            </Typography>
-          </Stack>
+        <TableCell>
+          <PlatformBlock id={platformId} hideName />
         </TableCell>
-        {/* <TableCell sx={{ fontFamily: MonoFont, maxWidth: 400, minWidth: 400, width: 400 }}>
-        <Tooltip title={address}>
-          <Truncate>{address}</Truncate>
-        </Tooltip>
-      </TableCell> */}
-        {/* <TableCell sx={{ maxWidth: 180, minWidth: 180, width: 180 }}>
-        <TimestampCell timestamp={lastModified} relative={relativeTime} />
-      </TableCell> */}
-        <TableCell
-          sx={{ fontFamily: MonoFont, maxWidth: 128, minWidth: 128, width: 128 }}
-          align="right"
-        >
-          {!meta ? (
-            <Skeleton></Skeleton>
+        <TableCell>
+          <IdentifierBlock id={wallet} variant="tablecell" label={getAddressBookEntry(wallet)} />
+        </TableCell>
+        <TableCell sx={{ fontFamily: MonoFont }} align="right">
+          {meta?.logs === meta?.rows ? (
+            <span>{formatNumber(meta?.logs || 0)}</span>
           ) : (
-            <>
-              {meta.logs === meta.rows ? (
-                <span>{formatNumber(meta.logs)}</span>
-              ) : (
-                <Tooltip
-                  title={`${formatNumber(meta.logs)} audit logs extracted from ${formatNumber(
-                    meta.rows
-                  )} entries`}
-                >
-                  <span>{formatNumber(meta.logs)}</span>
-                </Tooltip>
-              )}
-            </>
+            <Tooltip
+              title={`${formatNumber(meta?.logs || 0)} audit logs extracted from ${formatNumber(
+                meta?.rows || 0
+              )} entries`}
+            >
+              <span>{formatNumber(meta?.logs || 0)}</span>
+            </Tooltip>
           )}
         </TableCell>
-        <TableCell
-          sx={{ fontFamily: MonoFont, maxWidth: 120, minWidth: 120, width: 120 }}
-          align="right"
-        >
-          {!meta ? (
-            <Skeleton></Skeleton>
-          ) : (
-            <>
-              <Tooltip
-                title={`${formatNumber(
-                  meta.transactions
-                )} transactions extracted from ${formatNumber(meta.rows)} entries`}
-              >
-                <span>{formatNumber(meta.transactions)}</span>
-              </Tooltip>
-            </>
-          )}
+        <TableCell sx={{ fontFamily: MonoFont }} align="right">
+          <Tooltip
+            title={`${formatNumber(
+              meta?.transactions || 0
+            )} transactions extracted from ${formatNumber(meta?.rows || 0)} entries`}
+          >
+            <span>{formatNumber(meta?.transactions || 0)}</span>
+          </Tooltip>
         </TableCell>
         <TableCell variant="actionList">
           <Tooltip title="Inspect">

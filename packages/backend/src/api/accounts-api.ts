@@ -350,22 +350,6 @@ CREATE TABLE daily_prices (
 `)
 
   await account.execute(sql`
-CREATE TABLE connections (
-  id VARCHAR PRIMARY KEY,
-  address VARCHAR,
-  key VARCHAR,
-  label VARCHAR,
-  meta JSON,
-  options JSON,
-  extensionId VARCHAR NOT NULL,
-  platform VARCHAR NOT NULL,
-  secret VARCHAR,
-  syncedAt INTEGER,
-  timestamp INTEGER NOT NULL
-);
-`)
-
-  await account.execute(sql`
 CREATE TABLE networth (
   timestamp INTEGER PRIMARY KEY,
   time INTEGER NOT NULL,

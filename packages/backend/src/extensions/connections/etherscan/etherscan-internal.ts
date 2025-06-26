@@ -17,7 +17,7 @@ export function parseInternal(
   index: number,
   connection: EtherscanConnection
 ): ParserResult {
-  const { platform, address } = connection
+  const { platformId, address } = connection
   //
   let {
     to,
@@ -42,7 +42,7 @@ export function parseInternal(
   }
   const wallet = address
   const txId = `${connection.id}_${txHash}_INTERNAL_${index}`
-  const assetId = PLATFORMS_META[platform].nativeAssetId as string
+  const assetId = PLATFORMS_META[platformId].nativeAssetId as string
   const operation: AuditLogOperation = to === wallet ? "Deposit" : "Withdraw"
   const type: TransactionType = operation
 
@@ -68,7 +68,7 @@ export function parseInternal(
     id: `${txId}_VALUE_0`,
     importIndex: index,
     operation,
-    platform,
+    platformId,
     timestamp,
     txId,
     wallet,
@@ -84,7 +84,7 @@ export function parseInternal(
       id: `${txId}_WETH_${index}`,
       importIndex: index + 0.1,
       operation: "Withdraw",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -103,7 +103,7 @@ export function parseInternal(
     },
     outgoing: outgoing === "0" ? undefined : outgoing,
     outgoingAsset: outgoing === "0" ? undefined : outgoingAsset,
-    platform,
+    platformId,
     timestamp,
     type,
     wallet,

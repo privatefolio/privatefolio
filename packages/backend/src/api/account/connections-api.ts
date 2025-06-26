@@ -1,6 +1,7 @@
 import { getAddress } from "ethers"
 import { SqlParam, TaskCompletionCallback } from "src/interfaces"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 
 import { syncBinance } from "../../extensions/connections/binance/binance-connector"
@@ -20,16 +21,55 @@ import {
 import { hashString, noop } from "../../utils/utils"
 import { getAccount } from "../accounts-api"
 import { countAuditLogs, upsertAuditLogs } from "./audit-logs-api"
+import { getExtension } from "./extensions-api"
 import { getValue, setValue } from "./kv-api"
+import { getPlatform } from "./platforms-api"
 import { enqueueTask } from "./server-tasks-api"
 import { countTransactions, upsertTransactions } from "./transactions-api"
+
+const SCHEMA_VERSION = 5
+
+async function getAccountWithConnections(accountName: string) {
+  const schemaVersion = await getValue(accountName, `connections_schema_version`, 0)
+
+  const account = await getAccount(accountName)
+
+  if (schemaVersion < SCHEMA_VERSION) {
+    await account.execute(sql`DROP TABLE IF EXISTS connections`)
+
+    await account.execute(sql`
+      CREATE TABLE connections (
+        id VARCHAR PRIMARY KEY,
+        connectionNumber INTEGER NOT NULL UNIQUE,
+        address VARCHAR,
+        key VARCHAR,
+        meta JSON,
+        options JSON,
+        extensionId VARCHAR NOT NULL,
+        platform VARCHAR NOT NULL,
+        secret VARCHAR,
+        syncedAt INTEGER,
+        timestamp INTEGER NOT NULL
+      );
+    `)
+
+    await account.execute(sql`
+      INSERT OR IGNORE INTO key_value (key, value)
+      VALUES ('connection_seq', 0);
+    `)
+
+    await setValue(accountName, `connections_schema_version`, SCHEMA_VERSION)
+  }
+
+  return account
+}
 
 export async function getConnections(
   accountName: string,
   query = "SELECT * FROM connections",
   params?: SqlParam[]
 ) {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithConnections(accountName)
 
   try {
     const result = await account.execute(query, params)
@@ -38,14 +78,14 @@ export async function getConnections(
       /* eslint-disable sort-keys-fix/sort-keys-fix */
       const value = {
         id: row[0] as string,
-        address: row[1] as string,
-        key: row[2] as string,
-        label: row[3] as string,
+        connectionNumber: row[1] as number,
+        address: row[2] as string,
+        apiKey: row[3] as string,
         meta: JSON.parse(row[4] as string),
         options: JSON.parse(row[5] as string),
         extensionId: row[6] as string,
-        platform: row[7] as string,
-        secret: row[8] as string,
+        platformId: row[7] as string,
+        apiSecret: row[8] as string,
         syncedAt: row[9] as number,
         timestamp: row[10] as number,
       }
@@ -68,7 +108,7 @@ export async function countConnections(
   query = "SELECT COUNT(*) FROM connections",
   params?: SqlParam[]
 ): Promise<number> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithConnections(accountName)
 
   try {
     const result = await account.execute(query, params)
@@ -80,36 +120,45 @@ export async function countConnections(
 
 type PartialProps<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
-export type NewConnection = PartialProps<Connection, "id" | "timestamp" | "syncedAt">
+export type NewConnection = PartialProps<
+  Connection,
+  "id" | "timestamp" | "syncedAt" | "connectionNumber"
+>
 
 function deriveConnectionId(record: NewConnection) {
-  return hashString(
-    `con_${record.platform}_${record.extensionId}_${record.address || record.key}_${record.label}`
-  )
+  return hashString(`${record.extensionId}_${record.platformId}_${record.address || record.apiKey}`)
 }
 
 export async function upsertConnections(accountName: string, records: NewConnection[]) {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithConnections(accountName)
 
   try {
+    const seq = await getValue(accountName, "connection_seq", 0)
     await account.executeMany(
       `INSERT OR REPLACE INTO connections (
-        id, address, key, label, meta, options, extensionId, platform, secret, syncedAt, timestamp
+        id, connectionNumber, address, key, meta, options, extensionId, platform, secret, syncedAt, timestamp
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      records.map((record) => [
+      records.map((record, index) => [
         record.id || deriveConnectionId(record),
+        typeof record.connectionNumber === "number" ? record.connectionNumber : seq + index + 1,
         record.address ? getAddress(record.address) : null,
-        record.key || null,
-        record.label || null,
+        record.apiKey || null,
         JSON.stringify(record.meta) || null,
         JSON.stringify(record.options) || null,
         record.extensionId,
-        record.platform,
-        record.secret || null,
+        record.platformId,
+        record.apiSecret || null,
         record.syncedAt || null,
-        record.timestamp || new Date().getTime(),
+        record.timestamp || Date.now(),
       ])
     )
+    for (const record of records) {
+      await setValue(accountName, `cursor_${record.id || deriveConnectionId(record)}`, 0)
+    }
+    const latestConnectionNumber = await account.execute(
+      sql`SELECT MAX(connectionNumber) FROM connections`
+    )
+    await setValue(accountName, "connection_seq", latestConnectionNumber[0][0] as number)
     account.eventEmitter.emit(SubscriptionChannel.Connections, EventCause.Created)
   } catch (error) {
     throw new Error(`Failed to add or replace connections: ${error}`)
@@ -117,8 +166,8 @@ export async function upsertConnections(accountName: string, records: NewConnect
 
   const results = await getConnections(
     accountName,
-    "SELECT * FROM connections WHERE id = ?",
-    records.map((records) => records.id || deriveConnectionId(records))
+    "SELECT * FROM connections WHERE id IN (" + records.map(() => "?").join(",") + ")",
+    records.map((record) => record.id || deriveConnectionId(record))
   )
   for (const connection of results) {
     account.eventEmitter.emit(SubscriptionChannel.Connections, EventCause.Created, connection)
@@ -137,7 +186,7 @@ export async function resetConnection(
   connectionId: string,
   progress: ProgressCallback
 ) {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithConnections(accountName)
   const connection = await getConnection(accountName, connectionId)
 
   const auditLogsCount = await countAuditLogs(
@@ -181,7 +230,7 @@ export async function deleteConnection(
 ) {
   const connection = await getConnection(accountName, connectionId)
   await progress([0, `Removing connection with id ${connection.id}`])
-  const account = await getAccount(accountName)
+  const account = await getAccountWithConnections(accountName)
 
   const auditLogsCount = await resetConnection(accountName, connectionId, progress)
 
@@ -305,8 +354,16 @@ export async function enqueueSyncConnection(
   onCompletion?: TaskCompletionCallback
 ) {
   const connection = await getConnection(accountName, connectionId)
+  const addressBook = JSON.parse(await getValue(accountName, "address_book", "{}"))
+  const walletId = connection.address || connection.apiKey
+  const platform = await getPlatform(connection.platformId)
+  const extension = await getExtension(connection.extensionId)
+  const walletLabel = addressBook[walletId] || walletId
+  const platformLabel = platform?.name || connection.platformId
+  const extensionLabel = extension?.extensionName || connection.extensionId
+
   return enqueueTask(accountName, {
-    description: `Sync "${connection.address || connection.key}"`,
+    description: `Sync "${walletLabel}" from ${platformLabel} (${extensionLabel})`,
     determinate: true,
     function: async (progress, signal) => {
       await syncConnection(
@@ -319,7 +376,7 @@ export async function enqueueSyncConnection(
         signal
       )
     },
-    name: "Sync connection",
+    name: `Sync connection #${connection.connectionNumber}`,
     onCompletion,
     priority: TaskPriority.High,
     trigger,
@@ -332,13 +389,21 @@ export async function enqueueResetConnection(
   connectionId: string
 ) {
   const connection = await getConnection(accountName, connectionId)
+  const addressBook = JSON.parse(await getValue(accountName, "address_book", "{}"))
+  const walletId = connection.address || connection.apiKey
+  const platform = await getPlatform(connection.platformId)
+  const extension = await getExtension(connection.extensionId)
+  const walletLabel = addressBook[walletId] || walletId
+  const platformLabel = platform?.name || connection.platformId
+  const extensionLabel = extension?.extensionName || connection.extensionId
+
   return enqueueTask(accountName, {
-    description: `Reset "${connection.address}"`,
+    description: `Reset "${walletLabel}" from ${platformLabel} (${extensionLabel})`,
     determinate: true,
     function: async (progress) => {
       await resetConnection(accountName, connectionId, progress)
     },
-    name: "Reset connection",
+    name: `Reset connection #${connection.connectionNumber}`,
     priority: TaskPriority.VeryHigh,
     trigger,
   })
@@ -351,13 +416,21 @@ export async function enqueueDeleteConnection(
   onCompletion?: TaskCompletionCallback
 ) {
   const connection = await getConnection(accountName, connectionId)
+  const addressBook = JSON.parse(await getValue(accountName, "address_book", "{}"))
+  const walletId = connection.address || connection.apiKey
+  const platform = await getPlatform(connection.platformId)
+  const extension = await getExtension(connection.extensionId)
+  const walletLabel = addressBook[walletId] || walletId
+  const platformLabel = platform?.name || connection.platformId
+  const extensionLabel = extension?.extensionName || connection.extensionId
+
   return enqueueTask(accountName, {
-    description: `Remove "${connection.label}", alongside its audit logs and transactions.`,
+    description: `Remove "${walletLabel}" from ${platformLabel} (${extensionLabel}), alongside its audit logs and transactions.`,
     determinate: true,
     function: async (progress) => {
       await deleteConnection(accountName, connectionId, progress)
     },
-    name: "Remove connection",
+    name: `Remove connection #${connection.connectionNumber}`,
     onCompletion,
     priority: TaskPriority.Highest,
     trigger,

@@ -13,7 +13,7 @@ import { asUTC } from "src/utils/formatting-utils"
 
 export const extensionId = "etherscan-file-import"
 export const parserId = "etherscan-erc20"
-export const platform = "ethereum"
+export const platformId = "ethereum"
 
 export const HEADERS = [
   '"Txhash","Blockno","UnixTimestamp","DateTime (UTC)","From","To","TokenValue","USDValueDayOfTx","ContractAddress","TokenName","TokenSymbol"',
@@ -65,7 +65,7 @@ export function parse(
   const operation: AuditLogOperation = to === userAddress ? "Deposit" : "Withdraw"
   const type: TransactionType = operation
   const wallet = operation === "Deposit" ? to : from
-  const assetId = `${platform}:${contractAddress}:${symbol}`
+  const assetId = `${platformId}:${contractAddress}:${symbol}`
   const importId = fileImportId
   const importIndex = index
 
@@ -90,7 +90,7 @@ export function parse(
       id: `${txId}_TRANSFER_${index}`,
       importIndex,
       operation,
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -109,7 +109,7 @@ export function parse(
     },
     outgoing: outgoing === "0" ? undefined : outgoing,
     outgoingAsset: outgoing === "0" ? undefined : outgoingAsset,
-    platform,
+    platformId,
     timestamp,
     type,
     wallet,

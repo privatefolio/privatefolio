@@ -26,18 +26,18 @@ export function sanitizeAuditLog(auditLog: AuditLog) {
     connectionId: _connectionId,
     fileImportId: _fileImportId,
     importIndex: _importIndex,
-    platform,
+    platformId,
     timestamp,
     txId: fullTxId,
     balance,
     ...rest
   } = auditLog
 
-  const id = platform === "binance" ? fullId : trimAuditLogId(fullId, auditLog.platform)
-  let txId = fullTxId ? trimTxId(fullTxId, auditLog.platform) : undefined
+  const id = platformId === "binance" ? fullId : trimAuditLogId(fullId, auditLog.platformId)
+  let txId = fullTxId ? trimTxId(fullTxId, auditLog.platformId) : undefined
   let time = timestamp
 
-  if (platform === "binance") {
+  if (platformId === "binance") {
     time = (timestamp / 1000) | 0
     txId = undefined
   }
@@ -45,7 +45,7 @@ export function sanitizeAuditLog(auditLog: AuditLog) {
   return {
     balance,
     id,
-    platform,
+    platform: platformId,
     timestamp: time,
     txId,
     ...rest,
@@ -63,21 +63,21 @@ export function sanitizeTransaction(transaction: Transaction) {
     connectionId: _connectionId,
     fileImportId: _fileImportId,
     importIndex: _importIndex,
-    platform,
+    platformId,
     timestamp,
     ...rest
   } = transaction
 
   const id =
-    platform === "ethereum" ? trimTxId(transaction.id, transaction.platform) : transaction.id
+    platformId === "ethereum" ? trimTxId(transaction.id, transaction.platformId) : transaction.id
   let time = timestamp
-  if (platform === "binance") {
+  if (platformId === "binance") {
     time = (timestamp / 1000) | 0
   }
 
   return {
     _id: id,
-    platform,
+    platform: platformId,
     timestamp: time,
     ...rest,
   }

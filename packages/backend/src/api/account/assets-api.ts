@@ -9,7 +9,12 @@ import {
   TaskTrigger,
 } from "src/interfaces"
 import { CACHE_LOCATION } from "src/settings/settings"
-import { getAssetContract, getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
+import {
+  getAssetContract,
+  getAssetPlatform,
+  getAssetTicker,
+  ZERO_ADDRESS,
+} from "src/utils/assets-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
@@ -56,10 +61,23 @@ export async function getMyAssets(
     const cachedAssets = await getAssets()
 
     return results.map((result) => {
-      let cachedAsset = cachedAssets.find((asset) => asset.id === result.id)
-      if (!cachedAsset) {
+      let cachedAsset = cachedAssets.find((x) => x.id === result.id)
+      const contract = getAssetContract(result.id)
+      const platform = getAssetPlatform(result.id)
+      const ticker = getAssetTicker(result.id)
+      if (!cachedAsset && !contract && platform) {
+        cachedAsset = cachedAssets.find((x) => getAssetTicker(x.id) === ticker)
+      }
+      if (!cachedAsset && contract === ZERO_ADDRESS) {
+        cachedAsset = cachedAssets.find((x) => x.coingeckoId === platform)
+      }
+      if (!cachedAsset && contract === ZERO_ADDRESS && ticker === "ETH") {
+        cachedAsset = cachedAssets.find((x) => x.coingeckoId === "ethereum")
+      }
+      if (!cachedAsset && contract && platform) {
         cachedAsset = cachedAssets.find(
-          (asset) => getAssetTicker(asset.id) === getAssetTicker(result.id)
+          (x) =>
+            x.platforms && x.platforms[platform] && x.platforms[platform] === contract.toLowerCase()
         )
       }
       return { ...cachedAsset, ...result }
@@ -259,4 +277,22 @@ export function enqueueRefetchAssets(accountName: string, trigger: TaskTrigger) 
 
 export async function subscribeToAssetMetadata(accountName: string, callback: () => void) {
   return createSubscription(accountName, SubscriptionChannel.AssetMetadata, callback)
+}
+
+export async function deleteAssetPreferences(accountName: string) {
+  const account = await getAccount(accountName)
+  await account.execute("DELETE FROM assets")
+}
+
+export function enqueueDeleteAssetPreferences(accountName: string, trigger: TaskTrigger) {
+  return enqueueTask(accountName, {
+    description: "Deleting asset preferences (priceApiId, etc) for all assets.",
+    determinate: true,
+    function: async () => {
+      await deleteAssetPreferences(accountName)
+    },
+    name: "Delete asset preferences",
+    priority: TaskPriority.High,
+    trigger,
+  })
 }

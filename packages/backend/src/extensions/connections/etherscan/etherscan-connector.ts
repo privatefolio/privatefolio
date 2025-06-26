@@ -28,9 +28,9 @@ export async function syncEtherscan(
   since: string,
   until: string
 ) {
-  const chainId = PLATFORMS_META[connection.platform].chainId
+  const chainId = PLATFORMS_META[connection.platformId].chainId
   if (!chainId) {
-    throw new Error(`ChainId not found for platform: ${connection.platform}`)
+    throw new Error(`ChainId not found for platform: ${connection.platformId}`)
   }
 
   const rpcProvider = new FullEtherscanProvider(chainId, ETHERSCAN_API_KEY_V2)
@@ -58,7 +58,7 @@ export async function syncEtherscan(
   let staking: StakingWithdrawalTransaction[] = []
   let blocks: BlockRewardTransaction[] = []
 
-  if (connection.platform === "ethereum") {
+  if (connection.platformId === "ethereum") {
     staking = await rpcProvider.getStakingWithdrawalTransactions(connection.address, since, until)
     await progress([40, `Fetched ${staking.length} Staking Withdrawal transactions`])
     blocks = await rpcProvider.getBlockRewardTransactions(connection.address, since, until)

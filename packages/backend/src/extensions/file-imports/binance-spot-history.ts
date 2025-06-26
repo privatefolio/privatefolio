@@ -6,7 +6,7 @@ import { hashString } from "src/utils/utils"
 
 export const extensionId = "binance-file-import"
 export const parserId = "binance-spot-history"
-export const platform = "binance"
+export const platformId = "binance"
 
 export const HEADER = '"Date(UTC)","Pair","Side","Price","Executed","Amount","Fee"'
 
@@ -57,7 +57,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       metadata: { pair },
       outgoing: amount,
       outgoingAsset: quoteAssetId,
-      platform,
+      platformId,
       price,
       timestamp,
       type: "Swap",
@@ -70,7 +70,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       id: `${txId}_0`,
       importIndex: index,
       operation: "Sell",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -82,7 +82,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       id: `${txId}_1`,
       importIndex: index + 0.1,
       operation: "Buy",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -100,7 +100,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       metadata: { pair },
       outgoing: executed,
       outgoingAsset: baseAssetId,
-      platform,
+      platformId,
       price,
       timestamp,
       type: "Swap",
@@ -113,7 +113,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       id: `${txId}_0`,
       importIndex: index,
       operation: "Sell",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -125,7 +125,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       id: `${txId}_1`,
       importIndex: index + 0.1,
       operation: "Buy",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -139,7 +139,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
     id: `${txId}_2`,
     importIndex: index + 0.2,
     operation: "Fee",
-    platform,
+    platformId,
     timestamp,
     txId,
     wallet,

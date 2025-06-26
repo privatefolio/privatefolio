@@ -17,7 +17,7 @@ export function parseBlockReward(
   connection: EtherscanConnection
 ): ParserResult {
   // ----------------------------------------------------------------- Parse
-  const { platform, address } = connection
+  const { platformId, address } = connection
   const { blockReward: amount, timeStamp: time, blockNumber } = row
   // ----------------------------------------------------------------- Derive
   const timestamp = new Date(Number(time) * 1000).getTime()
@@ -26,7 +26,7 @@ export function parseBlockReward(
   }
   const wallet = address
   const txId = `${connection.id}_${wallet}+${blockNumber}_BLOCK_${index}`
-  const assetId = PLATFORMS_META[platform].nativeAssetId as string
+  const assetId = PLATFORMS_META[platformId].nativeAssetId as string
   const operation: AuditLogOperation = "Reward"
   const type: TransactionType = operation
 
@@ -44,7 +44,7 @@ export function parseBlockReward(
     id: `${txId}_VALUE_0`,
     importIndex: index,
     operation,
-    platform,
+    platformId,
     timestamp,
     txId,
     wallet,
@@ -57,7 +57,7 @@ export function parseBlockReward(
     incoming: incoming === "0" ? undefined : incoming,
     incomingAsset: incoming === "0" ? undefined : incomingAsset,
     metadata: {},
-    platform,
+    platformId,
     timestamp,
     type,
     wallet,

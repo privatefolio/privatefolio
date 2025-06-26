@@ -120,8 +120,8 @@ export function AuditLogTable(props: AuditLogsTableProps) {
       },
       {
         filterable: true,
-        key: "platform",
-        sx: { maxWidth: 0, minWidth: 0, width: 0 },
+        key: "platformId",
+        sx: { maxWidth: 40, minWidth: 40, width: 40 },
       },
       {
         filterable: true,

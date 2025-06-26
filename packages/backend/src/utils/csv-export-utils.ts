@@ -31,7 +31,7 @@ const auditLogsHeader = [
 export function transformTransactionsToCsv(transactions: Transaction[]): CsvData {
   const rows: CsvData = transactions.map((tx) => [
     toUTCString(tx.timestamp),
-    tx.platform,
+    tx.platformId,
     tx.wallet,
     tx.type,
     tx.incoming,
@@ -54,7 +54,7 @@ export function transformTransactionsToCsv(transactions: Transaction[]): CsvData
 export function transformAuditLogsToCsv(auditLogs: AuditLog[]): CsvData {
   const rows: CsvData = auditLogs.map((logs) => [
     toUTCString(logs.timestamp),
-    logs.platform,
+    logs.platformId,
     logs.wallet,
     logs.operation,
     logs.change,

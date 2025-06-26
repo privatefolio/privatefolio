@@ -194,7 +194,7 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
       })
       .catch((error) => {
         console.error(error)
-        setError(error)
+        setError(error as Error)
       })
       .finally(() => {
         setLoading(false)

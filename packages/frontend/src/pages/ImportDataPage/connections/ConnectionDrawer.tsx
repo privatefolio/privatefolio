@@ -18,6 +18,7 @@ import { useConfirm } from "src/hooks/useConfirm"
 import { BinanceConnectionOptions, Connection } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 import { $debugMode, PopoverToggleProps } from "src/stores/app-store"
+import { getAddressBookEntry } from "src/stores/metadata-store"
 import { $rpc } from "src/workers/remotes"
 
 type ConnectionDrawerProps = DrawerProps &
@@ -28,18 +29,8 @@ type ConnectionDrawerProps = DrawerProps &
 
 export function ConnectionDrawer(props: ConnectionDrawerProps) {
   const { open, toggleOpen, connection, relativeTime, ...rest } = props
-  const {
-    id,
-    address,
-    timestamp,
-    syncedAt,
-    extensionId,
-    platform: platformId,
-    label,
-    meta,
-    key,
-    options,
-  } = connection
+  const { id, address, timestamp, syncedAt, extensionId, platformId, meta, apiKey, options } =
+    connection
 
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
@@ -71,16 +62,14 @@ export function ConnectionDrawer(props: ConnectionDrawerProps) {
           <div>
             <SectionTitle>API Key</SectionTitle>
             <Stack gap={0.5} alignItems="flex-start">
-              <IdentifierBlock id={key as string} />
-              <Typography variant="caption">{label ? `${label}` : null}</Typography>
+              <IdentifierBlock id={apiKey as string} />
             </Stack>
           </div>
         ) : (
           <div>
-            <SectionTitle>Address</SectionTitle>
+            <SectionTitle>Wallet</SectionTitle>
             <Stack gap={0.5} alignItems="flex-start">
-              <IdentifierBlock id={address as string} />
-              <Typography variant="caption">{label ? `${label}` : null}</Typography>
+              <IdentifierBlock id={address!} label={getAddressBookEntry(address!)} />
             </Stack>
           </div>
         )}

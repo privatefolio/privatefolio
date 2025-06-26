@@ -35,7 +35,7 @@ export function AuditLogDrawer(props: AuditLogDrawerProps) {
     balance,
     operation,
     timestamp,
-    platform,
+    platformId,
     wallet,
     id,
     txId,
@@ -81,7 +81,7 @@ export function AuditLogDrawer(props: AuditLogDrawerProps) {
         </div>
         <div>
           <SectionTitle>Platform</SectionTitle>
-          <PlatformBlock id={platform} />
+          <PlatformBlock id={platformId} />
         </div>
         <div>
           <SectionTitle>Wallet</SectionTitle>

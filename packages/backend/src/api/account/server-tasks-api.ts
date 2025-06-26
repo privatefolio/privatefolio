@@ -201,7 +201,7 @@ async function processQueue(accountName: string) {
             })(),
           ])
         } catch (error) {
-          // console.error("Error processing task:", error)
+          console.error(getPrefix(accountName), "Error processing task:", error)
           errorMessage = String(error)
         } finally {
           let status: TaskStatus = "completed"

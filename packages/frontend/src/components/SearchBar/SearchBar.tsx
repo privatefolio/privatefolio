@@ -29,6 +29,7 @@ import { Action, KBarResults, useKBar, useMatches, useRegisterActions, VisualSta
 import { enqueueSnackbar } from "notistack"
 import React, { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { APP_ACTIONS } from "src/AppActions"
 import { Asset, FindPlatformsResult, RichExtension, Transaction } from "src/interfaces"
 import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
@@ -385,14 +386,6 @@ export const SearchBar = () => {
         section: SECTIONS.actions,
       },
       {
-        icon: <DeleteForever fontSize="small" />,
-        id: "action-delete-asset-prices",
-        name: "Delete asset prices",
-        perform: () => rpc.enqueueDeleteAssetPrices(activeAccount, "user"),
-        priority: 0,
-        section: SECTIONS.actions,
-      },
-      {
         icon: <CalculateOutlined fontSize="small" />,
         id: "action-recompute-trades",
         name: "Recompute trades",
@@ -449,6 +442,7 @@ export const SearchBar = () => {
         priority: 2,
         section: SECTIONS.actions,
       },
+      ...Object.values(APP_ACTIONS),
     ]
 
     actions.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""))

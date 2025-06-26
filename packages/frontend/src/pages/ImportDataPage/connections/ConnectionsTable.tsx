@@ -48,39 +48,42 @@ export function ConnectionsTable() {
   const headCells: HeadCell<Connection>[] = useMemo(
     () => [
       {
-        key: "timestamp",
-        label: "Created",
+        key: "connectionNumber",
+        label: "#",
         sortable: true,
+        sx: { maxWidth: 80, minWidth: 80, width: 80 },
       },
       {
         key: "syncedAt",
         label: "Synced at",
         sortable: true,
+        sx: { maxWidth: 180, minWidth: 180, width: 180 },
+        timestamp: true,
       },
-      // {
-      //   filterable: true,
-      //   hideLabel: true,
-      //   key: "platform",
-      //   label: "Platform",
-      // },
+      {
+        filterable: true,
+        key: "platformId",
+        sx: { maxWidth: 40, minWidth: 40, width: 40 },
+      },
       {
         key: "address",
-        label: "Address",
+        label: "Wallet",
         sortable: true,
+        // sx: { maxWidth: 420, minWidth: 300, width: 420 },
       },
       {
         key: "logs" as keyof Connection,
         label: "Audit logs",
         numeric: true,
-        sortable: true,
         // valueSelector: (row) => row.meta?.logs,
+        sx: { maxWidth: 128, minWidth: 128, width: 128 },
       },
       {
         key: "transactions" as keyof Connection,
         label: "Transactions",
         numeric: true,
-        sortable: true,
         // valueSelector: (row) => row.meta?.transactions,
+        sx: { maxWidth: 120, minWidth: 120, width: 120 },
       },
       {
         sx: { maxWidth: 60, minWidth: 60, width: 60 },
@@ -92,7 +95,7 @@ export function ConnectionsTable() {
   return (
     <>
       <MemoryTable<Connection>
-        initOrderBy="timestamp"
+        initOrderBy="connectionNumber"
         headCells={headCells}
         TableRowComponent={ConnectionTableRow}
         rows={rows}

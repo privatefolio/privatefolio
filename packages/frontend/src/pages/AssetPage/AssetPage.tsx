@@ -133,7 +133,7 @@ export default function AssetPage() {
             <>
               <div>
                 <SectionTitle>Rank</SectionTitle>
-                <span>#{metadata.market_cap_rank}</span>
+                <span>{metadata.market_cap_rank ? `#${metadata.market_cap_rank}` : "Unknown"}</span>
               </div>
               {metadata.market_data?.current_price?.usd && (
                 <div>
@@ -144,7 +144,7 @@ export default function AssetPage() {
                   />
                 </div>
               )}
-              {metadata.market_data?.market_cap?.usd && (
+              {!!metadata.market_data?.market_cap?.usd && (
                 <div>
                   <SectionTitle>Market Cap</SectionTitle>
                   <QuoteAmountBlock amount={metadata.market_data.market_cap.usd} />

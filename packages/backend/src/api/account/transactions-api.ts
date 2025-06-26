@@ -51,7 +51,7 @@ export async function getTransactions(
         outgoingAsset: row[10],
         outgoing: row[11],
         notes: row[13],
-        platform: row[14],
+        platformId: row[14],
         price: row[15],
         role: row[17],
         timestamp: row[18],
@@ -97,7 +97,7 @@ export async function upsertTransactions(accountName: string, records: Transacti
         record.outgoing || null,
         record.outgoingAsset || null,
         record.notes || null,
-        record.platform,
+        record.platformId,
         record.price || null,
         record.role || null,
         record.timestamp,
@@ -161,7 +161,7 @@ export async function autoMergeTransactions(
   const transactions = await getTransactions(accountName)
 
   const etherscan = transactions.filter((tx) =>
-    isEvmPlatform(tx.platform)
+    isEvmPlatform(tx.platformId)
   ) as EtherscanTransaction[]
 
   if (signal?.aborted) throw new Error(signal.reason)
@@ -268,7 +268,7 @@ export async function detectSpamTransactions(
   const transactions = await getTransactions(accountName)
 
   const etherscanTransactions = transactions.filter((tx) =>
-    isEvmPlatform(tx.platform)
+    isEvmPlatform(tx.platformId)
   ) as EtherscanTransaction[]
   if (signal?.aborted) {
     throw new Error(signal.reason)

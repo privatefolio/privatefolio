@@ -35,7 +35,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
   const [incomingAsset, setIncomingAsset] = useState<string | null>(null)
   const [outgoingAsset, setOutgoingAsset] = useState<string | null>(null)
 
-  const [platform, setPlatform] = useState<string>("ethereum")
+  const [platformId, setPlatform] = useState<string>("ethereum")
   const [type, setType] = useState<TransactionType>("Swap")
   const [binanceWallet, setBinanceWallet] = useState("Spot")
 
@@ -66,7 +66,8 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
       const formData = new FormData(event.target as HTMLFormElement)
 
       const timestamp = asUTC(new Date(formData.get("timestamp") as string))
-      const wallet = platform === "binance" ? binanceWallet : (formData.get("tx-wallet") as string)
+      const wallet =
+        platformId === "binance" ? binanceWallet : (formData.get("tx-wallet") as string)
       const incoming = formData.get("incoming") as string
       const outgoing = formData.get("outgoing") as string
       const fee = formData.get("fee") as string
@@ -85,7 +86,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
             notes,
             outgoing,
             outgoingAsset: outgoingAsset || undefined,
-            platform,
+            platformId,
             timestamp,
             type,
             wallet,
@@ -101,7 +102,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
     },
     [
       atom,
-      platform,
+      platformId,
       binanceWallet,
       type,
       incomingAsset,
@@ -139,7 +140,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
             <Select
               variant="outlined"
               fullWidth
-              value={platform}
+              value={platformId}
               onChange={(event) => setPlatform(event.target.value)}
             >
               {platforms?.map((x) => (
@@ -156,7 +157,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
           </div>
           <div>
             <SectionTitle>Wallet</SectionTitle>
-            {platform === "binance" ? (
+            {platformId === "binance" ? (
               <Select
                 sx={{ height: "40px" }}
                 variant="outlined"

@@ -15,7 +15,7 @@ export function parseFuturesCOINTrade(
   index: number,
   connection: BinanceConnection
 ): ParserResult {
-  const { platform } = connection
+  const { platformId } = connection
   const { baseAsset, buyer, commission, commissionAsset, id, qty, baseQty, quoteAsset, time } = row
   const wallet = `Binance ${BINANCE_WALLET_LABELS.coinFutures}`
   const timestamp = new Date(Number(time)).getTime()
@@ -47,7 +47,7 @@ export function parseFuturesCOINTrade(
         id: `${txId}_SELL`,
         importIndex,
         operation: "Sell",
-        platform,
+        platformId,
         timestamp,
         txId,
         wallet,
@@ -59,7 +59,7 @@ export function parseFuturesCOINTrade(
         id: `${txId}_BUY`,
         importIndex,
         operation: "Buy",
-        platform,
+        platformId,
         timestamp,
         txId,
         wallet,
@@ -80,7 +80,7 @@ export function parseFuturesCOINTrade(
         id: `${txId}_SELL`,
         importIndex,
         operation: "Sell",
-        platform,
+        platformId,
         timestamp,
         txId,
         wallet,
@@ -92,7 +92,7 @@ export function parseFuturesCOINTrade(
         id: `${txId}_BUY`,
         importIndex,
         operation: "Buy",
-        platform,
+        platformId,
         timestamp,
         txId,
         wallet,
@@ -109,7 +109,7 @@ export function parseFuturesCOINTrade(
       id: `${txId}_FEE`,
       importIndex,
       operation: "Fee",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -128,7 +128,7 @@ export function parseFuturesCOINTrade(
     metadata: {},
     outgoing: outgoing === "0" ? undefined : outgoing,
     outgoingAsset: outgoing === "0" ? undefined : outgoingAsset,
-    platform,
+    platformId,
     price: priceBN.toFixed(),
     timestamp,
     type,

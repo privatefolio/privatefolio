@@ -8,6 +8,7 @@ import {
   TableCell,
   TableRow,
   Tooltip,
+  Typography,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { allPriceApiIds } from "privatefolio-backend/src/settings/price-apis"
@@ -20,6 +21,7 @@ import { QuoteAmountBlock } from "src/components/QuoteAmountBlock"
 import { PRICE_APIS_META, PriceApiId } from "src/settings"
 import { $activeAccount } from "src/stores/account-store"
 import { $assetMap } from "src/stores/metadata-store"
+import { MonoFont } from "src/theme"
 import { getAssetPlatform } from "src/utils/assets-utils"
 import { resolveUrl } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
@@ -36,7 +38,7 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
     isTablet,
     ...rest
   } = props
-  const { id: assetId, name, coingeckoId, priceApiId, price } = row
+  const { id: assetId, name, coingeckoId, priceApiId, price, marketCapRank } = row
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
 
@@ -136,6 +138,15 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
             <Skeleton sx={{ margin: "0px 16px" }}></Skeleton>
           ) : (
             <QuoteAmountBlock amount={price?.value} formatting="price" />
+          )}
+        </TableCell>
+        <TableCell align="right" sx={{ fontFamily: MonoFont }}>
+          {marketCapRank ? (
+            `#${marketCapRank}`
+          ) : (
+            <Typography color="text.secondary" variant="inherit">
+              Unknown
+            </Typography>
           )}
         </TableCell>
       </TableRow>

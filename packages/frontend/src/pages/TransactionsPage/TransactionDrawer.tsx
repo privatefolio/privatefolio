@@ -48,7 +48,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
     incomingAsset,
     type,
     timestamp,
-    platform,
+    platformId,
     wallet,
     price,
     outgoing,
@@ -125,7 +125,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
         </div>
         <div>
           <SectionTitle>Platform</SectionTitle>
-          <PlatformBlock id={platform} />
+          <PlatformBlock id={platformId} />
         </div>
         <div>
           <SectionTitle>Wallet</SectionTitle>
@@ -245,8 +245,8 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
             <SectionTitle>Smart Contract</SectionTitle>
             <IdentifierBlock
               id={contractAddress}
-              href={getBlockExplorerUrl(platform, contractAddress, "address")}
-              linkText={`See on ${getBlockExplorerName(platform)}`}
+              href={getBlockExplorerUrl(platformId, contractAddress, "address")}
+              linkText={`See on ${getBlockExplorerName(platformId)}`}
             />
           </div>
         )}
@@ -262,8 +262,8 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
             <IdentifierBlock
               label={txHash}
               id={txHash}
-              href={getBlockExplorerUrl(platform, txHash, "tx")}
-              linkText={`See on ${getBlockExplorerName(platform)}`}
+              href={getBlockExplorerUrl(platformId, txHash, "tx")}
+              linkText={`See on ${getBlockExplorerName(platformId)}`}
             />
           </div>
         )}

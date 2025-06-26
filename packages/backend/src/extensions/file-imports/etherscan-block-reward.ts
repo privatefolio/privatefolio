@@ -10,7 +10,7 @@ import { formatAddress } from "src/utils/assets-utils"
 
 export const extensionId = "etherscan-file-import"
 export const parserId = "etherscan-block-rewards"
-export const platform = "ethereum"
+export const platformId = "ethereum"
 
 export const HEADER =
   '"Blockno","UnixTimestamp","DateTime (UTC)","Txn","Uncles","Miner","GasUsed","GasLimit","BaseFee","Reward(ETH)"'
@@ -50,7 +50,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
     id: `${txId}_VALUE_0`,
     importIndex: index,
     operation,
-    platform,
+    platformId,
     timestamp,
     txId,
     wallet,
@@ -63,7 +63,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
     incoming: incoming === "0" ? undefined : incoming,
     incomingAsset: incoming === "0" ? undefined : incomingAsset,
     metadata: {},
-    platform,
+    platformId,
     timestamp,
     type,
     wallet,

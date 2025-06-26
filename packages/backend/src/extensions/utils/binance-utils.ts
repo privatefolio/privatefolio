@@ -37,7 +37,7 @@ export function extractTransactions(logs: AuditLog[], fileImportId: string): Tra
 
     if (validAuditLogGrouping(group)) {
       const wallet = group[0].wallet
-      const platform = group[0].platform
+      const platformId = group[0].platformId
       const timestamp = group[0].timestamp
       //
       const hash = hashString(`${timestamp}`)
@@ -83,7 +83,7 @@ export function extractTransactions(logs: AuditLog[], fileImportId: string): Tra
         metadata: {},
         outgoing,
         outgoingAsset,
-        platform,
+        platformId,
         price,
         timestamp,
         type,

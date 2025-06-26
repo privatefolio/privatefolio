@@ -6,7 +6,7 @@ import { hashString } from "src/utils/utils"
 
 export const extensionId = "binance-file-import"
 export const parserId = "binance-account-statement"
-export const platform = "binance"
+export const platformId = "binance"
 
 export const HEADERS = [
   '"User_ID","UTC_Time","Account","Operation","Coin","Change","Remark"',
@@ -61,7 +61,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
     id,
     importIndex: index,
     operation,
-    platform,
+    platformId,
     // remark,
     timestamp,
     // userId,
@@ -79,7 +79,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
         incoming: change.toFixed(),
         incomingAsset: assetId,
         metadata: {},
-        platform,
+        platformId,
         timestamp,
         type: operation,
         wallet,
@@ -96,7 +96,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
         metadata: {},
         outgoing: change.mul(-1).toFixed(),
         outgoingAsset: assetId,
-        platform,
+        platformId,
         timestamp,
         type: "Withdraw",
         wallet,

@@ -211,12 +211,20 @@ export function TaskDetailsDialog({ task, ...props }: DialogProps & { task: Serv
                   !log[1][1] ? null : (
                     <div key={index}>
                       <TimeLabel timestamp={log[0]} debugMode={debugMode} />{" "}
-                      {!log[1][1]?.includes("Error") ? (
-                        `${log[1][1]}...`
-                      ) : (
+                      {log[1][1]?.includes("Error") ? (
                         <Typography variant="inherit" color="error" component="span">
                           {log[1][1]}
                         </Typography>
+                      ) : log[1][1]?.includes("Warning") ? (
+                        <Typography
+                          variant="inherit"
+                          color="var(--mui-palette-warning-main)"
+                          component="span"
+                        >
+                          {log[1][1]}
+                        </Typography>
+                      ) : (
+                        `${log[1][1]}...`
                       )}
                     </div>
                   )

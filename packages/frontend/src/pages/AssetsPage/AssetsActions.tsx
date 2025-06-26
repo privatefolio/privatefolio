@@ -1,6 +1,5 @@
 import {
   AttachMoneyRounded,
-  DeleteForever,
   MoreHoriz,
   VisibilityOffRounded,
   VisibilityRounded,
@@ -19,6 +18,7 @@ import {
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React from "react"
+import { ActionId, APP_ACTIONS } from "src/AppActions"
 import { $hideUnlisted, $hideUnlistedMap } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
@@ -101,14 +101,22 @@ export function AssetsActions() {
             <MenuItem
               dense
               onClick={async () => {
-                rpc.enqueueDeleteAssetPrices(activeAccount, "user")
+                await APP_ACTIONS[ActionId.DELETE_ASSET_PRICES].perform()
                 handleClose()
               }}
             >
-              <ListItemAvatar>
-                <DeleteForever fontSize="small" />
-              </ListItemAvatar>
-              <ListItemText>Delete asset prices</ListItemText>
+              <ListItemAvatar>{APP_ACTIONS[ActionId.DELETE_ASSET_PRICES].icon}</ListItemAvatar>
+              <ListItemText>{APP_ACTIONS[ActionId.DELETE_ASSET_PRICES].name}</ListItemText>
+            </MenuItem>
+            <MenuItem
+              dense
+              onClick={async () => {
+                await APP_ACTIONS[ActionId.DELETE_ASSET_PREFERENCES].perform()
+                handleClose()
+              }}
+            >
+              <ListItemAvatar>{APP_ACTIONS[ActionId.DELETE_ASSET_PREFERENCES].icon}</ListItemAvatar>
+              <ListItemText>{APP_ACTIONS[ActionId.DELETE_ASSET_PREFERENCES].name}</ListItemText>
             </MenuItem>
           </>
         )}

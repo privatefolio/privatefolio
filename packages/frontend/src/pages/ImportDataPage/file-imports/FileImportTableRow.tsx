@@ -15,7 +15,7 @@ import { FileImportDrawer } from "./FileImportDrawer"
 export function FileImportTableRow(props: TableRowComponentProps<FileImport>) {
   const { row, relativeTime, headCells, isMobile: _isMobile, isTablet, ...rest } = props
   const { name, meta, timestamp, lastModified, size } = row
-  const platform = meta?.platform
+  const platformId = meta?.platformId
 
   const { value: open, toggle: toggleOpen } = useBoolean(false)
 
@@ -27,8 +27,8 @@ export function FileImportTableRow(props: TableRowComponentProps<FileImport>) {
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Stack gap={0.5} marginY={0.5}>
                 <Stack direction="row" gap={1} alignItems="center" component="div">
-                  {platform ? (
-                    <PlatformBlock id={platform} hideName />
+                  {platformId ? (
+                    <PlatformBlock id={platformId} hideName />
                   ) : (
                     <Skeleton height={20} width={80} />
                   )}
@@ -100,7 +100,7 @@ export function FileImportTableRow(props: TableRowComponentProps<FileImport>) {
           )}
         </TableCell>
         <TableCell>
-          {platform ? <PlatformBlock id={platform} hideName /> : <Skeleton></Skeleton>}
+          {platformId ? <PlatformBlock id={platformId} hideName /> : <Skeleton></Skeleton>}
         </TableCell>
         <TableCell>
           <Tooltip title={name}>

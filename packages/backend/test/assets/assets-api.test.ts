@@ -8,7 +8,7 @@ const accountName = Math.random().toString(36).substring(7)
 describe("assets", () => {
   it("should add an asset", async () => {
     // arrange
-    const assetId = "ethereum:0x0000000000000000000000000000000000000004:WBTC"
+    const assetId = "ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC"
     // act
     await upsertAuditLog(accountName, {
       assetId,
@@ -16,7 +16,7 @@ describe("assets", () => {
       id: "",
       importIndex: 0,
       operation: "Deposit",
-      platform: "ethereum",
+      platformId: "ethereum",
       timestamp: 0,
       wallet: "",
     })
@@ -31,7 +31,7 @@ describe("assets", () => {
     expect(asset).toMatchInlineSnapshot(`
       {
         "coingeckoId": "wrapped-bitcoin",
-        "id": "ethereum:0x0000000000000000000000000000000000000004:WBTC",
+        "id": "ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC",
         "logoUrl": "https://example.com/logo.png",
         "marketCapRank": 12,
         "name": "Wrapped Bitcoin",
@@ -54,7 +54,7 @@ describe("assets", () => {
       id: "",
       importIndex: 0,
       operation: "Deposit",
-      platform: "ethereum",
+      platformId: "ethereum",
       timestamp: 0,
       wallet: "",
     })

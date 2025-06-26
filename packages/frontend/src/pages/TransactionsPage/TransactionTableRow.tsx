@@ -27,7 +27,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
     incomingAsset,
     type,
     timestamp,
-    platform,
+    platformId,
     wallet,
     outgoing,
     outgoingAsset,
@@ -137,7 +137,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
           <TimestampBlock timestamp={timestamp} relative={relativeTime} />
         </TableCell>
         <TableCell>
-          <PlatformBlock id={platform} hideName />
+          <PlatformBlock id={platformId} hideName />
         </TableCell>
         <TableCell variant="clickable">
           <IdentifierBlock id={wallet} variant="tablecell" label={getAddressBookEntry(wallet)} />

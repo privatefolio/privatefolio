@@ -29,16 +29,40 @@ export function AssetTable() {
   }, [accountName, rpc])
 
   // const rows = useMemo(() => Object.values(assetMap), [assetMap])
-  const rows: AssetWithPrice[] = useMemo(
-    () =>
-      queryTime === null
-        ? []
-        : Object.values(assetMap).map((x) => ({
-            ...x,
-            price: priceMap ? priceMap[x.id] : null,
-          })),
-    [queryTime, assetMap, priceMap]
-  )
+  const rows: AssetWithPrice[] = useMemo(() => {
+    if (queryTime === null) return []
+
+    const all = Object.values(assetMap).map((x) => ({
+      ...x,
+      price: priceMap ? priceMap[x.id] : null,
+    }))
+
+    // sort by market cap rank asc, then price desc then symbol asc
+    all.sort((a, b) => {
+      // Primary sort: market cap rank ascending (nulls/undefined last)
+      const aRank = a.marketCapRank ?? null
+      const bRank = b.marketCapRank ?? null
+      if (aRank !== bRank) {
+        if (aRank === null) return 1
+        if (bRank === null) return -1
+        return aRank - bRank
+      }
+
+      // Secondary sort: price descending (nulls last)
+      const aPrice = a.price?.value ?? null
+      const bPrice = b.price?.value ?? null
+      if (aPrice !== bPrice) {
+        if (aPrice === null) return 1
+        if (bPrice === null) return -1
+        return bPrice - aPrice // descending
+      }
+
+      // Tertiary sort: symbol ascending
+      return a.symbol.localeCompare(b.symbol)
+    })
+
+    return all
+  }, [queryTime, assetMap, priceMap])
 
   const hideUnlisted = useStore($hideUnlisted)
 
@@ -82,6 +106,13 @@ export function AssetTable() {
         sx: { maxWidth: 200, minWidth: 200, width: 200 },
         valueSelector: (row: AssetWithPrice) => row.price?.value,
       },
+      {
+        key: "marketCapRank",
+        label: "Mcap rank",
+        numeric: true,
+        sortable: true,
+        sx: { maxWidth: 200, minWidth: 200, width: 200 },
+      },
     ],
     []
   )
@@ -91,7 +122,7 @@ export function AssetTable() {
   return (
     <>
       <MemoryTable<AssetWithPrice>
-        initOrderBy="symbol"
+        initOrderBy="marketCapRank"
         initOrderDir="asc"
         headCells={headCells}
         TableRowComponent={AssetTableRow}

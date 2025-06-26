@@ -1,24 +1,24 @@
 import { SUPPORTED_PLATFORMS as etherscanPlatforms } from "src/extensions/connections/etherscan/etherscan-settings"
 import {
   extensionId as binanceFileImportId,
-  platform as binanceFileImportPlatform,
+  platformId as binanceFileImportPlatform,
 } from "src/extensions/file-imports/binance"
 import {
   extensionId as blockpitFileImportId,
-  platform as blockpitFileImportPlatform,
+  platformId as blockpitFileImportPlatform,
 } from "src/extensions/file-imports/blockpit"
 import {
   extensionId as coinmamaFileImportId,
-  platform as coinmamaFileImportPlatform,
+  platformId as coinmamaFileImportPlatform,
 } from "src/extensions/file-imports/coinmama"
 import { extensionId as etherscanFileImportId } from "src/extensions/file-imports/etherscan"
 import {
   extensionId as mexcFileImportId,
-  platform as mexcFileImportPlatform,
+  platformId as mexcFileImportPlatform,
 } from "src/extensions/file-imports/mexc"
 import {
   extensionId as privatefolioFileImportId,
-  platform as privatefolioFileImportPlatform,
+  platformId as privatefolioFileImportPlatform,
 } from "src/extensions/file-imports/privatefolio-transactions"
 import { Extension } from "src/interfaces"
 

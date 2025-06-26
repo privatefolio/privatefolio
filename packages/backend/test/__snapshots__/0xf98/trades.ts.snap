@@ -244,62 +244,6 @@
     ],
   },
   {
-    "amount": "777",
-    "assetId": "ethereum:0x52903256dd18D85c2Dc4a6C999907c9793eA61E3:INSP",
-    "auditLogIds": [
-      "3477221057_0x08e216f2da99f2961380d164c1df7c792dfc1075d026ec778d2e4e1931c80cf9_ERC20_3_TRANSFER_3",
-    ],
-    "balance": "777",
-    "cost": [],
-    "createdAt": 1511796400000,
-    "deposits": [
-      [
-        "ethereum:0x52903256dd18D85c2Dc4a6C999907c9793eA61E3:INSP",
-        "777",
-        "0",
-        "3477221057_0x08e216f2da99f2961380d164c1df7c792dfc1075d026ec778d2e4e1931c80cf9_ERC20_3",
-        1511796400000,
-      ],
-    ],
-    "fees": [],
-    "id": "3920691763",
-    "proceeds": [],
-    "tradeNumber": 3,
-    "tradeStatus": "open",
-    "tradeType": "Long",
-    "txIds": [
-      "3477221057_0x08e216f2da99f2961380d164c1df7c792dfc1075d026ec778d2e4e1931c80cf9_ERC20_3",
-    ],
-  },
-  {
-    "amount": "2",
-    "assetId": "ethereum:0x1d462414fe14cf489c7A21CaC78509f4bF8CD7c0:CAN",
-    "auditLogIds": [
-      "3477221057_0xf3c35a52ea24d286c1abf5b4f51a27aff17f70ebf62ef9ab616bd8cedd64e4dd_ERC20_4_TRANSFER_4",
-    ],
-    "balance": "2",
-    "cost": [],
-    "createdAt": 1518786600000,
-    "deposits": [
-      [
-        "ethereum:0x1d462414fe14cf489c7A21CaC78509f4bF8CD7c0:CAN",
-        "2",
-        "0",
-        "3477221057_0xf3c35a52ea24d286c1abf5b4f51a27aff17f70ebf62ef9ab616bd8cedd64e4dd_ERC20_4",
-        1518786600000,
-      ],
-    ],
-    "fees": [],
-    "id": "3366454161",
-    "proceeds": [],
-    "tradeNumber": 4,
-    "tradeStatus": "open",
-    "tradeType": "Long",
-    "txIds": [
-      "3477221057_0xf3c35a52ea24d286c1abf5b4f51a27aff17f70ebf62ef9ab616bd8cedd64e4dd_ERC20_4",
-    ],
-  },
-  {
     "amount": "10",
     "assetId": "ethereum:0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0:LOOM",
     "auditLogIds": [
@@ -321,7 +265,7 @@
     "fees": [],
     "id": "392869011",
     "proceeds": [],
-    "tradeNumber": 5,
+    "tradeNumber": 3,
     "tradeStatus": "open",
     "tradeType": "Long",
     "txIds": [
@@ -349,7 +293,7 @@
     "fees": [],
     "id": "2735413046",
     "proceeds": [],
-    "tradeNumber": 6,
+    "tradeNumber": 4,
     "tradeStatus": "open",
     "tradeType": "Long",
     "txIds": [

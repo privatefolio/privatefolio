@@ -70,7 +70,7 @@ export interface Transaction {
   notes?: string
   outgoing?: string
   outgoingAsset?: string
-  platform: string
+  platformId: string
   /**
    * outgoing / incoming
    */
@@ -161,7 +161,7 @@ export interface AuditLog {
   id: string
   importIndex: number
   operation: AuditLogOperation
-  platform: string
+  platformId: string
   tags?: number[]
   timestamp: Timestamp
   txId?: string
@@ -185,7 +185,7 @@ export interface FileImport {
     logs: number
     operations: AuditLogOperation[]
     parserId: string
-    platform: string
+    platformId: string
     rows: number
     transactions: number
     wallets: string[]
@@ -407,10 +407,11 @@ export type BinanceConnectionOptions = ConnectionOptions & {
 
 export interface Connection {
   address?: string
+  apiKey?: string
+  apiSecret?: string
+  connectionNumber: number
   extensionId: string
   id: string
-  key?: string // rename to apiKey
-  label: string
   meta?: {
     assetIds: string[]
     logs: number
@@ -420,8 +421,7 @@ export interface Connection {
     wallets: string[]
   }
   options?: BinanceConnectionOptions | ConnectionOptions
-  platform: string
-  secret?: string // rename to apiSecret
+  platformId: string
   syncedAt?: number
   /**
    * createdAt
@@ -452,7 +452,7 @@ export type CsvParser = {
   extensionId: string
   parse: CsvParseFn
   parserId: string
-  platform: string
+  platformId: string
   requirements?: string[]
 }
 
@@ -688,7 +688,7 @@ export type FilterOptionsMap = {
   incomingAsset: string[]
   operation: AuditLogOperation[]
   outgoingAsset: string[]
-  platform: string[]
+  platformId: string[]
   tags: number[]
   tradeStatus: string[]
   tradeType: readonly TradeType[]

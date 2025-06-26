@@ -14,7 +14,7 @@ export function parseFuturesUSDTrade(
   index: number,
   connection: BinanceConnection
 ): ParserResult {
-  const { platform } = connection
+  const { platformId } = connection
   const { baseAsset, buyer, commission, commissionAsset, id, qty, quoteQty, quoteAsset, time } = row
   const wallet = `Binance USD-M Futures`
   const timestamp = new Date(Number(time)).getTime()
@@ -46,7 +46,7 @@ export function parseFuturesUSDTrade(
         id: `${txId}_SELL`,
         importIndex,
         operation: "Sell",
-        platform,
+        platformId,
         timestamp,
         txId,
         wallet,
@@ -58,7 +58,7 @@ export function parseFuturesUSDTrade(
         id: `${txId}_BUY`,
         importIndex,
         operation: "Buy",
-        platform,
+        platformId,
         timestamp,
         txId,
         wallet,
@@ -79,7 +79,7 @@ export function parseFuturesUSDTrade(
         id: `${txId}_SELL`,
         importIndex,
         operation: "Sell",
-        platform,
+        platformId,
         timestamp,
         txId,
         wallet,
@@ -91,7 +91,7 @@ export function parseFuturesUSDTrade(
         id: `${txId}_BUY`,
         importIndex,
         operation: "Buy",
-        platform,
+        platformId,
         timestamp,
         txId,
         wallet,
@@ -108,7 +108,7 @@ export function parseFuturesUSDTrade(
       id: `${txId}_FEE`,
       importIndex,
       operation: "Fee",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -127,7 +127,7 @@ export function parseFuturesUSDTrade(
     metadata: {},
     outgoing: outgoing === "0" ? undefined : outgoing,
     outgoingAsset: outgoing === "0" ? undefined : outgoingAsset,
-    platform,
+    platformId,
     price: priceBN.toFixed(),
     timestamp,
     type,

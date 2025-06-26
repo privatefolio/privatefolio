@@ -223,7 +223,7 @@ export async function getBinanceDeposit(
   const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
-  const encodedSecret = encoder.encode(connection.secret)
+  const encodedSecret = encoder.encode(connection.apiSecret)
 
   const signature = await generateSignature(encodedData, encodedSecret)
   const endpoint = "/sapi/v1/capital/deposit/hisrec"
@@ -231,7 +231,7 @@ export async function getBinanceDeposit(
 
   const res = await fetch(url, {
     headers: {
-      "X-MBX-APIKEY": connection.key,
+      "X-MBX-APIKEY": connection.apiKey,
     },
   })
   if (debugMode) {
@@ -263,7 +263,7 @@ export async function getBinanceWithdraw(
   const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
-  const encodedSecret = encoder.encode(connection.secret)
+  const encodedSecret = encoder.encode(connection.apiSecret)
   const signature = await generateSignature(encodedData, encodedSecret)
 
   const endpoint = "/sapi/v1/capital/withdraw/history"
@@ -271,7 +271,7 @@ export async function getBinanceWithdraw(
 
   const res = await fetch(url, {
     headers: {
-      "X-MBX-APIKEY": connection.key,
+      "X-MBX-APIKEY": connection.apiKey,
     },
   })
   if (debugMode) {
@@ -295,7 +295,7 @@ export async function getBinanceSymbols(
 
   const res = await fetch(url, {
     headers: {
-      "X-MBX-APIKEY": connection.key,
+      "X-MBX-APIKEY": connection.apiKey,
     },
   })
   const data = await res.json()
@@ -320,7 +320,7 @@ export async function getBinanceTradesForSymbol(
   const queryString = `symbol=${symbol.symbol}&timestamp=${timestamp}&recvWindow=60000`
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
-  const encodedSecret = encoder.encode(connection.secret)
+  const encodedSecret = encoder.encode(connection.apiSecret)
   const signature = await generateSignature(encodedData, encodedSecret)
 
   const endpoint = "/api/v3/myTrades"
@@ -328,7 +328,7 @@ export async function getBinanceTradesForSymbol(
 
   const res = await fetch(url, {
     headers: {
-      "X-MBX-APIKEY": connection.key,
+      "X-MBX-APIKEY": connection.apiKey,
     },
   })
   const data: BinanceTrade[] = await res.json()
@@ -370,7 +370,7 @@ export async function getBinanceFlexibleRewards(
   const queryString = `timestamp=${timestamp}&type=${type}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
-  const encodedSecret = encoder.encode(connection.secret)
+  const encodedSecret = encoder.encode(connection.apiSecret)
   const signature = await generateSignature(encodedData, encodedSecret)
 
   const endpoint = "/sapi/v1/simple-earn/flexible/history/rewardsRecord"
@@ -378,7 +378,7 @@ export async function getBinanceFlexibleRewards(
 
   const res = await fetch(url, {
     headers: {
-      "X-MBX-APIKEY": connection.key,
+      "X-MBX-APIKEY": connection.apiKey,
     },
   })
   if (debugMode) {
@@ -405,7 +405,7 @@ export async function getBinanceLockedRewards(
   const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
-  const encodedSecret = encoder.encode(connection.secret)
+  const encodedSecret = encoder.encode(connection.apiSecret)
   const signature = await generateSignature(encodedData, encodedSecret)
 
   const endpoint = "/sapi/v1/simple-earn/locked/history/rewardsRecord"
@@ -413,7 +413,7 @@ export async function getBinanceLockedRewards(
 
   const res = await fetch(url, {
     headers: {
-      "X-MBX-APIKEY": connection.key,
+      "X-MBX-APIKEY": connection.apiKey,
     },
   })
   if (debugMode) {
@@ -442,7 +442,7 @@ export async function getBinanceMarginLoanRepayment(
   const queryString = `timestamp=${timestamp}&type=${type}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
-  const encodedSecret = encoder.encode(connection.secret)
+  const encodedSecret = encoder.encode(connection.apiSecret)
   const signature = await generateSignature(encodedData, encodedSecret)
 
   const endpoint = "/sapi/v1/margin/borrow-repay"
@@ -450,7 +450,7 @@ export async function getBinanceMarginLoanRepayment(
 
   const res = await fetch(url, {
     headers: {
-      "X-MBX-APIKEY": connection.key,
+      "X-MBX-APIKEY": connection.apiKey,
     },
   })
   if (debugMode) {
@@ -484,7 +484,7 @@ export async function getBinanceMarginTrades(
   const queryString = `symbol=${symbol.symbol}&isIsolated=${isIsolated}&timestamp=${timestamp}`
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
-  const encodedSecret = encoder.encode(connection.secret)
+  const encodedSecret = encoder.encode(connection.apiSecret)
   const signature = await generateSignature(encodedData, encodedSecret)
 
   const endpoint = "/sapi/v1/margin/myTrades"
@@ -492,7 +492,7 @@ export async function getBinanceMarginTrades(
 
   const res = await fetch(url, {
     headers: {
-      "X-MBX-APIKEY": connection.key,
+      "X-MBX-APIKEY": connection.apiKey,
     },
   })
   if (debugMode) {
@@ -529,7 +529,7 @@ export async function getBinanceMarginTransfer(
   const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
-  const encodedSecret = encoder.encode(connection.secret)
+  const encodedSecret = encoder.encode(connection.apiSecret)
   const signature = await generateSignature(encodedData, encodedSecret)
 
   const endpoint = "/sapi/v1/margin/transfer"
@@ -537,7 +537,7 @@ export async function getBinanceMarginTransfer(
 
   const res = await fetch(url, {
     headers: {
-      "X-MBX-APIKEY": connection.key,
+      "X-MBX-APIKEY": connection.apiKey,
     },
   })
   if (debugMode) {
@@ -572,7 +572,7 @@ export async function getBinanceMarginLiquidation(
   const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
-  const encodedSecret = encoder.encode(connection.secret)
+  const encodedSecret = encoder.encode(connection.apiSecret)
   const signature = await generateSignature(encodedData, encodedSecret)
 
   const endpoint = "/sapi/v1/margin/forceLiquidationRec"
@@ -580,7 +580,7 @@ export async function getBinanceMarginLiquidation(
 
   const res = await fetch(url, {
     headers: {
-      "X-MBX-APIKEY": connection.key,
+      "X-MBX-APIKEY": connection.apiKey,
     },
   })
   if (debugMode) {
@@ -610,7 +610,7 @@ export async function getBinanceFuturesUSDSymbols(
 
   const res = await fetch(url, {
     headers: {
-      "X-MBX-APIKEY": connection.key,
+      "X-MBX-APIKEY": connection.apiKey,
     },
   })
   const data = await res.json()
@@ -635,7 +635,7 @@ export async function getBinanceFuturesUSDTrades(
   const queryString = `symbol=${symbol.symbol}&timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
-  const encodedSecret = encoder.encode(connection.secret)
+  const encodedSecret = encoder.encode(connection.apiSecret)
   const signature = await generateSignature(encodedData, encodedSecret)
 
   const BASE_URL = "https://fapi.binance.com"
@@ -644,7 +644,7 @@ export async function getBinanceFuturesUSDTrades(
 
   const res = await fetch(url, {
     headers: {
-      "X-MBX-APIKEY": connection.key,
+      "X-MBX-APIKEY": connection.apiKey,
     },
   })
   const data = await res.json()
@@ -678,7 +678,7 @@ export async function getBinanceFuturesCOINSymbols(
 
   const res = await fetch(url, {
     headers: {
-      "X-MBX-APIKEY": connection.key,
+      "X-MBX-APIKEY": connection.apiKey,
     },
   })
   const data = await res.json()
@@ -704,7 +704,7 @@ export async function getBinanceFuturesCOINTrades(
 
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
-  const encodedSecret = encoder.encode(connection.secret)
+  const encodedSecret = encoder.encode(connection.apiSecret)
   const signature = await generateSignature(encodedData, encodedSecret)
 
   const BASE_URL = "https://dapi.binance.com"
@@ -713,7 +713,7 @@ export async function getBinanceFuturesCOINTrades(
 
   const res = await fetch(url, {
     headers: {
-      "X-MBX-APIKEY": connection.key,
+      "X-MBX-APIKEY": connection.apiKey,
     },
   })
   const data = await res.json()
@@ -750,7 +750,7 @@ export async function getBinanceFuturesCOINIncome(
 
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
-  const encodedSecret = encoder.encode(connection.secret)
+  const encodedSecret = encoder.encode(connection.apiSecret)
   const signature = await generateSignature(encodedData, encodedSecret)
 
   const BASE_URL = "https://dapi.binance.com"
@@ -759,7 +759,7 @@ export async function getBinanceFuturesCOINIncome(
 
   const res = await fetch(url, {
     headers: {
-      "X-MBX-APIKEY": connection.key,
+      "X-MBX-APIKEY": connection.apiKey,
     },
   })
   const data = await res.json()
@@ -791,7 +791,7 @@ export async function getBinanceFuturesUSDIncome(
 
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
-  const encodedSecret = encoder.encode(connection.secret)
+  const encodedSecret = encoder.encode(connection.apiSecret)
   const signature = await generateSignature(encodedData, encodedSecret)
 
   const BASE_URL = "https://fapi.binance.com"
@@ -800,7 +800,7 @@ export async function getBinanceFuturesUSDIncome(
 
   const res = await fetch(url, {
     headers: {
-      "X-MBX-APIKEY": connection.key,
+      "X-MBX-APIKEY": connection.apiKey,
     },
   })
   const data = await res.json()

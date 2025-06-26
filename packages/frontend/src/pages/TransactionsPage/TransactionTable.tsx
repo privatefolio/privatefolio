@@ -137,7 +137,7 @@ export function TransactionTable(props: TransactionsTableProps) {
       },
       {
         filterable: true,
-        key: "platform",
+        key: "platformId",
         sx: { maxWidth: 0, minWidth: 0, width: 0 },
       },
       {

@@ -37,11 +37,10 @@ describe("should import 0xb6e via connection", () => {
     connection = await upsertConnection(accountName, {
       address,
       extensionId: "etherscan-connection",
-      label: "",
-      platform: "arbitrum-one",
+      platformId: "arbitrum-one",
     })
     // assert
-    expect(connection.id).toMatchInlineSnapshot(`"3583443605"`)
+    expect(connection.id).toMatchInlineSnapshot(`"2662444559"`)
   })
 
   it.sequential("should sync connection", async () => {

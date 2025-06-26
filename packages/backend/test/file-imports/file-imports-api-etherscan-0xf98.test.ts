@@ -83,7 +83,7 @@ describe("0xf98 file import", () => {
             "Fee",
           ],
           "parserId": "etherscan-default",
-          "platform": "ethereum",
+          "platformId": "ethereum",
           "rows": 9,
           "transactions": 9,
           "wallets": [
@@ -150,7 +150,7 @@ describe("0xf98 file import", () => {
             "Deposit",
           ],
           "parserId": "etherscan-erc20",
-          "platform": "ethereum",
+          "platformId": "ethereum",
           "rows": 8,
           "transactions": 8,
           "wallets": [
@@ -208,23 +208,21 @@ describe("0xf98 file import", () => {
       10,Processing 24 audit logs
       ,Skipped ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN: No coingeckoId
       ,Skipped ethereum:0x519475b31653E46D20cD09F9FdcF3B12BDAcB4f5:VIU: No coingeckoId
+      ,Skipped ethereum:0x52903256dd18D85c2Dc4a6C999907c9793eA61E3:INSP: No coingeckoId
+      ,Skipped ethereum:0x1d462414fe14cf489c7A21CaC78509f4bF8CD7c0:CAN: No coingeckoId
       ,Skipped ethereum:0x7B2f9706CD8473B4F5B7758b0171a9933Fc6C4d6:HEALP: No coingeckoId
-      20,Found 6 asset groups
-      30,Processed 1/6 asset groups
-      40,Processed 2/6 asset groups
-      50,Processed 3/6 asset groups
-      60,Processed 4/6 asset groups
-      70,Processed 5/6 asset groups
-      80,Processed 6/6 asset groups
+      20,Found 4 asset groups
+      35,Processed 1/4 asset groups
+      50,Processed 2/4 asset groups
+      65,Processed 3/4 asset groups
+      80,Processed 4/4 asset groups
       80,Setting trades cursor to Nov 04, 2020
       80,Trades computation completed
-      82,Processing 6 trades
-      84,Processed 1/6 trades
-      87,Processed 2/6 trades
-      90,Processed 3/6 trades
-      92,Processed 4/6 trades
-      95,Processed 5/6 trades
-      98,Processed 6/6 trades
+      82,Processing 4 trades
+      86,Processed 1/4 trades
+      90,Processed 2/4 trades
+      94,Processed 3/4 trades
+      98,Processed 4/4 trades
       100,PnL computation completed"
     `)
   })
@@ -251,9 +249,9 @@ describe("0xf98 file import", () => {
         `../__snapshots__/0xf98/balances-${i}.ts.snap`
       )
     }
-    expect(trades.length).toMatchInlineSnapshot(`6`)
+    expect(trades.length).toMatchInlineSnapshot(`4`)
     await expect(trades).toMatchFileSnapshot("../__snapshots__/0xf98/trades.ts.snap")
-    expect(pnl.length).toMatchInlineSnapshot(`6`)
+    expect(pnl.length).toMatchInlineSnapshot(`4`)
     await expect(pnl).toMatchFileSnapshot("../__snapshots__/0xf98/account-pnl.ts.snap")
   })
 

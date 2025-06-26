@@ -18,7 +18,7 @@ export default function AssetsPage({ show }: { show: boolean }) {
     <StaggeredList component="main" gap={2} show={show}>
       <div>
         <Subheading>
-          <span>Assets</span>
+          <span>My Assets</span>
           <AssetsActions />
         </Subheading>
         <AssetTable />

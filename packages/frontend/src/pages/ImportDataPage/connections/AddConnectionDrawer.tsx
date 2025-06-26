@@ -18,6 +18,7 @@ import { DatePicker } from "@mui/x-date-pickers"
 import { useStore } from "@nanostores/react"
 import { isAddress } from "ethers"
 import { WritableAtom } from "nanostores"
+import { enqueueSnackbar } from "notistack"
 import {
   BINANCE_WALLET_LABELS,
   BinanceWalletId,
@@ -29,12 +30,17 @@ import { PlatformAvatar } from "src/components/PlatformAvatar"
 import { $activeAccount } from "src/stores/account-store"
 import { MonoFont } from "src/theme"
 import { asUTC } from "src/utils/formatting-utils"
-import { isProduction } from "src/utils/utils"
+import { isProduction, resolveUrl } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 import { AddressInput } from "../../../components/AddressInput"
 import { SectionTitle } from "../../../components/SectionTitle"
-import { BinanceConnectionOptions, ConnectionOptions, RichExtension } from "../../../interfaces"
+import {
+  BinanceConnectionOptions,
+  Connection,
+  ConnectionOptions,
+  RichExtension,
+} from "../../../interfaces"
 import { $debugMode } from "../../../stores/app-store"
 
 export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
@@ -49,7 +55,18 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
   const debugMode = useStore($debugMode)
 
   const [extensionId, setExtensionId] = useState<string>("etherscan-connection")
-  const [platformId, setPlatformId] = useState<string>("ethereum")
+  const [extensions, setExtensions] = useState<RichExtension[]>([])
+
+  useEffect(() => {
+    rpc.getExtensionsByType("connection").then(setExtensions)
+  }, [rpc])
+
+  const extension = useMemo(
+    () => extensions.find((x) => x.id === extensionId),
+    [extensionId, extensions]
+  )
+
+  const [platformId, setPlatformId] = useState<string>("all")
   const [binanceWallets, setState] = useState({
     coinFutures: false,
     crossMargin: true,
@@ -62,7 +79,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
     if (open) return
 
     setExtensionId("etherscan-connection")
-    setPlatformId("ethereum")
+    setPlatformId("all")
     setState({
       coinFutures: false,
       crossMargin: true,
@@ -85,7 +102,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
     [spot, crossMargin, isolatedMargin, coinFutures, usdFutures].filter((v) => v).length === 0
 
   const handleSubmit = useCallback(
-    (event: React.FormEvent<HTMLFormElement>) => {
+    async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault()
 
       const formData = new FormData(event.target as HTMLFormElement)
@@ -94,9 +111,9 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
        * 1. Extract
        */
       const address = formData.get("walletAddr") as string
-      const key = formData.get("apiKey") as string
-      const secret = formData.get("secret") as string
-      const label = formData.get("label") as string
+      const apiKey = formData.get("apiKey") as string
+      const apiSecret = formData.get("secret") as string
+      // const label = formData.get("label") as string // TODO5 rethink
       const sinceLimit = formData.get("sinceLimit")
         ? asUTC(new Date(formData.get("sinceLimit") as string))
         : undefined
@@ -105,26 +122,30 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
         : undefined
       const options: ConnectionOptions = { sinceLimit, untilLimit }
 
-      // TODO: move binanceWallets to an uncontrolled component
+      // TODO5: move binanceWallets to an uncontrolled component
       // const isolated = !!formData.get("isolated")
       // const usd = !!formData.get("usd")
 
       /**
        * 2. Validate
        */
-      if (extensionId === "etherscan-connection") {
+      if (!extension) {
+        setError("Extension not found")
+        return
+      }
+      if (extension.id === "etherscan-connection") {
         const isValidAddress = address && isAddress(address)
         if (!isValidAddress) {
           setError("Invalid wallet address")
           return
         }
         //
-      } else if (extensionId === "binance-connection") {
-        if (key.length === 0) {
+      } else if (extension.id === "binance-connection") {
+        if (apiKey.length === 0) {
           setError("API key is required")
           return
         }
-        if (secret.length === 0) {
+        if (apiSecret.length === 0) {
           setError("Secret is required")
           return
         }
@@ -136,38 +157,50 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
         //
       }
 
+      /**
+       * 3. Submit
+       */
       setLoading(true)
-      rpc
-        .upsertConnection(activeAccount, {
-          address,
-          extensionId,
-          key,
-          label,
-          options,
-          platform: platformId,
-          secret,
-        })
-        .then((connection) => {
+      try {
+        const connections: Connection[] = []
+
+        for (const x of platformId === "all" ? extension.platformIds! : [platformId]) {
+          const connection = await rpc.upsertConnection(activeAccount, {
+            address,
+            apiKey,
+            apiSecret,
+            extensionId,
+            options,
+            platformId: x,
+          })
+          connections.push(connection)
+        }
+
+        for (const connection of connections) {
           atom.set(false)
           rpc.enqueueSyncConnection(activeAccount, "user", connection.id, debugMode)
-        })
-        .catch((err) => {
-          setError(err.message ?? "Something went wrong")
-          setLoading(false)
-        })
+        }
+        enqueueSnackbar(
+          `${connections.length > 1 ? "Connections" : "Connection"} added, syncing...`,
+          { variant: "success" }
+        )
+      } catch (error) {
+        console.error(error)
+        setError(String(error))
+        setLoading(false)
+      }
     },
-    [binanceWallets, extensionId, platformId, walletsError, atom, rpc, activeAccount, debugMode]
-  )
-
-  const [extensions, setExtensions] = useState<RichExtension[]>([])
-
-  useEffect(() => {
-    rpc.getExtensionsByType("connection").then(setExtensions)
-  }, [rpc])
-
-  const extension = useMemo(
-    () => extensions.find((x) => x.id === extensionId),
-    [extensionId, extensions]
+    [
+      binanceWallets,
+      extensionId,
+      platformId,
+      walletsError,
+      atom,
+      rpc,
+      activeAccount,
+      debugMode,
+      extension,
+    ]
   )
 
   return (
@@ -228,6 +261,18 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                   value={platformId}
                   onChange={(event) => setPlatformId(event.target.value)}
                 >
+                  <MenuItem value="all">
+                    <Stack direction="row" alignItems="center">
+                      <ListItemAvatar>
+                        <PlatformAvatar
+                          src={resolveUrl("$STATIC_ASSETS/extensions/all-platforms.svg")}
+                          alt="All platforms"
+                          size="small"
+                        />
+                      </ListItemAvatar>
+                      <ListItemText primary="All" />
+                    </Stack>
+                  </MenuItem>
                   {extension?.platforms?.map((x) => (
                     <MenuItem key={x.id} value={x.id}>
                       <Stack direction="row" alignItems="center">
@@ -245,11 +290,11 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                 <AddressInput
                   name="walletAddr"
                   autoComplete="off"
-                  autoFocus
                   variant="outlined"
                   fullWidth
                   size="small"
                   required
+                  showAddressBook
                 />
               </div>
             </>
@@ -288,6 +333,18 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                       fontFamily: MonoFont,
                     },
                   }}
+                />
+              </div>
+              <div>
+                <SectionTitle>
+                  Label <Typography variant="caption">(optional)</Typography>
+                </SectionTitle>
+                <TextField
+                  name="label"
+                  autoComplete="off"
+                  variant="outlined"
+                  fullWidth
+                  size="small"
                 />
               </div>
               <FormControl sx={{ color: "var(--mui-palette-text-secondary)" }} error={walletsError}>
@@ -387,12 +444,6 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                 }}
               />
             </Stack>
-          </div>
-          <div>
-            <SectionTitle>
-              Label <Typography variant="caption">(optional)</Typography>
-            </SectionTitle>
-            <TextField name="label" autoComplete="off" variant="outlined" fullWidth size="small" />
           </div>
           {error && <FormHelperText error>{error}</FormHelperText>}
           <div>
