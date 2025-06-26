@@ -24,9 +24,17 @@ import {
   Stack,
   Tooltip,
 } from "@mui/material"
+import { persistentAtom } from "@nanostores/persistent"
 import { useStore } from "@nanostores/react"
-import { Action, KBarResults, useKBar, useMatches, useRegisterActions, VisualState } from "kbar"
-import { enqueueSnackbar } from "notistack"
+import {
+  Action,
+  ActionImpl,
+  KBarResults,
+  useKBar,
+  useMatches,
+  useRegisterActions,
+  VisualState,
+} from "kbar"
 import React, { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { APP_ACTIONS } from "src/AppActions"
@@ -62,7 +70,20 @@ const SECTIONS = {
   blockchains: { name: "Blockchains", priority: 6 },
   exchanges: { name: "Exchanges", priority: 7 },
   extensions: { name: "Extensions", priority: 5 },
+  recent: { name: "Recent", priority: 12 },
   transactions: { name: "Transactions", priority: 11 },
+}
+
+const $recentActionIds = persistentAtom<string[]>("recent-actions", [], {
+  decode: JSON.parse,
+  encode: JSON.stringify,
+})
+
+function addToRecentActions(actionId: string) {
+  const current = $recentActionIds.get()
+  const filtered = current.filter((id) => id !== actionId)
+  const updated = [actionId, ...filtered].slice(0, 10)
+  $recentActionIds.set(updated)
 }
 
 export const SearchBar = () => {
@@ -72,6 +93,7 @@ export const SearchBar = () => {
   const activeAccount = useStore($activeAccount)
   const assetMap = useStore($assetMap)
   const platformMap = useStore($platformMap)
+  const recentActionIds = useStore($recentActionIds)
 
   const {
     showing,
@@ -100,11 +122,6 @@ export const SearchBar = () => {
     setAssetsFound([])
     setAssetsLoading(false)
     ;(async () => {
-      if (!searchQuery || searchQuery.length < 1) {
-        setAssetsFound([])
-        return
-      }
-
       try {
         setAssetsLoading(true)
         const assets = await rpc.findAssets(activeAccount, searchQuery, 5, false, "coingecko")
@@ -316,14 +333,7 @@ export const SearchBar = () => {
         icon: <CloudSyncRounded fontSize="small" />,
         id: "action-sync-all-connections",
         name: "Sync all connections",
-        perform: () =>
-          rpc.enqueueSyncAllConnections(activeAccount, "user", $debugMode.get(), (error) => {
-            if (error) {
-              enqueueSnackbar(`Connections sync failed: ${error}`, { variant: "error" })
-            } else {
-              enqueueSnackbar("Connections synced", { variant: "success" })
-            }
-          }),
+        perform: () => rpc.enqueueSyncAllConnections(activeAccount, "user", $debugMode.get()),
         priority: 10,
         section: SECTIONS.actions,
       },
@@ -452,16 +462,37 @@ export const SearchBar = () => {
     return actions
   }, [activeAccount, rpc])
 
-  const actions = useMemo<Action[]>(
-    () => [
+  const actions = useMemo<Action[]>(() => {
+    const all = [
       ...txnsFoundActions,
       ...platformActions,
       ...assetActions,
       ...extensionActions,
       ...appActions,
-    ],
-    [txnsFoundActions, platformActions, assetActions, extensionActions, appActions]
-  )
+    ]
+
+    return all.map((action) => {
+      const index = recentActionIds.findIndex((id) => id === action.id)
+      const isRecent = index !== -1
+
+      return {
+        ...action,
+        perform: (currentActionImpl: ActionImpl) => {
+          addToRecentActions(action.id)
+          action.perform?.(currentActionImpl)
+        },
+        priority: isRecent ? -index : action.priority,
+        section: isRecent ? SECTIONS.recent : action.section,
+      }
+    })
+  }, [
+    recentActionIds,
+    txnsFoundActions,
+    platformActions,
+    assetActions,
+    extensionActions,
+    appActions,
+  ])
 
   useRegisterActions(actions, [actions])
 
