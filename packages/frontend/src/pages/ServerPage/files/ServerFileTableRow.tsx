@@ -24,7 +24,7 @@ export function ServerFileTableRow(props: TableRowComponentProps<ServerFile>) {
   if (isTablet) {
     return (
       <TableRow hover {...rest}>
-        <TableCell colSpan={headCells.length} variant="clickable">
+        <TableCell colSpan={headCells.length}>
           <Stack direction="row" justifyContent="space-between" alignItems="flex-start" gap={1}>
             <Stack gap={0.5} marginY={0.5} flexGrow={1} minWidth={0}>
               <Typography variant="body1" fontFamily={MonoFont} component="div">

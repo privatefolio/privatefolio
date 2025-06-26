@@ -7,7 +7,7 @@
   --tv-color-toolbar-button-text-active-hover: #42a5f5;
   --tv-color-toolbar-divider-background: rgba(67, 70, 81, 0.5);
   --tv-color-toolbar-button-background-hover: rgba(0, 0, 0, 0.05);
-  --tv-horizontal-scroll-fade-color: rgb(237, 238, 242);   /* TODO9: check */
+  --tv-horizontal-scroll-fade-color: rgb(237, 238, 242);   /* TODO8: check */
   /*
   --tv-color-popup-background: rgb(192, 180, 149);
   --tv-color-pane-background-secondary: rgb(192, 180, 149);
@@ -20,18 +20,18 @@
   --tv-color-toolbar-toggle-button-background-active-hover: magenta;
   */
   [class^="paneSeparator-"] {
-    background: rgba(253, 253, 253, 1) !important;  /* TODO9: check */
+    background: rgba(253, 253, 253, 1) !important;  /* TODO8: check */
   }
   [class^="price-axis-currency-label-wrapper"] > div {
-    background: rgba(253, 253, 253, 1) !important;  /* TODO9: check */
+    background: rgba(253, 253, 253, 1) !important;  /* TODO8: check */
     /* border-color: rgba(67, 70, 81, 0.5); */
     border: none;
   }
   [class^="fadeTop-"] {
-    background-image: linear-gradient(0deg,#fff0,rgb(237, 238, 242))  /* TODO9: check */
+    background-image: linear-gradient(0deg,#fff0,rgb(237, 238, 242))  /* TODO8: check */
   }
   [class^="fadeBot-"] {
-    background-image: linear-gradient(180deg,#fff0,rgb(237, 238, 242))  /* TODO9: check */
+    background-image: linear-gradient(180deg,#fff0,rgb(237, 238, 242))  /* TODO8: check */
   }
 }
 
@@ -72,7 +72,7 @@
 
 /* @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400;500;600;700&display=swap'); */
 
-/* TODO9: check */
+/* TODO8: check */
 /* * {
   font-family: 'IBM Plex Mono', monospace !important;
 } */

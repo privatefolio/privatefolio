@@ -4,8 +4,8 @@ import { useStore } from "@nanostores/react"
 import React, { memo, useEffect, useState } from "react"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AssetAmountBlock } from "src/components/AssetAmountBlock"
+import { AssetBlock } from "src/components/AssetBlock"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
-import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { TagList } from "src/components/TagList"
 import { useBoolean } from "src/hooks/useBoolean"
@@ -52,7 +52,7 @@ function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
     return (
       <>
         <TableRow hover {...rest}>
-          <TableCell colSpan={headCells.length} onClick={toggleOpen} sx={{ cursor: "pointer" }}>
+          <TableCell colSpan={headCells.length} onClick={toggleOpen} variant="clickable">
             <Stack>
               <Typography variant="caption" color="text.secondary">
                 <TimestampBlock timestamp={timestamp} relative={relativeTime} />
@@ -83,7 +83,7 @@ function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
                     showSign
                     showTicker={!showAssetColumn}
                   />
-                  {showAssetColumn && <MyAssetBlock id={assetId} />}
+                  {showAssetColumn && <AssetBlock id={assetId} variant="tablecell" />}
                 </Stack>
               </Stack>
               <TagList itemId={id} itemType="auditLog" />
@@ -137,7 +137,7 @@ function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
         </TableCell>
         {showAssetColumn && (
           <TableCell>
-            <MyAssetBlock id={assetId} />
+            <AssetBlock id={assetId} variant="tablecell" />
           </TableCell>
         )}
         <TableCell align="right" variant="clickable">

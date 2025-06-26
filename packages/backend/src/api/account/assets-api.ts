@@ -130,7 +130,7 @@ export async function getAsset(accountName: string, id: string): Promise<MyAsset
 
     const cachedAssets = await getAssets()
     return cachedAssets.find((x) => {
-      if (x.coingeckoId === id) return true
+      if (x.coingeckoId === id || x.coingeckoId === id.replace("coingecko:", "")) return true
       if (x.id === id) return true
       if (
         x.platforms &&

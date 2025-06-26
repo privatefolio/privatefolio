@@ -28,7 +28,7 @@ export function ServerTaskTableRow(props: TableRowComponentProps<ServerTask>) {
     return (
       <>
         <TableRow hover {...rest}>
-          <TableCell colSpan={headCells.length} variant="clickable">
+          <TableCell colSpan={headCells.length}>
             <Stack direction="row" justifyContent="space-between" alignItems="flex-start" gap={1}>
               <Stack gap={0.5} marginY={0.5} sx={{ maxWidth: 400 }}>
                 <Typography variant="body1" fontFamily={MonoFont} component="div">

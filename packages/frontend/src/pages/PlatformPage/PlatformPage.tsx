@@ -5,10 +5,10 @@ import { isBlockchain, isExchange } from "privatefolio-backend/src/utils/utils"
 import React, { useEffect, useState } from "react"
 import { useParams, useSearchParams } from "react-router-dom"
 import { ActionBlock } from "src/components/ActionBlock"
+import { AssetBlock } from "src/components/AssetBlock"
 import { BackButton } from "src/components/BackButton"
 import { CoinGeckoIcon } from "src/components/CoinGeckoIcon"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
-import { ForeignAssetBlock } from "src/components/ForeignAssetBlock"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
 import { NavTab } from "src/components/NavTab"
 import { PlatformAvatar } from "src/components/PlatformAvatar"
@@ -192,7 +192,7 @@ export default function PlatformPage() {
                 {isBlockchain(platform) && platform.nativeCoinId && (
                   <div>
                     <SectionTitle>Native Asset</SectionTitle>
-                    <ForeignAssetBlock coingeckoId={platform.nativeCoinId} />
+                    <AssetBlock id={platform.nativeCoinId} />
                   </div>
                 )}
               </Stack>

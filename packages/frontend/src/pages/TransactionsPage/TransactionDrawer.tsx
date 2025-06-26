@@ -7,10 +7,9 @@ import React, { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AmountBlock } from "src/components/AmountBlock"
-import { AppLink } from "src/components/AppLink"
+import { AssetBlock } from "src/components/AssetBlock"
 import { DrawerHeader } from "src/components/DrawerHeader"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
-import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TagManager } from "src/components/TagManager"
@@ -145,14 +144,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
                 showSign
                 currencyTicker={getAssetTicker(incomingAsset)}
               />
-              <Button
-                size="small"
-                component={AppLink}
-                to={`../asset/${encodeURI(incomingAsset)}`}
-                sx={{ padding: 1 }}
-              >
-                <MyAssetBlock id={incomingAsset} size="small" />
-              </Button>
+              <AssetBlock id={incomingAsset} variant="button" />
               <ValueChip
                 value={
                   priceMap && incoming && priceMap[incomingAsset]?.value
@@ -173,14 +165,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
                 showSign
                 currencyTicker={getAssetTicker(outgoingAsset)}
               />
-              <Button
-                size="small"
-                component={AppLink}
-                to={`../asset/${encodeURI(outgoingAsset)}`}
-                sx={{ padding: 1 }}
-              >
-                <MyAssetBlock id={outgoingAsset} size="small" />
-              </Button>
+              <AssetBlock id={outgoingAsset} variant="button" />
               <ValueChip
                 value={
                   priceMap && outgoing && priceMap[outgoingAsset]?.value
@@ -201,14 +186,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
                 showSign
                 currencyTicker={getAssetTicker(feeAsset)}
               />
-              <Button
-                size="small"
-                component={AppLink}
-                to={`../asset/${encodeURI(feeAsset)}`}
-                sx={{ padding: 1 }}
-              >
-                <MyAssetBlock id={feeAsset} size="small" />
-              </Button>
+              <AssetBlock id={feeAsset} variant="button" />
               <ValueChip
                 value={
                   priceMap && fee && priceMap[feeAsset]?.value

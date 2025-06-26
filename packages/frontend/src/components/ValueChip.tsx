@@ -12,7 +12,7 @@ export function ValueChip(props: ValueChipProps) {
 
   return (
     <Chip
-      size="medium"
+      size="small"
       sx={{
         "& > span": {
           padding: 0,

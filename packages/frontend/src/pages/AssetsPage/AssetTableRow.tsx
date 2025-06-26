@@ -13,9 +13,9 @@ import {
 import { useStore } from "@nanostores/react"
 import { allPriceApiIds } from "privatefolio-backend/src/settings/price-apis"
 import React from "react"
-import { AppLink } from "src/components/AppLink"
+import { AssetBlock } from "src/components/AssetBlock"
+import { CaptionText } from "src/components/CaptionText"
 import { ExtensionAvatar } from "src/components/ExtensionAvatar"
-import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { QuoteAmountBlock } from "src/components/QuoteAmountBlock"
 import { PRICE_APIS_META, PriceApiId } from "src/settings"
@@ -87,26 +87,33 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
   if (isTablet) {
     return (
       <TableRow hover {...rest}>
-        <TableCell colSpan={headCells.length} variant="clickable">
-          <Stack direction="row" gap={1} justifyContent="space-between" flexWrap="nowrap">
-            <AppLink to={`../asset/${encodeURI(assetId)}`} flexGrow={1}>
-              <Stack sx={{ height: 52 }} alignItems="center" direction="row" gap={1}>
-                <MyAssetBlock id={assetId} secondary={name} size="medium" />
+        <TableCell colSpan={Math.round(headCells.length / 2)} variant="clickable">
+          <AssetBlock
+            id={assetId}
+            secondary={
+              <>
+                <span>{name}</span>
                 {!coingeckoId && (
                   <Tooltip title="Not listed on Coingecko.com">
-                    <Chip label="Unlisted" size="small" sx={{ color: "text.secondary" }} />
+                    <Chip label={<CaptionText>Unlisted</CaptionText>} size="small" />
                   </Tooltip>
                 )}
-              </Stack>
-            </AppLink>
-            <Stack alignItems="flex-end" gap={0.5}>
-              {priceApiSelect}
-              {price === null ? (
-                <Skeleton sx={{ minWidth: 30 }}></Skeleton>
-              ) : (
+              </>
+            }
+            size="medium"
+            variant="tablecell"
+          />
+        </TableCell>
+        <TableCell colSpan={Math.floor(headCells.length / 2)} align="right">
+          <Stack alignItems="flex-end" gap={0.5}>
+            {priceApiSelect}
+            {price === null ? (
+              <Skeleton height={18} width={80} sx={{ display: "inline-block" }} />
+            ) : (
+              <CaptionText>
                 <QuoteAmountBlock amount={price?.value} formatting="price" />
-              )}
-            </Stack>
+              </CaptionText>
+            )}
           </Stack>
         </TableCell>
       </TableRow>
@@ -117,9 +124,7 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
     <>
       <TableRow hover {...rest}>
         <TableCell variant="clickable">
-          <AppLink to={`../asset/${encodeURI(assetId)}`}>
-            <MyAssetBlock id={assetId} size="small" />
-          </AppLink>
+          <AssetBlock id={assetId} size="small" variant="tablecell" showLoading />
         </TableCell>
         <TableCell>
           {name}
@@ -130,12 +135,12 @@ export function AssetTableRow(props: TableRowComponentProps<AssetWithPrice>) {
           )}
         </TableCell>
         <TableCell variant="clickable">
-          <PlatformBlock id={getAssetPlatform(assetId)} variant="tablecell" />
+          <PlatformBlock id={getAssetPlatform(assetId)} variant="tablecell" showLoading />
         </TableCell>
         <TableCell>{priceApiSelect}</TableCell>
         <TableCell variant="clickable" align="right">
           {price === null ? (
-            <Skeleton sx={{ margin: "0px 16px" }}></Skeleton>
+            <Skeleton sx={{ marginX: 2 }}></Skeleton>
           ) : (
             <QuoteAmountBlock amount={price?.value} formatting="price" />
           )}

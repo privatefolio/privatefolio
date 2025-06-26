@@ -23,7 +23,7 @@ export function FileImportTableRow(props: TableRowComponentProps<FileImport>) {
     return (
       <>
         <TableRow hover {...rest}>
-          <TableCell colSpan={headCells.length} onClick={toggleOpen} sx={{ cursor: "pointer" }}>
+          <TableCell colSpan={headCells.length} onClick={toggleOpen} variant="clickable">
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Stack gap={0.5} marginY={0.5}>
                 <Stack direction="row" gap={1} alignItems="center" component="div">

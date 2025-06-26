@@ -731,6 +731,7 @@ export const theme: CssVarsThemeOptions = {
               outline: "1px dashed rgba(var(--mui-palette-secondary-mainChannel) / 0.5)",
               outlineOffset: -1,
             },
+            cursor: "pointer",
             "html[data-mui-color-scheme='dark'] &:hover": {
               outline: "1px dashed rgba(var(--mui-palette-primary-mainChannel) / 0.33)",
             },

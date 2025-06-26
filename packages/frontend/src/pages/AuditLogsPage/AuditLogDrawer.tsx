@@ -1,12 +1,11 @@
-import { Button, Drawer, DrawerProps, Stack } from "@mui/material"
+import { Drawer, DrawerProps, Stack } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AmountBlock } from "src/components/AmountBlock"
-import { AppLink } from "src/components/AppLink"
+import { AssetBlock } from "src/components/AssetBlock"
 import { DrawerHeader } from "src/components/DrawerHeader"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
-import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TagManager } from "src/components/TagManager"
@@ -100,14 +99,7 @@ export function AuditLogDrawer(props: AuditLogDrawerProps) {
               showSign
               currencyTicker={getAssetTicker(assetId)}
             />
-            <Button
-              size="small"
-              component={AppLink}
-              to={`../asset/${encodeURI(assetId)}`}
-              sx={{ paddingX: 1 }}
-            >
-              <MyAssetBlock id={assetId} size="small" />
-            </Button>
+            <AssetBlock id={assetId} variant="button" />
             <ValueChip
               value={
                 priceMap && change && priceMap[assetId]?.value
@@ -121,14 +113,7 @@ export function AuditLogDrawer(props: AuditLogDrawerProps) {
           <SectionTitle>New balance</SectionTitle>
           <Stack direction="row" alignItems="center" gap={0.25}>
             <AmountBlock amount={balance} currencyTicker={getAssetTicker(assetId)} />
-            <Button
-              size="small"
-              component={AppLink}
-              to={`../asset/${encodeURI(assetId)}`}
-              sx={{ padding: 1 }}
-            >
-              <MyAssetBlock id={assetId} size="small" />
-            </Button>
+            <AssetBlock id={assetId} variant="button" />
             <ValueChip
               value={
                 priceMap && balance && priceMap[assetId]?.value

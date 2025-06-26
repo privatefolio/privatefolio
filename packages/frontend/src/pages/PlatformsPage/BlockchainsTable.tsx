@@ -63,7 +63,6 @@ export function BlockchainsTable() {
       rows={blockchains}
       rowCount={blockchains.length}
       queryTime={queryTime}
-      nullishSortPosition="end"
     />
   )
 }

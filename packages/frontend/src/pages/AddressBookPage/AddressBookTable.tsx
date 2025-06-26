@@ -16,19 +16,19 @@ import { AddressBookTableRow } from "./AddressBookTableRow"
 
 export function AddressBookTable() {
   const addressBook = useStore($addressBook)
-  const queryTime = useStore($inMemoryDataQueryTime)
+  const inMemoryDataQueryTime = useStore($inMemoryDataQueryTime)
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
 
   const rows: LabeledAddress[] = useMemo(
     () =>
-      queryTime === null
+      inMemoryDataQueryTime === null
         ? []
         : Object.keys(addressBook).reduce((acc, id) => {
             acc.push({ id, label: addressBook[id] })
             return acc
           }, [] as LabeledAddress[]),
-    [queryTime, addressBook]
+    [inMemoryDataQueryTime, addressBook]
   )
 
   const headCells: HeadCell<LabeledAddress>[] = useMemo(
@@ -86,7 +86,7 @@ export function AddressBookTable() {
         TableRowComponent={AddressBookTableRow}
         rows={rows}
         rowCount={rows.length}
-        queryTime={queryTime}
+        queryTime={inMemoryDataQueryTime}
         defaultRowsPerPage={10}
         emptyContent={
           <Button sx={{ padding: 4 }} onClick={handleAddNewRow}>

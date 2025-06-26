@@ -4,8 +4,8 @@ import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AssetAmountBlock } from "src/components/AssetAmountBlock"
+import { AssetBlock } from "src/components/AssetBlock"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
-import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { TagList } from "src/components/TagList"
 import { useBoolean } from "src/hooks/useBoolean"
@@ -59,11 +59,14 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
     return (
       <>
         <TableRow hover>
-          <TableCell colSpan={headCells.length} onClick={toggleOpen} sx={{ cursor: "pointer" }}>
-            <Stack>
-              <Typography variant="caption" color="text.secondary">
-                <TimestampBlock timestamp={timestamp} relative={relativeTime} />
-              </Typography>
+          <TableCell colSpan={headCells.length} onClick={toggleOpen} variant="clickable">
+            <Stack gap={0.5} marginY={0.5}>
+              <Stack direction="row" gap={1} alignItems="center" justifyContent="space-between">
+                <ActionBlock action={type} />
+                <Typography variant="caption" color="text.secondary">
+                  <TimestampBlock timestamp={timestamp} relative={relativeTime} />
+                </Typography>
+              </Stack>
               <Stack
                 direction="row"
                 gap={1}
@@ -72,8 +75,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
                 alignItems="center"
                 flexWrap="wrap"
               >
-                <Stack spacing={0.5}>
-                  <ActionBlock action={type} />
+                <Stack spacing={0.5} alignItems="flex-start">
                   <Stack
                     direction="row"
                     gap={1}
@@ -92,7 +94,12 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
                           showSign
                           placeholder=""
                         />
-                        <MyAssetBlock id={outgoingAsset} />
+                        <AssetBlock
+                          id={outgoingAsset}
+                          variant="tablecell"
+                          hideTooltip
+                          href={undefined}
+                        />
                       </Stack>
                     )}
                     {outgoing && incoming ? (
@@ -108,13 +115,18 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
                           showSign
                           placeholder=""
                         />
-                        <MyAssetBlock id={incomingAsset} />
+                        <AssetBlock
+                          id={incomingAsset}
+                          variant="tablecell"
+                          hideTooltip
+                          href={undefined}
+                        />
                       </Stack>
                     )}
                   </Stack>
                 </Stack>
-                <TagList itemId={id} itemType="transaction" />
               </Stack>
+              <TagList itemId={id} itemType="transaction" />
             </Stack>
           </TableCell>
         </TableRow>
@@ -156,7 +168,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
           />
         </TableCell>
         <TableCell>
-          <MyAssetBlock id={outgoingAsset} />
+          <AssetBlock id={outgoingAsset} variant="tablecell" />
         </TableCell>
         <TableCell align="right" variant="clickable">
           <AssetAmountBlock
@@ -169,7 +181,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
           />
         </TableCell>
         <TableCell>
-          <MyAssetBlock id={incomingAsset} />
+          <AssetBlock id={incomingAsset} variant="tablecell" />
         </TableCell>
         <TableCell align="right" variant="clickable">
           <AssetAmountBlock
@@ -182,7 +194,7 @@ export function TransactionTableRow(props: TableRowComponentProps<Transaction>) 
           />
         </TableCell>
         <TableCell>
-          <MyAssetBlock id={feeAsset} />
+          <AssetBlock id={feeAsset} variant="tablecell" />
         </TableCell>
         <TableCell>
           <TagList itemId={id} itemType="transaction" />

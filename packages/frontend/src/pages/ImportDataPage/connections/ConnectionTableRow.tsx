@@ -34,7 +34,7 @@ export function ConnectionTableRow(props: TableRowComponentProps<Connection>) {
     return (
       <>
         <TableRow hover {...rest}>
-          <TableCell colSpan={headCells.length} onClick={toggleOpen} sx={{ cursor: "pointer" }}>
+          <TableCell colSpan={headCells.length} onClick={toggleOpen} variant="clickable">
             <Stack gap={1} direction="row" justifyContent="space-between" alignItems="flex-start">
               <Stack gap={0.5} marginY={0.5}>
                 <Stack direction="row" gap={1} alignItems="center" component="div">
