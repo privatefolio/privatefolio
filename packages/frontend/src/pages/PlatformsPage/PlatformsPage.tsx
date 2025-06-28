@@ -7,6 +7,7 @@ import { Tabs } from "src/components/Tabs"
 
 import { BlockchainsTable } from "./BlockchainsTable"
 import { ExchangesTable } from "./ExchangesTable"
+import { PlatformActions } from "./PlatformActions"
 
 export default function PlatformsPage({ show }: { show: boolean }) {
   const [searchParams] = useSearchParams()
@@ -15,10 +16,13 @@ export default function PlatformsPage({ show }: { show: boolean }) {
   return (
     <StaggeredList component="main" gap={2} show={show}>
       <Stack>
-        <Tabs value={tab} defaultValue={tab} largeSize>
-          <NavTab value="exchanges" to={"?tab=exchanges"} label="Exchanges" />
-          <NavTab value="blockchains" to={"?tab=blockchains"} label="Blockchains" />
-        </Tabs>
+        <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
+          <Tabs value={tab} defaultValue={tab} largeSize>
+            <NavTab value="exchanges" to={"?tab=exchanges"} label="Exchanges" />
+            <NavTab value="blockchains" to={"?tab=blockchains"} label="Blockchains" />
+          </Tabs>
+          <PlatformActions />
+        </Stack>
         {tab === "exchanges" && <ExchangesTable />}
         {tab === "blockchains" && <BlockchainsTable />}
       </Stack>

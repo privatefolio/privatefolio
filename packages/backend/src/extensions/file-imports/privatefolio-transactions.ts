@@ -5,7 +5,7 @@ import { hashString } from "src/utils/utils"
 
 export const extensionId = "privatefolio-file-import"
 export const parserId = "privatefolio-transactions"
-export const platformId = "ethereum" // TODO8: this should work for all EVM chains
+export const platformId = "a/privatefolio" // TODO8: this should work for all EVM chains
 
 export const HEADER =
   '"Timestamp","Platform","Wallet","Type","Incoming","Incoming Asset","Outgoing","Outgoing Asset","Fee","Fee Asset","Smart Contract","Smart Contract Method","Blockchain Tx","Notes"'

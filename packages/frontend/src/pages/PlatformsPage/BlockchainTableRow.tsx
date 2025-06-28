@@ -29,6 +29,7 @@ export function BlockchainTableRow(props: BlockchainTableRowProps) {
             size="medium"
             platform={row}
             secondary={<span>Chain ID: {row.chainId ?? "N/A"}</span>}
+            showSupported
           />
         </TableCell>
         <TableCell align="right">
@@ -44,7 +45,7 @@ export function BlockchainTableRow(props: BlockchainTableRowProps) {
   return (
     <TableRow hover {...rest}>
       <TableCell variant="clickable">
-        <PlatformBlock variant="tablecell" platform={row} />
+        <PlatformBlock variant="tablecell" platform={row} showSupported />
       </TableCell>
       <TableCell variant="clickable">
         <AssetBlock id={row.nativeCoinId} size="small" variant="tablecell" showLoading />

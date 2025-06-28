@@ -34,7 +34,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
 
   const [loading, setLoading] = useState(false)
 
-  const [platformId, setPlatform] = useState<string>("ethereum")
+  const [platformId, setPlatform] = useState<string>("c/ethereum")
   const [type, setType] = useState<TransactionType>("Swap")
   const [binanceWallet, setBinanceWallet] = useState("Spot")
 
@@ -77,7 +77,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
       const timestamp = dateAndTime.getTime()
 
       const wallet =
-        platformId === "binance" ? binanceWallet : (formData.get("walletAddr") as string)
+        platformId === "e/binance" ? binanceWallet : (formData.get("walletAddr") as string)
 
       const incoming = formData.get("incoming") as string
       const outgoing = formData.get("outgoing") as string
@@ -137,7 +137,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
   useEffect(() => {
     if (open) return
 
-    setPlatform("ethereum")
+    setPlatform("c/ethereum")
     setBinanceWallet("Spot")
     setType("Swap")
     setNotes("")
@@ -179,7 +179,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
           </div>
           <div>
             <SectionTitle>Wallet</SectionTitle>
-            {platformId === "binance" ? (
+            {platformId === "e/binance" ? (
               <Select
                 sx={{ height: "40px" }}
                 variant="outlined"

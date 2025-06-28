@@ -28,7 +28,8 @@ import { TaskDetailsDialog } from "./TaskDetailsDialog"
 import { TaskDuration } from "./TaskDuration"
 import { TaskStatusIcon } from "./TaskStatusIcon"
 
-export const LIMIT = 10
+export const CHECK_LIMIT = 100
+export const SHOW_LIMIT = 10
 
 export function TaskDropdown() {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
@@ -58,7 +59,10 @@ export function TaskDropdown() {
     // TODO2 add filters: all, user, cron, side-effect
     // WHERE trigger = 'user'
     rpc
-      .getServerTasks(accountName, `SELECT * FROM server_tasks ORDER BY id DESC LIMIT ${LIMIT}`)
+      .getServerTasks(
+        accountName,
+        `SELECT * FROM server_tasks ORDER BY id DESC LIMIT ${CHECK_LIMIT}`
+      )
       .then(setLatestTasks)
       .catch(console.error)
   }, [rpc, refresh, accountName, connectionStatus])
@@ -189,7 +193,7 @@ export function TaskDropdown() {
             </ListItemButton>
           </ListItem>
         )}
-        {latestTasks.length >= LIMIT && (
+        {latestTasks.length >= SHOW_LIMIT && (
           <ListItem>
             <ListItemButton
               component={Link}

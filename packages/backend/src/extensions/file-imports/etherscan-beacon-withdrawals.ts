@@ -10,7 +10,7 @@ import { formatAddress } from "src/utils/assets-utils"
 
 export const extensionId = "etherscan-file-import"
 export const parserId = "etherscan-beacon-withdrawals"
-export const platformId = "ethereum"
+export const platformId = "c/ethereum"
 
 export const HEADER =
   '"Index","Blockno","UnixTimestamp","DateTime (UTC)","Validator Index","Recipient","Value"'

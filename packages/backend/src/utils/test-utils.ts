@@ -2,22 +2,20 @@ import { AuditLog, EtherscanTransaction, Transaction } from "src/interfaces"
 
 export function trimTxId(fullId: string, platformId: string): string {
   const parts = fullId.split("_")
-
-  // Example "1682669678_0xb41d6819932845278e7c451400f1778a952b35c6358dc51b49436438753f5113_NORMAL_0"
-  const trimmedId =
-    platformId === "ethereum" ? [parts[1], parts[2]].join("_") : parts.slice(1).join("_")
-
-  return trimmedId
+  return parts.length < 5
+    ? fullId
+    : platformId === "c/ethereum"
+      ? [parts[1], parts[2], parts[4]].join("_")
+      : parts.slice(1).join("_")
 }
 
 export function trimAuditLogId(fullId: string, platformId: string): string {
   const parts = fullId.split("_")
-
-  // Example "1682669678_0xb41d6819932845278e7c451400f1778a952b35c6358dc51b49436438753f5113_NORMAL_0_VALUE_0"
-  const trimmedId =
-    platformId === "ethereum" ? [parts[1], parts[2], parts[4]].join("_") : parts.slice(1).join("_")
-
-  return trimmedId
+  return parts.length < 3
+    ? fullId
+    : platformId === "c/ethereum"
+      ? [parts[1], parts[2]].join("_")
+      : parts.slice(1).join("_")
 }
 
 export function sanitizeAuditLog(auditLog: AuditLog) {
@@ -33,11 +31,12 @@ export function sanitizeAuditLog(auditLog: AuditLog) {
     ...rest
   } = auditLog
 
-  const id = platformId === "binance" ? fullId : trimAuditLogId(fullId, auditLog.platformId)
+  const id =
+    platformId === "e/binance" ? fullId : trimAuditLogId(fullId, auditLog.platformId)
   let txId = fullTxId ? trimTxId(fullTxId, auditLog.platformId) : undefined
   let time = timestamp
 
-  if (platformId === "binance") {
+  if (platformId === "e/binance") {
     time = (timestamp / 1000) | 0
     txId = undefined
   }
@@ -69,9 +68,11 @@ export function sanitizeTransaction(transaction: Transaction) {
   } = transaction
 
   const id =
-    platformId === "ethereum" ? trimTxId(transaction.id, transaction.platformId) : transaction.id
+    platformId === "c/ethereum"
+      ? trimTxId(transaction.id, transaction.platformId)
+      : transaction.id
   let time = timestamp
-  if (platformId === "binance") {
+  if (platformId === "e/binance") {
     time = (timestamp / 1000) | 0
   }
 

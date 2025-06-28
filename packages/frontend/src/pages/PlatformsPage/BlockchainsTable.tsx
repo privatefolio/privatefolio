@@ -2,6 +2,7 @@ import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo, useState } from "react"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
 import { Blockchain } from "src/interfaces"
+import { $showSupportedPlatformsOnly } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
 import { HeadCell } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
@@ -13,6 +14,7 @@ export function BlockchainsTable() {
   const [queryTime, setQueryTime] = useState<number | null>(null)
   const accountName = useStore($activeAccount)
   const rpc = useStore($rpc)
+  const showSupportedPlatformsOnly = useStore($showSupportedPlatformsOnly)
 
   useEffect(() => {
     document.title = `Blockchains - ${accountName} - Privatefolio`
@@ -28,6 +30,13 @@ export function BlockchainsTable() {
 
     loadBlockchains()
   }, [accountName, rpc])
+
+  const rows = useMemo(() => {
+    if (showSupportedPlatformsOnly) {
+      return blockchains.filter((blockchain) => blockchain.supported)
+    }
+    return blockchains
+  }, [blockchains, showSupportedPlatformsOnly])
 
   const headCells: HeadCell<Blockchain>[] = useMemo(
     () => [
@@ -60,8 +69,8 @@ export function BlockchainsTable() {
       initOrderDir="asc"
       headCells={headCells}
       TableRowComponent={BlockchainTableRow}
-      rows={blockchains}
-      rowCount={blockchains.length}
+      rows={rows}
+      rowCount={rows.length}
       queryTime={queryTime}
     />
   )

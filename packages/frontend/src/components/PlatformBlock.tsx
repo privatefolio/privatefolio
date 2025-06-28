@@ -1,4 +1,5 @@
-import { Box, Skeleton, Stack } from "@mui/material"
+import { VerifiedRounded } from "@mui/icons-material"
+import { Box, Skeleton, Stack, Tooltip } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo, useState } from "react"
 import { Platform } from "src/interfaces"
@@ -14,10 +15,11 @@ export type PlatformBlockProps = Omit<IdentifierBlockProps, "id"> & {
   id?: string
   platform?: Platform
   showLoading?: boolean
+  showSupported?: boolean
 }
 
 export function PlatformBlock(props: PlatformBlockProps) {
-  const { id, platform: cachedValue, size = "small", showLoading, ...rest } = props
+  const { id, platform: cachedValue, size = "small", showLoading, showSupported, ...rest } = props
 
   const [platform, setPlatform] = useState<Platform | undefined | null>(cachedValue)
 
@@ -54,7 +56,20 @@ export function PlatformBlock(props: PlatformBlockProps) {
     <IdentifierBlock
       id={platformId}
       href={`${activeAccountPath}/platform/${platformId}`}
-      label={platform?.name}
+      label={
+        <>
+          {platform?.name || "Unknown"}{" "}
+          {showSupported && platform?.supported && (
+            <Tooltip title={`Supported by ${platform?.extensionsIds?.length} extensions`}>
+              <VerifiedRounded
+                color="primary"
+                fontSize="inherit"
+                sx={{ verticalAlign: "middle" }}
+              />
+            </Tooltip>
+          )}
+        </>
+      }
       avatar={<PlatformAvatar src={platform?.image} alt={platform?.name} size={size} />}
       size={size}
       linkText={

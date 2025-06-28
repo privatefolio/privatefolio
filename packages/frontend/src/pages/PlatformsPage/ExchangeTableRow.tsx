@@ -29,6 +29,7 @@ export function ExchangeTableRow({
             platform={row}
             size="medium"
             secondary={!!row.url && <CaptionText>{extractRootUrl(row.url)}</CaptionText>}
+            showSupported
           />
         </TableCell>
         <TableCell align="right">
@@ -54,7 +55,7 @@ export function ExchangeTableRow({
   return (
     <TableRow hover {...rest}>
       <TableCell variant="clickable">
-        <PlatformBlock variant="tablecell" platform={row} />
+        <PlatformBlock variant="tablecell" platform={row} showSupported />
       </TableCell>
       <TableCell>
         {row.url ? (

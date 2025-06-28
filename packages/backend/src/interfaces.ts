@@ -132,9 +132,11 @@ export interface Exchange {
    */
   coingeckoTrustScore: number
   country?: string
+  extensionsIds?: string[]
   id: string
   image: string
   name: string
+  supported?: boolean
   url: string
   year: number
 }
@@ -144,6 +146,7 @@ export interface Blockchain {
    * EVM chainId
    */
   chainId: number
+  extensionsIds?: string[]
   id: string
   image: string
   name: string
@@ -151,6 +154,7 @@ export interface Blockchain {
    * coingeckoId of the native coin
    */
   nativeCoinId: string
+  supported?: boolean
 }
 
 export type Platform = Exchange | Blockchain

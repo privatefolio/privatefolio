@@ -6,7 +6,7 @@ import { hashString } from "src/utils/utils"
 
 export const extensionId = "blockpit-file-import"
 export const parserId = "blockpit"
-export const platformId = "blockpit"
+export const platformId = "a/blockpit"
 
 export const HEADER =
   "Blockpit ID;Timestamp;Source Type;Source Name;Integration;Transaction Type;Outgoing Asset;Outgoing Amount;Incoming Asset;Incoming Amount;Fee Asset;Fee Amount;Transaction ID;Note;Merge ID"

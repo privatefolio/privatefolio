@@ -6,7 +6,7 @@ import { hashString } from "src/utils/utils"
 
 export const extensionId = "binance-file-import"
 export const parserId = "binance-account-statement"
-export const platformId = "binance"
+export const platformId = "e/binance"
 
 export const HEADERS = [
   '"User_ID","UTC_Time","Account","Operation","Coin","Change","Remark"',

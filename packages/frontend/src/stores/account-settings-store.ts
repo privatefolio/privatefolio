@@ -99,3 +99,12 @@ export const $showRelativeTime = persistentAtom<boolean>("privatefolio-show-rela
   decode: (value) => value === "true",
   encode: (value) => (value ? "true" : "false"),
 })
+
+export const $showSupportedPlatformsOnly = persistentAtom<boolean>(
+  "privatefolio-show-supported-platforms-only",
+  false,
+  {
+    decode: (value) => value === "true",
+    encode: (value) => (value ? "true" : "false"),
+  }
+)

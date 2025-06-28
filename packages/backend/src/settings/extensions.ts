@@ -214,7 +214,7 @@ export const extensions: Extension[] = [
     extensionVersion: "1.0.0",
     githubUrl: "https://github.com/privatefolio/privatefolio",
     id: "binance-connection",
-    platformIds: ["binance"],
+    platformIds: ["e/binance"],
     priceUsd: 20,
     publishedAt: new Date("2025-06-01").getTime(),
     updatedAt: new Date("2025-06-01").getTime(),
@@ -256,7 +256,7 @@ export const extensions: Extension[] = [
     extensionVersion: "1.0.0",
     githubUrl: "https://github.com/privatefolio/privatefolio",
     id: "binance-price-api",
-    platformIds: ["binance"],
+    platformIds: ["e/binance"],
     publishedAt: new Date("2025-06-01").getTime(),
     sources: [
       {
@@ -283,7 +283,7 @@ export const extensions: Extension[] = [
     extensionVersion: "1.0.0",
     githubUrl: "https://github.com/privatefolio/privatefolio",
     id: "coinbase-price-api",
-    platformIds: ["gdax"],
+    platformIds: ["e/gdax"],
     publishedAt: new Date("2025-06-01").getTime(),
     sources: [
       {

@@ -13,7 +13,7 @@ import { asUTC } from "src/utils/formatting-utils"
 
 export const extensionId = "etherscan-file-import"
 export const parserId = "etherscan-erc20"
-export const platformId = "ethereum"
+export const platformId = "c/ethereum"
 
 export const HEADERS = [
   '"Txhash","Blockno","UnixTimestamp","DateTime (UTC)","From","To","TokenValue","USDValueDayOfTx","ContractAddress","TokenName","TokenSymbol"',

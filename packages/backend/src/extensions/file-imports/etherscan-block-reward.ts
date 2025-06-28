@@ -10,7 +10,7 @@ import { formatAddress } from "src/utils/assets-utils"
 
 export const extensionId = "etherscan-file-import"
 export const parserId = "etherscan-block-rewards"
-export const platformId = "ethereum"
+export const platformId = "c/ethereum"
 
 export const HEADER =
   '"Blockno","UnixTimestamp","DateTime (UTC)","Txn","Uncles","Miner","GasUsed","GasLimit","BaseFee","Reward(ETH)"'

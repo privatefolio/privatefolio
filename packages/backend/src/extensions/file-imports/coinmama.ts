@@ -5,7 +5,7 @@ import { hashString } from "src/utils/utils"
 
 export const extensionId = "coinmama-file-import"
 export const parserId = "coinmama"
-export const platformId = "coinmama"
+export const platformId = "e/coinmama"
 
 export const HEADER = "Transaction, Type,	Amount,	Date Created,	Status"
 

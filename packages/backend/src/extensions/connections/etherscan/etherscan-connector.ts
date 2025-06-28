@@ -58,7 +58,7 @@ export async function syncEtherscan(
   let staking: StakingWithdrawalTransaction[] = []
   let blocks: BlockRewardTransaction[] = []
 
-  if (connection.platformId === "ethereum") {
+  if (connection.platformId === "c/ethereum") {
     staking = await rpcProvider.getStakingWithdrawalTransactions(connection.address, since, until)
     await progress([40, `Fetched ${staking.length} Staking Withdrawal transactions`])
     blocks = await rpcProvider.getBlockRewardTransactions(connection.address, since, until)

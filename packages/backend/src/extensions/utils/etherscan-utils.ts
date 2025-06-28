@@ -51,7 +51,7 @@ export function sortTransactions(
 ) {
   const delta = b.timestamp - a.timestamp
 
-  if (delta === 0 && a.platformId === "ethereum") {
+  if (delta === 0 && a.platformId === "c/ethereum") {
     return trimTxId(a.id, a.platformId).localeCompare(trimTxId(b.id, b.platformId))
   }
 

@@ -12,7 +12,7 @@ import { asUTC } from "src/utils/formatting-utils"
 
 export const extensionId = "etherscan-file-import"
 export const parserId = "etherscan-default"
-export const platformId = "ethereum" // FIXME TODO7: this should work for all EVM chains
+export const platformId = "c/ethereum" // FIXME TODO7: this should work for all EVM chains
 
 export const HEADERS = [
   '"Txhash","Blockno","UnixTimestamp","DateTime (UTC)","From","To","ContractAddress","Value_IN(ETH)","Value_OUT(ETH)","CurrentValue","TxnFee(ETH)","TxnFee(USD)","Historical $Price/Eth","Status","ErrCode","Method"',

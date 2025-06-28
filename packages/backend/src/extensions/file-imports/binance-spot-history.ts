@@ -6,7 +6,7 @@ import { hashString } from "src/utils/utils"
 
 export const extensionId = "binance-file-import"
 export const parserId = "binance-spot-history"
-export const platformId = "binance"
+export const platformId = "e/binance"
 
 export const HEADER = '"Date(UTC)","Pair","Side","Price","Executed","Amount","Fee"'
 
