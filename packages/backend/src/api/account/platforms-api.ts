@@ -1,5 +1,5 @@
 import { access, mkdir, readFile, writeFile } from "fs/promises"
-import { CACHE_LOCATION } from "src/settings/settings"
+import { CACHE_LOCATION, PlatformPrefix } from "src/settings/settings"
 import { isBlockchain, isExchange } from "src/utils/utils"
 
 import {
@@ -25,7 +25,7 @@ import { enqueueTask } from "./server-tasks-api"
 const customExchanges: Exchange[] = [
   {
     coingeckoTrustScore: 0,
-    id: "e/coinmama",
+    id: `${PlatformPrefix.Exchange}coinmama`,
     image: "$STATIC_ASSETS/extensions/coinmama.png",
     name: "Coinmama",
     url: "https://www.coinmama.com",
@@ -50,7 +50,7 @@ export async function getExchanges(): Promise<Exchange[]> {
           coingeckoTrustRank: exchange.trust_score_rank,
           coingeckoTrustScore: exchange.trust_score ?? 0,
           country: exchange.country,
-          id: `e/${exchange.id}`,
+          id: `${PlatformPrefix.Exchange}${exchange.id}`,
           image: exchange.image,
           name: exchange.name,
           url: exchange.url,
@@ -87,7 +87,7 @@ export async function getBlockchains(): Promise<Blockchain[]> {
       (platform: CoingeckoAssetPlatform) =>
         ({
           chainId: platform.chain_identifier,
-          id: `c/${platform.id}`,
+          id: `${PlatformPrefix.Chain}${platform.id}`,
           image: platform.image,
           name: platform.name,
           nativeCoinId: platform.native_coin_id,

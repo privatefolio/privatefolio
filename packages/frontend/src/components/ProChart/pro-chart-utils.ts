@@ -23,7 +23,7 @@ export function toSearchSymbol(asset: MyAsset, priceApiId: PriceApiId): SearchSy
 
   const result: SearchSymbolResultItem = {
     description: pairLong,
-    e/ exchange.name,
+    exchange: exchange.name,
     exchange_logo: resolveUrl(exchange.logoUrl),
     full_name: name,
     logo_urls: asset.logoUrl ? [asset.logoUrl] : undefined,
@@ -52,7 +52,7 @@ export function toLibrarySymbol(asset: MyAsset, priceApiId: PriceApiId): Library
     has_seconds: true,
     has_weekly_and_monthly: true,
     industry: "Blockchain",
-    listed_e/ exchange.name,
+    listed_exchange: exchange.name,
     minmov: minMove,
     name: ticker,
     pricescale: priceScale,

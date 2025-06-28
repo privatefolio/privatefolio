@@ -37,10 +37,10 @@ describe("should import 0xb6e via connection", () => {
     connection = await upsertConnection(accountName, {
       address,
       extensionId: "etherscan-connection",
-      platformId: "arbitrum-one",
+      platformId: "chain.arbitrum-one",
     })
     // assert
-    expect(connection.id).toMatchInlineSnapshot(`"2662444559"`)
+    expect(connection.id).toMatchInlineSnapshot(`"1080536866"`)
   })
 
   it.sequential("should sync connection", async () => {
@@ -108,8 +108,8 @@ describe("should import 0xb6e via connection", () => {
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Fetching audit logs
       10,Processing 166 audit logs
-      ,Skipped arbitrum-one:0xfAf87e196A29969094bE35DfB0Ab9d0b8518dB84:ACHIVX: No coingeckoId
-      ,Skipped arbitrum-one:0xdf109e2b175038c66e074BfEacF37D7b0f3e426c:MaticSlot: No coingeckoId
+      ,Skipped chain.arbitrum-one:0xfAf87e196A29969094bE35DfB0Ab9d0b8518dB84:ACHIVX: No coingeckoId
+      ,Skipped chain.arbitrum-one:0xdf109e2b175038c66e074BfEacF37D7b0f3e426c:MaticSlot: No coingeckoId
       20,Found 4 asset groups
       35,Processed 1/4 asset groups
       50,Processed 2/4 asset groups

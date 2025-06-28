@@ -13,7 +13,7 @@ import { computeNetworth, getNetworth } from "src/api/account/networth-api"
 import { upsertServerTask } from "src/api/account/server-tasks-api"
 import { countTransactions, getTransactions } from "src/api/account/transactions-api"
 import { getAccount, resetAccount } from "src/api/accounts-api"
-import { ProgressUpdate, TaskPriority } from "src/interfaces"
+import { ProgressUpdate, TaskPriority, TaskStatus } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
 import { sleep } from "src/utils/utils"
 import { beforeAll } from "vitest"
@@ -66,7 +66,7 @@ describe("0xf98 file import", () => {
         logs: 16,
         operations: ["Deposit", "Withdraw", "Fee"],
         parserId: "etherscan-default",
-        platformId: "ethereum",
+        platformId: "chain.ethereum",
         rows: 9,
         transactions: 9,
         wallets: ["0xf98C96B5d10faAFc2324847c82305Bd5fd7E5ad3"],
@@ -124,7 +124,7 @@ describe("0xf98 file import", () => {
         logs: 8,
         operations: ["Deposit"],
         parserId: "etherscan-erc20",
-        platformId: "ethereum",
+        platformId: "chain.ethereum",
         rows: 8,
         transactions: 8,
         wallets: ["0xf98C96B5d10faAFc2324847c82305Bd5fd7E5ad3"],
@@ -192,7 +192,7 @@ describe("0xf98 file import", () => {
       description: "",
       name: "Test task",
       priority: TaskPriority.Lowest,
-      status: "completed",
+      status: TaskStatus.Completed,
       trigger: "user",
     })
     let account = await getAccount(accountName)
@@ -209,7 +209,7 @@ describe("0xf98 file import", () => {
       description: "",
       name: "Test task 2",
       priority: TaskPriority.Lowest,
-      status: "completed",
+      status: TaskStatus.Completed,
       trigger: "user",
     })
     sqliteSequence = await account.execute(`SELECT * FROM sqlite_sequence`)

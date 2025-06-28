@@ -108,3 +108,13 @@ export const $showSupportedPlatformsOnly = persistentAtom<boolean>(
     encode: (value) => (value ? "true" : "false"),
   }
 )
+
+// TODO9 transform into map
+export const $showActiveConnectionsOnly = persistentAtom<boolean>(
+  "privatefolio-show-active-connections-only",
+  true,
+  {
+    decode: (value) => value === "true",
+    encode: (value) => (value ? "true" : "false"),
+  }
+)

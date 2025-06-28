@@ -58,3 +58,5 @@ export const DEFAULT_SETTINGS: Settings = {
 
 export const TASK_LOG_CHAR_LIMIT = 20_000
 export const TASK_LOG_LINE_LIMIT = 1000
+
+export { PlatformPrefix } from "./platforms"

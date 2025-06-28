@@ -4,9 +4,11 @@ import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
 
+import { BINANCE_PLATFORM_ID } from "../utils/binance-utils"
+
 export const extensionId = "binance-file-import"
 export const parserId = "binance-spot-history"
-export const platformId = "e/binance"
+export const platformId = BINANCE_PLATFORM_ID
 
 export const HEADER = '"Date(UTC)","Pair","Side","Price","Executed","Amount","Fee"'
 

@@ -28,10 +28,10 @@ describe("should import 0xf98 via connection", () => {
     connection = await upsertConnection(accountName, {
       address,
       extensionId: "etherscan-connection",
-      platformId: "ethereum",
+      platformId: "chain.ethereum",
     })
     // assert
-    expect(connection.id).toMatchInlineSnapshot(`"3919330030"`)
+    expect(connection.id).toMatchInlineSnapshot(`"2328608129"`)
   })
 
   it.sequential("should sync connection", async () => {

@@ -67,7 +67,7 @@ export function getPersonalDataSymbol(id: string): LibrarySymbolInfo | undefined
     has_seconds: true,
     has_weekly_and_monthly: true,
     industry: "Blockchain",
-    listed_e/ exchange,
+    listed_exchange: exchange,
     minmov: minMove,
     name: symbol.full_name,
     pricescale: priceScale,

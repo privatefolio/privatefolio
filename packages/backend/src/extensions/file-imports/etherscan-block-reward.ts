@@ -8,9 +8,11 @@ import {
 import { PLATFORMS_META } from "src/settings/settings"
 import { formatAddress } from "src/utils/assets-utils"
 
+import { ETHEREUM_PLATFORM_ID } from "../utils/evm-utils"
+
 export const extensionId = "etherscan-file-import"
 export const parserId = "etherscan-block-rewards"
-export const platformId = "c/ethereum"
+export const platformId = ETHEREUM_PLATFORM_ID
 
 export const HEADER =
   '"Blockno","UnixTimestamp","DateTime (UTC)","Txn","Uncles","Miner","GasUsed","GasLimit","BaseFee","Reward(ETH)"'
@@ -32,7 +34,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
   const amount = reward
   //
   const txId = `${fileImportId}_${wallet}+${blockNumber}_BLOCK_${index}`
-  const assetId = PLATFORMS_META.ethereum.nativeAssetId as string
+  const assetId = PLATFORMS_META[ETHEREUM_PLATFORM_ID].nativeAssetId as string as string
   const operation: AuditLogOperation = "Reward"
   const type: TransactionType = operation
 

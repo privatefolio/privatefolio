@@ -78,7 +78,7 @@ export function IdentifierBlock(props: IdentifierBlockProps) {
       gap={size === "small" && variant !== "tablecell" ? 0.5 : 1}
     >
       {avatar}
-      <Stack>
+      <Stack sx={{ overflow: "hidden" }}>
         {labelElement}
         <CaptionText>{secondary}</CaptionText>
       </Stack>

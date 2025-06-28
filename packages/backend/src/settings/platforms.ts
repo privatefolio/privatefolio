@@ -1,288 +1,302 @@
-import { PlatformMeta } from "src/interfaces"
+import { PlatformMeta } from "../interfaces"
 
-export const WETH_ASSET_ID = "ethereum:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2:WETH"
-export const WBTC_ASSET_ID = "ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC"
+/**
+ * This is used to avoid conflicts with other platforms.
+ * E.g. "sonic" is both a chain and an exchange on Coingecko.
+ */
+export enum PlatformPrefix {
+  Chain = "chain.",
+  Exchange = "ex.",
+  App = "app.",
+}
+
+export const ETHEREUM_PLATFORM_ID = `${PlatformPrefix.Chain}ethereum`
+export const BINANCE_PLATFORM_ID = `${PlatformPrefix.Exchange}binance`
+
+export const WETH_ASSET_ID = `${ETHEREUM_PLATFORM_ID}:0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2:WETH`
+export const WBTC_ASSET_ID = `${ETHEREUM_PLATFORM_ID}:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC`
+export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
 export const PLATFORMS_META: Record<string, PlatformMeta> = {
-  "c/abstract": {
+  [`${PlatformPrefix.Chain}abstract`]: {
     blockExplorer: {
       name: "AbsScan",
       url: "https://abscan.org",
     },
     chainId: 2741,
-    nativeAssetId: "abstract:0x0000000000000000000000000000000000000000:ETH",
+    nativeAssetId: `${PlatformPrefix.Chain}abstract:${ZERO_ADDRESS}:ETH`,
   },
-  "c/apechain": {
+  [`${PlatformPrefix.Chain}apechain`]: {
     blockExplorer: {
       name: "ApeScan",
       url: "https://apescan.io",
     },
     chainId: 33139,
-    nativeAssetId: "apechain:0x0000000000000000000000000000000000000000:APE",
+    nativeAssetId: `${PlatformPrefix.Chain}apechain:${ZERO_ADDRESS}:APE`,
   },
-  "c/arbitrum-nova": {
+  [`${PlatformPrefix.Chain}arbitrum-nova`]: {
     blockExplorer: {
       name: "Arbitrum Nova Explorer",
       url: "https://nova.arbiscan.io",
     },
     chainId: 42170,
-    nativeAssetId: "arbitrum-nova:0x0000000000000000000000000000000000000000:ETH",
+    nativeAssetId: `${PlatformPrefix.Chain}arbitrum-nova:${ZERO_ADDRESS}:ETH`,
   },
-  "c/arbitrum-one": {
+  [`${PlatformPrefix.Chain}arbitrum-one`]: {
     blockExplorer: {
       name: "ArbiScan",
       url: "https://arbiscan.io",
     },
     chainId: 42161,
-    nativeAssetId: "arbitrum-one:0x0000000000000000000000000000000000000000:ETH",
+    nativeAssetId: `${PlatformPrefix.Chain}arbitrum-one:${ZERO_ADDRESS}:ETH`,
   },
-  "c/avalanche": {
+  [`${PlatformPrefix.Chain}avalanche`]: {
     blockExplorer: {
       name: "SnowScan",
       url: "https://snowscan.xyz",
     },
     chainId: 43114,
-    nativeAssetId: "avalanche:0x0000000000000000000000000000000000000000:AVAX",
+    nativeAssetId: `${PlatformPrefix.Chain}avalanche:${ZERO_ADDRESS}:AVAX`,
   },
-  "c/base": {
+  [`${PlatformPrefix.Chain}base`]: {
     blockExplorer: {
       name: "BaseScan",
       url: "https://basescan.org",
     },
     chainId: 8453,
-    nativeAssetId: "base:0x0000000000000000000000000000000000000000:ETH",
+    nativeAssetId: `${PlatformPrefix.Chain}base:${ZERO_ADDRESS}:ETH`,
   },
-  "c/berachain": {
+  [`${PlatformPrefix.Chain}berachain`]: {
     blockExplorer: {
       name: "BeraScan",
       url: "https://berascan.com",
     },
     chainId: 80094,
-    nativeAssetId: "berachain:0x0000000000000000000000000000000000000000:BERA",
+    nativeAssetId: `${PlatformPrefix.Chain}berachain:${ZERO_ADDRESS}:BERA`,
   },
-  "c/binance-smart-chain": {
+  [`${PlatformPrefix.Chain}binance-smart-chain`]: {
     blockExplorer: {
       name: "BSCScan",
       url: "https://bscscan.com",
     },
     chainId: 56,
-    nativeAssetId: "binance-smart-chain:0x0000000000000000000000000000000000000000:BNB",
+    nativeAssetId: `${PlatformPrefix.Chain}binance-smart-chain:${ZERO_ADDRESS}:BNB`,
   },
-  "c/bittorrent": {
+  [`${PlatformPrefix.Chain}bittorrent`]: {
     blockExplorer: {
       name: "BTTC Scan",
       url: "https://bttcscan.com",
     },
     chainId: 199,
-    nativeAssetId: "bittorrent:0x0000000000000000000000000000000000000000:BTT",
+    nativeAssetId: `${PlatformPrefix.Chain}bittorrent:${ZERO_ADDRESS}:BTT`,
   },
-  "c/blast": {
+  [`${PlatformPrefix.Chain}blast`]: {
     blockExplorer: {
       name: "BlastScan",
       url: "https://blastscan.io",
     },
     chainId: 81457,
-    nativeAssetId: "blast:0x0000000000000000000000000000000000000000:ETH",
+    nativeAssetId: `${PlatformPrefix.Chain}blast:${ZERO_ADDRESS}:ETH`,
   },
-  "c/celo": {
+  [`${PlatformPrefix.Chain}celo`]: {
     blockExplorer: {
       name: "CeloScan",
       url: "https://celoscan.io",
     },
     chainId: 42220,
-    nativeAssetId: "celo:0x0000000000000000000000000000000000000000:CELO",
+    nativeAssetId: `${PlatformPrefix.Chain}celo:${ZERO_ADDRESS}:CELO`,
   },
-  "c/cronos": {
+  [`${PlatformPrefix.Chain}cronos`]: {
     blockExplorer: {
       name: "CronoScan",
       url: "https://cronoscan.com",
     },
     chainId: 25,
-    nativeAssetId: "cronos:0x0000000000000000000000000000000000000000:CRO",
+    nativeAssetId: `${PlatformPrefix.Chain}cronos:${ZERO_ADDRESS}:CRO`,
   },
-  "c/ethereum": {
+  [`${PlatformPrefix.Chain}ethereum`]: {
     blockExplorer: {
       name: "Etherscan",
       url: "https://etherscan.io",
     },
     chainId: 1,
-    nativeAssetId: "ethereum:0x0000000000000000000000000000000000000000:ETH",
+    nativeAssetId: `${PlatformPrefix.Chain}ethereum:${ZERO_ADDRESS}:ETH`,
   },
-  "c/fraxtal": {
+  [`${PlatformPrefix.Chain}fraxtal`]: {
     blockExplorer: {
       name: "FraxScan",
       url: "https://fraxscan.com",
     },
     chainId: 252,
-    nativeAssetId: "fraxtal:0x0000000000000000000000000000000000000000:frxETH",
+    nativeAssetId: `${PlatformPrefix.Chain}fraxtal:${ZERO_ADDRESS}:frxETH`,
   },
-  "c/linea": {
+  [`${PlatformPrefix.Chain}linea`]: {
     blockExplorer: {
       name: "LineaScan",
       url: "https://lineascan.build",
     },
     chainId: 59144,
-    nativeAssetId: "linea:0x0000000000000000000000000000000000000000:ETH",
+    nativeAssetId: `${PlatformPrefix.Chain}linea:${ZERO_ADDRESS}:ETH`,
   },
-  "c/mantle": {
+  [`${PlatformPrefix.Chain}mantle`]: {
     blockExplorer: {
       name: "MantleScan",
       url: "https://mantlescan.xyz",
     },
     chainId: 5000,
-    nativeAssetId: "mantle:0x0000000000000000000000000000000000000000:MNT",
+    nativeAssetId: `${PlatformPrefix.Chain}mantle:${ZERO_ADDRESS}:MNT`,
   },
-  "c/memecore": {
+  [`${PlatformPrefix.Chain}memecore`]: {
     blockExplorer: {
       name: "MemeScan",
       url: "https://memescan.io",
     },
     chainId: 4352,
-    nativeAssetId: "memecore:0x0000000000000000000000000000000000000000:MEME",
+    nativeAssetId: `${PlatformPrefix.Chain}memecore:${ZERO_ADDRESS}:MEME`,
   },
-  "c/moonbeam": {
+  [`${PlatformPrefix.Chain}moonbeam`]: {
     blockExplorer: {
       name: "MoonScan",
       url: "https://moonscan.io",
     },
     chainId: 1284,
-    nativeAssetId: "moonbeam:0x0000000000000000000000000000000000000000:GLMR",
+    nativeAssetId: `${PlatformPrefix.Chain}moonbeam:${ZERO_ADDRESS}:GLMR`,
   },
-  "c/moonriver": {
+  [`${PlatformPrefix.Chain}moonriver`]: {
     blockExplorer: {
       name: "MoonRiver Scan",
       url: "https://moonriver.moonscan.io",
     },
     chainId: 1285,
-    nativeAssetId: "moonriver:0x0000000000000000000000000000000000000000:MOVR",
+    nativeAssetId: `${PlatformPrefix.Chain}moonriver:${ZERO_ADDRESS}:MOVR`,
   },
-  "c/opbnb": {
+  [`${PlatformPrefix.Chain}opbnb`]: {
     blockExplorer: {
       name: "opBNB Scan",
       url: "https://opbnbscan.com",
     },
     chainId: 204,
-    nativeAssetId: "opbnb:0x0000000000000000000000000000000000000000:BNB",
+    nativeAssetId: `${PlatformPrefix.Chain}opbnb:${ZERO_ADDRESS}:BNB`,
   },
-  "c/optimistic-ethereum": {
+  [`${PlatformPrefix.Chain}optimistic-ethereum`]: {
     blockExplorer: {
       name: "Optimistic Etherscan",
       url: "https://optimistic.etherscan.io",
     },
     chainId: 10,
-    nativeAssetId: "optimistic-ethereum:0x0000000000000000000000000000000000000000:ETH",
+    nativeAssetId: `${PlatformPrefix.Chain}optimistic-ethereum:${ZERO_ADDRESS}:ETH`,
   },
-  "c/polygon-pos": {
+  [`${PlatformPrefix.Chain}polygon-pos`]: {
     blockExplorer: {
       name: "PolygonScan",
       url: "https://polygonscan.com",
     },
     chainId: 137,
-    nativeAssetId: "polygon-pos:0x0000000000000000000000000000000000000000:MATIC",
+    nativeAssetId: `${PlatformPrefix.Chain}polygon-pos:${ZERO_ADDRESS}:MATIC`,
   },
-  "c/polygon-zkevm": {
+  [`${PlatformPrefix.Chain}polygon-zkevm`]: {
     blockExplorer: {
       name: "Polygon zkEVM Explorer",
       url: "https://zkevm.polygonscan.com",
     },
     chainId: 1101,
-    nativeAssetId: "polygon-zkevm:0x0000000000000000000000000000000000000000:ETH",
+    nativeAssetId: `${PlatformPrefix.Chain}polygon-zkevm:${ZERO_ADDRESS}:ETH`,
   },
-  "c/scroll": {
+  [`${PlatformPrefix.Chain}scroll`]: {
     blockExplorer: {
       name: "ScrollScan",
       url: "https://scrollscan.com",
     },
     chainId: 534352,
-    nativeAssetId: "scroll:0x0000000000000000000000000000000000000000:ETH",
+    nativeAssetId: `${PlatformPrefix.Chain}scroll:${ZERO_ADDRESS}:ETH`,
   },
-  "c/sonic": {
+  [`${PlatformPrefix.Chain}sonic`]: {
     blockExplorer: {
       name: "SonicScan",
       url: "https://sonicscan.org",
     },
     chainId: 146,
-    nativeAssetId: "sonic:0x0000000000000000000000000000000000000000:S",
+    nativeAssetId: `${PlatformPrefix.Chain}sonic:${ZERO_ADDRESS}:S`,
   },
-  "c/sophon": {
+  [`${PlatformPrefix.Chain}sophon`]: {
     blockExplorer: {
       name: "SophScan",
       url: "https://sophscan.xyz",
     },
     chainId: 50104,
-    nativeAssetId: "sophon:0x0000000000000000000000000000000000000000:SOPH",
+    nativeAssetId: `${PlatformPrefix.Chain}sophon:${ZERO_ADDRESS}:SOPH`,
   },
-  "c/swellchain": {
+  [`${PlatformPrefix.Chain}swellchain`]: {
     blockExplorer: {
       name: "SwellScan",
       url: "https://swellchainscan.io",
     },
     chainId: 1923,
-    nativeAssetId: "swellchain:0x0000000000000000000000000000000000000000:ETH",
+    nativeAssetId: `${PlatformPrefix.Chain}swellchain:${ZERO_ADDRESS}:ETH`,
   },
-  "c/taiko": {
+  [`${PlatformPrefix.Chain}taiko`]: {
     blockExplorer: {
       name: "TaikoScan",
       url: "https://taikoscan.io",
     },
     chainId: 167000,
-    nativeAssetId: "taiko:0x0000000000000000000000000000000000000000:ETH",
+    nativeAssetId: `${PlatformPrefix.Chain}taiko:${ZERO_ADDRESS}:ETH`,
   },
-  "c/unichain": {
+  [`${PlatformPrefix.Chain}unichain`]: {
     blockExplorer: {
       name: "UniScan",
       url: "https://uniscan.xyz",
     },
     chainId: 130,
-    nativeAssetId: "unichain:0x0000000000000000000000000000000000000000:UNI",
+    nativeAssetId: `${PlatformPrefix.Chain}unichain:${ZERO_ADDRESS}:UNI`,
   },
-  "c/wemix-network": {
+  [`${PlatformPrefix.Chain}wemix-network`]: {
     blockExplorer: {
       name: "WEMIX Scan",
       url: "https://wemixscan.com",
     },
     chainId: 1111,
-    nativeAssetId: "wemix-network:0x0000000000000000000000000000000000000000:WEMIX",
+    nativeAssetId: `${PlatformPrefix.Chain}wemix-network:${ZERO_ADDRESS}:WEMIX`,
   },
-  "c/world-chain": {
+  [`${PlatformPrefix.Chain}world-chain`]: {
     blockExplorer: {
       name: "WorldScan",
       url: "https://worldscan.org",
     },
     chainId: 480,
-    nativeAssetId: "world-chain:0x0000000000000000000000000000000000000000:WLD",
+    nativeAssetId: `${PlatformPrefix.Chain}world-chain:${ZERO_ADDRESS}:WLD`,
   },
-  "c/xai": {
+  [`${PlatformPrefix.Chain}xai`]: {
     blockExplorer: {
       name: "XaiScan",
       url: "https://xaiscan.io",
     },
     chainId: 660279,
-    nativeAssetId: "xai:0x0000000000000000000000000000000000000000:XAI",
+    nativeAssetId: `${PlatformPrefix.Chain}xai:${ZERO_ADDRESS}:XAI`,
   },
-  "c/xdai": {
+  [`${PlatformPrefix.Chain}xdai`]: {
     blockExplorer: {
       name: "GnosisScan",
       url: "https://gnosisscan.io",
     },
     chainId: 100,
-    nativeAssetId: "xdai:0x0000000000000000000000000000000000000000:xDAI",
+    nativeAssetId: `${PlatformPrefix.Chain}xdai:${ZERO_ADDRESS}:xDAI`,
   },
-  "c/xdc-network": {
+  [`${PlatformPrefix.Chain}xdc-network`]: {
     blockExplorer: {
       name: "XDC Scan",
       url: "https://xdcscan.com",
     },
     chainId: 50,
-    nativeAssetId: "xdc-network:0x0000000000000000000000000000000000000000:XDC",
+    nativeAssetId: `${PlatformPrefix.Chain}xdc-network:${ZERO_ADDRESS}:XDC`,
   },
-  "c/zksync": {
+  [`${PlatformPrefix.Chain}zksync`]: {
     blockExplorer: {
       name: "zkSync Era Explorer",
       url: "https://era.zksync.network",
     },
     chainId: 324,
-    nativeAssetId: "zksync:0x0000000000000000000000000000000000000000:ETH",
+    nativeAssetId: `${PlatformPrefix.Chain}zksync:${ZERO_ADDRESS}:ETH`,
   },
 }
 

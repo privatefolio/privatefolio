@@ -13,6 +13,8 @@ import { DatePicker, TimePicker } from "@mui/x-date-pickers"
 import { useStore } from "@nanostores/react"
 import { WritableAtom } from "nanostores"
 import { enqueueSnackbar } from "notistack"
+import { BINANCE_PLATFORM_ID } from "privatefolio-backend/src/extensions/utils/binance-utils"
+import { ETHEREUM_PLATFORM_ID } from "privatefolio-backend/src/extensions/utils/evm-utils"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { AddressInput } from "src/components/AddressInput"
 import { AssetBlock } from "src/components/AssetBlock"
@@ -34,7 +36,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
 
   const [loading, setLoading] = useState(false)
 
-  const [platformId, setPlatform] = useState<string>("c/ethereum")
+  const [platformId, setPlatform] = useState<string>(ETHEREUM_PLATFORM_ID)
   const [type, setType] = useState<TransactionType>("Swap")
   const [binanceWallet, setBinanceWallet] = useState("Spot")
 
@@ -77,7 +79,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
       const timestamp = dateAndTime.getTime()
 
       const wallet =
-        platformId === "e/binance" ? binanceWallet : (formData.get("walletAddr") as string)
+        platformId === BINANCE_PLATFORM_ID ? binanceWallet : (formData.get("walletAddr") as string)
 
       const incoming = formData.get("incoming") as string
       const outgoing = formData.get("outgoing") as string
@@ -137,7 +139,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
   useEffect(() => {
     if (open) return
 
-    setPlatform("c/ethereum")
+    setPlatform(ETHEREUM_PLATFORM_ID)
     setBinanceWallet("Spot")
     setType("Swap")
     setNotes("")
@@ -179,7 +181,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
           </div>
           <div>
             <SectionTitle>Wallet</SectionTitle>
-            {platformId === "e/binance" ? (
+            {platformId === BINANCE_PLATFORM_ID ? (
               <Select
                 sx={{ height: "40px" }}
                 variant="outlined"

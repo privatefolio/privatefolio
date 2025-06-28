@@ -1,7 +1,13 @@
 import EventEmitter from "events"
 import { access, mkdir, readdir, stat, writeFile } from "fs/promises"
 import { join } from "path"
-import { EventCause, SubscriptionChannel, SubscriptionId, TaskPriority } from "src/interfaces"
+import {
+  EventCause,
+  SubscriptionChannel,
+  SubscriptionId,
+  TaskPriority,
+  TaskStatus,
+} from "src/interfaces"
 import { DATABASES_LOCATION, FILES_LOCATION, TASK_LOGS_LOCATION } from "src/settings/settings"
 import { createSqliteDatabaseConnection } from "src/sqlite/sqlite"
 import { isDevelopment, isTestEnvironment } from "src/utils/environment-utils"
@@ -78,7 +84,7 @@ function populateFirstServerTask(accountName: string) {
       name: "Initialize database",
       priority: TaskPriority.High,
       startedAt: createdAt,
-      status: "completed",
+      status: TaskStatus.Completed,
       trigger: "system",
     })
     await enqueueRefetchPlatforms(accountName, "system")

@@ -62,7 +62,7 @@ it("should add a file import", async () => {
           "Buy with Credit Card",
         ],
         "parserId": "coinmama",
-        "platformId": "coinmama",
+        "platformId": "ex.coinmama",
         "rows": 5,
         "transactions": 2,
         "wallets": [
@@ -93,7 +93,7 @@ it("should add a file import", async () => {
             "Buy with Credit Card",
           ],
           "parserId": "coinmama",
-          "platformId": "coinmama",
+          "platformId": "ex.coinmama",
           "rows": 5,
           "transactions": 2,
           "wallets": [

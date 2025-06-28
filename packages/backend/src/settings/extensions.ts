@@ -20,6 +20,7 @@ import {
   extensionId as privatefolioFileImportId,
   platformId as privatefolioFileImportPlatform,
 } from "src/extensions/file-imports/privatefolio-transactions"
+import { BINANCE_PLATFORM_ID } from "src/extensions/utils/binance-utils"
 import { Extension } from "src/interfaces"
 
 export const extensions: Extension[] = [
@@ -214,7 +215,7 @@ export const extensions: Extension[] = [
     extensionVersion: "1.0.0",
     githubUrl: "https://github.com/privatefolio/privatefolio",
     id: "binance-connection",
-    platformIds: ["e/binance"],
+    platformIds: [BINANCE_PLATFORM_ID],
     priceUsd: 20,
     publishedAt: new Date("2025-06-01").getTime(),
     updatedAt: new Date("2025-06-01").getTime(),
@@ -256,7 +257,7 @@ export const extensions: Extension[] = [
     extensionVersion: "1.0.0",
     githubUrl: "https://github.com/privatefolio/privatefolio",
     id: "binance-price-api",
-    platformIds: ["e/binance"],
+    platformIds: [BINANCE_PLATFORM_ID],
     publishedAt: new Date("2025-06-01").getTime(),
     sources: [
       {
@@ -283,7 +284,7 @@ export const extensions: Extension[] = [
     extensionVersion: "1.0.0",
     githubUrl: "https://github.com/privatefolio/privatefolio",
     id: "coinbase-price-api",
-    platformIds: ["e/gdax"],
+    platformIds: ["e;gdax"],
     publishedAt: new Date("2025-06-01").getTime(),
     sources: [
       {

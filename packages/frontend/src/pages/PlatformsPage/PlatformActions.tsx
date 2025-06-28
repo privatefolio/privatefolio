@@ -5,18 +5,20 @@ import React from "react"
 import { $showSupportedPlatformsOnly } from "src/stores/account-settings-store"
 
 export function PlatformActions() {
-  const showSupportedOnly = useStore($showSupportedPlatformsOnly)
+  const showSupportedPlatformsOnly = useStore($showSupportedPlatformsOnly)
 
   return (
     <>
-      <Tooltip title={showSupportedOnly ? `Show only supported platforms` : `Show all platforms`}>
+      <Tooltip
+        title={showSupportedPlatformsOnly ? `Show only supported platforms` : `Show all platforms`}
+      >
         <IconButton
           color="secondary"
           onClick={() => {
-            $showSupportedPlatformsOnly.set(!showSupportedOnly)
+            $showSupportedPlatformsOnly.set(!showSupportedPlatformsOnly)
           }}
         >
-          {showSupportedOnly ? (
+          {showSupportedPlatformsOnly ? (
             <VerifiedRounded fontSize="small" />
           ) : (
             <VerifiedOutlined fontSize="small" />

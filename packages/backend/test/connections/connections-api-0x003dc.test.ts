@@ -28,10 +28,10 @@ describe("should import 0x003dc via connection", () => {
     connection = await upsertConnection(accountName, {
       address,
       extensionId: "etherscan-connection",
-      platformId: "ethereum",
+      platformId: "chain.ethereum",
     })
     // assert
-    expect(connection.id).toMatchInlineSnapshot(`"179372894"`)
+    expect(connection.id).toMatchInlineSnapshot(`"2883618289"`)
   })
 
   it.sequential("should sync connection", async () => {
@@ -136,7 +136,7 @@ describe("should import 0x003dc via connection", () => {
     const remainingConnections = await countConnections(accountName)
     //
     expect(updates.join("\n")).toMatchInlineSnapshot(`
-      "0,Removing connection with id 179372894
+      "0,Removing connection with id 2883618289
       0,Removing 1025 audit logs
       25,Setting balances cursor to Oct 06, 2017
       25,Setting networth cursor to Oct 06, 2017

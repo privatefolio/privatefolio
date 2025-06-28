@@ -1,11 +1,12 @@
 import Big from "big.js"
 import { AuditLog, AuditLogOperation, ParserResult, Transaction } from "src/interfaces"
+import { PlatformPrefix } from "src/settings/settings"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
 
 export const extensionId = "coinmama-file-import"
 export const parserId = "coinmama"
-export const platformId = "e/coinmama"
+export const platformId = `${PlatformPrefix.Exchange}coinmama`
 
 export const HEADER = "Transaction, Type,	Amount,	Date Created,	Status"
 

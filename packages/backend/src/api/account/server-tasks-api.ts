@@ -185,7 +185,7 @@ async function processQueue(accountName: string) {
 
         await patchServerTask(accountName, task.id, {
           startedAt: startTime,
-          status: "running",
+          status: TaskStatus.Running,
         })
 
         try {
@@ -204,9 +204,9 @@ async function processQueue(accountName: string) {
           console.error(getPrefix(accountName), "Error processing task:", error)
           errorMessage = String(error)
         } finally {
-          let status: TaskStatus = "completed"
-          if (errorMessage) status = "failed"
-          if (errorMessage && task.abortController.signal.aborted) status = "aborted"
+          let status: TaskStatus = TaskStatus.Completed
+          if (errorMessage) status = TaskStatus.Failed
+          if (errorMessage && task.abortController.signal.aborted) status = TaskStatus.Aborted
           if (task.abortController.signal.reason !== "reset") {
             const completedAt = Date.now()
 
@@ -254,7 +254,7 @@ async function ensureTaskQueue(accountName: string) {
     for (const task of tasks) {
       await patchServerTask(accountName, task.id, {
         errorMessage: "Server restarted.",
-        status: task.status === "running" ? "aborted" : "cancelled",
+        status: task.status === TaskStatus.Running ? TaskStatus.Aborted : TaskStatus.Cancelled,
       })
     }
   }
@@ -272,7 +272,7 @@ export async function enqueueTask(
   if (existing) return existing.id
 
   const createdAt = Date.now()
-  const status = "queued"
+  const status = TaskStatus.Queued
 
   const { id } = await upsertServerTask(accountName, { ...task, createdAt, status })
   taskQueue.push({ ...task, createdAt, id, status })
@@ -295,7 +295,7 @@ export async function cancelTask(accountName: string, taskId: number) {
     account.taskQueue = account.taskQueue.filter((x) => x.id !== taskId)
     await patchServerTask(accountName, taskId, {
       errorMessage: "Task cancelled by user.",
-      status: "cancelled",
+      status: TaskStatus.Cancelled,
     })
   } else {
     throw new Error(`Task with id ${taskId} not found.`)

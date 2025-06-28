@@ -1,7 +1,7 @@
 [
   {
     "amount": "166.736107396462",
-    "assetId": "ethereum:0xD533a949740bb3306d119CC777fa900bA034cd52:CRV",
+    "assetId": "chain.ethereum:0xD533a949740bb3306d119CC777fa900bA034cd52:CRV",
     "auditLogIds": [
       "4118854677_0xb9c45a687505defc549030b729855ab4b0dc6f047e001a1611e147b4f39e1624_ERC20_309_TRANSFER_309",
       "4118854677_0xb9c45a687505defc549030b729855ab4b0dc6f047e001a1611e147b4f39e1624_ERC20_310_TRANSFER_310",
@@ -12,7 +12,7 @@
     "createdAt": 1605881987000,
     "deposits": [
       [
-        "ethereum:0xD533a949740bb3306d119CC777fa900bA034cd52:CRV",
+        "chain.ethereum:0xD533a949740bb3306d119CC777fa900bA034cd52:CRV",
         "166.736107396461758394",
         "0",
         "4118854677_0xb9c45a687505defc549030b729855ab4b0dc6f047e001a1611e147b4f39e1624_ERC20_309",
@@ -20,7 +20,7 @@
       ],
     ],
     "fees": [],
-    "id": "1186041057",
+    "id": "2989515636",
     "proceeds": [],
     "tradeNumber": 61,
     "tradeStatus": "closed",
@@ -32,7 +32,7 @@
   },
   {
     "amount": "0.33333333",
-    "assetId": "ethereum:0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599:WBTC",
+    "assetId": "chain.ethereum:0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599:WBTC",
     "auditLogIds": [
       "4118854677_0x2c636c80d4a19e291285c82f680f92e9dbeea3a7200049bb0ead7cb25f461f93_ERC20_312_TRANSFER_312",
       "4118854677_0x789b45fc79a11c0a37895a39d3b33c4d6d52490a62cb20cec49731fc3cd4fc90_ERC20_314_TRANSFER_314",
@@ -43,7 +43,7 @@
     "createdAt": 1605905339000,
     "deposits": [
       [
-        "ethereum:0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599:WBTC",
+        "chain.ethereum:0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599:WBTC",
         "0.33333333",
         "0",
         "4118854677_0x2c636c80d4a19e291285c82f680f92e9dbeea3a7200049bb0ead7cb25f461f93_ERC20_312",
@@ -52,10 +52,10 @@
     ],
     "duration": 5026000,
     "fees": [],
-    "id": "756518007",
+    "id": "829655108",
     "proceeds": [
       [
-        "ethereum:0xC11b1268C1A384e55C48c2391d8d480264A3A7F4:cWBTC",
+        "chain.ethereum:0xC11b1268C1A384e55C48c2391d8d480264A3A7F4:cWBTC",
         "16.50923151",
         "0",
         "4118854677_0x789b45fc79a11c0a37895a39d3b33c4d6d52490a62cb20cec49731fc3cd4fc90_MERGED",
@@ -72,7 +72,7 @@
   },
   {
     "amount": "2511.22",
-    "assetId": "ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
+    "assetId": "chain.ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
     "auditLogIds": [
       "4118854677_0x4d9e790b7883c7d78d4354756639facf7330c587a55dc1f2364f679322f02cca_ERC20_317_TRANSFER_317",
       "4118854677_0xfd187c7ae91d9e23ec9c85ce485e3519f23099866d943d93a7cadd5815154308_ERC20_313_TRANSFER_313",
@@ -83,7 +83,7 @@
     "createdAt": 1605905577000,
     "deposits": [
       [
-        "ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
+        "chain.ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
         "2511.22",
         "0",
         "4118854677_0xfd187c7ae91d9e23ec9c85ce485e3519f23099866d943d93a7cadd5815154308_ERC20_313",
@@ -92,10 +92,10 @@
     ],
     "duration": 7308000,
     "fees": [],
-    "id": "2692361425",
+    "id": "2765498526",
     "proceeds": [
       [
-        "ethereum:0xc00e94Cb662C3520282E6f5717214004A7f26888:COMP",
+        "chain.ethereum:0xc00e94Cb662C3520282E6f5717214004A7f26888:COMP",
         "0.074090868129179643",
         "0",
         "4118854677_0x4d9e790b7883c7d78d4354756639facf7330c587a55dc1f2364f679322f02cca_MERGED",
@@ -112,7 +112,7 @@
   },
   {
     "amount": "17",
-    "assetId": "ethereum:0x429881672B9AE42b8EbA0E26cD9C73711b891Ca5:PICKLE",
+    "assetId": "chain.ethereum:0x429881672B9AE42b8EbA0E26cD9C73711b891Ca5:PICKLE",
     "auditLogIds": [
       "4118854677_0x0d9f79bb800e863e8a46ed869c2192c5174a0d5e3a04c715bdf234fc49cd1af9_ERC20_320_TRANSFER_320",
       "4118854677_0x3d5efff416fb9b531e80f9f42e44a4e8a4c6673d22905cf2af0446d5b9e405c4_ERC20_328_TRANSFER_328",
@@ -123,14 +123,14 @@
     "createdAt": 1606241643000,
     "deposits": [
       [
-        "ethereum:0x429881672B9AE42b8EbA0E26cD9C73711b891Ca5:PICKLE",
+        "chain.ethereum:0x429881672B9AE42b8EbA0E26cD9C73711b891Ca5:PICKLE",
         "17",
         "0",
         "4118854677_0x0d9f79bb800e863e8a46ed869c2192c5174a0d5e3a04c715bdf234fc49cd1af9_ERC20_320",
         1606241643000,
       ],
       [
-        "ethereum:0x429881672B9AE42b8EbA0E26cD9C73711b891Ca5:PICKLE",
+        "chain.ethereum:0x429881672B9AE42b8EbA0E26cD9C73711b891Ca5:PICKLE",
         "-17",
         "0",
         "4118854677_0x3d5efff416fb9b531e80f9f42e44a4e8a4c6673d22905cf2af0446d5b9e405c4_MERGED",
@@ -139,7 +139,7 @@
     ],
     "duration": 664174000,
     "fees": [],
-    "id": "2095766045",
+    "id": "3661043370",
     "proceeds": [],
     "tradeNumber": 64,
     "tradeStatus": "closed",
@@ -151,7 +151,7 @@
   },
   {
     "amount": "0.0508494402157599",
-    "assetId": "ethereum:0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e:YFI",
+    "assetId": "chain.ethereum:0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e:YFI",
     "auditLogIds": [
       "4118854677_0x167685ab25a6d44e05ab62b5209dccee358f4e011efe73f6e2e553a5c31e159b_ERC20_344_TRANSFER_344",
       "4118854677_0x9a6e1b69ff202eb42683bfcb8e2e4dc40d35146cc902540cf9a65f519c2e13c6_ERC20_325_TRANSFER_325",
@@ -161,7 +161,7 @@
     "closedAt": 1610013041000,
     "cost": [
       [
-        "ethereum:0xBA2E7Fed597fd0E3e70f5130BcDbbFE06bB94fe1:yYFI",
+        "chain.ethereum:0xBA2E7Fed597fd0E3e70f5130BcDbbFE06bB94fe1:yYFI",
         "-0.050208682006894037",
         "0",
         "0.050843401760063018",
@@ -172,14 +172,14 @@
     "createdAt": 1606900696000,
     "deposits": [
       [
-        "ethereum:0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e:YFI",
+        "chain.ethereum:0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e:YFI",
         "0.000006038455696881",
         "0",
         "4118854677_0x9a6e1b69ff202eb42683bfcb8e2e4dc40d35146cc902540cf9a65f519c2e13c6_ERC20_325",
         1606900696000,
       ],
       [
-        "ethereum:0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e:YFI",
+        "chain.ethereum:0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e:YFI",
         "-0.050849440215759899",
         "0",
         "4118854677_0xbe645fb0ad7851f21178f2d87388f9b3ea5e480f777febf35160a173cd3afd84_MERGED",
@@ -188,7 +188,7 @@
     ],
     "duration": 3112345000,
     "fees": [],
-    "id": "4242275441",
+    "id": "1750782724",
     "proceeds": [],
     "tradeNumber": 65,
     "tradeStatus": "closed",

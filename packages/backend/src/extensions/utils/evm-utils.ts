@@ -1,5 +1,9 @@
 import { ethers } from "ethers"
-import { RPC_PROVIDERS } from "src/settings/platforms"
+
+import { RPC_PROVIDERS } from "../../settings/platforms"
+import { PlatformPrefix } from "../../settings/settings"
+
+export const ETHEREUM_PLATFORM_ID = `${PlatformPrefix.Chain}ethereum`
 
 /**
  * Creates an ethers JsonRpcProvider with fallback support for supported EVM chains.

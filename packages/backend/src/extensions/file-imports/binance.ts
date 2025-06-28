@@ -4,9 +4,11 @@ import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
 
+import { BINANCE_PLATFORM_ID } from "../utils/binance-utils"
+
 export const extensionId = "binance-file-import"
 export const parserId = "binance-account-statement"
-export const platformId = "e/binance"
+export const platformId = BINANCE_PLATFORM_ID
 
 export const HEADERS = [
   '"User_ID","UTC_Time","Account","Operation","Coin","Change","Remark"',

@@ -144,7 +144,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
     const isCandlestickData = "open" in data[0]
 
     if (preferredType === "Candlestick" && !isCandlestickData) {
-      return "Area"
+      return "Baseline"
     }
 
     return preferredType

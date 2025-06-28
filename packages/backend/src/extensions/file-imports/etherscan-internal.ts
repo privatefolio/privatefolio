@@ -9,9 +9,11 @@ import { PLATFORMS_META, WETH_ASSET_ID } from "src/settings/settings"
 import { formatAddress, getAssetContract } from "src/utils/assets-utils"
 import { asUTC } from "src/utils/formatting-utils"
 
+import { ETHEREUM_PLATFORM_ID } from "../utils/evm-utils"
+
 export const extensionId = "etherscan-file-import"
 export const parserId = "etherscan-internal"
-export const platformId = "c/ethereum"
+export const platformId = ETHEREUM_PLATFORM_ID
 
 export const HEADERS = [
   '"Txhash","Blockno","UnixTimestamp","DateTime (UTC)","ParentTxFrom","ParentTxTo","ParentTxETH_Value","From","TxTo","ContractAddress","Value_IN(ETH)","Value_OUT(ETH)","CurrentValue","Historical $Price/Eth","Status","ErrCode","Type"',
@@ -51,7 +53,7 @@ export function parse(
   const txId = `${fileImportId}_${txHash}_INTERNAL_${index}`
   const timestamp = asUTC(new Date(datetimeUtc))
 
-  const assetId = PLATFORMS_META.ethereum.nativeAssetId as string
+  const assetId = PLATFORMS_META[ETHEREUM_PLATFORM_ID].nativeAssetId as string
   const wallet = valueIn === "0" ? parentTxFrom : txTo
 
   const logs: AuditLog[] = []

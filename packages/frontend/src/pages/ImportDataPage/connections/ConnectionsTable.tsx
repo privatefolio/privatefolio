@@ -7,6 +7,7 @@ import { AttentionBlock } from "src/components/AttentionBlock"
 import { Callout } from "src/components/Callout"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
 import { Connection } from "src/interfaces"
+import { $showActiveConnectionsOnly } from "src/stores/account-settings-store"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { closeSubscription } from "src/utils/browser-utils"
 import { HeadCell } from "src/utils/table-utils"
@@ -20,22 +21,23 @@ const $drawerOpen = atom(false)
 export function ConnectionsTable() {
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
+  const showActiveConnectionsOnly = useStore($showActiveConnectionsOnly)
 
   useEffect(() => {
     document.title = `Connections - ${activeAccount} - Privatefolio`
   }, [activeAccount])
 
   const [queryTime, setQueryTime] = useState<number | null>(null)
-  const [rows, setRows] = useState<Connection[]>([])
+  const [connections, setConnections] = useState<Connection[]>([])
 
   const connectionStatus = useStore($connectionStatus)
 
   useEffect(() => {
     async function fetchData() {
       const start = Date.now()
-      const rows = await rpc.getConnections(activeAccount)
+      const data = await rpc.getConnections(activeAccount)
       setQueryTime(Date.now() - start)
-      setRows(rows)
+      setConnections(data)
     }
 
     fetchData().then()
@@ -44,6 +46,13 @@ export function ConnectionsTable() {
 
     return closeSubscription(subscription, rpc)
   }, [connectionStatus, rpc, activeAccount])
+
+  const rows = useMemo(() => {
+    if (showActiveConnectionsOnly) {
+      return connections.filter((connection) => !connection.meta || connection.meta.logs > 0)
+    }
+    return connections
+  }, [connections, showActiveConnectionsOnly])
 
   const headCells: HeadCell<Connection>[] = useMemo(
     () => [

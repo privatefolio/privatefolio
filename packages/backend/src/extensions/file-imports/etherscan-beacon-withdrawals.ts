@@ -8,9 +8,11 @@ import {
 import { PLATFORMS_META } from "src/settings/settings"
 import { formatAddress } from "src/utils/assets-utils"
 
+import { ETHEREUM_PLATFORM_ID } from "../utils/evm-utils"
+
 export const extensionId = "etherscan-file-import"
 export const parserId = "etherscan-beacon-withdrawals"
-export const platformId = "c/ethereum"
+export const platformId = ETHEREUM_PLATFORM_ID
 
 export const HEADER =
   '"Index","Blockno","UnixTimestamp","DateTime (UTC)","Validator Index","Recipient","Value"'
@@ -34,7 +36,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
   const amount = value.split(" ")[0]
   //
   const txId = `${fileImportId}_${validatorIndex}+${withdrawalIndex}_BEACON_${index}`
-  const assetId = PLATFORMS_META.ethereum.nativeAssetId as string
+  const assetId = PLATFORMS_META[ETHEREUM_PLATFORM_ID].nativeAssetId as string as string
   const operation: AuditLogOperation = "Deposit"
   const type: TransactionType = operation
 

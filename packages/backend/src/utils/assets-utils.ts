@@ -1,6 +1,6 @@
 import { getAddress } from "ethers"
-import { Web3Address } from "src/interfaces"
 
+import { Web3Address } from "../interfaces"
 import { PLATFORMS_META } from "../settings/platforms"
 import { memoize } from "./fp-utils"
 
@@ -33,6 +33,12 @@ export const getAssetPlatform = memoize(function getAssetPlatform(assetId: strin
   try {
     if (!assetId.includes(":")) return undefined
     return assetId.split(":")[0]
+  } catch {}
+})
+
+export const removePlatformPrefix = memoize(function removePlatformPrefix(platformId: string) {
+  try {
+    return platformId.split(".")[1]
   } catch {}
 })
 

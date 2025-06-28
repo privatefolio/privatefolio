@@ -11,9 +11,11 @@ import { formatAddress } from "src/utils/assets-utils"
 import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { asUTC } from "src/utils/formatting-utils"
 
+import { ETHEREUM_PLATFORM_ID } from "../utils/evm-utils"
+
 export const extensionId = "etherscan-file-import"
 export const parserId = "etherscan-erc20"
-export const platformId = "c/ethereum"
+export const platformId = ETHEREUM_PLATFORM_ID
 
 export const HEADERS = [
   '"Txhash","Blockno","UnixTimestamp","DateTime (UTC)","From","To","TokenValue","USDValueDayOfTx","ContractAddress","TokenName","TokenSymbol"',

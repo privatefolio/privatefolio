@@ -5,13 +5,14 @@ import {
   TransactionRole,
   TransactionSide,
 } from "src/interfaces"
+import { PlatformPrefix } from "src/settings/settings"
 import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
 
 export const extensionId = "mexc-file-import"
 export const parserId = "mexc"
-export const platformId = "e/mxc"
+export const platformId = `${PlatformPrefix.Exchange}mexc`
 
 export const HEADER = "Pairs,Time,Side,Filled Price,Executed Amount,Total,Fee,Role"
 

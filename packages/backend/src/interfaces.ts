@@ -693,6 +693,15 @@ export type Web3Address = string
 
 export type CsvData = (string | number | undefined | boolean | object)[][]
 
+export enum TaskStatus {
+  Queued = "queued",
+  Running = "running",
+  Completed = "completed",
+  Aborted = "aborted",
+  Cancelled = "cancelled",
+  Failed = "failed",
+}
+
 export type FilterOptionsMap = {
   assetId: string[]
   createdBy: string[]
@@ -703,6 +712,7 @@ export type FilterOptionsMap = {
   operation: AuditLogOperation[]
   outgoingAsset: string[]
   platformId: string[]
+  status: TaskStatus[]
   tags: number[]
   tradeStatus: string[]
   tradeType: readonly TradeType[]
@@ -750,7 +760,6 @@ export enum EventCause {
   Reset = "reset",
 }
 
-export type TaskStatus = "queued" | "running" | "completed" | "aborted" | "cancelled" | "failed"
 export type TaskTrigger = "system" | "user" | "cron" | "side-effect"
 export enum TaskPriority {
   Lowest = 1,

@@ -1,7 +1,7 @@
 [
   {
     "amount": "4436.29651171632",
-    "assetId": "ethereum:0x6B175474E89094C44Da98b954EedeAC495271d0F:DAI",
+    "assetId": "chain.ethereum:0x6B175474E89094C44Da98b954EedeAC495271d0F:DAI",
     "auditLogIds": [
       "4118854677_0x4806d8d4d3771b16ac4a2a78e914365b2c23335483a29615ce725ecaccd74530_ERC20_243_TRANSFER_243",
       "4118854677_0xb843b8e860bd9b947f66a795799bd984a40199db0d79b549372b5fe2fcaec5f2_ERC20_244_TRANSFER_244",
@@ -12,7 +12,7 @@
     "createdAt": 1593638650000,
     "deposits": [
       [
-        "ethereum:0x6B175474E89094C44Da98b954EedeAC495271d0F:DAI",
+        "chain.ethereum:0x6B175474E89094C44Da98b954EedeAC495271d0F:DAI",
         "4436.296511716324658255",
         "0",
         "4118854677_0x4806d8d4d3771b16ac4a2a78e914365b2c23335483a29615ce725ecaccd74530_ERC20_243",
@@ -21,10 +21,10 @@
     ],
     "duration": 179000,
     "fees": [],
-    "id": "4212046995",
+    "id": "1720554278",
     "proceeds": [
       [
-        "ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
+        "chain.ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
         "4506.611832",
         "0",
         "4118854677_0xb843b8e860bd9b947f66a795799bd984a40199db0d79b549372b5fe2fcaec5f2_MERGED",
@@ -41,7 +41,7 @@
   },
   {
     "amount": "6.09461683937942",
-    "assetId": "ethereum:0xfC1E690f61EFd961294b3e1Ce3313fBD8aa4f85d:aDAI",
+    "assetId": "chain.ethereum:0xfC1E690f61EFd961294b3e1Ce3313fBD8aa4f85d:aDAI",
     "auditLogIds": [
       "4118854677_0x4806d8d4d3771b16ac4a2a78e914365b2c23335483a29615ce725ecaccd74530_ERC20_241_TRANSFER_241",
       "4118854677_0x4806d8d4d3771b16ac4a2a78e914365b2c23335483a29615ce725ecaccd74530_ERC20_242_TRANSFER_242",
@@ -52,7 +52,7 @@
     "createdAt": 1593638650000,
     "deposits": [
       [
-        "ethereum:0xfC1E690f61EFd961294b3e1Ce3313fBD8aa4f85d:aDAI",
+        "chain.ethereum:0xfC1E690f61EFd961294b3e1Ce3313fBD8aa4f85d:aDAI",
         "6.094616839379424091",
         "0",
         "4118854677_0x4806d8d4d3771b16ac4a2a78e914365b2c23335483a29615ce725ecaccd74530_ERC20_241",
@@ -60,7 +60,7 @@
       ],
     ],
     "fees": [],
-    "id": "653587978",
+    "id": "726725079",
     "proceeds": [],
     "tradeNumber": 42,
     "tradeStatus": "closed",
@@ -72,7 +72,7 @@
   },
   {
     "amount": "4506.611832",
-    "assetId": "ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
+    "assetId": "chain.ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
     "auditLogIds": [
       "4118854677_0x1ee00ef787754995138dd60f5916c540736e5d7c793d3de26b0123af59d99027_ERC20_248_TRANSFER_248",
       "4118854677_0xb843b8e860bd9b947f66a795799bd984a40199db0d79b549372b5fe2fcaec5f2_ERC20_245_TRANSFER_245",
@@ -81,7 +81,7 @@
     "closedAt": 1593639109000,
     "cost": [
       [
-        "ethereum:0x6B175474E89094C44Da98b954EedeAC495271d0F:DAI",
+        "chain.ethereum:0x6B175474E89094C44Da98b954EedeAC495271d0F:DAI",
         "-4436.296511716324658255",
         "0",
         "4506.611832",
@@ -92,7 +92,7 @@
     "createdAt": 1593638829000,
     "deposits": [
       [
-        "ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
+        "chain.ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
         "-4506.611832",
         "0",
         "4118854677_0x1ee00ef787754995138dd60f5916c540736e5d7c793d3de26b0123af59d99027_ERC20_248",
@@ -101,7 +101,7 @@
     ],
     "duration": 280000,
     "fees": [],
-    "id": "178378352",
+    "id": "251515453",
     "proceeds": [],
     "tradeNumber": 43,
     "tradeStatus": "closed",
@@ -113,7 +113,7 @@
   },
   {
     "amount": "5794.773921",
-    "assetId": "ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
+    "assetId": "chain.ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
     "auditLogIds": [
       "4118854677_0x16aa187a9077acfa3f40596922bfdb0bdedd9ecbf9e659b362acd7dc31430450_ERC20_251_TRANSFER_251",
       "4118854677_0x50b8b2280176aa2e7b884e57410f6ddcb9283ca96a5c511032455a3a6aec9a5a_ERC20_255_TRANSFER_255",
@@ -124,7 +124,7 @@
     "closedAt": 1595880708000,
     "cost": [
       [
-        "ethereum:0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8:yDAI+yUSDC+yUSDT+yTUSD",
+        "chain.ethereum:0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8:yDAI+yUSDC+yUSDT+yTUSD",
         "-2084.061308499881464635",
         "0",
         "2173.805751",
@@ -135,21 +135,21 @@
     "createdAt": 1594502905000,
     "deposits": [
       [
-        "ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
+        "chain.ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
         "-1000",
         "0",
         "4118854677_0x16aa187a9077acfa3f40596922bfdb0bdedd9ecbf9e659b362acd7dc31430450_MERGED",
         1594503166000,
       ],
       [
-        "ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
+        "chain.ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
         "4620.96817",
         "0",
         "4118854677_0x57183b743c7db3ce7db411f7575d74c560573ea2a1ae546a64dd13a4b4a8c5bb_ERC20_254",
         1595880014000,
       ],
       [
-        "ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
+        "chain.ethereum:0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48:USDC",
         "-5794.773921",
         "0",
         "4118854677_0x50b8b2280176aa2e7b884e57410f6ddcb9283ca96a5c511032455a3a6aec9a5a_MERGED",
@@ -158,7 +158,7 @@
     ],
     "duration": 1377803000,
     "fees": [],
-    "id": "4147431052",
+    "id": "4220568153",
     "proceeds": [],
     "tradeNumber": 44,
     "tradeStatus": "closed",
@@ -172,7 +172,7 @@
   },
   {
     "amount": "13.968052",
-    "assetId": "ethereum:0x9bA00D6856a4eDF4665BcA2C2309936572473B7E:aUSDC",
+    "assetId": "chain.ethereum:0x9bA00D6856a4eDF4665BcA2C2309936572473B7E:aUSDC",
     "auditLogIds": [
       "4118854677_0x57183b743c7db3ce7db411f7575d74c560573ea2a1ae546a64dd13a4b4a8c5bb_ERC20_252_TRANSFER_252",
       "4118854677_0x57183b743c7db3ce7db411f7575d74c560573ea2a1ae546a64dd13a4b4a8c5bb_ERC20_253_TRANSFER_253",
@@ -183,7 +183,7 @@
     "createdAt": 1595880014000,
     "deposits": [
       [
-        "ethereum:0x9bA00D6856a4eDF4665BcA2C2309936572473B7E:aUSDC",
+        "chain.ethereum:0x9bA00D6856a4eDF4665BcA2C2309936572473B7E:aUSDC",
         "13.968052",
         "0",
         "4118854677_0x57183b743c7db3ce7db411f7575d74c560573ea2a1ae546a64dd13a4b4a8c5bb_ERC20_252",
@@ -191,7 +191,7 @@
       ],
     ],
     "fees": [],
-    "id": "3998195814",
+    "id": "1970478649",
     "proceeds": [],
     "tradeNumber": 45,
     "tradeStatus": "closed",

@@ -13,6 +13,7 @@ import {
   getAssetContract,
   getAssetPlatform,
   getAssetTicker,
+  removePlatformPrefix,
   ZERO_ADDRESS,
 } from "src/utils/assets-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
@@ -64,20 +65,23 @@ export async function getMyAssets(
       let cachedAsset = cachedAssets.find((x) => x.id === result.id)
       const contract = getAssetContract(result.id)
       const platform = getAssetPlatform(result.id)
+      const coingeckoId = removePlatformPrefix(platform)
       const ticker = getAssetTicker(result.id)
       if (!cachedAsset && !contract && platform) {
         cachedAsset = cachedAssets.find((x) => getAssetTicker(x.id) === ticker)
       }
       if (!cachedAsset && contract === ZERO_ADDRESS) {
-        cachedAsset = cachedAssets.find((x) => x.coingeckoId === platform)
+        cachedAsset = cachedAssets.find((x) => x.coingeckoId === coingeckoId)
       }
       if (!cachedAsset && contract === ZERO_ADDRESS && ticker === "ETH") {
         cachedAsset = cachedAssets.find((x) => x.coingeckoId === "ethereum")
       }
-      if (!cachedAsset && contract && platform) {
+      if (!cachedAsset && contract && coingeckoId) {
         cachedAsset = cachedAssets.find(
           (x) =>
-            x.platforms && x.platforms[platform] && x.platforms[platform] === contract.toLowerCase()
+            x.platforms &&
+            x.platforms[coingeckoId] &&
+            x.platforms[coingeckoId] === contract.toLowerCase()
         )
       }
       return { ...cachedAsset, ...result }
@@ -119,7 +123,8 @@ export async function getAssets(): Promise<Asset[]> {
 
 export async function getAssetsByPlatform(platformId: string): Promise<Asset[]> {
   const assets = await getAssets()
-  return assets.filter((asset) => asset.platforms && asset.platforms[platformId])
+  const coingeckoId = removePlatformPrefix(platformId)
+  return assets.filter((asset) => asset.platforms && asset.platforms[coingeckoId])
 }
 
 export async function getAsset(accountName: string, id: string): Promise<MyAsset | undefined> {
@@ -127,15 +132,16 @@ export async function getAsset(accountName: string, id: string): Promise<MyAsset
   if (records.length === 0) {
     const contract = getAssetContract(id)
     const platform = getAssetPlatform(id)
+    const coingeckoId = removePlatformPrefix(platform)
 
     const cachedAssets = await getAssets()
     return cachedAssets.find((x) => {
-      if (x.coingeckoId === id || x.coingeckoId === id.replace("coingecko:", "")) return true
       if (x.id === id) return true
+      if (x.coingeckoId === id || x.coingeckoId === id.replace("coingecko:", "")) return true
       if (
         x.platforms &&
-        x.platforms[platform] &&
-        x.platforms[platform] === contract?.toLowerCase()
+        x.platforms[coingeckoId] &&
+        x.platforms[coingeckoId] === contract?.toLowerCase()
       ) {
         return true
       }

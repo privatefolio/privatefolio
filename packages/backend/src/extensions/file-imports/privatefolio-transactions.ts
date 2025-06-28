@@ -1,11 +1,12 @@
 import { AuditLog, EtherscanTransaction, ParserResult, TransactionType } from "src/interfaces"
+import { PlatformPrefix } from "src/settings/settings"
 import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
 
 export const extensionId = "privatefolio-file-import"
 export const parserId = "privatefolio-transactions"
-export const platformId = "a/privatefolio" // TODO8: this should work for all EVM chains
+export const platformId = `${PlatformPrefix.App}privatefolio` // TODO8: this should work for all EVM chains
 
 export const HEADER =
   '"Timestamp","Platform","Wallet","Type","Incoming","Incoming Asset","Outgoing","Outgoing Asset","Fee","Fee Asset","Smart Contract","Smart Contract Method","Blockchain Tx","Notes"'

@@ -2,7 +2,10 @@ import Big from "big.js"
 import { groupBy } from "lodash-es"
 
 import { AuditLog, Transaction } from "../../interfaces"
+import { PlatformPrefix } from "../../settings/settings"
 import { hashString } from "../../utils/utils"
+
+export const BINANCE_PLATFORM_ID = `${PlatformPrefix.Exchange}binance`
 
 function validAuditLogGrouping(logs: AuditLog[]) {
   let hasBuy = false

@@ -1,20 +1,31 @@
 import {
   BackupRounded,
   CalculateOutlined,
+  CloudOffRounded,
+  CloudRounded,
   CloudSyncRounded,
   MoreHoriz,
   RestoreRounded,
 } from "@mui/icons-material"
-import { IconButton, ListItemAvatar, ListItemText, Menu, MenuItem, Tooltip } from "@mui/material"
+import {
+  IconButton,
+  ListItemAvatar,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Stack,
+  Tooltip,
+} from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React from "react"
 import { ActionId, APP_ACTIONS } from "src/AppActions"
+import { $showActiveConnectionsOnly } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
 import { handleBackupRequest, onRestoreRequest } from "src/utils/backup-utils"
 import { $rpc } from "src/workers/remotes"
 
-export function ImportDataActions() {
+export function ImportDataActions({ currentTab }: { currentTab: string }) {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -25,9 +36,30 @@ export function ImportDataActions() {
   }
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
+  const showActiveConnectionsOnly = useStore($showActiveConnectionsOnly)
 
   return (
-    <>
+    <Stack direction="row">
+      {currentTab === "connections" && (
+        <Tooltip
+          title={
+            showActiveConnectionsOnly ? `Show only active connections` : `Show all connections`
+          }
+        >
+          <IconButton
+            color="secondary"
+            onClick={() => {
+              $showActiveConnectionsOnly.set(!showActiveConnectionsOnly)
+            }}
+          >
+            {showActiveConnectionsOnly ? (
+              <CloudRounded fontSize="small" />
+            ) : (
+              <CloudOffRounded fontSize="small" />
+            )}
+          </IconButton>
+        </Tooltip>
+      )}
       <Tooltip title="Actions">
         <IconButton color="secondary" onClick={handleClick}>
           <MoreHoriz fontSize="small" />
@@ -126,6 +158,6 @@ export function ImportDataActions() {
           <ListItemText>{APP_ACTIONS[ActionId.RESTORE_ADDRESS_BOOK].name}</ListItemText>
         </MenuItem>
       </Menu>
-    </>
+    </Stack>
   )
 }

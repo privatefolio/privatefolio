@@ -28,7 +28,7 @@ describe("trades-api", () => {
         id: "1",
         importIndex: 1,
         operation: "Deposit" as AuditLogOperation,
-        platformId: "ethereum",
+        platformId: "chain.ethereum",
         timestamp: 1600000000000, // Sep 13, 2020
         txId: "tx1",
         wallet: "0x123",
@@ -40,7 +40,7 @@ describe("trades-api", () => {
         id: "2",
         importIndex: 2,
         operation: "Withdraw" as AuditLogOperation,
-        platformId: "ethereum",
+        platformId: "chain.ethereum",
         timestamp: 1600100000000, // Sep 14, 2020
         txId: "tx2",
         wallet: "0x123",
@@ -52,7 +52,7 @@ describe("trades-api", () => {
         id: "3",
         importIndex: 3,
         operation: "Withdraw" as AuditLogOperation,
-        platformId: "ethereum",
+        platformId: "chain.ethereum",
         timestamp: 1600200000000, // Sep 15, 2020
         txId: "tx3",
         wallet: "0x123",
@@ -64,7 +64,7 @@ describe("trades-api", () => {
         id: "4",
         importIndex: 4,
         operation: "Withdraw" as AuditLogOperation,
-        platformId: "ethereum",
+        platformId: "chain.ethereum",
         timestamp: 1600200000000 + 5 * ONE_DAY, // Sep 20, 2020
         txId: "tx4",
         wallet: "0x123",
@@ -79,7 +79,7 @@ describe("trades-api", () => {
         incoming: "1.5",
         incomingAsset: assetId,
         metadata: { txHash: "0xabc1" },
-        platformId: "ethereum",
+        platformId: "chain.ethereum",
         timestamp: 1600000000000, // Sep 13, 2020
         type: "Deposit",
         wallet: "0x123",
@@ -92,7 +92,7 @@ describe("trades-api", () => {
         metadata: { txHash: "0xabc2" },
         outgoing: "1.0",
         outgoingAsset: assetId,
-        platformId: "ethereum",
+        platformId: "chain.ethereum",
         timestamp: 1600100000000, // Sep 14, 2020
         type: "Withdraw",
         wallet: "0x123",
@@ -105,7 +105,7 @@ describe("trades-api", () => {
         metadata: { txHash: "0xabc3" },
         outgoing: "0.5",
         outgoingAsset: assetId,
-        platformId: "ethereum",
+        platformId: "chain.ethereum",
         timestamp: 1600200000000, // Sep 15, 2020
         type: "Withdraw",
         wallet: "0x123",
@@ -118,7 +118,7 @@ describe("trades-api", () => {
         metadata: { txHash: "0xabc1" },
         outgoing: "2250",
         outgoingAsset: "ethereum:USDT",
-        platformId: "ethereum",
+        platformId: "chain.ethereum",
         timestamp: 1600000000000, // Sep 13, 2020
         type: "Deposit",
         wallet: "0x123",
@@ -129,7 +129,7 @@ describe("trades-api", () => {
         metadata: { txHash: "0xabc4" },
         outgoing: "1.5",
         outgoingAsset: assetId,
-        platformId: "ethereum",
+        platformId: "chain.ethereum",
         timestamp: 1600200000000 + 5 * ONE_DAY, // Sep 20, 2020
         type: "Withdraw",
         wallet: "0x123",
