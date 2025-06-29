@@ -30,9 +30,8 @@ export function AnalyticsProvider({ children }: PropsWithChildren) {
       import("posthog-js")
         .then((x) => x.default)
         .then((posthog) => {
-          if (window.location.toString().includes("localhost")) {
-            posthog.debug()
-          }
+          posthog.debug(false)
+          // if (window.location.toString().includes("localhost")) posthog.debug()
 
           posthog.init(POSTHOG_KEY!, {
             api_host: "https://ph.protocol.fun",
