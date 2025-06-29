@@ -51,9 +51,9 @@ export function FileImportsTable() {
       },
       {
         filterable: true,
-        key: "platform" as keyof FileImport,
-        sx: { maxWidth: 0, minWidth: 0, width: 0 },
-        valueSelector: (row) => row.meta?.platform,
+        key: "platformId" as keyof FileImport,
+        sx: { maxWidth: 40, minWidth: 40, width: 40 },
+        valueSelector: (row) => row.meta?.platformId,
       },
       {
         key: "name",

@@ -12,6 +12,7 @@ import {
   getAssetPlatform,
   getAssetTicker,
   isNativeAsset,
+  removePlatformPrefix,
 } from "../../utils/assets-utils"
 import { isServer } from "../../utils/environment-utils"
 import {
@@ -25,7 +26,8 @@ export const Identifier: PriceApiId = "alchemy"
 
 export function getPair(assetId: string) {
   const contract = getAssetContract(assetId)
-  const platform = getAssetPlatform(assetId)
+  const platformId = getAssetPlatform(assetId)
+  const coingeckoId = removePlatformPrefix(platformId)
   const ticker = getAssetTicker(assetId)
 
   const isNative = isNativeAsset(contract)
@@ -34,7 +36,7 @@ export function getPair(assetId: string) {
     return ticker
   }
 
-  const network = getNetwork(platform)
+  const network = getNetwork(coingeckoId)
 
   if (!network) {
     if (!ticker) throw new Error("Alchemy: No network or ticker")
@@ -59,12 +61,12 @@ function getInterval(timeInterval: ResolutionString) {
   throw new Error(`Alchemy does not support the '${timeInterval}' time interval.`)
 }
 
-function getNetwork(platform: string) {
-  if (platform === "ethereum") return "eth-mainnet"
-  if (platform === "arbitrum-one") return "arb-mainnet"
-  if (platform === "optimistic-ethereum") return "opt-mainnet"
-  if (platform === "base") return "base-mainnet"
-  if (platform === "polygon-pos") return "polygon-mainnet"
+function getNetwork(coingeckoId: string) {
+  if (coingeckoId === "ethereum") return "eth-mainnet"
+  if (coingeckoId === "arbitrum-one") return "arb-mainnet"
+  if (coingeckoId === "optimistic-ethereum") return "opt-mainnet"
+  if (coingeckoId === "base") return "base-mainnet"
+  if (coingeckoId === "polygon-pos") return "polygon-mainnet"
   return ""
 }
 

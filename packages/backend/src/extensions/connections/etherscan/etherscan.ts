@@ -19,7 +19,7 @@ export function parseNormal(
   connection: EtherscanConnection
 ): ParserResult {
   // ----------------------------------------------------------------- Parse
-  const { platform, address } = connection
+  const { platformId, address } = connection
   let {
     to,
     value,
@@ -41,7 +41,7 @@ export function parseNormal(
     throw new Error(`Invalid timestamp: ${time}`)
   }
   const txId = `${connection.id}_${txHash}_NORMAL_${index}`
-  const assetId = PLATFORMS_META[platform].nativeAssetId as string
+  const assetId = PLATFORMS_META[platformId].nativeAssetId as string
   const wallet = address
   const hasError = isError === "1" || undefined
   const method = extractMethodFromFunctionName(functionName || methodId)
@@ -76,7 +76,7 @@ export function parseNormal(
         id: `${txId}_VALUE_0`,
         importIndex: index,
         operation,
-        platform,
+        platformId,
         timestamp,
         txId,
         wallet,
@@ -93,7 +93,7 @@ export function parseNormal(
           id: `${txId}_WETH_${index}`,
           importIndex: index + 0.1,
           operation: "Mint",
-          platform,
+          platformId,
           timestamp,
           txId,
           wallet,
@@ -115,7 +115,7 @@ export function parseNormal(
       id: `${txId}_FEE_0`,
       importIndex: index + 0.1,
       operation: "Fee",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -138,7 +138,7 @@ export function parseNormal(
     },
     outgoing: outgoing === "0" ? undefined : outgoing,
     outgoingAsset: outgoing === "0" ? undefined : outgoingAsset,
-    platform,
+    platformId,
     // price,
     // role,
     timestamp,

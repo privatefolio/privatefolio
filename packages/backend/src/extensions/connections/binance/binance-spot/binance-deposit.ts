@@ -15,7 +15,7 @@ export function parseDeposit(
   index: number,
   connection: BinanceConnection
 ): ParserResult {
-  const { platform } = connection
+  const { platformId } = connection
   const { amount, coin, insertTime, txId: txHash } = row
 
   const wallet = `Binance Spot`
@@ -46,7 +46,7 @@ export function parseDeposit(
       id: `${txId}_TRANSFER_${index}`,
       importIndex,
       operation,
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -64,7 +64,7 @@ export function parseDeposit(
     },
     outgoing: undefined,
     outgoingAsset: undefined,
-    platform,
+    platformId,
     timestamp,
     type,
     wallet,

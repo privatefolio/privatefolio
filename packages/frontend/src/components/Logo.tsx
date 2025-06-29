@@ -1,15 +1,24 @@
+import { Box, BoxProps } from "@mui/material"
 import React from "react"
 
-export function LoadingLogo() {
+type LogoProps = React.SVGProps<SVGSVGElement> &
+  BoxProps & {
+    loading?: boolean
+  }
+
+export function Logo(props: LogoProps) {
+  const { loading = false, ...rest } = props
+
   return (
-    <svg
+    <Box
+      component="svg"
       width={40}
       height={40}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="-25 -25 551 551"
-      className="loading-indicator-active"
-      // className={true ? "loading-indicator-active" : "loading-indicator-inactive"}
+      className={loading ? "loading-indicator-active" : ""}
       // color="var(--mui-palette-primary-main)"
+      {...rest}
     >
       <path
         fill="currentColor"
@@ -17,6 +26,6 @@ export function LoadingLogo() {
         strokeWidth={5}
         stroke="currentColor"
       />
-    </svg>
+    </Box>
   )
 }

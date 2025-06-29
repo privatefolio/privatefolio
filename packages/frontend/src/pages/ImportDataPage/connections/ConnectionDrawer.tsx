@@ -1,5 +1,4 @@
-import { LoadingButton } from "@mui/lab"
-import { Drawer, DrawerProps, Stack, Tooltip, Typography } from "@mui/material"
+import { Drawer, DrawerProps, Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { enqueueSnackbar } from "notistack"
 import {
@@ -11,6 +10,7 @@ import { AmountBlock } from "src/components/AmountBlock"
 import { DrawerHeader } from "src/components/DrawerHeader"
 import { ExtensionBlock } from "src/components/ExtensionBlock"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
+import { LoadingButton } from "src/components/LoadingButton"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TimestampBlock } from "src/components/TimestampBlock"
@@ -18,6 +18,7 @@ import { useConfirm } from "src/hooks/useConfirm"
 import { BinanceConnectionOptions, Connection } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 import { $debugMode, PopoverToggleProps } from "src/stores/app-store"
+import { getAddressBookEntry } from "src/stores/metadata-store"
 import { $rpc } from "src/workers/remotes"
 
 type ConnectionDrawerProps = DrawerProps &
@@ -28,18 +29,8 @@ type ConnectionDrawerProps = DrawerProps &
 
 export function ConnectionDrawer(props: ConnectionDrawerProps) {
   const { open, toggleOpen, connection, relativeTime, ...rest } = props
-  const {
-    id,
-    address,
-    timestamp,
-    syncedAt,
-    extensionId,
-    platform: platformId,
-    label,
-    meta,
-    key,
-    options,
-  } = connection
+  const { id, address, timestamp, syncedAt, extensionId, platformId, meta, apiKey, options } =
+    connection
 
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
@@ -48,6 +39,7 @@ export function ConnectionDrawer(props: ConnectionDrawerProps) {
   const [loadingRemove, setLoadingRemove] = useState(false)
   const [loadingReset, setLoadingReset] = useState(false)
   const [loadingSync, setLoadingSync] = useState(false)
+  const [loadingResync, setLoadingResync] = useState(false)
 
   return (
     <Drawer open={open} onClose={toggleOpen} {...rest}>
@@ -71,16 +63,14 @@ export function ConnectionDrawer(props: ConnectionDrawerProps) {
           <div>
             <SectionTitle>API Key</SectionTitle>
             <Stack gap={0.5} alignItems="flex-start">
-              <IdentifierBlock id={key as string} />
-              <Typography variant="caption">{label ? `${label}` : null}</Typography>
+              <IdentifierBlock id={apiKey as string} />
             </Stack>
           </div>
         ) : (
           <div>
-            <SectionTitle>Address</SectionTitle>
+            <SectionTitle>Wallet</SectionTitle>
             <Stack gap={0.5} alignItems="flex-start">
-              <IdentifierBlock id={address as string} />
-              <Typography variant="caption">{label ? `${label}` : null}</Typography>
+              <IdentifierBlock id={address!} label={getAddressBookEntry(address!)} />
             </Stack>
           </div>
         )}
@@ -158,97 +148,109 @@ export function ConnectionDrawer(props: ConnectionDrawerProps) {
             )}
           </>
         )}
-        <Stack direction="column" gap={1}>
+        <div>
           <SectionTitle>Actions</SectionTitle>
-          <Tooltip title={loadingSync ? "Syncing…" : "Sync connection"}>
-            <span>
-              <LoadingButton
-                size="small"
-                variant="outlined"
-                color="secondary"
-                loading={loadingSync}
-                onClick={() => {
-                  setLoadingSync(true)
-                  rpc.enqueueSyncConnection(
-                    activeAccount,
-                    "user",
-                    connection.id,
-                    $debugMode.get(),
-                    (error) => {
-                      setLoadingSync(false)
-                      if (error) {
-                        enqueueSnackbar("Could not sync connection", { variant: "error" })
-                      }
+          <Stack gap={1} alignItems="flex-start">
+            <LoadingButton
+              loading={loadingSync}
+              loadingText="Syncing connection…"
+              tooltip="Sync connection"
+              size="small"
+              variant="outlined"
+              color="secondary"
+              onClick={() => {
+                setLoadingSync(true)
+                rpc.enqueueSyncConnection(
+                  activeAccount,
+                  "user",
+                  connection.id,
+                  $debugMode.get(),
+                  (error) => {
+                    setLoadingSync(false)
+                    if (error) {
+                      enqueueSnackbar("Connection sync failed", { variant: "error" })
                     }
-                  )
-                }}
-              >
-                Sync connection
-              </LoadingButton>
-            </span>
-          </Tooltip>
-          <Tooltip title={loadingReset ? "Resetting…" : "This will reset and sync the connection"}>
-            <span>
-              <LoadingButton
-                size="small"
-                variant="outlined"
-                color="secondary"
-                onClick={async () => {
-                  setLoadingReset(true)
+                  }
+                )
+              }}
+            >
+              Sync connection
+            </LoadingButton>
+            <LoadingButton
+              loadingText={loadingReset ? "Resetting connection…" : "Resyncing connection…"}
+              tooltip="This will reset and re-sync the connection"
+              loading={loadingReset || loadingResync}
+              size="small"
+              variant="outlined"
+              color="secondary"
+              onClick={async () => {
+                setLoadingReset(true)
+                await rpc.enqueueResetConnection(activeAccount, "user", connection.id, (error) => {
+                  setLoadingReset(false)
+                  if (error) {
+                    enqueueSnackbar(`Connection reset failed: ${error}`, { variant: "error" })
+                  } else {
+                    enqueueSnackbar("Connection reset", { variant: "success" })
+                  }
+                })
+                setLoadingResync(true)
+                await rpc.enqueueSyncConnection(
+                  activeAccount,
+                  "user",
+                  connection.id,
+                  $debugMode.get(),
+                  (error) => {
+                    setLoadingResync(false)
+                    if (error) {
+                      enqueueSnackbar(`Connection re-sync failed: ${error}`, {
+                        variant: "error",
+                      })
+                    } else {
+                      enqueueSnackbar("Connection re-synced", { variant: "success" })
+                    }
+                  }
+                )
+              }}
+            >
+              Reset connection
+            </LoadingButton>
+            <LoadingButton
+              loading={loadingRemove}
+              loadingText="Removing connection…"
+              tooltip="This will remove the connection alongside its transactions and audit logs"
+              size="small"
+              variant="outlined"
+              color="error"
+              onClick={async () => {
+                const { confirmed } = await confirm({
+                  confirmText: "Remove",
+                  content: (
+                    <>
+                      All audit logs and transactions linked to this connection will be deleted.
+                      <br /> This action is permanent. Are you sure you wish to continue?
+                    </>
+                  ),
+                  title: "Remove connection",
+                  variant: "warning",
+                })
 
-                  await rpc.enqueueResetConnection(activeAccount, "user", connection.id)
-                  await rpc.enqueueSyncConnection(
-                    activeAccount,
-                    "user",
-                    connection.id,
-                    $debugMode.get(),
-                    () => setLoadingReset(false)
-                  )
-                }}
-                loading={loadingReset}
-              >
-                Reset connection
-              </LoadingButton>
-            </span>
-          </Tooltip>
-          <Tooltip
-            title={
-              loadingRemove
-                ? "Removing…"
-                : "This will remove the connection alongside its transactions and audit logs"
-            }
-          >
-            <span>
-              <LoadingButton
-                size="small"
-                variant="outlined"
-                color="error"
-                onClick={async () => {
-                  const { confirmed } = await confirm({
-                    confirmText: "Remove",
-                    content: (
-                      <>
-                        All audit logs and transactions linked to this connection will be deleted.
-                        <br /> This action is permanent. Are you sure you wish to continue?
-                      </>
-                    ),
-                    title: "Remove connection",
-                    variant: "warning",
-                  })
-
-                  if (!confirmed) return
-                  setLoadingRemove(true)
-                  await rpc.enqueueDeleteConnection(activeAccount, "user", connection.id, () =>
-                    setLoadingRemove(false)
-                  )
-                }}
-                loading={loadingRemove}
-              >
-                Remove connection
-              </LoadingButton>
-            </span>
-          </Tooltip>
-        </Stack>
+                if (!confirmed) return
+                setLoadingRemove(true)
+                await rpc.enqueueDeleteConnection(activeAccount, "user", connection.id, (error) => {
+                  setLoadingRemove(false)
+                  if (error) {
+                    enqueueSnackbar(`Connection removal failed: ${error}`, { variant: "error" })
+                  } else {
+                    enqueueSnackbar("Connection removed", { variant: "success" })
+                    toggleOpen()
+                  }
+                })
+              }}
+            >
+              Remove connection
+            </LoadingButton>
+          </Stack>
+        </div>
       </Stack>
     </Drawer>
   )

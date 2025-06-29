@@ -16,7 +16,7 @@ export function parseWithdraw(
   index: number,
   connection: BinanceConnection
 ): ParserResult {
-  const { platform } = connection
+  const { platformId } = connection
   const { transactionFee, amount, coin, applyTime, txId: txHash } = row
 
   const wallet = `Binance Spot`
@@ -49,7 +49,7 @@ export function parseWithdraw(
       id: `${txId}_TRANSFER_${index}`,
       importIndex,
       operation,
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -67,7 +67,7 @@ export function parseWithdraw(
     },
     outgoing: outgoing === "0" ? undefined : outgoing,
     outgoingAsset: outgoing === "0" ? undefined : outgoingAsset,
-    platform,
+    platformId,
     timestamp,
     type,
     wallet,

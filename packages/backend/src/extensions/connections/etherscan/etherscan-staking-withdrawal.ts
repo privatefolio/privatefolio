@@ -17,7 +17,7 @@ export function parseStakingWithdrawal(
   connection: EtherscanConnection
 ): ParserResult {
   // ----------------------------------------------------------------- Parse
-  const { platform, address } = connection
+  const { platformId, address } = connection
   const {
     amount: amountInGwei,
     timestamp: time,
@@ -32,7 +32,7 @@ export function parseStakingWithdrawal(
   }
   const wallet = address
   const txId = `${connection.id}_${validatorIndex}+${withdrawalIndex}_BEACON_${index}`
-  const assetId = PLATFORMS_META[platform].nativeAssetId as string
+  const assetId = PLATFORMS_META[platformId].nativeAssetId as string
   const operation: AuditLogOperation = "Deposit"
   const type: TransactionType = operation
 
@@ -50,7 +50,7 @@ export function parseStakingWithdrawal(
     id: `${txId}_VALUE_0`,
     importIndex: index,
     operation,
-    platform,
+    platformId,
     timestamp,
     txId,
     wallet,
@@ -63,7 +63,7 @@ export function parseStakingWithdrawal(
     incoming: incoming === "0" ? undefined : incoming,
     incomingAsset: incoming === "0" ? undefined : incomingAsset,
     metadata: {},
-    platform,
+    platformId,
     timestamp,
     type,
     wallet,

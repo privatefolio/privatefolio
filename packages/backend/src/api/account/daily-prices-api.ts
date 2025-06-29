@@ -16,12 +16,47 @@ import { allPriceApiIds } from "src/settings/price-apis"
 import { PRICE_API_PAGINATION, PRICE_APIS_META } from "src/settings/settings"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { formatDate } from "src/utils/formatting-utils"
+import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { noop } from "src/utils/utils"
 
 import { getAccount } from "../accounts-api"
 import { getMyAssets, patchAsset } from "./assets-api"
+import { getValue, setValue } from "./kv-api"
 import { enqueueTask } from "./server-tasks-api"
+
+const SCHEMA_VERSION = 2
+
+async function getAccountWithDailyPrices(accountName: string) {
+  const schemaVersion = await getValue(accountName, `daily_prices_schema_version`, 0)
+  const account = await getAccount(accountName)
+
+  if (schemaVersion < SCHEMA_VERSION) {
+    await account.execute(sql`
+      CREATE TABLE IF NOT EXISTS daily_prices (
+        id VARCHAR PRIMARY KEY NOT NULL UNIQUE,
+        assetId VARCHAR NOT NULL,
+        timestamp INTEGER NOT NULL,
+        price JSON,
+        pair VARCHAR,
+        priceApiId VARCHAR,
+        FOREIGN KEY (assetId) REFERENCES assets(id)
+      );
+    `)
+
+    await account.execute(sql`
+      CREATE INDEX IF NOT EXISTS idx_daily_prices_asset_timestamp ON daily_prices (assetId, timestamp);
+    `)
+
+    await account.execute(sql`
+      CREATE INDEX IF NOT EXISTS idx_daily_prices_timestamp ON daily_prices (timestamp);
+    `)
+
+    await setValue(accountName, `daily_prices_schema_version`, SCHEMA_VERSION)
+  }
+
+  return account
+}
 
 type NewDailyPrice = Omit<DailyPrice, "id">
 
@@ -33,7 +68,7 @@ export async function upsertDailyPrices(
   accountName: string,
   records: DailyPrice[] | NewDailyPrice[]
 ) {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithDailyPrices(accountName)
 
   try {
     await account.executeMany(
@@ -70,7 +105,7 @@ export async function getPricesForAsset(
     return [{ time: timestamp / 1000, value: 1 }] as ChartData[]
   }
 
-  const account = await getAccount(accountName)
+  const account = await getAccountWithDailyPrices(accountName)
 
   let query = `
     SELECT price FROM daily_prices
@@ -108,7 +143,7 @@ export async function getAssetPriceMap(
   accountName: string,
   timestamp: Timestamp = new Date().getTime()
 ): Promise<Record<string, ChartData>> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithDailyPrices(accountName)
 
   const day: Timestamp = timestamp - (timestamp % 86400000)
 
@@ -135,7 +170,7 @@ export async function getPriceCursor(
   accountName: string,
   assetId: string
 ): Promise<Timestamp | undefined> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithDailyPrices(accountName)
 
   const query = `
     SELECT timestamp FROM daily_prices
@@ -304,7 +339,7 @@ export function enqueueFetchPrices(accountName: string, trigger: TaskTrigger) {
 }
 
 export async function deleteDailyPrices(accountName: string) {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithDailyPrices(accountName)
   await account.execute("DELETE FROM daily_prices")
 }
 

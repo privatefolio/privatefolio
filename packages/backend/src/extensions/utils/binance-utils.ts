@@ -2,7 +2,10 @@ import Big from "big.js"
 import { groupBy } from "lodash-es"
 
 import { AuditLog, Transaction } from "../../interfaces"
+import { PlatformPrefix } from "../../settings/settings"
 import { hashString } from "../../utils/utils"
+
+export const BINANCE_PLATFORM_ID = `${PlatformPrefix.Exchange}binance`
 
 function validAuditLogGrouping(logs: AuditLog[]) {
   let hasBuy = false
@@ -37,7 +40,7 @@ export function extractTransactions(logs: AuditLog[], fileImportId: string): Tra
 
     if (validAuditLogGrouping(group)) {
       const wallet = group[0].wallet
-      const platform = group[0].platform
+      const platformId = group[0].platformId
       const timestamp = group[0].timestamp
       //
       const hash = hashString(`${timestamp}`)
@@ -83,7 +86,7 @@ export function extractTransactions(logs: AuditLog[], fileImportId: string): Tra
         metadata: {},
         outgoing,
         outgoingAsset,
-        platform,
+        platformId,
         price,
         timestamp,
         type,

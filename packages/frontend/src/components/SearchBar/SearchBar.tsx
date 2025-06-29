@@ -24,11 +24,20 @@ import {
   Stack,
   Tooltip,
 } from "@mui/material"
+import { persistentAtom } from "@nanostores/persistent"
 import { useStore } from "@nanostores/react"
-import { Action, KBarResults, useKBar, useMatches, useRegisterActions, VisualState } from "kbar"
-import { enqueueSnackbar } from "notistack"
+import {
+  Action,
+  ActionImpl,
+  KBarResults,
+  useKBar,
+  useMatches,
+  useRegisterActions,
+  VisualState,
+} from "kbar"
 import React, { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { APP_ACTIONS } from "src/AppActions"
 import { Asset, FindPlatformsResult, RichExtension, Transaction } from "src/interfaces"
 import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
@@ -61,7 +70,20 @@ const SECTIONS = {
   blockchains: { name: "Blockchains", priority: 6 },
   exchanges: { name: "Exchanges", priority: 7 },
   extensions: { name: "Extensions", priority: 5 },
+  recent: { name: "Recent", priority: 12 },
   transactions: { name: "Transactions", priority: 11 },
+}
+
+const $recentActionIds = persistentAtom<string[]>("recent-actions", [], {
+  decode: JSON.parse,
+  encode: JSON.stringify,
+})
+
+function addToRecentActions(actionId: string) {
+  const current = $recentActionIds.get()
+  const filtered = current.filter((id) => id !== actionId)
+  const updated = [actionId, ...filtered].slice(0, 10)
+  $recentActionIds.set(updated)
 }
 
 export const SearchBar = () => {
@@ -71,6 +93,7 @@ export const SearchBar = () => {
   const activeAccount = useStore($activeAccount)
   const assetMap = useStore($assetMap)
   const platformMap = useStore($platformMap)
+  const recentActionIds = useStore($recentActionIds)
 
   const {
     showing,
@@ -99,11 +122,6 @@ export const SearchBar = () => {
     setAssetsFound([])
     setAssetsLoading(false)
     ;(async () => {
-      if (!searchQuery || searchQuery.length < 1) {
-        setAssetsFound([])
-        return
-      }
-
       try {
         setAssetsLoading(true)
         const assets = await rpc.findAssets(activeAccount, searchQuery, 5, false, "coingecko")
@@ -296,7 +314,7 @@ export const SearchBar = () => {
           rpc.enqueueFetchPrices(activeAccount, "user")
           rpc.enqueueRefreshBalances(activeAccount, "user")
           rpc.enqueueRefreshNetworth(activeAccount, "user")
-          // rpc.enqueueRefreshTrades(activeAccount, "user") // TODO9: currently broken
+          rpc.enqueueRefreshTrades(activeAccount, "user")
         },
         priority: 11,
         section: SECTIONS.actions,
@@ -315,12 +333,15 @@ export const SearchBar = () => {
         icon: <CloudSyncRounded fontSize="small" />,
         id: "action-sync-all-connections",
         name: "Sync all connections",
-        perform: () =>
-          rpc.enqueueSyncAllConnections(activeAccount, "user", $debugMode.get(), (error) => {
-            if (error) {
-              enqueueSnackbar("Could not sync connection", { variant: "error" })
-            }
-          }),
+        perform: () => rpc.enqueueSyncAllConnections(activeAccount, "user", $debugMode.get()),
+        priority: 10,
+        section: SECTIONS.actions,
+      },
+      {
+        icon: <CloudSyncRounded fontSize="small" />,
+        id: "action-reset-all-connections",
+        name: "Reset all connections",
+        perform: () => rpc.enqueueResetAllConnections(activeAccount, "user"),
         priority: 10,
         section: SECTIONS.actions,
       },
@@ -385,21 +406,13 @@ export const SearchBar = () => {
         section: SECTIONS.actions,
       },
       {
-        icon: <DeleteForever fontSize="small" />,
-        id: "action-delete-asset-prices",
-        name: "Delete asset prices",
-        perform: () => rpc.enqueueDeleteAssetPrices(activeAccount, "user"),
-        priority: 0,
-        section: SECTIONS.actions,
-      },
-      {
         icon: <CalculateOutlined fontSize="small" />,
         id: "action-recompute-trades",
         name: "Recompute trades",
         perform: () => rpc.enqueueRecomputeTrades(activeAccount, "user"),
         priority: 3,
         section: SECTIONS.actions,
-        shortcut: ["$mod+x"],
+        // shortcut: ["$mod+x"],
       },
       {
         icon: <CalculateOutlined fontSize="small" />,
@@ -449,6 +462,7 @@ export const SearchBar = () => {
         priority: 2,
         section: SECTIONS.actions,
       },
+      ...Object.values(APP_ACTIONS),
     ]
 
     actions.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""))
@@ -456,16 +470,37 @@ export const SearchBar = () => {
     return actions
   }, [activeAccount, rpc])
 
-  const actions = useMemo<Action[]>(
-    () => [
+  const actions = useMemo<Action[]>(() => {
+    const all = [
       ...txnsFoundActions,
       ...platformActions,
       ...assetActions,
       ...extensionActions,
       ...appActions,
-    ],
-    [txnsFoundActions, platformActions, assetActions, extensionActions, appActions]
-  )
+    ]
+
+    return all.map((action) => {
+      const index = recentActionIds.findIndex((id) => id === action.id)
+      const isRecent = index !== -1
+
+      return {
+        ...action,
+        perform: (currentActionImpl: ActionImpl) => {
+          addToRecentActions(action.id)
+          action.perform?.(currentActionImpl)
+        },
+        priority: isRecent ? -index : action.priority,
+        section: isRecent ? SECTIONS.recent : action.section,
+      }
+    })
+  }, [
+    recentActionIds,
+    txnsFoundActions,
+    platformActions,
+    assetActions,
+    extensionActions,
+    appActions,
+  ])
 
   useRegisterActions(actions, [actions])
 

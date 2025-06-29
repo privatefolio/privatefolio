@@ -4,9 +4,11 @@ import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
 
+import { BINANCE_PLATFORM_ID } from "../utils/binance-utils"
+
 export const extensionId = "binance-file-import"
 export const parserId = "binance-spot-history"
-export const platform = "binance"
+export const platformId = BINANCE_PLATFORM_ID
 
 export const HEADER = '"Date(UTC)","Pair","Side","Price","Executed","Amount","Fee"'
 
@@ -57,7 +59,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       metadata: { pair },
       outgoing: amount,
       outgoingAsset: quoteAssetId,
-      platform,
+      platformId,
       price,
       timestamp,
       type: "Swap",
@@ -70,7 +72,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       id: `${txId}_0`,
       importIndex: index,
       operation: "Sell",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -82,7 +84,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       id: `${txId}_1`,
       importIndex: index + 0.1,
       operation: "Buy",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -100,7 +102,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       metadata: { pair },
       outgoing: executed,
       outgoingAsset: baseAssetId,
-      platform,
+      platformId,
       price,
       timestamp,
       type: "Swap",
@@ -113,7 +115,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       id: `${txId}_0`,
       importIndex: index,
       operation: "Sell",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -125,7 +127,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       id: `${txId}_1`,
       importIndex: index + 0.1,
       operation: "Buy",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -139,7 +141,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
     id: `${txId}_2`,
     importIndex: index + 0.2,
     operation: "Fee",
-    platform,
+    platformId,
     timestamp,
     txId,
     wallet,

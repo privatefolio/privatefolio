@@ -1,17 +1,21 @@
+import Big from "big.js"
 import { mergeTransactions } from "src/extensions/utils/etherscan-utils"
 import {
+  AuditLog,
   AuditLogOperation,
   EventCause,
   MyAsset,
   ServerFile,
   SqlParam,
   SubscriptionChannel,
+  TaskCompletionCallback,
 } from "src/interfaces"
 import { isEvmPlatform } from "src/utils/assets-utils"
 import { transformTransactionsToCsv } from "src/utils/csv-export-utils"
 import { createCsvString } from "src/utils/csv-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { saveFile } from "src/utils/file-utils"
+import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { noop } from "src/utils/utils"
 
@@ -24,16 +28,65 @@ import {
 } from "../../interfaces"
 import { getAccount } from "../accounts-api"
 import { getMyAssets } from "./assets-api"
-import { getAuditLogsByTxId } from "./audit-logs-api"
+import { getAuditLogsByTxId, upsertAuditLogs } from "./audit-logs-api"
+import { getValue, setValue } from "./kv-api"
 import { enqueueTask } from "./server-tasks-api"
 import { assignTagToAuditLog, assignTagToTransaction } from "./tags-api"
+
+const SCHEMA_VERSION = 1
+
+async function getAccountWithTransactions(accountName: string) {
+  const schemaVersion = await getValue(accountName, `transactions_schema_version`, 0)
+  const account = await getAccount(accountName)
+
+  if (schemaVersion < SCHEMA_VERSION) {
+    // Drop existing table to recreate with new schema
+    await account.execute(sql`DROP TABLE IF EXISTS transactions`)
+
+    await account.execute(sql`
+      CREATE TABLE transactions (
+        id VARCHAR PRIMARY KEY,
+        incomingAsset VARCHAR,
+        incoming VARCHAR,
+        incomingN FLOAT GENERATED ALWAYS AS (CAST(incoming AS REAL)) STORED,
+        feeAsset VARCHAR,
+        fee VARCHAR,
+        feeN FLOAT GENERATED ALWAYS AS (CAST(fee AS REAL)) STORED,
+        fileImportId VARCHAR,
+        connectionId VARCHAR,
+        importIndex INTEGER,
+        outgoingAsset VARCHAR,
+        outgoing VARCHAR,
+        outgoingN FLOAT GENERATED ALWAYS AS (CAST(outgoing AS REAL)) STORED,
+        notes VARCHAR,
+        platformId VARCHAR NOT NULL,
+        price VARCHAR,
+        priceN FLOAT GENERATED ALWAYS AS (CAST(price AS REAL)) STORED,
+        role VARCHAR,
+        timestamp INTEGER NOT NULL,
+        type VARCHAR NOT NULL,
+        wallet VARCHAR NOT NULL,
+        metadata JSON,
+        FOREIGN KEY (feeAsset) REFERENCES assets(id),
+        FOREIGN KEY (incomingAsset) REFERENCES assets(id),
+        FOREIGN KEY (outgoingAsset) REFERENCES assets(id),
+        FOREIGN KEY (connectionId) REFERENCES connections(id),
+        FOREIGN KEY (fileImportId) REFERENCES fileImports(id)
+      );
+    `)
+
+    await setValue(accountName, `transactions_schema_version`, SCHEMA_VERSION)
+  }
+
+  return account
+}
 
 export async function getTransactions(
   accountName: string,
   query = "SELECT * FROM transactions ORDER BY timestamp DESC, incomingN DESC",
   params?: SqlParam[]
 ) {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTransactions(accountName)
 
   try {
     const result = await account.execute(query, params)
@@ -51,7 +104,7 @@ export async function getTransactions(
         outgoingAsset: row[10],
         outgoing: row[11],
         notes: row[13],
-        platform: row[14],
+        platformId: row[14],
         price: row[15],
         role: row[17],
         timestamp: row[18],
@@ -76,13 +129,13 @@ export async function getTransaction(accountName: string, id: string) {
 }
 
 export async function upsertTransactions(accountName: string, records: Transaction[]) {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTransactions(accountName)
 
   try {
     await account.executeMany(
       `INSERT OR REPLACE INTO transactions (
         id, incomingAsset, fee, feeAsset, fileImportId, connectionId, 
-        importIndex, incoming, outgoing, outgoingAsset, notes, platform, price, 
+        importIndex, incoming, outgoing, outgoingAsset, notes, platformId, price, 
         role, timestamp, type, wallet, metadata
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       records.map((record) => [
@@ -97,7 +150,7 @@ export async function upsertTransactions(accountName: string, records: Transacti
         record.outgoing || null,
         record.outgoingAsset || null,
         record.notes || null,
-        record.platform,
+        record.platformId,
         record.price || null,
         record.role || null,
         record.timestamp,
@@ -131,7 +184,7 @@ export async function countTransactions(
   query = "SELECT COUNT(*) FROM transactions",
   params?: SqlParam[]
 ): Promise<number> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTransactions(accountName)
 
   try {
     const result = await account.execute(query, params)
@@ -156,12 +209,12 @@ export async function autoMergeTransactions(
   progress: ProgressCallback = noop,
   signal?: AbortSignal
 ) {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTransactions(accountName)
   await progress([0, "Fetching all transactions"])
   const transactions = await getTransactions(accountName)
 
   const etherscan = transactions.filter((tx) =>
-    isEvmPlatform(tx.platform)
+    isEvmPlatform(tx.platformId)
   ) as EtherscanTransaction[]
 
   if (signal?.aborted) throw new Error(signal.reason)
@@ -263,12 +316,12 @@ export async function detectSpamTransactions(
   progress: ProgressCallback = noop,
   signal?: AbortSignal
 ) {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTransactions(accountName)
   await progress([0, "Fetching all transactions"])
   const transactions = await getTransactions(accountName)
 
   const etherscanTransactions = transactions.filter((tx) =>
-    isEvmPlatform(tx.platform)
+    isEvmPlatform(tx.platformId)
   ) as EtherscanTransaction[]
   if (signal?.aborted) {
     throw new Error(signal.reason)
@@ -334,98 +387,111 @@ export function enqueueDetectSpamTransactions(accountName: string, trigger: Task
   })
 }
 
-// TODO9
 export async function addTransaction(
-  _transaction: Omit<Transaction, "id" | "_rev" | "importId" | "importIndex">,
-  _accountName: string
+  transaction: Omit<Transaction, "id" | "_rev" | "importId" | "importIndex">,
+  accountName: string
 ) {
-  // const {
-  //   fee,
-  //   feeAsset,
-  //   incoming,
-  //   incomingAsset,
-  //   outgoing,
-  //   outgoingAsset,
-  //   platform,
-  //   timestamp,
-  //   type,
-  //   wallet,
-  //   notes,
-  // } = transaction
-  // const id = hashString(`con_${platform}_${wallet}_added_manually`)
-  // // const importId = ""
-  // const importIndex = 0
-  // const operation = type
-  //   .replace("Wrap", "Unknown")
-  //   .replace("Unwrap", "Unknown") as AuditLogOperation
-  // const logs: AuditLog[] = []
-  // let price: string | undefined
-  // if (incoming && outgoing) {
-  //   price = Big(outgoing).div(Big(incoming)).toString()
-  // }
-  // if (incoming && incomingAsset) {
-  //   logs.push({
-  //     assetId: `${platform}:${incomingAsset}`,
-  //     change: incoming,
-  //     id: `${id}_BUY`,
-  //     importIndex,
-  //     operation: type === "Swap" ? "Buy" : operation,
-  //     platform,
-  //     timestamp,
-  //     txId: id,
-  //     wallet,
-  //   })
-  // }
-  // if (outgoing && outgoingAsset) {
-  //   logs.push({
-  //     assetId: `${platform}:${outgoingAsset}`,
-  //     change: `-${outgoing}`,
-  //     id: `${id}_SELL`,
-  //     importIndex,
-  //     operation: type === "Swap" ? "Sell" : operation,
-  //     platform,
-  //     timestamp,
-  //     txId: id,
-  //     wallet,
-  //   })
-  // }
-  // if (fee) {
-  //   logs.push({
-  //     assetId: `${platform}:${feeAsset}`,
-  //     change: `-${fee}`,
-  //     id: `${id}_FEE`,
-  //     importIndex,
-  //     operation: "Fee",
-  //     platform,
-  //     timestamp,
-  //     txId: id,
-  //     wallet,
-  //   })
-  // }
-  // const tx: Transaction[] = [
-  //   {
-  //     fee: !fee ? undefined : fee,
-  //     feeAsset: !fee ? undefined : `${platform}:${feeAsset}`,
-  //     id,
-  //     importIndex,
-  //     incoming: !incoming ? undefined : incoming,
-  //     incomingAsset: !incoming ? undefined : `${platform}:${incomingAsset}`,
-  //     metadata: {},
-  //     notes,
-  //     outgoing: !outgoing ? undefined : outgoing,
-  //     outgoingAsset: !outgoing ? undefined : `${platform}:${outgoingAsset}`,
-  //     platform,
-  //     price,
-  //     timestamp,
-  //     type,
-  //     wallet,
-  //   },
-  // ]
-  throw new Error("Not implemented")
-  // const account = getAccount(accountName)
-  // account.auditLogsDB.bulkDocs(logs)
-  // account.transactionsDB.bulkDocs(tx)
-  // TODO8
+  const {
+    fee,
+    feeAsset,
+    incoming,
+    incomingAsset,
+    outgoing,
+    outgoingAsset,
+    platformId,
+    timestamp,
+    type,
+    wallet,
+    notes,
+  } = transaction
+
+  // validation
+  if (incoming && !incomingAsset) {
+    throw new Error("Incoming asset is required")
+  }
+  if (outgoing && !outgoingAsset) {
+    throw new Error("Outgoing asset is required")
+  }
+  if (fee && !feeAsset) {
+    throw new Error("Fee asset is required")
+  }
+  if (timestamp < 0) {
+    throw new Error("Timestamp is required")
+  }
+
+  const seq = await getValue(accountName, "transaction_man_seq", 1)
+  const id = `MANUAL_${seq}`
+  // const importId = ""
+  const importIndex = 0
+  const operation = type
+    .replace("Wrap", "Unknown")
+    .replace("Unwrap", "Unknown") as AuditLogOperation
+  const logs: AuditLog[] = []
+  let price: string | undefined
+  if (incoming && outgoing) {
+    price = Big(outgoing).div(Big(incoming)).toString()
+  }
+  if (incoming && incomingAsset) {
+    logs.push({
+      assetId: incomingAsset,
+      change: incoming,
+      id: `${id}_BUY`,
+      importIndex,
+      operation: type === "Swap" ? "Buy" : operation,
+      platformId,
+      timestamp,
+      txId: id,
+      wallet,
+    })
+  }
+  if (outgoing && outgoingAsset) {
+    logs.push({
+      assetId: outgoingAsset,
+      change: `-${outgoing}`,
+      id: `${id}_SELL`,
+      importIndex,
+      operation: type === "Swap" ? "Sell" : operation,
+      platformId,
+      timestamp,
+      txId: id,
+      wallet,
+    })
+  }
+  if (fee) {
+    logs.push({
+      assetId: feeAsset,
+      change: `-${fee}`,
+      id: `${id}_FEE`,
+      importIndex,
+      operation: "Fee",
+      platformId,
+      timestamp,
+      txId: id,
+      wallet,
+    })
+  }
+  const tx: Transaction[] = [
+    {
+      fee: !fee ? undefined : fee,
+      feeAsset: !fee ? undefined : feeAsset,
+      id,
+      importIndex,
+      incoming: !incoming ? undefined : incoming,
+      incomingAsset: !incoming ? undefined : incomingAsset,
+      metadata: {},
+      notes,
+      outgoing: !outgoing ? undefined : outgoing,
+      outgoingAsset: !outgoing ? undefined : outgoingAsset,
+      platformId,
+      price,
+      timestamp,
+      type,
+      wallet,
+    },
+  ]
+  await upsertTransactions(accountName, tx)
+  await upsertAuditLogs(accountName, logs)
+  await setValue(accountName, "transaction_man_seq", seq + 1)
 }
 
 export async function getTransactionsByTxHash(accountName: string, txHash: string) {
@@ -434,6 +500,50 @@ export async function getTransactionsByTxHash(accountName: string, txHash: strin
     "SELECT * FROM transactions WHERE json_extract(metadata, '$.txHash') = ?",
     [txHash]
   )
+}
+
+export async function deleteTransaction(
+  accountName: string,
+  transactionId: string,
+  progress: ProgressCallback = noop
+): Promise<void> {
+  const account = await getAccountWithTransactions(accountName)
+
+  await progress([0, `Removing transaction ${transactionId}`])
+
+  const auditLogs = await getAuditLogsByTxId(accountName, transactionId)
+  await progress([25, `Removing ${auditLogs.length} associated audit logs`])
+
+  await account.execute(`DELETE FROM audit_logs WHERE txId = ?`, [transactionId])
+
+  await account.execute(`DELETE FROM transaction_tags WHERE transaction_id = ?`, [transactionId])
+
+  await progress([75, `Removing transaction`])
+  await account.execute(`DELETE FROM transactions WHERE id = ?`, [transactionId])
+
+  await progress([100, `Transaction removed successfully`])
+
+  account.eventEmitter.emit(SubscriptionChannel.Transactions, EventCause.Deleted, transactionId)
+  account.eventEmitter.emit(SubscriptionChannel.AuditLogs, EventCause.Deleted)
+}
+
+export async function enqueueDeleteTransaction(
+  accountName: string,
+  trigger: TaskTrigger,
+  transactionId: string,
+  onCompletion?: TaskCompletionCallback
+) {
+  return enqueueTask(accountName, {
+    description: `Remove transaction ${transactionId} and its audit logs.`,
+    determinate: true,
+    function: async (progress) => {
+      await deleteTransaction(accountName, transactionId, progress)
+    },
+    name: `Remove transaction ${transactionId}`,
+    onCompletion,
+    priority: TaskPriority.Highest,
+    trigger,
+  })
 }
 
 export async function enqueueExportTransactions(accountName: string, trigger: TaskTrigger) {

@@ -79,10 +79,10 @@ export function formatWebsiteLink(url: string) {
     .replace(/\/$/, "")
 }
 
-// export function formatHex(addr: string, long = false) {
-//   const digits = long ? 6 : 3
-//   return `${addr.slice(0, 2 + digits)}...${addr.slice(-digits)}`
-// }
+export function formatHex(addr: string, long = false) {
+  const digits = long ? 6 : 4
+  return `${addr.slice(0, 2 + digits)}...${addr.slice(-digits)}`
+}
 
 export function formatCamelCase(str: string) {
   return str

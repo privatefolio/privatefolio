@@ -1,3 +1,4 @@
+import { ETHEREUM_PLATFORM_ID } from "src/extensions/utils/evm-utils"
 import { EtherscanConnection, ProgressCallback, SyncResult } from "src/interfaces"
 import { PLATFORMS_META } from "src/settings/settings"
 import { noop } from "src/utils/utils"
@@ -8,7 +9,10 @@ import { parseERC20 } from "./etherscan-erc20"
 import { parseInternal } from "./etherscan-internal"
 import {
   BlockRewardTransaction,
+  Erc20Transaction,
   FullEtherscanProvider,
+  InternalTransaction,
+  NormalTransaction,
   StakingWithdrawalTransaction,
 } from "./etherscan-rpc"
 import { ETHERSCAN_API_KEY_V2 } from "./etherscan-settings"
@@ -28,9 +32,9 @@ export async function syncEtherscan(
   since: string,
   until: string
 ) {
-  const chainId = PLATFORMS_META[connection.platform].chainId
+  const chainId = PLATFORMS_META[connection.platformId].chainId
   if (!chainId) {
-    throw new Error(`ChainId not found for platform: ${connection.platform}`)
+    throw new Error(`ChainId not found for platform: ${connection.platformId}`)
   }
 
   const rpcProvider = new FullEtherscanProvider(chainId, ETHERSCAN_API_KEY_V2)
@@ -47,23 +51,42 @@ export async function syncEtherscan(
     walletMap: {},
   }
 
-  await progress([0, `Fetching all transactions`])
-  const normal = await rpcProvider.getTransactions(connection.address, since, until)
-  await progress([10, `Fetched ${normal.length} Normal transactions`])
-  const internal = await rpcProvider.getInternalTransactions(connection.address, since, until)
-  await progress([20, `Fetched ${internal.length} Internal transactions`])
-  const erc20 = await rpcProvider.getErc20Transactions(connection.address, since, until)
-  await progress([30, `Fetched ${erc20.length} ERC20 transactions`])
-
+  let normal: NormalTransaction[] = []
+  let internal: InternalTransaction[] = []
+  let erc20: Erc20Transaction[] = []
   let staking: StakingWithdrawalTransaction[] = []
   let blocks: BlockRewardTransaction[] = []
 
-  if (connection.platform === "ethereum") {
+  await progress([0, `Fetching all transactions`])
+  normal = await rpcProvider.getTransactions(connection.address, since, until)
+  await progress([10, `Fetched ${normal.length} Normal transactions`])
+
+  if (normal.length === 0) {
+    const reason = "because the wallet is not active"
+    await progress([20, `Skipping Internal transactions ${reason}`])
+    await progress([30, `Skipping ERC20 transactions ${reason}`])
+    await progress([40, `Skipping Staking Withdrawal transactions ${reason}`])
+    await progress([50, `Skipping Block Reward transactions ${reason}`])
+  } else {
+    internal = await rpcProvider.getInternalTransactions(connection.address, since, until)
+    await progress([20, `Fetched ${internal.length} Internal transactions`])
+    erc20 = await rpcProvider.getErc20Transactions(connection.address, since, until)
+    await progress([30, `Fetched ${erc20.length} ERC20 transactions`])
+  }
+
+  if (connection.platformId === ETHEREUM_PLATFORM_ID && normal.length > 0) {
     staking = await rpcProvider.getStakingWithdrawalTransactions(connection.address, since, until)
     await progress([40, `Fetched ${staking.length} Staking Withdrawal transactions`])
     blocks = await rpcProvider.getBlockRewardTransactions(connection.address, since, until)
     await progress([50, `Fetched ${blocks.length} Block Reward transactions`])
   }
+
+  if (connection.platformId !== ETHEREUM_PLATFORM_ID && normal.length > 0) {
+    const reason = "because the chain is not Ethereum"
+    await progress([60, `Skipping Staking Withdrawal transactions ${reason}`])
+    await progress([70, `Skipping Block Reward transactions ${reason}`])
+  }
+
   const transactionArrays = [normal, internal, erc20, staking, blocks]
 
   let blockNumber = 0

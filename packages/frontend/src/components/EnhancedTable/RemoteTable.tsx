@@ -10,14 +10,15 @@ import React, {
   ComponentType,
   memo,
   MouseEvent,
+  ReactNode,
   useCallback,
   useLayoutEffect,
   useMemo,
   useState,
 } from "react"
 import { useSearchParams } from "react-router-dom"
-import { $showRelativeTime } from "src/stores/account-settings-store"
 import { $debugMode } from "src/stores/app-store"
+import { $showRelativeTime } from "src/stores/device-settings-store"
 import { sleep } from "src/utils/utils"
 
 import {
@@ -57,6 +58,7 @@ export interface RemoteTableProps<T extends BaseType> {
    */
   defaultRowsPerPage?: number
   emptyContent?: JSX.Element
+  extraRow?: ReactNode
   headCells: HeadCell<T>[]
   initOrderBy: keyof T
   queryFn: QueryTableData<T>
@@ -71,6 +73,7 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
     initOrderBy,
     emptyContent = <NoDataButton />,
     addNewRow,
+    extraRow,
   } = props
 
   const [queryTime, setQueryTime] = useState<number | null>(null)
@@ -194,7 +197,7 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
       })
       .catch((error) => {
         console.error(error)
-        setError(error)
+        setError(error as Error)
       })
       .finally(() => {
         setLoading(false)
@@ -363,6 +366,13 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
                   <TableRow>
                     <TableCell colSpan={headCells.length} variant="clickable">
                       {addNewRow}
+                    </TableCell>
+                  </TableRow>
+                )}
+                {!isFirstLoading && extraRow && !isEmpty && (
+                  <TableRow>
+                    <TableCell colSpan={headCells.length} variant="clickable">
+                      {extraRow}
                     </TableCell>
                   </TableRow>
                 )}

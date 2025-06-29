@@ -18,8 +18,7 @@ describe.skip("should import 0xB6e32 from arbitrum via connection", () => {
     connection = await upsertConnection(accountName, {
       address,
       extensionId: "etherscan-connection",
-      label: "",
-      platform: "arbitrum-one",
+      platformId: "arbitrum-one",
     })
     // assert
     expect(connection.id).toMatchInlineSnapshot(`"2295571797"`)

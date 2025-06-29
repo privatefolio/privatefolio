@@ -2,8 +2,8 @@ import { useMediaQuery } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useCallback, useMemo } from "react"
 import { SqlParam, Time, Timestamp } from "src/interfaces"
-import { $quoteCurrency, $showQuotedAmounts } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
+import { $quoteCurrency, $showQuotedAmounts } from "src/stores/device-settings-store"
 import { getAssetTicker } from "src/utils/assets-utils"
 import {
   aggregateByWeek,

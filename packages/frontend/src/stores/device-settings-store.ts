@@ -60,42 +60,45 @@ export const $quoteCurrency = computed(
   }
 )
 
-export const $hideSmallBalancesMap = persistentMap<Record<string, string | undefined>>(
-  "privatefolio-small-balances",
-  {}
+const booleanTransformer = {
+  decode: (value: string) => value === "true",
+  encode: (value: boolean) => (value ? "true" : "false"),
+}
+
+export const $hideSmallBalances = persistentAtom<boolean>(
+  "privatefolio-hide-small-balances",
+  true,
+  booleanTransformer
 )
 
-export const $hideSmallBalances = computed(
-  [$activeAccount, $hideSmallBalancesMap],
-  (activeAccount, hideSmallBalancesMap) => {
-    const val = hideSmallBalancesMap[activeAccount]
-    return typeof val === "string" ? val === "true" : true
-  }
-)
-
-export const $hideUnlistedMap = persistentMap<Record<string, string | undefined>>(
-  "privatefolio-unlisted-assets",
-  {}
-)
-
-export const $hideUnlisted = computed(
-  [$activeAccount, $hideUnlistedMap],
-  (activeAccount, hideUnlistedMap) => {
-    const val = hideUnlistedMap[activeAccount]
-    return typeof val === "string" ? val === "true" : true
-  }
+export const $hideUnlisted = persistentAtom<boolean>(
+  "privatefolio-hide-unlisted-assets",
+  true,
+  booleanTransformer
 )
 
 export const $showQuotedAmounts = persistentAtom<boolean>(
   "privatefolio-show-quoted-amounts",
   true,
-  {
-    decode: (value) => value === "true",
-    encode: (value) => (value ? "true" : "false"),
-  }
+  booleanTransformer
 )
 
-export const $showRelativeTime = persistentAtom<boolean>("privatefolio-show-relative-time", true, {
-  decode: (value) => value === "true",
-  encode: (value) => (value ? "true" : "false"),
-})
+export const $showRelativeTime = persistentAtom<boolean>(
+  "privatefolio-show-relative-time",
+  true,
+  booleanTransformer
+)
+
+export const $hideUnsupportedPlatforms = persistentAtom<boolean>(
+  "privatefolio-hide-unsupported-platforms",
+  false,
+  booleanTransformer
+)
+
+export const $hideInactiveConnections = persistentAtom<boolean>(
+  "privatefolio-hide-inactive-connections",
+  true,
+  booleanTransformer
+)
+
+export const $hideSpam = persistentAtom<boolean>("privatefolio-hide-spam", true, booleanTransformer)

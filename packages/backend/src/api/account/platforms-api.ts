@@ -1,5 +1,5 @@
 import { access, mkdir, readFile, writeFile } from "fs/promises"
-import { CACHE_LOCATION } from "src/settings/settings"
+import { CACHE_LOCATION, PlatformPrefix } from "src/settings/settings"
 import { isBlockchain, isExchange } from "src/utils/utils"
 
 import {
@@ -19,12 +19,13 @@ import {
   TaskTrigger,
 } from "../../interfaces"
 import { getMyPlatformIds } from "./audit-logs-api"
+import { getExtensions } from "./extensions-api"
 import { enqueueTask } from "./server-tasks-api"
 
 const customExchanges: Exchange[] = [
   {
     coingeckoTrustScore: 0,
-    id: "coinmama",
+    id: `${PlatformPrefix.Exchange}coinmama`,
     image: "$STATIC_ASSETS/extensions/coinmama.png",
     name: "Coinmama",
     url: "https://www.coinmama.com",
@@ -49,7 +50,7 @@ export async function getExchanges(): Promise<Exchange[]> {
           coingeckoTrustRank: exchange.trust_score_rank,
           coingeckoTrustScore: exchange.trust_score ?? 0,
           country: exchange.country,
-          id: exchange.id,
+          id: `${PlatformPrefix.Exchange}${exchange.id}`,
           image: exchange.image,
           name: exchange.name,
           url: exchange.url,
@@ -57,8 +58,18 @@ export async function getExchanges(): Promise<Exchange[]> {
         }) as Exchange
     )
     list.sort((a, b) => (a.coingeckoTrustRank ?? Infinity) - (b.coingeckoTrustRank ?? Infinity))
-    exchanges = list
-    return [...exchanges, ...customExchanges]
+    exchanges = [...list, ...customExchanges]
+
+    const extensions = await getExtensions()
+    exchanges = exchanges.map((exchange) => {
+      const extensionsIds = extensions
+        .filter((extension) => extension.platformIds?.includes(exchange.id))
+        .map((extension) => extension.id)
+      const supported = extensionsIds.length > 0
+      return { ...exchange, extensionsIds, supported }
+    })
+
+    return exchanges
   } catch {
     return customExchanges
   }
@@ -76,7 +87,7 @@ export async function getBlockchains(): Promise<Blockchain[]> {
       (platform: CoingeckoAssetPlatform) =>
         ({
           chainId: platform.chain_identifier,
-          id: platform.id,
+          id: `${PlatformPrefix.Chain}${platform.id}`,
           image: platform.image,
           name: platform.name,
           nativeCoinId: platform.native_coin_id,
@@ -84,6 +95,17 @@ export async function getBlockchains(): Promise<Blockchain[]> {
     )
     list.sort((a, b) => (a.chainId ?? Infinity) - (b.chainId ?? Infinity))
     blockchains = list
+
+    const extensions = await getExtensions()
+    blockchains = blockchains.map((blockchain) => {
+      const extensionsIds = extensions
+        .filter((extension) => extension.platformIds?.includes(blockchain.id))
+        .map((extension) => extension.id)
+      const supported = extensionsIds.length > 0
+
+      return { ...blockchain, extensionsIds, supported }
+    })
+
     return blockchains
   } catch {
     return []
@@ -144,7 +166,8 @@ export async function findPlatforms(
   let exchanges: Exchange[] = []
 
   if (searchSet === "coingecko") {
-    [blockchains, exchanges] = await Promise.all([getBlockchains(), getExchanges()])
+    // eslint-disable-next-line @typescript-eslint/no-extra-semi
+    ;[blockchains, exchanges] = await Promise.all([getBlockchains(), getExchanges()])
   } else {
     const myPlatforms = await getMyPlatforms(accountName)
     blockchains = myPlatforms.filter((platform) => isBlockchain(platform))

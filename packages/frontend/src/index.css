@@ -20,7 +20,7 @@ html {
   /* scrollbar-gutter: stable; */
   -webkit-tap-highlight-color: transparent;
   /* overflow-y: scroll !important; */
-  /* overflow-y: scroll;  */
+  overflow-y: scroll; 
 }
 
 /* Scrollbar */

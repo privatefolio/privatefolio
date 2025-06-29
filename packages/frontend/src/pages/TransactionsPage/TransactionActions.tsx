@@ -11,6 +11,7 @@ import {
 import { useStore } from "@nanostores/react"
 import { transformTransactionsToCsv } from "privatefolio-backend/build/src/utils/csv-export-utils"
 import React, { MutableRefObject } from "react"
+import { HideSpamToggle } from "src/components/HideSpamToggle"
 import { QuoteCurrencyToggle } from "src/components/QuoteCurrencyToggle"
 import { Transaction } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
@@ -51,6 +52,7 @@ export function TransactionActions(props: TransactionActionsProps) {
         </IconButton>
       </Tooltip> */}
       <QuoteCurrencyToggle />
+      <HideSpamToggle />
       <Tooltip title="Actions">
         <IconButton color="secondary" onClick={handleClick}>
           <MoreHoriz fontSize="small" />

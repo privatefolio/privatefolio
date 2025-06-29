@@ -16,6 +16,7 @@ import {
   TradeStatus,
   TradeType,
 } from "src/interfaces"
+import { getAssetTicker } from "src/utils/assets-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { formatDate, ONE_DAY } from "src/utils/formatting-utils"
 import { sql } from "src/utils/sql-utils"
@@ -24,7 +25,7 @@ import { hashString, isTestEnvironment, noop } from "src/utils/utils"
 
 import { getAccount } from "../accounts-api"
 import { getMyAssets } from "./assets-api"
-import { getAuditLogs } from "./audit-logs-api"
+import { getAuditLogOrderQuery, getAuditLogs } from "./audit-logs-api"
 import { getAssetPriceMap, getPricesForAsset } from "./daily-prices-api"
 import { getValue, setValue } from "./kv-api"
 import { enqueueTask } from "./server-tasks-api"
@@ -107,6 +108,11 @@ async function getAccountWithTrades(accountName: string) {
         pnl VARCHAR NOT NULL,
         FOREIGN KEY (trade_id) REFERENCES trades(id)
       );
+    `)
+
+    await account.execute(sql`
+      INSERT OR IGNORE INTO key_value (key, value)
+      VALUES ('trade_seq', 0);
     `)
 
     await setValue(accountName, `trade_schema_version`, SCHEMA_VERSION)
@@ -307,6 +313,103 @@ export async function invalidateTradePnl(accountName: string, newValue: Timestam
   }
 }
 
+async function processTransactionForTrade(
+  accountName: string,
+  trade: Trade,
+  txId: string,
+  assetId: string,
+  log: AuditLog,
+  progress: ProgressCallback
+): Promise<void> {
+  const tx = await getTransaction(accountName, txId)
+  const priceMap = await getAssetPriceMap(accountName, tx.timestamp)
+
+  if (!tx) {
+    throw new Error(`Transaction with id ${txId} not found`)
+  }
+
+  // Deposits
+  if (
+    tx.incomingAsset &&
+    tx.incoming &&
+    tx.incomingAsset === assetId &&
+    log.operation === "Deposit"
+  ) {
+    const assetPrice = priceMap[tx.incomingAsset]?.value || 0
+    if (!assetPrice && !isTestEnvironment)
+      await progress([undefined, `Warning: price not found for ${tx.incomingAsset}`])
+    trade.deposits.push([
+      tx.incomingAsset,
+      tx.incoming,
+      assetPrice ? Big(assetPrice).mul(tx.incoming).toString() : "0",
+      txId,
+      tx.timestamp,
+    ])
+  }
+
+  // Withdrawals
+  if (
+    tx.outgoingAsset &&
+    tx.outgoing &&
+    tx.outgoingAsset === assetId &&
+    log.operation === "Withdraw"
+  ) {
+    const assetPrice = priceMap[tx.outgoingAsset]?.value || 0
+    if (!assetPrice && !isTestEnvironment)
+      await progress([undefined, `Warning: price not found for ${tx.outgoingAsset}`])
+    trade.deposits.push([
+      tx.outgoingAsset,
+      `-${tx.outgoing}`,
+      assetPrice ? Big(assetPrice).mul(`-${tx.outgoing}`).toString() : "0",
+      txId,
+      tx.timestamp,
+    ])
+  }
+
+  // Cost
+  if (tx.outgoingAsset && tx.outgoing && tx.incomingAsset === assetId) {
+    const assetPrice = priceMap[tx.outgoingAsset]?.value || 0
+    if (!assetPrice && !isTestEnvironment)
+      await progress([undefined, `Warning: price not found for ${tx.outgoingAsset}`])
+    trade.cost.push([
+      tx.outgoingAsset,
+      `-${tx.outgoing}`,
+      assetPrice ? Big(assetPrice).mul(`-${tx.outgoing}`).toString() : "0",
+      log.change,
+      txId,
+      tx.timestamp,
+    ])
+  }
+
+  // Proceeds
+  if (tx.incomingAsset && tx.incoming && tx.outgoingAsset === assetId) {
+    const assetPrice = priceMap[tx.incomingAsset]?.value || 0
+    if (!assetPrice && !isTestEnvironment)
+      await progress([undefined, `Warning: price not found for ${tx.incomingAsset}`])
+    trade.proceeds.push([
+      tx.incomingAsset,
+      tx.incoming,
+      assetPrice ? Big(assetPrice).mul(tx.incoming).toString() : "0",
+      txId,
+      tx.timestamp,
+    ])
+  }
+
+  // Fees
+  if (tx.feeAsset && tx.fee && tx.feeAsset === assetId) {
+    const assetPrice = priceMap[tx.feeAsset]?.value || 0
+    if (!assetPrice && !isTestEnvironment)
+      await progress([undefined, `Warning: price not found for ${tx.feeAsset}`])
+    trade.fees.push([
+      tx.feeAsset,
+      tx.fee,
+      assetPrice ? Big(assetPrice).mul(tx.fee).toString() : "0",
+      txId,
+      tx.timestamp,
+    ])
+  }
+}
+
 export type ComputeTradesRequest = {
   since?: Timestamp
 }
@@ -333,14 +436,16 @@ export async function computeTrades(
     await account.execute("DELETE FROM trade_transactions")
     await account.execute("DELETE FROM trade_pnl")
     await account.execute("DELETE FROM trades")
+    await setValue(accountName, "trade_seq", 0)
   }
 
   await progress([0, "Fetching audit logs"])
+  const orderQuery = await getAuditLogOrderQuery(true)
   const auditLogs = await getAuditLogs(
     accountName,
     since === 0
-      ? "SELECT * FROM audit_logs ORDER BY timestamp ASC, changeN ASC, id ASC"
-      : "SELECT * FROM audit_logs WHERE timestamp > ? ORDER BY timestamp ASC, changeN ASC, id ASC",
+      ? `SELECT * FROM audit_logs ${orderQuery}`
+      : `SELECT * FROM audit_logs WHERE timestamp > ? ${orderQuery}`,
     since === 0 ? undefined : [since]
   )
 
@@ -349,7 +454,7 @@ export async function computeTrades(
     return
   }
 
-  await progress([10, `Processing ${auditLogs.length} audit logs`])
+  await progress([2.5, `Processing ${auditLogs.length} audit logs`])
 
   const myAssets = await getMyAssets(accountName)
   const assetsMap: Record<string, MyAsset> = myAssets.reduce((acc, asset) => {
@@ -369,17 +474,22 @@ export async function computeTrades(
 
   const assetGroups: Record<string, AuditLog[]> = {}
 
+  let skippedAssets = 0
+
   for (const [key, logs] of Object.entries(allAssetGroups)) {
     if (!assetsMap[key] || !assetsMap[key].coingeckoId) {
-      await progress([undefined, `Skipped ${key}: No coingeckoId`])
+      skippedAssets++
     } else {
       assetGroups[key] = logs
     }
   }
 
-  await progress([20, `Found ${Object.keys(assetGroups).length} asset groups`])
+  await progress([
+    6,
+    `Found ${Object.keys(assetGroups).length} asset groups (skipped ${skippedAssets} unlisted assets)`,
+  ])
 
-  const trades: Trade[] =
+  const existingTrades: Trade[] =
     since === 0
       ? []
       : await getTrades(
@@ -387,116 +497,50 @@ export async function computeTrades(
           "SELECT * FROM trades WHERE tradeStatus = 'open' ORDER BY createdAt ASC"
         )
 
-  if (trades.length > 0) {
-    await progress([20, `Found ${trades.length} open trades`])
+  if (existingTrades.length > 0) {
+    await progress([6, `Found ${existingTrades.length} open trades`])
+
+    for (const trade of existingTrades) {
+      trade.deposits = trade.deposits.filter((x) => x[4] <= since)
+      trade.fees = trade.fees.filter((x) => x[4] <= since)
+      trade.proceeds = trade.proceeds.filter((x) => x[4] <= since)
+      trade.cost = trade.cost.filter((x) => x[5] <= since)
+      trade.amount = 0
+      trade.balance = 0
+      trade.deposits.forEach(([assetId, amount]) => {
+        if (assetId === trade.assetId)
+          trade.balance = new Big(trade.balance).plus(amount).toNumber()
+      })
+      trade.proceeds.forEach(([assetId, amount]) => {
+        if (assetId === trade.assetId)
+          trade.balance = new Big(trade.balance).plus(amount).toNumber()
+      })
+      trade.cost.forEach(([, , , exposure]) => {
+        trade.balance = new Big(trade.balance).plus(exposure).toNumber()
+      })
+      trade.fees.forEach(([assetId, amount]) => {
+        if (assetId === trade.assetId)
+          trade.balance = new Big(trade.balance).plus(amount).toNumber()
+      })
+      trade.amount = Big(trade.balance).abs().toNumber()
+    }
   }
 
+  const trades: Trade[] = []
   let processedGroups = 0
 
   const tradeAuditLogs: [string, string][] = []
   const tradeTransactions: [string, string][] = []
   let oldestClosedTrade = 0
 
-  async function processTransactionForTrade(
-    trade: Trade,
-    txId: string,
-    assetId: string,
-    log: AuditLog
-  ): Promise<void> {
-    const tx = await getTransaction(accountName, txId)
-    const priceMap = await getAssetPriceMap(accountName, tx.timestamp)
-
-    if (!tx) {
-      throw new Error(`Transaction with id ${txId} not found`)
-    }
-
-    // Deposits
-    if (
-      tx.incomingAsset &&
-      tx.incoming &&
-      tx.incomingAsset === assetId &&
-      log.operation === "Deposit"
-    ) {
-      const assetPrice = priceMap[tx.incomingAsset]?.value
-      if (!assetPrice && !isTestEnvironment)
-        throw new Error(`Price not found for asset ${tx.incomingAsset}`)
-      trade.deposits.push([
-        tx.incomingAsset,
-        tx.incoming,
-        assetPrice ? Big(assetPrice).mul(tx.incoming).toString() : "0",
-        txId,
-        tx.timestamp,
-      ])
-    }
-
-    // Withdrawals
-    if (
-      tx.outgoingAsset &&
-      tx.outgoing &&
-      tx.outgoingAsset === assetId &&
-      log.operation === "Withdraw"
-    ) {
-      const assetPrice = priceMap[tx.outgoingAsset]?.value
-      if (!assetPrice && !isTestEnvironment)
-        throw new Error(`Price not found for asset ${tx.outgoingAsset}`)
-      trade.deposits.push([
-        tx.outgoingAsset,
-        `-${tx.outgoing}`,
-        assetPrice ? Big(assetPrice).mul(`-${tx.outgoing}`).toString() : "0",
-        txId,
-        tx.timestamp,
-      ])
-    }
-
-    // Cost
-    if (tx.outgoingAsset && tx.outgoing && tx.incomingAsset === assetId) {
-      const assetPrice = priceMap[tx.outgoingAsset]?.value
-      if (!assetPrice && !isTestEnvironment)
-        throw new Error(`Price not found for asset ${tx.outgoingAsset}`)
-      trade.cost.push([
-        tx.outgoingAsset,
-        `-${tx.outgoing}`,
-        assetPrice ? Big(assetPrice).mul(`-${tx.outgoing}`).toString() : "0",
-        log.change,
-        txId,
-        tx.timestamp,
-      ])
-    }
-
-    // Proceeds
-    if (tx.incomingAsset && tx.incoming && tx.outgoingAsset === assetId) {
-      const assetPrice = priceMap[tx.incomingAsset]?.value
-      if (!assetPrice && !isTestEnvironment)
-        throw new Error(`Price not found for asset ${tx.incomingAsset}`)
-      trade.proceeds.push([
-        tx.incomingAsset,
-        tx.incoming,
-        assetPrice ? Big(assetPrice).mul(tx.incoming).toString() : "0",
-        txId,
-        tx.timestamp,
-      ])
-    }
-
-    // Fees
-    if (tx.feeAsset && tx.fee && tx.feeAsset === assetId) {
-      const assetPrice = priceMap[tx.feeAsset]?.value
-      if (!assetPrice && !isTestEnvironment)
-        throw new Error(`Price not found for asset ${tx.feeAsset}`)
-      trade.fees.push([
-        tx.feeAsset,
-        tx.fee,
-        assetPrice ? Big(assetPrice).mul(tx.fee).toString() : "0",
-        txId,
-        tx.timestamp,
-      ])
-    }
-
-    tradeTransactions.push([trade.id, tx.id])
-  }
-
   for (const [assetId, logs] of Object.entries(assetGroups)) {
     let currentTrade: Trade | null = null
     let balance = new Big(0)
+
+    if (existingTrades.length > 0) {
+      currentTrade = existingTrades.find((x) => x.assetId === assetId) ?? null
+      balance = new Big(currentTrade?.balance ?? 0)
+    }
 
     for (const log of logs) {
       const change = new Big(log.change)
@@ -517,7 +561,7 @@ export async function computeTrades(
           fees: [],
           id: tradeId,
           proceeds: [],
-          tradeNumber: 0,
+          tradeNumber: -1,
           tradeStatus: "open",
           tradeType,
         }
@@ -526,7 +570,14 @@ export async function computeTrades(
         if (log.txId) {
           tradeTransactions.push([tradeId, log.txId])
           // Track transactions for cost/proceeds/fees
-          await processTransactionForTrade(currentTrade, log.txId, assetId, log)
+          await processTransactionForTrade(
+            accountName,
+            currentTrade,
+            log.txId,
+            assetId,
+            log,
+            progress
+          )
         }
       }
       // If we have an active trade, update it
@@ -548,7 +599,14 @@ export async function computeTrades(
         if (log.txId) {
           tradeTransactions.push([currentTrade.id, log.txId])
           // Update cost, proceeds and fees if this is a transaction
-          await processTransactionForTrade(currentTrade, log.txId, assetId, log)
+          await processTransactionForTrade(
+            accountName,
+            currentTrade,
+            log.txId,
+            assetId,
+            log,
+            progress
+          )
         }
 
         // Check if we need to close the current trade and start a new one
@@ -582,7 +640,7 @@ export async function computeTrades(
               fees: [],
               id: newTradeId,
               proceeds: [],
-              tradeNumber: 0,
+              tradeNumber: -1,
               tradeStatus: "open",
               tradeType: newTradeType,
             }
@@ -603,20 +661,37 @@ export async function computeTrades(
 
     processedGroups++
     await progress([
-      20 + Math.floor((processedGroups / Object.keys(assetGroups).length) * 60),
-      `Processed ${processedGroups}/${Object.keys(assetGroups).length} asset groups`,
+      6 + Math.floor((processedGroups / Object.keys(assetGroups).length) * 19),
+      `Processed all trades for ${getAssetTicker(assetId)}`,
     ])
   }
+
+  // these are trades with no new audit logs
+  existingTrades.forEach((trade) => {
+    if (!trades.find((t) => t.id === trade.id)) {
+      trades.push(trade)
+    }
+  })
 
   // Save trades
   if (trades.length > 0) {
     trades.sort((a, b) => a.createdAt - b.createdAt)
-    trades.forEach((trade, index) => {
-      trade.tradeNumber = index + 1
+    const seq = await getValue(accountName, "trade_seq", 0)
+    const newTrades: Trade[] = []
+    for (const trade of trades) {
+      if (trade.tradeNumber === -1) {
+        newTrades.push(trade)
+      }
+    }
+    newTrades.forEach((trade, index) => {
+      trade.tradeNumber = seq + index + 1
     })
+    if (newTrades.length > 0) {
+      const latestTradeNumber = seq + newTrades.length
+      await setValue(accountName, "trade_seq", latestTradeNumber)
+    }
 
     await upsertTrades(accountName, trades)
-
     // Insert all trade-audit log relationships
     if (tradeAuditLogs.length > 0) {
       await account.executeMany(
@@ -636,11 +711,11 @@ export async function computeTrades(
 
   if (oldestClosedTrade > 0) {
     const newCursor = oldestClosedTrade
-    await progress([80, `Setting trades cursor to ${formatDate(newCursor)}`])
+    await progress([25, `Setting trades cursor to ${formatDate(newCursor)}`])
     await setValue(accountName, "tradesCursor", newCursor)
   }
 
-  await progress([80, "Trades computation completed"])
+  await progress([25, `Computed ${trades.length} trades`])
   await computePnl(accountName, progress, trades, since === 0 ? 0 : undefined)
 }
 
@@ -652,7 +727,7 @@ export function enqueueRefreshTrades(accountName: string, trigger: TaskTrigger) 
       await computeTrades(accountName, progress, undefined, signal)
     },
     name: "Refresh trades",
-    priority: TaskPriority.Medium,
+    priority: TaskPriority.Low,
     trigger,
   })
 }
@@ -665,7 +740,7 @@ export function enqueueRecomputeTrades(accountName: string, trigger: TaskTrigger
       await computeTrades(accountName, progress, { since: 0 }, signal)
     },
     name: "Recompute trades",
-    priority: TaskPriority.Medium,
+    priority: TaskPriority.Low,
     trigger,
   })
 }
@@ -825,7 +900,7 @@ export async function computePnl(
   }
 
   if (since !== 0) {
-    await progress([80, `Refreshing PnL starting ${formatDate(since)}`])
+    await progress([25, `Refreshing PnL starting ${formatDate(since)}`])
     await account.execute(
       "DELETE FROM trade_pnl WHERE trade_id IN (SELECT id FROM trades WHERE createdAt >= ?)",
       [since]
@@ -839,11 +914,12 @@ export async function computePnl(
     return
   }
 
-  await progress([82, `Processing ${trades.length} trades`])
+  await progress([30, `Computing PnL for ${trades.length} trades`])
 
   const tradePnls: TradePnL[] = []
   let processedTrades = 0
   let latestTimestamp = 0
+  const orderQuery = await getAuditLogOrderQuery()
 
   for (const trade of trades) {
     // Get daily prices for the asset during the trade period
@@ -883,7 +959,7 @@ export async function computePnl(
       // Find the latest audit log before or at this timestamp to get the balance
       const [latestLog] = await getAuditLogs(
         accountName,
-        "SELECT * FROM audit_logs WHERE timestamp <= ? AND assetId = ? ORDER BY timestamp DESC LIMIT 1",
+        `SELECT * FROM audit_logs WHERE timestamp <= ? AND assetId = ? ${orderQuery} LIMIT 1`,
         [bucketEnd, trade.assetId]
       )
 
@@ -933,10 +1009,12 @@ export async function computePnl(
 
     processedTrades++
     await progress([
-      82 + Math.floor((processedTrades / trades.length) * 16),
-      `Processed ${processedTrades}/${trades.length} trades`,
+      30 + Math.floor((processedTrades / trades.length) * 65),
+      `Processed trade #${trade.tradeNumber} (${trade.tradeType} ${trade.amount} ${getAssetTicker(trade.assetId)})`,
     ])
   }
+
+  await progress([95, `Saving ${tradePnls.length} records to disk`])
 
   if (tradePnls.length > 0) {
     await upsertTradePnls(accountName, tradePnls)

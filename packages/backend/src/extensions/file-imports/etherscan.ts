@@ -10,9 +10,11 @@ import { formatAddress, getAssetContract } from "src/utils/assets-utils"
 import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { asUTC } from "src/utils/formatting-utils"
 
+import { ETHEREUM_PLATFORM_ID } from "../utils/evm-utils"
+
 export const extensionId = "etherscan-file-import"
 export const parserId = "etherscan-default"
-export const platform = "ethereum" // FIXME TODO7: this should work for all EVM chains
+export const platformId = ETHEREUM_PLATFORM_ID // FIXME TODO7: this should work for all EVM chains
 
 export const HEADERS = [
   '"Txhash","Blockno","UnixTimestamp","DateTime (UTC)","From","To","ContractAddress","Value_IN(ETH)","Value_OUT(ETH)","CurrentValue","TxnFee(ETH)","TxnFee(USD)","Historical $Price/Eth","Status","ErrCode","Method"',
@@ -45,7 +47,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
     throw new Error(`Invalid timestamp: ${datetimeUtc}`)
   }
   const txId = `${fileImportId}_${txHash}_NORMAL_${index}`
-  const assetId = PLATFORMS_META[platform].nativeAssetId as string
+  const assetId = PLATFORMS_META[platformId].nativeAssetId as string
   const wallet = incoming === "0" ? from : to
   const hasError = status === "Error(0)" || undefined // TODO2 statuses like Error(1) means only some internal txns failed
   //
@@ -73,7 +75,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
         id: `${txId}_VALUE_0`,
         importIndex: index,
         operation,
-        platform,
+        platformId,
         timestamp,
         txId,
         wallet,
@@ -90,7 +92,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
           id: `${txId}_WETH_${index}`,
           importIndex: index + 0.1,
           operation: "Mint",
-          platform,
+          platformId,
           timestamp,
           txId,
           wallet,
@@ -112,7 +114,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       id: `${txId}_FEE_0`,
       importIndex: index + 0.1,
       operation: "Fee",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -135,7 +137,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
     },
     outgoing: hasError || outgoing === "0" ? undefined : outgoing,
     outgoingAsset: hasError || outgoing === "0" ? undefined : assetId,
-    platform,
+    platformId,
     // price,
     // role,
     timestamp,

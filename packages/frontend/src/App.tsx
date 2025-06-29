@@ -175,9 +175,12 @@ export default function App() {
         <>
           <Box
             sx={{
-              // TODO2 make this smaller
-              "@media (min-width: 1836px)": {
+              "@media (min-width: 990px)": {
                 display: "inline-flex",
+              },
+              "@media (min-width: 990px) and (max-width: 1836px)": {
+                minWidth: 96,
+                width: 96,
               },
               display: "none",
               minWidth: 300,
@@ -186,8 +189,11 @@ export default function App() {
           />
           <Paper
             sx={{
-              // xl + width
               "@media (min-width: 1836px)": {
+                maxWidth: 300,
+                minWidth: 300,
+              },
+              "@media (min-width: 990px)": {
                 display: "inline-flex",
               },
               borderBottom: 0,
@@ -198,22 +204,27 @@ export default function App() {
               display: "none",
               // height: "100%-25", // Notice bar
               height: "100%",
-              minWidth: 300,
+              maxWidth: 96,
+              minWidth: 96,
               position: "fixed",
               // top: 25, // Notice bar
             }}
             elevation={0}
           >
-            <MenuDrawerContents
-              open={true}
-              toggleOpen={noop}
-              appVer={APP_VERSION}
-              gitHash={GIT_HASH}
-            />
+            <MenuDrawerContents open toggleOpen={noop} appVer={APP_VERSION} gitHash={GIT_HASH} />
           </Paper>
         </>
       )}
-      <Box sx={{ flexBasis: "100%", width: "100%" }}>
+      <Box
+        sx={{
+          "@media (min-width: 990px) and (max-width: 1836px)": {
+            flexBasis: "calc(100% - 96px)",
+            width: "calc(100% - 96px)",
+          },
+          flexBasis: "100%",
+          width: "100%",
+        }}
+      >
         {/* TODO0 */}
         {/* <Box
           sx={{

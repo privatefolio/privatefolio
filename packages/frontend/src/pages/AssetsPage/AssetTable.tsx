@@ -4,8 +4,8 @@ import React, { useEffect, useMemo, useState } from "react"
 import { AttentionBlock } from "src/components/AttentionBlock"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
 import { AssetWithPrice, ChartData } from "src/interfaces"
-import { $hideUnlisted } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
+import { $hideUnlisted } from "src/stores/device-settings-store"
 import { $assetMap, $inMemoryDataQueryTime } from "src/stores/metadata-store"
 import { getAssetPlatform } from "src/utils/assets-utils"
 import { HeadCell } from "src/utils/table-utils"
@@ -15,7 +15,7 @@ import { AssetTableRow } from "./AssetTableRow"
 
 export function AssetTable() {
   const assetMap = useStore($assetMap)
-  const queryTime = useStore($inMemoryDataQueryTime)
+  const inMemoryDataQueryTime = useStore($inMemoryDataQueryTime)
 
   const [priceMap, setPriceMap] = useState<Record<string, ChartData> | null>(null)
 
@@ -29,16 +29,40 @@ export function AssetTable() {
   }, [accountName, rpc])
 
   // const rows = useMemo(() => Object.values(assetMap), [assetMap])
-  const rows: AssetWithPrice[] = useMemo(
-    () =>
-      queryTime === null
-        ? []
-        : Object.values(assetMap).map((x) => ({
-            ...x,
-            price: priceMap ? priceMap[x.id] : null,
-          })),
-    [queryTime, assetMap, priceMap]
-  )
+  const rows: AssetWithPrice[] = useMemo(() => {
+    if (inMemoryDataQueryTime === null) return []
+
+    const all = Object.values(assetMap).map((x) => ({
+      ...x,
+      price: priceMap ? priceMap[x.id] : null,
+    }))
+
+    // sort by market cap rank asc, then price desc then symbol asc
+    all.sort((a, b) => {
+      // Primary sort: market cap rank ascending (nulls/undefined last)
+      const aRank = a.marketCapRank ?? null
+      const bRank = b.marketCapRank ?? null
+      if (aRank !== bRank) {
+        if (aRank === null) return 1
+        if (bRank === null) return -1
+        return aRank - bRank
+      }
+
+      // Secondary sort: price descending (nulls last)
+      // const aPrice = a.price?.value ?? null
+      // const bPrice = b.price?.value ?? null
+      // if (aPrice !== bPrice) {
+      //   if (aPrice === null) return 1
+      //   if (bPrice === null) return -1
+      //   return bPrice - aPrice // descending
+      // }
+
+      // Tertiary sort: symbol ascending
+      return a.symbol.localeCompare(b.symbol)
+    })
+
+    return all
+  }, [inMemoryDataQueryTime, assetMap, priceMap])
 
   const hideUnlisted = useStore($hideUnlisted)
 
@@ -59,28 +83,35 @@ export function AssetTable() {
         key: "name",
         label: "Name",
         sortable: true,
-        sx: { maxWidth: 350, minWidth: 140, width: "100%" },
+        sx: { maxWidth: 350, minWidth: 140, width: "50%" },
       },
       {
         key: "platform" as keyof AssetWithPrice,
         label: "Platform",
         sortable: true,
-        sx: { maxWidth: 200, minWidth: 200, width: 200 },
+        sx: { width: "50%" },
         valueSelector: (row: AssetWithPrice) => getAssetPlatform(row.id),
       },
       {
         key: "priceApiId",
         label: "Price API",
         sortable: true,
-        sx: { maxWidth: 200, minWidth: 200, width: 200 },
+        sx: { maxWidth: 180, minWidth: 180, width: 180 },
       },
       {
         key: "price",
         label: "Price",
         numeric: true,
-        sortable: true,
-        sx: { maxWidth: 200, minWidth: 200, width: 200 },
+        // sortable: true,
+        sx: { maxWidth: 150, minWidth: 150, width: 150 },
         valueSelector: (row: AssetWithPrice) => row.price?.value,
+      },
+      {
+        key: "marketCapRank",
+        label: "Mcap rank",
+        numeric: true,
+        sortable: true,
+        sx: { maxWidth: 130, minWidth: 130, width: 130 },
       },
     ],
     []
@@ -91,13 +122,13 @@ export function AssetTable() {
   return (
     <>
       <MemoryTable<AssetWithPrice>
-        initOrderBy="symbol"
+        initOrderBy="marketCapRank"
         initOrderDir="asc"
         headCells={headCells}
         TableRowComponent={AssetTableRow}
         rows={filteredRows}
         rowCount={rows.length}
-        queryTime={queryTime}
+        queryTime={inMemoryDataQueryTime}
         defaultRowsPerPage={10}
         extraRow={
           !!hiddenAssets && (

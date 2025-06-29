@@ -1,4 +1,4 @@
-import { Add } from "@mui/icons-material"
+import { Add, InfoOutlined } from "@mui/icons-material"
 import { Button } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { throttle } from "lodash-es"
@@ -6,6 +6,7 @@ import React, { MutableRefObject, useCallback, useEffect, useMemo, useState } fr
 import { AttentionBlock } from "src/components/AttentionBlock"
 import { SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
+import { $hideSpam } from "src/stores/device-settings-store"
 import { $inspectTime } from "src/stores/pages/balances-store"
 import { closeSubscription } from "src/utils/browser-utils"
 import { ONE_DAY } from "src/utils/formatting-utils"
@@ -34,6 +35,8 @@ export function TransactionTable(props: TransactionsTableProps) {
   const [refresh, setRefresh] = useState(0)
   const connectionStatus = useStore($connectionStatus)
   const rpc = useStore($rpc)
+  const hideSpam = useStore($hideSpam)
+  const [hiddenCount, setHiddenCount] = useState<number>(0)
   const inspectTime = useStore($inspectTime)
 
   useEffect(() => {
@@ -62,6 +65,7 @@ export function TransactionTable(props: TransactionsTableProps) {
       const filterConditions: string[] = []
       let tagJoin = ""
       let tradeJoin = ""
+      let spamExcludeJoin = ""
 
       // Add existing filters to the conditions array
       Object.keys(filters).forEach((key) => {
@@ -97,6 +101,13 @@ export function TransactionTable(props: TransactionsTableProps) {
         filterConditions.push(`timestamp >= ${inspectTime}`)
       }
 
+      // Hide spam transactions if the setting is enabled
+      if (hideSpam) {
+        spamExcludeJoin =
+          "LEFT JOIN transaction_tags spam_tags ON transactions.id = spam_tags.transaction_id LEFT JOIN tags spam_tag_names ON spam_tags.tag_id = spam_tag_names.id AND spam_tag_names.name = 'spam'"
+        filterConditions.push(`spam_tag_names.id IS NULL`)
+      }
+
       // Construct the filterQuery
       let filterQuery = ""
       if (filterConditions.length > 0) {
@@ -106,7 +117,7 @@ export function TransactionTable(props: TransactionsTableProps) {
       const orderQuery = `ORDER BY timestamp ${order}`
       const limitQuery = `LIMIT ${rowsPerPage} OFFSET ${page * rowsPerPage}`
 
-      const query = `SELECT transactions.* FROM transactions ${tagJoin} ${tradeJoin} ${filterQuery} ${orderQuery} ${limitQuery}`
+      const query = `SELECT transactions.* FROM transactions ${tagJoin} ${tradeJoin} ${spamExcludeJoin} ${filterQuery} ${orderQuery} ${limitQuery}`
 
       const transactions = await rpc.getTransactions(accountName, query)
 
@@ -115,16 +126,28 @@ export function TransactionTable(props: TransactionsTableProps) {
         tableDataRef.current = transactions
       }
 
-      return [
-        transactions,
-        () =>
-          rpc.countTransactions(
-            accountName,
-            `SELECT COUNT (*) FROM transactions ${tagJoin} ${tradeJoin} ${filterQuery}`
-          ),
-      ]
+      const visibleCountQuery = `SELECT COUNT (*) FROM transactions ${tagJoin} ${tradeJoin} ${spamExcludeJoin} ${filterQuery}`
+
+      const getVisibleCount = () => rpc.countTransactions(accountName, visibleCountQuery)
+
+      if (hideSpam) {
+        const totalFilterConditions = filterConditions.filter(
+          (condition) => !condition.includes("spam_tag_names.id IS NULL")
+        )
+        const totalFilterQuery =
+          totalFilterConditions.length > 0 ? "WHERE " + totalFilterConditions.join(" AND ") : ""
+        const totalCountQuery = `SELECT COUNT (*) FROM transactions ${tagJoin} ${tradeJoin} ${totalFilterQuery}`
+
+        const visibleCount = await getVisibleCount()
+        const totalCount = await rpc.countTransactions(accountName, totalCountQuery)
+        setHiddenCount(totalCount - visibleCount)
+      } else {
+        setHiddenCount(0)
+      }
+
+      return [transactions, getVisibleCount]
     },
-    [accountName, assetId, refresh, tableDataRef, rpc, tradeId, inspectTime]
+    [accountName, assetId, refresh, tableDataRef, rpc, tradeId, inspectTime, hideSpam]
   )
 
   const headCells = useMemo<HeadCell<Transaction>[]>(
@@ -137,8 +160,8 @@ export function TransactionTable(props: TransactionsTableProps) {
       },
       {
         filterable: true,
-        key: "platform",
-        sx: { maxWidth: 0, minWidth: 0, width: 0 },
+        key: "platformId",
+        sx: { maxWidth: 40, minWidth: 40, width: 40 },
       },
       {
         filterable: true,
@@ -227,6 +250,14 @@ export function TransactionTable(props: TransactionsTableProps) {
               <span>
                 Click to <u>add a new transaction</u>.
               </span>
+            </AttentionBlock>
+          )
+        }
+        extraRow={
+          !!hiddenCount && (
+            <AttentionBlock>
+              <InfoOutlined sx={{ height: 20, width: 20 }} />
+              <span>{hiddenCount} spam transactions hidden…</span>
             </AttentionBlock>
           )
         }

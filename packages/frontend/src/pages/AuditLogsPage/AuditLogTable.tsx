@@ -1,8 +1,11 @@
+import { InfoOutlined } from "@mui/icons-material"
 import { useStore } from "@nanostores/react"
 import { throttle } from "lodash-es"
 import React, { MutableRefObject, useCallback, useEffect, useMemo, useState } from "react"
+import { AttentionBlock } from "src/components/AttentionBlock"
 import { SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
+import { $hideSpam } from "src/stores/device-settings-store"
 import { closeSubscription } from "src/utils/browser-utils"
 
 import {
@@ -28,6 +31,8 @@ export function AuditLogTable(props: AuditLogsTableProps) {
   const [refresh, setRefresh] = useState(0)
   const connectionStatus = useStore($connectionStatus)
   const rpc = useStore($rpc)
+  const hideSpam = useStore($hideSpam)
+  const [hiddenCount, setHiddenCount] = useState<number>(0)
 
   useEffect(() => {
     const subscription = rpc.subscribeToAuditLogs(
@@ -55,6 +60,7 @@ export function AuditLogTable(props: AuditLogsTableProps) {
       const filterConditions: string[] = []
       let tagJoin = ""
       let tradeJoin = ""
+      let spamExcludeJoin = ""
 
       // Add existing filters to the conditions array
       for (const key of Object.keys(filters)) {
@@ -81,16 +87,23 @@ export function AuditLogTable(props: AuditLogsTableProps) {
         tradeJoin = "INNER JOIN trade_audit_logs ON audit_logs.id = trade_audit_logs.audit_log_id"
       }
 
+      // Hide spam transactions if the setting is enabled
+      if (hideSpam) {
+        spamExcludeJoin =
+          "LEFT JOIN audit_log_tags spam_tags ON audit_logs.id = spam_tags.audit_log_id LEFT JOIN tags spam_tag_names ON spam_tags.tag_id = spam_tag_names.id AND spam_tag_names.name = 'spam'"
+        filterConditions.push(`spam_tag_names.id IS NULL`)
+      }
+
       // Construct the filterQuery
       let filterQuery = ""
       if (filterConditions.length > 0) {
         filterQuery = "WHERE " + filterConditions.join(" AND ")
       }
 
-      const orderQuery = `ORDER BY timestamp ${order}`
+      const orderQuery = await rpc.getAuditLogOrderQuery(order === "asc")
       const limitQuery = `LIMIT ${rowsPerPage} OFFSET ${page * rowsPerPage}`
 
-      const query = `SELECT audit_logs.* FROM audit_logs ${tagJoin} ${tradeJoin} ${filterQuery} ${orderQuery} ${limitQuery}`
+      const query = `SELECT audit_logs.* FROM audit_logs ${tagJoin} ${tradeJoin} ${spamExcludeJoin} ${filterQuery} ${orderQuery} ${limitQuery}`
       const auditLogs = await rpc.getAuditLogs(accountName, query)
 
       if (signal?.aborted) throw new Error(signal.reason)
@@ -98,16 +111,28 @@ export function AuditLogTable(props: AuditLogsTableProps) {
         tableDataRef.current = auditLogs
       }
 
-      return [
-        auditLogs,
-        () =>
-          rpc.countAuditLogs(
-            accountName,
-            `SELECT COUNT (*) FROM audit_logs ${tagJoin} ${tradeJoin} ${filterQuery}`
-          ),
-      ]
+      const visibleCountQuery = `SELECT COUNT (*) FROM audit_logs ${tagJoin} ${tradeJoin} ${spamExcludeJoin} ${filterQuery}`
+
+      const getVisibleCount = () => rpc.countAuditLogs(accountName, visibleCountQuery)
+
+      if (hideSpam) {
+        const totalFilterConditions = filterConditions.filter(
+          (condition) => !condition.includes("spam_tag_names.id IS NULL")
+        )
+        const totalFilterQuery =
+          totalFilterConditions.length > 0 ? "WHERE " + totalFilterConditions.join(" AND ") : ""
+        const totalCountQuery = `SELECT COUNT (*) FROM audit_logs ${tagJoin} ${tradeJoin} ${totalFilterQuery}`
+
+        const visibleCount = await getVisibleCount()
+        const totalCount = await rpc.countAuditLogs(accountName, totalCountQuery)
+        setHiddenCount(totalCount - visibleCount)
+      } else {
+        setHiddenCount(0)
+      }
+
+      return [auditLogs, getVisibleCount]
     },
-    [rpc, accountName, assetId, tableDataRef, refresh, tradeId]
+    [rpc, accountName, assetId, tableDataRef, refresh, tradeId, hideSpam]
   )
 
   const headCells = useMemo<HeadCell<AuditLog>[]>(
@@ -120,8 +145,8 @@ export function AuditLogTable(props: AuditLogsTableProps) {
       },
       {
         filterable: true,
-        key: "platform",
-        sx: { maxWidth: 0, minWidth: 0, width: 0 },
+        key: "platformId",
+        sx: { maxWidth: 40, minWidth: 40, width: 40 },
       },
       {
         filterable: true,
@@ -148,17 +173,21 @@ export function AuditLogTable(props: AuditLogsTableProps) {
         sx: { maxWidth: 140, minWidth: 140, width: 140 },
       },
       {
-        key: "balance",
-        label: "New balance",
+        label: "Wallet balance",
         numeric: true,
         sx: { width: "50%" },
       },
       {
-        filterable: true,
-        key: "tags",
-        label: "Tags",
-        sx: { maxWidth: 120, minWidth: 120, width: 120 },
+        label: "Account balance",
+        numeric: true,
+        sx: { width: "50%" },
       },
+      // {
+      //   filterable: true,
+      //   key: "tags",
+      //   label: "Tags",
+      //   sx: { maxWidth: 120, minWidth: 120, width: 120 },
+      // },
       {
         sx: { maxWidth: 60, minWidth: 60, width: 60 },
       },
@@ -188,6 +217,14 @@ export function AuditLogTable(props: AuditLogsTableProps) {
         headCells={headCells}
         queryFn={queryFn}
         TableRowComponent={AuditLogTableRow}
+        extraRow={
+          !!hiddenCount && (
+            <AttentionBlock>
+              <InfoOutlined sx={{ height: 20, width: 20 }} />
+              <span>{hiddenCount} spam audit logs hidden…</span>
+            </AttentionBlock>
+          )
+        }
         {...rest}
       />
     </>

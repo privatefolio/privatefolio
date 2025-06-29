@@ -3,19 +3,21 @@ import { Button, Drawer, DrawerProps, Skeleton, Stack, TextField } from "@mui/ma
 import { useStore } from "@nanostores/react"
 import Big from "big.js"
 import { debounce } from "lodash-es"
+import { enqueueSnackbar } from "notistack"
 import React, { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AmountBlock } from "src/components/AmountBlock"
-import { AppLink } from "src/components/AppLink"
+import { AssetBlock } from "src/components/AssetBlock"
 import { DrawerHeader } from "src/components/DrawerHeader"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
-import { MyAssetBlock } from "src/components/MyAssetBlock"
+import { LoadingButton } from "src/components/LoadingButton"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TagManager } from "src/components/TagManager"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { ValueChip } from "src/components/ValueChip"
+import { useConfirm } from "src/hooks/useConfirm"
 import { ChartData, EtherscanMetadata, Tag, Transaction } from "src/interfaces"
 import { DEFAULT_DEBOUNCE_DURATION, getBlockExplorerName, getBlockExplorerUrl } from "src/settings"
 import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
@@ -48,7 +50,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
     incomingAsset,
     type,
     timestamp,
-    platform,
+    platformId,
     wallet,
     price,
     outgoing,
@@ -68,6 +70,8 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
   const [isPriceInverted, setIsPriceInverted] = useState(false)
+  const [loadingRemove, setLoadingRemove] = useState(false)
+  const confirm = useConfirm()
 
   useEffect(() => {
     if (!open) return
@@ -125,7 +129,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
         </div>
         <div>
           <SectionTitle>Platform</SectionTitle>
-          <PlatformBlock id={platform} />
+          <PlatformBlock id={platformId} />
         </div>
         <div>
           <SectionTitle>Wallet</SectionTitle>
@@ -145,14 +149,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
                 showSign
                 currencyTicker={getAssetTicker(incomingAsset)}
               />
-              <Button
-                size="small"
-                component={AppLink}
-                to={`../asset/${encodeURI(incomingAsset)}`}
-                sx={{ padding: 1 }}
-              >
-                <MyAssetBlock id={incomingAsset} size="small" />
-              </Button>
+              <AssetBlock id={incomingAsset} variant="button" />
               <ValueChip
                 value={
                   priceMap && incoming && priceMap[incomingAsset]?.value
@@ -173,14 +170,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
                 showSign
                 currencyTicker={getAssetTicker(outgoingAsset)}
               />
-              <Button
-                size="small"
-                component={AppLink}
-                to={`../asset/${encodeURI(outgoingAsset)}`}
-                sx={{ padding: 1 }}
-              >
-                <MyAssetBlock id={outgoingAsset} size="small" />
-              </Button>
+              <AssetBlock id={outgoingAsset} variant="button" />
               <ValueChip
                 value={
                   priceMap && outgoing && priceMap[outgoingAsset]?.value
@@ -201,14 +191,7 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
                 showSign
                 currencyTicker={getAssetTicker(feeAsset)}
               />
-              <Button
-                size="small"
-                component={AppLink}
-                to={`../asset/${encodeURI(feeAsset)}`}
-                sx={{ padding: 1 }}
-              >
-                <MyAssetBlock id={feeAsset} size="small" />
-              </Button>
+              <AssetBlock id={feeAsset} variant="button" />
               <ValueChip
                 value={
                   priceMap && fee && priceMap[feeAsset]?.value
@@ -245,8 +228,8 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
             <SectionTitle>Smart Contract</SectionTitle>
             <IdentifierBlock
               id={contractAddress}
-              href={getBlockExplorerUrl(platform, contractAddress, "address")}
-              linkText={`See on ${getBlockExplorerName(platform)}`}
+              href={getBlockExplorerUrl(platformId, contractAddress, "address")}
+              linkText={`See on ${getBlockExplorerName(platformId)}`}
             />
           </div>
         )}
@@ -262,8 +245,8 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
             <IdentifierBlock
               label={txHash}
               id={txHash}
-              href={getBlockExplorerUrl(platform, txHash, "tx")}
-              linkText={`See on ${getBlockExplorerName(platform)}`}
+              href={getBlockExplorerUrl(platformId, txHash, "tx")}
+              linkText={`See on ${getBlockExplorerName(platformId)}`}
             />
           </div>
         )}
@@ -306,6 +289,44 @@ export function TransactionDrawer(props: TransactionDrawerProps) {
             fullWidth
             placeholder="Write a custom note…"
           />
+        </div>
+        <div>
+          <SectionTitle>Actions</SectionTitle>
+          <LoadingButton
+            loading={loadingRemove}
+            loadingText="Removing…"
+            tooltip="This will remove the transaction and its audit logs"
+            size="small"
+            variant="outlined"
+            color="error"
+            onClick={async () => {
+              const { confirmed } = await confirm({
+                confirmText: "Remove",
+                content: (
+                  <>
+                    This transaction and all its audit logs will be deleted.
+                    <br /> This action is permanent. Are you sure you wish to continue?
+                  </>
+                ),
+                title: "Remove transaction",
+                variant: "warning",
+              })
+
+              if (!confirmed) return
+              setLoadingRemove(true)
+              rpc.enqueueDeleteTransaction(activeAccount, "user", id, (error) => {
+                setLoadingRemove(false)
+                if (error) {
+                  enqueueSnackbar(`Transaction removal failed: ${error}`, { variant: "error" })
+                } else {
+                  enqueueSnackbar("Transaction removed", { variant: "success" })
+                  toggleOpen()
+                }
+              })
+            }}
+          >
+            Remove transaction
+          </LoadingButton>
         </div>
       </Stack>
     </Drawer>

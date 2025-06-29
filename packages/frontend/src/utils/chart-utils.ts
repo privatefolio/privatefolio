@@ -6,7 +6,7 @@ import {
   Time,
 } from "lightweight-charts"
 import { ChartData } from "src/interfaces"
-import { Currency } from "src/stores/account-settings-store"
+import { Currency } from "src/stores/device-settings-store"
 
 import { TooltipPrimitiveOptions } from "../lightweight-charts/plugins/tooltip/tooltip"
 import { formatNumber } from "./formatting-utils"

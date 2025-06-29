@@ -25,7 +25,6 @@
     "@feathersjs/rest-client": "^5.0.31",
     "@million/lint": "^1.0.14",
     "@mui/icons-material": "^5.11.16",
-    "@mui/lab": "^5.0.0-alpha.157",
     "@mui/material": "^5.15.1",
     "@mui/x-date-pickers": "^7.6.2",
     "@nanostores/logger": "^0.2.4",

@@ -37,11 +37,10 @@ describe("should import 0xb6e via connection", () => {
     connection = await upsertConnection(accountName, {
       address,
       extensionId: "etherscan-connection",
-      label: "",
-      platform: "arbitrum-one",
+      platformId: "chain.arbitrum-one",
     })
     // assert
-    expect(connection.id).toMatchInlineSnapshot(`"3583443605"`)
+    expect(connection.id).toMatchInlineSnapshot(`"1080536866"`)
   })
 
   it.sequential("should sync connection", async () => {
@@ -108,23 +107,50 @@ describe("should import 0xb6e via connection", () => {
     // assert
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Fetching audit logs
-      10,Processing 166 audit logs
-      ,Skipped arbitrum-one:0xfAf87e196A29969094bE35DfB0Ab9d0b8518dB84:ACHIVX: No coingeckoId
-      ,Skipped arbitrum-one:0xdf109e2b175038c66e074BfEacF37D7b0f3e426c:MaticSlot: No coingeckoId
-      20,Found 4 asset groups
-      35,Processed 1/4 asset groups
-      50,Processed 2/4 asset groups
-      65,Processed 3/4 asset groups
-      80,Processed 4/4 asset groups
-      80,Setting trades cursor to Nov 26, 2024
-      80,Trades computation completed
-      82,Processing 6 trades
-      84,Processed 1/6 trades
-      87,Processed 2/6 trades
-      90,Processed 3/6 trades
-      92,Processed 4/6 trades
-      95,Processed 5/6 trades
-      98,Processed 6/6 trades
+      2.5,Processing 166 audit logs
+      6,Found 4 asset groups (skipped 2 unlisted assets)
+      10,Processed all trades for ETH
+      15,Processed all trades for ARB
+      20,Processed all trades for USDC
+      25,Processed all trades for USDGLO
+      25,Setting trades cursor to Nov 26, 2024
+      25,Computed 6 trades
+      30,Computing PnL for 6 trades
+      40,Processed trade #1 (Long 0.05579850139 ETH)
+      51,Processed trade #2 (Long 1861.1648677664375 ARB)
+      62,Processed trade #3 (Long 487.130424 USDC)
+      73,Processed trade #4 (Long 807.641687 USDC)
+      84,Processed trade #5 (Long 14.717481 USDC)
+      95,Processed trade #6 (Long 2.01 USDGLO)
+      95,Saving 1224 records to disk
+      98,Setting profit & loss cursor to Jun 14, 2025
+      100,PnL computation completed"
+    `)
+  })
+
+  it.sequential("should refresh trades", async () => {
+    // act
+    const updates: ProgressUpdate[] = []
+    await computeTrades(accountName, async (state) => updates.push(state))
+    // assert
+    expect(updates.join("\n")).toMatchInlineSnapshot(`
+      "0,Refreshing trades starting Nov 26, 2024
+      0,Fetching audit logs
+      2.5,Processing 32 audit logs
+      6,Found 4 asset groups (skipped 1 unlisted assets)
+      6,Found 4 open trades
+      10,Processed all trades for ETH
+      15,Processed all trades for ARB
+      20,Processed all trades for USDC
+      25,Processed all trades for USDGLO
+      25,Computed 4 trades
+      25,Refreshing PnL starting Jun 14, 2025
+      30,Computing PnL for 4 trades
+      46,Processed trade #1 (Long 0.05579850139 ETH)
+      62,Processed trade #2 (Long 1861.1648677664375 ARB)
+      78,Processed trade #5 (Long 14.717481 USDC)
+      95,Processed trade #6 (Long 2.01 USDGLO)
+      95,Saving 1023 records to disk
       98,Setting profit & loss cursor to Jun 14, 2025
       100,PnL computation completed"
     `)
@@ -182,6 +208,8 @@ describe("should import 0xb6e via connection", () => {
     //
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Removing 166 audit logs
+      25,Setting balances cursor to Mar 03, 2024
+      25,Setting networth cursor to Mar 03, 2024
       50,Removing 162 transactions"
     `)
     expect(remainingAuditLogs).toMatchInlineSnapshot(`0`)

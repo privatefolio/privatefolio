@@ -10,7 +10,7 @@ import {
   TaskCompletionCallback,
   TaskStatus,
 } from "src/interfaces"
-import { TASK_LOGS_LOCATION } from "src/settings/settings"
+import { TASK_LOG_CHAR_LIMIT, TASK_LOG_LINE_LIMIT, TASK_LOGS_LOCATION } from "src/settings/settings"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { getPrefix, isTestEnvironment, sleep } from "src/utils/utils"
@@ -132,7 +132,7 @@ function createProgressCallback(account: Account, taskId: number): ProgressCallb
 
   return async (update: ProgressUpdate) => {
     try {
-      if (entryCount >= 200) return
+      if (entryCount >= TASK_LOG_LINE_LIMIT) return
       if (isTestEnvironment) return
 
       const logEntry = `${new Date().toISOString()} ${JSON.stringify(update)}\n`
@@ -185,7 +185,7 @@ async function processQueue(accountName: string) {
 
         await patchServerTask(accountName, task.id, {
           startedAt: startTime,
-          status: "running",
+          status: TaskStatus.Running,
         })
 
         try {
@@ -201,12 +201,12 @@ async function processQueue(accountName: string) {
             })(),
           ])
         } catch (error) {
-          // console.error("Error processing task:", error)
+          console.error(getPrefix(accountName), "Error processing task:", error)
           errorMessage = String(error)
         } finally {
-          let status: TaskStatus = "completed"
-          if (errorMessage) status = "failed"
-          if (errorMessage && task.abortController.signal.aborted) status = "aborted"
+          let status: TaskStatus = TaskStatus.Completed
+          if (errorMessage) status = TaskStatus.Failed
+          if (errorMessage && task.abortController.signal.aborted) status = TaskStatus.Aborted
           if (task.abortController.signal.reason !== "reset") {
             const completedAt = Date.now()
 
@@ -220,7 +220,7 @@ async function processQueue(accountName: string) {
             account.pendingTask = undefined
           }
           if (task.onCompletion) {
-            task.onCompletion(errorMessage ? new Error(errorMessage) : undefined)
+            task.onCompletion(errorMessage || undefined)
           }
         }
       }
@@ -254,7 +254,7 @@ async function ensureTaskQueue(accountName: string) {
     for (const task of tasks) {
       await patchServerTask(accountName, task.id, {
         errorMessage: "Server restarted.",
-        status: task.status === "running" ? "aborted" : "cancelled",
+        status: task.status === TaskStatus.Running ? TaskStatus.Aborted : TaskStatus.Cancelled,
       })
     }
   }
@@ -272,7 +272,7 @@ export async function enqueueTask(
   if (existing) return existing.id
 
   const createdAt = Date.now()
-  const status = "queued"
+  const status = TaskStatus.Queued
 
   const { id } = await upsertServerTask(accountName, { ...task, createdAt, status })
   taskQueue.push({ ...task, createdAt, id, status })
@@ -295,7 +295,7 @@ export async function cancelTask(accountName: string, taskId: number) {
     account.taskQueue = account.taskQueue.filter((x) => x.id !== taskId)
     await patchServerTask(accountName, taskId, {
       errorMessage: "Task cancelled by user.",
-      status: "cancelled",
+      status: TaskStatus.Cancelled,
     })
   } else {
     throw new Error(`Task with id ${taskId} not found.`)
@@ -312,8 +312,8 @@ export async function getServerTaskLog(accountName: string, taskId: number) {
   try {
     await access(logFilePath)
     const lines = await readFile(logFilePath, "utf-8")
-    if (lines.length > 10_000) {
-      return lines.slice(0, 10_000)
+    if (lines.length > TASK_LOG_CHAR_LIMIT) {
+      return lines.slice(0, TASK_LOG_CHAR_LIMIT)
     } else {
       return lines
     }

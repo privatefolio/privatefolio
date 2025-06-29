@@ -12,6 +12,10 @@ export type AmountBlockProps = TypographyProps & {
   colorized?: boolean
   currencySymbol?: string
   currencyTicker?: string
+  /**
+   * @default false
+   */
+  hideTooltip?: boolean
   maxDigits?: number
   placeholder?: string
   showSign?: boolean
@@ -34,6 +38,7 @@ export function AmountBlock(props: AmountBlockProps) {
     showTicker,
     showSign,
     maxDigits,
+    hideTooltip = false,
     ...rest
   } = props
 
@@ -89,7 +94,7 @@ export function AmountBlock(props: AmountBlockProps) {
   return (
     <Tooltip
       title={
-        typeof amountN === "number" ? (
+        hideTooltip ? null : typeof amountN === "number" ? (
           <Stack alignItems="center">
             <Box sx={{ fontFamily: MonoFont }}>
               {fullValue} {currencyTicker}

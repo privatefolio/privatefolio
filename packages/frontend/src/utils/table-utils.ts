@@ -14,7 +14,6 @@ export type ValueSelector<T> = (row: T) => string | number | undefined
 export interface HeadCell<T extends BaseType> {
   filterable?: boolean
   hidden?: boolean
-  hideLabel?: boolean
   key?: keyof T
   label?: ReactNode
   numeric?: boolean

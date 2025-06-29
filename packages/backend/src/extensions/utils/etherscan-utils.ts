@@ -3,6 +3,7 @@ import spamTokens from "src/config/spam-tokens.json"
 import { EtherscanTransaction, Transaction } from "src/interfaces"
 
 import { trimTxId } from "../../utils/test-utils"
+import { ETHEREUM_PLATFORM_ID } from "./evm-utils"
 
 function toTitleCase(text: string): string {
   return (
@@ -46,13 +47,13 @@ function validTransactionGrouping(transactions: EtherscanTransaction[]) {
 }
 
 export function sortTransactions(
-  a: Pick<Transaction, "timestamp" | "platform" | "id">,
-  b: Pick<Transaction, "timestamp" | "platform" | "id">
+  a: Pick<Transaction, "timestamp" | "platformId" | "id">,
+  b: Pick<Transaction, "timestamp" | "platformId" | "id">
 ) {
   const delta = b.timestamp - a.timestamp
 
-  if (delta === 0 && a.platform === "ethereum") {
-    return trimTxId(a.id, a.platform).localeCompare(trimTxId(b.id, b.platform))
+  if (delta === 0 && a.platformId === ETHEREUM_PLATFORM_ID) {
+    return trimTxId(a.id, a.platformId).localeCompare(trimTxId(b.id, b.platformId))
   }
 
   return delta

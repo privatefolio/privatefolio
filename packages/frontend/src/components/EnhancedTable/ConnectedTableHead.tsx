@@ -47,7 +47,7 @@ export function ConnectedTableHead<T extends BaseType>(props: ConnectedTableHead
     activeFilters,
     setFilterKey,
   } = props
-  const { key, numeric, label, hideLabel, filterable, sortable, timestamp } = headCell
+  const { key, numeric, label, filterable, sortable, timestamp } = headCell
 
   const { value: open, toggle: toggleOpen } = useBoolean(false)
 
@@ -146,7 +146,7 @@ export function ConnectedTableHead<T extends BaseType>(props: ConnectedTableHead
             ) : null}
           </TableSortLabel>
         ) : (
-          <>{hideLabel ? "" : label}</>
+          <>{label}</>
         )}
       </Stack>
     </>

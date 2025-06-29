@@ -20,7 +20,7 @@ import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { CoingeckoMetadataFull } from "src/interfaces"
-import { getBlockExplorerUrl } from "src/settings"
+import { getBlockExplorerUrl, PlatformPrefix } from "src/settings"
 import { formatWebsiteLink, noop } from "src/utils/utils"
 
 type AssetDetailsProps = {
@@ -229,11 +229,13 @@ export function AssetDetails(props: AssetDetailsProps) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {Object.entries(metadata.detail_platforms).map(([platformId, details]) => {
+              {Object.entries(metadata.detail_platforms).map(([coingeckoId, details]) => {
                 if (!details.contract_address) return null
 
+                const platformId = `${PlatformPrefix.Chain}${coingeckoId}`
+
                 return (
-                  <TableRow key={platformId}>
+                  <TableRow key={coingeckoId}>
                     <TableCell>
                       <PlatformBlock id={platformId} size="small" />
                     </TableCell>

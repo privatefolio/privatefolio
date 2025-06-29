@@ -1,11 +1,12 @@
 import Big from "big.js"
 import { AuditLog, AuditLogOperation, ParserResult, Transaction } from "src/interfaces"
+import { PlatformPrefix } from "src/settings/settings"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
 
 export const extensionId = "coinmama-file-import"
 export const parserId = "coinmama"
-export const platform = "coinmama"
+export const platformId = `${PlatformPrefix.Exchange}coinmama`
 
 export const HEADER = "Transaction, Type,	Amount,	Date Created,	Status"
 
@@ -50,7 +51,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
     metadata: {},
     outgoing,
     outgoingAsset,
-    platform,
+    platformId,
     price,
     timestamp,
     type: "Buy",
@@ -65,7 +66,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       id: `${txId}_0`,
       importIndex: index,
       operation: transaction as AuditLogOperation,
-      platform,
+      platformId,
       timestamp,
       wallet,
     },

@@ -8,12 +8,12 @@ import {
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React from "react"
+import { $activeAccount } from "src/stores/account-store"
 import {
   $quoteCurrency,
   $quoteCurrencyMap,
   DEFAULT_CURRENCIES_MAP,
-} from "src/stores/account-settings-store"
-import { $activeAccount } from "src/stores/account-store"
+} from "src/stores/device-settings-store"
 
 export function CurrencySelector() {
   const currency = useStore($quoteCurrency)

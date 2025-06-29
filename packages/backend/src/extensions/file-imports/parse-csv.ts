@@ -33,7 +33,7 @@ export async function parseCsv(
     throw new Error(`File import unsupported, unknown header: ${header}`)
   }
 
-  const { extensionId, platform, parse } = parser
+  const { extensionId, platformId, parse } = parser
 
   const logs: AuditLog[] = []
   let transactions: Transaction[] = []
@@ -82,7 +82,7 @@ export async function parseCsv(
     operations: Object.keys(operationMap) as AuditLogOperation[],
     parserId,
     // pairList: Array.from(pairList),
-    platform,
+    platformId,
     rows: rows.length - 1,
     transactions: transactions.length,
     wallets: Object.keys(walletMap),

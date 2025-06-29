@@ -14,7 +14,7 @@ export type ExtensionBlockProps = Omit<IdentifierBlockProps, "id"> & {
 }
 
 export function ExtensionBlock(props: ExtensionBlockProps) {
-  const { id, extension: cachedValue, ...rest } = props
+  const { id, extension: cachedValue, size = "small", ...rest } = props
 
   const [extension, setExtension] = useState<RichExtension | undefined>(cachedValue)
   const rpc = useStore($rpc)
@@ -35,10 +35,10 @@ export function ExtensionBlock(props: ExtensionBlockProps) {
         <ExtensionAvatar
           src={extension?.extensionLogoUrl}
           alt={extension?.extensionName}
-          size="small"
+          size={size}
         />
       }
-      size="small"
+      size={size}
       href={`../extension/${id || extension.id}`}
       linkText={
         <Stack alignItems="center">

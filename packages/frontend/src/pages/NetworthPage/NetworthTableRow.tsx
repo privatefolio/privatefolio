@@ -1,11 +1,11 @@
 import { Stack, TableCell, TableRow, Typography } from "@mui/material"
 import React from "react"
 import { AmountBlock } from "src/components/AmountBlock"
-import { AppLink } from "src/components/AppLink"
+import { AssetBlock } from "src/components/AssetBlock"
 import { CaptionText } from "src/components/CaptionText"
-import { MyAssetBlock } from "src/components/MyAssetBlock"
+import { PlatformBlock } from "src/components/PlatformBlock"
 import { QuoteAmountBlock } from "src/components/QuoteAmountBlock"
-import { getAssetTicker } from "src/utils/assets-utils"
+import { getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
 
 import { Balance } from "../../interfaces"
 import { TableRowComponentProps } from "../../utils/table-utils"
@@ -24,24 +24,23 @@ export function NetworthTableRow(props: TableRowComponentProps<Balance>) {
   if (isTablet) {
     return (
       <TableRow hover {...rest}>
-        <TableCell colSpan={headCells.length} variant="clickable">
-          <AppLink to={`./asset/${encodeURI(assetId)}`}>
-            <Stack gap={1} direction="row" justifyContent="space-between" alignItems="flex-start">
-              <MyAssetBlock
-                id={assetId}
-                size="medium"
-                secondary={<QuoteAmountBlock amount={price?.value} formatting="price" />}
-              />
-              <Stack alignItems="flex-end">
-                <Typography variant="body1">
-                  <QuoteAmountBlock amount={value} />
-                </Typography>
-                <CaptionText>
-                  <AmountBlock amount={balance} />
-                </CaptionText>
-              </Stack>
-            </Stack>
-          </AppLink>
+        <TableCell colSpan={Math.round(headCells.length / 2)} variant="clickable">
+          <AssetBlock
+            id={assetId}
+            size="medium"
+            variant="tablecell"
+            secondary={<QuoteAmountBlock amount={price?.value} formatting="price" hideTooltip />}
+          />
+        </TableCell>
+        <TableCell colSpan={Math.floor(headCells.length / 2)} align="right">
+          <Stack alignItems="flex-end">
+            <Typography variant="body1">
+              <QuoteAmountBlock amount={value} />
+            </Typography>
+            <CaptionText>
+              <AmountBlock amount={balance} />
+            </CaptionText>
+          </Stack>
         </TableCell>
       </TableRow>
     )
@@ -50,9 +49,10 @@ export function NetworthTableRow(props: TableRowComponentProps<Balance>) {
   return (
     <TableRow hover {...rest}>
       <TableCell variant="clickable">
-        <AppLink to={`./asset/${encodeURI(assetId)}`}>
-          <MyAssetBlock id={assetId} showPlatform />
-        </AppLink>
+        <AssetBlock id={assetId} variant="tablecell" />
+      </TableCell>
+      <TableCell variant="clickable">
+        <PlatformBlock id={getAssetPlatform(assetId)} variant="tablecell" />
       </TableCell>
       <TableCell variant="clickable" align="right">
         <AmountBlock amount={balance} currencyTicker={getAssetTicker(assetId)} />

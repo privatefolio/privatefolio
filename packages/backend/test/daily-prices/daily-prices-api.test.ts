@@ -221,7 +221,7 @@ it("should fetch WBTC prices using DefiLlama", async () => {
     [
       {
         coingeckoId: "test",
-        id: "ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC-1",
+        id: "chain.ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC-1",
         priceApiId: "defi-llama",
         symbol: "WBTC",
       },
@@ -232,7 +232,7 @@ it("should fetch WBTC prices using DefiLlama", async () => {
   )
   const records = await getPricesForAsset(
     accountName,
-    "ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC-1"
+    "chain.ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC-1"
   )
   // assert
   expect(updates).toMatchInlineSnapshot(`
@@ -290,7 +290,7 @@ it("should fetch WBTC prices using Alchemy", async () => {
     [
       {
         coingeckoId: "test",
-        id: "ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC-2",
+        id: "chain.ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC-2",
         priceApiId: "alchemy",
         symbol: "WBTC",
       },
@@ -301,7 +301,7 @@ it("should fetch WBTC prices using Alchemy", async () => {
   )
   const records = await getPricesForAsset(
     accountName,
-    "ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC-2"
+    "chain.ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC-2"
   )
   // assert
   expect(updates).toMatchInlineSnapshot(`

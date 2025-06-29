@@ -8,7 +8,7 @@ export function parseLoan(
   index: number,
   connection: BinanceConnection
 ): ParserResult {
-  const { platform } = connection
+  const { platformId } = connection
   const { asset, isolatedSymbol, principal, timestamp: time, txId: id } = row
   const wallet = isolatedSymbol ? `Binance Isolated Margin` : `Binance Cross Margin`
   const timestamp = new Date(Number(time)).getTime()
@@ -31,7 +31,7 @@ export function parseLoan(
       id: `${txId}_LOAN`,
       importIndex,
       operation: "Loan",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -47,7 +47,7 @@ export function parseRepayment(
   index: number,
   connection: BinanceConnection
 ): ParserResult {
-  const { platform } = connection
+  const { platformId: platform } = connection
   const { amount, asset, isolatedSymbol, timestamp: time, txId: id } = row
   const wallet = isolatedSymbol ? `Binance isolated margin` : `Binance cross margin`
   const timestamp = new Date(Number(time)).getTime()
@@ -69,7 +69,7 @@ export function parseRepayment(
       id: `${txId}_Repayment`,
       importIndex,
       operation: "Loan Repayment",
-      platform,
+      platformId: platform,
       timestamp,
       txId,
       wallet,

@@ -1,5 +1,4 @@
-import { LoadingButton } from "@mui/lab"
-import { Drawer, DrawerProps, Skeleton, Stack, Tooltip, Typography } from "@mui/material"
+import { Drawer, DrawerProps, Skeleton, Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { MouseEvent, useState } from "react"
 import { AmountBlock } from "src/components/AmountBlock"
@@ -7,6 +6,7 @@ import { DrawerHeader } from "src/components/DrawerHeader"
 import { ExtensionBlock } from "src/components/ExtensionBlock"
 import { FileSizeBlock } from "src/components/FileSizeBlock"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
+import { LoadingButton } from "src/components/LoadingButton"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TimestampBlock } from "src/components/TimestampBlock"
@@ -105,7 +105,7 @@ export function FileImportDrawer(props: FileImportDrawerProps) {
         </div>
         <div>
           <SectionTitle>Platform</SectionTitle>
-          {!meta ? <Skeleton height={20} width={80} /> : <PlatformBlock id={meta.platform} />}
+          {!meta ? <Skeleton height={20} width={80} /> : <PlatformBlock id={meta.platformId} />}
         </div>
         <div>
           <SectionTitle>Imported</SectionTitle>
@@ -125,23 +125,17 @@ export function FileImportDrawer(props: FileImportDrawerProps) {
         </div>
         <div>
           <SectionTitle>Actions</SectionTitle>
-          <Tooltip
-            title={
-              loading ? "Removing…" : "This will remove all its transactions and audit logs too"
-            }
+          <LoadingButton
+            loading={loading}
+            loadingText="Removing file import…"
+            tooltip="This will remove all its transactions and audit logs too"
+            size="small"
+            variant="outlined"
+            color="error"
+            onClick={handleRemove}
           >
-            <span>
-              <LoadingButton
-                size="small"
-                variant="outlined"
-                color="error"
-                onClick={handleRemove}
-                loading={loading}
-              >
-                Remove file import
-              </LoadingButton>
-            </span>
-          </Tooltip>
+            Remove file import
+          </LoadingButton>
         </div>
 
         {/* assets */}

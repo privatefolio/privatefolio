@@ -11,8 +11,14 @@ import {
 } from "fs/promises"
 import JSZip from "jszip"
 import { join } from "path"
-import type { NewServerTask, TaskStatus } from "src/interfaces"
-import { ProgressCallback, ServerFile, TaskPriority, TaskTrigger } from "src/interfaces"
+import {
+  NewServerTask,
+  ProgressCallback,
+  ServerFile,
+  TaskPriority,
+  TaskStatus,
+  TaskTrigger,
+} from "src/interfaces"
 import { DATABASES_LOCATION, FILES_LOCATION, TASK_LOGS_LOCATION } from "src/settings/settings"
 import { saveFile } from "src/utils/file-utils"
 import { noop, parseProgressLog } from "src/utils/utils"
@@ -430,7 +436,7 @@ export async function enqueueRestore(accountName: string, trigger: TaskTrigger, 
 
       const startedAt = Date.now()
       let errorMessage: string | undefined
-      let status: TaskStatus = "completed"
+      let status: TaskStatus = TaskStatus.Completed
 
       try {
         await restore(accountName, file, progressCallback)
@@ -473,13 +479,13 @@ export async function enqueueRestore(accountName: string, trigger: TaskTrigger, 
               completedAt: completedAt.getTime(),
               duration: completedAt.getTime() - backupTask.startedAt,
               errorMessage: null,
-              status: "completed",
+              status: TaskStatus.Completed,
             })
           }
         } catch {}
       } catch (error) {
         errorMessage = error.message
-        status = "failed"
+        status = TaskStatus.Failed
         const errorLogEntry = `${new Date().toISOString()} ${JSON.stringify([undefined, `Restore account failed: ${error.message}`])}\n`
         savedLogs.push(errorLogEntry)
         throw error

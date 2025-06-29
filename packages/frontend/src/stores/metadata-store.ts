@@ -2,7 +2,14 @@ import { atom, keepMount, map } from "nanostores"
 import { getAssetTicker } from "src/utils/assets-utils"
 import { logAtoms } from "src/utils/browser-utils"
 
-import { FilterOptionsMap, MyAsset, Platform, TRADE_TYPES, TRANSACTIONS_TYPES } from "../interfaces"
+import {
+  FilterOptionsMap,
+  MyAsset,
+  Platform,
+  TaskStatus,
+  TRADE_TYPES,
+  TRANSACTIONS_TYPES,
+} from "../interfaces"
 import { RPC } from "../workers/remotes"
 
 export type FilterKey = keyof FilterOptionsMap
@@ -74,7 +81,8 @@ export async function fetchInMemoryData(rpc: RPC, accountName: string) {
     incomingAsset: assetIds,
     operation,
     outgoingAsset: assetIds,
-    platform: platformIds,
+    platformId: platformIds,
+    status: Object.values(TaskStatus),
     tags: tagIds,
     tradeStatus: ["open", "closed"],
     tradeType: TRADE_TYPES,
@@ -102,7 +110,8 @@ export const FILTER_LABEL_MAP: Record<FilterKey | DirectFilterKey, string> = {
   incomingAsset: "Incoming Asset",
   operation: "Operation",
   outgoingAsset: "Outgoing Asset",
-  platform: "Platform",
+  platformId: "Platform",
+  status: "Task status",
   tags: "Tags",
   tradeId: "Trade Id",
   tradeStatus: "Trade Status",
@@ -146,6 +155,12 @@ export function getFilterValueLabel(value: string | number | undefined) {
   if (value === "price-api") return "Price API"
   if (value === "metadata") return "Metadata"
   if (value === "coingecko") return "Coingecko"
+  if (value === "queued") return "Queued"
+  if (value === "running") return "Running"
+  if (value === "completed") return "Completed"
+  if (value === "aborted") return "Aborted"
+  if (value === "cancelled") return "Cancelled"
+  if (value === "failed") return "Failed"
 
   if (value === "open") return "Open"
   if (value === "closed") return "Closed"

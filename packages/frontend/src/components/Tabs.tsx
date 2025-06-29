@@ -15,8 +15,8 @@ export function Tabs({ sx, largeSize, ...rest }: TabsProps) {
     const el = wrapperRef.current?.querySelector(`.${tabsClasses.scroller}`)
     if (!el) return
 
-    setShowLeftShadow(el.scrollLeft > 0)
-    setShowRightShadow(Math.round(el.scrollLeft + el.clientWidth) < el.scrollWidth)
+    setShowLeftShadow(Math.floor(el.scrollLeft - 2) > 0)
+    setShowRightShadow(Math.round(el.scrollLeft + el.clientWidth + 2) < el.scrollWidth)
   }
 
   useEffect(() => {

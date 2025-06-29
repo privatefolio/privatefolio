@@ -71,18 +71,23 @@ declare module "@mui/material/LinearProgress" {
     accent: true
   }
 }
+declare module "@mui/system/createTheme" {
+  interface BreakpointOverrides {
+    xxl: true
+  }
+}
 
 export const theme: CssVarsThemeOptions = {
-  // breakpoints: {
-  // default values
-  //   values: {
-  //     lg: 1200,
-  //     md: 900,
-  //     sm: 600,
-  //     xl: 1536,
-  //     xs: 0,
-  //   },
-  // },
+  breakpoints: {
+    values: {
+      lg: 1200,
+      md: 900,
+      sm: 600,
+      xl: 1536,
+      xs: 0,
+      xxl: 1836, // xl + menu width
+    },
+  },
   colorSchemes: {
     dark: {
       overlays: [
@@ -228,6 +233,19 @@ export const theme: CssVarsThemeOptions = {
       styleOverrides: {
         root: {
           fontSize: "0.875rem",
+        },
+      },
+    },
+    MuiAutocomplete: {
+      defaultProps: {
+        slotProps: {
+          paper: {
+            elevation: 1,
+            sx: {
+              marginTop: "3px",
+            },
+            transparent: "on",
+          },
         },
       },
     },
@@ -567,7 +585,7 @@ export const theme: CssVarsThemeOptions = {
             transparent: "on",
           },
           sx: {
-            marginTop: 0.5,
+            marginTop: 0.25,
           },
         },
       },
@@ -726,6 +744,7 @@ export const theme: CssVarsThemeOptions = {
               outline: "1px dashed rgba(var(--mui-palette-secondary-mainChannel) / 0.5)",
               outlineOffset: -1,
             },
+            cursor: "pointer",
             "html[data-mui-color-scheme='dark'] &:hover": {
               outline: "1px dashed rgba(var(--mui-palette-primary-mainChannel) / 0.33)",
             },
@@ -743,9 +762,6 @@ export const theme: CssVarsThemeOptions = {
             ".MuiTableRow-root:hover & .MuiIconButton-root": {
               visibility: "visible",
             },
-            alignItems: "center",
-            display: "flex",
-            justifyContent: "flex-end",
           },
         },
       ],

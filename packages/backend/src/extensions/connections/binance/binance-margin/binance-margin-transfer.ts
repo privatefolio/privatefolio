@@ -8,7 +8,7 @@ export function parseMarginTransfer(
   index: number,
   connection: BinanceConnection
 ): ParserResult {
-  const { platform } = connection
+  const { platformId } = connection
   const { amount, asset, timestamp: time, transFrom, transTo, txId: id } = row
   const timestamp = new Date(Number(time)).getTime()
   if (isNaN(timestamp)) {
@@ -30,7 +30,7 @@ export function parseMarginTransfer(
       id: `${txId}_Transfer_From`,
       importIndex,
       operation: "Transfer",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet: `Binance ${(transFrom.charAt(0) + transFrom.substring(1).toLowerCase()).replace(
@@ -45,7 +45,7 @@ export function parseMarginTransfer(
       id: `${txId}_Transfer_To`,
       importIndex,
       operation: "Transfer",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet: `Binance ${(transTo.charAt(0) + transTo.substring(1).toLowerCase()).replace(

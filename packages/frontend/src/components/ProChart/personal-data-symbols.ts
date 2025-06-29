@@ -4,7 +4,7 @@ import { RPC } from "src/workers/remotes"
 import { LibrarySymbolInfo, SearchSymbolResultItem } from "./charting_library/charting_library"
 import { EXCHANGE_DELIMITER } from "./pro-chart-utils"
 
-// TODO9
+// TODO8
 const logoUrl = "https://privatefolio.xyz/privatefolio.svg"
 const type = "personal data"
 const exchange = "Privatefolio"
