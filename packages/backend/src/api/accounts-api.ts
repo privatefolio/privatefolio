@@ -289,18 +289,6 @@ CREATE TABLE key_value (
 `)
 
   await account.execute(sql`
-CREATE TABLE daily_prices (
-  id VARCHAR PRIMARY KEY NOT NULL UNIQUE,
-  assetId VARCHAR NOT NULL,
-  timestamp INTEGER NOT NULL,
-  price JSON,
-  pair VARCHAR,
-  priceApiId VARCHAR,
-  FOREIGN KEY (assetId) REFERENCES assets(id)
-);
-`)
-
-  await account.execute(sql`
 CREATE TABLE networth (
   timestamp INTEGER PRIMARY KEY,
   time INTEGER NOT NULL,
