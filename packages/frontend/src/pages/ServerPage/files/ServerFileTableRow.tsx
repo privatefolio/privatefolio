@@ -24,7 +24,7 @@ export function ServerFileTableRow(props: TableRowComponentProps<ServerFile>) {
   if (isTablet) {
     return (
       <TableRow hover {...rest}>
-        <TableCell colSpan={headCells.length} variant="clickable">
+        <TableCell colSpan={headCells.length}>
           <Stack direction="row" justifyContent="space-between" alignItems="flex-start" gap={1}>
             <Stack gap={0.5} marginY={0.5} flexGrow={1} minWidth={0}>
               <Typography variant="body1" fontFamily={MonoFont} component="div">
@@ -123,7 +123,8 @@ export function ServerFileTableRow(props: TableRowComponentProps<ServerFile>) {
         </Stack>
       </TableCell>
       <TableCell variant="actionList">
-        {/* {(status === "queued" || status === "running") && (
+        <Stack direction="row" justifyContent="flex-end">
+          {/* {(status === "queued" || status === "running") && (
               <Tooltip title={status === "queued" ? "Cancel" : "Abort"}>
                 <IconButton
                   aria-label="Cancel Task"
@@ -135,34 +136,35 @@ export function ServerFileTableRow(props: TableRowComponentProps<ServerFile>) {
                 </IconButton>
               </Tooltip>
             )} */}
-        {status === "completed" && (
-          <Tooltip title="Download">
-            <IconButton
-              size="small"
-              color="secondary"
-              onClick={async () => {
-                const params = new URLSearchParams({
-                  accountName: activeAccount,
-                  fileId: row.id.toString(),
-                })
+          {status === "completed" && (
+            <Tooltip title="Download">
+              <IconButton
+                size="small"
+                color="secondary"
+                onClick={async () => {
+                  const params = new URLSearchParams({
+                    accountName: activeAccount,
+                    fileId: row.id.toString(),
+                  })
 
-                const { baseUrl, jwtKey } = $rest.get()
+                  const { baseUrl, jwtKey } = $rest.get()
 
-                const response = await fetch(`${baseUrl}/download?${params.toString()}`, {
-                  headers: {
-                    Authorization: `Bearer ${localStorage.getItem(jwtKey)}`,
-                  },
-                })
+                  const response = await fetch(`${baseUrl}/download?${params.toString()}`, {
+                    headers: {
+                      Authorization: `Bearer ${localStorage.getItem(jwtKey)}`,
+                    },
+                  })
 
-                const blob = await response.blob()
+                  const blob = await response.blob()
 
-                downloadFile(blob, row.name)
-              }}
-            >
-              <Download fontSize="inherit" />
-            </IconButton>
-          </Tooltip>
-        )}
+                  downloadFile(blob, row.name)
+                }}
+              >
+                <Download fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
+          )}
+        </Stack>
       </TableCell>
     </TableRow>
   )

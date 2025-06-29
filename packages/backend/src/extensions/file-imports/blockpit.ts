@@ -1,12 +1,13 @@
 import Big from "big.js"
 import { AuditLog, ParserResult, Transaction } from "src/interfaces"
+import { PlatformPrefix } from "src/settings/settings"
 import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { parseEuropeanDateString } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
 
 export const extensionId = "blockpit-file-import"
 export const parserId = "blockpit"
-export const platform = "blockpit"
+export const platformId = `${PlatformPrefix.App}blockpit`
 
 export const HEADER =
   "Blockpit ID;Timestamp;Source Type;Source Name;Integration;Transaction Type;Outgoing Asset;Outgoing Amount;Incoming Asset;Incoming Amount;Fee Asset;Fee Amount;Transaction ID;Note;Merge ID"
@@ -65,7 +66,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
           id: txId.concat("Buy"),
           importIndex: index,
           operation: "Buy",
-          platform: "binance",
+          platformId: "binance",
           timestamp,
           wallet,
         },
@@ -76,7 +77,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
           id: txId.concat("Sell"),
           importIndex: index,
           operation: "Sell",
-          platform: "binance",
+          platformId: "binance",
           timestamp,
           wallet,
         },
@@ -87,7 +88,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
           id: txId.concat("Fee"),
           importIndex: index,
           operation: "Fee",
-          platform: "binance",
+          platformId: "binance",
           timestamp,
           wallet,
         },
@@ -101,7 +102,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
           id: txId.concat("Buy"),
           importIndex: index,
           operation: "Buy",
-          platform: "binance",
+          platformId: "binance",
           timestamp,
           wallet,
         },
@@ -112,7 +113,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
           id: txId.concat("Sell"),
           importIndex: index,
           operation: "Sell",
-          platform: "binance",
+          platformId: "binance",
           timestamp,
           wallet,
         },
@@ -130,7 +131,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
         metadata: {},
         outgoing,
         outgoingAsset,
-        platform: "binance",
+        platformId: "binance",
         price,
         timestamp,
         type,
@@ -147,7 +148,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
         id: txId,
         importIndex: index,
         operation: type,
-        platform: "binance",
+        platformId: "binance",
         timestamp,
         wallet,
       },
@@ -160,7 +161,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
         incoming,
         incomingAsset,
         metadata: {},
-        platform: "binance",
+        platformId: "binance",
         timestamp,
         type,
         wallet,
@@ -178,7 +179,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
         id: txId,
         importIndex: index,
         operation: type,
-        platform: "binance",
+        platformId: "binance", // TODO9
         timestamp,
         wallet,
       },
@@ -191,7 +192,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
         metadata: {},
         outgoing: change.toFixed(),
         outgoingAsset,
-        platform: "binance",
+        platformId: "binance",
         timestamp,
         type,
         wallet,

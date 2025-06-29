@@ -5,13 +5,14 @@ import {
   TransactionRole,
   TransactionSide,
 } from "src/interfaces"
+import { PlatformPrefix } from "src/settings/settings"
 import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
 
 export const extensionId = "mexc-file-import"
 export const parserId = "mexc"
-export const platform = "mxc"
+export const platformId = `${PlatformPrefix.Exchange}mexc`
 
 export const HEADER = "Pairs,Time,Side,Filled Price,Executed Amount,Total,Fee,Role"
 
@@ -51,7 +52,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       metadata: {},
       outgoing: total,
       outgoingAsset: quoteAssetId,
-      platform,
+      platformId,
       price,
       role,
       timestamp,
@@ -65,7 +66,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       id: `${txId}_0`,
       importIndex: index,
       operation: "Sell",
-      platform,
+      platformId,
       timestamp,
       wallet,
     })
@@ -76,7 +77,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       id: `${txId}_1`,
       importIndex: index + 0.1,
       operation: "Buy",
-      platform,
+      platformId,
       timestamp,
       wallet,
     })
@@ -93,7 +94,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       metadata: {},
       outgoing: amount,
       outgoingAsset: assetId,
-      platform,
+      platformId,
       price,
       role,
       timestamp,
@@ -107,7 +108,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       id: `${txId}_0`,
       importIndex: index,
       operation: "Sell",
-      platform,
+      platformId,
       timestamp,
       wallet,
     })
@@ -118,7 +119,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       id: `${txId}_1`,
       importIndex: index + 0.1,
       operation: "Buy",
-      platform,
+      platformId,
       timestamp,
       wallet,
     })
@@ -131,7 +132,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
     id: `${txId}_2`,
     importIndex: index + 0.2,
     operation: "Fee",
-    platform,
+    platformId,
     timestamp,
     wallet,
   })

@@ -18,7 +18,7 @@ export function parseERC20(
   connection: EtherscanConnection
 ): ParserResult {
   // ----------------------------------------------------------------- Parse
-  const { platform, address } = connection
+  const { platformId, address } = connection
   let {
     contractAddress,
     timeStamp: time,
@@ -41,7 +41,7 @@ export function parseERC20(
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${time}`)
   }
-  const assetId = `${platform}:${contractAddress}:${symbol}`
+  const assetId = `${platformId}:${contractAddress}:${symbol}`
   if (isSpamToken(contractAddress, symbol)) {
     return { logs: [] }
   }
@@ -74,7 +74,7 @@ export function parseERC20(
       id: `${txId}_TRANSFER_${index}`,
       importIndex,
       operation,
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -93,7 +93,7 @@ export function parseERC20(
     },
     outgoing: outgoing === "0" ? undefined : outgoing,
     outgoingAsset: outgoing === "0" ? undefined : outgoingAsset,
-    platform,
+    platformId,
     timestamp,
     type,
     wallet,

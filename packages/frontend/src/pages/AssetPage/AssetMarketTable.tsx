@@ -121,7 +121,7 @@ export function AssetMarketTable({ metadata, isLoading }: AssetMarketsProps) {
       initOrderBy="volume"
       initOrderDir="desc"
       defaultRowsPerPage={10}
-      // nullishSortPosition="start" TODO5: test me
+      nullishSortPosition="start"
     />
   )
 }

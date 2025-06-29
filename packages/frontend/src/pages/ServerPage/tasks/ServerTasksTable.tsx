@@ -69,7 +69,8 @@ export function ServerTasksTable() {
 
       return [
         records,
-        () => rpc.countServerTasks(accountName, `SELECT COUNT (*) FROM server_tasks`),
+        () =>
+          rpc.countServerTasks(accountName, `SELECT COUNT (*) FROM server_tasks ${filterQuery}`),
       ]
     },
     [accountName, refresh, rpc]
@@ -121,6 +122,7 @@ export function ServerTasksTable() {
         sx: { maxWidth: 120, minWidth: 120, width: 120 },
       },
       {
+        filterable: true,
         key: "status",
         label: "Status",
         sortable: true,

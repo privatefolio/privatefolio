@@ -1,6 +1,6 @@
 import { useStore } from "@nanostores/react"
 import React from "react"
-import { $quoteCurrency } from "src/stores/account-settings-store"
+import { $quoteCurrency } from "src/stores/device-settings-store"
 
 import { AmountBlock, AmountBlockProps } from "./AmountBlock"
 

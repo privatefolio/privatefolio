@@ -1,11 +1,12 @@
 import { AuditLog, EtherscanTransaction, ParserResult, TransactionType } from "src/interfaces"
+import { PlatformPrefix } from "src/settings/settings"
 import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
 
 export const extensionId = "privatefolio-file-import"
 export const parserId = "privatefolio-transactions"
-export const platform = "ethereum" // TODO8: this should work for all EVM chains
+export const platformId = `${PlatformPrefix.App}privatefolio` // TODO8: this should work for all EVM chains
 
 export const HEADER =
   '"Timestamp","Platform","Wallet","Type","Incoming","Incoming Asset","Outgoing","Outgoing Asset","Fee","Fee Asset","Smart Contract","Smart Contract Method","Blockchain Tx","Notes"'
@@ -14,7 +15,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
   const columns = extractColumnsFromRow(csvRow, 14)
   //
   const timestamp = asUTC(new Date(columns[0]))
-  const platform = columns[1]
+  const platformId = columns[1]
   const wallet = columns[2]
   const type = columns[3] as TransactionType
   const incoming = columns[4]
@@ -52,7 +53,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       notes,
       outgoing: outgoing === "" ? undefined : outgoing,
       outgoingAsset: outgoing === "" ? undefined : outgoingAsset,
-      platform,
+      platformId,
       timestamp,
       type,
       wallet,
@@ -69,7 +70,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       id: `${txId}_DEPOSIT`,
       importIndex: index + 0.1,
       operation: "Deposit",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -84,7 +85,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       id: `${txId}_WITHDRAW`,
       importIndex: index + 0.1,
       operation: "Withdraw",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -99,7 +100,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
       id: `${txId}_FEE`,
       importIndex: index + 0.1,
       operation: "Fee",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,

@@ -236,6 +236,19 @@ export const theme: CssVarsThemeOptions = {
         },
       },
     },
+    MuiAutocomplete: {
+      defaultProps: {
+        slotProps: {
+          paper: {
+            elevation: 1,
+            sx: {
+              marginTop: "3px",
+            },
+            transparent: "on",
+          },
+        },
+      },
+    },
     MuiBackdrop: {
       styleOverrides: {
         root: {
@@ -572,7 +585,7 @@ export const theme: CssVarsThemeOptions = {
             transparent: "on",
           },
           sx: {
-            marginTop: 0.5,
+            marginTop: 0.25,
           },
         },
       },
@@ -731,6 +744,7 @@ export const theme: CssVarsThemeOptions = {
               outline: "1px dashed rgba(var(--mui-palette-secondary-mainChannel) / 0.5)",
               outlineOffset: -1,
             },
+            cursor: "pointer",
             "html[data-mui-color-scheme='dark'] &:hover": {
               outline: "1px dashed rgba(var(--mui-palette-primary-mainChannel) / 0.33)",
             },
@@ -748,9 +762,6 @@ export const theme: CssVarsThemeOptions = {
             ".MuiTableRow-root:hover & .MuiIconButton-root": {
               visibility: "visible",
             },
-            alignItems: "center",
-            display: "flex",
-            justifyContent: "flex-end",
           },
         },
       ],

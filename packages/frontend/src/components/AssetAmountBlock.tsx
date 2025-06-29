@@ -2,7 +2,7 @@ import { Skeleton } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React from "react"
 import { ChartData } from "src/interfaces"
-import { $showQuotedAmounts } from "src/stores/account-settings-store"
+import { $showQuotedAmounts } from "src/stores/device-settings-store"
 import { getAssetTicker } from "src/utils/assets-utils"
 
 import { AmountBlock, AmountBlockProps } from "./AmountBlock"

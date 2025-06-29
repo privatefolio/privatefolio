@@ -1,11 +1,9 @@
 import { Add, MenuBookRounded } from "@mui/icons-material"
-import { Button, Stack, TextField, Typography } from "@mui/material"
+import { Button, Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useCallback, useMemo } from "react"
-import { AddressInputUncontrolled } from "src/components/AddressInput"
 import { AttentionBlock } from "src/components/AttentionBlock"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
-import { SectionTitle } from "src/components/SectionTitle"
 import { useConfirm } from "src/hooks/useConfirm"
 import { LabeledAddress } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
@@ -13,23 +11,24 @@ import { $addressBook, $inMemoryDataQueryTime } from "src/stores/metadata-store"
 import { HeadCell } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
 
+import { AddressBookForm } from "./AddressBookForm"
 import { AddressBookTableRow } from "./AddressBookTableRow"
 
 export function AddressBookTable() {
   const addressBook = useStore($addressBook)
-  const queryTime = useStore($inMemoryDataQueryTime)
+  const inMemoryDataQueryTime = useStore($inMemoryDataQueryTime)
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
 
   const rows: LabeledAddress[] = useMemo(
     () =>
-      queryTime === null
+      inMemoryDataQueryTime === null
         ? []
         : Object.keys(addressBook).reduce((acc, id) => {
             acc.push({ id, label: addressBook[id] })
             return acc
           }, [] as LabeledAddress[]),
-    [queryTime, addressBook]
+    [inMemoryDataQueryTime, addressBook]
   )
 
   const headCells: HeadCell<LabeledAddress>[] = useMemo(
@@ -58,24 +57,7 @@ export function AddressBookTable() {
   const handleAddNewRow = useCallback(async () => {
     const { confirmed, event } = await confirm({
       confirmText: "Add",
-      content: (
-        <Stack gap={2} sx={{ "@media (min-width: 900px)": { minWidth: 520 } }}>
-          <div>
-            <SectionTitle>Address</SectionTitle>
-            <AddressInputUncontrolled
-              variant="outlined"
-              fullWidth
-              size="small"
-              required
-              name="address"
-            />
-          </div>
-          <div>
-            <SectionTitle>Label</SectionTitle>
-            <TextField variant="outlined" fullWidth size="small" required name="label" />
-          </div>
-        </Stack>
-      ),
+      content: <AddressBookForm />,
       focusInput: "address",
       title: "Add wallet or smart contract to address book",
     })
@@ -98,13 +80,13 @@ export function AddressBookTable() {
   return (
     <>
       <MemoryTable<LabeledAddress>
-        initOrderBy="id"
+        initOrderBy="label"
         initOrderDir="asc"
         headCells={headCells}
         TableRowComponent={AddressBookTableRow}
         rows={rows}
         rowCount={rows.length}
-        queryTime={queryTime}
+        queryTime={inMemoryDataQueryTime}
         defaultRowsPerPage={10}
         emptyContent={
           <Button sx={{ padding: 4 }} onClick={handleAddNewRow}>

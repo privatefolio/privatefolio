@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from "react"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
 import { Exchange } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
+import { $hideUnsupportedPlatforms } from "src/stores/device-settings-store"
 import { HeadCell } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
 
@@ -13,7 +14,7 @@ export function ExchangesTable() {
   const [queryTime, setQueryTime] = useState<number | null>(null)
   const accountName = useStore($activeAccount)
   const rpc = useStore($rpc)
-
+  const showSupportedOnly = useStore($hideUnsupportedPlatforms)
   useEffect(() => {
     document.title = `Exchanges - ${accountName} - Privatefolio`
   }, [accountName])
@@ -28,6 +29,13 @@ export function ExchangesTable() {
 
     loadExchanges()
   }, [accountName, rpc])
+
+  const rows = useMemo(() => {
+    if (showSupportedOnly) {
+      return exchanges.filter((exchange) => exchange.supported)
+    }
+    return exchanges
+  }, [exchanges, showSupportedOnly])
 
   const headCells: HeadCell<Exchange>[] = useMemo(
     () => [
@@ -76,8 +84,8 @@ export function ExchangesTable() {
       initOrderDir="asc"
       headCells={headCells}
       TableRowComponent={ExchangeTableRow}
-      rows={exchanges}
-      rowCount={exchanges.length}
+      rows={rows}
+      rowCount={rows.length}
       queryTime={queryTime}
     />
   )

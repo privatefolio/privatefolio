@@ -10,8 +10,8 @@ import { SectionTitle } from "src/components/SectionTitle"
 import { TagManager } from "src/components/TagManager"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { Tag, Trade, TradePnL } from "src/interfaces"
-import { $quoteCurrency } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
+import { $quoteCurrency } from "src/stores/device-settings-store"
 import { $rpc } from "src/workers/remotes"
 
 interface TradeDetailsProps {

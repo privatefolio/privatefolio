@@ -2,7 +2,7 @@ import { MonetizationOn, MonetizationOnOutlined } from "@mui/icons-material"
 import { IconButton, Tooltip } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React from "react"
-import { $quoteCurrency, $showQuotedAmounts } from "src/stores/account-settings-store"
+import { $quoteCurrency, $showQuotedAmounts } from "src/stores/device-settings-store"
 
 export function QuoteCurrencyToggle() {
   const showQuotedAmounts = useStore($showQuotedAmounts)

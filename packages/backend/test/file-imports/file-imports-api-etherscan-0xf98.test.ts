@@ -73,7 +73,7 @@ describe("0xf98 file import", () => {
         "lastModified": 0,
         "meta": {
           "assetIds": [
-            "ethereum:0x0000000000000000000000000000000000000000:ETH",
+            "chain.ethereum:0x0000000000000000000000000000000000000000:ETH",
           ],
           "extensionId": "etherscan-file-import",
           "logs": 16,
@@ -83,7 +83,7 @@ describe("0xf98 file import", () => {
             "Fee",
           ],
           "parserId": "etherscan-default",
-          "platform": "ethereum",
+          "platformId": "chain.ethereum",
           "rows": 9,
           "transactions": 9,
           "wallets": [
@@ -135,14 +135,14 @@ describe("0xf98 file import", () => {
         "lastModified": 0,
         "meta": {
           "assetIds": [
-            "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN",
-            "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA",
-            "ethereum:0x519475b31653E46D20cD09F9FdcF3B12BDAcB4f5:VIU",
-            "ethereum:0x52903256dd18D85c2Dc4a6C999907c9793eA61E3:INSP",
-            "ethereum:0x1d462414fe14cf489c7A21CaC78509f4bF8CD7c0:CAN",
-            "ethereum:0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0:LOOM",
-            "ethereum:0x7B2f9706CD8473B4F5B7758b0171a9933Fc6C4d6:HEALP",
-            "ethereum:0x58b6A8A3302369DAEc383334672404Ee733aB239:LPT",
+            "chain.ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN",
+            "chain.ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA",
+            "chain.ethereum:0x519475b31653E46D20cD09F9FdcF3B12BDAcB4f5:VIU",
+            "chain.ethereum:0x52903256dd18D85c2Dc4a6C999907c9793eA61E3:INSP",
+            "chain.ethereum:0x1d462414fe14cf489c7A21CaC78509f4bF8CD7c0:CAN",
+            "chain.ethereum:0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0:LOOM",
+            "chain.ethereum:0x7B2f9706CD8473B4F5B7758b0171a9933Fc6C4d6:HEALP",
+            "chain.ethereum:0x58b6A8A3302369DAEc383334672404Ee733aB239:LPT",
           ],
           "extensionId": "etherscan-file-import",
           "logs": 8,
@@ -150,7 +150,7 @@ describe("0xf98 file import", () => {
             "Deposit",
           ],
           "parserId": "etherscan-erc20",
-          "platform": "ethereum",
+          "platformId": "chain.ethereum",
           "rows": 8,
           "transactions": 8,
           "wallets": [
@@ -205,26 +205,20 @@ describe("0xf98 file import", () => {
     // assert
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Fetching audit logs
-      10,Processing 24 audit logs
-      ,Skipped ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN: No coingeckoId
-      ,Skipped ethereum:0x519475b31653E46D20cD09F9FdcF3B12BDAcB4f5:VIU: No coingeckoId
-      ,Skipped ethereum:0x7B2f9706CD8473B4F5B7758b0171a9933Fc6C4d6:HEALP: No coingeckoId
-      20,Found 6 asset groups
-      30,Processed 1/6 asset groups
-      40,Processed 2/6 asset groups
-      50,Processed 3/6 asset groups
-      60,Processed 4/6 asset groups
-      70,Processed 5/6 asset groups
-      80,Processed 6/6 asset groups
-      80,Setting trades cursor to Nov 04, 2020
-      80,Trades computation completed
-      82,Processing 6 trades
-      84,Processed 1/6 trades
-      87,Processed 2/6 trades
-      90,Processed 3/6 trades
-      92,Processed 4/6 trades
-      95,Processed 5/6 trades
-      98,Processed 6/6 trades
+      2.5,Processing 24 audit logs
+      6,Found 4 asset groups (skipped 5 unlisted assets)
+      10,Processed all trades for ETH
+      15,Processed all trades for XDATA
+      20,Processed all trades for LOOM
+      25,Processed all trades for LPT
+      25,Setting trades cursor to Nov 04, 2020
+      25,Computed 4 trades
+      30,Computing PnL for 4 trades
+      46,Processed trade #1 (Long 5.151643 ETH)
+      62,Processed trade #2 (Long 0.21165476692904842 XDATA)
+      78,Processed trade #3 (Long 10 LOOM)
+      95,Processed trade #4 (Long 2.117826656607922 LPT)
+      95,Saving 4 records to disk
       100,PnL computation completed"
     `)
   })
@@ -251,9 +245,9 @@ describe("0xf98 file import", () => {
         `../__snapshots__/0xf98/balances-${i}.ts.snap`
       )
     }
-    expect(trades.length).toMatchInlineSnapshot(`6`)
+    expect(trades.length).toMatchInlineSnapshot(`4`)
     await expect(trades).toMatchFileSnapshot("../__snapshots__/0xf98/trades.ts.snap")
-    expect(pnl.length).toMatchInlineSnapshot(`6`)
+    expect(pnl.length).toMatchInlineSnapshot(`4`)
     await expect(pnl).toMatchFileSnapshot("../__snapshots__/0xf98/account-pnl.ts.snap")
   })
 

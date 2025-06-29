@@ -1,11 +1,13 @@
+import { BINANCE_PLATFORM_ID } from "src/extensions/utils/binance-utils"
 import { AuditLog, EtherscanTransaction, Transaction } from "src/interfaces"
 
 export function trimTxId(fullId: string, platformId: string): string {
   const parts = fullId.split("_")
 
   // Example "1682669678_0xb41d6819932845278e7c451400f1778a952b35c6358dc51b49436438753f5113_NORMAL_0"
-  const trimmedId =
-    platformId === "ethereum" ? [parts[1], parts[2]].join("_") : parts.slice(1).join("_")
+  const trimmedId = platformId.includes("chain.")
+    ? [parts[1], parts[2]].join("_")
+    : parts.slice(1).join("_")
 
   return trimmedId
 }
@@ -14,8 +16,9 @@ export function trimAuditLogId(fullId: string, platformId: string): string {
   const parts = fullId.split("_")
 
   // Example "1682669678_0xb41d6819932845278e7c451400f1778a952b35c6358dc51b49436438753f5113_NORMAL_0_VALUE_0"
-  const trimmedId =
-    platformId === "ethereum" ? [parts[1], parts[2], parts[4]].join("_") : parts.slice(1).join("_")
+  const trimmedId = platformId.includes("chain.")
+    ? [parts[1], parts[2], parts[4]].join("_")
+    : parts.slice(1).join("_")
 
   return trimmedId
 }
@@ -26,18 +29,19 @@ export function sanitizeAuditLog(auditLog: AuditLog) {
     connectionId: _connectionId,
     fileImportId: _fileImportId,
     importIndex: _importIndex,
-    platform,
+    platformId,
     timestamp,
     txId: fullTxId,
     balance,
     ...rest
   } = auditLog
 
-  const id = platform === "binance" ? fullId : trimAuditLogId(fullId, auditLog.platform)
-  let txId = fullTxId ? trimTxId(fullTxId, auditLog.platform) : undefined
+  const id =
+    platformId === BINANCE_PLATFORM_ID ? fullId : trimAuditLogId(fullId, auditLog.platformId)
+  let txId = fullTxId ? trimTxId(fullTxId, auditLog.platformId) : undefined
   let time = timestamp
 
-  if (platform === "binance") {
+  if (platformId === BINANCE_PLATFORM_ID) {
     time = (timestamp / 1000) | 0
     txId = undefined
   }
@@ -45,7 +49,7 @@ export function sanitizeAuditLog(auditLog: AuditLog) {
   return {
     balance,
     id,
-    platform,
+    platform: platformId,
     timestamp: time,
     txId,
     ...rest,
@@ -63,21 +67,22 @@ export function sanitizeTransaction(transaction: Transaction) {
     connectionId: _connectionId,
     fileImportId: _fileImportId,
     importIndex: _importIndex,
-    platform,
+    platformId,
     timestamp,
     ...rest
   } = transaction
 
-  const id =
-    platform === "ethereum" ? trimTxId(transaction.id, transaction.platform) : transaction.id
+  const id = platformId.includes("chain.")
+    ? trimTxId(transaction.id, transaction.platformId)
+    : transaction.id
   let time = timestamp
-  if (platform === "binance") {
+  if (platformId === BINANCE_PLATFORM_ID) {
     time = (timestamp / 1000) | 0
   }
 
   return {
     _id: id,
-    platform,
+    platform: platformId,
     timestamp: time,
     ...rest,
   }

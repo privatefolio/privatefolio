@@ -14,7 +14,7 @@ export function parseMarginTrade(
   index: number,
   connection: BinanceConnection
 ): ParserResult {
-  const { platform } = connection
+  const { platformId } = connection
   const {
     baseAsset,
     commission,
@@ -60,7 +60,7 @@ export function parseMarginTrade(
         id: `${txId}_SELL`,
         importIndex,
         operation: "Sell",
-        platform,
+        platformId,
         timestamp,
         txId,
         wallet,
@@ -72,7 +72,7 @@ export function parseMarginTrade(
         id: `${txId}_BUY`,
         importIndex,
         operation: "Buy",
-        platform,
+        platformId,
         timestamp,
         txId,
         wallet,
@@ -91,7 +91,7 @@ export function parseMarginTrade(
         id: `${txId}_SELL`,
         importIndex,
         operation: "Sell",
-        platform,
+        platformId,
         timestamp,
         txId,
         wallet,
@@ -103,7 +103,7 @@ export function parseMarginTrade(
         id: `${txId}_BUY`,
         importIndex,
         operation: "Buy",
-        platform,
+        platformId,
         timestamp,
         txId,
         wallet,
@@ -119,7 +119,7 @@ export function parseMarginTrade(
       id: `${txId}_FEE`,
       importIndex,
       operation: "Fee",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -136,7 +136,7 @@ export function parseMarginTrade(
     metadata: {},
     outgoing: outgoing === "0" ? undefined : outgoing,
     outgoingAsset: outgoing === "0" ? undefined : outgoingAsset,
-    platform,
+    platformId,
     price: priceBN.toString(),
     timestamp,
     type,

@@ -211,12 +211,7 @@ export default function App() {
             }}
             elevation={0}
           >
-            <MenuDrawerContents
-              open={true}
-              toggleOpen={noop}
-              appVer={APP_VERSION}
-              gitHash={GIT_HASH}
-            />
+            <MenuDrawerContents open toggleOpen={noop} appVer={APP_VERSION} gitHash={GIT_HASH} />
           </Paper>
         </>
       )}

@@ -4,15 +4,15 @@ import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { useParams, useSearchParams } from "react-router-dom"
 import { AssetAmountBlock } from "src/components/AssetAmountBlock"
+import { AssetBlock } from "src/components/AssetBlock"
 import { BackButton } from "src/components/BackButton"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
-import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { NavTab } from "src/components/NavTab"
 import { SubtitleText } from "src/components/SubtitleText"
 import { Tabs } from "src/components/Tabs"
 import { ChartData, Trade } from "src/interfaces"
-import { $showQuotedAmounts } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
+import { $showQuotedAmounts } from "src/stores/device-settings-store"
 import { $assetMap } from "src/stores/metadata-store"
 import { ONE_DAY } from "src/utils/formatting-utils"
 import { $rpc } from "src/workers/remotes"
@@ -128,7 +128,7 @@ export default function TradePage() {
             <Stack component={SubtitleText} direction="row" gap={1} alignItems="flex-end">
               <span>{trade.tradeType}</span>
               <AssetAmountBlock amount={trade.amount} assetId={trade.assetId} priceMap={priceMap} />
-              <MyAssetBlock id={trade.assetId} />
+              <AssetBlock id={trade.assetId} variant="tablecell" />
             </Stack>
           </Stack>
         </Stack>

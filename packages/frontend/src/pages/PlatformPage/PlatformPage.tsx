@@ -1,14 +1,14 @@
-import { LanguageRounded } from "@mui/icons-material"
-import { Chip, Paper, Stack, Typography } from "@mui/material"
+import { LanguageRounded, VerifiedRounded } from "@mui/icons-material"
+import { Chip, Paper, Stack, Tooltip, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { isBlockchain, isExchange } from "privatefolio-backend/src/utils/utils"
 import React, { useEffect, useState } from "react"
 import { useParams, useSearchParams } from "react-router-dom"
 import { ActionBlock } from "src/components/ActionBlock"
+import { AssetBlock } from "src/components/AssetBlock"
 import { BackButton } from "src/components/BackButton"
 import { CoinGeckoIcon } from "src/components/CoinGeckoIcon"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
-import { ForeignAssetBlock } from "src/components/ForeignAssetBlock"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
 import { NavTab } from "src/components/NavTab"
 import { PlatformAvatar } from "src/components/PlatformAvatar"
@@ -82,7 +82,16 @@ export default function PlatformPage() {
           <PlatformAvatar src={logoUrl} alt={name} size="large" />
           <Stack>
             <Typography variant="h6" fontFamily={SerifFont} sx={{ marginBottom: -0.5 }}>
-              <span>{name}</span>
+              <span>{name}</span>{" "}
+              {platform?.supported && (
+                <Tooltip title={`Supported by ${platform?.extensionsIds?.length} extensions`}>
+                  <VerifiedRounded
+                    color="primary"
+                    fontSize="inherit"
+                    sx={{ verticalAlign: "middle" }}
+                  />
+                </Tooltip>
+              )}
             </Typography>
             <SubtitleText>{platform.id}</SubtitleText>
           </Stack>
@@ -192,7 +201,7 @@ export default function PlatformPage() {
                 {isBlockchain(platform) && platform.nativeCoinId && (
                   <div>
                     <SectionTitle>Native Asset</SectionTitle>
-                    <ForeignAssetBlock coingeckoId={platform.nativeCoinId} />
+                    <AssetBlock id={platform.nativeCoinId} />
                   </div>
                 )}
               </Stack>

@@ -4,13 +4,13 @@ import { useStore } from "@nanostores/react"
 import React, { memo, useEffect, useState } from "react"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AssetAmountBlock } from "src/components/AssetAmountBlock"
+import { AssetBlock } from "src/components/AssetBlock"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
-import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { TagList } from "src/components/TagList"
 import { useBoolean } from "src/hooks/useBoolean"
-import { $showQuotedAmounts } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
+import { $showQuotedAmounts } from "src/stores/device-settings-store"
 import { getAddressBookEntry } from "src/stores/metadata-store"
 import { greenColor, redColor } from "src/utils/color-utils"
 import { $rpc } from "src/workers/remotes"
@@ -22,7 +22,8 @@ import { AuditLogDrawer } from "./AuditLogDrawer"
 
 function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
   const { row, relativeTime, headCells, isMobile: _isMobile, isTablet, ...rest } = props
-  const { assetId, change, balance, operation, timestamp, platform, wallet, id } = row
+  const { assetId, change, balance, balanceWallet, operation, timestamp, platformId, wallet, id } =
+    row
 
   const changeN = Number(change)
   const changeColor = changeN < 0 ? redColor : greenColor
@@ -52,7 +53,7 @@ function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
     return (
       <>
         <TableRow hover {...rest}>
-          <TableCell colSpan={headCells.length} onClick={toggleOpen} sx={{ cursor: "pointer" }}>
+          <TableCell colSpan={headCells.length} onClick={toggleOpen} variant="clickable">
             <Stack>
               <Typography variant="caption" color="text.secondary">
                 <TimestampBlock timestamp={timestamp} relative={relativeTime} />
@@ -83,7 +84,7 @@ function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
                     showSign
                     showTicker={!showAssetColumn}
                   />
-                  {showAssetColumn && <MyAssetBlock id={assetId} />}
+                  {showAssetColumn && <AssetBlock id={assetId} variant="tablecell" />}
                 </Stack>
               </Stack>
               <TagList itemId={id} itemType="auditLog" />
@@ -109,7 +110,7 @@ function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
           <TimestampBlock timestamp={timestamp} relative={relativeTime} />
         </TableCell>
         <TableCell>
-          <PlatformBlock id={platform} hideName />
+          <PlatformBlock id={platformId} hideName />
         </TableCell>
         <TableCell variant="clickable">
           <IdentifierBlock id={wallet} variant="tablecell" label={getAddressBookEntry(wallet)} />
@@ -137,20 +138,29 @@ function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
         </TableCell>
         {showAssetColumn && (
           <TableCell>
-            <MyAssetBlock id={assetId} />
+            <AssetBlock id={assetId} variant="tablecell" />
           </TableCell>
         )}
         <TableCell align="right" variant="clickable">
           <AssetAmountBlock
             assetId={assetId}
-            amount={balance}
+            amount={balanceWallet}
             priceMap={priceMap}
-            tooltipMessage="Use the 'Compute balances' action to compute these values."
+            tooltipMessage="Use the 'Compute balances' action to see these values."
           />
         </TableCell>
-        <TableCell>
-          <TagList itemId={id} itemType="auditLog" />
+        <TableCell align="right" variant="clickable">
+          <AssetAmountBlock
+            assetId={assetId}
+            amount={balance}
+            priceMap={priceMap}
+            tooltipMessage="Use the 'Compute balances' action to see these values."
+          />
         </TableCell>
+
+        {/* <TableCell>
+          <TagList itemId={id} itemType="auditLog" />
+        </TableCell> */}
         <TableCell variant="actionList">
           <Tooltip title="Inspect">
             <IconButton size="small" color="secondary" onClick={toggleOpen}>

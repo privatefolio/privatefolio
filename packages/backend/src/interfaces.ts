@@ -20,8 +20,11 @@ export const TRANSACTIONS_TYPES = [
   "Unwrap",
   "Wrap",
   "Approve",
+  "Other",
 ] as const
 export type TransactionType = (typeof TRANSACTIONS_TYPES)[number]
+
+export const MANUAL_TX_TYPES: TransactionType[] = ["Swap", "Deposit", "Withdraw", "Other"]
 
 export const TRADE_TYPES = [
   "Long",
@@ -70,7 +73,7 @@ export interface Transaction {
   notes?: string
   outgoing?: string
   outgoingAsset?: string
-  platform: string
+  platformId: string
   /**
    * outgoing / incoming
    */
@@ -129,9 +132,11 @@ export interface Exchange {
    */
   coingeckoTrustScore: number
   country?: string
+  extensionsIds?: string[]
   id: string
   image: string
   name: string
+  supported?: boolean
   url: string
   year: number
 }
@@ -141,6 +146,7 @@ export interface Blockchain {
    * EVM chainId
    */
   chainId: number
+  extensionsIds?: string[]
   id: string
   image: string
   name: string
@@ -148,20 +154,28 @@ export interface Blockchain {
    * coingeckoId of the native coin
    */
   nativeCoinId: string
+  supported?: boolean
 }
 
 export type Platform = Exchange | Blockchain
 
 export interface AuditLog {
   assetId: string
+  /**
+   * Cumulative balance of all wallets
+   */
   balance?: string
+  /**
+   * Balance of the wallet
+   */
+  balanceWallet?: string
   change: string
   connectionId?: string
   fileImportId?: string
   id: string
   importIndex: number
   operation: AuditLogOperation
-  platform: string
+  platformId: string
   tags?: number[]
   timestamp: Timestamp
   txId?: string
@@ -185,7 +199,7 @@ export interface FileImport {
     logs: number
     operations: AuditLogOperation[]
     parserId: string
-    platform: string
+    platformId: string
     rows: number
     transactions: number
     wallets: string[]
@@ -407,10 +421,11 @@ export type BinanceConnectionOptions = ConnectionOptions & {
 
 export interface Connection {
   address?: string
+  apiKey?: string
+  apiSecret?: string
+  connectionNumber: number
   extensionId: string
   id: string
-  key?: string // rename to apiKey
-  label: string
   meta?: {
     assetIds: string[]
     logs: number
@@ -420,8 +435,7 @@ export interface Connection {
     wallets: string[]
   }
   options?: BinanceConnectionOptions | ConnectionOptions
-  platform: string
-  secret?: string // rename to apiSecret
+  platformId: string
   syncedAt?: number
   /**
    * createdAt
@@ -452,7 +466,7 @@ export type CsvParser = {
   extensionId: string
   parse: CsvParseFn
   parserId: string
-  platform: string
+  platformId: string
   requirements?: string[]
 }
 
@@ -679,6 +693,15 @@ export type Web3Address = string
 
 export type CsvData = (string | number | undefined | boolean | object)[][]
 
+export enum TaskStatus {
+  Queued = "queued",
+  Running = "running",
+  Completed = "completed",
+  Aborted = "aborted",
+  Cancelled = "cancelled",
+  Failed = "failed",
+}
+
 export type FilterOptionsMap = {
   assetId: string[]
   createdBy: string[]
@@ -688,7 +711,8 @@ export type FilterOptionsMap = {
   incomingAsset: string[]
   operation: AuditLogOperation[]
   outgoingAsset: string[]
-  platform: string[]
+  platformId: string[]
+  status: TaskStatus[]
   tags: number[]
   tradeStatus: string[]
   tradeType: readonly TradeType[]
@@ -736,7 +760,6 @@ export enum EventCause {
   Reset = "reset",
 }
 
-export type TaskStatus = "queued" | "running" | "completed" | "aborted" | "cancelled" | "failed"
 export type TaskTrigger = "system" | "user" | "cron" | "side-effect"
 export enum TaskPriority {
   Lowest = 1,
@@ -800,7 +823,7 @@ export interface NewServerTask extends Omit<ServerTask, "id"> {
   id?: number
 }
 
-export type TaskCompletionCallback = (error: Error | undefined) => void
+export type TaskCompletionCallback = (error: string | undefined) => void
 
 /**
  * First value represents a percentage (0-100), second value is a message

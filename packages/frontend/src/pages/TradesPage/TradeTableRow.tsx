@@ -6,8 +6,8 @@ import { ActionBlock } from "src/components/ActionBlock"
 import { AppLink } from "src/components/AppLink"
 import { AssetAmountBlock } from "src/components/AssetAmountBlock"
 import { AggregatableValue, AssetAmountsBlock } from "src/components/AssetAmountsBlock"
+import { AssetBlock } from "src/components/AssetBlock"
 import { CaptionText } from "src/components/CaptionText"
-import { MyAssetBlock } from "src/components/MyAssetBlock"
 import { QuoteAmountBlock } from "src/components/QuoteAmountBlock"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { ChartData, SqlParam, Trade, TradePnL } from "src/interfaces"
@@ -18,7 +18,7 @@ import { $rpc } from "src/workers/remotes"
 
 export function TradeTableRow({
   row,
-  headCells,
+  headCells: _headCells,
   isMobile: _isMobile,
   isTablet,
   relativeTime,
@@ -53,8 +53,12 @@ export function TradeTableRow({
   const costBasis = useMemo<AggregatableValue[]>(() => {
     return cost.map(([assetId, amount, usdValue, exposure, txId, txTimestamp]) => [
       assetId,
-      Big(amount).div(`-${exposure}`).toString(),
-      Big(usdValue).div(`-${exposure}`).toString(),
+      Big(amount)
+        .div(exposure.includes("-") ? exposure : `-${exposure}`)
+        .toString(),
+      Big(usdValue)
+        .div(exposure.includes("-") ? exposure : `-${exposure}`)
+        .toString(),
       txId,
       txTimestamp,
     ])
@@ -89,29 +93,29 @@ export function TradeTableRow({
   if (isTablet) {
     return (
       <TableRow hover {...rest}>
-        <TableCell colSpan={headCells.length} variant="clickable">
-          <Stack gap={1} direction="row" justifyContent="space-between" alignItems="flex-start">
-            <AppLink to={`${activeAccountPath}/trade/${row.id}`}>
-              <MyAssetBlock
-                id={assetId}
-                size="medium"
-                secondary={
-                  <QuoteAmountBlock amount={priceMap?.[assetId]?.value} formatting="price" />
-                }
+        <TableCell variant="clickable">
+          <AssetBlock
+            id={assetId}
+            size="medium"
+            variant="tablecell"
+            secondary={
+              <QuoteAmountBlock
+                amount={priceMap?.[assetId]?.value}
+                formatting="price"
+                hideTooltip
               />
-            </AppLink>
-            <Stack alignItems="flex-end">
-              <QuoteAmountBlock amount={tradePnl?.pnl} showSign colorized />
-              <CaptionText>
-                <span>{tradeType}</span>{" "}
-                <AssetAmountBlock
-                  amount={amount}
-                  assetId={assetId}
-                  priceMap={priceMap}
-                  showTicker
-                />
-              </CaptionText>
-            </Stack>
+            }
+            href={`${activeAccountPath}/trade/${row.id}`}
+            linkText="View trade"
+          />
+        </TableCell>
+        <TableCell>
+          <Stack alignItems="flex-end">
+            <QuoteAmountBlock amount={tradePnl?.pnl} showSign colorized />
+            <CaptionText>
+              <span>{tradeType}</span>{" "}
+              <AssetAmountBlock amount={amount} assetId={assetId} priceMap={priceMap} showTicker />
+            </CaptionText>
           </Stack>
         </TableCell>
       </TableRow>
@@ -122,7 +126,7 @@ export function TradeTableRow({
     <TableRow hover tabIndex={-1}>
       <TableCell variant="clickable">
         <Tooltip title="View trade">
-          <AppLink to={`${activeAccountPath}/trade/${row.id}`}>{tradeNumber}</AppLink>
+          <AppLink href={`${activeAccountPath}/trade/${row.id}`}>{tradeNumber}</AppLink>
         </Tooltip>
       </TableCell>
       {/* <TableCell>
@@ -138,8 +142,8 @@ export function TradeTableRow({
       <TableCell variant="clickable" align="right">
         <AssetAmountBlock amount={amount} assetId={assetId} priceMap={priceMap} />
       </TableCell>
-      <TableCell>
-        <MyAssetBlock id={assetId} />
+      <TableCell variant="clickable">
+        <AssetBlock id={assetId} variant="tablecell" />
       </TableCell>
       <TableCell>
         <AssetAmountsBlock values={costBasis} aggregation="average" formatting="price" />

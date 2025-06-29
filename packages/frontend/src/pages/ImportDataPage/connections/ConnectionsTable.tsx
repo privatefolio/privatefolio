@@ -8,6 +8,7 @@ import { Callout } from "src/components/Callout"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
 import { Connection } from "src/interfaces"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
+import { $hideInactiveConnections } from "src/stores/device-settings-store"
 import { closeSubscription } from "src/utils/browser-utils"
 import { HeadCell } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
@@ -20,22 +21,23 @@ const $drawerOpen = atom(false)
 export function ConnectionsTable() {
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
+  const hideInactiveConnections = useStore($hideInactiveConnections)
 
   useEffect(() => {
     document.title = `Connections - ${activeAccount} - Privatefolio`
   }, [activeAccount])
 
   const [queryTime, setQueryTime] = useState<number | null>(null)
-  const [rows, setRows] = useState<Connection[]>([])
+  const [connections, setConnections] = useState<Connection[]>([])
 
   const connectionStatus = useStore($connectionStatus)
 
   useEffect(() => {
     async function fetchData() {
       const start = Date.now()
-      const rows = await rpc.getConnections(activeAccount)
+      const data = await rpc.getConnections(activeAccount)
       setQueryTime(Date.now() - start)
-      setRows(rows)
+      setConnections(data)
     }
 
     fetchData().then()
@@ -45,42 +47,52 @@ export function ConnectionsTable() {
     return closeSubscription(subscription, rpc)
   }, [connectionStatus, rpc, activeAccount])
 
+  const rows = useMemo(() => {
+    if (hideInactiveConnections) {
+      return connections.filter((connection) => !connection.meta || connection.meta.logs > 0)
+    }
+    return connections
+  }, [connections, hideInactiveConnections])
+
   const headCells: HeadCell<Connection>[] = useMemo(
     () => [
       {
-        key: "timestamp",
-        label: "Created",
+        key: "connectionNumber",
+        label: "#",
         sortable: true,
+        sx: { maxWidth: 80, minWidth: 80, width: 80 },
       },
       {
         key: "syncedAt",
         label: "Synced at",
         sortable: true,
+        sx: { maxWidth: 180, minWidth: 180, width: 180 },
+        timestamp: true,
       },
-      // {
-      //   filterable: true,
-      //   hideLabel: true,
-      //   key: "platform",
-      //   label: "Platform",
-      // },
+      {
+        filterable: true,
+        key: "platformId",
+        sx: { maxWidth: 40, minWidth: 40, width: 40 },
+      },
       {
         key: "address",
-        label: "Address",
+        label: "Wallet",
         sortable: true,
+        // sx: { maxWidth: 420, minWidth: 300, width: 420 },
       },
       {
         key: "logs" as keyof Connection,
         label: "Audit logs",
         numeric: true,
-        sortable: true,
         // valueSelector: (row) => row.meta?.logs,
+        sx: { maxWidth: 128, minWidth: 128, width: 128 },
       },
       {
         key: "transactions" as keyof Connection,
         label: "Transactions",
         numeric: true,
-        sortable: true,
         // valueSelector: (row) => row.meta?.transactions,
+        sx: { maxWidth: 120, minWidth: 120, width: 120 },
       },
       {
         sx: { maxWidth: 60, minWidth: 60, width: 60 },
@@ -92,7 +104,7 @@ export function ConnectionsTable() {
   return (
     <>
       <MemoryTable<Connection>
-        initOrderBy="timestamp"
+        initOrderBy="connectionNumber"
         headCells={headCells}
         TableRowComponent={ConnectionTableRow}
         rows={rows}

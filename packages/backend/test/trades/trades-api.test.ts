@@ -15,54 +15,56 @@ import { describe, expect, it, vi } from "vitest"
 
 const accountName = Math.random().toString(36).substring(7)
 
+const assetId = "ethereum:0x0000000000000000000000000000000000000000:ETH"
+
 describe("trades-api", () => {
   it("should compute trades from audit logs", async () => {
     // arrange
     const auditLogs: AuditLog[] = [
       {
-        assetId: "ethereum:ETH",
+        assetId,
         balance: "1.5",
         change: "1.5",
         id: "1",
         importIndex: 1,
         operation: "Deposit" as AuditLogOperation,
-        platform: "ethereum",
+        platformId: "chain.ethereum",
         timestamp: 1600000000000, // Sep 13, 2020
         txId: "tx1",
         wallet: "0x123",
       },
       {
-        assetId: "ethereum:ETH",
+        assetId,
         balance: "0.5",
         change: "-1.0",
         id: "2",
         importIndex: 2,
         operation: "Withdraw" as AuditLogOperation,
-        platform: "ethereum",
+        platformId: "chain.ethereum",
         timestamp: 1600100000000, // Sep 14, 2020
         txId: "tx2",
         wallet: "0x123",
       },
       {
-        assetId: "ethereum:ETH",
+        assetId,
         balance: "0",
         change: "-0.5",
         id: "3",
         importIndex: 3,
         operation: "Withdraw" as AuditLogOperation,
-        platform: "ethereum",
+        platformId: "chain.ethereum",
         timestamp: 1600200000000, // Sep 15, 2020
         txId: "tx3",
         wallet: "0x123",
       },
       {
-        assetId: "ethereum:ETH",
+        assetId,
         balance: "-1",
         change: "-1",
         id: "4",
         importIndex: 4,
         operation: "Withdraw" as AuditLogOperation,
-        platform: "ethereum",
+        platformId: "chain.ethereum",
         timestamp: 1600200000000 + 5 * ONE_DAY, // Sep 20, 2020
         txId: "tx4",
         wallet: "0x123",
@@ -71,52 +73,52 @@ describe("trades-api", () => {
     const transactions: Transaction[] = [
       {
         fee: "0.001",
-        feeAsset: "ethereum:ETH",
+        feeAsset: assetId,
         id: "tx1",
         importIndex: 1,
         incoming: "1.5",
-        incomingAsset: "ethereum:ETH",
+        incomingAsset: assetId,
         metadata: { txHash: "0xabc1" },
-        platform: "ethereum",
+        platformId: "chain.ethereum",
         timestamp: 1600000000000, // Sep 13, 2020
         type: "Deposit",
         wallet: "0x123",
       },
       {
         fee: "0.001",
-        feeAsset: "ethereum:ETH",
+        feeAsset: assetId,
         id: "tx2",
         importIndex: 2,
         metadata: { txHash: "0xabc2" },
         outgoing: "1.0",
-        outgoingAsset: "ethereum:ETH",
-        platform: "ethereum",
+        outgoingAsset: assetId,
+        platformId: "chain.ethereum",
         timestamp: 1600100000000, // Sep 14, 2020
         type: "Withdraw",
         wallet: "0x123",
       },
       {
         fee: "0.001",
-        feeAsset: "ethereum:ETH",
+        feeAsset: assetId,
         id: "tx3",
         importIndex: 3,
         metadata: { txHash: "0xabc3" },
         outgoing: "0.5",
-        outgoingAsset: "ethereum:ETH",
-        platform: "ethereum",
+        outgoingAsset: assetId,
+        platformId: "chain.ethereum",
         timestamp: 1600200000000, // Sep 15, 2020
         type: "Withdraw",
         wallet: "0x123",
       },
       {
         fee: "0.001",
-        feeAsset: "ethereum:ETH",
+        feeAsset: assetId,
         id: "tx1-usdt",
         importIndex: 1,
         metadata: { txHash: "0xabc1" },
         outgoing: "2250",
         outgoingAsset: "ethereum:USDT",
-        platform: "ethereum",
+        platformId: "chain.ethereum",
         timestamp: 1600000000000, // Sep 13, 2020
         type: "Deposit",
         wallet: "0x123",
@@ -126,8 +128,8 @@ describe("trades-api", () => {
         importIndex: 4,
         metadata: { txHash: "0xabc4" },
         outgoing: "1.5",
-        outgoingAsset: "ethereum:ETH",
-        platform: "ethereum",
+        outgoingAsset: assetId,
+        platformId: "chain.ethereum",
         timestamp: 1600200000000 + 5 * ONE_DAY, // Sep 20, 2020
         type: "Withdraw",
         wallet: "0x123",
@@ -171,14 +173,15 @@ describe("trades-api", () => {
     const trades = await getTrades(accountName, await getTradesFullQuery())
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Fetching audit logs
-      10,Processing 4 audit logs
-      20,Found 1 asset groups
-      80,Processed 1/1 asset groups
-      80,Setting trades cursor to Sep 15, 2020
-      80,Trades computation completed
-      82,Processing 2 trades
-      90,Processed 1/2 trades
-      98,Processed 2/2 trades
+      2.5,Processing 4 audit logs
+      6,Found 1 asset groups (skipped 0 unlisted assets)
+      25,Processed all trades for ETH
+      25,Setting trades cursor to Sep 15, 2020
+      25,Computed 2 trades
+      30,Computing PnL for 2 trades
+      62,Processed trade #1 (Long 1.5 ETH)
+      95,Processed trade #2 (Short 1 ETH)
+      95,Saving 9 records to disk
       98,Setting profit & loss cursor to Sep 23, 2020
       100,PnL computation completed"
     `)
@@ -186,7 +189,7 @@ describe("trades-api", () => {
       [
         {
           "amount": "1.5",
-          "assetId": "ethereum:ETH",
+          "assetId": "ethereum:0x0000000000000000000000000000000000000000:ETH",
           "auditLogIds": [
             "1",
             "2",
@@ -198,21 +201,21 @@ describe("trades-api", () => {
           "createdAt": 1600000000000,
           "deposits": [
             [
-              "ethereum:ETH",
+              "ethereum:0x0000000000000000000000000000000000000000:ETH",
               "1.5",
               "0",
               "tx1",
               1600000000000,
             ],
             [
-              "ethereum:ETH",
+              "ethereum:0x0000000000000000000000000000000000000000:ETH",
               "-1.0",
               "0",
               "tx2",
               1600100000000,
             ],
             [
-              "ethereum:ETH",
+              "ethereum:0x0000000000000000000000000000000000000000:ETH",
               "-0.5",
               "0",
               "tx3",
@@ -222,28 +225,28 @@ describe("trades-api", () => {
           "duration": 200000000,
           "fees": [
             [
-              "ethereum:ETH",
+              "ethereum:0x0000000000000000000000000000000000000000:ETH",
               "0.001",
               "0",
               "tx1",
               1600000000000,
             ],
             [
-              "ethereum:ETH",
+              "ethereum:0x0000000000000000000000000000000000000000:ETH",
               "0.001",
               "0",
               "tx2",
               1600100000000,
             ],
             [
-              "ethereum:ETH",
+              "ethereum:0x0000000000000000000000000000000000000000:ETH",
               "0.001",
               "0",
               "tx3",
               1600200000000,
             ],
           ],
-          "id": "2097354210",
+          "id": "3031837334",
           "proceeds": [],
           "tradeNumber": 1,
           "tradeStatus": "closed",
@@ -256,7 +259,7 @@ describe("trades-api", () => {
         },
         {
           "amount": "1",
-          "assetId": "ethereum:ETH",
+          "assetId": "ethereum:0x0000000000000000000000000000000000000000:ETH",
           "auditLogIds": [
             "4",
           ],
@@ -265,7 +268,7 @@ describe("trades-api", () => {
           "createdAt": 1600632000000,
           "deposits": [
             [
-              "ethereum:ETH",
+              "ethereum:0x0000000000000000000000000000000000000000:ETH",
               "-1.5",
               "0",
               "tx4",
@@ -273,7 +276,7 @@ describe("trades-api", () => {
             ],
           ],
           "fees": [],
-          "id": "2551033095",
+          "id": "3485516219",
           "proceeds": [],
           "tradeNumber": 2,
           "tradeStatus": "open",
@@ -291,45 +294,45 @@ describe("trades-api", () => {
           "cost": "0",
           "deposits": "0",
           "fees": "0",
-          "id": "2097354210_1599868800000",
+          "id": "3031837334_1599868800000",
           "pnl": "0",
           "positionValue": "0",
           "proceeds": "0",
           "timestamp": 1599868800000,
-          "tradeId": "2097354210",
+          "tradeId": "3031837334",
         },
         {
           "cost": "0",
           "deposits": "0",
           "fees": "0",
-          "id": "2097354210_1599955200000",
+          "id": "3031837334_1599955200000",
           "pnl": "1500",
           "positionValue": "1500",
           "proceeds": "0",
           "timestamp": 1599955200000,
-          "tradeId": "2097354210",
+          "tradeId": "3031837334",
         },
         {
           "cost": "0",
           "deposits": "0",
           "fees": "0",
-          "id": "2097354210_1600041600000",
+          "id": "3031837334_1600041600000",
           "pnl": "750",
           "positionValue": "750",
           "proceeds": "0",
           "timestamp": 1600041600000,
-          "tradeId": "2097354210",
+          "tradeId": "3031837334",
         },
         {
           "cost": "0",
           "deposits": "0",
           "fees": "0",
-          "id": "2097354210_1600128000000",
+          "id": "3031837334_1600128000000",
           "pnl": "0",
           "positionValue": "0",
           "proceeds": "0",
           "timestamp": 1600128000000,
-          "tradeId": "2097354210",
+          "tradeId": "3031837334",
         },
       ]
     `)
@@ -340,56 +343,56 @@ describe("trades-api", () => {
           "cost": "0",
           "deposits": "0",
           "fees": "0",
-          "id": "2551033095_1600473600000",
+          "id": "3485516219_1600473600000",
           "pnl": "0",
           "positionValue": "0",
           "proceeds": "0",
           "timestamp": 1600473600000,
-          "tradeId": "2551033095",
+          "tradeId": "3485516219",
         },
         {
           "cost": "0",
           "deposits": "0",
           "fees": "0",
-          "id": "2551033095_1600560000000",
+          "id": "3485516219_1600560000000",
           "pnl": "-4500",
           "positionValue": "-4500",
           "proceeds": "0",
           "timestamp": 1600560000000,
-          "tradeId": "2551033095",
+          "tradeId": "3485516219",
         },
         {
           "cost": "0",
           "deposits": "0",
           "fees": "0",
-          "id": "2551033095_1600646400000",
+          "id": "3485516219_1600646400000",
           "pnl": "-5000",
           "positionValue": "-5000",
           "proceeds": "0",
           "timestamp": 1600646400000,
-          "tradeId": "2551033095",
+          "tradeId": "3485516219",
         },
         {
           "cost": "0",
           "deposits": "0",
           "fees": "0",
-          "id": "2551033095_1600732800000",
+          "id": "3485516219_1600732800000",
           "pnl": "-5500",
           "positionValue": "-5500",
           "proceeds": "0",
           "timestamp": 1600732800000,
-          "tradeId": "2551033095",
+          "tradeId": "3485516219",
         },
         {
           "cost": "0",
           "deposits": "0",
           "fees": "0",
-          "id": "2551033095_1600819200000",
+          "id": "3485516219_1600819200000",
           "pnl": "-6000",
           "positionValue": "-6000",
           "proceeds": "0",
           "timestamp": 1600819200000,
-          "tradeId": "2551033095",
+          "tradeId": "3485516219",
         },
       ]
     `)
@@ -518,15 +521,15 @@ describe("trades-api", () => {
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Refreshing trades starting Sep 15, 2020
       0,Fetching audit logs
-      10,Processing 1 audit logs
-      20,Found 1 asset groups
-      20,Found 1 open trades
-      80,Processed 1/1 asset groups
-      80,Trades computation completed
-      80,Refreshing PnL starting Sep 23, 2020
-      82,Processing 2 trades
-      90,Processed 1/2 trades
-      98,Processed 2/2 trades
+      2.5,Processing 1 audit logs
+      6,Found 1 asset groups (skipped 0 unlisted assets)
+      6,Found 1 open trades
+      25,Processed all trades for ETH
+      25,Computed 1 trades
+      25,Refreshing PnL starting Sep 23, 2020
+      30,Computing PnL for 1 trades
+      95,Processed trade #2 (Short 1 ETH)
+      95,Saving 5 records to disk
       98,Setting profit & loss cursor to Sep 23, 2020
       100,PnL computation completed"
     `)
@@ -535,7 +538,7 @@ describe("trades-api", () => {
       [
         {
           "amount": "1.5",
-          "assetId": "ethereum:ETH",
+          "assetId": "ethereum:0x0000000000000000000000000000000000000000:ETH",
           "auditLogIds": [
             "1",
             "2",
@@ -547,21 +550,21 @@ describe("trades-api", () => {
           "createdAt": 1600000000000,
           "deposits": [
             [
-              "ethereum:ETH",
+              "ethereum:0x0000000000000000000000000000000000000000:ETH",
               "1.5",
               "0",
               "tx1",
               1600000000000,
             ],
             [
-              "ethereum:ETH",
+              "ethereum:0x0000000000000000000000000000000000000000:ETH",
               "-1.0",
               "0",
               "tx2",
               1600100000000,
             ],
             [
-              "ethereum:ETH",
+              "ethereum:0x0000000000000000000000000000000000000000:ETH",
               "-0.5",
               "0",
               "tx3",
@@ -571,28 +574,28 @@ describe("trades-api", () => {
           "duration": 200000000,
           "fees": [
             [
-              "ethereum:ETH",
+              "ethereum:0x0000000000000000000000000000000000000000:ETH",
               "0.001",
               "0",
               "tx1",
               1600000000000,
             ],
             [
-              "ethereum:ETH",
+              "ethereum:0x0000000000000000000000000000000000000000:ETH",
               "0.001",
               "0",
               "tx2",
               1600100000000,
             ],
             [
-              "ethereum:ETH",
+              "ethereum:0x0000000000000000000000000000000000000000:ETH",
               "0.001",
               "0",
               "tx3",
               1600200000000,
             ],
           ],
-          "id": "2097354210",
+          "id": "3031837334",
           "proceeds": [],
           "tradeNumber": 1,
           "tradeStatus": "closed",
@@ -605,7 +608,7 @@ describe("trades-api", () => {
         },
         {
           "amount": "1",
-          "assetId": "ethereum:ETH",
+          "assetId": "ethereum:0x0000000000000000000000000000000000000000:ETH",
           "auditLogIds": [
             "4",
           ],
@@ -614,7 +617,7 @@ describe("trades-api", () => {
           "createdAt": 1600632000000,
           "deposits": [
             [
-              "ethereum:ETH",
+              "ethereum:0x0000000000000000000000000000000000000000:ETH",
               "-1.5",
               "0",
               "tx4",
@@ -622,7 +625,7 @@ describe("trades-api", () => {
             ],
           ],
           "fees": [],
-          "id": "2551033095",
+          "id": "3485516219",
           "proceeds": [],
           "tradeNumber": 2,
           "tradeStatus": "open",
@@ -640,45 +643,45 @@ describe("trades-api", () => {
           "cost": "0",
           "deposits": "0",
           "fees": "0",
-          "id": "2097354210_1599868800000",
+          "id": "3031837334_1599868800000",
           "pnl": "0",
           "positionValue": "0",
           "proceeds": "0",
           "timestamp": 1599868800000,
-          "tradeId": "2097354210",
+          "tradeId": "3031837334",
         },
         {
           "cost": "0",
           "deposits": "0",
           "fees": "0",
-          "id": "2097354210_1599955200000",
+          "id": "3031837334_1599955200000",
           "pnl": "1500",
           "positionValue": "1500",
           "proceeds": "0",
           "timestamp": 1599955200000,
-          "tradeId": "2097354210",
+          "tradeId": "3031837334",
         },
         {
           "cost": "0",
           "deposits": "0",
           "fees": "0",
-          "id": "2097354210_1600041600000",
+          "id": "3031837334_1600041600000",
           "pnl": "750",
           "positionValue": "750",
           "proceeds": "0",
           "timestamp": 1600041600000,
-          "tradeId": "2097354210",
+          "tradeId": "3031837334",
         },
         {
           "cost": "0",
           "deposits": "0",
           "fees": "0",
-          "id": "2097354210_1600128000000",
+          "id": "3031837334_1600128000000",
           "pnl": "0",
           "positionValue": "0",
           "proceeds": "0",
           "timestamp": 1600128000000,
-          "tradeId": "2097354210",
+          "tradeId": "3031837334",
         },
       ]
     `)
@@ -689,56 +692,56 @@ describe("trades-api", () => {
           "cost": "0",
           "deposits": "0",
           "fees": "0",
-          "id": "2551033095_1600473600000",
+          "id": "3485516219_1600473600000",
           "pnl": "0",
           "positionValue": "0",
           "proceeds": "0",
           "timestamp": 1600473600000,
-          "tradeId": "2551033095",
+          "tradeId": "3485516219",
         },
         {
           "cost": "0",
           "deposits": "0",
           "fees": "0",
-          "id": "2551033095_1600560000000",
+          "id": "3485516219_1600560000000",
           "pnl": "-4500",
           "positionValue": "-4500",
           "proceeds": "0",
           "timestamp": 1600560000000,
-          "tradeId": "2551033095",
+          "tradeId": "3485516219",
         },
         {
           "cost": "0",
           "deposits": "0",
           "fees": "0",
-          "id": "2551033095_1600646400000",
+          "id": "3485516219_1600646400000",
           "pnl": "-5000",
           "positionValue": "-5000",
           "proceeds": "0",
           "timestamp": 1600646400000,
-          "tradeId": "2551033095",
+          "tradeId": "3485516219",
         },
         {
           "cost": "0",
           "deposits": "0",
           "fees": "0",
-          "id": "2551033095_1600732800000",
+          "id": "3485516219_1600732800000",
           "pnl": "-5500",
           "positionValue": "-5500",
           "proceeds": "0",
           "timestamp": 1600732800000,
-          "tradeId": "2551033095",
+          "tradeId": "3485516219",
         },
         {
           "cost": "0",
           "deposits": "0",
           "fees": "0",
-          "id": "2551033095_1600819200000",
+          "id": "3485516219_1600819200000",
           "pnl": "-6543",
           "positionValue": "-6543",
           "proceeds": "0",
           "timestamp": 1600819200000,
-          "tradeId": "2551033095",
+          "tradeId": "3485516219",
         },
       ]
     `)

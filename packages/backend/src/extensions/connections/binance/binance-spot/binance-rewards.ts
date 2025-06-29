@@ -14,7 +14,7 @@ export function parseReward(
   index: number,
   connection: BinanceConnection
 ): ParserResult {
-  const { platform } = connection
+  const { platformId } = connection
   const { amount, rewards, asset, positionId, projectId, time } = row
   const wallet = `Binance Spot`
   const timestamp = new Date(Number(time)).getTime()
@@ -45,7 +45,7 @@ export function parseReward(
       id: `${txId}_REWARD`,
       importIndex,
       operation: "Reward",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -60,7 +60,7 @@ export function parseReward(
     metadata: {},
     outgoing: undefined,
     outgoingAsset: undefined,
-    platform,
+    platformId,
     timestamp,
     type,
     wallet,

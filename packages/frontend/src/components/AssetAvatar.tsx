@@ -19,7 +19,10 @@ const StyledAvatar = styled(Avatar)`
 
 export interface AssetAvatarProps extends AvatarProps {
   alt?: string
-  size?: "small" | "medium" | "large" | "snug"
+  /**
+   * @default "small"
+   */
+  size?: "small" | "snug" | "medium" | "large"
 }
 
 const SIZE_MAP = {
@@ -37,7 +40,7 @@ const FONT_SIZE_MAP = {
 }
 
 export function AssetAvatar(props: AssetAvatarProps) {
-  const { alt = "", src, size = "medium", sx, ...rest } = props
+  const { alt = "", src, size = "small", sx, ...rest } = props
   const color = stringToColor(alt)
 
   const source = useMemo(() => resolveUrl(src), [src])

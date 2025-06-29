@@ -3,9 +3,10 @@ import { IconButton, Stack, Tooltip, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo, useState } from "react"
 import { AttentionBlock } from "src/components/AttentionBlock"
-import { $hideSmallBalances, $hideSmallBalancesMap } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
+import { $hideSmallBalances } from "src/stores/device-settings-store"
 import { $inspectTime } from "src/stores/pages/balances-store"
+import { getAssetPlatform } from "src/utils/assets-utils"
 import { formatDate } from "src/utils/formatting-utils"
 import { $rpc } from "src/workers/remotes"
 
@@ -58,7 +59,14 @@ export default function NetworthPage() {
         key: "assetId",
         label: "Asset",
         sortable: true,
-        sx: { width: "66%" },
+        sx: { width: "50%" },
+      },
+      {
+        filterable: true,
+        key: "platformId" as keyof Balance,
+        label: "Platform",
+        sx: { width: "50%" },
+        valueSelector: (row: Balance) => getAssetPlatform(row.assetId),
       },
       {
         key: "balanceN",
@@ -104,7 +112,7 @@ export default function NetworthPage() {
               <IconButton
                 color="secondary"
                 onClick={() => {
-                  $hideSmallBalancesMap.setKey(activeAccount, String(!hideSmallBalances))
+                  $hideSmallBalances.set(!hideSmallBalances)
                 }}
               >
                 {hideSmallBalances ? (
@@ -123,6 +131,7 @@ export default function NetworthPage() {
             rowCount={rows.length + hiddenBalances}
             defaultRowsPerPage={10}
             queryTime={queryTime}
+            nullishSortPosition="start"
             extraRow={
               !!hiddenBalances && (
                 <AttentionBlock>
@@ -131,7 +140,6 @@ export default function NetworthPage() {
                 </AttentionBlock>
               )
             }
-            // nullishSortPosition="start" TODO5: test me
           />
         </div>
       )}

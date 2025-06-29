@@ -8,7 +8,7 @@ export function parseMarginLiquidation(
   index: number,
   connection: BinanceConnection
 ): ParserResult {
-  const { platform } = connection
+  const { platformId } = connection
   const { executedQty, isIsolated, orderId, symbol, updatedTime } = row
   const wallet = isIsolated ? `Binance Isolated Margin` : `Binance Cross Margin`
   const timestamp = new Date(Number(updatedTime)).getTime()
@@ -30,7 +30,7 @@ export function parseMarginLiquidation(
       id: `${txId}_LOAN`,
       importIndex,
       operation: "Liquidation Repayment",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,

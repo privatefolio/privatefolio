@@ -14,7 +14,7 @@ export function parseTrade(
   index: number,
   connection: BinanceConnection
 ): ParserResult {
-  const { platform } = connection
+  const { platformId } = connection
   const { id, qty, quoteQty, commission, commissionAsset, time, isBuyer, baseAsset, quoteAsset } =
     row
   const wallet = `Binance Spot`
@@ -49,7 +49,7 @@ export function parseTrade(
         id: `${txId}_SELL`,
         importIndex,
         operation: "Sell",
-        platform,
+        platformId,
         timestamp,
         txId,
         wallet,
@@ -61,7 +61,7 @@ export function parseTrade(
         id: `${txId}_BUY`,
         importIndex,
         operation: "Buy",
-        platform,
+        platformId,
         timestamp,
         txId,
         wallet,
@@ -80,7 +80,7 @@ export function parseTrade(
         id: `${txId}_SELL`,
         importIndex,
         operation: "Sell",
-        platform,
+        platformId,
         timestamp,
         txId,
         wallet,
@@ -92,7 +92,7 @@ export function parseTrade(
         id: `${txId}_BUY`,
         importIndex,
         operation: "Buy",
-        platform,
+        platformId,
         timestamp,
         txId,
         wallet,
@@ -108,7 +108,7 @@ export function parseTrade(
       id: `${txId}_FEE`,
       importIndex,
       operation: "Fee",
-      platform,
+      platformId,
       timestamp,
       txId,
       wallet,
@@ -126,7 +126,7 @@ export function parseTrade(
     metadata: {},
     outgoing: outgoing === "0" ? undefined : outgoing,
     outgoingAsset: outgoing === "0" ? undefined : outgoingAsset,
-    platform,
+    platformId,
     price,
     timestamp,
     type,

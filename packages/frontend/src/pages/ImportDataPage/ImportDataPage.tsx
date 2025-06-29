@@ -33,7 +33,7 @@ export default function ImportDataPage({ show }: { show: boolean }) {
             <NavTab value="address-book" to={"?tab=address-book"} label="Address book" />
             <NavTab value="tags" to={"?tab=tags"} label="Tags" />
           </Tabs>
-          <ImportDataActions />
+          <ImportDataActions currentTab={tab} />
         </Stack>
         {tab === "file-imports" && <FileImportsTable />}
         {tab === "connections" && <ConnectionsTable />}

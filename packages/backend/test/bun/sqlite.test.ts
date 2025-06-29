@@ -13,7 +13,7 @@ import { computeNetworth, getNetworth } from "src/api/account/networth-api"
 import { upsertServerTask } from "src/api/account/server-tasks-api"
 import { countTransactions, getTransactions } from "src/api/account/transactions-api"
 import { getAccount, resetAccount } from "src/api/accounts-api"
-import { ProgressUpdate, TaskPriority } from "src/interfaces"
+import { ProgressUpdate, TaskPriority, TaskStatus } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
 import { sleep } from "src/utils/utils"
 import { beforeAll } from "vitest"
@@ -61,12 +61,12 @@ describe("0xf98 file import", () => {
       id: "1151263496",
       lastModified: 0,
       meta: {
-        assetIds: ["ethereum:0x0000000000000000000000000000000000000000:ETH"],
+        assetIds: ["chain.ethereum:0x0000000000000000000000000000000000000000:ETH"],
         extensionId: "etherscan-file-import",
         logs: 16,
         operations: ["Deposit", "Withdraw", "Fee"],
         parserId: "etherscan-default",
-        platform: "ethereum",
+        platformId: "chain.ethereum",
         rows: 9,
         transactions: 9,
         wallets: ["0xf98C96B5d10faAFc2324847c82305Bd5fd7E5ad3"],
@@ -111,20 +111,20 @@ describe("0xf98 file import", () => {
       lastModified: 0,
       meta: {
         assetIds: [
-          "ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN",
-          "ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA",
-          "ethereum:0x519475b31653E46D20cD09F9FdcF3B12BDAcB4f5:VIU",
-          "ethereum:0x52903256dd18D85c2Dc4a6C999907c9793eA61E3:INSP",
-          "ethereum:0x1d462414fe14cf489c7A21CaC78509f4bF8CD7c0:CAN",
-          "ethereum:0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0:LOOM",
-          "ethereum:0x7B2f9706CD8473B4F5B7758b0171a9933Fc6C4d6:HEALP",
-          "ethereum:0x58b6A8A3302369DAEc383334672404Ee733aB239:LPT",
+          "chain.ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN",
+          "chain.ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA",
+          "chain.ethereum:0x519475b31653E46D20cD09F9FdcF3B12BDAcB4f5:VIU",
+          "chain.ethereum:0x52903256dd18D85c2Dc4a6C999907c9793eA61E3:INSP",
+          "chain.ethereum:0x1d462414fe14cf489c7A21CaC78509f4bF8CD7c0:CAN",
+          "chain.ethereum:0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0:LOOM",
+          "chain.ethereum:0x7B2f9706CD8473B4F5B7758b0171a9933Fc6C4d6:HEALP",
+          "chain.ethereum:0x58b6A8A3302369DAEc383334672404Ee733aB239:LPT",
         ],
         extensionId: "etherscan-file-import",
         logs: 8,
         operations: ["Deposit"],
         parserId: "etherscan-erc20",
-        platform: "ethereum",
+        platformId: "chain.ethereum",
         rows: 8,
         transactions: 8,
         wallets: ["0xf98C96B5d10faAFc2324847c82305Bd5fd7E5ad3"],
@@ -192,7 +192,7 @@ describe("0xf98 file import", () => {
       description: "",
       name: "Test task",
       priority: TaskPriority.Lowest,
-      status: "completed",
+      status: TaskStatus.Completed,
       trigger: "user",
     })
     let account = await getAccount(accountName)
@@ -209,7 +209,7 @@ describe("0xf98 file import", () => {
       description: "",
       name: "Test task 2",
       priority: TaskPriority.Lowest,
-      status: "completed",
+      status: TaskStatus.Completed,
       trigger: "user",
     })
     sqliteSequence = await account.execute(`SELECT * FROM sqlite_sequence`)
