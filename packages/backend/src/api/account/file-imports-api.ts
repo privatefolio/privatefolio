@@ -26,6 +26,7 @@ import { invalidateBalances } from "./balances-api"
 import { invalidateNetworth } from "./networth-api"
 import { getServerFile } from "./server-files-api"
 import { enqueueTask } from "./server-tasks-api"
+import { invalidateTradePnl, invalidateTrades } from "./trades-api"
 import { countTransactions, upsertTransactions } from "./transactions-api"
 
 async function readFileImportText(accountName: string, fileRecord: ServerFile) {
@@ -100,6 +101,8 @@ export async function importFile(
       await progress([25, `Setting balances cursor to ${formatDate(newCursor)}`])
       await invalidateBalances(accountName, newCursor)
       await invalidateNetworth(accountName, newCursor)
+      await invalidateTrades(accountName, newCursor)
+      await invalidateTradePnl(accountName, newCursor)
     }
 
     await account.execute(`UPDATE file_imports SET timestamp = ?, meta = ? WHERE id = ?`, [

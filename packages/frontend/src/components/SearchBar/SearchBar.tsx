@@ -412,7 +412,7 @@ export const SearchBar = () => {
         perform: () => rpc.enqueueRecomputeTrades(activeAccount, "user"),
         priority: 3,
         section: SECTIONS.actions,
-        shortcut: ["$mod+x"],
+        // shortcut: ["$mod+x"],
       },
       {
         icon: <CalculateOutlined fontSize="small" />,

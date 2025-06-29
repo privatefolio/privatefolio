@@ -110,6 +110,11 @@ async function getAccountWithTrades(accountName: string) {
       );
     `)
 
+    await account.execute(sql`
+      INSERT OR IGNORE INTO key_value (key, value)
+      VALUES ('trade_seq', 0);
+    `)
+
     await setValue(accountName, `trade_schema_version`, SCHEMA_VERSION)
   }
 
@@ -431,6 +436,7 @@ export async function computeTrades(
     await account.execute("DELETE FROM trade_transactions")
     await account.execute("DELETE FROM trade_pnl")
     await account.execute("DELETE FROM trades")
+    await setValue(accountName, "trade_seq", 0)
   }
 
   await progress([0, "Fetching audit logs"])
@@ -448,7 +454,7 @@ export async function computeTrades(
     return
   }
 
-  await progress([10, `Processing ${auditLogs.length} audit logs`])
+  await progress([2.5, `Processing ${auditLogs.length} audit logs`])
 
   const myAssets = await getMyAssets(accountName)
   const assetsMap: Record<string, MyAsset> = myAssets.reduce((acc, asset) => {
@@ -479,7 +485,7 @@ export async function computeTrades(
   }
 
   await progress([
-    20,
+    6,
     `Found ${Object.keys(assetGroups).length} asset groups (skipped ${skippedAssets} unlisted assets)`,
   ])
 
@@ -492,7 +498,7 @@ export async function computeTrades(
         )
 
   if (existingTrades.length > 0) {
-    await progress([20, `Found ${existingTrades.length} open trades`])
+    await progress([6, `Found ${existingTrades.length} open trades`])
 
     for (const trade of existingTrades) {
       trade.deposits = trade.deposits.filter((x) => x[4] <= since)
@@ -655,31 +661,37 @@ export async function computeTrades(
 
     processedGroups++
     await progress([
-      20 + Math.floor((processedGroups / Object.keys(assetGroups).length) * 60),
+      6 + Math.floor((processedGroups / Object.keys(assetGroups).length) * 19),
       `Processed all trades for ${getAssetTicker(assetId)}`,
     ])
   }
 
+  // these are trades with no new audit logs
+  existingTrades.forEach((trade) => {
+    if (!trades.find((t) => t.id === trade.id)) {
+      trades.push(trade)
+    }
+  })
+
   // Save trades
   if (trades.length > 0) {
     trades.sort((a, b) => a.createdAt - b.createdAt)
-    // TODO9 use a seq cursor
+    const seq = await getValue(accountName, "trade_seq", 0)
     const newTrades: Trade[] = []
-    let highestTradeNumber = 0
     for (const trade of trades) {
       if (trade.tradeNumber === -1) {
         newTrades.push(trade)
-      } else if (trade.tradeNumber > highestTradeNumber) {
-        highestTradeNumber = trade.tradeNumber
       }
     }
-
     newTrades.forEach((trade, index) => {
-      trade.tradeNumber = index + 1
+      trade.tradeNumber = seq + index + 1
     })
+    if (newTrades.length > 0) {
+      const latestTradeNumber = seq + newTrades.length
+      await setValue(accountName, "trade_seq", latestTradeNumber)
+    }
 
     await upsertTrades(accountName, trades)
-
     // Insert all trade-audit log relationships
     if (tradeAuditLogs.length > 0) {
       await account.executeMany(
@@ -699,11 +711,11 @@ export async function computeTrades(
 
   if (oldestClosedTrade > 0) {
     const newCursor = oldestClosedTrade
-    await progress([80, `Setting trades cursor to ${formatDate(newCursor)}`])
+    await progress([25, `Setting trades cursor to ${formatDate(newCursor)}`])
     await setValue(accountName, "tradesCursor", newCursor)
   }
 
-  await progress([80, `Computed ${trades.length} trades`])
+  await progress([25, `Computed ${trades.length} trades`])
   await computePnl(accountName, progress, trades, since === 0 ? 0 : undefined)
 }
 
@@ -888,7 +900,7 @@ export async function computePnl(
   }
 
   if (since !== 0) {
-    await progress([80, `Refreshing PnL starting ${formatDate(since)}`])
+    await progress([25, `Refreshing PnL starting ${formatDate(since)}`])
     await account.execute(
       "DELETE FROM trade_pnl WHERE trade_id IN (SELECT id FROM trades WHERE createdAt >= ?)",
       [since]
@@ -902,7 +914,7 @@ export async function computePnl(
     return
   }
 
-  await progress([82, `Computing PnL for ${trades.length} trades`])
+  await progress([30, `Computing PnL for ${trades.length} trades`])
 
   const tradePnls: TradePnL[] = []
   let processedTrades = 0
@@ -997,10 +1009,12 @@ export async function computePnl(
 
     processedTrades++
     await progress([
-      82 + Math.floor((processedTrades / trades.length) * 16),
+      30 + Math.floor((processedTrades / trades.length) * 65),
       `Processed trade #${trade.tradeNumber} (${trade.tradeType} ${trade.amount} ${getAssetTicker(trade.assetId)})`,
     ])
   }
+
+  await progress([95, `Saving ${tradePnls.length} records to disk`])
 
   if (tradePnls.length > 0) {
     await upsertTradePnls(accountName, tradePnls)

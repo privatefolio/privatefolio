@@ -29,6 +29,7 @@ import { getValue, setValue } from "./kv-api"
 import { invalidateNetworth } from "./networth-api"
 import { getPlatform } from "./platforms-api"
 import { enqueueTask } from "./server-tasks-api"
+import { invalidateTradePnl, invalidateTrades } from "./trades-api"
 import { countTransactions, upsertTransactions } from "./transactions-api"
 
 const SCHEMA_VERSION = 6
@@ -330,6 +331,8 @@ export async function syncConnection(
       await progress([75, `Setting balances cursor to ${formatDate(newCursor)}`])
       await invalidateBalances(accountName, newCursor)
       await invalidateNetworth(accountName, newCursor)
+      await invalidateTrades(accountName, newCursor)
+      await invalidateTradePnl(accountName, newCursor)
     }
   }
 
