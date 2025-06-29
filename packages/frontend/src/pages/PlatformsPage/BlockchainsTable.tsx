@@ -2,8 +2,8 @@ import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo, useState } from "react"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
 import { Blockchain } from "src/interfaces"
-import { $showSupportedPlatformsOnly } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
+import { $hideUnsupportedPlatforms } from "src/stores/device-settings-store"
 import { HeadCell } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
 
@@ -14,7 +14,7 @@ export function BlockchainsTable() {
   const [queryTime, setQueryTime] = useState<number | null>(null)
   const accountName = useStore($activeAccount)
   const rpc = useStore($rpc)
-  const showSupportedPlatformsOnly = useStore($showSupportedPlatformsOnly)
+  const hideUnsupportedPlatforms = useStore($hideUnsupportedPlatforms)
 
   useEffect(() => {
     document.title = `Blockchains - ${accountName} - Privatefolio`
@@ -32,11 +32,11 @@ export function BlockchainsTable() {
   }, [accountName, rpc])
 
   const rows = useMemo(() => {
-    if (showSupportedPlatformsOnly) {
+    if (hideUnsupportedPlatforms) {
       return blockchains.filter((blockchain) => blockchain.supported)
     }
     return blockchains
-  }, [blockchains, showSupportedPlatformsOnly])
+  }, [blockchains, hideUnsupportedPlatforms])
 
   const headCells: HeadCell<Blockchain>[] = useMemo(
     () => [

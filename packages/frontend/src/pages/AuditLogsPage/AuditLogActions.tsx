@@ -13,6 +13,7 @@ import {
 import { useStore } from "@nanostores/react"
 import { transformAuditLogsToCsv } from "privatefolio-backend/build/src/utils/csv-export-utils"
 import React, { MutableRefObject, useState } from "react"
+import { HideSpamToggle } from "src/components/HideSpamToggle"
 import { QuoteCurrencyToggle } from "src/components/QuoteCurrencyToggle"
 import { AuditLog } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
@@ -43,6 +44,7 @@ export function AuditLogActions(props: AuditLogsActionsProps) {
   return (
     <Stack direction="row">
       <QuoteCurrencyToggle />
+      <HideSpamToggle />
       <Tooltip title="Actions">
         <IconButton color="secondary" onClick={handleClick}>
           <MoreHoriz fontSize="small" />

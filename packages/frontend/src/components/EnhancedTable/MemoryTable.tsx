@@ -14,8 +14,8 @@ import React, {
   useMemo,
   useState,
 } from "react"
-import { $showRelativeTime } from "src/stores/account-settings-store"
 import { $debugMode } from "src/stores/app-store"
+import { $showRelativeTime } from "src/stores/device-settings-store"
 
 import { TableFooter } from "../../components/TableFooter"
 import {

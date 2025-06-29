@@ -3,8 +3,8 @@ import { IconButton, Stack, Tooltip, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo, useState } from "react"
 import { AttentionBlock } from "src/components/AttentionBlock"
-import { $hideSmallBalances, $hideSmallBalancesMap } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
+import { $hideSmallBalances } from "src/stores/device-settings-store"
 import { $inspectTime } from "src/stores/pages/balances-store"
 import { getAssetPlatform } from "src/utils/assets-utils"
 import { formatDate } from "src/utils/formatting-utils"
@@ -112,7 +112,7 @@ export default function NetworthPage() {
               <IconButton
                 color="secondary"
                 onClick={() => {
-                  $hideSmallBalancesMap.setKey(activeAccount, String(!hideSmallBalances))
+                  $hideSmallBalances.set(!hideSmallBalances)
                 }}
               >
                 {hideSmallBalances ? (

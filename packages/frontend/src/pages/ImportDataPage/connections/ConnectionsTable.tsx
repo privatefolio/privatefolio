@@ -7,8 +7,8 @@ import { AttentionBlock } from "src/components/AttentionBlock"
 import { Callout } from "src/components/Callout"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
 import { Connection } from "src/interfaces"
-import { $showActiveConnectionsOnly } from "src/stores/account-settings-store"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
+import { $hideInactiveConnections } from "src/stores/device-settings-store"
 import { closeSubscription } from "src/utils/browser-utils"
 import { HeadCell } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
@@ -21,7 +21,7 @@ const $drawerOpen = atom(false)
 export function ConnectionsTable() {
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
-  const showActiveConnectionsOnly = useStore($showActiveConnectionsOnly)
+  const hideInactiveConnections = useStore($hideInactiveConnections)
 
   useEffect(() => {
     document.title = `Connections - ${activeAccount} - Privatefolio`
@@ -48,11 +48,11 @@ export function ConnectionsTable() {
   }, [connectionStatus, rpc, activeAccount])
 
   const rows = useMemo(() => {
-    if (showActiveConnectionsOnly) {
+    if (hideInactiveConnections) {
       return connections.filter((connection) => !connection.meta || connection.meta.logs > 0)
     }
     return connections
-  }, [connections, showActiveConnectionsOnly])
+  }, [connections, hideInactiveConnections])
 
   const headCells: HeadCell<Connection>[] = useMemo(
     () => [

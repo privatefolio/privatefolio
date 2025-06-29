@@ -9,8 +9,8 @@ import { IdentifierBlock } from "src/components/IdentifierBlock"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { TagList } from "src/components/TagList"
 import { useBoolean } from "src/hooks/useBoolean"
-import { $showQuotedAmounts } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
+import { $showQuotedAmounts } from "src/stores/device-settings-store"
 import { getAddressBookEntry } from "src/stores/metadata-store"
 import { greenColor, redColor } from "src/utils/color-utils"
 import { $rpc } from "src/workers/remotes"
@@ -22,7 +22,8 @@ import { AuditLogDrawer } from "./AuditLogDrawer"
 
 function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
   const { row, relativeTime, headCells, isMobile: _isMobile, isTablet, ...rest } = props
-  const { assetId, change, balanceWallet, operation, timestamp, platformId, wallet, id } = row
+  const { assetId, change, balance, balanceWallet, operation, timestamp, platformId, wallet, id } =
+    row
 
   const changeN = Number(change)
   const changeColor = changeN < 0 ? redColor : greenColor
@@ -148,9 +149,18 @@ function AuditLogTableRowBase(props: TableRowComponentProps<AuditLog>) {
             tooltipMessage="Use the 'Compute balances' action to see these values."
           />
         </TableCell>
-        <TableCell>
-          <TagList itemId={id} itemType="auditLog" />
+        <TableCell align="right" variant="clickable">
+          <AssetAmountBlock
+            assetId={assetId}
+            amount={balance}
+            priceMap={priceMap}
+            tooltipMessage="Use the 'Compute balances' action to see these values."
+          />
         </TableCell>
+
+        {/* <TableCell>
+          <TagList itemId={id} itemType="auditLog" />
+        </TableCell> */}
         <TableCell variant="actionList">
           <Tooltip title="Inspect">
             <IconButton size="small" color="secondary" onClick={toggleOpen}>

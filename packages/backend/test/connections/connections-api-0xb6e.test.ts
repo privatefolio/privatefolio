@@ -108,22 +108,47 @@ describe("should import 0xb6e via connection", () => {
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Fetching audit logs
       10,Processing 166 audit logs
-      ,Skipped chain.arbitrum-one:0xfAf87e196A29969094bE35DfB0Ab9d0b8518dB84:ACHIVX: No coingeckoId
-      ,Skipped chain.arbitrum-one:0xdf109e2b175038c66e074BfEacF37D7b0f3e426c:MaticSlot: No coingeckoId
-      20,Found 4 asset groups
-      35,Processed 1/4 asset groups
-      50,Processed 2/4 asset groups
-      65,Processed 3/4 asset groups
-      80,Processed 4/4 asset groups
+      20,Found 4 asset groups (skipped 2 unlisted assets)
+      35,Processed all trades for ETH
+      50,Processed all trades for ARB
+      65,Processed all trades for USDC
+      80,Processed all trades for USDGLO
       80,Setting trades cursor to Nov 26, 2024
-      80,Trades computation completed
-      82,Processing 6 trades
-      84,Processed 1/6 trades
-      87,Processed 2/6 trades
-      90,Processed 3/6 trades
-      92,Processed 4/6 trades
-      95,Processed 5/6 trades
-      98,Processed 6/6 trades
+      80,Computed 6 trades
+      82,Computing PnL for 6 trades
+      84,Processed trade #1 (Long 0.05579850139 ETH)
+      87,Processed trade #2 (Long 1861.1648677664375 ARB)
+      90,Processed trade #3 (Long 487.130424 USDC)
+      92,Processed trade #4 (Long 807.641687 USDC)
+      95,Processed trade #5 (Long 14.717481 USDC)
+      98,Processed trade #6 (Long 2.01 USDGLO)
+      98,Setting profit & loss cursor to Jun 14, 2025
+      100,PnL computation completed"
+    `)
+  })
+
+  it.sequential("should refresh trades", async () => {
+    // act
+    const updates: ProgressUpdate[] = []
+    await computeTrades(accountName, async (state) => updates.push(state))
+    // assert
+    expect(updates.join("\n")).toMatchInlineSnapshot(`
+      "0,Refreshing trades starting Nov 26, 2024
+      0,Fetching audit logs
+      10,Processing 32 audit logs
+      20,Found 4 asset groups (skipped 1 unlisted assets)
+      20,Found 4 open trades
+      35,Processed all trades for ETH
+      50,Processed all trades for ARB
+      65,Processed all trades for USDC
+      80,Processed all trades for USDGLO
+      80,Computed 4 trades
+      80,Refreshing PnL starting Jun 14, 2025
+      82,Computing PnL for 4 trades
+      86,Processed trade #1 (Long 0.05579850139 ETH)
+      90,Processed trade #2 (Long 1861.1648677664375 ARB)
+      94,Processed trade #5 (Long 14.717481 USDC)
+      98,Processed trade #6 (Long 2.01 USDGLO)
       98,Setting profit & loss cursor to Jun 14, 2025
       100,PnL computation completed"
     `)

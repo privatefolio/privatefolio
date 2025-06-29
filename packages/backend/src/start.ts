@@ -90,7 +90,7 @@ async function setupNetworthCronJob(accountName: string) {
       await writeApi.enqueueRefreshBalances(accountName, "cron")
       await writeApi.enqueueFetchPrices(accountName, "cron")
       await writeApi.enqueueRefreshNetworth(accountName, "cron")
-      // await writeApi.enqueueRefreshTrades(accountName, "cron") // TODO9: currently broken
+      await writeApi.enqueueRefreshTrades(accountName, "cron")
     })
     networthCronJobs[accountName] = cronJob
   } catch (error) {
@@ -155,6 +155,7 @@ async function setupSideEffects(accountName: string) {
             await writeApi.enqueueFetchPrices(accountName, "side-effect")
           }
           await writeApi.enqueueRefreshNetworth(accountName, "side-effect")
+          await writeApi.enqueueRefreshTrades(accountName, "side-effect")
         },
         SHORT_THROTTLE_DURATION,
         {

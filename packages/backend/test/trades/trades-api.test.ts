@@ -174,13 +174,13 @@ describe("trades-api", () => {
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Fetching audit logs
       10,Processing 4 audit logs
-      20,Found 1 asset groups
-      80,Processed 1/1 asset groups
+      20,Found 1 asset groups (skipped 0 unlisted assets)
+      80,Processed all trades for ETH
       80,Setting trades cursor to Sep 15, 2020
-      80,Trades computation completed
-      82,Processing 2 trades
-      90,Processed 1/2 trades
-      98,Processed 2/2 trades
+      80,Computed 2 trades
+      82,Computing PnL for 2 trades
+      90,Processed trade #1 (Long 1.5 ETH)
+      98,Processed trade #2 (Short 1 ETH)
       98,Setting profit & loss cursor to Sep 23, 2020
       100,PnL computation completed"
     `)
@@ -521,14 +521,13 @@ describe("trades-api", () => {
       "0,Refreshing trades starting Sep 15, 2020
       0,Fetching audit logs
       10,Processing 1 audit logs
-      20,Found 1 asset groups
+      20,Found 1 asset groups (skipped 0 unlisted assets)
       20,Found 1 open trades
-      80,Processed 1/1 asset groups
-      80,Trades computation completed
+      80,Processed all trades for ETH
+      80,Computed 1 trades
       80,Refreshing PnL starting Sep 23, 2020
-      82,Processing 2 trades
-      90,Processed 1/2 trades
-      98,Processed 2/2 trades
+      82,Computing PnL for 1 trades
+      98,Processed trade #2 (Short 1 ETH)
       98,Setting profit & loss cursor to Sep 23, 2020
       100,PnL computation completed"
     `)

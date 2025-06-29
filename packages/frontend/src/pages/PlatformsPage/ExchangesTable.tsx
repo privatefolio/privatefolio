@@ -2,8 +2,8 @@ import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo, useState } from "react"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
 import { Exchange } from "src/interfaces"
-import { $showSupportedPlatformsOnly } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
+import { $hideUnsupportedPlatforms } from "src/stores/device-settings-store"
 import { HeadCell } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
 
@@ -14,7 +14,7 @@ export function ExchangesTable() {
   const [queryTime, setQueryTime] = useState<number | null>(null)
   const accountName = useStore($activeAccount)
   const rpc = useStore($rpc)
-  const showSupportedOnly = useStore($showSupportedPlatformsOnly)
+  const showSupportedOnly = useStore($hideUnsupportedPlatforms)
   useEffect(() => {
     document.title = `Exchanges - ${accountName} - Privatefolio`
   }, [accountName])

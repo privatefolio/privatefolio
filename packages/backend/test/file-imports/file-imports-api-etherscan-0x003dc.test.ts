@@ -320,165 +320,129 @@ describe("should import 0x003dc via files", () => {
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Fetching audit logs
       10,Processing 1025 audit logs
-      ,Skipped chain.ethereum:0x519475b31653E46D20cD09F9FdcF3B12BDAcB4f5:VIU: No coingeckoId
-      ,Skipped chain.ethereum:0x52903256dd18D85c2Dc4a6C999907c9793eA61E3:INSP: No coingeckoId
-      ,Skipped chain.ethereum:0x42d6622deCe394b54999Fbd73D108123806f6a18:SPANK: No coingeckoId
-      ,Skipped chain.ethereum:0x960b236A07cf122663c4303350609A66A7B288C0:ANT: No coingeckoId
-      ,Skipped chain.ethereum:0xa74476443119A942dE498590Fe1f2454d7D4aC0d:GNT: No coingeckoId
-      ,Skipped chain.ethereum:0xB9e7F8568e08d5659f5D29C4997173d84CdF2607:SWT: No coingeckoId
-      ,Skipped chain.ethereum:0xE4E5E5e15dd6BcEBe489e5fABB4E8Bf8E01684DE:INT: No coingeckoId
-      ,Skipped chain.ethereum:0x6B01c3170ae1EFEBEe1a3159172CB3F7A5ECf9E5:BOOTY: No coingeckoId
-      ,Skipped chain.ethereum:0xd8D605151f55cd04827c3673C31eD3761fe7B6E9:MESH: No coingeckoId
-      ,Skipped chain.ethereum:0x2fF2B86C156583b1135C584fd940A1996FA4230b:findtherabbit.me: No coingeckoId
-      ,Skipped chain.ethereum:0x1ae5af661E9D8694038136751959070590db5EE4:SAFE: No coingeckoId
-      ,Skipped chain.ethereum:0xF5DCe57282A584D2746FaF1593d3121Fcac444dC:cSAI: No coingeckoId
-      ,Skipped chain.ethereum:0xC12D1c73eE7DC3615BA4e37E4ABFdbDDFA38907E:KICK: No coingeckoId
-      ,Skipped chain.ethereum:0x88938e9358D763C7655E788D92c731EcC9153cC5:DMS: No coingeckoId
-      ,Skipped chain.ethereum:0xcD62b1C403fa761BAadFC74C525ce2B51780b184:ANJ: No coingeckoId
-      ,Skipped chain.ethereum:0x0f8b6440A1F7BE3354fe072638a5C0F500b044bE:KTH: No coingeckoId
-      ,Skipped chain.ethereum:0x136faE4333EA36A24bb751E2d505D6ca4Fd9f00b:ETHRSIAPY: No coingeckoId
-      ,Skipped chain.ethereum:0xbf70A33A13fBe8D0106Df321Da0Cf654d2E9Ab50:ETHBTCRSI7030: No coingeckoId
-      ,Skipped chain.ethereum:0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8:yDAI+yUSDC+yUSDT+yTUSD: No coingeckoId
-      ,Skipped chain.ethereum:0x1985365e9f78359a9B6AD760e32412f4a445E862:REP: No coingeckoId
-      ,Skipped chain.ethereum:0x543Ff227F64Aa17eA132Bf9886cAb5DB55DCAddf:GEN: No coingeckoId
-      ,Skipped chain.ethereum:0xBA2E7Fed597fd0E3e70f5130BcDbbFE06bB94fe1:yYFI: No coingeckoId
-      ,Skipped chain.ethereum:0xC2aDdA861F89bBB333c90c492cB837741916A225:UNI-V2: No coingeckoId
-      ,Skipped chain.ethereum:0x2fDbAdf3C4D5A8666Bc06645B8358ab803996E28:UNI-V2: No coingeckoId
-      ,Skipped chain.ethereum:0xd3d2E2692501A5c9Ca623199D38826e513033a17:UNI-V2: No coingeckoId
-      ,Skipped chain.ethereum:0xaeE2b2097ED86354AbfD4e2361761794C6DDc07b:oETH $500 Call 11/20/20: No coingeckoId
-      ,Skipped chain.ethereum:0xc5bDdf9843308380375a611c18B50Fb9341f502A:yveCRV-DAO: No coingeckoId
-      ,Skipped chain.ethereum:0xC11b1268C1A384e55C48c2391d8d480264A3A7F4:cWBTC: No coingeckoId
-      ,Skipped chain.ethereum:0x5D8d9F5b96f4438195BE9b99eee6118Ed4304286:COVER: No coingeckoId
-      ,Skipped chain.ethereum:0x088ee5007C98a9677165D78dD2109AE4a3D04d0C:SLP: No coingeckoId
-      ,Skipped chain.ethereum:0x71fbC1d795FcfBcA43A3ebF6de0101952f31a410:ADAO: No coingeckoId
-      ,Skipped chain.ethereum:0xcD7989894bc033581532D2cd88Da5db0A4b12859:UNI-V2: No coingeckoId
-      ,Skipped chain.ethereum:0x235c9e24D3FB2FAFd58a2E49D454Fdcd2DBf7FF1:bUNI-V2: No coingeckoId
-      ,Skipped chain.ethereum:0xE86204c4eDDd2f70eE00EAd6805f917671F56c52:UNI-V2: No coingeckoId
-      ,Skipped chain.ethereum:0xC17078FDd324CC473F8175Dc5290fae5f2E84714:bUNI-V2: No coingeckoId
-      ,Skipped chain.ethereum:0x4688a8b1F292FDaB17E9a90c8Bc379dC1DBd8713:COVER: No coingeckoId
-      20,Found 33 asset groups
-      21,Processed 1/33 asset groups
-      23,Processed 2/33 asset groups
-      25,Processed 3/33 asset groups
-      27,Processed 4/33 asset groups
-      29,Processed 5/33 asset groups
-      30,Processed 6/33 asset groups
-      32,Processed 7/33 asset groups
-      34,Processed 8/33 asset groups
-      36,Processed 9/33 asset groups
-      38,Processed 10/33 asset groups
-      40,Processed 11/33 asset groups
-      41,Processed 12/33 asset groups
-      43,Processed 13/33 asset groups
-      45,Processed 14/33 asset groups
-      47,Processed 15/33 asset groups
-      49,Processed 16/33 asset groups
-      50,Processed 17/33 asset groups
-      52,Processed 18/33 asset groups
-      54,Processed 19/33 asset groups
-      56,Processed 20/33 asset groups
-      58,Processed 21/33 asset groups
-      60,Processed 22/33 asset groups
-      61,Processed 23/33 asset groups
-      63,Processed 24/33 asset groups
-      65,Processed 25/33 asset groups
-      67,Processed 26/33 asset groups
-      69,Processed 27/33 asset groups
-      70,Processed 28/33 asset groups
-      72,Processed 29/33 asset groups
-      74,Processed 30/33 asset groups
-      76,Processed 31/33 asset groups
-      78,Processed 32/33 asset groups
-      80,Processed 33/33 asset groups
+      20,Found 33 asset groups (skipped 36 unlisted assets)
+      21,Processed all trades for ETH
+      23,Processed all trades for DNT
+      25,Processed all trades for MANA
+      27,Processed all trades for SAI
+      29,Processed all trades for WETH
+      30,Processed all trades for CETH
+      32,Processed all trades for DAI
+      34,Processed all trades for CDAI
+      36,Processed all trades for TKN
+      38,Processed all trades for USDC
+      40,Processed all trades for FREE
+      41,Processed all trades for ADAI
+      43,Processed all trades for AUSDC
+      45,Processed all trades for MKR
+      47,Processed all trades for LRC
+      49,Processed all trades for UNI
+      50,Processed all trades for YFI
+      52,Processed all trades for CRV
+      54,Processed all trades for CUNI
+      56,Processed all trades for AMKR
+      58,Processed all trades for COMP
+      60,Processed all trades for WBTC
+      61,Processed all trades for PICKLE
+      63,Processed all trades for MYST
+      65,Processed all trades for BADGER
+      67,Processed all trades for USDT
+      69,Processed all trades for 1INCH
+      70,Processed all trades for SUSHI
+      72,Processed all trades for DIGG
+      74,Processed all trades for 3CRV
+      76,Processed all trades for GTC
+      78,Processed all trades for GLM
+      80,Processed all trades for YVYFI
       80,Setting trades cursor to Sep 20, 2022
-      80,Trades computation completed
-      82,Processing 86 trades
-      82,Processed 1/86 trades
-      82,Processed 2/86 trades
-      82,Processed 3/86 trades
-      82,Processed 4/86 trades
-      82,Processed 5/86 trades
-      83,Processed 6/86 trades
-      83,Processed 7/86 trades
-      83,Processed 8/86 trades
-      83,Processed 9/86 trades
-      83,Processed 10/86 trades
-      84,Processed 11/86 trades
-      84,Processed 12/86 trades
-      84,Processed 13/86 trades
-      84,Processed 14/86 trades
-      84,Processed 15/86 trades
-      84,Processed 16/86 trades
-      85,Processed 17/86 trades
-      85,Processed 18/86 trades
-      85,Processed 19/86 trades
-      85,Processed 20/86 trades
-      85,Processed 21/86 trades
-      86,Processed 22/86 trades
-      86,Processed 23/86 trades
-      86,Processed 24/86 trades
-      86,Processed 25/86 trades
-      86,Processed 26/86 trades
-      87,Processed 27/86 trades
-      87,Processed 28/86 trades
-      87,Processed 29/86 trades
-      87,Processed 30/86 trades
-      87,Processed 31/86 trades
-      87,Processed 32/86 trades
-      88,Processed 33/86 trades
-      88,Processed 34/86 trades
-      88,Processed 35/86 trades
-      88,Processed 36/86 trades
-      88,Processed 37/86 trades
-      89,Processed 38/86 trades
-      89,Processed 39/86 trades
-      89,Processed 40/86 trades
-      89,Processed 41/86 trades
-      89,Processed 42/86 trades
-      90,Processed 43/86 trades
-      90,Processed 44/86 trades
-      90,Processed 45/86 trades
-      90,Processed 46/86 trades
-      90,Processed 47/86 trades
-      90,Processed 48/86 trades
-      91,Processed 49/86 trades
-      91,Processed 50/86 trades
-      91,Processed 51/86 trades
-      91,Processed 52/86 trades
-      91,Processed 53/86 trades
-      92,Processed 54/86 trades
-      92,Processed 55/86 trades
-      92,Processed 56/86 trades
-      92,Processed 57/86 trades
-      92,Processed 58/86 trades
-      92,Processed 59/86 trades
-      93,Processed 60/86 trades
-      93,Processed 61/86 trades
-      93,Processed 62/86 trades
-      93,Processed 63/86 trades
-      93,Processed 64/86 trades
-      94,Processed 65/86 trades
-      94,Processed 66/86 trades
-      94,Processed 67/86 trades
-      94,Processed 68/86 trades
-      94,Processed 69/86 trades
-      95,Processed 70/86 trades
-      95,Processed 71/86 trades
-      95,Processed 72/86 trades
-      95,Processed 73/86 trades
-      95,Processed 74/86 trades
-      95,Processed 75/86 trades
-      96,Processed 76/86 trades
-      96,Processed 77/86 trades
-      96,Processed 78/86 trades
-      96,Processed 79/86 trades
-      96,Processed 80/86 trades
-      97,Processed 81/86 trades
-      97,Processed 82/86 trades
-      97,Processed 83/86 trades
-      97,Processed 84/86 trades
-      97,Processed 85/86 trades
-      98,Processed 86/86 trades
+      80,Computed 86 trades
+      82,Computing PnL for 86 trades
+      82,Processed trade #1 (Long 47.67419555637689 ETH)
+      82,Processed trade #2 (Long 1910 DNT)
+      82,Processed trade #3 (Long 3067.671 MANA)
+      82,Processed trade #4 (Long 10.87060820937004 SAI)
+      82,Processed trade #5 (Long 1927.5 SAI)
+      83,Processed trade #6 (Long 9462.77 SAI)
+      83,Processed trade #7 (Long 8 WETH)
+      83,Processed trade #8 (Long 47 WETH)
+      83,Processed trade #9 (Long 2911 SAI)
+      83,Processed trade #10 (Long 47.60993124529113 WETH)
+      84,Processed trade #11 (Long 2250 SAI)
+      84,Processed trade #12 (Long 1300 SAI)
+      84,Processed trade #13 (Long 5144.247788224923 SAI)
+      84,Processed trade #14 (Long 2325 SAI)
+      84,Processed trade #15 (Long 1750 SAI)
+      84,Processed trade #16 (Long 675.84 SAI)
+      85,Processed trade #17 (Long 3075 SAI)
+      85,Processed trade #18 (Long 3760 SAI)
+      85,Processed trade #19 (Long 2098.99161694 CETH)
+      85,Processed trade #20 (Long 1000 SAI)
+      85,Processed trade #21 (Long 1000 SAI)
+      86,Processed trade #22 (Long 1000 SAI)
+      86,Processed trade #23 (Long 2750 SAI)
+      86,Processed trade #24 (Long 2520.9911048659155 DAI)
+      86,Processed trade #25 (Long 41035.42403614 CDAI)
+      86,Processed trade #26 (Long 995 SAI)
+      87,Processed trade #27 (Long 994.96892911 SAI)
+      87,Processed trade #28 (Long 994.96892911 DAI)
+      87,Processed trade #29 (Long 821.373092771901 DAI)
+      87,Processed trade #30 (Long 2000 DAI)
+      87,Processed trade #31 (Long 2839.5 DAI)
+      87,Processed trade #32 (Long 2145.86543802 TKN)
+      88,Processed trade #33 (Long 1571.469243 USDC)
+      88,Processed trade #34 (Long 10000 FREE)
+      88,Processed trade #35 (Long 99.957818 USDC)
+      88,Processed trade #36 (Long 4430.2018948769455 ADAI)
+      88,Processed trade #37 (Long 4607.000118 AUSDC)
+      89,Processed trade #38 (Long 2497.72853867 CETH)
+      89,Processed trade #39 (Long 3906 DAI)
+      89,Processed trade #40 (Long 2146 DAI)
+      89,Processed trade #41 (Long 4436.296511716325 DAI)
+      89,Processed trade #42 (Short 6.094616839379424 ADAI)
+      90,Processed trade #43 (Long 4506.611832 USDC)
+      90,Processed trade #44 (Long 5794.773921 USDC)
+      90,Processed trade #45 (Short 13.968052 AUSDC)
+      90,Processed trade #46 (Long 5794.815104 USDC)
+      90,Processed trade #47 (Long 7.076083294896952 MKR)
+      90,Processed trade #48 (Long 5940.0227188854915 LRC)
+      91,Processed trade #49 (Long 1017.881923452677 DAI)
+      91,Processed trade #50 (Long 400 UNI)
+      91,Processed trade #51 (Long 0.0970886 YFI)
+      91,Processed trade #52 (Long 0.046449260886212644 YFI)
+      91,Processed trade #53 (Long 2500 USDC)
+      92,Processed trade #54 (Long 500 CRV)
+      92,Processed trade #55 (Long 267.54314482231206 UNI)
+      92,Processed trade #56 (Long 2.150945835565699 MKR)
+      92,Processed trade #57 (Long 13322.70172601 CUNI)
+      92,Processed trade #58 (Long 2.150945835565699 AMKR)
+      92,Processed trade #59 (Long 6022.107825046159 DAI)
+      93,Processed trade #60 (Long 1.2853117351540768 COMP)
+      93,Processed trade #61 (Short 166.73610739646176 CRV)
+      93,Processed trade #62 (Long 0.33333333 WBTC)
+      93,Processed trade #63 (Long 2511.22 USDC)
+      93,Processed trade #64 (Long 17 PICKLE)
+      94,Processed trade #65 (Long 0.0508494402157599 YFI)
+      94,Processed trade #66 (Long 521.4366690830452 MYST)
+      94,Processed trade #67 (Long 42.85272155641802 BADGER)
+      94,Processed trade #68 (Long 0.25532646 WBTC)
+      94,Processed trade #69 (Long 1000 USDT)
+      95,Processed trade #70 (Long 746.7450104902583 1INCH)
+      95,Processed trade #71 (Long 21.374913152096518 SUSHI)
+      95,Processed trade #72 (Long 0.07052041880285556 YFI)
+      95,Processed trade #73 (Long 0.048925828 DIGG)
+      95,Processed trade #74 (Long 56.68907623690096 BADGER)
+      95,Processed trade #75 (Long 201.8817290386431 CRV)
+      96,Processed trade #76 (Long 136.0013233557136 3CRV)
+      96,Processed trade #77 (Long 2.15543784295425 MKR)
+      96,Processed trade #78 (Short 0.004492007388551107 AMKR)
+      96,Processed trade #79 (Long 269.05019322329014 UNI)
+      96,Processed trade #80 (Long 0.0635 WBTC)
+      97,Processed trade #81 (Long 0.09370821 WBTC)
+      97,Processed trade #82 (Long 231.9853 GTC)
+      97,Processed trade #83 (Long 248.18304423451846 CRV)
+      97,Processed trade #84 (Long 17 PICKLE)
+      97,Processed trade #85 (Long 441 GLM)
+      98,Processed trade #86 (Long 0.001196905052533791 YVYFI)
       100,PnL computation completed"
     `)
   })

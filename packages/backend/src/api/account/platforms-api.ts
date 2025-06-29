@@ -166,7 +166,8 @@ export async function findPlatforms(
   let exchanges: Exchange[] = []
 
   if (searchSet === "coingecko") {
-    [blockchains, exchanges] = await Promise.all([getBlockchains(), getExchanges()])
+    // eslint-disable-next-line @typescript-eslint/no-extra-semi
+    ;[blockchains, exchanges] = await Promise.all([getBlockchains(), getExchanges()])
   } else {
     const myPlatforms = await getMyPlatforms(accountName)
     blockchains = myPlatforms.filter((platform) => isBlockchain(platform))

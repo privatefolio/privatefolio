@@ -19,9 +19,9 @@ import {
 import { useStore } from "@nanostores/react"
 import React from "react"
 import { ActionId, APP_ACTIONS } from "src/AppActions"
-import { $hideUnlisted, $hideUnlistedMap } from "src/stores/account-settings-store"
 import { $activeAccount } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
+import { $hideUnlisted } from "src/stores/device-settings-store"
 import { $rpc } from "src/workers/remotes"
 
 export function AssetsActions() {
@@ -45,7 +45,7 @@ export function AssetsActions() {
         <IconButton
           color="secondary"
           onClick={() => {
-            $hideUnlistedMap.setKey(activeAccount, String(!hideUnlisted))
+            $hideUnlisted.set(!hideUnlisted)
           }}
         >
           {hideUnlisted ? (
