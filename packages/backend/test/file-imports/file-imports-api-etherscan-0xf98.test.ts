@@ -205,19 +205,20 @@ describe("0xf98 file import", () => {
     // assert
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Fetching audit logs
-      10,Processing 24 audit logs
-      20,Found 4 asset groups (skipped 5 unlisted assets)
-      35,Processed all trades for ETH
-      50,Processed all trades for XDATA
-      65,Processed all trades for LOOM
-      80,Processed all trades for LPT
-      80,Setting trades cursor to Nov 04, 2020
-      80,Computed 4 trades
-      82,Computing PnL for 4 trades
-      86,Processed trade #1 (Long 5.151643 ETH)
-      90,Processed trade #2 (Long 0.21165476692904842 XDATA)
-      94,Processed trade #3 (Long 10 LOOM)
-      98,Processed trade #4 (Long 2.117826656607922 LPT)
+      2.5,Processing 24 audit logs
+      6,Found 4 asset groups (skipped 5 unlisted assets)
+      10,Processed all trades for ETH
+      15,Processed all trades for XDATA
+      20,Processed all trades for LOOM
+      25,Processed all trades for LPT
+      25,Setting trades cursor to Nov 04, 2020
+      25,Computed 4 trades
+      30,Computing PnL for 4 trades
+      46,Processed trade #1 (Long 5.151643 ETH)
+      62,Processed trade #2 (Long 0.21165476692904842 XDATA)
+      78,Processed trade #3 (Long 10 LOOM)
+      95,Processed trade #4 (Long 2.117826656607922 LPT)
+      95,Saving 4 records to disk
       100,PnL computation completed"
     `)
   })

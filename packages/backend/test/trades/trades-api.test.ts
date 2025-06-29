@@ -173,14 +173,15 @@ describe("trades-api", () => {
     const trades = await getTrades(accountName, await getTradesFullQuery())
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Fetching audit logs
-      10,Processing 4 audit logs
-      20,Found 1 asset groups (skipped 0 unlisted assets)
-      80,Processed all trades for ETH
-      80,Setting trades cursor to Sep 15, 2020
-      80,Computed 2 trades
-      82,Computing PnL for 2 trades
-      90,Processed trade #1 (Long 1.5 ETH)
-      98,Processed trade #2 (Short 1 ETH)
+      2.5,Processing 4 audit logs
+      6,Found 1 asset groups (skipped 0 unlisted assets)
+      25,Processed all trades for ETH
+      25,Setting trades cursor to Sep 15, 2020
+      25,Computed 2 trades
+      30,Computing PnL for 2 trades
+      62,Processed trade #1 (Long 1.5 ETH)
+      95,Processed trade #2 (Short 1 ETH)
+      95,Saving 9 records to disk
       98,Setting profit & loss cursor to Sep 23, 2020
       100,PnL computation completed"
     `)
@@ -520,14 +521,15 @@ describe("trades-api", () => {
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Refreshing trades starting Sep 15, 2020
       0,Fetching audit logs
-      10,Processing 1 audit logs
-      20,Found 1 asset groups (skipped 0 unlisted assets)
-      20,Found 1 open trades
-      80,Processed all trades for ETH
-      80,Computed 1 trades
-      80,Refreshing PnL starting Sep 23, 2020
-      82,Computing PnL for 1 trades
-      98,Processed trade #2 (Short 1 ETH)
+      2.5,Processing 1 audit logs
+      6,Found 1 asset groups (skipped 0 unlisted assets)
+      6,Found 1 open trades
+      25,Processed all trades for ETH
+      25,Computed 1 trades
+      25,Refreshing PnL starting Sep 23, 2020
+      30,Computing PnL for 1 trades
+      95,Processed trade #2 (Short 1 ETH)
+      95,Saving 5 records to disk
       98,Setting profit & loss cursor to Sep 23, 2020
       100,PnL computation completed"
     `)
