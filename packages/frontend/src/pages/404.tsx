@@ -11,7 +11,7 @@ export default function FourZeroFourPage({
   type?: string
 }) {
   return (
-    <StaggeredList component="main" gap={1} show={show}>
+    <StaggeredList component="main" show={show}>
       <Subheading>
         <span>{type} not found</span>
       </Subheading>

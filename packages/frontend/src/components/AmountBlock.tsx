@@ -6,6 +6,7 @@ import { greenColor, redColor } from "src/utils/color-utils"
 import { EMPTY_OBJECT } from "src/utils/utils"
 
 import { formatNumber } from "../utils/formatting-utils"
+import { Truncate } from "./Truncate"
 
 export type AmountBlockProps = TypographyProps & {
   amount?: string | number
@@ -137,7 +138,7 @@ export function AmountBlock(props: AmountBlockProps) {
         {...rest}
       >
         {typeof amountN === "number" ? (
-          compactLabel
+          <Truncate>{compactLabel}</Truncate>
         ) : (
           <Typography color="text.secondary" component="span" variant="inherit">
             {placeholder}
