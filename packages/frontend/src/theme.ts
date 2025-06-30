@@ -7,7 +7,8 @@ export const SerifFont = "'Roboto Serif', serif"
 export const MonoFont = "'IBM Plex Mono', monospace"
 
 // export const bgColor = "rgb(232, 233, 237)"
-export const bgColor = "rgb(237, 238, 242)"
+// export const bgColor = "rgb(237, 238, 242)"
+export const bgColor = "rgb(242, 243, 245)"
 
 export const chipBgOpacity = 0.075
 
