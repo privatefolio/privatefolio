@@ -732,6 +732,7 @@ export enum SubscriptionChannel {
   ServerFiles = "server-files",
   KeyValue = "key-value",
   AuditLogs = "audit-logs",
+  ChatHistory = "chat-history",
   Networth = "networth",
   DailyPrices = "daily-prices",
   FileImports = "file-imports",
@@ -917,4 +918,23 @@ export interface AccountPnL {
   positionValue: string
   proceeds: string
   timestamp: number
+}
+
+export interface ChatMessage {
+  conversationId: string
+  id: string
+  message: string
+  metadata?: string
+  role: "user" | "assistant" | "system"
+  timestamp: number
+  tokens?: number
+}
+
+export interface ChatConversation {
+  firstMessage: string
+  id: string
+  lastTime: number
+  messageCount: number
+  model?: string
+  startTime: number
 }

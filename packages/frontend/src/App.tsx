@@ -47,6 +47,7 @@ import { $cloudRest, $cloudRpc, $localRest, $localRpc, $rpc } from "./workers/re
 
 const AssetPage = lazy(() => import("./pages/AssetPage/AssetPage"))
 const AssetsPage = lazy(() => import("./pages/AssetsPage/AssetsPage"))
+const AssistantPage = lazy(() => import("./pages/AssistantPage/AssistantPage"))
 const AuditLogsPage = lazy(() => import("./pages/AuditLogsPage/AuditLogsPage"))
 const ExtensionPage = lazy(() => import("./pages/ExtensionPage/ExtensionPage"))
 const ExtensionsPage = lazy(() => import("./pages/ExtensionsPage/ExtensionsPage"))
@@ -264,6 +265,7 @@ export default function App() {
                   <Route path="transactions" element={<TransactionsPage show />} />
                   <Route path="audit-logs" element={<AuditLogsPage show />} />
                   <Route path="import-data" element={<ImportDataPage show />} />
+                  <Route path="assistant" element={<AssistantPage show />} />
                   <Route path="server" element={<ServerPage show />} />
                   <Route path="extensions" element={<ExtensionsPage show />} />
                   <Route path="extension/:extensionId" element={<ExtensionPage />} />

@@ -1,5 +1,7 @@
+import { InfoOutlined } from "@mui/icons-material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo, useState } from "react"
+import { AttentionBlock } from "src/components/AttentionBlock"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
 import { Exchange } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
@@ -78,6 +80,8 @@ export function ExchangesTable() {
     []
   )
 
+  const hiddenCount = exchanges.length - rows.length
+
   return (
     <MemoryTable<Exchange>
       initOrderBy={"coingeckoTrustRank" as keyof Exchange}
@@ -87,6 +91,14 @@ export function ExchangesTable() {
       rows={rows}
       rowCount={rows.length}
       queryTime={queryTime}
+      extraRow={
+        !!hiddenCount && (
+          <AttentionBlock>
+            <InfoOutlined sx={{ height: 20, width: 20 }} />
+            <span>{hiddenCount} unsupported exchanges hidden…</span>
+          </AttentionBlock>
+        )
+      }
     />
   )
 }

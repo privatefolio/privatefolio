@@ -203,7 +203,7 @@ export function ServerSettings() {
   const metadataToggleValue = isMetadataCustomMode ? "custom" : metadataRefreshInterval
 
   return (
-    <Paper sx={{ paddingX: 2, paddingY: 2 }}>
+    <Paper sx={{ paddingX: 2, paddingY: 1 }}>
       <Stack gap={2}>
         <Stack gap={1}>
           <LearnMore

@@ -1,8 +1,10 @@
 import { Serializable } from "src/backend-server"
 import { SqlParam, SubscriptionChannel } from "src/interfaces"
+import { encryptValue } from "src/utils/jwt-utils"
 import { createSubscription } from "src/utils/sub-utils"
 
 import { getAccount } from "../accounts-api"
+import { readSecrets } from "../auth-http-api"
 
 export async function setValue(accountName: string, key: string, value: unknown) {
   const account = await getAccount(accountName)
@@ -37,4 +39,19 @@ export async function subscribeToKV<T>(
   }
 
   return createSubscription(accountName, SubscriptionChannel.KeyValue, listener)
+}
+
+export async function setEncryptedValue(accountName: string, key: string, value: string) {
+  if (!value) {
+    await setValue(accountName, key, null)
+    return
+  }
+
+  const secrets = await readSecrets()
+  if (!secrets) {
+    throw new Error("Authentication secrets not found. Cannot encrypt value.")
+  }
+
+  const encryptedValue = await encryptValue(value, secrets.jwtSecret)
+  await setValue(accountName, key, encryptedValue)
 }

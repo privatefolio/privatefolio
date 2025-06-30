@@ -1,5 +1,6 @@
 import {
   AccountBalanceRounded,
+  AutoAwesomeRounded,
   CandlestickChartRounded,
   CloudRounded,
   ExtensionRounded,
@@ -177,6 +178,15 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             avatar={<CandlestickChartRounded />}
           />
           <NavMenuItem
+            value="assistant"
+            to={`${activeAccountPath}/assistant`}
+            label="Assistant"
+            aria-label="Visit Assistant"
+            onClick={toggleOpen}
+            shortcutKey="i"
+            avatar={<AutoAwesomeRounded />}
+          />
+          <NavMenuItem
             value="assets"
             to={`${activeAccountPath}/assets`}
             label="Assets"
@@ -245,7 +255,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             label="Pro chart"
             aria-label="Visit Pro chart"
             onClick={toggleOpen}
-            shortcutKey="p"
+            shortcutKey="c"
             avatar={<TimelineRounded />}
           />
         </Stack>

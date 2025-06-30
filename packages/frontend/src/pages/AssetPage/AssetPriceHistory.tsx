@@ -117,7 +117,7 @@ export function AssetPriceHistory(props: AssetPriceHistoryProps) {
           displayEmpty
           sx={{
             "& .MuiSelect-select": {
-              borderRadius: 0.5,
+              borderRadius: "4px !important",
               paddingX: 1.5,
               paddingY: 0.5,
             },
@@ -131,7 +131,7 @@ export function AssetPriceHistory(props: AssetPriceHistoryProps) {
         >
           {asset.priceApiId && (
             <MenuItem value="">
-              <Stack direction="row" alignItems={"center"} gap={1}>
+              <Stack direction="row" alignItems="center" gap={1}>
                 <SdCardRounded sx={{ fontSize: "1rem !important" }} />
                 Database cache
               </Stack>

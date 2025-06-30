@@ -158,7 +158,7 @@ export async function upsertConnections(accountName: string, records: NewConnect
       ])
     )
     for (const record of records) {
-      await setValue(accountName, `cursor_${record.id || deriveConnectionId(record)}`, 0)
+      await setValue(accountName, `connection_cursor_${record.id || deriveConnectionId(record)}`, 0)
     }
     const latestConnectionNumber = await account.execute(
       sql`SELECT MAX(connectionNumber) FROM connections`
@@ -225,7 +225,7 @@ export async function resetConnection(
   await progress([50, `Removing ${transactionsCount} transactions`])
   await account.execute(`DELETE FROM transactions WHERE connectionId = ?`, [connection.id])
 
-  await setValue(accountName, `cursor_${connection.id}`, 0)
+  await setValue(accountName, `connection_cursor_${connection.id}`, 0)
 
   connection.meta = {
     assetIds: [],
@@ -281,7 +281,11 @@ export async function syncConnection(
   let result: SyncResult
 
   if (since === undefined) {
-    since = (await getValue<string>(accountName, `cursor_${connection.id}`, "0")) as string
+    since = (await getValue<string>(
+      accountName,
+      `connection_cursor_${connection.id}`,
+      "0"
+    )) as string
   }
   if (until === undefined) {
     until = String(Date.now())
@@ -366,7 +370,7 @@ export async function syncConnection(
   // Set cursor
   if (result.rows > 0) {
     await progress([90, `Setting cursor to ${result.newCursor}`])
-    await setValue(accountName, `cursor_${connection.id}`, result.newCursor)
+    await setValue(accountName, `connection_cursor_${connection.id}`, result.newCursor)
   }
 
   return connection

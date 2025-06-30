@@ -6,6 +6,7 @@ import { proxy } from "comlink"
 import { access } from "fs/promises"
 import { join } from "path"
 
+import { handleAssistantChat } from "./api/account/assistant-http-api"
 import { handleDownload, handlePreflight, handleUpload } from "./api/account/server-files-http-api"
 import {
   handleLoginRequest,
@@ -111,7 +112,7 @@ export class BackendServer<T extends BackendApiShape> {
           }
         }
 
-        const protectedRoutes = ["/download", "/upload"]
+        const protectedRoutes = ["/download", "/upload", "/assistant-chat"]
         if (!isAuthenticated) {
           if (protectedRoutes.includes(pathname)) {
             console.warn(`Blocked unauthenticated request to ${pathname}.`)
@@ -125,6 +126,9 @@ export class BackendServer<T extends BackendApiShape> {
         }
         if (pathname === "/upload") {
           return await handleUpload(request)
+        }
+        if (pathname === "/assistant-chat") {
+          return await handleAssistantChat(request)
         }
 
         // WebSocket upgrade check (protected)

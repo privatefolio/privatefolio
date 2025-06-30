@@ -1,5 +1,7 @@
+import { InfoOutlined } from "@mui/icons-material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo, useState } from "react"
+import { AttentionBlock } from "src/components/AttentionBlock"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
 import { Blockchain } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
@@ -63,6 +65,8 @@ export function BlockchainsTable() {
     []
   )
 
+  const hiddenCount = blockchains.length - rows.length
+
   return (
     <MemoryTable<Blockchain>
       initOrderBy="chainId"
@@ -72,6 +76,14 @@ export function BlockchainsTable() {
       rows={rows}
       rowCount={rows.length}
       queryTime={queryTime}
+      extraRow={
+        !!hiddenCount && (
+          <AttentionBlock>
+            <InfoOutlined sx={{ height: 20, width: 20 }} />
+            <span>{hiddenCount} unsupported blockchains hidden…</span>
+          </AttentionBlock>
+        )
+      }
     />
   )
 }

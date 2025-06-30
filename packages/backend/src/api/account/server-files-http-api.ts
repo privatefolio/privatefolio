@@ -103,7 +103,6 @@ export async function handleDownload(request: Request): Promise<Response> {
 export async function handleUpload(request: Request): Promise<Response> {
   const { method } = request
 
-  // Ensure the request method is POST
   if (method !== "POST") {
     return new Response("Method not allowed - only POST is allowed.", {
       headers: corsHeaders,
