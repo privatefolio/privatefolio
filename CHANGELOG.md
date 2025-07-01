@@ -3,6 +3,35 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.8 - 2025/07/01
+
+### 💡 Feature updates
+
+- Add support for 26 more blockchains with the Etherscan extension
+- Add a mini nav menu for tablets and laptops
+- Improve user experience around connections: new `All platforms` option
+- Add a new action `Verify balances` which checks if the on-chain data reflects the app data
+- Allow adding of manual transactions
+- Add `Recent` section in search bar
+- Add a checkmark for the exchanges and blockchains supported by our extensions
+
+### 🐛 Bug Fixes
+
+- Fix truncation on `AmountBlock`
+- Fix refresh trades
+
+### Other updates
+
+- Speed up daily price retrieval with database indexes
+- Add platform categories to avoid conflicts on unique coingecko ids
+- Add a new page to chat with OpenAI models (next step is to give them tools)
+
+## v2.0.0-beta.7 - 2025/06/22
+
+### 🐛 Bug Fixes
+
+- Fix a bug in telemetry
+
 ## v2.0.0-beta.6 - 2025/06/20
 
 ### 💡 Feature updates
