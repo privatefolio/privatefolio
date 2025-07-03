@@ -3,6 +3,12 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.11 - 2025/07/03
+
+### 💡 Feature updates
+
+- Auto-updates for the Windows and Linux apps
+
 ## v2.0.0-beta.8 - 2025/07/01
 
 ### 💡 Feature updates
