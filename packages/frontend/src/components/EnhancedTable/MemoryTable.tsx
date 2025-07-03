@@ -79,12 +79,12 @@ export function getComparator<T extends BaseType>(
 
 export type MemoryTableProps<T extends BaseType> = {
   TableRowComponent: ComponentType<TableRowComponentProps<T>>
-  addNewRow?: JSX.Element
+  addNewRow?: ReactNode
   /**
    * @default 20
    */
   defaultRowsPerPage?: number
-  emptyContent?: JSX.Element
+  emptyContent?: ReactNode
   extraRow?: ReactNode
   headCells: HeadCell<T>[]
   initOrderBy: keyof T

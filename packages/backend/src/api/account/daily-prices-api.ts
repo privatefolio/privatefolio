@@ -27,7 +27,7 @@ import { enqueueTask } from "./server-tasks-api"
 
 const SCHEMA_VERSION = 2
 
-async function getAccountWithDailyPrices(accountName: string) {
+export async function getAccountWithDailyPrices(accountName: string) {
   const schemaVersion = await getValue(accountName, `daily_prices_schema_version`, 0)
   const account = await getAccount(accountName)
 

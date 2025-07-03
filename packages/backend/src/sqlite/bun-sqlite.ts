@@ -1,5 +1,6 @@
 import { Database } from "bun:sqlite"
-import { isDebug, isDevelopment, isTestEnvironment } from "src/utils/environment-utils"
+import { isDebug, isDevelopment, isTestEnvironment, writesAllowed } from "src/utils/environment-utils"
+import { isReadQuery } from "src/utils/sql-utils"
 import { getPrefix } from "src/utils/utils"
 
 export type SQLiteCompatibleType = boolean | string | number | null | Uint8Array
@@ -14,12 +15,17 @@ export async function createQueryExecutor(
   databaseFilePath: string,
   accountName: string
 ): Promise<QueryExecutor> {
-  const db = new Database(databaseFilePath)
+  const db = new Database(databaseFilePath, {
+    create: true,
+    readonly: !writesAllowed, // doesn't work
+    readwrite: writesAllowed, // doesn't work
+  })
 
   async function executeFn(
     query: string,
     params: SQLiteCompatibleType[] = []
   ): Promise<SQLiteCompatibleType[][]> {
+    if (!writesAllowed && !isReadQuery(query)) throw new Error("Illegal write query")
     try {
       const start = process.hrtime.bigint() // Start time in nanoseconds
 
@@ -52,6 +58,8 @@ export async function createQueryExecutor(
     query: string,
     params: SQLiteCompatibleType[][] = []
   ): Promise<SQLiteCompatibleType[][]> {
+    if (!writesAllowed && !isReadQuery(query)) throw new Error("Illegal write query")
+
     const results: SQLiteCompatibleType[][] = []
 
     // TODO3

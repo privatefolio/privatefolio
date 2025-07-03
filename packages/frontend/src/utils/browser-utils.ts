@@ -47,8 +47,8 @@ export function isInputFocused() {
     (activeElement instanceof HTMLElement && activeElement.isContentEditable)
   if (inputFocused) return true
 
-  const modalOpen = document.querySelector("div[role='dialog']")
-  if (modalOpen) return true
+  if (document.querySelector("div[role='dialog']")) return true
+  if (document.querySelector("div[role='presentation']")) return true
 
   return false
 }

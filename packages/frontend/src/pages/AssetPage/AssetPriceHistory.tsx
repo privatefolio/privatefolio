@@ -163,6 +163,8 @@ export function AssetPriceHistory(props: AssetPriceHistoryProps) {
         tooltipOptions={tooltipOptions}
         chartOptions={chartOptions}
         extraSettings={extraSettings}
+        emptyContent="No price data available."
+        showToolbarAlways
       />
     </>
   )

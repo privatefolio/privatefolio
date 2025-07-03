@@ -15,6 +15,7 @@ import { getCronExpression, getPrefix, isDevelopment } from "./utils/utils"
 console.log("Starting worker...")
 const worker = new Worker(import.meta.resolve("./api-worker"), {
   env: {
+    ALLOW_WRITES: "true",
     BUN_WORKER: "true",
     ...process.env,
   },

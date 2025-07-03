@@ -1,6 +1,7 @@
 import { open } from "sqlite"
 import sqlite3 from "sqlite3"
-import { isDevelopment, isTestEnvironment } from "src/utils/environment-utils"
+import { isDevelopment, isTestEnvironment, writesAllowed } from "src/utils/environment-utils"
+import { isReadQuery } from "src/utils/sql-utils"
 import { getPrefix } from "src/utils/utils"
 
 export type SQLiteCompatibleType = boolean | string | number | null | Uint8Array
@@ -18,12 +19,14 @@ export async function createQueryExecutor(
   const db = await open({
     driver: sqlite3.Database,
     filename: databaseFilePath,
+    mode: !writesAllowed ? sqlite3.OPEN_READONLY : sqlite3.OPEN_READWRITE,
   })
 
   async function executeFn(
     query: string,
     params: SQLiteCompatibleType[] = []
   ): Promise<SQLiteCompatibleType[][]> {
+    if (!writesAllowed && !isReadQuery(query)) throw new Error("Illegal write query")
     try {
       const start = process.hrtime.bigint() // Start time in nanoseconds
 
@@ -56,6 +59,8 @@ export async function createQueryExecutor(
     query: string,
     params: SQLiteCompatibleType[][] = []
   ): Promise<SQLiteCompatibleType[][]> {
+    if (!writesAllowed && !isReadQuery(query)) throw new Error("Illegal write query")
+
     const results: SQLiteCompatibleType[][] = []
 
     // TODO2

@@ -184,7 +184,10 @@ export class BackendServer<T extends BackendApiShape> {
             // console.log("RPC: New request", request)
 
             const isReadMethod =
-              method.startsWith("get") || method.startsWith("count") || !this.writeApi
+              method.startsWith("read") ||
+              method.startsWith("get") ||
+              method.startsWith("count") ||
+              !this.writeApi
 
             const isSubcribeMethod = method.startsWith("subscribe")
 

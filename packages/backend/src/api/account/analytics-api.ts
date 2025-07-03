@@ -1,6 +1,7 @@
 import { sql } from "src/utils/sql-utils"
 
 import { executeSql } from "../accounts-api"
+import { getAccountWithDailyPrices } from "./daily-prices-api"
 
 export async function getBreakdownChartData(
   accountName: string,
@@ -12,6 +13,7 @@ export async function getBreakdownChartData(
     values: number[]
   }[]
 > {
+  await getAccountWithDailyPrices(accountName)
   const result = await executeSql(
     accountName,
     sql`

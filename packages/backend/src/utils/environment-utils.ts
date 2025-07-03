@@ -14,6 +14,7 @@ const runtime = !isServer
 export const isDevelopment = isNode && process.env.NODE_ENV === "development"
 export const isTestEnvironment = isNode && process.env.NODE_ENV === "test"
 export const isProduction = isNode && process.env.NODE_ENV === "production"
+export const writesAllowed = (isNode && process.env.ALLOW_WRITES === "true") || isTestEnvironment
 
 export const environment = isProduction ? "production" : isTestEnvironment ? "test" : "development"
 
@@ -23,6 +24,7 @@ if (!isTestEnvironment) {
   console.log(`Backend runtime is ${runtime}`)
   console.log(`Backend environment is ${environment}`)
   console.log(`Sqlite implementation is ${useBunSqlite ? "bun" : "sqlite3"}`)
+  console.log(`Sqlite writes are ${writesAllowed ? "allowed" : "disallowed"}`)
 }
 
 export const isDebug = false

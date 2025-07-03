@@ -23,6 +23,7 @@ import { sleep } from "src/utils/utils"
 
 import { getCoingeckoCoins } from "../../extensions/metadata/coingecko/coingecko-asset-cache"
 import { getAccount } from "../accounts-api"
+import { getAccountWithAuditLogs } from "./audit-logs-api"
 import { enqueueTask } from "./server-tasks-api"
 
 const getQuery = sql`
@@ -39,7 +40,7 @@ export async function getMyAssets(
   query = getQuery,
   params?: SqlParam[]
 ): Promise<MyAsset[]> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithAuditLogs(accountName)
 
   try {
     const result = await account.execute(query, params)

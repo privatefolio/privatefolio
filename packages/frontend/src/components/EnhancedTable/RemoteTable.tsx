@@ -52,12 +52,12 @@ export type QueryTableData<T extends BaseType> = (
 
 export interface RemoteTableProps<T extends BaseType> {
   TableRowComponent: ComponentType<TableRowComponentProps<T>>
-  addNewRow?: JSX.Element
+  addNewRow?: ReactNode
   /**
    * @default 20
    */
   defaultRowsPerPage?: number
-  emptyContent?: JSX.Element
+  emptyContent?: ReactNode
   extraRow?: ReactNode
   headCells: HeadCell<T>[]
   initOrderBy: keyof T
@@ -406,4 +406,4 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
 
 export const RemoteTable = memo(RemoteTableBase) as <T extends BaseType>(
   props: RemoteTableProps<T>
-) => JSX.Element
+) => ReactNode

@@ -13,7 +13,7 @@ import { enqueueTask } from "./server-tasks-api"
 
 const SCHEMA_VERSION = 3
 
-async function getAccountWithAuditLogs(accountName: string) {
+export async function getAccountWithAuditLogs(accountName: string) {
   const schemaVersion = await getValue(accountName, `audit_logs_schema_version`, 0)
   const account = await getAccount(accountName)
 

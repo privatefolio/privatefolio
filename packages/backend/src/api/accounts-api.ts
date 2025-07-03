@@ -3,6 +3,7 @@ import { access, mkdir, readdir, stat, writeFile } from "fs/promises"
 import { join } from "path"
 import {
   EventCause,
+  SqlParam,
   SubscriptionChannel,
   SubscriptionId,
   TaskPriority,
@@ -51,7 +52,7 @@ async function createDatabaseConnection(accountName: string, createIfNeeded = fa
 
   const db = await createSqliteDatabaseConnection(databaseFilePath, accountName)
 
-  const journalMode = await db.execute(`PRAGMA journal_mode;`)
+  const journalMode = await db.execute(`PRAGMA journal_mode`)
   if (isDevelopment) {
     console.log(getPrefix(accountName), "SQLite journal mode:", journalMode[0][0])
   }
@@ -430,9 +431,14 @@ export async function getDiskUsage(accountName: string) {
   return stats.size
 }
 
-export async function executeSql(accountName: string, sql: string) {
+export async function executeSql(accountName: string, query: string, params?: SqlParam[]) {
   const account = await getAccount(accountName)
-  return account.execute(sql)
+  return account.execute(query, params)
+}
+
+export async function readSql(accountName: string, query: string, params?: SqlParam[]) {
+  const account = await getAccount(accountName)
+  return account.execute(query, params)
 }
 
 export async function unsubscribe(subscriptionId: SubscriptionId) {

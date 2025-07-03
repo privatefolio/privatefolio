@@ -96,6 +96,7 @@ export function AssistantChatHistoryTable() {
       headCells={headCells}
       queryFn={queryFn}
       TableRowComponent={AssistantChatHistoryTableRow}
+      emptyContent="No conversation history."
     />
   )
 }
