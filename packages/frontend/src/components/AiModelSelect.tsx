@@ -1,7 +1,7 @@
-import { ListItemAvatar, ListItemText, MenuItem, Select, SelectProps, Stack } from "@mui/material"
+import { ListItemAvatar, ListItemText, Select, SelectProps, Stack } from "@mui/material"
 import React from "react"
 
-import { CaptionText } from "./CaptionText"
+import { MenuItemWithTooltip } from "./MenuItemWithTooltip"
 
 function OpenAiIcon({ size = 16 }: { size?: number }) {
   return (
@@ -61,6 +61,11 @@ type OpenAIChatModelId =
   | "chatgpt-4o-latest"
 
 export interface AiModel {
+  contextWindow: number
+  costPer1kTokens: {
+    input: number
+    output: number
+  }
   description: string
   family: "openai"
   label: string
@@ -69,18 +74,33 @@ export interface AiModel {
 
 const AVAILABLE_MODELS: AiModel[] = [
   {
+    contextWindow: 128000,
+    costPer1kTokens: {
+      input: 0.0025,
+      output: 0.01,
+    },
     description: "Great for most tasks",
     family: "openai",
     label: "GPT-4o",
     value: "gpt-4o",
   },
   {
+    contextWindow: 128000,
+    costPer1kTokens: {
+      input: 0.06,
+      output: 0.24,
+    },
     description: "Uses advanced reasoning",
     family: "openai",
     label: "GPT-o3",
     value: "o3",
   },
   {
+    contextWindow: 128000,
+    costPer1kTokens: {
+      input: 0.0015,
+      output: 0.006,
+    },
     description: "Fastest at advanced reasoning",
     family: "openai",
     label: "GPT-o4-mini",
@@ -93,36 +113,66 @@ const AVAILABLE_MODELS: AiModel[] = [
   //   value: "o4-mini-high",
   // },
   {
+    contextWindow: 200000,
+    costPer1kTokens: {
+      input: 0.0025,
+      output: 0.01,
+    },
     description: "Good for writing and exploring ideas",
     family: "openai",
     label: "GPT-4.5-preview",
     value: "gpt-4.5-preview",
   },
   {
+    contextWindow: 128000,
+    costPer1kTokens: {
+      input: 0.0025,
+      output: 0.01,
+    },
     description: "Great for quick coding and analysis",
     family: "openai",
     label: "GPT-4.1",
     value: "gpt-4.1",
   },
   {
+    contextWindow: 128000,
+    costPer1kTokens: {
+      input: 0.00015,
+      output: 0.0006,
+    },
     description: "Faster for everyday tasks",
     family: "openai",
     label: "GPT-4.1-mini",
     value: "gpt-4.1-mini",
   },
   {
+    contextWindow: 128000,
+    costPer1kTokens: {
+      input: 0.00015,
+      output: 0.0006,
+    },
     description: "Cost-efficient for most tasks",
     family: "openai",
     label: "GPT-4o-mini",
     value: "gpt-4o-mini",
   },
   {
+    contextWindow: 128000,
+    costPer1kTokens: {
+      input: 0.01,
+      output: 0.03,
+    },
     description: "Advanced model with large context",
     family: "openai",
     label: "GPT-4-turbo",
     value: "gpt-4-turbo",
   },
   {
+    contextWindow: 16385,
+    costPer1kTokens: {
+      input: 0.0005,
+      output: 0.0015,
+    },
     description: "Fast and efficient for simple tasks",
     family: "openai",
     label: "GPT-3.5-turbo",
@@ -130,30 +180,59 @@ const AVAILABLE_MODELS: AiModel[] = [
   },
 ]
 
-export type AiModelSelectProps = SelectProps<string> & {
-  /**
-   * @default false
-   */
-  showDescription?: boolean
+function formatContextWindow(tokens: number): string {
+  if (tokens >= 1000000) {
+    return `${(tokens / 1000000).toFixed(1)}M tokens`
+  } else if (tokens >= 1000) {
+    return `${(tokens / 1000).toFixed(0)}K tokens`
+  } else {
+    return `${tokens} tokens`
+  }
 }
 
+function formatCost(cost: number): string {
+  if (cost >= 1) {
+    return `$${cost.toFixed(2)}`
+  } else if (cost >= 0.001) {
+    return `$${cost.toFixed(3)}`
+  } else {
+    return `$${cost.toFixed(5)}`
+  }
+}
+
+function ModelTooltip({ model }: { model: AiModel }) {
+  return (
+    <Stack>
+      <strong>{model.label}</strong>
+      <span>{model.description}</span>
+      <span className="secondary">Context Window: {formatContextWindow(model.contextWindow)}</span>
+      <span className="secondary">Input Cost: {formatCost(model.costPer1kTokens.input)}</span>
+      <span className="secondary">Output Cost: {formatCost(model.costPer1kTokens.output)}</span>
+    </Stack>
+  )
+}
+
+export type AiModelSelectProps = SelectProps<string>
+
 export function AiModelSelect(props: AiModelSelectProps) {
-  const { showDescription = false, ...rest } = props
+  const { ...rest } = props
 
   return (
     <Select size="small" sx={{ minWidth: 320 }} inputProps={{ name: "model-select" }} {...rest}>
       {AVAILABLE_MODELS.map((model) => (
-        <MenuItem key={model.value} value={model.value}>
+        <MenuItemWithTooltip
+          key={model.value}
+          value={model.value}
+          tooltipProps={{
+            placement: "right",
+            title: <ModelTooltip model={model} />,
+          }}
+        >
           <Stack direction="row" alignItems="center">
-            <ListItemAvatar>
-              {model.family === "openai" && <OpenAiIcon size={showDescription ? 24 : 16} />}
-            </ListItemAvatar>
-            <ListItemText
-              primary={model.label}
-              secondary={showDescription && <CaptionText>{model.description}</CaptionText>}
-            />
+            <ListItemAvatar>{model.family === "openai" && <OpenAiIcon size={16} />}</ListItemAvatar>
+            <ListItemText primary={model.label} />
           </Stack>
-        </MenuItem>
+        </MenuItemWithTooltip>
       ))}
     </Select>
   )

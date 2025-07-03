@@ -1,5 +1,6 @@
 import { persistentAtom, persistentMap } from "@nanostores/persistent"
 import { computed } from "nanostores"
+import { DEFAULT_SETTINGS } from "src/settings"
 
 import { $activeAccount } from "./account-store"
 
@@ -102,3 +103,8 @@ export const $hideInactiveConnections = persistentAtom<boolean>(
 )
 
 export const $hideSpam = persistentAtom<boolean>("privatefolio-hide-spam", true, booleanTransformer)
+
+export const $assistantModel = persistentAtom<string>(
+  "privatefolio-assistant-model",
+  DEFAULT_SETTINGS.assistantModel
+)

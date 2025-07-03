@@ -164,10 +164,16 @@ export function getBucketSize(timeInterval: ResolutionString): Time {
   throw new Error(`Unsupported time interval: ${timeInterval}`)
 }
 
-export function approximateTimestamp(timestamp: Time, timeInterval: ResolutionString) {
+export function approximateTimestamp(time: Time, timeInterval: ResolutionString) {
   const bucketSize = getBucketSize(timeInterval)
-  const remainder = timestamp % bucketSize
-  return remainder > bucketSize / 2 ? timestamp - remainder + bucketSize : timestamp - remainder
+  const remainder = time % bucketSize
+  return remainder > bucketSize / 2 ? time - remainder + bucketSize : time - remainder
+}
+
+export function floorTimestamp(time: Time, timeInterval: ResolutionString) {
+  const bucketSize = getBucketSize(timeInterval)
+  const remainder = time % bucketSize
+  return time - remainder
 }
 
 export function ensureValidBuckets(

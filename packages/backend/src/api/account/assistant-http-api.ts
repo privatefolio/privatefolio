@@ -1,5 +1,6 @@
 import { createOpenAI } from "@ai-sdk/openai"
 import { streamText } from "ai"
+import { getAssistantSystemPrompt, getAssistantTools, MAX_STEPS } from "src/settings/assistant"
 import { decryptValue } from "src/utils/jwt-utils"
 
 import { corsHeaders } from "../../settings/settings"
@@ -53,10 +54,21 @@ export async function handleAssistantChat(request: Request): Promise<Response> {
       })
     }
 
+    const tools = getAssistantTools(accountName)
+    const system = getAssistantSystemPrompt()
+
     const openai = createOpenAI({ apiKey })
     const result = streamText({
+      maxRetries: 5,
+      maxSteps: MAX_STEPS + 2,
       messages,
-      model: openai(model),
+      model: openai.responses(model),
+      system,
+      tools: {
+        // https://ai-sdk.dev/cookbook/node/web-search-agent#using-native-web-search
+        web_search_preview: openai.tools.webSearchPreview(),
+        ...tools,
+      },
     })
 
     return result.toDataStreamResponse({

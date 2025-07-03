@@ -19,7 +19,7 @@ import { getAccount } from "../accounts-api"
 import { getValue, setValue } from "./kv-api"
 import { enqueueTask } from "./server-tasks-api"
 
-const SCHEMA_VERSION = 1
+const SCHEMA_VERSION = 2
 
 export async function getAccountWithChatHistory(accountName: string) {
   const account = await getAccount(accountName)
@@ -39,6 +39,7 @@ export async function getAccountWithChatHistory(accountName: string) {
         timestamp INTEGER NOT NULL,
         tokens INTEGER,
         metadata TEXT,
+        parts TEXT,
         FOREIGN KEY (conversationId) REFERENCES conversations(id)
       );
     `)
@@ -72,15 +73,18 @@ export async function getChatHistory(
   try {
     const result = await account.execute(query, params)
     return result.map((row) => {
+      /* eslint-disable sort-keys-fix/sort-keys-fix */
       const value = {
-        conversationId: row[1],
         id: row[0],
-        message: row[3],
-        metadata: row[6],
+        conversationId: row[1],
         role: row[2],
+        message: row[3],
         timestamp: row[4],
         tokens: row[5],
+        metadata: row[6],
+        parts: row[7],
       }
+      /* eslint-enable */
       transformNullsToUndefined(value)
       return value as ChatMessage
     })
@@ -118,8 +122,8 @@ export async function upsertChatMessages(accountName: string, records: NewChatMe
   try {
     await account.executeMany(
       `INSERT OR REPLACE INTO chat_history (
-        id, conversationId, role, message, timestamp, tokens, metadata
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        id, conversationId, role, message, timestamp, tokens, metadata, parts
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       records.map((record) => [
         record.id || crypto.randomUUID(),
         record.conversationId,
@@ -128,6 +132,7 @@ export async function upsertChatMessages(accountName: string, records: NewChatMe
         record.timestamp,
         record.tokens || null,
         record.metadata || null,
+        record.parts || null,
       ])
     )
 
@@ -229,7 +234,16 @@ export async function getChatRoles(
 }
 
 function transformChatHistoryToCsv(chatHistory: ChatMessage[]) {
-  const headers = ["id", "conversationId", "role", "message", "timestamp", "tokens", "metadata"]
+  const headers = [
+    "id",
+    "conversationId",
+    "role",
+    "message",
+    "timestamp",
+    "tokens",
+    "metadata",
+    "parts",
+  ]
   const rows = chatHistory.map((message) => [
     message.id,
     message.conversationId,
@@ -238,6 +252,7 @@ function transformChatHistoryToCsv(chatHistory: ChatMessage[]) {
     new Date(message.timestamp).toISOString(),
     message.tokens?.toString() || "",
     message.metadata || "",
+    message.parts || "",
   ])
   return [headers, ...rows]
 }

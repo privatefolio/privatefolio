@@ -925,6 +925,7 @@ export interface ChatMessage {
   id: string
   message: string
   metadata?: string
+  parts?: string // JSON string of message parts array
   role: "user" | "assistant" | "system"
   timestamp: number
   tokens?: number

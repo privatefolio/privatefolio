@@ -99,7 +99,6 @@ export function AssistantSettings() {
             value={assistantModel}
             onChange={(event) => setAssistantModel(event.target.value)}
             disabled={isLoading}
-            showDescription
           />
         </div>
         <div>

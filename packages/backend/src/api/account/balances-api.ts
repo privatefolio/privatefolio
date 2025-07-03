@@ -1,10 +1,10 @@
 import Big from "big.js"
 import { getErc20Balance, getNativeBalance } from "src/extensions/utils/evm-utils"
-import { EventCause, SqlParam } from "src/interfaces"
+import { EventCause, ResolutionString, SqlParam } from "src/interfaces"
 import { PLATFORMS_META } from "src/settings/platforms"
 import { getAssetContract, getAssetPlatform, isEvmPlatform } from "src/utils/assets-utils"
 import { formatDate, ONE_DAY } from "src/utils/formatting-utils"
-import { noop } from "src/utils/utils"
+import { floorTimestamp, noop } from "src/utils/utils"
 
 import {
   Balance,
@@ -57,10 +57,12 @@ export async function getBalancesAt(
   cursor: Timestamp = -1
 ): Promise<Balance[]> {
   const account = await getAccount(accountName)
-  const balancesCursor =
+  let balancesCursor =
     cursor !== -1
       ? cursor
       : ((await getValue<Timestamp>(accountName, "balancesCursor", 0)) as Timestamp)
+
+  balancesCursor = floorTimestamp(balancesCursor / 1000, "1D" as ResolutionString) * 1000
 
   try {
     const result = await account.execute("SELECT * FROM balances WHERE timestamp = ?", [

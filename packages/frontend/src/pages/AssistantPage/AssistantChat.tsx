@@ -1,6 +1,6 @@
 import { Message, useChat } from "@ai-sdk/react"
-import { ArrowUpwardRounded, StopRounded } from "@mui/icons-material"
-import { Box, Button, Container, Input, Paper, Stack, Typography } from "@mui/material"
+import { ArrowUpwardRounded, CheckRounded, StopRounded } from "@mui/icons-material"
+import { Box, Button, Input, Paper, Stack, Tooltip, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useRef, useState } from "react"
 import ReactMarkdown from "react-markdown"
@@ -9,15 +9,16 @@ import remarkGfm from "remark-gfm"
 import { AiModelSelect } from "src/components/AiModelSelect"
 import { CircularSpinner } from "src/components/CircularSpinner"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
-import { DEFAULT_SETTINGS } from "src/settings"
 import { $activeAccount } from "src/stores/account-store"
+import { $assistantModel } from "src/stores/device-settings-store"
 import { $rest, $rpc } from "src/workers/remotes"
 
 export function AssistantChat() {
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const existingConversationId = searchParams.get("conversation")
+  const isNewConversation = searchParams.get("new") === "true"
 
   useEffect(() => {
     document.title = `Assistant chat - ${activeAccount} - Privatefolio`
@@ -27,13 +28,18 @@ export function AssistantChat() {
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [userHasScrolledUp, setUserHasScrolledUp] = useState(false)
-  const [model, setModel] = useState(DEFAULT_SETTINGS.assistantModel)
+  const model = useStore($assistantModel)
   const [initialMessages, setInitialMessages] = useState<Message[]>([])
   const [isLoadingHistory, setIsLoadingHistory] = useState(!!existingConversationId)
 
   // Load existing conversation messages if conversationId is provided
   useEffect(() => {
-    if (!existingConversationId || !activeAccount) return
+    if (!activeAccount) return
+    if (!existingConversationId || isNewConversation) {
+      setIsLoadingHistory(false)
+      setInitialMessages([])
+      return
+    }
 
     const loadConversationHistory = async () => {
       try {
@@ -43,11 +49,12 @@ export function AssistantChat() {
           existingConversationId
         )
 
-        // Transform chat history to useChat message format
-        const messages = chatHistory.map((msg) => ({
+        const messages: Message[] = chatHistory.map((msg) => ({
+          annotations: msg.metadata ? Object.values(JSON.parse(msg.metadata)) : undefined,
           content: msg.message,
           createdAt: new Date(msg.timestamp),
           id: msg.id,
+          parts: msg.parts ? JSON.parse(msg.parts) : undefined,
           role: msg.role,
         }))
 
@@ -60,14 +67,27 @@ export function AssistantChat() {
     }
 
     loadConversationHistory()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existingConversationId, activeAccount, rpc])
 
   const { messages, input, handleInputChange, handleSubmit, error, status, stop, id } = useChat({
     api: `${rest.baseUrl}/assistant-chat`,
     body: { accountName: activeAccount, model },
     headers: { Authorization: `Bearer ${localStorage.getItem(rest.jwtKey)}` },
-    id: existingConversationId || undefined,
+    id: existingConversationId || window.crypto.randomUUID(),
     initialMessages,
+    onError: async (error) => {
+      try {
+        await rpc.upsertChatMessage(activeAccount, {
+          conversationId: existingConversationId || id,
+          message: error.message,
+          metadata: JSON.stringify({ model, severity: "error" }),
+          parts: undefined,
+          role: "system",
+          timestamp: Date.now(),
+        })
+      } catch {}
+    },
     onFinish: async (message) => {
       try {
         await rpc.upsertChatMessage(activeAccount, {
@@ -75,12 +95,14 @@ export function AssistantChat() {
           id: message.id,
           message: message.content,
           metadata: JSON.stringify({ model }),
+          parts: message.parts ? JSON.stringify(message.parts) : undefined,
           role: message.role as "assistant",
           timestamp: Date.now(),
         })
-      } catch (error) {
-        console.error("Failed to save assistant message:", error)
-      }
+      } catch {}
+    },
+    onToolCall: (toolCall) => {
+      console.log("📜 LOG > onToolCall > toolCall:", toolCall)
     },
   })
 
@@ -118,6 +140,9 @@ export function AssistantChat() {
         role: "user",
         timestamp: Date.now(),
       })
+
+      searchParams.set("new", "false")
+      setSearchParams(searchParams, { replace: true })
     } catch (error) {
       console.error("Failed to save user message:", error)
     }
@@ -128,30 +153,21 @@ export function AssistantChat() {
     setTimeout(() => inputRef.current?.focus(), 10)
   }
 
-  useEffect(() => {
-    if (!activeAccount) return
-
-    const loadSettings = async () => {
-      const savedSettings = await rpc.getSettings(activeAccount)
-      const settings = Object.assign({}, DEFAULT_SETTINGS, savedSettings)
-
-      setModel(settings.assistantModel)
-    }
-
-    loadSettings()
-  }, [activeAccount, rpc])
-
   const hasMessages = initialMessages.length > 0 || messages.length > 0
+
+  useEffect(() => {
+    if (existingConversationId === id) return
+
+    searchParams.set("conversation", id)
+    setSearchParams(searchParams, { replace: true })
+  }, [existingConversationId, id, hasMessages, searchParams, setSearchParams])
 
   if (isLoadingHistory) return <DefaultSpinner />
 
   return (
-    <Container
-      maxWidth="md"
+    <Stack
+      gap={2}
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
         height: "calc(100vh - 170px)",
         marginTop: 4,
       }}
@@ -187,37 +203,262 @@ export function AssistantChat() {
               }),
             }}
           >
-            <Typography
-              variant="body1"
-              component="div"
-              sx={{
-                "& a": {
-                  "&:hover": {
-                    textDecoration: "underline",
-                  },
-                  color: "primary.main",
-                  textDecoration: "none",
-                },
-                "& code": {
-                  backgroundColor: "rgba(0, 0, 0, 0.1)",
-                  borderRadius: 1,
-                  px: 0.5,
-                  py: 0.125,
-                },
+            {message.parts && (
+              <>
+                {message.parts
+                  .filter((part) => part.type === "tool-invocation")
+                  .map((part) => {
+                    const toolPart = part as Extract<typeof part, { type: "tool-invocation" }>
+                    const tool = toolPart.toolInvocation
+                    const toolName = (
+                      <Tooltip
+                        title={
+                          <Stack alignItems="center">
+                            <span className="secondary">Call arguments</span>
+                            <span>{JSON.stringify(tool.args, null, 2)}</span>
+                          </Stack>
+                        }
+                      >
+                        <Box
+                          sx={{
+                            backgroundColor: "action.hover",
+                            borderRadius: 2,
+                            letterSpacing: "0.05rem",
+                            paddingX: 0.75,
+                          }}
+                          component="span"
+                        >
+                          {tool.toolName}
+                        </Box>
+                      </Tooltip>
+                    )
 
-                "& h3": {
-                  marginY: 1,
-                },
-                "& li": {
-                  marginY: 0.25,
-                },
-                "& ul, & ol": {
-                  marginY: 1,
-                },
-              }}
-            >
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
-            </Typography>
+                    return (
+                      <Stack direction="row" alignItems="center" gap={1} key={tool.toolCallId}>
+                        {tool.state === "call" && <CircularSpinner size={14} />}
+                        {tool.state === "result" && (
+                          <CheckRounded fontSize="inherit" color="success" />
+                        )}
+                        {tool.state === "partial-call" && <CircularSpinner size={14} />}
+                        <Typography variant="body2" color="text.secondary">
+                          {tool.state === "call" && <>Using {toolName}...</>}
+                          {tool.state === "result" && <>Used {toolName}</>}
+                          {tool.state === "partial-call" && `Calling ${toolName}...`}
+                        </Typography>
+                      </Stack>
+                    )
+                  })}
+                {message.parts
+                  .filter((part) => part.type === "reasoning")
+                  .map((part, index) => {
+                    const reasoningPart = part as Extract<typeof part, { type: "reasoning" }>
+                    return (
+                      <Box
+                        key={index}
+                        sx={{
+                          backgroundColor: "action.hover",
+                          borderRadius: 2,
+                          mb: 1,
+                          px: 2,
+                          py: 1,
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ fontStyle: "italic" }}
+                        >
+                          Reasoning:
+                        </Typography>
+                        <Typography variant="body2" color="text.primary">
+                          {reasoningPart.reasoning}
+                        </Typography>
+                        {reasoningPart.details.length > 0 && (
+                          <Box sx={{ mt: 1 }}>
+                            {reasoningPart.details.map((detail, detailIndex) => (
+                              <Typography
+                                key={detailIndex}
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{ display: "block", mt: 0.5 }}
+                              >
+                                {detail.type === "text" ? detail.text : "[Redacted]"}
+                                {detail.type === "text" && detail.signature && (
+                                  <Typography
+                                    component="span"
+                                    variant="caption"
+                                    color="primary.main"
+                                    sx={{ ml: 1 }}
+                                  >
+                                    {detail.signature}
+                                  </Typography>
+                                )}
+                              </Typography>
+                            ))}
+                          </Box>
+                        )}
+                      </Box>
+                    )
+                  })}
+                {message.parts
+                  .filter((part) => part.type === "source")
+                  .map((part, index) => {
+                    const sourcePart = part as Extract<typeof part, { type: "source" }>
+                    return (
+                      <Box
+                        key={index}
+                        sx={{
+                          backgroundColor: "info.light",
+                          borderRadius: 2,
+                          mt: 1,
+                          px: 2,
+                          py: 1,
+                        }}
+                      >
+                        <Typography variant="body2" color="info.dark" sx={{ fontWeight: "bold" }}>
+                          Source:
+                        </Typography>
+                        <Typography variant="body2" color="text.primary">
+                          {JSON.stringify(sourcePart.source, null, 2)}
+                        </Typography>
+                      </Box>
+                    )
+                  })}
+                {message.parts
+                  .filter((part) => part.type === "file")
+                  .map((part, index) => {
+                    const filePart = part as Extract<typeof part, { type: "file" }>
+                    const isImage = filePart.mimeType.startsWith("image/")
+                    const isText = filePart.mimeType.startsWith("text/")
+
+                    return (
+                      <Box
+                        key={index}
+                        sx={{
+                          backgroundColor: "grey.100",
+                          borderRadius: 2,
+                          mt: 1,
+                          px: 2,
+                          py: 1,
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ fontWeight: "bold", mb: 1 }}
+                        >
+                          File ({filePart.mimeType}):
+                        </Typography>
+                        {isImage && (
+                          <Box
+                            component="img"
+                            src={filePart.data}
+                            alt="File attachment"
+                            sx={{
+                              borderRadius: 1,
+                              maxHeight: 400,
+                              maxWidth: "100%",
+                            }}
+                          />
+                        )}
+                        {isText && (
+                          <Typography
+                            variant="body2"
+                            component="pre"
+                            sx={{
+                              backgroundColor: "grey.50",
+                              borderRadius: 1,
+                              fontFamily: "monospace",
+                              fontSize: "0.875rem",
+                              overflow: "auto",
+                              px: 1,
+                              py: 0.5,
+                              whiteSpace: "pre-wrap",
+                            }}
+                          >
+                            {filePart.data}
+                          </Typography>
+                        )}
+                        {!isImage && !isText && (
+                          <Typography variant="body2" color="text.secondary">
+                            [File content - {filePart.mimeType}]
+                          </Typography>
+                        )}
+                      </Box>
+                    )
+                  })}
+                {message.parts
+                  .filter((part) => part.type === "text")
+                  .map((part, index) => {
+                    const textPart = part as Extract<typeof part, { type: "text" }>
+                    const isError = message.annotations?.find(
+                      (x) => typeof x === "string" && x.includes("error")
+                    )
+
+                    return (
+                      <Typography
+                        key={index}
+                        variant="body2"
+                        component="div"
+                        color={isError ? "error" : "text.primary"}
+                        sx={{
+                          "& a": {
+                            "&:hover": {
+                              textDecoration: "underline",
+                            },
+                            color: "primary.main",
+                            textDecoration: "none",
+                          },
+                          "& b, & strong": {
+                            fontWeight: "500",
+                          },
+                          "& code": {
+                            backgroundColor: "rgba(0, 0, 0, 0.1)",
+                            borderRadius: 1,
+                            px: 0.5,
+                            py: 0.125,
+                          },
+                          "& h3": {
+                            fontWeight: "500",
+                            // marginY: 1,
+                          },
+                          "html[data-mui-color-scheme='dark'] &": {
+                            fontWeight: "300",
+                          },
+                          // "& li": {
+                          //   marginY: 0.25,
+                          // },
+                          // "& ul, & ol": {
+                          //   marginY: 1,
+                          // },
+                          // fontWeight: "300",
+                        }}
+                      >
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {isError ? `Error: ${textPart.text}` : textPart.text}
+                        </ReactMarkdown>
+                      </Typography>
+                    )
+                  })}
+                {/* {message.parts
+              ?.filter((part) => part.type === "step-start")
+              .map((part, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    borderColor: "divider",
+                    borderTop: "2px solid",
+                    mt: 2,
+                    pt: 1,
+                  }}
+                >
+                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: "bold" }}>
+                    Step {index + 1}
+                  </Typography>
+                </Box>
+              ))} */}
+              </>
+            )}
           </Box>
         ))}
         {isWaiting && (
@@ -264,6 +505,8 @@ export function AssistantChat() {
           sx={{
             borderRadius: 3.5,
             marginBottom: 3,
+            // marginX: "auto",
+            // maxWidth: 720,
             padding: 1,
           }}
         >
@@ -313,7 +556,7 @@ export function AssistantChat() {
                 borderRadius: 3,
               }}
               value={model}
-              onChange={(event) => setModel(event.target.value)}
+              onChange={(event) => $assistantModel.set(event.target.value)}
               disabled={isLoading}
             />
             <Button
@@ -339,6 +582,6 @@ export function AssistantChat() {
           </Stack>
         </Paper>
       </Box>
-    </Container>
+    </Stack>
   )
 }
