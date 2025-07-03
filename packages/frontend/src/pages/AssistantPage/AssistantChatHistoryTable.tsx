@@ -53,9 +53,7 @@ export function AssistantChatHistoryTable() {
           conversationId,
           MIN(timestamp) as startTime,
           MAX(timestamp) as lastTime,
-          COUNT(*) as messageCount,
-          (SELECT message FROM chat_history ch1 WHERE ch1.conversationId = chat_history.conversationId ORDER BY timestamp ASC LIMIT 1) as firstMessage,
-          (SELECT metadata FROM chat_history ch2 WHERE ch2.conversationId = chat_history.conversationId AND ch2.metadata IS NOT NULL ORDER BY timestamp DESC LIMIT 1) as lastMetadata
+          (SELECT message FROM chat_history ch1 WHERE ch1.conversationId = chat_history.conversationId ORDER BY timestamp ASC LIMIT 1) as firstMessage
         FROM chat_history 
         GROUP BY conversationId 
         ${orderQuery} 
@@ -79,12 +77,13 @@ export function AssistantChatHistoryTable() {
         key: "startTime",
         label: "Started",
         sortable: true,
-        sx: { maxWidth: 200, minWidth: 200, width: 200 },
+        sx: { maxWidth: 180, minWidth: 180, width: 180 },
         timestamp: true,
       },
       {
         key: "firstMessage",
         label: "First message",
+        sx: { width: "100%" },
       },
     ],
     []

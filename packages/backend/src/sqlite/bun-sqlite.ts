@@ -1,5 +1,10 @@
 import { Database } from "bun:sqlite"
-import { isDebug, isDevelopment, isTestEnvironment, writesAllowed } from "src/utils/environment-utils"
+import {
+  isDebug,
+  isDevelopment,
+  isTestEnvironment,
+  writesAllowed,
+} from "src/utils/environment-utils"
 import { isReadQuery } from "src/utils/sql-utils"
 import { getPrefix } from "src/utils/utils"
 

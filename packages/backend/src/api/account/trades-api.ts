@@ -33,7 +33,7 @@ import { getTransaction } from "./transactions-api"
 
 const SCHEMA_VERSION = 17
 
-async function getAccountWithTrades(accountName: string) {
+export async function getAccountWithTrades(accountName: string) {
   const schemaVersion = await getValue(accountName, `trade_schema_version`, 0)
 
   const account = await getAccount(accountName)

@@ -26,7 +26,7 @@ export function configureIpcMain(ipcMain: Electron.IpcMain, window: BrowserWindo
   ipcMain.handle("restart-backend", handleRestartBackend)
 }
 
-function createSetModeHandler(window: BrowserWindow) {
+function createSetModeHandler(_window: BrowserWindow) {
   return function handleSetMode(event: IpcMainEvent, mode: PaletteMode) {
     console.log("Setting theme mode", mode)
     if (isWindows) {

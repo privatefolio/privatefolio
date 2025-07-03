@@ -9,6 +9,7 @@ import {
 } from "src/interfaces"
 import { createCsvString } from "src/utils/csv-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { writesAllowed } from "src/utils/environment-utils"
 import { saveFile } from "src/utils/file-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
@@ -20,10 +21,11 @@ import { enqueueTask } from "./server-tasks-api"
 
 const SCHEMA_VERSION = 1
 
-async function getAccountWithChatHistory(accountName: string) {
-  const schemaVersion = await getValue(accountName, `chat_history_schema_version`, 0)
+export async function getAccountWithChatHistory(accountName: string) {
   const account = await getAccount(accountName)
+  if (!writesAllowed) return account
 
+  const schemaVersion = await getValue(accountName, `chat_history_schema_version`, 0)
   if (schemaVersion < SCHEMA_VERSION) {
     // Drop existing table to recreate with new schema
     await account.execute(sql`DROP TABLE IF EXISTS chat_history`)
@@ -279,9 +281,7 @@ export async function getConversationSummaries(
       conversationId,
       MIN(timestamp) as startTime,
       MAX(timestamp) as lastTime,
-      COUNT(*) as messageCount,
-      (SELECT message FROM chat_history ch1 WHERE ch1.conversationId = chat_history.conversationId ORDER BY timestamp ASC LIMIT 1) as firstMessage,
-      (SELECT metadata FROM chat_history ch2 WHERE ch2.conversationId = chat_history.conversationId AND ch2.metadata IS NOT NULL ORDER BY timestamp DESC LIMIT 1) as lastMetadata
+      (SELECT message FROM chat_history ch1 WHERE ch1.conversationId = chat_history.conversationId ORDER BY timestamp ASC LIMIT 1) as firstMessage
     FROM chat_history 
     GROUP BY conversationId 
     ORDER BY lastTime DESC
@@ -293,15 +293,14 @@ export async function getConversationSummaries(
   try {
     const result = await account.execute(query, params)
     return result.map((row) => {
-      const metadata = row[5] ? JSON.parse(row[5] as string) : {}
+      /* eslint-disable sort-keys-fix/sort-keys-fix */
       const value = {
-        firstMessage: row[4],
         id: row[0],
-        lastTime: row[2],
-        messageCount: row[3],
-        model: metadata.model,
         startTime: row[1],
+        lastTime: row[2],
+        firstMessage: row[3],
       }
+      /* eslint-enable */
       transformNullsToUndefined(value)
       return value as ChatConversation
     })

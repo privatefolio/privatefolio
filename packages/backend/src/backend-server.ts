@@ -183,11 +183,14 @@ export class BackendServer<T extends BackendApiShape> {
             const { id, method, params, functionId } = request
             // console.log("RPC: New request", request)
 
-            const isReadMethod =
+            let isReadMethod =
               method.startsWith("read") ||
               method.startsWith("get") ||
               method.startsWith("count") ||
               !this.writeApi
+
+            // hack because we do db initialization in getAccountNames
+            if (method === "getAccountNames") isReadMethod = false
 
             const isSubcribeMethod = method.startsWith("subscribe")
 

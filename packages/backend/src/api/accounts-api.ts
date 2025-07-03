@@ -18,9 +18,15 @@ import { createSubscription } from "src/utils/sub-utils"
 import { getPrefix, sleep, wasteCpuCycles } from "src/utils/utils"
 
 import { enqueueRefetchAssets } from "./account/assets-api"
+import { getAccountWithChatHistory } from "./account/assistant-api"
+import { getAccountWithAuditLogs } from "./account/audit-logs-api"
+import { getAccountWithConnections } from "./account/connections-api"
+import { getAccountWithDailyPrices } from "./account/daily-prices-api"
 import { getValue, setValue } from "./account/kv-api"
 import { enqueueRefetchPlatforms } from "./account/platforms-api"
 import { enqueueTask, upsertServerTask } from "./account/server-tasks-api"
+import { getAccountWithTrades } from "./account/trades-api"
+import { getAccountWithTransactions } from "./account/transactions-api"
 import { allSubscriptions, appEventEmitter } from "./internal"
 
 if (typeof window !== "undefined") {
@@ -155,6 +161,12 @@ export async function createAccount(accountName: string) {
     )
   }
   await getAccount(accountName, true)
+  await getAccountWithAuditLogs(accountName)
+  await getAccountWithChatHistory(accountName)
+  await getAccountWithConnections(accountName)
+  await getAccountWithTrades(accountName)
+  await getAccountWithTransactions(accountName)
+  await getAccountWithDailyPrices(accountName)
 }
 
 export async function deleteAccount(accountName: string, keepAccount = false) {

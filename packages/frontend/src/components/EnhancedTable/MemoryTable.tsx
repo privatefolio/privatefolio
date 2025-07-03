@@ -1,4 +1,4 @@
-import { Paper, Stack, TableHead, useMediaQuery } from "@mui/material"
+import { Paper, Stack, TableHead, Typography, useMediaQuery } from "@mui/material"
 import Table from "@mui/material/Table"
 import TableBody from "@mui/material/TableBody"
 import TableCell from "@mui/material/TableCell"
@@ -85,6 +85,7 @@ export type MemoryTableProps<T extends BaseType> = {
    */
   defaultRowsPerPage?: number
   emptyContent?: ReactNode
+  error?: Error
   extraRow?: ReactNode
   headCells: HeadCell<T>[]
   initOrderBy: keyof T
@@ -109,6 +110,7 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
     addNewRow,
     initOrderBy,
     queryTime,
+    error,
     emptyContent = <NoDataButton />,
     extraRow,
     rowCount = rows.length,
@@ -294,7 +296,7 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
                     row={row}
                   />
                 ))}
-                {filteredRows.length === 0 && !isEmpty && !isLoading && (
+                {filteredRows.length === 0 && !isEmpty && !isLoading && !error && (
                   <TableRow>
                     <TableCell colSpan={headCells.length}>
                       No records match the current filters.
@@ -305,8 +307,21 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
                   <TableRow>
                     <TableCell colSpan={headCells.length}>
                       <Stack justifyContent="center" alignItems="center" sx={{ height: 260 }}>
-                        {isEmpty && !isLoading && emptyContent}
+                        {isEmpty && !isLoading && !error && emptyContent}
                         {isLoading && <CircularSpinner color="secondary" />}
+                        {error && (
+                          <>
+                            <Typography>Error loading data</Typography>
+                            <Typography
+                              color="error"
+                              variant="body2"
+                              component="div"
+                              maxWidth={400}
+                            >
+                              <span>{error.message}</span>
+                            </Typography>
+                          </>
+                        )}
                       </Stack>
                     </TableCell>
                   </TableRow>

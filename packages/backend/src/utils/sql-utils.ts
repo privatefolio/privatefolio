@@ -12,21 +12,12 @@ export function isReadQuery(query: string): boolean {
     .trim()
     .toUpperCase()
 
-  // Check for multiple statements (semicolons not inside quotes)
-  const multipleStatements = q.split("'").reduce((acc, part, index) => {
-    if (index % 2 === 0) {
-      // Only check parts outside quotes
-      return acc || part.includes(";")
-    }
-    return acc
-  }, false)
-
+  const multipleStatements = q.includes(";")
   if (multipleStatements) {
     // console.log("📜 LOG > multiple statements:", q)
     return false
   }
 
-  // Check if it starts with a read operation (including WITH for CTEs)
   if (!/^(SELECT|PRAGMA|EXPLAIN|WITH)\b/.test(q)) {
     // console.log("📜 LOG > write query:", query)
     return false

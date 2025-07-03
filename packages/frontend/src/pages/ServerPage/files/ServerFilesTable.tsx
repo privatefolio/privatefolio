@@ -86,7 +86,7 @@ export function ServerFilesTable() {
         key: "scheduledAt",
         label: "Scheduled",
         sortable: true,
-        sx: { maxWidth: 200, minWidth: 200, width: 200 },
+        sx: { maxWidth: 180, minWidth: 180, width: 180 },
         timestamp: true,
       },
       {

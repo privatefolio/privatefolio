@@ -81,7 +81,7 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
   const [loading, setLoading] = useState<boolean>(true)
   const [rows, setRows] = useState<T[]>([])
   const [orderBy, setOrderBy] = useState<keyof T>(initOrderBy)
-  const [error, setError] = useState<Error | null>(null)
+  const [error, setError] = useState<Error>()
 
   const [searchParams, setSearchParams] = useSearchParams()
 

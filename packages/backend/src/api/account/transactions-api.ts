@@ -35,7 +35,7 @@ import { assignTagToAuditLog, assignTagToTransaction } from "./tags-api"
 
 const SCHEMA_VERSION = 1
 
-async function getAccountWithTransactions(accountName: string) {
+export async function getAccountWithTransactions(accountName: string) {
   const schemaVersion = await getValue(accountName, `transactions_schema_version`, 0)
   const account = await getAccount(accountName)
 

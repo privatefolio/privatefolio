@@ -29,15 +29,22 @@ export function ConnectionsTable() {
 
   const [queryTime, setQueryTime] = useState<number | null>(null)
   const [connections, setConnections] = useState<Connection[]>([])
+  const [error, setError] = useState<Error>()
 
   const connectionStatus = useStore($connectionStatus)
 
   useEffect(() => {
     async function fetchData() {
       const start = Date.now()
-      const data = await rpc.getConnections(activeAccount)
-      setQueryTime(Date.now() - start)
-      setConnections(data)
+      try {
+        const data = await rpc.getConnections(activeAccount)
+        setConnections(data)
+      } catch (error) {
+        console.error(error)
+        setError(error as Error)
+      } finally {
+        setQueryTime(Date.now() - start)
+      }
     }
 
     fetchData().then()
@@ -109,6 +116,7 @@ export function ConnectionsTable() {
         TableRowComponent={ConnectionTableRow}
         rows={rows}
         queryTime={queryTime}
+        error={error}
         emptyContent={
           <Button sx={{ padding: 4 }} onClick={() => $drawerOpen.set(true)}>
             <Typography color="text.secondary" variant="body2" component="div">

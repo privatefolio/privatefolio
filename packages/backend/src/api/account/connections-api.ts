@@ -20,7 +20,7 @@ import {
   Timestamp,
 } from "../../interfaces"
 import { formatDate } from "../../utils/formatting-utils"
-import { hashString, noop } from "../../utils/utils"
+import { hashString, noop, writesAllowed } from "../../utils/utils"
 import { getAccount } from "../accounts-api"
 import { countAuditLogs, upsertAuditLogs } from "./audit-logs-api"
 import { invalidateBalances } from "./balances-api"
@@ -34,11 +34,11 @@ import { countTransactions, upsertTransactions } from "./transactions-api"
 
 const SCHEMA_VERSION = 6
 
-async function getAccountWithConnections(accountName: string) {
-  const schemaVersion = await getValue(accountName, `connections_schema_version`, 0)
-
+export async function getAccountWithConnections(accountName: string) {
   const account = await getAccount(accountName)
+  if (!writesAllowed) return account
 
+  const schemaVersion = await getValue(accountName, `connections_schema_version`, 0)
   if (schemaVersion < SCHEMA_VERSION) {
     await account.execute(sql`DROP TABLE IF EXISTS connections`)
 

@@ -1,4 +1,4 @@
-import { useChat } from "@ai-sdk/react"
+import { Message, useChat } from "@ai-sdk/react"
 import { ArrowUpwardRounded, StopRounded } from "@mui/icons-material"
 import { Box, Button, Container, Input, Paper, Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
@@ -28,7 +28,7 @@ export function AssistantChat() {
   const inputRef = useRef<HTMLInputElement>(null)
   const [userHasScrolledUp, setUserHasScrolledUp] = useState(false)
   const [model, setModel] = useState(DEFAULT_SETTINGS.assistantModel)
-  const [initialMessages, setInitialMessages] = useState<any[]>([])
+  const [initialMessages, setInitialMessages] = useState<Message[]>([])
   const [isLoadingHistory, setIsLoadingHistory] = useState(!!existingConversationId)
 
   // Load existing conversation messages if conversationId is provided
