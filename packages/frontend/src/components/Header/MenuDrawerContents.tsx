@@ -94,6 +94,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
           },
           gap: 1,
           height: "100%",
+          overflow: "auto",
           paddingX: 2,
           paddingY: 1,
           width: "100%",
