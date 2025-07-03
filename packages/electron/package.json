@@ -4,26 +4,20 @@
     "name": "Daniel Constantin"
   },
   "dependencies": {
-    "electron-log": "^5.1.5",
+    "electron-log": "^5.2.0",
     "electron-squirrel-startup": "^1.0.1",
-    "electron-store": "^8.2.0",
-    "update-electron-app": "^2.0.1"
+    "electron-store": "^8.2.0"
   },
   "description": "Desktop version of Privatefolio.",
+  "homepage": "https://privatefolio.xyz",
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.4",
-    "@electron-forge/maker-deb": "^6.0.4",
-    "@electron-forge/maker-rpm": "^6.0.4",
-    "@electron-forge/maker-squirrel": "^6.0.4",
-    "@electron-forge/maker-zip": "^6.0.4",
-    "@types/electron-squirrel-startup": "^1.0.0",
-    "@types/node": "^18.0.0",
+    "@types/node": "^22.0.0",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
-    "concurrently": "^9.0.1",
-    "electron": "^24.2.0",
+    "concurrently": "^9.2.0",
+    "electron": "^37.1.0",
+    "electron-builder": "^26.0.12",
     "electron-icon-builder": "^2.0.1",
-    "electron-reload": "^2.0.0-alpha.1",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-standard": "^17.1.0",
@@ -36,8 +30,9 @@
     "eslint-plugin-sort-keys-fix": "^1.1.2",
     "eslint-plugin-unused-imports": "^2.0.0",
     "eslint-plugin-vitest": "^0.5.4",
+    "nodemon": "^3.1.10",
     "prettier": "^3.2.5",
-    "typescript": "^5.4.5"
+    "typescript": "^5.6.0"
   },
   "keywords": [],
   "license": "AGPL-3.0",
@@ -47,27 +42,22 @@
   "productName": "Privatefolio",
   "scripts": {
     "build": "tsc",
-    "build-bin:linux": "electron-forge make -p linux --arch=x64",
-    "build-bin:mac": "electron-forge make -p darwin --arch=x64,arm64",
-    "build-bin:win": "electron-forge make -p win32 --arch=x64",
+    "build-bin:linux": "electron-builder --linux --x64",
+    "build-bin:mac": "electron-builder --mac --x64 --arm64",
+    "build-bin:win": "electron-builder --win --x64",
     "build:types": "tsc --declaration --emitDeclarationOnly",
     "build:watch": "tsc --watch --preserveWatchOutput",
     "check-types": "tsc --noEmit",
     "check-types:watch": "yarn check-types --watch --preserveWatchOutput",
-    "dev": "concurrently \"yarn build:watch\" \"electron-forge start\" --kill-others --restart-tries 1 --restart-after 500 --prefix \"{command}\" --prefix-colors \"blue,cyan\" --prefix-length 30",
+    "dev": "concurrently \"yarn build:watch\" \"yarn electron:watch\" --kill-others --prefix \"{command}\" --prefix-colors \"blue,cyan\" --prefix-length 30",
     "gen-icons": "bun ./generate-icons.sh",
+    "electron:watch": "nodemon --watch build --delay 200ms --exec electron ./build/start.js",
     "lint": "eslint .",
     "lint:fix": "yarn lint --fix",
-    "package:linux": "electron-forge package -p linux --arch=x64",
-    "package:mac": "electron-forge package -p darwin --arch=x64,arm64",
-    "package:win": "electron-forge package -p win32 --arch=x64",
+    "package:linux": "electron-builder --linux --x64 --dir",
+    "package:mac": "electron-builder --mac --x64 --arm64 --dir",
+    "package:win": "electron-builder --win --x64 --dir",
     "postbuild": "yarn gen-icons",
-    "postbuild-bin:linux": "bash ./postbuild-bin.sh",
-    "postbuild-bin:mac": "bash ./postbuild-bin.sh",
-    "postbuild-bin:win": "bash ./postbuild-bin.sh",
-    "postpackage:linux": "bash ./postbuild-bin.sh",
-    "postpackage:mac": "bash ./postbuild-bin.sh",
-    "postpackage:win": "bash ./postbuild-bin.sh",
     "prebuild": "rm -rf ./build",
     "prebuild-bin:linux": "bash ./prebuild-bin.sh",
     "prebuild-bin:mac": "bash ./prebuild-bin.sh",
@@ -76,5 +66,91 @@
     "prepackage:mac": "bash ./prebuild-bin.sh",
     "prepackage:win": "bash ./prebuild-bin.sh"
   },
-  "version": "2.0.0-beta.8"
+  "version": "2.0.0-beta.8",
+  "build": {
+    "appId": "net.danielconstantin.privatefolio",
+    "productName": "Privatefolio",
+    "asar": false,
+    "directories": {
+      "output": "out"
+    },
+    "files": [
+      "build/**/*",
+      "resources/**/*",
+      "node_modules/**/*",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!**/node_modules/*.d.ts",
+      "!**/node_modules/.bin",
+      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+      "!.editorconfig",
+      "!**/._*",
+      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+      "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+      "!**/{appveyor.yml,.travis.yml,circle.yml}",
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}",
+      {
+        "from": "../frontend/build",
+        "to": "node_modules/privatefolio-frontend/build"
+      },
+      {
+        "from": "../backend/build",
+        "to": "node_modules/privatefolio-backend/build"
+      }
+    ],
+    "extraResources": [
+      {
+        "from": "resources",
+        "to": "resources"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.utilities",
+      "icon": "build/images/icon.icns",
+      "target": [
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "win": {
+      "icon": "build/images/icon.ico",
+      "target": [
+        {
+          "target": "squirrel",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "squirrelWindows": {
+      "iconUrl": "https://danielconstantin.net/privatefolio.ico",
+      "loadingGif": "build/images/install-spinner.gif"
+    },
+    "linux": {
+      "category": "Office;Finance",
+      "icon": "build/icons/png/1024x1024.png",
+      "target": [
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "deb": {
+      "packageName": "privatefolio",
+      "depends": [
+        "libnotify4",
+        "libxtst6",
+        "libnss3"
+      ]
+    }
+  }
 }

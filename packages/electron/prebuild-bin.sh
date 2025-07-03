@@ -1,39 +1,7 @@
 #!/bin/bash
 set -e  # Exit immediately if a command exits with a non-zero status
 
-# Define packages to handle with their dependencies
-# declare -A PACKAGE_DEPS
-# PACKAGE_DEPS["privatefolio-backend"]="" # "sqlite3 sqlite"
-# PACKAGE_DEPS["privatefolio-frontend"]=""
 
-# Define packages to handle
-PACKAGES=(
-  "privatefolio-frontend:../frontend"
-  "privatefolio-backend:../backend"
-)
-
-for PACKAGE_INFO in "${PACKAGES[@]}"; do
-  # Split the package info into name and source path
-  PACKAGE_NAME=${PACKAGE_INFO%%:*}
-  PACKAGE_SRC=${PACKAGE_INFO#*:}
-  PACKAGE_LOCATION="node_modules/$PACKAGE_NAME"
-  
-  # Copy the files
-  mkdir -p "$PACKAGE_LOCATION/build"
-  cp -r "$PACKAGE_SRC"/build/* "$PACKAGE_LOCATION/build/"
-  # mkdir -p "$PACKAGE_LOCATION/src"
-  # cp -r "$PACKAGE_SRC"/src/* "$PACKAGE_LOCATION/src/"
-  
-  # Copy dependencies based on package
-  # IFS=' ' read -ra DEPS <<< "${PACKAGE_DEPS[$PACKAGE_NAME]}"
-  # for DEP in "${DEPS[@]}"; do
-  #   if [ -n "$DEP" ]; then
-  #     echo "Copying $DEP"
-  #     mkdir -p "$PACKAGE_LOCATION/node_modules/$DEP"
-  #     cp -r "$PACKAGE_SRC/node_modules/$DEP"/* "$PACKAGE_LOCATION/node_modules/$DEP/"
-  #   fi
-  # done
-done
 
 # Bundle bun-sh into the resources folder
 BUN_LOCATION="resources/bun-sh"

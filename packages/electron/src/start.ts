@@ -2,8 +2,8 @@ import { app, BrowserWindow, dialog, ipcMain, Menu, shell, Tray } from "electron
 import Logger from "electron-log/main"
 import Store from "electron-store"
 import path from "path"
-import updateElectronApp from "update-electron-app"
 
+// import updateElectronApp from "update-electron-app"
 import { TITLE_BAR_OPTS } from "./api"
 import { getAutoLaunchEnabled, toggleAutoLaunch } from "./auto-launch"
 import * as backendManager from "./backend-manager"
@@ -42,12 +42,12 @@ console.log("Starting app...")
 console.log("Logging to", getLatestLogFilepath())
 console.log("Dev flag", hasDevFlag)
 
-updateElectronApp({
-  logger: Logger,
-  notifyUser: true,
-  repo: "privatefolio/privatefolio",
-  updateInterval: "1 hour",
-})
+// updateElectronApp({
+//   logger: Logger,
+//   notifyUser: true,
+//   repo: "privatefolio/privatefolio",
+//   updateInterval: "1 hour",
+// })
 
 // Logs: C:\Users\daniel\AppData\Local\SquirrelTemp
 const squirrel = require("electron-squirrel-startup")
@@ -56,15 +56,6 @@ console.log("Squirrel startup", squirrel)
 if (squirrel) app.quit()
 
 console.log("Production", isProduction)
-
-if (!isProduction) {
-  const executable = isWindows ? "electron.cmd" : "electron"
-  require("electron-reload")(__dirname, {
-    electron: path.resolve(__dirname, "../node_modules/.bin", executable),
-    forceHardReset: true,
-    hardResetMethod: "exit",
-  })
-}
 
 const appIconPath = isWindows
   ? path.join(__dirname, "images/icon.ico")
