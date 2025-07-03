@@ -2,10 +2,9 @@ import { app, BrowserWindow, dialog, ipcMain, Menu, shell, Tray } from "electron
 import Logger from "electron-log/main"
 import Store from "electron-store"
 import path from "path"
-import updateElectronApp from "update-electron-app"
 
-import { TITLE_BAR_OPTS } from "./api"
 import { getAutoLaunchEnabled, toggleAutoLaunch } from "./auto-launch"
+import { AutoUpdater } from "./auto-updater"
 import * as backendManager from "./backend-manager"
 import { configureIpcMain } from "./ipc-main"
 import {
@@ -25,10 +24,29 @@ interface WindowState {
 }
 
 interface StoreType {
+  autoUpdateEnabled: boolean
   windowState: WindowState
 }
 
 const store = new Store<StoreType>()
+
+function getAutoUpdateEnabled(): boolean {
+  return store.get("autoUpdateEnabled", true)
+}
+
+function toggleAutoUpdate(): boolean {
+  const currentEnabled = getAutoUpdateEnabled()
+  const newEnabled = !currentEnabled
+  store.set("autoUpdateEnabled", newEnabled)
+
+  if (newEnabled) {
+    appUpdater.startPeriodicCheck()
+  } else {
+    appUpdater.stopPeriodicCheck()
+  }
+
+  return newEnabled
+}
 
 const startMinimized = process.argv.includes("--hidden")
 
@@ -42,13 +60,6 @@ console.log("Starting app...")
 console.log("Logging to", getLatestLogFilepath())
 console.log("Dev flag", hasDevFlag)
 
-updateElectronApp({
-  logger: Logger,
-  notifyUser: true,
-  repo: "privatefolio/privatefolio",
-  updateInterval: "1 hour",
-})
-
 // Logs: C:\Users\daniel\AppData\Local\SquirrelTemp
 const squirrel = require("electron-squirrel-startup")
 
@@ -56,15 +67,6 @@ console.log("Squirrel startup", squirrel)
 if (squirrel) app.quit()
 
 console.log("Production", isProduction)
-
-if (!isProduction) {
-  const executable = isWindows ? "electron.cmd" : "electron"
-  require("electron-reload")(__dirname, {
-    electron: path.resolve(__dirname, "../node_modules/.bin", executable),
-    forceHardReset: true,
-    hardResetMethod: "exit",
-  })
-}
 
 const appIconPath = isWindows
   ? path.join(__dirname, "images/icon.ico")
@@ -77,6 +79,8 @@ Menu.setApplicationMenu(null)
 
 let isQuitting = false
 let tray: Tray | null = null
+
+const appUpdater = new AutoUpdater(Logger)
 
 function createWindow() {
   console.log("Creating main window")
@@ -95,8 +99,9 @@ function createWindow() {
     minHeight: 480,
     minWidth: 480,
     show: false,
-    titleBarOverlay: TITLE_BAR_OPTS.light,
+    // titleBarOverlay: TITLE_BAR_OPTS.light, TODO9
     titleBarStyle: "default",
+    // titleBarStyle: isWindows ? "hidden" : "default",
     webPreferences: {
       additionalArguments: [`--${appEnvironment}`],
       preload: path.join(__dirname, "./preload.js"),
@@ -182,6 +187,7 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
 
   const isVisible = mainWindow.isVisible()
   const isAutoLaunchEnabled = await getAutoLaunchEnabled()
+  const isAutoUpdateEnabled = getAutoUpdateEnabled()
   const isDevToolsOpened = mainWindow.webContents.isDevToolsOpened()
 
   console.log(
@@ -222,6 +228,22 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
       },
       label: "Auto-start on login",
       type: "checkbox",
+    },
+    {
+      checked: isAutoUpdateEnabled,
+      click: async function () {
+        const newEnabled = toggleAutoUpdate()
+        console.log("Auto-update", newEnabled ? "enabled" : "disabled")
+        updateTrayMenu(mainWindow)
+      },
+      label: "Auto-update",
+      type: "checkbox",
+    },
+    {
+      click: function () {
+        appUpdater.checkForUpdates(true)
+      },
+      label: "Check for Updates",
     },
     {
       label: "Debug",
@@ -360,6 +382,11 @@ if (!gotTheLock) {
     mainWindow = createWindow()
     console.log("Configuring IPC")
     configureIpcMain(ipcMain, mainWindow)
+
+    console.log("Initializing auto-updater")
+    appUpdater.setMainWindow(mainWindow)
+    if (getAutoUpdateEnabled()) appUpdater.startPeriodicCheck()
+
     console.log("Creating tray")
     tray = new Tray(appIconPath)
     tray.setToolTip("Privatefolio")
@@ -403,6 +430,7 @@ if (!gotTheLock) {
   app.on("before-quit", async (event) => {
     console.log("Before quit event")
     isQuitting = true
+    appUpdater.stopPeriodicCheck()
 
     // If the backend is running, stop it gracefully
     if (backendManager.isRunning()) {

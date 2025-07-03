@@ -1,7 +1,6 @@
 import { app, BrowserWindow, IpcMainEvent, Notification, shell } from "electron"
 import path from "path"
 
-import { TITLE_BAR_OPTS } from "./api"
 import * as backendManager from "./backend-manager"
 import { PaletteMode } from "./preload"
 import { getLatestLogFilepath, isProduction, isWindows } from "./utils"
@@ -31,7 +30,7 @@ function createSetModeHandler(window: BrowserWindow) {
   return function handleSetMode(event: IpcMainEvent, mode: PaletteMode) {
     console.log("Setting theme mode", mode)
     if (isWindows) {
-      window.setTitleBarOverlay(TITLE_BAR_OPTS[mode])
+      // window.setTitleBarOverlay(TITLE_BAR_OPTS[mode]) TODO9
     }
     event.returnValue = true
   }

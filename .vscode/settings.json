@@ -5,7 +5,7 @@
   // "[json]": {
   //   "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   // },
-  "prettier.prettierPath": "./packages/frontend/node_modules/prettier",
+  // "prettier.prettierPath": "./packages/frontend/node_modules/prettier",
   "eslint.workingDirectories": [
     {
       "mode": "auto"

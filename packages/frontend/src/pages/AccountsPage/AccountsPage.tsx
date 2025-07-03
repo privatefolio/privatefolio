@@ -100,6 +100,10 @@ export default function AccountsPage() {
         position="fixed"
         elevation={0}
         sx={{
+          "& button": {
+            WebkitAppRegion: "no-drag",
+          },
+          WebkitAppRegion: "drag",
           backdropFilter: "none !important",
           background: "none !important",
           border: "none",
