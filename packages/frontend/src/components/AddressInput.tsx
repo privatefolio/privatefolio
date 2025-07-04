@@ -4,25 +4,32 @@ import InputAdornment from "@mui/material/InputAdornment"
 import TextField, { TextFieldProps } from "@mui/material/TextField"
 import { useStore } from "@nanostores/react"
 import { getAddress, isAddress } from "ethers"
-import React, { useState } from "react"
-import { $addressBook } from "src/stores/metadata-store"
+import React, { useMemo, useState } from "react"
+import { $addressBook, $filterOptionsMap } from "src/stores/metadata-store"
 import { formatHex } from "src/utils/utils"
 
 import { MonoFont } from "../theme"
+import { Truncate } from "./Truncate"
 
 type AddressInputProps = Omit<TextFieldProps, "onChange" | "value"> & {
   onChange?: (value: string) => void
   showAddressBook?: boolean
+  showWallets?: boolean
   value?: string
 }
 
 const placeholder = "0x000…"
 
 export function AddressInput(props: AddressInputProps) {
-  const { value, onChange, showAddressBook, ...rest } = props
+  const { value, onChange, showAddressBook, showWallets, ...rest } = props
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<boolean>()
   const addressBook = useStore($addressBook, { keys: showAddressBook ? [] : undefined })
+  const filterOptionsMap = useStore($filterOptionsMap, { keys: showWallets ? [] : undefined })
+  const unlabelledWallets = useMemo(
+    () => filterOptionsMap?.wallet.filter((wallet) => !addressBook[wallet]),
+    [filterOptionsMap, addressBook]
+  )
 
   const handleChange = (newValue: string) => {
     if (!newValue) {
@@ -46,15 +53,26 @@ export function AddressInput(props: AddressInputProps) {
     </InputAdornment>
   ) : null
 
-  if (showAddressBook && addressBook && Object.keys(addressBook).length > 0) {
-    const options = addressBook
-      ? Object.entries(addressBook).map(([address, label]) => ({
+  const displayAddresBook = showAddressBook && addressBook && Object.keys(addressBook).length > 0
+  const displayWallets = showWallets && unlabelledWallets && unlabelledWallets.length > 0
+
+  if (displayAddresBook || displayWallets) {
+    const options: { address: string; label?: string }[] = []
+
+    if (displayAddresBook) {
+      options.push(
+        ...Object.entries(addressBook).map(([address, label]) => ({
           address,
           label,
         }))
-      : []
+      )
+    }
 
-    options.sort((a, b) => a.label.localeCompare(b.label))
+    if (displayWallets) {
+      options.push(...unlabelledWallets.map((wallet) => ({ address: wallet })))
+    }
+
+    options.sort((a, b) => a.label?.localeCompare(b.label ?? "") ?? 0)
 
     return (
       <Autocomplete
@@ -65,14 +83,27 @@ export function AddressInput(props: AddressInputProps) {
         getOptionLabel={(option) => (typeof option === "string" ? option : option.address)}
         renderOption={(props, option) => (
           <Box component="li" {...props} key={option.address}>
-            <Typography variant="body2">{option.label}</Typography>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ fontFamily: MonoFont, marginLeft: "auto" }}
-            >
-              {formatHex(option.address)}
-            </Typography>
+            {option.label ? (
+              <>
+                <Typography variant="body2">{option.label}</Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ fontFamily: MonoFont, marginLeft: "auto" }}
+                >
+                  {formatHex(option.address)}
+                </Typography>
+              </>
+            ) : (
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ fontFamily: MonoFont }}
+                component={Truncate}
+              >
+                {option.address}
+              </Typography>
+            )}
           </Box>
         )}
         renderInput={(params) => (
@@ -127,6 +158,7 @@ export function AddressInput(props: AddressInputProps) {
 export type AddressInputUncontrolledProps = Omit<TextFieldProps, "onChange" | "value"> & {
   initialValue?: string
   showAddressBook?: boolean
+  showWallets?: boolean
 }
 
 export function AddressInputUncontrolled({

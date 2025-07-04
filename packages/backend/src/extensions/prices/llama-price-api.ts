@@ -7,7 +7,7 @@ import {
   removePlatformPrefix,
 } from "src/utils/assets-utils"
 
-import { approximateTimestamp, ensureValidBuckets } from "../../utils/utils"
+import { approximateTime, ensureValidBuckets } from "../../utils/utils"
 
 export const Identifier: PriceApiId = "defi-llama"
 
@@ -91,7 +91,7 @@ export async function queryPrices(request: QueryRequest) {
 
   const patched = ensureValidBuckets(
     prices.map((price) => ({
-      time: approximateTimestamp(price.timestamp, timeInterval) as Time,
+      time: approximateTime(price.timestamp, timeInterval) as Time,
       value: price.price,
     })),
     timeInterval

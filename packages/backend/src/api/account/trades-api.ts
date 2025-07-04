@@ -5,6 +5,7 @@ import {
   EventCause,
   MyAsset,
   ProgressCallback,
+  ResolutionString,
   SqlParam,
   SubscriptionChannel,
   TaskPriority,
@@ -21,7 +22,7 @@ import { transformNullsToUndefined } from "src/utils/db-utils"
 import { formatDate, ONE_DAY } from "src/utils/formatting-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
-import { hashString, isTestEnvironment, noop } from "src/utils/utils"
+import { floorTimestamp, hashString, isTestEnvironment, noop } from "src/utils/utils"
 
 import { getAccount } from "../accounts-api"
 import { getMyAssets } from "./assets-api"
@@ -923,10 +924,10 @@ export async function computePnl(
 
   for (const trade of trades) {
     // Get daily prices for the asset during the trade period
-    const startTime = trade.createdAt - (trade.createdAt % 86400000)
+    const startTime = floorTimestamp(trade.createdAt, "1D" as ResolutionString)
     const endTime = trade.closedAt
-      ? trade.closedAt - (trade.closedAt % 86400000)
-      : Date.now() - (Date.now() % 86400000)
+      ? floorTimestamp(trade.closedAt, "1D" as ResolutionString)
+      : floorTimestamp(Date.now(), "1D" as ResolutionString)
 
     // Add genesis entry (one day before trade creation)
     const genesisTime = startTime - ONE_DAY

@@ -17,16 +17,12 @@ import {
 } from "src/interfaces"
 import { FILES_LOCATION } from "src/settings/settings"
 import { splitRows } from "src/utils/csv-utils"
-import { formatDate } from "src/utils/formatting-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { hashString, noop } from "src/utils/utils"
 
 import { countAuditLogs, upsertAuditLogs } from "./audit-logs-api"
-import { invalidateBalances } from "./balances-api"
-import { invalidateNetworth } from "./networth-api"
 import { getServerFile } from "./server-files-api"
 import { enqueueTask } from "./server-tasks-api"
-import { invalidateTradePnl, invalidateTrades } from "./trades-api"
 import { countTransactions, upsertTransactions } from "./transactions-api"
 
 async function readFileImportText(accountName: string, fileRecord: ServerFile) {
@@ -94,15 +90,6 @@ export async function importFile(
       if (!oldestTimestamp || log.timestamp < oldestTimestamp) {
         oldestTimestamp = log.timestamp
       }
-    }
-
-    if (oldestTimestamp) {
-      const newCursor = oldestTimestamp - (oldestTimestamp % 86400000) - 86400000
-      await progress([25, `Setting balances cursor to ${formatDate(newCursor)}`])
-      await invalidateBalances(accountName, newCursor)
-      await invalidateNetworth(accountName, newCursor)
-      await invalidateTrades(accountName, newCursor)
-      await invalidateTradePnl(accountName, newCursor)
     }
 
     await account.execute(`UPDATE file_imports SET timestamp = ?, meta = ? WHERE id = ?`, [
@@ -183,15 +170,7 @@ export async function deleteFileImport(
   )
   await progress([0, `Removing ${auditLogsCount} audit logs`])
   await account.execute(`DELETE FROM audit_logs WHERE fileImportId = ?`, [fileImport.id])
-  account.eventEmitter.emit(SubscriptionChannel.AuditLogs, EventCause.Deleted)
-
-  if (oldestTimestamp) {
-    const newCursor = oldestTimestamp - (oldestTimestamp % 86400000) - 86400000
-    await progress([25, `Setting balances cursor to ${formatDate(newCursor)}`])
-    await invalidateBalances(accountName, newCursor)
-    await progress([25, `Setting networth cursor to ${formatDate(newCursor)}`])
-    await invalidateNetworth(accountName, newCursor)
-  }
+  account.eventEmitter.emit(SubscriptionChannel.AuditLogs, EventCause.Deleted, oldestTimestamp)
 
   const transactionsCount = await countTransactions(
     accountName,

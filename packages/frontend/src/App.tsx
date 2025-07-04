@@ -141,7 +141,7 @@ export default function App() {
 
     fetchInMemoryData(rpc, activeAccount)
 
-    const subscription = rpc.subscribeToAssetMetadata(
+    const subscription = rpc.subscribeToMetadata(
       activeAccount,
       throttle(() => fetchInMemoryData(rpc, activeAccount), SHORT_THROTTLE_DURATION, {
         leading: false,

@@ -102,7 +102,7 @@ export async function assignTagToAuditLog(
       `INSERT OR IGNORE INTO audit_log_tags (audit_log_id, tag_id) VALUES (?, ?)`,
       [auditLogId, tag.id]
     )
-    account.eventEmitter.emit(SubscriptionChannel.AuditLogs, EventCause.Updated, auditLogId)
+    account.eventEmitter.emit(SubscriptionChannel.AuditLogs, EventCause.Updated)
   } catch (error) {
     throw new Error(`Failed to assign tag '${tagName}' to audit log ${auditLogId}: ${error}`)
   }
@@ -155,7 +155,7 @@ export async function removeTagFromAuditLog(
       auditLogId,
       tagId,
     ])
-    account.eventEmitter.emit(SubscriptionChannel.AuditLogs, EventCause.Updated, auditLogId)
+    account.eventEmitter.emit(SubscriptionChannel.AuditLogs, EventCause.Updated)
   } catch (error) {
     throw new Error(`Failed to remove tag id ${tagId} from audit log ${auditLogId}: ${error}`)
   }

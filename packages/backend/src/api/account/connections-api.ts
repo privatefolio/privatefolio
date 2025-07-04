@@ -19,17 +19,13 @@ import {
   TaskTrigger,
   Timestamp,
 } from "../../interfaces"
-import { formatDate } from "../../utils/formatting-utils"
 import { hashString, noop, writesAllowed } from "../../utils/utils"
 import { getAccount } from "../accounts-api"
 import { countAuditLogs, upsertAuditLogs } from "./audit-logs-api"
-import { invalidateBalances } from "./balances-api"
 import { getExtension } from "./extensions-api"
 import { getValue, setValue } from "./kv-api"
-import { invalidateNetworth } from "./networth-api"
 import { getPlatform } from "./platforms-api"
 import { enqueueTask } from "./server-tasks-api"
-import { invalidateTradePnl, invalidateTrades } from "./trades-api"
 import { countTransactions, upsertTransactions } from "./transactions-api"
 
 const SCHEMA_VERSION = 6
@@ -209,14 +205,6 @@ export async function resetConnection(
   await progress([0, `Removing ${auditLogsCount} audit logs`])
   await account.execute(`DELETE FROM audit_logs WHERE connectionId = ?`, [connection.id])
 
-  if (oldestTimestamp) {
-    const newCursor = oldestTimestamp - (oldestTimestamp % 86400000) - 86400000
-    await progress([25, `Setting balances cursor to ${formatDate(newCursor)}`])
-    await invalidateBalances(accountName, newCursor)
-    await progress([25, `Setting networth cursor to ${formatDate(newCursor)}`])
-    await invalidateNetworth(accountName, newCursor)
-  }
-
   const transactionsCount = await countTransactions(
     accountName,
     `SELECT COUNT(*) FROM transactions WHERE connectionId = ?`,
@@ -238,7 +226,7 @@ export async function resetConnection(
 
   await upsertConnection(accountName, connection)
 
-  account.eventEmitter.emit(SubscriptionChannel.AuditLogs, EventCause.Deleted)
+  account.eventEmitter.emit(SubscriptionChannel.AuditLogs, EventCause.Deleted, oldestTimestamp)
 
   return auditLogsCount
 }
@@ -319,25 +307,6 @@ export async function syncConnection(
   if (txIds.length > 0) {
     await progress([70, `Saving ${txIds.length} transactions to disk`])
     await upsertTransactions(accountName, Object.values(result.txMap))
-  }
-
-  // Invalidate balances and networth if we have new data
-  if (logIds.length > 0) {
-    let oldestTimestamp: Timestamp | undefined
-    for (const log of Object.values(result.logMap)) {
-      if (!oldestTimestamp || log.timestamp < oldestTimestamp) {
-        oldestTimestamp = log.timestamp
-      }
-    }
-
-    if (oldestTimestamp) {
-      const newCursor = oldestTimestamp - (oldestTimestamp % 86400000) - 86400000
-      await progress([75, `Setting balances cursor to ${formatDate(newCursor)}`])
-      await invalidateBalances(accountName, newCursor)
-      await invalidateNetworth(accountName, newCursor)
-      await invalidateTrades(accountName, newCursor)
-      await invalidateTradePnl(accountName, newCursor)
-    }
   }
 
   // Save metadata

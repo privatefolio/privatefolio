@@ -4,7 +4,7 @@ import { Priority } from "kbar/lib/types"
 import { enqueueSnackbar } from "notistack"
 import React from "react"
 import { $activeAccount } from "src/stores/account-store"
-import { $addressBook, fetchInMemoryData } from "src/stores/metadata-store"
+import { $addressBook } from "src/stores/metadata-store"
 import { downloadFile, requestFile } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
@@ -97,7 +97,6 @@ export const APP_ACTIONS: Record<ActionId, Action> = {
       const activeAccount = $activeAccount.get()
       const rpc = $rpc.get()
       await rpc.enqueueDeleteAssetPreferences(activeAccount, "user")
-      await fetchInMemoryData(rpc, activeAccount)
     },
     priority: 0,
     section,

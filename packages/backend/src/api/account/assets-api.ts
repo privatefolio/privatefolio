@@ -171,7 +171,7 @@ export async function upsertAssets(accountName: string, records: MyAsset[]) {
       ])
     )
 
-    account.eventEmitter.emit(SubscriptionChannel.AssetMetadata)
+    account.eventEmitter.emit(SubscriptionChannel.Metadata)
   } catch (error) {
     throw new Error(`Failed to add or replace assets: ${error}`)
   }
@@ -273,7 +273,7 @@ export function enqueueRefetchAssets(accountName: string, trigger: TaskTrigger) 
     function: async (progress) => {
       const data = await refetchAssetsWithRetry()
       const account = await getAccount(accountName)
-      account.eventEmitter.emit(SubscriptionChannel.AssetMetadata)
+      account.eventEmitter.emit(SubscriptionChannel.Metadata)
       await progress([undefined, `Refetched ${data.length} coins from coingecko.com.`])
     },
     name: "Refetch assets",
@@ -282,13 +282,14 @@ export function enqueueRefetchAssets(accountName: string, trigger: TaskTrigger) 
   })
 }
 
-export async function subscribeToAssetMetadata(accountName: string, callback: () => void) {
-  return createSubscription(accountName, SubscriptionChannel.AssetMetadata, callback)
+export async function subscribeToMetadata(accountName: string, callback: () => void) {
+  return createSubscription(accountName, SubscriptionChannel.Metadata, callback)
 }
 
 export async function deleteAssetPreferences(accountName: string) {
   const account = await getAccount(accountName)
   await account.execute("DELETE FROM assets")
+  account.eventEmitter.emit(SubscriptionChannel.Metadata)
 }
 
 export function enqueueDeleteAssetPreferences(accountName: string, trigger: TaskTrigger) {

@@ -7,6 +7,7 @@ import {
   ProgressLog,
   ResolutionString,
   Time,
+  Timestamp,
 } from "src/interfaces"
 
 import { isBunWorker } from "./environment-utils"
@@ -164,16 +165,16 @@ export function getBucketSize(timeInterval: ResolutionString): Time {
   throw new Error(`Unsupported time interval: ${timeInterval}`)
 }
 
-export function approximateTimestamp(time: Time, timeInterval: ResolutionString) {
+export function approximateTime(time: Time, timeInterval: ResolutionString) {
   const bucketSize = getBucketSize(timeInterval)
   const remainder = time % bucketSize
   return remainder > bucketSize / 2 ? time - remainder + bucketSize : time - remainder
 }
 
-export function floorTimestamp(time: Time, timeInterval: ResolutionString) {
-  const bucketSize = getBucketSize(timeInterval)
-  const remainder = time % bucketSize
-  return time - remainder
+export function floorTimestamp(timestamp: Timestamp, timeInterval: ResolutionString) {
+  const bucketSize = getBucketSize(timeInterval) * 1000
+  const remainder = timestamp % bucketSize
+  return timestamp - remainder
 }
 
 export function ensureValidBuckets(

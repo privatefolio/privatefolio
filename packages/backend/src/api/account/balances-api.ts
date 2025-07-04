@@ -21,7 +21,6 @@ import { getMyAssets } from "./assets-api"
 import { countAuditLogs, getAuditLogOrderQuery, getAuditLogs, getWallets } from "./audit-logs-api"
 import { getPricesForAsset } from "./daily-prices-api"
 import { getValue, setValue } from "./kv-api"
-import { invalidateNetworth } from "./networth-api"
 import { getPlatform } from "./platforms-api"
 import { enqueueTask } from "./server-tasks-api"
 
@@ -62,7 +61,7 @@ export async function getBalancesAt(
       ? cursor
       : ((await getValue<Timestamp>(accountName, "balancesCursor", 0)) as Timestamp)
 
-  balancesCursor = floorTimestamp(balancesCursor / 1000, "1D" as ResolutionString) * 1000
+  balancesCursor = floorTimestamp(balancesCursor, "1D" as ResolutionString)
 
   try {
     const result = await account.execute("SELECT * FROM balances WHERE timestamp = ?", [
@@ -195,10 +194,10 @@ export async function computeBalances(
       const { assetId, change, timestamp, wallet } = log
 
       if (genesisDay === 0) {
-        genesisDay = timestamp - (timestamp % 86400000)
+        genesisDay = floorTimestamp(timestamp, "1D" as ResolutionString)
       }
 
-      const nextDay: Timestamp = timestamp - (timestamp % 86400000)
+      const nextDay: Timestamp = floorTimestamp(timestamp, "1D" as ResolutionString)
 
       // fill the daily gaps
       if (latestDay !== 0) {
@@ -271,19 +270,17 @@ export async function computeBalances(
       balanceIds.map((timestamp) => [timestamp, JSON.stringify(historicalBalances[timestamp])])
     )
 
-    await setValue(accountName, "balancesCursor", latestDay)
     await progress([
       Math.floor((Math.min(i + pageSize, count) * 90) / count),
       `Processed ${balanceIds.length} daily balances`,
     ])
 
+    await progress([undefined, `Setting balances cursor to ${formatDate(latestDay)}`])
+    await setValue(accountName, "balancesCursor", latestDay)
+
     // free memory
     historicalBalances = {}
   }
-
-  const newCursor = since - (since % 86400000) - 86400000
-  await progress([95, `Setting networth cursor to ${formatDate(newCursor)}`])
-  await invalidateNetworth(accountName, newCursor)
 
   if (latestDay === 0 && since === 0) {
     await account.execute("DELETE FROM balances")
@@ -314,6 +311,7 @@ export async function computeBalances(
     recordsLength += balanceIds.length
   }
 
+  await progress([undefined, `Setting balances cursor to ${formatDate(latestDay)}`])
   await setValue(accountName, "balancesCursor", latestDay)
   await progress([100, `Saved ${recordsLength} records to disk`])
 }

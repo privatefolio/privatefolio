@@ -737,7 +737,7 @@ export enum SubscriptionChannel {
   DailyPrices = "daily-prices",
   FileImports = "file-imports",
   Connections = "connections",
-  AssetMetadata = "asset-metadata",
+  Metadata = "metadata",
   Balances = "balances",
   Transactions = "transactions",
   ServerLog = "server-logs",

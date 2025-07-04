@@ -1,4 +1,11 @@
-import { EventCause, ServerFile, SqlParam, TaskPriority, TaskTrigger } from "src/interfaces"
+import {
+  EventCause,
+  ServerFile,
+  SqlParam,
+  TaskPriority,
+  TaskTrigger,
+  Timestamp,
+} from "src/interfaces"
 import { transformAuditLogsToCsv } from "src/utils/csv-export-utils"
 import { createCsvString } from "src/utils/csv-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
@@ -128,15 +135,12 @@ export async function upsertAuditLogs(accountName: string, records: AuditLog[]) 
         record.wallet,
       ])
     )
-    // TODO8 this will help invalidating balances cursor
-    // let earliestTimestamp = Date.now()
-    // for (const record of records) {
-    //   if (record.timestamp < earliestTimestamp) {
-    //     earliestTimestamp = record.timestamp
-    //   }
-    // }
+    let oldestTimestamp = Date.now()
+    for (const record of records) {
+      if (record.timestamp < oldestTimestamp) oldestTimestamp = record.timestamp
+    }
 
-    account.eventEmitter.emit(SubscriptionChannel.AuditLogs, EventCause.Created)
+    account.eventEmitter.emit(SubscriptionChannel.AuditLogs, EventCause.Created, oldestTimestamp)
   } catch (error) {
     throw new Error(`Failed to add or replace audit logs: ${error}`)
   }
@@ -169,7 +173,7 @@ export async function countAuditLogs(
 
 export async function subscribeToAuditLogs(
   accountName: string,
-  callback: (cause: EventCause) => void
+  callback: (cause: EventCause, oldestTimestamp?: Timestamp) => void
 ) {
   return createSubscription(accountName, SubscriptionChannel.AuditLogs, callback)
 }

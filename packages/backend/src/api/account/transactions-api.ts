@@ -525,7 +525,11 @@ export async function deleteTransaction(
   await progress([100, `Transaction removed successfully`])
 
   account.eventEmitter.emit(SubscriptionChannel.Transactions, EventCause.Deleted, transactionId)
-  account.eventEmitter.emit(SubscriptionChannel.AuditLogs, EventCause.Deleted)
+  let oldestTimestamp = Date.now()
+  for (const log of auditLogs) {
+    if (log.timestamp < oldestTimestamp) oldestTimestamp = log.timestamp
+  }
+  account.eventEmitter.emit(SubscriptionChannel.AuditLogs, EventCause.Deleted, oldestTimestamp)
 }
 
 export async function enqueueDeleteTransaction(

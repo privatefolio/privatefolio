@@ -16,7 +16,7 @@ import {
 } from "../../utils/assets-utils"
 import { isServer } from "../../utils/environment-utils"
 import {
-  approximateTimestamp,
+  approximateTime,
   ensureValidBuckets,
   getBucketSize,
   paginatePriceRequest,
@@ -152,7 +152,7 @@ export async function queryPrices(request: QueryRequest) {
 
   const patched = ensureValidBuckets(
     prices.map((price) => ({
-      time: approximateTimestamp(new Date(price.timestamp).getTime() / 1000, timeInterval) as Time,
+      time: approximateTime(new Date(price.timestamp).getTime() / 1000, timeInterval) as Time,
       value: parseFloat(price.value),
     })),
     timeInterval

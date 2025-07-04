@@ -214,6 +214,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
                 size="small"
                 required
                 showAddressBook
+                showWallets
               />
             )}
           </div>

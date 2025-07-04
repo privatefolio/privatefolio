@@ -218,6 +218,8 @@ async function getParserContext(
                 size="small"
                 required
                 name={requirement}
+                showAddressBook
+                showWallets
               />
             </div>
           )

@@ -18,7 +18,7 @@ import { getAssetTicker } from "src/utils/assets-utils"
 import { formatDate } from "src/utils/formatting-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
-import { noop } from "src/utils/utils"
+import { floorTimestamp, noop } from "src/utils/utils"
 
 import { getAccount } from "../accounts-api"
 import { getMyAssets, patchAsset } from "./assets-api"
@@ -145,7 +145,7 @@ export async function getAssetPriceMap(
 ): Promise<Record<string, ChartData>> {
   const account = await getAccountWithDailyPrices(accountName)
 
-  const day: Timestamp = timestamp - (timestamp % 86400000)
+  const day: Timestamp = floorTimestamp(timestamp, "1D" as ResolutionString)
 
   const prices = await account.execute(
     `
@@ -212,7 +212,7 @@ export async function fetchDailyPrices(
   await progress([0, `Fetching asset prices for ${assets.length} assets`])
 
   const now = Date.now()
-  const today: Timestamp = now - (now % 86400000)
+  const today: Timestamp = floorTimestamp(now, "1D" as ResolutionString)
 
   const promises: (() => Promise<void>)[] = []
 

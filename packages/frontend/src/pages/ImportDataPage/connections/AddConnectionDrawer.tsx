@@ -288,6 +288,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                   size="small"
                   required
                   showAddressBook
+                  showWallets
                 />
               </div>
             </>

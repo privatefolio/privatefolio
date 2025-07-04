@@ -24,6 +24,7 @@ export function AddressBookForm({ address, label }: AddressBookFormProps) {
           required
           name="address"
           disabled={!!address}
+          showWallets
         />
       </div>
       <div>

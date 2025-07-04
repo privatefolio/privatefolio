@@ -6,11 +6,19 @@ import { throttle } from "lodash-es"
 
 import { refetchAssetsIfNeeded } from "./api/account/assets-api"
 import { refetchPlatformsIfNeeded } from "./api/account/platforms-api"
+import { getAccount } from "./api/accounts-api"
 import { Api, api } from "./api/api"
 import { BackendServer } from "./backend-server"
-import { EventCause, SubscriptionId } from "./interfaces"
+import {
+  EventCause,
+  ResolutionString,
+  SubscriptionChannel,
+  SubscriptionId,
+  Timestamp,
+} from "./interfaces"
 import { SHORT_THROTTLE_DURATION } from "./settings/settings"
-import { getCronExpression, getPrefix, isDevelopment } from "./utils/utils"
+import { ONE_DAY } from "./utils/formatting-utils"
+import { floorTimestamp, getCronExpression, getPrefix, isDevelopment } from "./utils/utils"
 
 console.log("Starting worker...")
 const worker = new Worker(import.meta.resolve("./api-worker"), {
@@ -133,14 +141,20 @@ async function setupSideEffects(accountName: string) {
     accountName,
     proxy(
       throttle(
-        async (cause) => {
+        async (cause, oldestTimestamp?: Timestamp) => {
           console.log(
             getPrefix(accountName, true),
             `Running side-effects (trigger by audit log changes).`
           )
           if (cause === EventCause.Updated) return
-          if (cause === EventCause.Reset) return
 
+          if (oldestTimestamp) {
+            const newCursor = floorTimestamp(oldestTimestamp, "1D" as ResolutionString) - ONE_DAY
+            await writeApi.invalidateBalances(accountName, newCursor)
+            await writeApi.invalidateNetworth(accountName, newCursor)
+            await writeApi.invalidateTrades(accountName, newCursor)
+            await writeApi.invalidateTradePnl(accountName, newCursor)
+          }
           await writeApi.computeGenesis(accountName)
           await writeApi.computeLastTx(accountName)
 
@@ -157,6 +171,9 @@ async function setupSideEffects(accountName: string) {
           }
           await writeApi.enqueueRefreshNetworth(accountName, "side-effect")
           await writeApi.enqueueRefreshTrades(accountName, "side-effect")
+
+          const account = await getAccount(accountName)
+          account.eventEmitter.emit(SubscriptionChannel.Metadata)
         },
         SHORT_THROTTLE_DURATION,
         {
