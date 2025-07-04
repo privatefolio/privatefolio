@@ -60,8 +60,8 @@ describe("should import 0xb6e via connection", () => {
       "0,Computing balances for 166 audit logs
       0,Processing logs 1 to 166
       90,Processed 432 daily balances
-      95,Setting networth cursor to Dec 31, 1969
       96,Filling balances to reach today
+      99,Setting balances cursor to May 09, 2025
       100,Saved 433 records to disk"
     `)
   })
@@ -208,8 +208,6 @@ describe("should import 0xb6e via connection", () => {
     //
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Removing 166 audit logs
-      25,Setting balances cursor to Mar 03, 2024
-      25,Setting networth cursor to Mar 03, 2024
       50,Removing 162 transactions"
     `)
     expect(remainingAuditLogs).toMatchInlineSnapshot(`0`)

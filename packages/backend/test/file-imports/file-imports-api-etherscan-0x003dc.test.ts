@@ -289,8 +289,8 @@ describe("should import 0x003dc via files", () => {
       87,Processed 1350 daily balances
       87,Processing logs 1001 to 1025
       90,Processed 622 daily balances
-      95,Setting networth cursor to Dec 31, 1969
       96,Filling balances to reach today
+      99,Setting balances cursor to Feb 28, 2023
       100,Saved 1973 records to disk"
     `)
   })
@@ -493,20 +493,14 @@ describe("should import 0x003dc via files", () => {
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Removing file import with id 4118854677
       0,Removing 419 audit logs
-      25,Setting balances cursor to Nov 20, 2017
-      25,Setting networth cursor to Nov 20, 2017
       50,Removing 364 transactions
       100,Removed file import with id 4118854677
       0,Removing file import with id 2523657605
       0,Removing 61 audit logs
-      25,Setting balances cursor to Sep 25, 2018
-      25,Setting networth cursor to Sep 25, 2018
       50,Removing 32 transactions
       100,Removed file import with id 2523657605
       0,Removing file import with id 2137860255
       0,Removing 545 audit logs
-      25,Setting balances cursor to Oct 06, 2017
-      25,Setting networth cursor to Oct 06, 2017
       50,Removing 271 transactions
       100,Removed file import with id 2137860255"
     `)

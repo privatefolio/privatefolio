@@ -275,9 +275,6 @@ export async function computeBalances(
       `Processed ${balanceIds.length} daily balances`,
     ])
 
-    await progress([undefined, `Setting balances cursor to ${formatDate(latestDay)}`])
-    await setValue(accountName, "balancesCursor", latestDay)
-
     // free memory
     historicalBalances = {}
   }
@@ -311,7 +308,7 @@ export async function computeBalances(
     recordsLength += balanceIds.length
   }
 
-  await progress([undefined, `Setting balances cursor to ${formatDate(latestDay)}`])
+  await progress([99, `Setting balances cursor to ${formatDate(latestDay)}`])
   await setValue(accountName, "balancesCursor", latestDay)
   await progress([100, `Saved ${recordsLength} records to disk`])
 }

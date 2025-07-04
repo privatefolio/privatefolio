@@ -51,8 +51,8 @@ describe("should import 0xf98 via connection", () => {
       "0,Computing balances for 24 audit logs
       0,Processing logs 1 to 24
       90,Processed 1153 daily balances
-      95,Setting networth cursor to Dec 31, 1969
       96,Filling balances to reach today
+      99,Setting balances cursor to Dec 31, 2020
       100,Saved 1211 records to disk"
     `)
   })
@@ -110,8 +110,6 @@ describe("should import 0xf98 via connection", () => {
     //
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Removing 24 audit logs
-      25,Setting balances cursor to Sep 08, 2017
-      25,Setting networth cursor to Sep 08, 2017
       50,Removing 16 transactions"
     `)
     expect(remainingAuditLogs).toMatchInlineSnapshot(`0`)

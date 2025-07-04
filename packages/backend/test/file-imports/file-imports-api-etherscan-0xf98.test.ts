@@ -175,8 +175,8 @@ describe("0xf98 file import", () => {
       "0,Computing balances for 24 audit logs
       0,Processing logs 1 to 24
       90,Processed 1153 daily balances
-      95,Setting networth cursor to Dec 31, 1969
       96,Filling balances to reach today
+      99,Setting balances cursor to Dec 31, 2020
       100,Saved 1211 records to disk"
     `)
   })
@@ -267,14 +267,10 @@ describe("0xf98 file import", () => {
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Removing file import with id 3477221057
       0,Removing 8 audit logs
-      25,Setting balances cursor to Oct 26, 2017
-      25,Setting networth cursor to Oct 26, 2017
       50,Removing 8 transactions
       100,Removed file import with id 3477221057
       0,Removing file import with id 1151263496
       0,Removing 16 audit logs
-      25,Setting balances cursor to Sep 08, 2017
-      25,Setting networth cursor to Sep 08, 2017
       50,Removing 8 transactions
       100,Removed file import with id 1151263496"
     `)
