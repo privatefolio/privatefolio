@@ -1,15 +1,24 @@
-import { Visibility, VisibilityOff } from "@mui/icons-material"
-import { Button, IconButton, InputAdornment, Paper, Stack, TextField } from "@mui/material"
+import { ExpandMore, Visibility, VisibilityOff } from "@mui/icons-material"
+import {
+  Button,
+  Collapse,
+  IconButton,
+  InputAdornment,
+  Paper,
+  Stack,
+  TextField,
+} from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { enqueueSnackbar } from "notistack"
 import React, { useEffect, useState } from "react"
-import { AiModelSelect } from "src/components/AiModelSelect"
+import { AssistantModelSelect } from "src/components/AssistantModelSelect"
 import { LearnMore } from "src/components/LearnMore"
 import { SectionTitle } from "src/components/SectionTitle"
 
 import { DEFAULT_SETTINGS } from "../../settings"
 import { $activeAccount } from "../../stores/account-store"
 import { $rpc } from "../../workers/remotes"
+import { ModelComparisonTable } from "./ModelComparisonTable"
 
 export function AssistantSettings() {
   const rpc = useStore($rpc)
@@ -72,6 +81,11 @@ export function AssistantSettings() {
     setShowPassword((show) => !show)
   }
 
+  const [showModelComparison, setShowModelComparison] = useState(false)
+  const handleToggleModelComparison = () => {
+    setShowModelComparison((show) => !show)
+  }
+
   const passwordAdornment = (
     <InputAdornment position="end">
       <IconButton
@@ -90,16 +104,38 @@ export function AssistantSettings() {
     <Paper sx={{ paddingX: 2, paddingY: 1 }}>
       <Stack gap={2}>
         <div>
-          <LearnMore
-            title={`Choose which OpenAI model to use for the assistant. GPT-4o Mini is recommended for cost efficiency while GPT-4o provides better performance.`}
-          >
-            <SectionTitle>AI Model</SectionTitle>
+          <LearnMore title={`Choose which LLM model to use for the assistant.`}>
+            <SectionTitle>Default AI Model</SectionTitle>
           </LearnMore>
-          <AiModelSelect
+          <AssistantModelSelect
             value={assistantModel}
             onChange={(event) => setAssistantModel(event.target.value)}
             disabled={isLoading}
           />
+          <Button
+            size="small"
+            color="secondary"
+            onClick={handleToggleModelComparison}
+            endIcon={
+              <ExpandMore
+                sx={{
+                  transform: showModelComparison ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: "transform 0.5s",
+                }}
+                fontSize="inherit"
+              />
+            }
+            sx={{
+              display: "flex",
+              marginY: 1,
+              paddingX: 2,
+            }}
+          >
+            <span>AI Model Comparison</span>
+          </Button>
+          <Collapse in={showModelComparison}>
+            <ModelComparisonTable />
+          </Collapse>
         </div>
         <div>
           <LearnMore

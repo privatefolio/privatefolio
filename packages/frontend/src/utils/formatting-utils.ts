@@ -131,3 +131,13 @@ export function formatPrivatefolioTxId(txId: string) {
 }
 
 export const ONE_DAY = 24 * 60 * 60 * 1000
+
+export function formatContextWindow(tokens: number): string {
+  if (tokens >= 1000000) {
+    return `${(tokens / 1000000).toFixed(1)}M`
+  } else if (tokens >= 1000) {
+    return `${(tokens / 1000).toFixed(0)}K`
+  } else {
+    return `${tokens} tokens`
+  }
+}

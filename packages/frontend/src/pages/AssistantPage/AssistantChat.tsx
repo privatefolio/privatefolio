@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from "react"
 import ReactMarkdown from "react-markdown"
 import { useSearchParams } from "react-router-dom"
 import remarkGfm from "remark-gfm"
-import { AiModelSelect } from "src/components/AiModelSelect"
+import { AssistantModelSelect } from "src/components/AssistantModelSelect"
 import { CircularSpinner } from "src/components/CircularSpinner"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { $activeAccount } from "src/stores/account-store"
@@ -532,7 +532,7 @@ export function AssistantChat() {
             }}
           />
           <Stack direction="row" alignItems="flex-end" gap={1} justifyContent="space-between">
-            <AiModelSelect
+            <AssistantModelSelect
               size="small"
               variant="filled"
               disableUnderline
