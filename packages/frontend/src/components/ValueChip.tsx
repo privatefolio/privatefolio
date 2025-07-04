@@ -24,7 +24,7 @@ export function ValueChip(props: ValueChipProps) {
         color: "text.secondary",
         marginX: 1,
       }}
-      label={<QuoteAmountBlock amount={value} />}
+      label={<QuoteAmountBlock amount={value} disableTruncate />}
     />
   )
 }

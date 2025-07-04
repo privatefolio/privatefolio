@@ -340,6 +340,7 @@ export async function detectSpamTransactions(
   const spam = etherscanTransactions.filter((tx) => {
     // it means the user created the transaction
     if (tx.fee) return false
+    if (tx.id.startsWith("MANUAL_")) return false
     if (tx.incomingAsset && !assetMap[tx.incomingAsset]?.coingeckoId) {
       return true
     }

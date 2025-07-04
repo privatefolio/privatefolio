@@ -14,7 +14,6 @@ import { useStore } from "@nanostores/react"
 import { WritableAtom } from "nanostores"
 import { enqueueSnackbar } from "notistack"
 import { BINANCE_PLATFORM_ID } from "privatefolio-backend/src/extensions/utils/binance-utils"
-import { ETHEREUM_PLATFORM_ID } from "privatefolio-backend/src/extensions/utils/evm-utils"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { AddressInput } from "src/components/AddressInput"
 import { AssetBlock } from "src/components/AssetBlock"
@@ -36,7 +35,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
 
   const [loading, setLoading] = useState(false)
 
-  const [platformId, setPlatform] = useState<string>(ETHEREUM_PLATFORM_ID)
+  const [platformId, setPlatform] = useState<string>("")
   const [type, setType] = useState<TransactionType>("Swap")
   const [binanceWallet, setBinanceWallet] = useState("Spot")
 
@@ -89,6 +88,16 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
       let outgoingAsset = formData.get("outgoingAsset") as string
       let feeAsset = formData.get("feeAsset") as string
 
+      const incomingAssetTicker = getAssetTicker(incomingAsset)
+      const outgoingAssetTicker = getAssetTicker(outgoingAsset)
+      const feeAssetTicker = getAssetTicker(feeAsset)
+
+      incomingAsset =
+        assetsIds.find((assetId) => getAssetTicker(assetId) === incomingAssetTicker) || ""
+      outgoingAsset =
+        assetsIds.find((assetId) => getAssetTicker(assetId) === outgoingAssetTicker) || ""
+      feeAsset = assetsIds.find((assetId) => getAssetTicker(assetId) === feeAssetTicker) || ""
+
       // if assets don't have a platforms (free solo), set it to platformId
       if (incomingAsset && !getAssetPlatform(incomingAsset)) {
         incomingAsset = `${platformId}:${formatTicker(incomingAsset)}`
@@ -130,7 +139,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
           setLoading(false)
         })
     },
-    [atom, platformId, binanceWallet, type, notes, rpc, activeAccount]
+    [atom, platformId, binanceWallet, type, notes, rpc, activeAccount, assetsIds]
   )
 
   const platformMap = useStore($platformMap)
@@ -139,12 +148,12 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
   useEffect(() => {
     if (open) return
 
-    setPlatform(ETHEREUM_PLATFORM_ID)
+    setPlatform(platforms[0]?.id || "")
     setBinanceWallet("Spot")
     setType("Swap")
     setNotes("")
     setLoading(false)
-  }, [open])
+  }, [open, platforms])
 
   const renderOption = (props, option) => (
     <Box component="li" {...props} key={option}>

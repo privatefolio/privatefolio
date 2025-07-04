@@ -13,6 +13,7 @@ export type AmountBlockProps = TypographyProps & {
   colorized?: boolean
   currencySymbol?: string
   currencyTicker?: string
+  disableTruncate?: boolean
   /**
    * @default false
    */
@@ -40,6 +41,7 @@ export function AmountBlock(props: AmountBlockProps) {
     showSign,
     maxDigits,
     hideTooltip = false,
+    disableTruncate = false,
     ...rest
   } = props
 
@@ -138,7 +140,11 @@ export function AmountBlock(props: AmountBlockProps) {
         {...rest}
       >
         {typeof amountN === "number" ? (
-          <Truncate>{compactLabel}</Truncate>
+          disableTruncate ? (
+            compactLabel
+          ) : (
+            <Truncate>{compactLabel}</Truncate>
+          )
         ) : (
           <Typography color="text.secondary" component="span" variant="inherit">
             {placeholder}

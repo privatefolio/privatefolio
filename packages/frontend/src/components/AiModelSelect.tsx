@@ -2,6 +2,7 @@ import { ListItemAvatar, ListItemText, Select, SelectProps, Stack } from "@mui/m
 import React from "react"
 
 import { MenuItemWithTooltip } from "./MenuItemWithTooltip"
+import { QuoteAmountBlock } from "./QuoteAmountBlock"
 
 function OpenAiIcon({ size = 16 }: { size?: number }) {
   return (
@@ -190,24 +191,31 @@ function formatContextWindow(tokens: number): string {
   }
 }
 
-function formatCost(cost: number): string {
-  if (cost >= 1) {
-    return `$${cost.toFixed(2)}`
-  } else if (cost >= 0.001) {
-    return `$${cost.toFixed(3)}`
-  } else {
-    return `$${cost.toFixed(5)}`
-  }
-}
-
 function ModelTooltip({ model }: { model: AiModel }) {
   return (
     <Stack>
       <strong>{model.label}</strong>
       <span>{model.description}</span>
-      <span className="secondary">Context Window: {formatContextWindow(model.contextWindow)}</span>
-      <span className="secondary">Input Cost: {formatCost(model.costPer1kTokens.input)}</span>
-      <span className="secondary">Output Cost: {formatCost(model.costPer1kTokens.output)}</span>
+      <br />
+      <span className="secondary">Context window: {formatContextWindow(model.contextWindow)}</span>
+      <span className="secondary">
+        Input cost:{" "}
+        <QuoteAmountBlock
+          amount={model.costPer1kTokens.input}
+          formatting="price"
+          hideTooltip
+          disableTruncate
+        />
+      </span>
+      <span className="secondary">
+        Output cost:{" "}
+        <QuoteAmountBlock
+          amount={model.costPer1kTokens.output}
+          formatting="price"
+          hideTooltip
+          disableTruncate
+        />
+      </span>
     </Stack>
   )
 }
@@ -216,6 +224,8 @@ export type AiModelSelectProps = SelectProps<string>
 
 export function AiModelSelect(props: AiModelSelectProps) {
   const { ...rest } = props
+
+  // return <QuoteAmountBlock amount={222} formatting="price" hideTooltip />
 
   return (
     <Select size="small" sx={{ minWidth: 320 }} inputProps={{ name: "model-select" }} {...rest}>
