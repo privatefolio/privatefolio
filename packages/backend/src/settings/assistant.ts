@@ -1,4 +1,4 @@
-import { Tool } from "ai"
+import { Tool, tool } from "ai"
 import { getMyAssets } from "src/api/account/assets-api"
 import { getBalancesAt } from "src/api/account/balances-api"
 import { getConnections } from "src/api/account/connections-api"
@@ -30,9 +30,9 @@ You can use a maximum of ${MAX_STEPS} tools.`
 
 export function getAssistantTools(accountName: string) {
   return {
-    getBalancesAt: {
+    getBalancesAt: tool({
       description: "Get current balances for all assets in the portfolio.",
-      execute: async ({ timestamp }: { timestamp?: number }) => {
+      execute: async ({ timestamp }) => {
         try {
           const balances = await getBalancesAt(accountName, timestamp)
           return { balances }
@@ -48,8 +48,8 @@ export function getAssistantTools(accountName: string) {
             "Unix timestamp (in milliseconds) to get balances at; omit for the latest balance"
           ),
       }),
-    },
-    getConnections: {
+    }),
+    getConnections: tool({
       description: "Get all platform connections configured in the portfolio.",
       execute: async () => {
         try {
@@ -61,8 +61,8 @@ export function getAssistantTools(accountName: string) {
       },
       id: "privatefolio.getConnections",
       parameters: z.object({}),
-    },
-    getMyAssets: {
+    }),
+    getMyAssets: tool({
       description: "Get all assets in the portfolio with their details.",
       execute: async () => {
         try {
@@ -74,8 +74,8 @@ export function getAssistantTools(accountName: string) {
       },
       id: "privatefolio.getMyAssets",
       parameters: z.object({}),
-    },
-    getPlatforms: {
+    }),
+    getPlatforms: tool({
       description: "Get all platforms used by this account.",
       execute: async () => {
         try {
@@ -87,6 +87,6 @@ export function getAssistantTools(accountName: string) {
       },
       id: "privatefolio.getPlatforms",
       parameters: z.object({}),
-    },
+    }),
   } satisfies Record<string, Tool>
 }

@@ -14,6 +14,7 @@ import React, { useEffect, useState } from "react"
 import { AssistantModelSelect } from "src/components/AssistantModelSelect"
 import { LearnMore } from "src/components/LearnMore"
 import { SectionTitle } from "src/components/SectionTitle"
+import { $assistantModel } from "src/stores/device-settings-store"
 
 import { DEFAULT_SETTINGS } from "../../settings"
 import { $activeAccount } from "../../stores/account-store"
@@ -64,6 +65,7 @@ export function AssistantSettings() {
 
     try {
       await rpc.updateSettings(activeAccount, { assistantModel })
+      $assistantModel.set(assistantModel)
       if (assistantApiKey !== "encrypted") {
         await rpc.setEncryptedValue(activeAccount, "assistant_openai_key", assistantApiKey)
       }
