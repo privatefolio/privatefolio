@@ -28,6 +28,7 @@ function QueryTimerBase({ queryTime, ...rest }: { queryTime: number | null } & T
           color="text.secondary"
           component={Stack}
           direction="row"
+          alignItems="center"
           gap={1}
           className="QueryTimer"
           {...rest}
@@ -40,7 +41,7 @@ function QueryTimerBase({ queryTime, ...rest }: { queryTime: number | null } & T
             </>
           ) : (
             <>
-              <TimerSharp fontSize="small" sx={{ padding: 0.25 }} />
+              <TimerSharp fontSize="small" sx={{ height: 16, width: 16 }} />
               {isMobile ? null : <span>{formatDuration(queryTime)}</span>}
             </>
           )}

@@ -11,6 +11,7 @@ import { Truncate } from "./Truncate"
 export type AmountBlockProps = TypographyProps & {
   amount?: string | number
   colorized?: boolean
+  compact?: boolean
   currencySymbol?: string
   currencyTicker?: string
   disableTruncate?: boolean
@@ -42,6 +43,7 @@ export function AmountBlock(props: AmountBlockProps) {
     maxDigits,
     hideTooltip = false,
     disableTruncate = false,
+    compact = false,
     ...rest
   } = props
 
@@ -74,10 +76,10 @@ export function AmountBlock(props: AmountBlockProps) {
     return formatNumber(amountN, {
       maximumFractionDigits: minimumFractionDigits,
       minimumFractionDigits,
-      notation: amountN > 1_000_000 ? "compact" : undefined,
+      notation: amountN > 1_000_000 || compact ? "compact" : undefined,
       ...formatOpts,
     })
-  }, [amountN, formatOpts, minimumFractionDigits])
+  }, [amountN, compact, formatOpts, minimumFractionDigits])
 
   const compactLabel = useMemo(() => {
     if (typeof amountN !== "number") return ""

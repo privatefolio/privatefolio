@@ -1,12 +1,10 @@
 import { Settings } from "@mui/icons-material"
 import { Stack } from "@mui/material"
-import { useStore } from "@nanostores/react"
-import React, { useEffect } from "react"
+import React from "react"
 import { useSearchParams } from "react-router-dom"
 import { NavTab } from "src/components/NavTab"
 import { StaggeredList } from "src/components/StaggeredList"
 import { Tabs } from "src/components/Tabs"
-import { $activeAccount } from "src/stores/account-store"
 
 import { AssistantActions } from "./AssistantActions"
 import { AssistantChat } from "./AssistantChat"
@@ -14,12 +12,6 @@ import { AssistantChatHistoryTable } from "./AssistantChatHistoryTable"
 import { AssistantSettings } from "./AssistantSettings"
 
 export default function AssistantPage({ show }: { show: boolean }) {
-  const activeAccount = useStore($activeAccount)
-
-  useEffect(() => {
-    document.title = `Assistant - ${activeAccount} - Privatefolio`
-  }, [activeAccount])
-
   const [searchParams] = useSearchParams()
   const tab = searchParams.get("tab") || "chat"
 

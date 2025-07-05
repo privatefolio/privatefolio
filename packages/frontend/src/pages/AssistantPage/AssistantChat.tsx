@@ -9,8 +9,10 @@ import remarkGfm from "remark-gfm"
 import { AssistantModelSelect } from "src/components/AssistantModelSelect"
 import { CircularSpinner } from "src/components/CircularSpinner"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
+import { ExternalLink } from "src/components/ExternalLink"
 import { $activeAccount } from "src/stores/account-store"
 import { $assistantModel } from "src/stores/device-settings-store"
+import { extractRootUrl } from "src/utils/utils"
 import { $rest, $rpc } from "src/workers/remotes"
 
 export function AssistantChat() {
@@ -27,8 +29,7 @@ export function AssistantChat() {
   const rest = useStore($rest)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const [userHasScrolledUp, setUserHasScrolledUp] = useState(false)
-  const model = useStore($assistantModel)
+  const modelId = useStore($assistantModel)
   const [initialMessages, setInitialMessages] = useState<Message[]>([])
   const [isLoadingHistory, setIsLoadingHistory] = useState(!!existingConversationId)
 
@@ -72,7 +73,7 @@ export function AssistantChat() {
 
   const { messages, input, handleInputChange, handleSubmit, error, status, stop, id } = useChat({
     api: `${rest.baseUrl}/assistant-chat`,
-    body: { accountName: activeAccount, model },
+    body: { accountName: activeAccount, modelId },
     headers: { Authorization: `Bearer ${localStorage.getItem(rest.jwtKey)}` },
     id: existingConversationId || window.crypto.randomUUID(),
     initialMessages,
@@ -81,7 +82,7 @@ export function AssistantChat() {
         await rpc.upsertChatMessage(activeAccount, {
           conversationId: existingConversationId || id,
           message: error.message,
-          metadata: JSON.stringify({ model, severity: "error" }),
+          metadata: JSON.stringify({ modelId, severity: "error" }),
           parts: undefined,
           role: "system",
           timestamp: Date.now(),
@@ -94,7 +95,7 @@ export function AssistantChat() {
           conversationId: existingConversationId || id,
           id: message.id,
           message: message.content,
-          metadata: JSON.stringify({ model }),
+          metadata: JSON.stringify({ modelId }),
           parts: message.parts ? JSON.stringify(message.parts) : undefined,
           role: message.role as "assistant",
           timestamp: Date.now(),
@@ -109,22 +110,6 @@ export function AssistantChat() {
   const isWaiting = status === "submitted"
   const isStreaming = status === "streaming"
   const isLoading = isWaiting || isStreaming
-
-  useEffect(() => {
-    if (!userHasScrolledUp) {
-      window.scrollTo({ behavior: "instant", top: document.body.scrollHeight })
-    }
-  }, [messages, isLoading, userHasScrolledUp])
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const isAtBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 10 // 10px threshold
-      setUserHasScrolledUp(!isAtBottom)
-    }
-
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
 
   const handleSubmitRequest = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -305,23 +290,23 @@ export function AssistantChat() {
                   .map((part, index) => {
                     const sourcePart = part as Extract<typeof part, { type: "source" }>
                     return (
-                      <Box
+                      <ExternalLink
                         key={index}
+                        href={sourcePart.source.url}
+                        target="_blank"
+                        variant="body2"
                         sx={{
-                          backgroundColor: "info.light",
-                          borderRadius: 2,
-                          mt: 1,
-                          px: 2,
-                          py: 1,
+                          backgroundColor: "var(--mui-palette-background-paper)",
+                          borderRadius: 3,
+                          display: "inline-block",
+                          marginBottom: 0.5,
+                          marginRight: 0.5,
+                          paddingX: 1,
+                          paddingY: 0.5,
                         }}
                       >
-                        <Typography variant="body2" color="info.dark" sx={{ fontWeight: "bold" }}>
-                          Source:
-                        </Typography>
-                        <Typography variant="body2" color="text.primary">
-                          {JSON.stringify(sourcePart.source, null, 2)}
-                        </Typography>
-                      </Box>
+                        {sourcePart.source.title || extractRootUrl(sourcePart.source.url)}
+                      </ExternalLink>
                     )
                   })}
                 {message.parts
@@ -555,7 +540,7 @@ export function AssistantChat() {
                 background: "rgba(var(--mui-palette-common-onBackgroundChannel) / 0.05)",
                 borderRadius: 3,
               }}
-              value={model}
+              value={modelId}
               onChange={(event) => $assistantModel.set(event.target.value)}
               disabled={isLoading}
             />

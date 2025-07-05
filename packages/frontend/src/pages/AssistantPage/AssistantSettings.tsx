@@ -31,7 +31,9 @@ export function AssistantSettings() {
 
   const [isLoading, setIsLoading] = useState(true)
   const [assistantModel, setAssistantModel] = useState(DEFAULT_SETTINGS.assistantModel)
-  const [assistantApiKey, setAssistantApiKey] = useState("")
+  const [openaiApiKey, setOpenaiApiKey] = useState("")
+  const [perplexityApiKey, setPerplexityApiKey] = useState("")
+  const [anthropicApiKey, setAnthropicApiKey] = useState("")
   const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
@@ -45,8 +47,22 @@ export function AssistantSettings() {
 
         setAssistantModel(settings.assistantModel)
 
-        const openAiApiKeyEncrypted = await rpc.getValue(activeAccount, "assistant_openai_key", "")
-        setAssistantApiKey(openAiApiKeyEncrypted ? "encrypted" : "")
+        // Load all API keys
+        const openaiKeyEncrypted = await rpc.getValue(activeAccount, "assistant_openai_key", "")
+        const perplexityKeyEncrypted = await rpc.getValue(
+          activeAccount,
+          "assistant_perplexity_key",
+          ""
+        )
+        const anthropicKeyEncrypted = await rpc.getValue(
+          activeAccount,
+          "assistant_anthropic_key",
+          ""
+        )
+
+        setOpenaiApiKey(openaiKeyEncrypted ? "encrypted" : "")
+        setPerplexityApiKey(perplexityKeyEncrypted ? "encrypted" : "")
+        setAnthropicApiKey(anthropicKeyEncrypted ? "encrypted" : "")
       } catch (error) {
         console.error("Failed to load assistant settings:", error)
         enqueueSnackbar("Failed to load assistant settings", { variant: "error" })
@@ -66,9 +82,18 @@ export function AssistantSettings() {
     try {
       await rpc.updateSettings(activeAccount, { assistantModel })
       $assistantModel.set(assistantModel)
-      if (assistantApiKey !== "encrypted") {
-        await rpc.setEncryptedValue(activeAccount, "assistant_openai_key", assistantApiKey)
+
+      // Save API keys only if they were changed
+      if (openaiApiKey !== "encrypted") {
+        await rpc.setEncryptedValue(activeAccount, "assistant_openai_key", openaiApiKey)
       }
+      if (perplexityApiKey !== "encrypted") {
+        await rpc.setEncryptedValue(activeAccount, "assistant_perplexity_key", perplexityApiKey)
+      }
+      if (anthropicApiKey !== "encrypted") {
+        await rpc.setEncryptedValue(activeAccount, "assistant_anthropic_key", anthropicApiKey)
+      }
+
       enqueueSnackbar("Assistant settings saved successfully", { variant: "success" })
     } catch (error) {
       console.error("Failed to save assistant settings:", error)
@@ -78,9 +103,17 @@ export function AssistantSettings() {
     }
   }
 
-  const [showPassword, setShowPassword] = useState(false)
-  const handleClickShowPassword = () => {
-    setShowPassword((show) => !show)
+  const [showPasswords, setShowPasswords] = useState({
+    anthropic: false,
+    openai: false,
+    perplexity: false,
+  })
+
+  const handleTogglePassword = (provider: keyof typeof showPasswords) => {
+    setShowPasswords((prev) => ({
+      ...prev,
+      [provider]: !prev[provider],
+    }))
   }
 
   const [showModelComparison, setShowModelComparison] = useState(false)
@@ -88,16 +121,20 @@ export function AssistantSettings() {
     setShowModelComparison((show) => !show)
   }
 
-  const passwordAdornment = (
+  const createPasswordAdornment = (provider: keyof typeof showPasswords) => (
     <InputAdornment position="end">
       <IconButton
         aria-label="toggle password visibility"
-        onClick={handleClickShowPassword}
+        onClick={() => handleTogglePassword(provider)}
         edge="end"
         size="small"
         color="secondary"
       >
-        {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+        {showPasswords[provider] ? (
+          <VisibilityOff fontSize="small" />
+        ) : (
+          <Visibility fontSize="small" />
+        )}
       </IconButton>
     </InputAdornment>
   )
@@ -154,15 +191,69 @@ export function AssistantSettings() {
             <SectionTitle>OpenAI API Key</SectionTitle>
           </LearnMore>
           <TextField
-            type={showPassword ? "text" : "password"}
+            type={showPasswords.openai ? "text" : "password"}
             size="small"
-            value={assistantApiKey}
-            onChange={(e) => setAssistantApiKey(e.target.value)}
+            value={openaiApiKey}
+            onChange={(e) => setOpenaiApiKey(e.target.value)}
             disabled={isLoading}
             sx={{ minWidth: 320 }}
             placeholder="sk-..."
             InputProps={{
-              endAdornment: passwordAdornment,
+              endAdornment: createPasswordAdornment("openai"),
+            }}
+          />
+        </div>
+        <div>
+          <LearnMore
+            title={
+              <>
+                The API key which will be used to call Perplexity. You can get one from
+                perplexity.ai.
+                <br />
+                <br />
+                The key is stored securely (with encryption) and only used for API calls.
+              </>
+            }
+          >
+            <SectionTitle>Perplexity API Key</SectionTitle>
+          </LearnMore>
+          <TextField
+            type={showPasswords.perplexity ? "text" : "password"}
+            size="small"
+            value={perplexityApiKey}
+            onChange={(e) => setPerplexityApiKey(e.target.value)}
+            disabled={isLoading}
+            sx={{ minWidth: 320 }}
+            placeholder="pplx-..."
+            InputProps={{
+              endAdornment: createPasswordAdornment("perplexity"),
+            }}
+          />
+        </div>
+        <div>
+          <LearnMore
+            title={
+              <>
+                The API key which will be used to call Anthropic. You can get one from
+                console.anthropic.com.
+                <br />
+                <br />
+                The key is stored securely (with encryption) and only used for API calls.
+              </>
+            }
+          >
+            <SectionTitle>Anthropic API Key</SectionTitle>
+          </LearnMore>
+          <TextField
+            type={showPasswords.anthropic ? "text" : "password"}
+            size="small"
+            value={anthropicApiKey}
+            onChange={(e) => setAnthropicApiKey(e.target.value)}
+            disabled={isLoading}
+            sx={{ minWidth: 320 }}
+            placeholder="sk-ant-..."
+            InputProps={{
+              endAdornment: createPasswordAdornment("anthropic"),
             }}
           />
         </div>

@@ -1,4 +1,5 @@
 import { InfoOutlined } from "@mui/icons-material"
+import { TableCell, TableRow } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo, useState } from "react"
 import { AttentionBlock } from "src/components/AttentionBlock"
@@ -93,10 +94,14 @@ export function ExchangesTable() {
       queryTime={queryTime}
       extraRow={
         !!hiddenCount && (
-          <AttentionBlock>
-            <InfoOutlined sx={{ height: 20, width: 20 }} />
-            <span>{hiddenCount} unsupported exchanges hidden…</span>
-          </AttentionBlock>
+          <TableRow>
+            <TableCell colSpan={headCells.length}>
+              <AttentionBlock>
+                <InfoOutlined sx={{ height: 16, width: 16 }} />
+                <span>{hiddenCount} unsupported exchanges hidden…</span>
+              </AttentionBlock>
+            </TableCell>
+          </TableRow>
         )
       }
     />

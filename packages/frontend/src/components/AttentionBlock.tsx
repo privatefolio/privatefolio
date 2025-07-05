@@ -1,4 +1,4 @@
-import { Stack, StackProps, StackTypeMap } from "@mui/material"
+import { Button, Stack, StackProps, StackTypeMap } from "@mui/material"
 import React from "react"
 
 export function AttentionBlock<
@@ -14,8 +14,12 @@ export function AttentionBlock<
         borderRadius: 0,
         color: "text.secondary",
         justifyContent: "flex-start",
-        paddingX: 1.75,
-        paddingY: 1,
+        ...(props.component === Button
+          ? {
+              paddingX: 2,
+              paddingY: 1,
+            }
+          : {}),
         textAlign: "start",
         ...theme.typography.body2,
       })}

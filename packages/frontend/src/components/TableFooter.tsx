@@ -27,7 +27,7 @@ export function TableFooter(props: TableFooterProps) {
         borderBottomRightRadius: "var(--priv-border-radius)",
         borderTop: "1px solid var(--mui-palette-TableCell-border)",
         bottom: 0,
-        paddingX: 1.5,
+        paddingX: 2,
         position: stickyVersion ? "sticky" : undefined,
         ...sx,
         // TODO6
@@ -63,6 +63,7 @@ export function TableFooter(props: TableFooterProps) {
               flexGrow: 0,
             },
             [`& .${tablePaginationClasses.input}`]: {
+              marginLeft: queryTime !== undefined ? undefined : -1,
               marginRight: "auto",
             },
             [`& .${tablePaginationClasses.toolbar}`]: {

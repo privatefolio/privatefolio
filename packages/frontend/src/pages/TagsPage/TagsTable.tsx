@@ -120,7 +120,7 @@ export function TagsTable() {
       }
       addNewRow={
         <AttentionBlock component={Button} onClick={handleAddNewRow} fullWidth>
-          <Add sx={{ height: 20, width: 20 }} />
+          <Add sx={{ height: 16, width: 16 }} />
           <span>
             Click to <u>add a new tag</u>.
           </span>

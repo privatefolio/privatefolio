@@ -74,9 +74,11 @@ export async function fetchInMemoryData(rpc: RPC, accountName: string) {
 
   const map: FilterOptionsMap = {
     assetId: assetIds,
+    capabilities: ["web-search", "reasoning", "tools"],
     createdBy: ["user", "system"],
     exchangeType: ["DEX", "CEX"],
     extensionType: ["file-import", "connection", "price-api", "metadata"],
+    family: ["openai", "perplexity", "anthropic"],
     feeAsset: assetIds,
     incomingAsset: assetIds,
     operation,
@@ -102,9 +104,11 @@ type DirectFilterKey = "id" | "txId" | "txHash" | "tradeId"
 // TODO0 this union type can be improved
 export const FILTER_LABEL_MAP: Record<FilterKey | DirectFilterKey, string> = {
   assetId: "Asset",
+  capabilities: "Capabilities",
   createdBy: "Created By",
   exchangeType: "Exchange Type",
   extensionType: "Type",
+  family: "Model Family",
   feeAsset: "Fee Asset",
   id: "Id",
   incomingAsset: "Incoming Asset",
@@ -161,7 +165,12 @@ export function getFilterValueLabel(value: string | number | undefined) {
   if (value === "aborted") return "Aborted"
   if (value === "cancelled") return "Cancelled"
   if (value === "failed") return "Failed"
-
+  if (value === "openai") return "OpenAI"
+  if (value === "perplexity") return "Perplexity"
+  if (value === "anthropic") return "Anthropic"
+  if (value === "web-search") return "Web search"
+  if (value === "reasoning") return "Reasoning"
+  if (value === "tools") return "Tools"
   if (value === "open") return "Open"
   if (value === "closed") return "Closed"
 

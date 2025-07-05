@@ -41,7 +41,6 @@ import { StackedAreaData as LcStackedAreaData } from "src/lightweight-charts/plu
 import { StackedAreaSeries } from "src/lightweight-charts/plugins/stacked-area-series/stacked-area-series"
 import { StackedTooltipPrimitive } from "src/lightweight-charts/plugins/stacked-tooltip/stacked-tooltip"
 import { $inspectTime } from "src/stores/pages/balances-store"
-import { MonoFont } from "src/theme"
 import { isInputFocused } from "src/utils/browser-utils"
 import { noop } from "src/utils/utils"
 
@@ -459,7 +458,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
           }}
           alignItems="center"
           justifyContent="space-between"
-          paddingX={1.5}
+          paddingX={2}
           direction="row"
           flexWrap="wrap"
           gap={0.5}
@@ -702,7 +701,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
               background: "var(--mui-palette-background-paper)",
               display: "flex",
               height: 28,
-              paddingX: 1.5,
+              paddingX: 2,
             },
             bottom: 4,
             position: "absolute",
@@ -720,9 +719,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
           direction="row"
         >
           <div>
-            {queryTime !== undefined && (
-              <QueryTimer queryTime={queryTime} variant="caption" fontFamily={MonoFont} />
-            )}
+            {queryTime !== undefined && <QueryTimer queryTime={queryTime} variant="caption" />}
           </div>
           <div>
             <Tooltip title={logScale ? "Switch to linear scale" : "Switch to log scale"}>

@@ -1,5 +1,5 @@
 import { Add, InfoOutlined } from "@mui/icons-material"
-import { Button } from "@mui/material"
+import { Button, TableCell, TableRow } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { throttle } from "lodash-es"
 import React, { MutableRefObject, useCallback, useEffect, useMemo, useState } from "react"
@@ -246,7 +246,7 @@ export function TransactionTable(props: TransactionsTableProps) {
         addNewRow={
           !toggleAddTransactionDrawer ? undefined : (
             <AttentionBlock component={Button} onClick={toggleAddTransactionDrawer} fullWidth>
-              <Add sx={{ height: 20, width: 20 }} />
+              <Add sx={{ height: 16, width: 16 }} />
               <span>
                 Click to <u>add a new transaction</u>.
               </span>
@@ -255,10 +255,14 @@ export function TransactionTable(props: TransactionsTableProps) {
         }
         extraRow={
           !!hiddenCount && (
-            <AttentionBlock>
-              <InfoOutlined sx={{ height: 20, width: 20 }} />
-              <span>{hiddenCount} spam transactions hidden…</span>
-            </AttentionBlock>
+            <TableRow>
+              <TableCell colSpan={headCells.length}>
+                <AttentionBlock>
+                  <InfoOutlined sx={{ height: 16, width: 16 }} />
+                  <span>{hiddenCount} spam transactions hidden…</span>
+                </AttentionBlock>
+              </TableCell>
+            </TableRow>
           )
         }
         {...rest}

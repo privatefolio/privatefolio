@@ -5,6 +5,7 @@ import type {
   InternalTransaction,
   NormalTransaction,
 } from "./extensions/connections/etherscan/etherscan-rpc"
+import { ModelCapability, ModelFamily } from "./settings/assistant-models"
 import type { PriceApiId } from "./settings/settings"
 
 export type TransactionRole = "Maker" | "Taker"
@@ -704,9 +705,11 @@ export enum TaskStatus {
 
 export type FilterOptionsMap = {
   assetId: string[]
+  capabilities: ModelCapability[]
   createdBy: string[]
   exchangeType: string[]
   extensionType: string[]
+  family: ModelFamily[]
   feeAsset: string[]
   incomingAsset: string[]
   operation: AuditLogOperation[]

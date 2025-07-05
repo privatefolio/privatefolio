@@ -4,9 +4,10 @@ import {
   AVAILABLE_MODELS,
 } from "privatefolio-backend/src/settings/assistant-models"
 import React from "react"
+import { getFilterValueLabel } from "src/stores/metadata-store"
 import { formatContextWindow } from "src/utils/formatting-utils"
 
-import { AssistantModelIcon } from "./AssistantModelIcon"
+import { AssistantModelAvatar } from "./AssistantModelIcon"
 import { MenuItemWithTooltip } from "./MenuItemWithTooltip"
 import { QuoteAmountBlock } from "./QuoteAmountBlock"
 
@@ -16,6 +17,7 @@ function ModelTooltip({ model }: { model: AssistantModel }) {
       <strong>{model.label}</strong>
       <span>{model.description}</span>
       <br />
+      <span>{model.capabilities?.map(getFilterValueLabel).join(", ")}</span>
       <span className="secondary">Context window: {formatContextWindow(model.contextWindow)}</span>
       <span className="secondary">
         Input cost:{" "}
@@ -48,8 +50,8 @@ export function AssistantModelSelect(props: AssistantModelSelectProps) {
     <Select size="small" sx={{ minWidth: 320 }} inputProps={{ name: "model-select" }} {...rest}>
       {AVAILABLE_MODELS.map((model) => (
         <MenuItemWithTooltip
-          key={model.value}
-          value={model.value}
+          key={model.id}
+          value={model.id}
           tooltipProps={{
             placement: "right",
             title: <ModelTooltip model={model} />,
@@ -57,7 +59,7 @@ export function AssistantModelSelect(props: AssistantModelSelectProps) {
         >
           <Stack direction="row" alignItems="center">
             <ListItemAvatar>
-              <AssistantModelIcon model={model} size={16} />
+              <AssistantModelAvatar model={model} size="small" />
             </ListItemAvatar>
             <ListItemText primary={model.label} />
           </Stack>

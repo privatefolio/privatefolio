@@ -12,10 +12,26 @@
   resolved "https://registry.yarnpkg.com/@adraffy/ens-normalize/-/ens-normalize-1.10.1.tgz#63430d04bd8c5e74f8d7d049338f1cd9d4f02069"
   integrity sha512-96Z2IP3mYmF1Xg2cDm8f1gWGf/HUVedQ3FMifV4kG/PQ4yEP51xDtRAEfhVNt5f/uzpNkZHwWQuUcu6D6K+Ekw==
 
+"@ai-sdk/anthropic@^1.2.12":
+  version "1.2.12"
+  resolved "https://registry.yarnpkg.com/@ai-sdk/anthropic/-/anthropic-1.2.12.tgz#80a4b2527c6bb120778fbc83da4af775aae953a5"
+  integrity sha512-YSzjlko7JvuiyQFmI9RN1tNZdEiZxc+6xld/0tq/VkJaHpEzGAb1yiNxxvmYVcjvfu/PcvCxAAYXmTYQQ63IHQ==
+  dependencies:
+    "@ai-sdk/provider" "1.1.3"
+    "@ai-sdk/provider-utils" "2.2.8"
+
 "@ai-sdk/openai@^1.3.22":
   version "1.3.22"
   resolved "https://registry.yarnpkg.com/@ai-sdk/openai/-/openai-1.3.22.tgz#ed52af8f8fb3909d108e945d12789397cb188b9b"
   integrity sha512-QwA+2EkG0QyjVR+7h6FE7iOu2ivNqAVMm9UJZkVxxTk5OIq5fFJDTEI/zICEMuHImTTXR2JjsL6EirJ28Jc4cw==
+  dependencies:
+    "@ai-sdk/provider" "1.1.3"
+    "@ai-sdk/provider-utils" "2.2.8"
+
+"@ai-sdk/perplexity@^1.1.9":
+  version "1.1.9"
+  resolved "https://registry.yarnpkg.com/@ai-sdk/perplexity/-/perplexity-1.1.9.tgz#99542573a4ac240e513c3b7de99359a77a7797a7"
+  integrity sha512-Ytolh/v2XupXbTvjE18EFBrHLoNMH0Ueji3lfSPhCoRUfkwrgZ2D9jlNxvCNCCRiGJG5kfinSHvzrH5vGDklYA==
   dependencies:
     "@ai-sdk/provider" "1.1.3"
     "@ai-sdk/provider-utils" "2.2.8"

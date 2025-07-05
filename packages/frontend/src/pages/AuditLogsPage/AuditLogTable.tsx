@@ -1,4 +1,5 @@
 import { InfoOutlined } from "@mui/icons-material"
+import { TableCell, TableRow } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { throttle } from "lodash-es"
 import React, { MutableRefObject, useCallback, useEffect, useMemo, useState } from "react"
@@ -219,10 +220,14 @@ export function AuditLogTable(props: AuditLogsTableProps) {
         TableRowComponent={AuditLogTableRow}
         extraRow={
           !!hiddenCount && (
-            <AttentionBlock>
-              <InfoOutlined sx={{ height: 20, width: 20 }} />
-              <span>{hiddenCount} spam audit logs hidden…</span>
-            </AttentionBlock>
+            <TableRow>
+              <TableCell colSpan={headCells.length}>
+                <AttentionBlock>
+                  <InfoOutlined sx={{ height: 16, width: 16 }} />
+                  <span>{hiddenCount} spam audit logs hidden…</span>
+                </AttentionBlock>
+              </TableCell>
+            </TableRow>
           )
         }
         {...rest}

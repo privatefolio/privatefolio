@@ -369,13 +369,7 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
                     </TableCell>
                   </TableRow>
                 )}
-                {!isFirstLoading && extraRow && !isEmpty && (
-                  <TableRow>
-                    <TableCell colSpan={headCells.length} variant="clickable">
-                      {extraRow}
-                    </TableCell>
-                  </TableRow>
-                )}
+                {!isFirstLoading && extraRow && !isEmpty && extraRow}
               </TableBody>
             </Table>
           </TableContainer>

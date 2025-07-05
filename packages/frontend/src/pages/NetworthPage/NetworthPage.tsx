@@ -1,5 +1,5 @@
 import { InfoOutlined, VisibilityOffRounded, VisibilityRounded } from "@mui/icons-material"
-import { IconButton, Stack, Tooltip, Typography } from "@mui/material"
+import { IconButton, Stack, TableCell, TableRow, Tooltip, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo, useState } from "react"
 import { AttentionBlock } from "src/components/AttentionBlock"
@@ -134,10 +134,14 @@ export default function NetworthPage() {
             nullishSortPosition="start"
             extraRow={
               !!hiddenBalances && (
-                <AttentionBlock>
-                  <InfoOutlined sx={{ height: 20, width: 20 }} />
-                  <span>{hiddenBalances} small balances hidden…</span>
-                </AttentionBlock>
+                <TableRow>
+                  <TableCell colSpan={headCells.length}>
+                    <AttentionBlock>
+                      <InfoOutlined sx={{ height: 16, width: 16 }} />
+                      <span>{hiddenBalances} small balances hidden…</span>
+                    </AttentionBlock>
+                  </TableCell>
+                </TableRow>
               )
             }
           />

@@ -44,20 +44,45 @@ export type OpenAIChatModelId =
   | "gpt-3.5-turbo-1106"
   | "chatgpt-4o-latest"
 
+export type PerplexityModelId =
+  | "sonar-deep-research"
+  | "sonar-reasoning-pro"
+  | "sonar-reasoning"
+  | "sonar-pro"
+  | "sonar"
+  | "r1-1776"
+
+export type AnthropicModelId =
+  | "claude-3-5-sonnet-20241022"
+  | "claude-3-5-sonnet-20240620"
+  | "claude-3-5-haiku-20241022"
+  | "claude-3-opus-20240229"
+  | "claude-3-sonnet-20240229"
+  | "claude-3-haiku-20240307"
+
+export type ModelId = OpenAIChatModelId | PerplexityModelId | AnthropicModelId
+
+export type ModelFamily = "openai" | "perplexity" | "anthropic"
+
+export type ModelCapability = "web-search" | "reasoning" | "tools"
+
 export interface AssistantModel {
+  capabilities?: ModelCapability[]
   contextWindow: number
   costPer1kTokens: {
     input: number
     output: number
   }
   description: string
-  family: "openai"
+  family: ModelFamily
+  id: ModelId
   label: string
-  value: OpenAIChatModelId
 }
 
 export const AVAILABLE_MODELS: AssistantModel[] = [
+  // OpenAI Models
   {
+    capabilities: ["tools", "web-search"],
     contextWindow: 128000,
     costPer1kTokens: {
       input: 0.0025,
@@ -65,10 +90,11 @@ export const AVAILABLE_MODELS: AssistantModel[] = [
     },
     description: "Great for most tasks",
     family: "openai",
+    id: "gpt-4o",
     label: "GPT-4o",
-    value: "gpt-4o",
   },
   {
+    capabilities: ["tools", "web-search", "reasoning"],
     contextWindow: 128000,
     costPer1kTokens: {
       input: 0.06,
@@ -76,10 +102,11 @@ export const AVAILABLE_MODELS: AssistantModel[] = [
     },
     description: "Uses advanced reasoning",
     family: "openai",
+    id: "o3",
     label: "GPT-o3",
-    value: "o3",
   },
   {
+    capabilities: ["tools", "web-search", "reasoning"],
     contextWindow: 128000,
     costPer1kTokens: {
       input: 0.0015,
@@ -87,16 +114,11 @@ export const AVAILABLE_MODELS: AssistantModel[] = [
     },
     description: "Fastest at advanced reasoning",
     family: "openai",
+    id: "o4-mini",
     label: "GPT-o4-mini",
-    value: "o4-mini",
   },
-  // {
-  //   description: "Great at coding and visual reasoning",
-  //   family: "openai",
-  //   label: "GPT-o4-mini-high",
-  //   value: "o4-mini-high",
-  // },
   {
+    capabilities: ["tools", "web-search"],
     contextWindow: 200000,
     costPer1kTokens: {
       input: 0.0025,
@@ -104,10 +126,11 @@ export const AVAILABLE_MODELS: AssistantModel[] = [
     },
     description: "Good for writing and exploring ideas",
     family: "openai",
+    id: "gpt-4.5-preview",
     label: "GPT-4.5-preview",
-    value: "gpt-4.5-preview",
   },
   {
+    capabilities: ["tools", "web-search"],
     contextWindow: 128000,
     costPer1kTokens: {
       input: 0.0025,
@@ -115,10 +138,11 @@ export const AVAILABLE_MODELS: AssistantModel[] = [
     },
     description: "Great for quick coding and analysis",
     family: "openai",
+    id: "gpt-4.1",
     label: "GPT-4.1",
-    value: "gpt-4.1",
   },
   {
+    capabilities: ["tools", "web-search"],
     contextWindow: 128000,
     costPer1kTokens: {
       input: 0.00015,
@@ -126,10 +150,11 @@ export const AVAILABLE_MODELS: AssistantModel[] = [
     },
     description: "Faster for everyday tasks",
     family: "openai",
+    id: "gpt-4.1-mini",
     label: "GPT-4.1-mini",
-    value: "gpt-4.1-mini",
   },
   {
+    capabilities: ["tools", "web-search"],
     contextWindow: 128000,
     costPer1kTokens: {
       input: 0.00015,
@@ -137,10 +162,11 @@ export const AVAILABLE_MODELS: AssistantModel[] = [
     },
     description: "Cost-efficient for most tasks",
     family: "openai",
+    id: "gpt-4o-mini",
     label: "GPT-4o-mini",
-    value: "gpt-4o-mini",
   },
   {
+    capabilities: ["tools", "web-search"],
     contextWindow: 128000,
     costPer1kTokens: {
       input: 0.01,
@@ -148,10 +174,11 @@ export const AVAILABLE_MODELS: AssistantModel[] = [
     },
     description: "Advanced model with large context",
     family: "openai",
+    id: "gpt-4-turbo",
     label: "GPT-4-turbo",
-    value: "gpt-4-turbo",
   },
   {
+    capabilities: ["tools", "web-search"],
     contextWindow: 16385,
     costPer1kTokens: {
       input: 0.0005,
@@ -159,7 +186,139 @@ export const AVAILABLE_MODELS: AssistantModel[] = [
     },
     description: "Fast and efficient for simple tasks",
     family: "openai",
+    id: "gpt-3.5-turbo",
     label: "GPT-3.5-turbo",
-    value: "gpt-3.5-turbo",
+  },
+  // Perplexity Models
+  {
+    capabilities: ["web-search"],
+    contextWindow: 128000,
+    costPer1kTokens: {
+      input: 0.002,
+      output: 0.008,
+    },
+    description:
+      "Best suited for exhaustive research, generating detailed reports and in-depth insights",
+    family: "perplexity",
+    id: "sonar-deep-research",
+    label: "Sonar Deep Research",
+  },
+  {
+    capabilities: ["web-search", "reasoning"],
+    contextWindow: 128000,
+    costPer1kTokens: {
+      input: 0.002,
+      output: 0.008,
+    },
+    description:
+      "Enhanced reasoning model with multi-step problem-solving capabilities and real-time search",
+    family: "perplexity",
+    id: "sonar-reasoning-pro",
+    label: "Sonar Reasoning Pro",
+  },
+  {
+    capabilities: ["web-search", "reasoning"],
+    contextWindow: 128000,
+    costPer1kTokens: {
+      input: 0.001,
+      output: 0.005,
+    },
+    description: "Quick problem-solving and reasoning model, ideal for evaluating complex queries",
+    family: "perplexity",
+    id: "sonar-reasoning",
+    label: "Sonar Reasoning",
+  },
+  {
+    capabilities: ["web-search"],
+    contextWindow: 200000,
+    costPer1kTokens: {
+      input: 0.003,
+      output: 0.015,
+    },
+    description:
+      "Advanced search model optimized for complex queries and deeper content understanding",
+    family: "perplexity",
+    id: "sonar-pro",
+    label: "Sonar Pro",
+  },
+  {
+    capabilities: ["web-search"],
+    contextWindow: 128000,
+    costPer1kTokens: {
+      input: 0.001,
+      output: 0.001,
+    },
+    description: "Lightweight, cost-effective search model designed for quick, grounded answers",
+    family: "perplexity",
+    id: "sonar",
+    label: "Sonar",
+  },
+  {
+    capabilities: ["reasoning"],
+    contextWindow: 128000,
+    costPer1kTokens: {
+      input: 0.002,
+      output: 0.008,
+    },
+    description: "Advanced reasoning model",
+    family: "perplexity",
+    id: "r1-1776",
+    label: "R1-1776",
+  },
+  // Anthropic Models
+  {
+    contextWindow: 200000,
+    costPer1kTokens: {
+      input: 0.003,
+      output: 0.015,
+    },
+    description: "Most capable model, great for complex tasks",
+    family: "anthropic",
+    id: "claude-3-5-sonnet-20241022",
+    label: "Claude 3.5 Sonnet",
+  },
+  {
+    contextWindow: 200000,
+    costPer1kTokens: {
+      input: 0.0008,
+      output: 0.004,
+    },
+    description: "Fast and efficient for everyday tasks",
+    family: "anthropic",
+    id: "claude-3-5-haiku-20241022",
+    label: "Claude 3.5 Haiku",
+  },
+  {
+    contextWindow: 200000,
+    costPer1kTokens: {
+      input: 0.015,
+      output: 0.075,
+    },
+    description: "Most powerful model for complex reasoning",
+    family: "anthropic",
+    id: "claude-3-opus-20240229",
+    label: "Claude 3 Opus",
+  },
+  {
+    contextWindow: 200000,
+    costPer1kTokens: {
+      input: 0.003,
+      output: 0.015,
+    },
+    description: "Balanced performance and cost",
+    family: "anthropic",
+    id: "claude-3-sonnet-20240229",
+    label: "Claude 3 Sonnet",
+  },
+  {
+    contextWindow: 200000,
+    costPer1kTokens: {
+      input: 0.00025,
+      output: 0.00125,
+    },
+    description: "Fastest Claude model",
+    family: "anthropic",
+    id: "claude-3-haiku-20240307",
+    label: "Claude 3 Haiku",
   },
 ]

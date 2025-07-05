@@ -1,4 +1,5 @@
 import { InfoOutlined } from "@mui/icons-material"
+import { TableCell, TableRow } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo, useState } from "react"
 import { AttentionBlock } from "src/components/AttentionBlock"
@@ -86,7 +87,8 @@ export function AssetTable() {
         sx: { maxWidth: 350, minWidth: 140, width: "50%" },
       },
       {
-        key: "platform" as keyof AssetWithPrice,
+        filterable: true,
+        key: "platformId" as keyof AssetWithPrice,
         label: "Platform",
         sortable: true,
         sx: { width: "50%" },
@@ -132,10 +134,14 @@ export function AssetTable() {
         defaultRowsPerPage={10}
         extraRow={
           !!hiddenAssets && (
-            <AttentionBlock>
-              <InfoOutlined sx={{ height: 20, width: 20 }} />
-              <span>{hiddenAssets} unlisted assets hidden…</span>
-            </AttentionBlock>
+            <TableRow>
+              <TableCell colSpan={headCells.length}>
+                <AttentionBlock>
+                  <InfoOutlined sx={{ height: 16, width: 16 }} />
+                  <span>{hiddenAssets} unlisted assets hidden…</span>
+                </AttentionBlock>
+              </TableCell>
+            </TableRow>
           )
         }
       />

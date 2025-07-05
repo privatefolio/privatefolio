@@ -58,7 +58,6 @@ export function AddressBookTable() {
     const { confirmed, event } = await confirm({
       confirmText: "Add",
       content: <AddressBookForm />,
-      focusInput: "address",
       title: "Add wallet or smart contract to address book",
     })
 
@@ -102,7 +101,7 @@ export function AddressBookTable() {
         }
         addNewRow={
           <AttentionBlock component={Button} onClick={handleAddNewRow} fullWidth>
-            <Add sx={{ height: 20, width: 20 }} />
+            <Add sx={{ height: 16, width: 16 }} />
             <span>
               Click to <u>label a wallet or a smart contract</u>.
             </span>

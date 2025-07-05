@@ -181,7 +181,12 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
     () =>
       rows.filter((row) => {
         for (const key in activeFilters) {
-          if (valueSelectors[key](row) !== activeFilters[key]) {
+          const value = valueSelectors[key](row)
+          const filterValue = activeFilters[key]
+
+          if (typeof value === "string" && typeof filterValue === "string") {
+            if (!value.toLowerCase().includes(filterValue.toLowerCase())) return false
+          } else if (value !== filterValue) {
             return false
           }
         }
@@ -333,13 +338,7 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
                     </TableCell>
                   </TableRow>
                 )}
-                {!isLoading && extraRow && !isEmpty && (
-                  <TableRow>
-                    <TableCell colSpan={headCells.length} variant="clickable">
-                      {extraRow}
-                    </TableCell>
-                  </TableRow>
-                )}
+                {!isLoading && extraRow && !isEmpty && extraRow}
               </TableBody>
             </Table>
           </TableContainer>

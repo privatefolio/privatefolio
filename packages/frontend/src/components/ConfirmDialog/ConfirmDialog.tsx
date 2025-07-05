@@ -48,7 +48,9 @@ export function ConfirmDialog(props: ConfirmDialogProps) {
   useEffect(() => {
     if (focusInput && open) {
       setTimeout(() => {
-        const input = document.querySelector(`input[name="${focusInput}"]`) as HTMLInputElement
+        const input = document.querySelector(
+          `input[name="${focusInput}"], textarea[name="${focusInput}"]`
+        ) as HTMLInputElement | HTMLTextAreaElement
         if (input) {
           input.focus()
         } else {

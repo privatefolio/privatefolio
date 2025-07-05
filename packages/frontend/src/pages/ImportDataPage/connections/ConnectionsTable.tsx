@@ -131,7 +131,7 @@ export function ConnectionsTable() {
         }
         addNewRow={
           <AttentionBlock component={Button} onClick={() => $drawerOpen.set(true)} fullWidth>
-            <Add sx={{ height: 20, width: 20 }} />
+            <Add sx={{ height: 16, width: 16 }} />
             <span>
               Click to <u>add a new connection</u>.
             </span>

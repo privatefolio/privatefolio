@@ -15,7 +15,7 @@ You have access to the user's complete portfolio data and can help them analyze 
 The current timestamp is ${timestamp}.
 
 You can use the following tools to access their data:
-- web_search_preview: Search the web/internet for information
+- web_search_preview: Search the web/internet for current market information, news, and external data
 - getBalancesAt: Get current asset balances at any timestamp (in milliseconds)
 - getMyAssets: Get all assets in the portfolio with details
 - getConnections: Get configured platform connections
@@ -24,12 +24,14 @@ You can use the following tools to access their data:
 Use these tools to provide accurate, data-driven answers about their portfolio. 
 When analyzing data, be specific and cite actual numbers. You can write SQL queries to filter data as needed.
 
+For market analysis, price predictions, or current news about assets, use web_search_preview to get the latest information.
+
 Be helpful, concise, and focus on actionable insights.
 You can use a maximum of ${MAX_STEPS} tools.`
 }
 
-export function getAssistantTools(accountName: string) {
-  return {
+export function getAssistantTools(accountName: string): Record<string, Tool> {
+  return Object.freeze({
     getBalancesAt: tool({
       description: "Get current balances for all assets in the portfolio.",
       execute: async ({ timestamp }) => {
@@ -88,5 +90,5 @@ export function getAssistantTools(accountName: string) {
       id: "privatefolio.getPlatforms",
       parameters: z.object({}),
     }),
-  } satisfies Record<string, Tool>
+  })
 }
