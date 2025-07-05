@@ -92,8 +92,8 @@ export async function handleAssistantChat(request: Request): Promise<Response> {
         llmModel = createOpenAI({ apiKey, compatibility: "strict" }).responses(model.id)
         providerOptions = {
           openai: {
-            reasoningEffort: "low",
-            reasoningSummary: "auto",
+            reasoningEffort: "medium",
+            reasoningSummary: "detailed",
           } satisfies OpenAIResponsesProviderOptions,
         }
         tools = {

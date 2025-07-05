@@ -159,7 +159,7 @@ export function AssistantSettings() {
               <ExpandMore
                 sx={{
                   transform: showModelComparison ? "rotate(180deg)" : "rotate(0deg)",
-                  transition: "transform 0.5s",
+                  transition: "transform 0.2s",
                 }}
                 fontSize="inherit"
               />

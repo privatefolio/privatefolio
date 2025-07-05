@@ -1,19 +1,29 @@
 import { Message, useChat } from "@ai-sdk/react"
-import { ArrowUpwardRounded, CheckRounded, StopRounded } from "@mui/icons-material"
+import {
+  ArrowUpwardRounded,
+  HandymanOutlined,
+  LanguageRounded,
+  LeaderboardRounded,
+  StopRounded,
+  TextSnippetRounded,
+  TipsAndUpdatesRounded,
+  TravelExploreRounded,
+} from "@mui/icons-material"
 import { Box, Button, Input, Paper, Stack, Tooltip, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useRef, useState } from "react"
-import ReactMarkdown from "react-markdown"
 import { useSearchParams } from "react-router-dom"
-import remarkGfm from "remark-gfm"
 import { AssistantModelSelect } from "src/components/AssistantModelSelect"
 import { CircularSpinner } from "src/components/CircularSpinner"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { ExternalLink } from "src/components/ExternalLink"
 import { $activeAccount } from "src/stores/account-store"
 import { $assistantModel } from "src/stores/device-settings-store"
+import { colorArray, yellowBright } from "src/utils/color-utils"
 import { extractRootUrl } from "src/utils/utils"
 import { $rest, $rpc } from "src/workers/remotes"
+
+import { CustomMarkdown } from "./CustomMarkdown"
 
 export function AssistantChat() {
   const rpc = useStore($rpc)
@@ -170,9 +180,72 @@ export function AssistantChat() {
         }}
       >
         {!hasMessages && (
-          <Typography variant="h4" textAlign="center" marginTop={10}>
-            What&apos;s on the agenda today?
-          </Typography>
+          <Stack alignItems="center">
+            <Typography variant="h4" textAlign="center" marginTop={10}>
+              What can I help you with?
+            </Typography>
+            <Stack
+              direction="row"
+              justifyContent="center"
+              gap={1}
+              marginTop={2}
+              maxWidth={500}
+              flexWrap="wrap"
+            >
+              <Button
+                variant="outlined"
+                color="secondary"
+                startIcon={<LeaderboardRounded sx={{ color: colorArray[4] }} />}
+                onClick={() => {
+                  handleInputChange({
+                    target: { value: "Analyze my latest trade" },
+                  } as React.ChangeEvent<HTMLInputElement>)
+                  inputRef.current?.focus()
+                }}
+              >
+                Analyze my latest trade
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                startIcon={<TipsAndUpdatesRounded sx={{ color: yellowBright }} />}
+                onClick={() => {
+                  handleInputChange({
+                    target: { value: "Make a plan for reducing exposure" },
+                  } as React.ChangeEvent<HTMLInputElement>)
+                  inputRef.current?.focus()
+                }}
+              >
+                Make a plan for reducing exposure
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                startIcon={<TextSnippetRounded sx={{ color: colorArray[3] }} />}
+                onClick={() => {
+                  handleInputChange({
+                    target: { value: "Create a monthly report" },
+                  } as React.ChangeEvent<HTMLInputElement>)
+                  inputRef.current?.focus()
+                }}
+              >
+                Create a monthly report
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                startIcon={<TravelExploreRounded sx={{ color: colorArray[6] }} />}
+                onClick={() => {
+                  handleInputChange({
+                    target: { value: "Research my top holding" },
+                  } as React.ChangeEvent<HTMLInputElement>)
+                  inputRef.current?.focus()
+                }}
+              >
+                Research my top holding
+              </Button>
+            </Stack>
+          </Stack>
         )}
         {messages.map((message) => (
           <Box
@@ -183,8 +256,8 @@ export function AssistantChat() {
                 backgroundColor: "background.paper",
                 borderRadius: 3.5,
                 maxWidth: "60%",
-                paddingX: 3,
-                paddingY: 0,
+                paddingX: 2.5,
+                paddingY: 1.5,
               }),
             }}
           >
@@ -219,13 +292,26 @@ export function AssistantChat() {
                     )
 
                     return (
-                      <Stack direction="row" alignItems="center" gap={1} key={tool.toolCallId}>
-                        {tool.state === "call" && <CircularSpinner size={14} />}
-                        {tool.state === "result" && (
-                          <CheckRounded fontSize="inherit" color="success" />
-                        )}
-                        {tool.state === "partial-call" && <CircularSpinner size={14} />}
-                        <Typography variant="body2" color="text.secondary">
+                      <Stack key={tool.toolCallId} alignItems="flex-start">
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          component={Stack}
+                          direction="row"
+                          alignItems="center"
+                          gap={1}
+                          sx={{
+                            backgroundColor: "var(--mui-palette-background-paper)",
+                            borderRadius: 3,
+                            marginBottom: 0.5,
+                            marginRight: 0.5,
+                            paddingX: 1,
+                            paddingY: 0.5,
+                          }}
+                        >
+                          {tool.state === "call" && <CircularSpinner size={14} />}
+                          {tool.state === "result" && <HandymanOutlined fontSize="inherit" />}
+                          {tool.state === "partial-call" && <CircularSpinner size={14} />}
                           {tool.state === "call" && <>Using {toolName}...</>}
                           {tool.state === "result" && <>Used {toolName}</>}
                           {tool.state === "partial-call" && `Calling ${toolName}...`}
@@ -287,12 +373,12 @@ export function AssistantChat() {
                   })}
                 {message.parts
                   .filter((part) => part.type === "source")
-                  .map((part, index) => {
-                    const sourcePart = part as Extract<typeof part, { type: "source" }>
+                  .map((part) => {
+                    const { source } = part as Extract<typeof part, { type: "source" }>
                     return (
                       <ExternalLink
-                        key={index}
-                        href={sourcePart.source.url}
+                        key={source.id}
+                        href={source.url}
                         target="_blank"
                         variant="body2"
                         sx={{
@@ -305,7 +391,11 @@ export function AssistantChat() {
                           paddingY: 0.5,
                         }}
                       >
-                        {sourcePart.source.title || extractRootUrl(sourcePart.source.url)}
+                        <LanguageRounded
+                          fontSize="inherit"
+                          sx={{ marginRight: 1, verticalAlign: "middle" }}
+                        />
+                        {source.title || extractRootUrl(source.url)}
                       </ExternalLink>
                     )
                   })}
@@ -381,48 +471,13 @@ export function AssistantChat() {
                     )
 
                     return (
-                      <Typography
+                      <CustomMarkdown
                         key={index}
                         variant="body2"
-                        component="div"
                         color={isError ? "error" : "text.primary"}
-                        sx={{
-                          "& a": {
-                            "&:hover": {
-                              textDecoration: "underline",
-                            },
-                            color: "primary.main",
-                            textDecoration: "none",
-                          },
-                          "& b, & strong": {
-                            fontWeight: "500",
-                          },
-                          "& code": {
-                            backgroundColor: "rgba(0, 0, 0, 0.1)",
-                            borderRadius: 1,
-                            px: 0.5,
-                            py: 0.125,
-                          },
-                          "& h3": {
-                            fontWeight: "500",
-                            // marginY: 1,
-                          },
-                          "html[data-mui-color-scheme='dark'] &": {
-                            fontWeight: "300",
-                          },
-                          // "& li": {
-                          //   marginY: 0.25,
-                          // },
-                          // "& ul, & ol": {
-                          //   marginY: 1,
-                          // },
-                          // fontWeight: "300",
-                        }}
                       >
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {isError ? `Error: ${textPart.text}` : textPart.text}
-                        </ReactMarkdown>
-                      </Typography>
+                        {isError ? `Error: ${textPart.text}` : textPart.text}
+                      </CustomMarkdown>
                     )
                   })}
                 {/* {message.parts

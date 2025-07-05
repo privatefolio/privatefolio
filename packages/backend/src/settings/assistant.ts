@@ -29,6 +29,7 @@ For market analysis, price predictions, or current news about assets, use web_se
 Be helpful, concise, and focus on actionable insights.
 You can use a maximum of ${MAX_STEPS} tools.`
 }
+// Please respond in GitHub Flavored Markdown format.
 
 export function getAssistantTools(accountName: string): Record<string, Tool> {
   return Object.freeze({
