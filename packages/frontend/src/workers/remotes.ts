@@ -24,7 +24,7 @@ const BASE_LOCAL_SERVER_URL =
   TARGET === "electron"
     ? "localhost:5555"
     : isProduction
-      ? window.location.origin // self hosted
+      ? `${window.location.hostname}:${window.location.port}` // self hosted
       : "localhost:4001"
 const REMOTE_SERVER_URL = (cloudAccount: User) => `${cloudAccount.id}.privatefolio.app`
 

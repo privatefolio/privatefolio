@@ -15,7 +15,7 @@ Alternatively, you can build the image locally using the [Docker Build documenta
 
 1.  **Pull the Image:**
     ```sh
-    docker pull ghcr.io/privatefolio/privatefolio:main
+    docker pull ghcr.io/privatefolio/privatefolio:latest
     ```
 
 2.  **Run the Container:**
@@ -24,7 +24,7 @@ Alternatively, you can build the image locally using the [Docker Build documenta
       -p ${PORT:-5555}:5555 \
       -v privatefolio-data:/app/data \
       --name privatefolio \
-      ghcr.io/privatefolio/privatefolio:main
+      ghcr.io/privatefolio/privatefolio:latest
     ```
     - `-d`: Run in detached mode.
     - `-p ${PORT:-5555}:5555`: Map the host port (default 5555) to the container port 5555. Adjust the host port if needed.
@@ -40,7 +40,7 @@ Alternatively, you can build the image locally using the [Docker Build documenta
       -e PORT=5000 \
       -v privatefolio-data:/app/data \
       --name privatefolio \
-      ghcr.io/privatefolio/privatefolio:main
+      ghcr.io/privatefolio/privatefolio:latest
     ```
 
 For more detailed information on building the image locally, managing data, and accessing logs, refer to the [Docker Build documentation](DOCKER_BUILD.md).
@@ -91,7 +91,7 @@ To deploy updates, simply run:
 ```sh
 fly deploy
 ```
-Fly.io will pull the latest `:main` image from GHCR (or rebuild if configured differently) and deploy the new version.
+Fly.io will pull the latest `:latest` image from GHCR (or rebuild if configured differently) and deploy the new version.
 
 ### Accessing the Deployed App
 

@@ -5,7 +5,7 @@
 app = 'privatefolio'
 
 [build]
-  image = 'ghcr.io/privatefolio/privatefolio:main'
+  image = 'ghcr.io/privatefolio/privatefolio:latest'
 
 [env]
   PORT = '5555'
