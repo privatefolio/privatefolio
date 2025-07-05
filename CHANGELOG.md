@@ -3,6 +3,23 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.14 - 2025/07/06
+
+### 💡 Feature updates
+
+- Give tools (like reading user balances) to the AI Assistant, alongside Reasoning and Web search
+- Add Anthropic and Perplexity as AI providers, alongside OpenAI
+
+### 🐛 Bug Fixes
+
+- Fix bug in cursor invalidations
+- Fix bug in self hosted deployments regarding the port
+
+### Other updates
+
+- Better error message when the server is unreachable
+- Add new readSql method useful in kiosk mode
+
 ## v2.0.0-beta.11 - 2025/07/03
 
 ### 💡 Feature updates
