@@ -1,4 +1,4 @@
-import { Visibility, VisibilityOff } from "@mui/icons-material"
+import { Visibility, VisibilityOff, WifiOffRounded } from "@mui/icons-material"
 import {
   Alert,
   Button,
@@ -98,6 +98,17 @@ export default function LocalAuthPage() {
       </IconButton>
     </InputAdornment>
   )
+
+  if (errorMessage?.includes("Cannot connect to server")) {
+    return (
+      <Container maxWidth="xs" sx={{ marginTop: 8 }} disableGutters>
+        <CardContent component={Stack} gap={2} alignItems="center">
+          <WifiOffRounded sx={{ fontSize: 100 }} />
+          <Alert severity="error">{errorMessage}</Alert>
+        </CardContent>
+      </Container>
+    )
+  }
 
   return (
     <Container maxWidth="xs" sx={{ marginTop: 8 }} disableGutters>
