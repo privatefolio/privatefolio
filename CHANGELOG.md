@@ -3,6 +3,12 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.15 - 2025/07/06
+
+### 🐛 Bug Fixes
+
+- Fix issue with `kioskMode` introduced in `v2.0.0-beta.14`
+
 ## v2.0.0-beta.14 - 2025/07/06
 
 ### 💡 Feature updates
