@@ -239,6 +239,7 @@ export async function refetchAssets() {
   await mkdir(`${CACHE_LOCATION}/coins`, { recursive: true })
   await writeFile(`${CACHE_LOCATION}/coins/all.json`, JSON.stringify(data, null, 2))
   const assets = await getAssets()
+  console.log(`Coingecko assets fetched.`)
   return assets
 }
 

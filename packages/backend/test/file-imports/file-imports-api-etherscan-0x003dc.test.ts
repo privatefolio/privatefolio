@@ -27,7 +27,7 @@ const mocks = vi.hoisted(() => {
   }
 })
 
-describe("should import 0x003dc via files", () => {
+describe("0x003dc file import", () => {
   beforeAll(async () => {
     vi.mock("fs/promises", () => ({
       ...fs.promises,

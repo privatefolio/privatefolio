@@ -18,7 +18,7 @@ Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 ### Other updates
 
 - Better error message when the server is unreachable
-- Add new readSql method useful in kiosk mode
+- Add new `readSql` method, useful in kiosk mode
 
 ## v2.0.0-beta.11 - 2025/07/03
 
