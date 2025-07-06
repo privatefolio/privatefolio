@@ -112,30 +112,44 @@ export async function getBlockchains(): Promise<Blockchain[]> {
   }
 }
 
-async function refetchPlatforms() {
+async function refetchBlockchains() {
   const data = await getCoingeckoAssetPlatforms()
+  console.log(`Coingecko blockchains fetched.`)
   await mkdir(`${CACHE_LOCATION}/asset-platforms`, { recursive: true })
   await writeFile(`${CACHE_LOCATION}/asset-platforms/all.json`, JSON.stringify(data, null, 2))
   blockchains = []
-  exchanges = []
-  return data
+  return await getBlockchains()
 }
 
 async function refetchExchanges() {
   const data = await getCoingeckoExchanges()
+  console.log(`Coingecko exchanges fetched.`)
   await mkdir(`${CACHE_LOCATION}/exchanges`, { recursive: true })
   await writeFile(`${CACHE_LOCATION}/exchanges/all.json`, JSON.stringify(data, null, 2))
   exchanges = []
-  return data
+  return await getExchanges()
 }
 
-export function enqueueRefetchPlatforms(accountName: string, trigger: TaskTrigger) {
+export function enqueueRefetchPlatforms(
+  accountName: string,
+  trigger: TaskTrigger,
+  onlyIfNeeded = false
+) {
   return enqueueTask(accountName, {
-    description: "Refetching asset platforms.",
+    description: "Refetching platforms.",
     function: async (progress) => {
+      const blockchains = await getBlockchains()
+      const exchanges = await getExchanges()
+      if (blockchains.length !== 0 && exchanges.length !== 0 && onlyIfNeeded) {
+        await progress([
+          undefined,
+          `Coingecko platforms already exist: ${blockchains.length} blockchains, ${exchanges.length} exchanges.`,
+        ])
+        return
+      }
       await Promise.all([
         (async function first() {
-          const data = await refetchPlatforms()
+          const data = await refetchBlockchains()
           await progress([undefined, `Refetched ${data.length} blockchains`])
         })(),
         (async function second() {
@@ -144,7 +158,7 @@ export function enqueueRefetchPlatforms(accountName: string, trigger: TaskTrigge
         })(),
       ])
     },
-    name: "Refetch asset platforms",
+    name: "Refetch platforms",
     priority: TaskPriority.High,
     trigger,
   })
@@ -247,8 +261,10 @@ export async function refetchPlatformsIfNeeded() {
   const exchanges = await getExchanges()
   if (blockchains.length === 0 || exchanges.length === 0) {
     console.log(`Coingecko platforms fetching...`)
-    return await Promise.all([refetchPlatforms(), refetchExchanges()])
+    return await Promise.all([refetchBlockchains(), refetchExchanges()])
   }
-  console.log(`Coingecko platforms already exist.`)
+  console.log(
+    `Coingecko platforms already exist. ${blockchains.length} blockchains, ${exchanges.length} exchanges.`
+  )
   return { blockchains, exchanges }
 }

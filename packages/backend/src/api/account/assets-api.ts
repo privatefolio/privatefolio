@@ -19,7 +19,6 @@ import {
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
-import { sleep } from "src/utils/utils"
 
 import { getCoingeckoCoins } from "../../extensions/metadata/coingecko/coingecko-asset-cache"
 import { getAccount } from "../accounts-api"
@@ -92,7 +91,7 @@ export async function getMyAssets(
   }
 }
 
-const assets: Asset[] = []
+let assets: Asset[] = []
 
 export async function getAssets(): Promise<Asset[]> {
   if (assets.length > 0) {
@@ -234,27 +233,13 @@ export async function findAssets(
   return matchingAssets
 }
 
-export async function refetchAssets() {
+async function refetchAssets() {
   const data = await getCoingeckoCoins()
+  console.log(`Coingecko assets fetched.`)
   await mkdir(`${CACHE_LOCATION}/coins`, { recursive: true })
   await writeFile(`${CACHE_LOCATION}/coins/all.json`, JSON.stringify(data, null, 2))
-  const assets = await getAssets()
-  console.log(`Coingecko assets fetched.`)
-  return assets
-}
-
-export async function refetchAssetsWithRetry(retries = 3) {
-  for (let i = 0; i < retries; i++) {
-    try {
-      return await refetchAssets()
-    } catch (error) {
-      console.error(`Failed to refetch assets: ${String(error)}`)
-      if (i === retries - 1) {
-        throw new Error(`Failed to refetch assets after ${retries} retries.`)
-      }
-      await sleep(1000)
-    }
-  }
+  assets = []
+  return await getAssets()
 }
 
 export async function refetchAssetsIfNeeded() {
@@ -262,20 +247,29 @@ export async function refetchAssetsIfNeeded() {
   const assets = await getAssets()
   if (assets.length === 0) {
     console.log(`Coingecko assets fetching...`)
-    return await refetchAssetsWithRetry()
+    return await refetchAssets()
   }
-  console.log(`Coingecko assets already exist.`)
+  console.log(`Coingecko assets already exist: ${assets.length} records.`)
   return assets
 }
 
-export function enqueueRefetchAssets(accountName: string, trigger: TaskTrigger) {
+export function enqueueRefetchAssets(
+  accountName: string,
+  trigger: TaskTrigger,
+  onlyIfNeeded = false
+) {
   return enqueueTask(accountName, {
     description: "Refetching assets.",
     function: async (progress) => {
-      const data = await refetchAssetsWithRetry()
+      const assets = await getAssets()
+      if (assets.length !== 0 && onlyIfNeeded) {
+        await progress([undefined, `Coingecko assets already exist: ${assets.length} records.`])
+        return
+      }
+      const data = await refetchAssets()
       const account = await getAccount(accountName)
       account.eventEmitter.emit(SubscriptionChannel.Metadata)
-      await progress([undefined, `Refetched ${data.length} coins from coingecko.com.`])
+      await progress([undefined, `Refetched ${data.length} assets from coingecko.com.`])
     },
     name: "Refetch assets",
     priority: TaskPriority.High,

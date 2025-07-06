@@ -1,9 +1,9 @@
 import { refetchAssetsIfNeeded } from "src/api/account/assets-api"
-import { sleep } from "src/utils/utils"
+import { refetchPlatformsIfNeeded } from "src/api/account/platforms-api"
 
 export default async function setup() {
   console.log("Setting up tests...")
-  const assets = await refetchAssetsIfNeeded()
-  console.log(`Tests setup complete. ${assets.length} assets fetched.`)
-  await sleep(1_000)
+  await refetchAssetsIfNeeded()
+  await refetchPlatformsIfNeeded()
+  console.log(`Tests setup complete.`)
 }

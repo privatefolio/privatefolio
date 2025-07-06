@@ -14,15 +14,15 @@ const mocks = vi.hoisted(() => {
   }
 })
 
-it("should add a file import", async () => {
-  beforeAll(async () => {
-    vi.mock("fs/promises", () => ({
-      ...fs.promises,
-      access: mocks.access,
-      readFile: mocks.readFile,
-    }))
-  })
+beforeAll(async () => {
+  vi.mock("fs/promises", () => ({
+    ...fs.promises,
+    access: mocks.access,
+    readFile: mocks.readFile,
+  }))
+})
 
+it("should add a file import", async () => {
   // arrange
   const fileName = "coinmama.csv"
   const filePath = join("test/files", fileName)

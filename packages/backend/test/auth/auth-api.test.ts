@@ -16,7 +16,6 @@ import {
 import { extractJwt, generateJwt, verifyJwt } from "../../src/utils/jwt-utils"
 
 beforeAll(async () => {
-  // Mock the fs/promises module
   vi.mock("fs/promises", () => ({
     access: vi.fn().mockResolvedValue(true),
     mkdir: vi.fn(),

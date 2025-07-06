@@ -82,6 +82,7 @@ const accounts: Record<string, Promise<Account>> = {}
 
 function populateFirstServerTask(accountName: string) {
   const createdAt = Date.now()
+  if (isTestEnvironment) return
   setTimeout(async () => {
     await upsertServerTask(accountName, {
       completedAt: Date.now(),
@@ -94,8 +95,8 @@ function populateFirstServerTask(accountName: string) {
       status: TaskStatus.Completed,
       trigger: "system",
     })
-    await enqueueRefetchPlatforms(accountName, "system")
-    await enqueueRefetchAssets(accountName, "system")
+    await enqueueRefetchPlatforms(accountName, "system", true)
+    await enqueueRefetchAssets(accountName, "system", true)
   }, 50)
 }
 
