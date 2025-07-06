@@ -48,7 +48,7 @@ export function isInputFocused() {
   if (inputFocused) return true
 
   if (document.querySelector("div[role='dialog']")) return true
-  if (document.querySelector("div[role='presentation']")) return true
+  if (document.querySelector("div[role='presentation']:not([aria-hidden='true'])")) return true
 
   return false
 }

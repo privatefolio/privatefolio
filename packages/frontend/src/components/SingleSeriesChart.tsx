@@ -306,6 +306,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
     }
 
     function handleKeydown(event: KeyboardEvent) {
+      if (isInputFocused()) return
       if (
         event.key === "Shift" &&
         !shiftPressedRef.current &&
@@ -331,7 +332,6 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
 
     function handleKeyup(event: KeyboardEvent) {
       if (isInputFocused()) return
-
       if (event.key === "Shift") {
         shiftPressedRef.current = false
         if (allowedCursorModes.includes("move")) {
