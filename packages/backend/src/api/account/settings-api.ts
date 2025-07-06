@@ -35,9 +35,23 @@ export async function updateSettings(
   return updatedSettings
 }
 
-export async function subscribeToSettings(
-  accountName: string,
-  callback: (settings: Settings) => void
-) {
+export async function subscribeToSettings(accountName: string, callback: () => void) {
   return subscribeToKV(accountName, SETTINGS_KEY, callback)
+}
+
+export async function subscribeToSettingsProperty(
+  accountName: string,
+  property: string,
+  callback: () => void
+) {
+  let currentPropertyValue = (await getSettings(accountName))[property]
+
+  return subscribeToKV<string>(accountName, SETTINGS_KEY, (newValue) => {
+    const newSettings = JSON.parse(newValue) as Settings
+
+    if (newSettings[property] !== currentPropertyValue) {
+      currentPropertyValue = newSettings[property]
+      callback()
+    }
+  })
 }

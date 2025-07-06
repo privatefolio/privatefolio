@@ -31,22 +31,27 @@ console.log("Started worker...")
 
 const accountNames = await writeApi.getAccountNames()
 
-let kioskMode = false
-for (const accountName of accountNames) {
-  const accountSettings = await writeApi.getSettings(accountName)
-  if (accountSettings.kioskMode) {
-    kioskMode = true
-    break
+async function getKioskMode() {
+  let kioskMode = false
+  for (const accountName of accountNames) {
+    const accountSettings = await writeApi.getSettings(accountName)
+    if (accountSettings.kioskMode) {
+      kioskMode = true
+      break
+    }
   }
+  return kioskMode
 }
 
 const sideEffects: Record<string, SubscriptionId> = {}
 const networthCronJobs: Record<string, Cron> = {}
 const metadataCronJobs: Record<string, Cron> = {}
-const settingsSubscriptions: Record<string, SubscriptionId> = {}
+const networthIntervalSubs: Record<string, SubscriptionId> = {}
+const metadataIntervalSubs: Record<string, SubscriptionId> = {}
 let server: BackendServer<Api>
 
-function startServer() {
+async function startServer() {
+  const kioskMode = await getKioskMode()
   server?.close()
   server = new BackendServer(api, writeApi as Api, false, kioskMode, function shutdown() {
     console.log("Shutting down server.")
@@ -63,14 +68,12 @@ async function handleAccountsSideEffects() {
   if (accounts.length === 0) return
 
   for (const accountName of accounts) {
-    await writeApi.subscribeToSettings(
+    await writeApi.subscribeToSettingsProperty(
       accountName,
-      proxy(async (settings) => {
-        if (settings.kioskMode) {
-          kioskMode = true
-          // Restart server with new kiosk mode
-          startServer()
-        }
+      "kioskMode",
+      proxy(async () => {
+        console.log("Kiosk mode changed, restarting server.")
+        await startServer()
       })
     )
   }
@@ -187,16 +190,33 @@ async function setupSideEffects(accountName: string) {
   await setupNetworthCronJob(accountName)
   await setupMetadataCronJob(accountName)
 
-  const settingsSubId = await writeApi.subscribeToSettings(
+  const networthIntervalSubId = await writeApi.subscribeToSettingsProperty(
     accountName,
+    "networthRefreshInterval",
     proxy(async () => {
-      console.log(getPrefix(accountName, true), `Settings changed, refreshing cron jobs.`)
+      console.log(
+        getPrefix(accountName, true),
+        `Networth refresh interval changed, refreshing cron job.`
+      )
       await setupNetworthCronJob(accountName)
+    })
+  )
+
+  networthIntervalSubs[accountName] = networthIntervalSubId
+
+  const metadataIntervalSubId = await writeApi.subscribeToSettingsProperty(
+    accountName,
+    "metadataRefreshInterval",
+    proxy(async () => {
+      console.log(
+        getPrefix(accountName, true),
+        `Metadata refresh interval changed, refreshing cron job.`
+      )
       await setupMetadataCronJob(accountName)
     })
   )
 
-  settingsSubscriptions[accountName] = settingsSubId
+  metadataIntervalSubs[accountName] = metadataIntervalSubId
 }
 
 await writeApi.subscribeToAccounts(
@@ -217,9 +237,13 @@ await writeApi.subscribeToAccounts(
           delete metadataCronJobs[accountName]
         }
 
-        if (settingsSubscriptions[accountName]) {
-          await writeApi.unsubscribe(settingsSubscriptions[accountName])
-          delete settingsSubscriptions[accountName]
+        if (networthIntervalSubs[accountName]) {
+          await writeApi.unsubscribe(networthIntervalSubs[accountName])
+          delete networthIntervalSubs[accountName]
+        }
+        if (metadataIntervalSubs[accountName]) {
+          await writeApi.unsubscribe(metadataIntervalSubs[accountName])
+          delete metadataIntervalSubs[accountName]
         }
       } catch {}
     }
@@ -242,8 +266,7 @@ for (const accountName of accountNames) {
 }
 
 await handleAccountsSideEffects()
-
-startServer()
+await startServer()
 
 process.on("SIGINT", () => {
   console.log("Shutting down server.")
