@@ -35,7 +35,7 @@ export function ServerLogs() {
   return (
     <Paper sx={{ maxHeight: 800, overflow: "auto", paddingX: 2, paddingY: 1 }}>
       {isLoading ? (
-        <DefaultSpinner />
+        <DefaultSpinner wrapper />
       ) : logs.length === 0 ? (
         <Typography variant="body2">Nothing to see here…</Typography>
       ) : (

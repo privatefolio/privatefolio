@@ -74,7 +74,7 @@ export default function TradePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showQuotedAmounts, trade, rpc, activeAccount])
 
-  if (isLoading) return <DefaultSpinner />
+  if (isLoading) return <DefaultSpinner wrapper />
   if (!tradeId || !trade) return <FourZeroFourPage show type="Trade" />
 
   return (

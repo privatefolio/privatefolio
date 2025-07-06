@@ -11,8 +11,8 @@ import {
   Typography,
 } from "@mui/material"
 import React from "react"
-import { CircularSpinner } from "src/components/CircularSpinner"
 import { CoinGeckoIcon } from "src/components/CoinGeckoIcon"
+import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { DiscordIcon } from "src/components/DiscordIcon"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
 import { NoDataAvailable } from "src/components/NoDataAvailable"
@@ -38,12 +38,12 @@ export function AssetDetails(props: AssetDetailsProps) {
   const [showAllCategories, setShowAllCategories] = React.useState(false)
   const [showFullDescription, setShowFullDescription] = React.useState(false)
 
-  if (isLoading || isEmpty) {
+  if (isLoading) return <DefaultSpinner wrapper />
+  if (isEmpty) {
     return (
       <Paper>
-        <Stack justifyContent="center" alignItems="center" sx={{ height: 260 }}>
-          {isEmpty && !isLoading && <NoDataAvailable />}
-          {isLoading && <CircularSpinner color="secondary" />}
+        <Stack justifyContent="center" alignItems="center" sx={{ height: 300 }}>
+          {isEmpty && <NoDataAvailable />}
         </Stack>
       </Paper>
     )

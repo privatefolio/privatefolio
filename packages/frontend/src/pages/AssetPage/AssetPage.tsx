@@ -91,7 +91,7 @@ export default function AssetPage() {
       .finally(() => setLoading(false))
   }, [activeAccount, assetId, assetMap, rpc])
 
-  if (!filterMap.assetId) return <DefaultSpinner />
+  if (!filterMap.assetId) return <DefaultSpinner wrapper />
   if (!assetId) return <FourZeroFourPage show type="Asset" />
 
   return (

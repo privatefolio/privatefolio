@@ -17,7 +17,7 @@ import React, { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import { AccountAvatar, SIZE_MAP } from "src/components/AccountAvatar"
 import { AddAccountDialog } from "src/components/AccountPicker/AddAccountDialog"
-import { CircularSpinner } from "src/components/CircularSpinner"
+import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { Gravatar } from "src/components/Gravatar"
 import { LogoText } from "src/components/Header/LogoText"
 import { SettingsButton } from "src/components/Header/SettingsButton"
@@ -250,7 +250,7 @@ export default function AccountsPage() {
           </Stack>
         ) : !localAccounts && !cloudAccounts ? (
           <Stack alignItems="center" justifyContent="center" gap={1}>
-            <CircularSpinner />
+            <DefaultSpinner />
           </Stack>
         ) : (
           <Box

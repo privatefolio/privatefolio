@@ -2,7 +2,7 @@ import { Paper, Stack } from "@mui/material"
 import { isAddress } from "ethers"
 import { formatAddress } from "privatefolio-backend/build/src/utils/assets-utils"
 import React, { useMemo } from "react"
-import { CircularSpinner } from "src/components/CircularSpinner"
+import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
 import { NoDataAvailable } from "src/components/NoDataAvailable"
 import { CoingeckoMetadataFull } from "src/interfaces"
@@ -102,12 +102,12 @@ export function AssetMarketTable({ metadata, isLoading }: AssetMarketsProps) {
     []
   )
 
-  if (isLoading || isEmpty) {
+  if (isLoading) return <DefaultSpinner wrapper />
+  if (isEmpty) {
     return (
       <Paper>
-        <Stack justifyContent="center" alignItems="center" sx={{ height: 260 }}>
-          {isEmpty && !isLoading && <NoDataAvailable />}
-          {isLoading && <CircularSpinner color="secondary" />}
+        <Stack justifyContent="center" alignItems="center" sx={{ height: 300 }}>
+          {isEmpty && <NoDataAvailable />}
         </Stack>
       </Paper>
     )

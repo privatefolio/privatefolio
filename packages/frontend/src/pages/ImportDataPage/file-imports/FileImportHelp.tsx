@@ -85,7 +85,7 @@ export function FileImportHelp() {
               ))}
             </Tabs>
             {HowToComponent && (
-              <Suspense fallback={<DefaultSpinner />}>
+              <Suspense fallback={<DefaultSpinner wrapper />}>
                 <HowToComponent />
               </Suspense>
             )}

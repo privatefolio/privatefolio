@@ -6,7 +6,6 @@ import React, { lazy, Suspense, useEffect } from "react"
 import { Navigate, Route, Routes } from "react-router-dom"
 
 import { AccountRouteGuard } from "./AccountRouteGuard"
-import { CircularSpinner } from "./components/CircularSpinner"
 import { DefaultSpinner } from "./components/DefaultSpinner"
 import { ErrorBoundary } from "./components/ErrorBoundary"
 import { ConnectionBanner } from "./components/Header/ConnectionBanner"
@@ -157,7 +156,7 @@ export default function App() {
       <Box
         sx={{ alignItems: "center", display: "flex", height: "100vh", justifyContent: "center" }}
       >
-        <CircularSpinner />
+        <DefaultSpinner />
       </Box>
     )
   }
@@ -252,7 +251,7 @@ export default function App() {
         <Header />
         <Container disableGutters maxWidth="xl" sx={{ paddingX: { xs: 2 }, paddingY: 2 }}>
           <ErrorBoundary>
-            <Suspense fallback={<DefaultSpinner />}>
+            <Suspense fallback={<DefaultSpinner wrapper />}>
               <Routes>
                 <Route index element={<AccountsPage />} />
                 <Route path="/cloud" element={<CloudUserPage show />} />

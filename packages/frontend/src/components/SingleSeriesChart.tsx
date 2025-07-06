@@ -11,7 +11,6 @@ import {
   Button,
   Chip,
   Divider,
-  Fade,
   IconButton,
   IconButtonProps,
   Paper,
@@ -67,7 +66,7 @@ import {
   profitColor,
 } from "../utils/chart-utils"
 import { Chart, ChartProps } from "./Chart"
-import { CircularSpinner } from "./CircularSpinner"
+import { DefaultSpinner } from "./DefaultSpinner"
 import { NoDataButton } from "./NoDataButton"
 import { QueryTimer } from "./QueryTimer"
 
@@ -458,29 +457,8 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
 
   const isEmpty = data.length === 0
 
-  const [showLoading, setShowLoading] = useState(false)
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setShowLoading(true)
-    }, 250)
-    return () => clearTimeout(timeout)
-  }, [])
-
   return (
     <>
-      {/* {isLoading ? (
-            <Stack gap={1.5} sx={{ height, overflow: "hidden" }} justifyContent="center">
-              <Stack
-                direction="row"
-                gap={1.5}
-                alignItems={"flex-end"}
-                sx={{ paddingY: 1, width: 1168 }}
-              >
-                <CircularSpinner color="secondary" />
-              </Stack>
-            </Stack>
-          ) : ( */}
       <Paper
         sx={{
           height,
@@ -729,13 +707,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
               sx={{ height: "100%", width: "100%" }}
             >
               {isEmpty && !isLoading && !error && emptyContent}
-              {isLoading && (
-                <Fade in={showLoading}>
-                  <div>
-                    <CircularSpinner color="secondary" />
-                  </div>
-                </Fade>
-              )}
+              {isLoading && <DefaultSpinner />}
               {error && (
                 <Stack spacing={1} alignItems="center">
                   <Typography>Error loading data</Typography>

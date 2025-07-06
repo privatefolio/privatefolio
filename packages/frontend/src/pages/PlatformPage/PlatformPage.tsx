@@ -58,7 +58,7 @@ export default function PlatformPage() {
       })
   }, [platformId, rpc])
 
-  if (isLoading) return <DefaultSpinner />
+  if (isLoading) return <DefaultSpinner wrapper />
   if (!platform) return <FourZeroFourPage type="Platform" show />
 
   const { name, image: logoUrl } = platform

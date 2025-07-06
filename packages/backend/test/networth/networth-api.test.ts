@@ -4,7 +4,8 @@ import { computeBalances } from "src/api/account/balances-api"
 import { fetchDailyPrices } from "src/api/account/daily-prices-api"
 import { importFile } from "src/api/account/file-imports-api"
 import { computeNetworth, getNetworth } from "src/api/account/networth-api"
-import { ProgressUpdate } from "src/interfaces"
+import { ProgressUpdate, ResolutionString } from "src/interfaces"
+import { aggregateCandles } from "src/utils/data-utils"
 import { beforeAll, expect, it, vi } from "vitest"
 
 const accountName = Math.random().toString(36).substring(7)
@@ -68,6 +69,9 @@ it.sequential("should compute historical networth", async () => {
   )
   expect(networthArray.length).toMatchInlineSnapshot(`15`)
   expect(networthArray).toMatchSnapshot()
+  expect(aggregateCandles(networthArray, "3d" as ResolutionString)).toMatchSnapshot("as 3d candles")
+  expect(aggregateCandles(networthArray, "1w" as ResolutionString)).toMatchSnapshot("as 1w candles")
+  expect(aggregateCandles(networthArray, "1m" as ResolutionString)).toMatchSnapshot("as 1m candles")
 })
 
 it.sequential("should refresh networth", async () => {

@@ -79,7 +79,7 @@ export default function ExtensionPage() {
     return lazy(() => import(`../../extensions/${extension.howTo}.tsx`))
   }, [extension?.howTo])
 
-  if (isLoading) return <DefaultSpinner />
+  if (isLoading) return <DefaultSpinner wrapper />
   if (!extension) return <FourZeroFourPage show type="Extension" />
 
   const {
@@ -242,7 +242,7 @@ export default function ExtensionPage() {
         )}
 
         {tab === "how-to" && HowToComponent && (
-          <Suspense fallback={<DefaultSpinner />}>
+          <Suspense fallback={<DefaultSpinner wrapper />}>
             <HowToComponent />
           </Suspense>
         )}

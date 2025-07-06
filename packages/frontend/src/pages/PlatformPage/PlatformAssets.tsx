@@ -57,7 +57,7 @@ export function PlatformAssets({ platformId }: PlatformAssetsProps) {
   if (assets === undefined) {
     return (
       <Paper sx={{ height: 200, paddingX: 2, paddingY: 1 }}>
-        <DefaultSpinner />
+        <DefaultSpinner wrapper />
       </Paper>
     )
   }

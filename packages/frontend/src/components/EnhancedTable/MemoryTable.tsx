@@ -32,7 +32,7 @@ import {
   TableRowComponentProps,
   ValueSelector,
 } from "../../utils/table-utils"
-import { CircularSpinner } from "../CircularSpinner"
+import { DefaultSpinner } from "../DefaultSpinner"
 import { FilterChip } from "../FilterChip"
 import { NoDataButton } from "../NoDataButton"
 import { ConnectedTableHead } from "./ConnectedTableHead"
@@ -315,7 +315,7 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
                     <TableCell colSpan={headCells.length}>
                       <Stack justifyContent="center" alignItems="center" sx={{ height: 260 }}>
                         {isEmpty && !isLoading && !error && emptyContent}
-                        {isLoading && <CircularSpinner color="secondary" />}
+                        {isLoading && <DefaultSpinner />}
                         {error && (
                           <>
                             <Typography>Error loading data</Typography>

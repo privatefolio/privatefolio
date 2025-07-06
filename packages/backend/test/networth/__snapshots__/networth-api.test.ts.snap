@@ -1,5 +1,100 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`should compute historical networth > as 1m candles 1`] = `
+[
+  {
+    "close": 0,
+    "high": 0,
+    "low": 0,
+    "open": 0,
+    "time": 1501545600,
+    "value": 0,
+  },
+  {
+    "close": 237.14,
+    "high": 337.37,
+    "low": 159.48,
+    "open": 0,
+    "time": 1504224000,
+    "value": 237.14,
+  },
+]
+`;
+
+exports[`should compute historical networth > as 1w candles 1`] = `
+[
+  {
+    "close": 166.44,
+    "high": 178.03,
+    "low": 0,
+    "open": 0,
+    "time": 1503867600,
+    "value": 166.44,
+  },
+  {
+    "close": 310.17,
+    "high": 337.37,
+    "low": 159.48,
+    "open": 166.44,
+    "time": 1504472400,
+    "value": 310.17,
+  },
+  {
+    "close": 237.14,
+    "high": 307.21,
+    "low": 237.14,
+    "open": 310.17,
+    "time": 1505077200,
+    "value": 237.14,
+  },
+]
+`;
+
+exports[`should compute historical networth > as 3d candles 1`] = `
+[
+  {
+    "close": 167.3,
+    "high": 178.03,
+    "low": 0,
+    "open": 0,
+    "time": 1504137600,
+    "value": 167.3,
+  },
+  {
+    "close": 159.48,
+    "high": 166.44,
+    "low": 159.48,
+    "open": 167.3,
+    "time": 1504396800,
+    "value": 159.48,
+  },
+  {
+    "close": 317.37,
+    "high": 337.37,
+    "low": 166.09,
+    "open": 159.48,
+    "time": 1504656000,
+    "value": 317.37,
+  },
+  {
+    "close": 307.21,
+    "high": 316.23,
+    "low": 307.21,
+    "open": 317.37,
+    "time": 1504915200,
+    "value": 307.21,
+  },
+  {
+    "close": 237.14,
+    "high": 303.84,
+    "low": 237.14,
+    "open": 307.21,
+    "time": 1505174400,
+    "value": 237.14,
+  },
+]
+`;
+
 exports[`should compute historical networth 3`] = `
 [
   {

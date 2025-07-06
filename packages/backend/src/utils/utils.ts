@@ -159,6 +159,7 @@ export function getBucketSize(timeInterval: ResolutionString): Time {
 
   // Days/Weeks/Months
   if (timeInterval === "1D") return 86400
+  if (timeInterval === "3D") return 3 * 86400
   if (timeInterval === "1W") return 604800
   if (timeInterval === "1M") return 2592000
 

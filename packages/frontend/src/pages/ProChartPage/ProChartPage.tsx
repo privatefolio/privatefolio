@@ -2,7 +2,7 @@
 import { Box, Paper, Stack } from "@mui/material"
 import { animated, useSpring } from "@react-spring/web"
 import React, { useEffect, useState } from "react"
-import { CircularSpinner } from "src/components/CircularSpinner"
+import { DefaultSpinner } from "src/components/DefaultSpinner"
 import ProChart from "src/components/ProChart/ProChart"
 import { WorkInProgressCallout } from "src/components/WorkInProgressCallout"
 import { SPRING_CONFIGS } from "src/utils/utils"
@@ -55,7 +55,7 @@ export default function ProChartPage({ show: _show }: { show: boolean }) {
       >
         {!open && (
           <Box sx={{ position: "absolute" }}>
-            <CircularSpinner />
+            <DefaultSpinner />
           </Box>
         )}
         <AnimatedPaper

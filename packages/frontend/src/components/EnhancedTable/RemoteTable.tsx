@@ -34,7 +34,7 @@ import {
   Order,
   TableRowComponentProps,
 } from "../../utils/table-utils"
-import { CircularSpinner } from "../CircularSpinner"
+import { DefaultSpinner } from "../DefaultSpinner"
 import { FilterChip } from "../FilterChip"
 import { NoDataButton } from "../NoDataButton"
 import { TableFooter } from "../TableFooter"
@@ -346,7 +346,7 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
                         gap={1}
                       >
                         {isEmpty && !isFirstLoading && emptyContent}
-                        {isFirstLoading && !error && <CircularSpinner color="secondary" />}
+                        {isFirstLoading && !error && <DefaultSpinner />}
                         {error && (
                           <>
                             <Typography>Error loading data</Typography>

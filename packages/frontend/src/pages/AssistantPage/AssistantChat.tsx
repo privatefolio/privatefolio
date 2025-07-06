@@ -156,7 +156,7 @@ export function AssistantChat() {
     setSearchParams(searchParams, { replace: true })
   }, [existingConversationId, id, hasMessages, searchParams, setSearchParams])
 
-  if (isLoadingHistory) return <DefaultSpinner />
+  if (isLoadingHistory) return <DefaultSpinner wrapper />
 
   return (
     <Stack
