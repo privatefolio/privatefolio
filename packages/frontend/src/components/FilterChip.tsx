@@ -1,7 +1,7 @@
 import { alpha, Chip, ChipProps, lighten } from "@mui/material"
 import React from "react"
 
-type FilterChipProps = ChipProps & {
+type FilterChipProps = Omit<ChipProps, "color"> & {
   color: string
 }
 

@@ -9,7 +9,7 @@ import {
   PriceToCoordinateConverter,
   Time,
 } from "lightweight-charts"
-import { stringToColor } from "src/utils/color-utils"
+import { $colorArray, stringToNumber } from "src/utils/color-utils"
 
 import { StackedAreaData } from "./data"
 import { StackedAreaSeriesOptions } from "./options"
@@ -53,10 +53,14 @@ export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
     this._data = data
     this._options = options
     if (data.bars.length === 0) return
-    this._options.colors = data.bars[0].originalData.assets.map((asset) => ({
-      area: alpha(stringToColor(asset), 0.2),
-      line: stringToColor(asset),
-    }))
+    this._options.colors = data.bars[0].originalData.assets.map((asset) => {
+      const colorArray = $colorArray.get()
+      const color = colorArray[stringToNumber(asset) % colorArray.length]
+      return {
+        area: alpha(color, 0.2),
+        line: color,
+      }
+    })
   }
 
   _drawImpl(

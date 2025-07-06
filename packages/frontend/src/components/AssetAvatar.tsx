@@ -1,9 +1,10 @@
 import { alpha, Avatar, AvatarProps, styled, Typography } from "@mui/material"
+import { useStore } from "@nanostores/react"
 import React, { useMemo } from "react"
 import { resolveUrl } from "src/utils/utils"
 
 import { MonoFont } from "../theme"
-import { stringToColor } from "../utils/color-utils"
+import { $colorArray, stringToNumber } from "../utils/color-utils"
 
 const StyledAvatar = styled(Avatar)`
   border-radius: unset;
@@ -41,7 +42,9 @@ const FONT_SIZE_MAP = {
 
 export function AssetAvatar(props: AssetAvatarProps) {
   const { alt = "", src, size = "small", sx, ...rest } = props
-  const color = stringToColor(alt)
+
+  const colorArray = useStore($colorArray)
+  const color = colorArray[stringToNumber(alt) % colorArray.length]
 
   const source = useMemo(() => resolveUrl(src), [src])
 

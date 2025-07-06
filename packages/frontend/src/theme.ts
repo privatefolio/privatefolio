@@ -1,5 +1,5 @@
 import { ExpandMoreRounded } from "@mui/icons-material"
-import { alpha, CssVarsThemeOptions, Fade } from "@mui/material"
+import { alpha, colors, CssVarsThemeOptions, Fade } from "@mui/material"
 import { blue, grey } from "@mui/material/colors"
 
 export const MainFont = "'IBM Plex Sans', sans-serif"
@@ -52,10 +52,43 @@ declare module "@mui/material" {
   }
   interface Palette {
     accent: Palette["primary"]
+    color: {
+      blue: string
+      cyan: string
+      green: string
+      indigo: string
+      lime: string
+      orange: string
+      pink: string
+      purple: string
+      red: string
+      yellow: string
+    }
   }
 
   interface PaletteOptions {
-    accent?: PaletteOptions["primary"]
+    accent: PaletteOptions["primary"]
+    color: {
+      blue: string
+      cyan: string
+      green: string
+      indigo: string
+      lime: string
+      orange: string
+      pink: string
+      purple: string
+      red: string
+      yellow: string
+      // amber,
+      // blueGrey,
+      // lightBlue,
+      // lightGreen,
+      // brown,
+      // deepOrange,
+      // deepPurple,
+      // lightBlue,
+      // teal,
+    }
   }
 }
 
@@ -139,6 +172,18 @@ export const theme: CssVarsThemeOptions = {
           paper: "rgb(40, 40, 40)",
           paperTransparent: "rgba(60, 60, 60, 0.33)", // derived from default + paper
         },
+        color: {
+          blue: colors.blue[500],
+          cyan: colors.cyan[300],
+          green: colors.green[600],
+          indigo: colors.indigo[300],
+          lime: colors.lime[800],
+          orange: colors.orange[500],
+          pink: colors.pink[300],
+          purple: colors.purple[400],
+          red: colors.red[400],
+          yellow: colors.yellow[600],
+        },
         info: {
           main: blue[400],
         },
@@ -202,6 +247,18 @@ export const theme: CssVarsThemeOptions = {
           default: bgColor,
           paper: "rgb(253, 253, 253)",
           paperTransparent: "rgba(255, 255, 255, 0.55)",
+        },
+        color: {
+          blue: colors.blue[700],
+          cyan: colors.cyan[700],
+          green: colors.green[800],
+          indigo: colors.indigo[900],
+          lime: colors.lime[900],
+          orange: colors.orange[900],
+          pink: colors.pink[800],
+          purple: colors.purple[500],
+          red: colors.red[600],
+          yellow: colors.yellow[800],
         },
         // divider: "rgba(0,0,0,0.15)",
         info: {

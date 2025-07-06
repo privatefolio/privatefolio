@@ -19,7 +19,6 @@ import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { ExternalLink } from "src/components/ExternalLink"
 import { $activeAccount } from "src/stores/account-store"
 import { $assistantModel } from "src/stores/device-settings-store"
-import { colorArray, yellowBright } from "src/utils/color-utils"
 import { extractRootUrl } from "src/utils/utils"
 import { $rest, $rpc } from "src/workers/remotes"
 
@@ -195,7 +194,7 @@ export function AssistantChat() {
               <Button
                 variant="outlined"
                 color="secondary"
-                startIcon={<LeaderboardRounded sx={{ color: colorArray[4] }} />}
+                startIcon={<LeaderboardRounded sx={{ color: "var(--mui-palette-color-cyan)" }} />}
                 onClick={() => {
                   handleInputChange({
                     target: { value: "Analyze my latest trade" },
@@ -208,7 +207,9 @@ export function AssistantChat() {
               <Button
                 variant="outlined"
                 color="secondary"
-                startIcon={<TipsAndUpdatesRounded sx={{ color: yellowBright }} />}
+                startIcon={
+                  <TipsAndUpdatesRounded sx={{ color: "var(--mui-palette-color-yellow)" }} />
+                }
                 onClick={() => {
                   handleInputChange({
                     target: { value: "Make a plan for reducing exposure" },
@@ -221,7 +222,7 @@ export function AssistantChat() {
               <Button
                 variant="outlined"
                 color="secondary"
-                startIcon={<TextSnippetRounded sx={{ color: colorArray[3] }} />}
+                startIcon={<TextSnippetRounded sx={{ color: "var(--mui-palette-color-green)" }} />}
                 onClick={() => {
                   handleInputChange({
                     target: { value: "Create a monthly report" },
@@ -234,7 +235,9 @@ export function AssistantChat() {
               <Button
                 variant="outlined"
                 color="secondary"
-                startIcon={<TravelExploreRounded sx={{ color: colorArray[6] }} />}
+                startIcon={
+                  <TravelExploreRounded sx={{ color: "var(--mui-palette-color-indigo)" }} />
+                }
                 onClick={() => {
                   handleInputChange({
                     target: { value: "Research my top holding" },

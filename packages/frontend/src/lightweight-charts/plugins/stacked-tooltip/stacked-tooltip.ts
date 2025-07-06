@@ -13,7 +13,7 @@ import {
 } from "lightweight-charts"
 import { throttle } from "lodash-es"
 import { getDecimalPrecision } from "privatefolio-backend/build/src/utils/formatting-utils"
-import { stringToColor } from "src/utils/color-utils"
+import { $colorArray, stringToNumber } from "src/utils/color-utils"
 
 import { formatNumber } from "../../../utils/formatting-utils"
 import { positionsLine } from "../../helpers/dimensions/positions"
@@ -77,7 +77,8 @@ const defaultOptions: TooltipPrimitiveOptions = {
     return d.values
       .map((value, index) => {
         const assetName = d.assets[index]
-        const assetColor = stringToColor(assetName)
+        const colorArray = $colorArray.get()
+        const assetColor = colorArray[stringToNumber(assetName) % colorArray.length]
 
         const minimumFractionDigits =
           typeof significantDigits === "number" ? significantDigits : getDecimalPrecision(value)

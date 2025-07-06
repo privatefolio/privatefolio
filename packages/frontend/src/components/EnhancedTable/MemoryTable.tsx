@@ -23,7 +23,7 @@ import {
   FILTER_LABEL_MAP,
   getFilterValueLabel,
 } from "../../stores/metadata-store"
-import { stringToColor } from "../../utils/color-utils"
+import { $colorArray, stringToNumber } from "../../utils/color-utils"
 import {
   ActiveFilterMap,
   BaseType,
@@ -224,16 +224,18 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
   //   console.timeEnd("MemoryTable Render Time")
   // })
 
+  const colorArray = useStore($colorArray)
+
   return (
     <>
       <Stack gap={1}>
         {Object.keys(activeFilters).length > 0 && inMemoryDataQueryTime !== null && (
-          <Stack direction="row" spacing={1} marginLeft={1} marginTop={0.5}>
+          <Stack direction="row" gap={1} marginLeft={0.5} marginTop={0.5} flexWrap="wrap">
             {Object.keys(activeFilters).map((x) => (
               <FilterChip
                 key={x}
                 label={`${FILTER_LABEL_MAP[x]} = ${getFilterValueLabel(activeFilters[x])}`}
-                color={stringToColor(x)}
+                color={colorArray[stringToNumber(x) % colorArray.length]}
                 onDelete={() => {
                   setFilterKey(x as keyof T, undefined)
                 }}

@@ -1,6 +1,7 @@
 import { useTheme } from "@mui/material"
 import React, { useEffect } from "react"
 import { bgColor } from "src/theme"
+import { $colorArray } from "src/utils/color-utils"
 
 export function ThemeSideEffects() {
   const theme = useTheme()
@@ -16,6 +17,10 @@ export function ThemeSideEffects() {
       document.querySelector('link[rel*="icon"]')?.setAttribute("href", "/privatefolio-local.svg")
     }
   }, [])
+
+  useEffect(() => {
+    $colorArray.set(Object.values(theme.palette.color))
+  }, [theme.palette.color])
 
   return <meta name="theme-color" content={bgColor} />
 }

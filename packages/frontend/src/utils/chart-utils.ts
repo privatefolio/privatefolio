@@ -17,10 +17,11 @@ export const createPriceFormatter = memoize((currency: Currency) => {
     `${currency.symbol}${formatNumber(x)}`.replace(`${currency.symbol}-`, `-${currency.symbol}`)
 })
 
-export const createValueFormatter = memoize((currency: Currency, isMobile: boolean) => {
+export const createValueFormatter = memoize((currency: Currency, _isMobile: boolean) => {
   return (x: number) =>
     `${currency.symbol}${formatNumber(x, {
-      maximumFractionDigits: isMobile ? currency.significantDigits : currency.maxDigits,
+      // maximumFractionDigits: isMobile ? currency.significantDigits : currency.maxDigits,
+      maximumFractionDigits: currency.significantDigits,
       minimumFractionDigits: currency.significantDigits,
     })}`.replace(`${currency.symbol}-`, `-${currency.symbol}`)
 })
