@@ -7,7 +7,7 @@ import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
 import { $quoteCurrency } from "src/stores/device-settings-store"
 import { closeSubscription } from "src/utils/browser-utils"
-import { aggregateByWeek, createValueFormatter } from "src/utils/chart-utils"
+import { aggregateCandles, createValueFormatter } from "src/utils/chart-utils"
 
 import { QueryChartData, SingleSeriesChart, TooltipOpts } from "../../components/SingleSeriesChart"
 import { $rpc } from "../../workers/remotes"
@@ -34,7 +34,7 @@ function NetworthChartBase() {
     async (interval) => {
       const _refresh = refresh // reference the dependency for eslint(react-hooks/exhaustive-deps)
       const networth = await rpc.getNetworth(activeAccount)
-      return interval === "1w" ? aggregateByWeek(networth) : networth
+      return aggregateCandles(networth, interval)
     },
     [rpc, activeAccount, refresh]
   )

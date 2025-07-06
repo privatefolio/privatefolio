@@ -5,7 +5,7 @@ import {
   isUTCTimestamp,
   Time,
 } from "lightweight-charts"
-import { ChartData } from "src/interfaces"
+import { ChartData, ResolutionString } from "src/interfaces"
 import { Currency } from "src/stores/device-settings-store"
 
 import { TooltipPrimitiveOptions } from "../lightweight-charts/plugins/tooltip/tooltip"
@@ -126,7 +126,7 @@ export function extractTooltipColors(theme: Theme): Partial<TooltipPrimitiveOpti
   }
 }
 
-export function aggregateByWeek(data: ChartData[]): ChartData[] {
+function aggregateByWeeks(data: ChartData[]): ChartData[] {
   const aggregatedData: ChartData[] = []
   let previousWeekClose: number | undefined
 
@@ -178,6 +178,104 @@ export function aggregateByWeek(data: ChartData[]): ChartData[] {
   }
 
   return aggregatedData
+}
+
+function aggregateByDays(data: ChartData[], interval: ResolutionString): ChartData[] {
+  const days = parseInt(interval, 10)
+  if (!Number.isFinite(days) || days <= 0) {
+    throw new Error(`Invalid aggregation period: ${String(interval)}`)
+  }
+
+  const aggregatedData: ChartData[] = []
+  let previousPeriodClose: number | undefined
+
+  const SECONDS_PER_DAY = 24 * 60 * 60
+  const periodSeconds = days * SECONDS_PER_DAY
+
+  // Group datapoints in buckets keyed by period start timestamp (UTC, in seconds)
+  const periodMap = new Map<number, ChartData[]>()
+
+  for (const d of data) {
+    const bucketStart = Math.floor(d.time / periodSeconds) * periodSeconds
+    if (!periodMap.has(bucketStart)) {
+      periodMap.set(bucketStart, [])
+    }
+    periodMap.get(bucketStart)!.push(d)
+  }
+
+  const sortedKeys = Array.from(periodMap.keys()).sort((a, b) => a - b)
+
+  for (const bucketStart of sortedKeys) {
+    const bucket = periodMap.get(bucketStart)!
+    // Ensure chronological order to compute open/close
+    bucket.sort((a, b) => a.time - b.time)
+
+    const close = bucket[bucket.length - 1]!.value
+    const low = Math.min(...bucket.map((d) => d.value))
+    const high = Math.max(...bucket.map((d) => d.value))
+    const open = previousPeriodClose !== undefined ? previousPeriodClose : bucket[0]!.value
+
+    const candle: ChartData = {
+      close,
+      high,
+      low,
+      open,
+      time: bucketStart,
+      value: close,
+    }
+
+    aggregatedData.push(candle)
+    previousPeriodClose = close
+  }
+
+  return aggregatedData
+}
+
+function aggregateByMonths(data: ChartData[], interval: ResolutionString): ChartData[] {
+  const months = parseInt(interval, 10)
+  if (!Number.isFinite(months) || months <= 0) {
+    throw new Error(`Invalid aggregation period: ${String(interval)}`)
+  }
+
+  const buckets = new Map<number, ChartData[]>()
+
+  for (const d of data) {
+    const date = new Date(d.time * 1000) // seconds → Date
+    const monthIndex = date.getUTCFullYear() * 12 + date.getUTCMonth()
+    const groupIndex = Math.floor(monthIndex / months)
+
+    const startMonthIndex = groupIndex * months
+    const startYear = Math.floor(startMonthIndex / 12)
+    const startMonth = startMonthIndex % 12
+    const bucketStart = Date.UTC(startYear, startMonth, 1, 0, 0, 0) / 1000 // seconds
+
+    if (!buckets.has(bucketStart)) buckets.set(bucketStart, [])
+    buckets.get(bucketStart)!.push(d)
+  }
+
+  const out: ChartData[] = []
+  let prevClose: number | undefined
+
+  for (const t of [...buckets.keys()].sort((a, b) => a - b)) {
+    const bucket = buckets.get(t)!.sort((a, b) => a.time - b.time)
+
+    const close = bucket[bucket.length - 1]!.value
+    const low = Math.min(...bucket.map((d) => d.value))
+    const high = Math.max(...bucket.map((d) => d.value))
+    const open = prevClose ?? bucket[0]!.value
+
+    out.push({ close, high, low, open, time: t, value: close })
+    prevClose = close
+  }
+
+  return out
+}
+
+export function aggregateCandles(data: ChartData[], interval: ResolutionString): ChartData[] {
+  if (interval === "1d") return data
+  if (interval.includes("w")) return aggregateByWeeks(data)
+  if (interval.includes("m")) return aggregateByMonths(data, interval)
+  return aggregateByDays(data, interval)
 }
 
 export function getDate(time: Time): Date {

@@ -1,6 +1,8 @@
+import { alpha } from "@mui/material"
 import { atom } from "nanostores"
 
 import { logAtoms } from "./browser-utils"
+import { lossColor as redColor, neutralColor, profitColor as greenColor } from "./chart-utils"
 import { memoize, pipe } from "./fp-utils"
 
 const toCharArray = (text: string) => text.split("")
@@ -34,4 +36,13 @@ export const stringToNumber = memoize(
   )
 )
 
-export { profitColor as greenColor, lossColor as redColor } from "./chart-utils"
+export { greenColor, redColor }
+
+export const getHistogramColor = (value: number) => {
+  if (value > 0) {
+    return alpha(greenColor, 0.5)
+  } else if (value < 0) {
+    return alpha(redColor, 0.5)
+  }
+  return alpha(neutralColor, 0.5)
+}

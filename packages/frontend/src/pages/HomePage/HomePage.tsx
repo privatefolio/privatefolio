@@ -20,7 +20,7 @@ export default function HomePage() {
         <Tabs value={tab} defaultValue={tab} largeSize>
           <NavTab value="networth" to="?tab=networth" label="Net worth" />
           <NavTab value="breakdown" to="?tab=breakdown" label="Breakdown" />
-          <NavTab value="pnl" to="?tab=pnl" label="Profit & loss" />
+          <NavTab value="pnl" to="?tab=pnl" label="Profits" />
           <NavTab value="deposits" to="?tab=deposits" label="Deposits" />
         </Tabs>
         <NetworthActions />

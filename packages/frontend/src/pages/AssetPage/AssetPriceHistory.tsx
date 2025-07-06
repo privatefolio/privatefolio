@@ -13,7 +13,7 @@ import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
 import { $quoteCurrency } from "src/stores/device-settings-store"
 import { closeSubscription } from "src/utils/browser-utils"
-import { aggregateByWeek, createPriceFormatter } from "src/utils/chart-utils"
+import { aggregateCandles, createPriceFormatter } from "src/utils/chart-utils"
 import { resolveUrl } from "src/utils/utils"
 
 import { QueryChartData, SingleSeriesChart, TooltipOpts } from "../../components/SingleSeriesChart"
@@ -71,7 +71,7 @@ export function AssetPriceHistory(props: AssetPriceHistoryProps) {
         ? await rpc.getPricesForAsset(activeAccount, asset.id)
         : await getLivePricesForAsset(asset.id, priceApiId || defaultPriceApiId)
 
-      return interval === "1w" ? aggregateByWeek(prices) : prices
+      return aggregateCandles(prices, interval)
     },
     [rpc, activeAccount, asset, priceApiId, refresh]
   )

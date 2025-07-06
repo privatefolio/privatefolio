@@ -1,5 +1,7 @@
 import { persistentAtom, persistentMap } from "@nanostores/persistent"
+import { SeriesType } from "lightweight-charts"
 import { computed } from "nanostores"
+import { ResolutionString } from "src/interfaces"
 import { DEFAULT_SETTINGS } from "src/settings"
 
 import { $activeAccount } from "./account-store"
@@ -108,3 +110,6 @@ export const $assistantModel = persistentAtom<string>(
   "privatefolio-assistant-model",
   DEFAULT_SETTINGS.assistantModel
 )
+
+export const $preferredInterval = persistentAtom<ResolutionString>("3d" as ResolutionString)
+export const $preferredType = persistentAtom<SeriesType>("Candlestick")

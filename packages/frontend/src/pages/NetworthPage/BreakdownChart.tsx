@@ -1,9 +1,13 @@
 import { Stack, useMediaQuery } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useCallback, useEffect, useMemo } from "react"
-import { QueryChartData, SingleSeriesChart, TooltipOpts } from "src/components/SingleSeriesChart"
+import {
+  QueryChartData,
+  SeriesOpts,
+  SingleSeriesChart,
+  TooltipOpts,
+} from "src/components/SingleSeriesChart"
 import { WorkInProgressCallout } from "src/components/WorkInProgressCallout"
-import { StackedAreaSeriesOptions } from "src/lightweight-charts/plugins/stacked-area-series/options"
 import { $activeAccount } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
 import { $quoteCurrency } from "src/stores/device-settings-store"
@@ -54,9 +58,11 @@ export function BreakdownChart() {
     [currency, debugMode, isMobile]
   )
 
-  const seriesOptions: Partial<StackedAreaSeriesOptions> = useMemo(
+  const seriesOptions: SeriesOpts = useMemo(
     () => ({
-      lineWidth: 1,
+      StackedArea: {
+        lineWidth: 1,
+      },
     }),
     []
   )

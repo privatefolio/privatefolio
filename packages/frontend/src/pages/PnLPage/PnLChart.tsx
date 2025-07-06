@@ -8,13 +8,7 @@ import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
 import { $quoteCurrency } from "src/stores/device-settings-store"
 import { closeSubscription } from "src/utils/browser-utils"
-import {
-  aggregateByWeek,
-  createValueFormatter,
-  lossColor,
-  neutralColor,
-  profitColor,
-} from "src/utils/chart-utils"
+import { aggregateCandles, createValueFormatter } from "src/utils/chart-utils"
 
 import { QueryChartData, SingleSeriesChart, TooltipOpts } from "../../components/SingleSeriesChart"
 import { $rpc } from "../../workers/remotes"
@@ -46,7 +40,6 @@ export function PnLChart({ trade }: { trade?: Trade }) {
         values = pnlData.map((pnl) => {
           const pnlValue = Number(pnl.pnl)
           return {
-            color: pnlValue === 0 ? neutralColor : pnlValue > 0 ? profitColor : lossColor,
             time: (pnl.timestamp / 1000) as Time,
             value: pnlValue,
           }
@@ -56,7 +49,6 @@ export function PnLChart({ trade }: { trade?: Trade }) {
         values = pnlData.map((pnl) => {
           const pnlValue = Number(pnl.pnl)
           return {
-            color: pnlValue === 0 ? neutralColor : pnlValue > 0 ? profitColor : lossColor,
             time: (pnl.timestamp / 1000) as Time,
             value: pnlValue,
           }
@@ -65,11 +57,8 @@ export function PnLChart({ trade }: { trade?: Trade }) {
 
       let result: ChartData[]
 
-      if (interval === "1w") {
-        result = aggregateByWeek(values).map((x) => ({
-          ...x,
-          color: x.value === 0 ? neutralColor : x.value > 0 ? profitColor : lossColor,
-        }))
+      if (interval !== "1d") {
+        result = aggregateCandles(values, interval)
       } else {
         result = values
       }
@@ -112,7 +101,7 @@ export function PnLChart({ trade }: { trade?: Trade }) {
       queryFn={queryFn}
       tooltipOptions={tooltipOptions}
       chartOptions={chartOptions}
-      initType="Baseline"
+      // initType="Baseline"
     />
   )
 }

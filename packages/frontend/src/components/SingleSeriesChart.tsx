@@ -11,6 +11,7 @@ import {
   Button,
   Chip,
   Divider,
+  Fade,
   IconButton,
   IconButtonProps,
   Paper,
@@ -31,27 +32,33 @@ import {
   IChartApi,
   ISeriesApi,
   MouseEventParams,
-  SeriesOptionsCommon,
+  SeriesPartialOptionsMap,
   SeriesType,
   Time as LcTime,
 } from "lightweight-charts"
 import { merge } from "lodash-es"
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { StackedAreaData as LcStackedAreaData } from "src/lightweight-charts/plugins/stacked-area-series/data"
+import {
+  defaultOptions as stackedAreaDefaultOpts,
+  StackedAreaSeriesOptions,
+} from "src/lightweight-charts/plugins/stacked-area-series/options"
 import { StackedAreaSeries } from "src/lightweight-charts/plugins/stacked-area-series/stacked-area-series"
 import { StackedTooltipPrimitive } from "src/lightweight-charts/plugins/stacked-tooltip/stacked-tooltip"
+import { $preferredInterval } from "src/stores/device-settings-store"
 import { $inspectTime } from "src/stores/pages/balances-store"
 import { isInputFocused } from "src/utils/browser-utils"
 import { noop } from "src/utils/utils"
 
 import { useBoolean } from "../hooks/useBoolean"
 import { ChartData, ResolutionString, StackedAreaData } from "../interfaces"
+import { CandleTooltipPrimitive } from "../lightweight-charts/plugins/candle-tooltip/candle-tooltip"
 import { DeltaTooltipPrimitive } from "../lightweight-charts/plugins/delta-tooltip/delta-tooltip"
 import {
   TooltipPrimitive,
   TooltipPrimitiveOptions,
 } from "../lightweight-charts/plugins/tooltip/tooltip"
-import { $favoriteIntervals, $preferredInterval, INTERVAL_LABEL_MAP } from "../stores/chart-store"
+import { $favoriteIntervals, INTERVAL_LABEL_MAP, supportedIntervals } from "../stores/chart-store"
 import {
   candleStickOptions,
   extractTooltipColors,
@@ -83,6 +90,10 @@ export type TooltipOpts = Partial<Omit<TooltipPrimitiveOptions, "priceExtractor"
 
 export type CursorMode = "move" | "inspect" | "measure"
 
+export type SeriesOpts = DeepPartial<SeriesPartialOptionsMap> & {
+  StackedArea?: Partial<StackedAreaSeriesOptions>
+}
+
 export interface SingleSeriesChartProps extends Omit<Partial<ChartProps>, "chartRef"> {
   allowedCursorModes?: CursorMode[]
   emptyContent?: ReactNode
@@ -94,22 +105,57 @@ export interface SingleSeriesChartProps extends Omit<Partial<ChartProps>, "chart
   isStackedArea?: boolean
   onSeriesReady?: (chart: IChartApi, series: ISeriesApi<SeriesType>) => void
   queryFn: QueryChartData
-  seriesOptions?: DeepPartial<SeriesOptionsCommon>
+  seriesOptions?: SeriesOpts
   showToolbarAlways?: boolean
   size?: "small" | "medium" | "large"
   tooltipOptions?: TooltipOpts
 }
 
-const DEFAULT_OPTS = {}
-
 export function SingleSeriesChart(props: SingleSeriesChartProps) {
+  const theme = useTheme()
+  const color = theme.palette.accent.main
+  const darkMode = theme.palette.mode === "dark"
+
+  const defaultSeriesOptions: SeriesOpts = useMemo(
+    () => ({
+      Area: {
+        bottomColor: alpha(color, 0),
+        lineColor: color,
+        lineWidth: 1,
+        priceLineVisible: false,
+        topColor: alpha(color, darkMode ? 0.25 : 0.5),
+      },
+      Baseline: {
+        baseLineColor: neutralColor,
+        bottomFillColor1: alpha(lossColor, 0),
+        bottomFillColor2: alpha(lossColor, 0.5),
+        bottomLineColor: lossColor,
+        lineWidth: 1,
+        priceLineVisible: false,
+        topFillColor1: alpha(profitColor, 0.5),
+        topFillColor2: alpha(profitColor, 0),
+        topLineColor: profitColor,
+      },
+      Candlestick: {
+        ...candleStickOptions,
+        priceLineVisible: false,
+      },
+      Histogram: {
+        color: alpha(profitColor, 0.5),
+        priceLineVisible: false,
+      },
+      StackedArea: stackedAreaDefaultOpts,
+    }),
+    [color, darkMode]
+  )
+
   const {
     allowedCursorModes = ["move", "inspect", "measure"],
     queryFn,
     initType = "Candlestick",
     size = "large",
-    seriesOptions = DEFAULT_OPTS as DeepPartial<SeriesOptionsCommon>,
-    tooltipOptions = DEFAULT_OPTS as TooltipOpts,
+    seriesOptions = defaultSeriesOptions,
+    tooltipOptions = {},
     emptyContent = <NoDataButton />,
     isStackedArea,
     onSeriesReady = noop,
@@ -160,8 +206,6 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
     allowedCursorModes.length > 0 ? allowedCursorModes[0] : "move"
   )
 
-  const theme = useTheme()
-
   const plotSeries = useCallback(
     (data: ChartData[] | StackedAreaData[]) => {
       if (!chartRef.current || data.length <= 0) {
@@ -174,57 +218,34 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
         } catch {}
       }
 
+      const opts = merge({}, defaultSeriesOptions, seriesOptions)
+
       const isStackedData = "values" in data[0]
 
       if (isStackedData) {
         const customSeriesView = new StackedAreaSeries<LcStackedAreaData>()
-        const customSeries = chartRef.current.addCustomSeries(customSeriesView, {
-          priceLineVisible: false,
-          ...seriesOptions,
-        })
+        const customSeries = chartRef.current.addCustomSeries(customSeriesView, opts.StackedArea)
 
         customSeries.setData(data as LcStackedAreaData[])
         seriesRef.current = customSeries
       } else {
         if (activeType === "Candlestick") {
-          seriesRef.current = chartRef.current.addSeries(CandlestickSeries, {
-            ...candleStickOptions,
-            priceLineVisible: false,
-            ...seriesOptions,
-          })
+          seriesRef.current = chartRef.current.addSeries(CandlestickSeries, opts.Candlestick)
         } else if (activeType === "Histogram") {
-          seriesRef.current = chartRef.current.addSeries(HistogramSeries, {
-            color: alpha(profitColor, 0.5),
-            priceLineVisible: false,
-            ...seriesOptions,
-          })
+          seriesRef.current = chartRef.current.addSeries(HistogramSeries, opts.Histogram)
         } else if (activeType === "Baseline") {
-          seriesRef.current = chartRef.current.addSeries(BaselineSeries, {
-            baseLineColor: neutralColor,
-            // baseValue: { price: 0, type: "price" },
-            bottomFillColor1: alpha(lossColor, 0),
-            bottomFillColor2: alpha(lossColor, 0.5),
-            bottomLineColor: lossColor,
-            lineWidth: 1,
-            priceLineVisible: false,
-            topFillColor1: alpha(profitColor, 1),
-            topFillColor2: alpha(profitColor, 0),
-            topLineColor: profitColor,
-            ...seriesOptions,
-          })
+          seriesRef.current = chartRef.current.addSeries(BaselineSeries, opts.Baseline)
         } else {
-          seriesRef.current = chartRef.current.addSeries(AreaSeries, {
-            bottomColor: alpha(profitColor, 0),
-            lineColor: profitColor,
-            // lineType: 2,
-            lineWidth: 1,
-            priceLineVisible: false,
-            topColor: alpha(profitColor, 1),
-            ...seriesOptions,
-          })
+          seriesRef.current = chartRef.current.addSeries(AreaSeries, opts.Area)
         }
         try {
-          seriesRef.current.setData(data as ChartData[] as never)
+          let seriesData = data as ChartData[]
+
+          if (activeType === "Histogram") {
+            seriesData = data as ChartData[]
+          }
+
+          seriesRef.current.setData(seriesData as never)
         } catch (error) {
           console.error(error)
           setError(error as Error)
@@ -237,7 +258,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
         setSeriesReady(true)
       }, 0)
     },
-    [activeType, seriesOptions, onSeriesReady]
+    [defaultSeriesOptions, seriesOptions, onSeriesReady, activeType]
   )
 
   useEffect(() => {
@@ -268,6 +289,14 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
         tooltipOptions
       )
     )
+    const candleTooltip = new CandleTooltipPrimitive(
+      merge(
+        {
+          tooltip: extractTooltipColors(theme),
+        },
+        tooltipOptions
+      )
+    )
     const deltaTooltip = new DeltaTooltipPrimitive(
       merge(
         {
@@ -289,6 +318,8 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
       seriesRef.current.attachPrimitive(stackedTooltip)
     } else if (cursorMode === "measure") {
       seriesRef.current.attachPrimitive(deltaTooltip)
+    } else if (activeType === "Candlestick") {
+      seriesRef.current.attachPrimitive(candleTooltip)
     } else {
       seriesRef.current.attachPrimitive(regularTooltip)
     }
@@ -317,7 +348,11 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
           handleScale: false,
           handleScroll: false,
         })
-        seriesRef.current?.detachPrimitive(regularTooltip)
+        if (activeType === "Candlestick") {
+          seriesRef.current?.detachPrimitive(candleTooltip)
+        } else {
+          seriesRef.current?.detachPrimitive(regularTooltip)
+        }
         seriesRef.current?.attachPrimitive(deltaTooltip)
         setCursorMode("measure")
       } else if (event.key === "Control" && allowedCursorModes.includes("inspect")) {
@@ -340,7 +375,11 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
             handleScroll: true,
           })
           seriesRef.current?.detachPrimitive(deltaTooltip)
-          seriesRef.current?.attachPrimitive(regularTooltip)
+          if (activeType === "Candlestick") {
+            seriesRef.current?.attachPrimitive(candleTooltip)
+          } else {
+            seriesRef.current?.attachPrimitive(regularTooltip)
+          }
           setCursorMode("move")
         } else if (allowedCursorModes.length > 0) {
           setCursorMode(allowedCursorModes[0])
@@ -365,10 +404,19 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
     return () => {
       seriesRef.current?.detachPrimitive(deltaTooltip)
       seriesRef.current?.detachPrimitive(regularTooltip)
+      seriesRef.current?.detachPrimitive(candleTooltip)
       document.removeEventListener("keydown", handleKeydown)
       document.removeEventListener("keyup", handleKeyup)
     }
-  }, [cursorMode, seriesReady, tooltipOptions, theme, allowedCursorModes, isStackedArea])
+  }, [
+    cursorMode,
+    seriesReady,
+    tooltipOptions,
+    theme,
+    allowedCursorModes,
+    isStackedArea,
+    activeType,
+  ])
 
   useEffect(() => {
     plotSeries(data)
@@ -410,6 +458,15 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
 
   const isEmpty = data.length === 0
 
+  const [showLoading, setShowLoading] = useState(false)
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setShowLoading(true)
+    }, 250)
+    return () => clearTimeout(timeout)
+  }, [])
+
   return (
     <>
       {/* {isLoading ? (
@@ -448,13 +505,13 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
             borderBottom: "1px solid var(--mui-palette-TableCell-border)",
             marginLeft: -0.5,
             minHeight: 43,
-            ...((isFirstLoad || isEmpty) && !showToolbarAlways
-              ? {
-                  borderColor: "transparent",
-                  opacity: 0,
-                  pointerEvents: "none",
-                }
-              : {}),
+            // ...((isFirstLoad || isEmpty) && !showToolbarAlways
+            //   ? {
+            //       borderColor: "transparent",
+            //       opacity: 0,
+            //       pointerEvents: "none",
+            //     }
+            //   : {}),
           }}
           alignItems="center"
           justifyContent="space-between"
@@ -545,7 +602,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
                   title={
                     <>
                       Switch interval to {INTERVAL_LABEL_MAP[interval]}
-                      {!["1d", "1w"].includes(interval) && (
+                      {!supportedIntervals.includes(interval) && (
                         <Chip
                           size="small"
                           color="primary"
@@ -560,7 +617,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
                     <Button
                       size="small"
                       sx={{ borderRadius: 0.5, paddingX: 1 }}
-                      disabled={!["1d", "1w"].includes(interval)}
+                      disabled={!supportedIntervals.includes(interval)}
                       // disabled={timeframes ? !timeframes.includes(interval as Timeframe) : false}
                       // className={timeframe === interval ? "active" : undefined}
                       title={interval}
@@ -570,7 +627,11 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
                         $preferredInterval.set(interval)
                       }}
                     >
-                      {interval.replace("1d", "D").replace("1w", "W")}
+                      {interval
+                        .replace("1d", "D")
+                        .replace("1w", "W")
+                        .replace("3d", "3D")
+                        .replace("1m", "M")}
                     </Button>
                   </span>
                 </Tooltip>
@@ -668,7 +729,13 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
               sx={{ height: "100%", width: "100%" }}
             >
               {isEmpty && !isLoading && !error && emptyContent}
-              {isLoading && <CircularSpinner color="secondary" />}
+              {isLoading && (
+                <Fade in={showLoading}>
+                  <div>
+                    <CircularSpinner color="secondary" />
+                  </div>
+                </Fade>
+              )}
               {error && (
                 <Stack spacing={1} alignItems="center">
                   <Typography>Error loading data</Typography>
@@ -706,7 +773,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
             bottom: 4,
             position: "absolute",
             width: "100%",
-            zIndex: 1,
+            zIndex: 2,
             ...(isLoading || isEmpty || error
               ? {
                   borderColor: "transparent",

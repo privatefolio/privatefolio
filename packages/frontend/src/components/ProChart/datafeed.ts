@@ -6,7 +6,7 @@ import {
   SUPPORTED_RESOLUTIONS,
 } from "privatefolio-backend/src/settings/price-apis"
 import { ChartData } from "src/interfaces"
-import { aggregateByWeek } from "src/utils/chart-utils"
+import { aggregateCandles } from "src/utils/chart-utils"
 
 import { $activeAccount } from "../../stores/account-store"
 import { $rpc } from "../../workers/remotes"
@@ -61,7 +61,7 @@ export const datafeed: IBasicDataFeed = {
           onError(`Unknown privatefolio symbol ${id}`)
           return
         }
-        const data = resolution === "1W" ? aggregateByWeek(chartData) : chartData
+        const data = aggregateCandles(chartData, resolution)
         const bars = data.map(mapChartDataToBars)
         onResult(bars, { noData: false })
         return

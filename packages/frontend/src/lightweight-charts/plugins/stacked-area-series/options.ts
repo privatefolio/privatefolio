@@ -35,4 +35,5 @@ export const defaultOptions: StackedAreaSeriesOptions = {
     { area: "rgba(84, 110, 122, 0.2)", line: "rgb(84, 110, 122)" },
   ],
   lineWidth: 2,
+  priceLineVisible: false,
 } as const

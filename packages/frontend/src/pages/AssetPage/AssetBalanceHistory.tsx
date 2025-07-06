@@ -6,7 +6,7 @@ import { $activeAccount } from "src/stores/account-store"
 import { $quoteCurrency, $showQuotedAmounts } from "src/stores/device-settings-store"
 import { getAssetTicker } from "src/utils/assets-utils"
 import {
-  aggregateByWeek,
+  aggregateCandles,
   createNativeAmountFormatter,
   createValueFormatter,
   neutralColor,
@@ -99,7 +99,7 @@ export function AssetBalanceHistory(props: AssetBalanceHistoryProps) {
         records = records.slice(firstNonZeroIndex - 1)
       }
 
-      return interval === "1w" ? aggregateByWeek(records) : records
+      return aggregateCandles(records, interval)
     },
     [rpc, activeAccount, assetId, start, end, showQuotedAmounts]
   )

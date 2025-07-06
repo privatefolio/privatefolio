@@ -237,7 +237,7 @@ export function AssetDetails(props: AssetDetailsProps) {
                 return (
                   <TableRow key={coingeckoId}>
                     <TableCell>
-                      <PlatformBlock id={platformId} size="small" />
+                      <PlatformBlock id={platformId} size="small" showSupported />
                     </TableCell>
                     <TableCell>
                       <IdentifierBlock

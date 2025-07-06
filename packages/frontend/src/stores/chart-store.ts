@@ -1,25 +1,32 @@
-import { SeriesType } from "lightweight-charts"
 import { atom } from "nanostores"
 
 import { ResolutionString } from "../interfaces"
 
+export const supportedIntervals: ResolutionString[] = [
+  "1d" as ResolutionString,
+  "3d" as ResolutionString,
+  "1w" as ResolutionString,
+  "1m" as ResolutionString,
+]
+
 export const $favoriteIntervals = atom<ResolutionString[]>([
   // "1s" as ResolutionString,
-  "1m" as ResolutionString,
+  // "1m" as ResolutionString,
   "1h" as ResolutionString,
   "1d" as ResolutionString,
+  "3d" as ResolutionString,
   "1w" as ResolutionString,
+  "1m" as ResolutionString,
 ])
 
 export const INTERVAL_LABEL_MAP: Record<ResolutionString, string> = {
   ["1d" as ResolutionString]: "1 day",
+  ["3d" as ResolutionString]: "3 days",
   ["1h" as ResolutionString]: "1 hour",
   ["1m" as ResolutionString]: "1 minute",
   ["1w" as ResolutionString]: "1 week",
+  ["1m" as ResolutionString]: "1 month",
 }
-
-export const $preferredInterval = atom<ResolutionString>("1d" as ResolutionString)
-export const $preferredType = atom<SeriesType>("Candlestick")
 
 export const TIME_FRAMES = [
   {

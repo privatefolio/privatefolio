@@ -137,7 +137,7 @@ export default function TradePage() {
         <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
           <Tabs value={tab} defaultValue={tab}>
             <NavTab value="details" to={`?tab=details`} label="Details" />
-            <NavTab value="pnl" to="?tab=pnl" label="Profit & loss" />
+            <NavTab value="pnl" to="?tab=pnl" label="Profits" />
             <NavTab value="exposure" to={`?tab=exposure`} label="Exposure" />
             <NavTab value="price-history" to={`?tab=price-history`} label="Price history" />
             <NavTab value="transactions" to={`?tab=transactions`} label="Transactions" />

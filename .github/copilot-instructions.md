@@ -10,7 +10,6 @@ Always read these files:
 - [DESIGN.md](/docs/DESIGN.md)
 - [DATABASE_TIPS.md](/docs/DATABASE_TIPS.md)
 - [ELECTRON_SETUP.md](/docs/ELECTRON_SETUP.md)
-Always write tests for new code and ensure all tests pass.
 Don't forget this is a monorepo. Use `lerna run --scope [project-name]` to run commands.
 If I ever write "ack" reply with "ack".
 Never run the `dev` script.

@@ -16,7 +16,7 @@ export function PnLPage() {
   const inspectTime = useStore($inspectTime)
 
   useEffect(() => {
-    document.title = `Profit & loss - ${activeAccount} - Privatefolio`
+    document.title = `Profits - ${activeAccount} - Privatefolio`
   }, [activeAccount])
 
   return (
