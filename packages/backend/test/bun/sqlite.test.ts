@@ -198,7 +198,7 @@ describe("0xf98 file import", () => {
     let account = await getAccount(accountName)
     await sleep(100) // wait for the init_db task to be created
     let sqliteSequence = await account.execute(`SELECT * FROM sqlite_sequence`)
-    expect(sqliteSequence).toEqual([["server_tasks", 4]])
+    expect(sqliteSequence).toEqual([["server_tasks", 1]])
     // act
     await resetAccount(accountName)
     // assert
@@ -213,6 +213,6 @@ describe("0xf98 file import", () => {
       trigger: "user",
     })
     sqliteSequence = await account.execute(`SELECT * FROM sqlite_sequence`)
-    expect(sqliteSequence).toEqual([["server_tasks", 4]])
+    expect(sqliteSequence).toEqual([["server_tasks", 1]])
   })
 })
