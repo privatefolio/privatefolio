@@ -53,11 +53,11 @@ export type PerplexityModelId =
   | "r1-1776"
 
 export type AnthropicModelId =
+  | "claude-4-opus-20250514"
+  | "claude-4-sonnet-20250514"
+  | "claude-3-7-sonnet-20250219"
   | "claude-3-5-sonnet-20241022"
-  | "claude-3-5-sonnet-20240620"
   | "claude-3-5-haiku-20241022"
-  | "claude-3-opus-20240229"
-  | "claude-3-sonnet-20240229"
   | "claude-3-haiku-20240307"
 
 export type ModelId = OpenAIChatModelId | PerplexityModelId | AnthropicModelId
@@ -267,56 +267,74 @@ export const AVAILABLE_MODELS: AssistantModel[] = [
   },
   // Anthropic Models
   {
-    contextWindow: 200000,
-    costPer1kTokens: {
-      input: 0.003,
-      output: 0.015,
-    },
-    description: "Most capable model, great for complex tasks",
-    family: "anthropic",
-    id: "claude-3-5-sonnet-20241022",
-    label: "Claude 3.5 Sonnet",
-  },
-  {
-    contextWindow: 200000,
-    costPer1kTokens: {
-      input: 0.0008,
-      output: 0.004,
-    },
-    description: "Fast and efficient for everyday tasks",
-    family: "anthropic",
-    id: "claude-3-5-haiku-20241022",
-    label: "Claude 3.5 Haiku",
-  },
-  {
+    capabilities: ["tools", "web-search", "reasoning"],
     contextWindow: 200000,
     costPer1kTokens: {
       input: 0.015,
       output: 0.075,
     },
-    description: "Most powerful model for complex reasoning",
+    description: "Most intelligent model for complex tasks",
     family: "anthropic",
-    id: "claude-3-opus-20240229",
-    label: "Claude 3 Opus",
+    id: "claude-4-opus-20250514",
+    label: "Claude 4 Opus",
   },
   {
+    capabilities: ["tools", "web-search", "reasoning"],
     contextWindow: 200000,
     costPer1kTokens: {
       input: 0.003,
       output: 0.015,
     },
-    description: "Balanced performance and cost",
+    description: "Optimal balance of intelligence, cost, and speed",
     family: "anthropic",
-    id: "claude-3-sonnet-20240229",
-    label: "Claude 3 Sonnet",
+    id: "claude-4-sonnet-20250514",
+    label: "Claude 4 Sonnet",
   },
   {
+    capabilities: ["tools", "web-search", "reasoning"],
+    contextWindow: 200000,
+    costPer1kTokens: {
+      input: 0.003,
+      output: 0.015,
+    },
+    description: "Optimal balance of intelligence, cost, and speed",
+    family: "anthropic",
+    id: "claude-3-7-sonnet-20250219",
+    label: "Claude 3.7 Sonnet",
+  },
+  {
+    capabilities: ["tools", "web-search"],
+    contextWindow: 200000,
+    costPer1kTokens: {
+      input: 0.003,
+      output: 0.015,
+    },
+    description: "Optimal balance of intelligence, cost, and speed",
+    family: "anthropic",
+    id: "claude-3-5-sonnet-20241022",
+    label: "Claude 3.5 Sonnet",
+  },
+  {
+    capabilities: ["tools", "web-search"],
+    contextWindow: 200000,
+    costPer1kTokens: {
+      input: 0.0008,
+      output: 0.004,
+    },
+    description: "Fastest, most cost-effective model",
+    family: "anthropic",
+    id: "claude-3-5-haiku-20241022",
+    label: "Claude 3.5 Haiku",
+  },
+
+  {
+    capabilities: ["tools"],
     contextWindow: 200000,
     costPer1kTokens: {
       input: 0.00025,
       output: 0.00125,
     },
-    description: "Fastest Claude model",
+    description: "Fastest, most cost-effective model",
     family: "anthropic",
     id: "claude-3-haiku-20240307",
     label: "Claude 3 Haiku",

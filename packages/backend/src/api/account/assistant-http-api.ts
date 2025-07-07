@@ -203,10 +203,18 @@ export async function handleAssistantChat(
         break
       case "anthropic":
         llmModel = createAnthropic({ apiKey }).languageModel(model.id)
-        providerOptions = {
-          anthropic: {
-            thinking: { budgetTokens: 1200, type: "enabled" },
-          } satisfies AnthropicProviderOptions,
+        if (model.capabilities?.includes("reasoning")) {
+          providerOptions = {
+            anthropic: {
+              thinking: {
+                budgetTokens: 1200,
+                type: "enabled",
+              },
+            } satisfies AnthropicProviderOptions,
+          }
+        }
+        if (model.capabilities?.includes("web-search")) {
+          // https://github.com/vercel/ai/issues/6666#issuecomment-3005289250
         }
         break
       default:
