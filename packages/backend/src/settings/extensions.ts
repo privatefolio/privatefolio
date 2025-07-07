@@ -362,7 +362,7 @@ export const extensions: Extension[] = [
     description: "A calculator for planning your crypto investments based on budget and desired portfolio allocation.",
     extensionLogoUrl: "$STATIC_ASSETS/extensions/investment-planner.svg", // Placeholder icon
     extensionName: "Investment Planner",
-    extensionType: "file-import", //todo  change to tool
+    extensionType: "file-import", // todo  change to tool
     extensionVersion: "1.0.1", 
     githubUrl: "https://github.com/A-SOM/privatefolio",
     id: "investment-planner",
