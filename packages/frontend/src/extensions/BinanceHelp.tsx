@@ -8,6 +8,7 @@ import StepLabel from "@mui/material/StepLabel"
 import Stepper from "@mui/material/Stepper"
 import Typography from "@mui/material/Typography"
 import * as React from "react"
+import { AppLink } from "src/components/AppLink"
 import { ExternalLink } from "src/components/ExternalLink"
 
 const steps = [
@@ -21,11 +22,7 @@ const steps = [
         .
         <br />
         <br />
-        <a
-          href="https://public.bnbstatic.com/image/cms/article/body/202401/66f3d1ab78ec47cd25bc7f1f47681fe0.png"
-          target="_blank"
-          rel="noreferrer"
-        >
+        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202401/66f3d1ab78ec47cd25bc7f1f47681fe0.png">
           <img
             // width="100%" FIXME TODO0 this is to avoid layout jumps
             height={201}
@@ -33,7 +30,7 @@ const steps = [
             src="https://public.bnbstatic.com/image/cms/article/body/202401/66f3d1ab78ec47cd25bc7f1f47681fe0.png"
             alt="Step visualization"
           />
-        </a>
+        </AppLink>
       </>
     ),
     label: "Visit the transaction history page",
@@ -44,11 +41,7 @@ const steps = [
         Mouseover the export icon and click on <u>Export Transaction Records</u>.
         <br />
         <br />
-        <a
-          href="https://public.bnbstatic.com/image/cms/article/body/202401/7f5790d524eeb91156ff2cd2e0f26972.png"
-          target="_blank"
-          rel="noreferrer"
-        >
+        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202401/7f5790d524eeb91156ff2cd2e0f26972.png">
           <img
             height={203}
             width={433}
@@ -56,7 +49,7 @@ const steps = [
             src="https://public.bnbstatic.com/image/cms/article/body/202401/7f5790d524eeb91156ff2cd2e0f26972.png"
             alt="Step visualization"
           />
-        </a>
+        </AppLink>
       </>
     ),
     label: "Open the export pop-up",
@@ -67,18 +60,14 @@ const steps = [
         Select the time range (up to 12 months) and click on <u>Generate</u>.
         <br />
         <br />
-        <a
-          href="https://public.bnbstatic.com/image/cms/article/body/202401/a8d16a3f1114ae1bc62ff84e8affdd07.png"
-          target="_blank"
-          rel="noreferrer"
-        >
+        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202401/a8d16a3f1114ae1bc62ff84e8affdd07.png">
           <img
             height={415}
             width={433}
             src="https://public.bnbstatic.com/image/cms/article/body/202401/a8d16a3f1114ae1bc62ff84e8affdd07.png"
             alt="Step visualization"
           />
-        </a>
+        </AppLink>
       </>
     ),
     label: "Request a new export",
@@ -90,18 +79,14 @@ const steps = [
         reminder.
         <br />
         <br />
-        <a
-          href="https://public.bnbstatic.com/image/cms/article/body/202401/3e36984bc3e1bde5f0fd5cb8db8d1987.png"
-          target="_blank"
-          rel="noreferrer"
-        >
+        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202401/3e36984bc3e1bde5f0fd5cb8db8d1987.png">
           <img
             height={419}
             width={433}
             src="https://public.bnbstatic.com/image/cms/article/body/202401/3e36984bc3e1bde5f0fd5cb8db8d1987.png"
             alt="Step visualization"
           />
-        </a>
+        </AppLink>
       </>
     ),
     label: "Wait for completion",
@@ -113,18 +98,14 @@ const steps = [
         <u>Download</u>.
         <br />
         <br />
-        <a
-          href="https://public.bnbstatic.com/image/cms/article/body/202401/0b6cb437fc9d280c3ddbe4466e7d5069.png"
-          target="_blank"
-          rel="noreferrer"
-        >
+        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202401/0b6cb437fc9d280c3ddbe4466e7d5069.png">
           <img
             height={421}
             width={433}
             src="https://public.bnbstatic.com/image/cms/article/body/202401/0b6cb437fc9d280c3ddbe4466e7d5069.png"
             alt="Step visualization"
           />
-        </a>
+        </AppLink>
       </>
     ),
     label: "Download",

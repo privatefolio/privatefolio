@@ -11,7 +11,7 @@ import {
   TextField,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React, { FormEvent, useCallback, useMemo, useState } from "react"
+import React, { FormEvent, useCallback, useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { $cloudAccounts, $localAccounts } from "src/stores/account-store"
 import { $cloudAvailable } from "src/stores/cloud-user-store"
@@ -40,6 +40,13 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
   const [accountType, setAccountType] = useState<"local" | "cloud">(
     localServerEnabled ? "local" : "cloud"
   )
+
+  useEffect(() => {
+    if (!open) {
+      setName("")
+      setError("")
+    }
+  }, [open])
 
   const handleSubmit = useCallback(
     async (event: FormEvent) => {

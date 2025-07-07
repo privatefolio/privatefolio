@@ -8,6 +8,7 @@ import StepLabel from "@mui/material/StepLabel"
 import Stepper from "@mui/material/Stepper"
 import Typography from "@mui/material/Typography"
 import * as React from "react"
+import { AppLink } from "src/components/AppLink"
 import { ExternalLink } from "src/components/ExternalLink"
 import { resolveUrl } from "src/utils/utils"
 
@@ -19,18 +20,14 @@ const steps = [
         <ExternalLink href="https://etherscan.io/exportData">CSV Export</ExternalLink>.
         <br />
         <br />
-        <a
-          href={resolveUrl("$STATIC_ASSETS/help/etherscan/step1.png")}
-          target="_blank"
-          rel="noreferrer"
-        >
+        <AppLink href={resolveUrl("$STATIC_ASSETS/help/etherscan/step1.png")}>
           <img
             height={217}
             width={433}
             src={resolveUrl("$STATIC_ASSETS/help/etherscan/step1.png")}
             alt="Step visualization"
           />
-        </a>
+        </AppLink>
       </>
     ),
     label: "Visit the csv export page",
@@ -42,18 +39,14 @@ const steps = [
         .
         <br />
         <br />
-        <a
-          href={resolveUrl("$STATIC_ASSETS/help/etherscan/step2.png")}
-          target="_blank"
-          rel="noreferrer"
-        >
+        <AppLink href={resolveUrl("$STATIC_ASSETS/help/etherscan/step2.png")}>
           <img
             height={249}
             width={433}
             src={resolveUrl("$STATIC_ASSETS/help/etherscan/step2.png")}
             alt="Step visualization"
           />
-        </a>
+        </AppLink>
       </>
     ),
     label: "Export normal transactions",
@@ -66,18 +59,14 @@ const steps = [
         .
         <br />
         <br />
-        <a
-          href={resolveUrl("$STATIC_ASSETS/help/etherscan/step3.png")}
-          target="_blank"
-          rel="noreferrer"
-        >
+        <AppLink href={resolveUrl("$STATIC_ASSETS/help/etherscan/step3.png")}>
           <img
             height={249}
             width={433}
             src={resolveUrl("$STATIC_ASSETS/help/etherscan/step3.png")}
             alt="Step visualization"
           />
-        </a>
+        </AppLink>
       </>
     ),
     label: "Export internal transactions",
@@ -90,18 +79,14 @@ const steps = [
         .
         <br />
         <br />
-        <a
-          href={resolveUrl("$STATIC_ASSETS/help/etherscan/step4.png")}
-          target="_blank"
-          rel="noreferrer"
-        >
+        <AppLink href={resolveUrl("$STATIC_ASSETS/help/etherscan/step4.png")}>
           <img
             height={249}
             width={433}
             src={resolveUrl("$STATIC_ASSETS/help/etherscan/step4.png")}
             alt="Step visualization"
           />
-        </a>
+        </AppLink>
       </>
     ),
     label: "Export ERC20 transactions",

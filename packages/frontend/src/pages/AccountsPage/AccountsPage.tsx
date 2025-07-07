@@ -17,6 +17,7 @@ import React, { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import { AccountAvatar, SIZE_MAP } from "src/components/AccountAvatar"
 import { AddAccountDialog } from "src/components/AccountPicker/AddAccountDialog"
+import { AppLink } from "src/components/AppLink"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { Gravatar } from "src/components/Gravatar"
 import { LogoText } from "src/components/Header/LogoText"
@@ -100,7 +101,7 @@ export default function AccountsPage() {
         position="fixed"
         elevation={0}
         sx={{
-          "& button": {
+          "& button, & .MuiInputBase-root, & a": {
             WebkitAppRegion: "no-drag",
           },
           WebkitAppRegion: "drag",
@@ -125,15 +126,15 @@ export default function AccountsPage() {
                 gap={1}
                 sx={{
                   height: "100%",
-
                   width: "100%",
                 }}
               >
                 <Button
                   size="small"
+                  color="secondary"
                   variant="text"
                   href="https://privatefolio.xyz"
-                  target="_blank"
+                  component={AppLink}
                   sx={{ marginX: -2, paddingX: 2 }}
                 >
                   <LogoText />
@@ -193,7 +194,7 @@ export default function AccountsPage() {
           position: "fixed",
           top: 0,
           width: "100%",
-          zIndex: 1000,
+          // zIndex: 1000,
         }}
         alignItems="center"
         justifyContent="center"
@@ -220,7 +221,7 @@ export default function AccountsPage() {
                 size="large"
                 variant="contained"
                 href="https://privatefolio.xyz/downloads"
-                target="_blank"
+                component={AppLink}
                 endIcon={<OpenInNewRounded sx={{ fontSize: "1rem !important" }} />}
                 sx={{
                   paddingY: 0.25,

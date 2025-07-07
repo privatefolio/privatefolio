@@ -10,6 +10,7 @@ import {
   Typography,
 } from "@mui/material"
 import * as React from "react"
+import { AppLink } from "src/components/AppLink"
 import { ExternalLink } from "src/components/ExternalLink"
 import { resolveUrl } from "src/utils/utils"
 
@@ -22,18 +23,14 @@ const steps = [
         <ExternalLink href="https://privatefolio.app/c/0/transactions">Transactions</ExternalLink>.
         <br />
         <br />
-        <a
-          href={resolveUrl("$STATIC_ASSETS/help/privatefolio/Step1.png")}
-          target="_blank"
-          rel="noreferrer"
-        >
+        <AppLink href={resolveUrl("$STATIC_ASSETS/help/privatefolio/Step1.png")}>
           <img
             height={201}
             width={433}
             src={resolveUrl("$STATIC_ASSETS/help/privatefolio/Step1.png")}
             alt="Step visualization"
           />
-        </a>
+        </AppLink>
       </>
     ),
     label: "Visit the Transactions page",
@@ -45,18 +42,14 @@ const steps = [
         the transactions from this account.
         <br />
         <br />
-        <a
-          href={resolveUrl("$STATIC_ASSETS/help/privatefolio/Step2.png")}
-          target="_blank"
-          rel="noreferrer"
-        >
+        <AppLink href={resolveUrl("$STATIC_ASSETS/help/privatefolio/Step2.png")}>
           <img
             height={201}
             width={433}
             src={resolveUrl("$STATIC_ASSETS/help/privatefolio/Step2.png")}
             alt="Step visualization"
           />
-        </a>
+        </AppLink>
       </>
     ),
     label: "Export all the transactions",

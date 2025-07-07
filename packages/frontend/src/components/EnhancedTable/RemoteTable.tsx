@@ -19,6 +19,7 @@ import React, {
 import { useSearchParams } from "react-router-dom"
 import { $debugMode } from "src/stores/app-store"
 import { $showRelativeTime } from "src/stores/device-settings-store"
+import { appBarHeight } from "src/theme"
 import { sleep } from "src/utils/utils"
 
 import {
@@ -267,6 +268,7 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
                           padding="normal"
                           sortDirection={orderBy === headCell.key ? order : false}
                           sx={{
+                            top: appBarHeight,
                             ...headCell.sx,
                             ...(isFirstLoading || isEmpty
                               ? {

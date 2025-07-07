@@ -25,7 +25,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <ThemeProvider>
         <ConfirmDialogProvider>
-          {/* <NoticeBoard /> */}
           <KBarProvider
             options={{
               disableDocumentLock: true,

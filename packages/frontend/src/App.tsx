@@ -1,4 +1,4 @@
-import { Box, Paper, Stack } from "@mui/material"
+import { Box, Stack } from "@mui/material"
 import Container from "@mui/material/Container"
 import { useStore } from "@nanostores/react"
 import { throttle } from "lodash-es"
@@ -187,9 +187,12 @@ export default function App() {
               width: 300,
             }}
           />
-          <Paper
+          <Box
+            className="nav-drawer"
             sx={{
               "@media (min-width: 1836px)": {
+                backgroundColor: "var(--mui-palette-background-paper)",
+                borderRight: "1px solid var(--mui-palette-divider)",
                 maxWidth: 300,
                 minWidth: 300,
               },
@@ -202,17 +205,14 @@ export default function App() {
               borderTop: 0,
               bottom: 0,
               display: "none",
-              // height: "100%-25", // Notice bar
               height: "100%",
               maxWidth: 96,
               minWidth: 96,
               position: "fixed",
-              // top: 25, // Notice bar
             }}
-            elevation={0}
           >
             <MenuDrawerContents open toggleOpen={noop} appVer={APP_VERSION} gitHash={GIT_HASH} />
-          </Paper>
+          </Box>
         </>
       )}
       <Box

@@ -2,13 +2,14 @@ import { ExpandMoreRounded } from "@mui/icons-material"
 import { alpha, colors, CssVarsThemeOptions, Fade } from "@mui/material"
 import { blue, grey } from "@mui/material/colors"
 
+import { isElectron } from "./utils/electron-utils"
+
 export const MainFont = "'IBM Plex Sans', sans-serif"
 export const SerifFont = "'Roboto Serif', serif"
 export const MonoFont = "'IBM Plex Mono', monospace"
 
-// export const bgColor = "rgb(232, 233, 237)"
-// export const bgColor = "rgb(237, 238, 242)"
 export const bgColor = "rgb(242, 243, 245)"
+export const appBarHeight = 52
 
 export const chipBgOpacity = 0.075
 
@@ -318,6 +319,7 @@ export const theme: CssVarsThemeOptions = {
               // backgroundColor: "var(--mui-palette-background-default)",
             },
           },
+          WebkitAppRegion: "no-drag",
           // "html[data-mui-color-scheme='light'] &": {
           //   background: "rgba(255, 255, 255, 0.33)",
           // },
@@ -481,9 +483,10 @@ export const theme: CssVarsThemeOptions = {
         paperAnchorRight: {
           borderBottom: "none",
           borderRight: "none",
-          borderTop: "none",
+          borderTop: isElectron ? undefined : "none",
           // borderBottomLeftRadius: 16,
-          // borderTopLeftRadius: 16
+          borderTopLeftRadius: isElectron ? "16px !important" : 0,
+          top: isElectron ? appBarHeight : 0,
         },
       },
     },
@@ -853,6 +856,14 @@ export const theme: CssVarsThemeOptions = {
         },
       },
     },
+    MuiToolbar: {
+      styleOverrides: {
+        root: {
+          height: `${appBarHeight}px !important`,
+          minHeight: `${appBarHeight}px !important`,
+        },
+      },
+    },
     MuiTooltip: {
       defaultProps: {
         // PopperProps: {
@@ -956,4 +967,5 @@ export const theme: CssVarsThemeOptions = {
     },
     fontFamily: MainFont,
   },
+  zIndex: {},
 }

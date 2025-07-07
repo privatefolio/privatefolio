@@ -1,12 +1,13 @@
 import { OpenInNew } from "@mui/icons-material"
-import { Link, LinkProps } from "@mui/material"
 import React from "react"
 
-export function ExternalLink({ children, ...rest }: LinkProps) {
+import { AppLink, AppLinkProps } from "./AppLink"
+
+export function ExternalLink({ children, ...rest }: AppLinkProps) {
   return (
-    <Link underline="hover" color="text.secondary" target="_blank" {...rest}>
+    <AppLink underline="hover" color="text.secondary" {...rest}>
       {children}
       <OpenInNew fontSize="inherit" sx={{ marginLeft: 0.5, verticalAlign: "middle" }} />
-    </Link>
+    </AppLink>
   )
 }

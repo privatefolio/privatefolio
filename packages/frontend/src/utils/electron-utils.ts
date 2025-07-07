@@ -13,33 +13,26 @@ interface ElectronAPI {
     send: (message: string) => void
   }
   openDevTools: () => void
+  openExternalLink: (url: string) => void
   openLogsDir: () => string
   platform: NodeJS.Platform
   readLogs: () => string
-  // sendImage: (base64Image: string) => Promise<void>
   setMode: (mode: PaletteMode) => boolean
 }
 
-// export async function sendImageToElectron(fileName, base64: string) {
-//   // remove "data:mime/type;base64," prefix from data url
-//   const sanitized = base64.substring(base64.indexOf(",") + 1)
-//   await window.electron?.sendImage(sanitized)
-// }
-
 export const setElectronMode = window.electron?.setMode
+export const openExternalLink = window.electron?.openExternalLink
 export const isElectron = Boolean(window.electron)
 export const isWindows = window.electron && window.electron.platform === "win32"
 export const isProductionElectron = !!window.electron?.isProduction
 
 console.log(`Electron API ${isElectron ? "available" : "not available"}`)
 
-export const stickyHeader = false // isWindows
-
 export const { openLogsDir, readLogs, openDevTools } = window.electron || {}
 
 // Initialize logger
 ;(() => {
-  if (isElectron) {
+  if (isElectron && isProductionElectron) {
     const originalConsole = console
     Object.assign(console, Logger.scope("Renderer"))
     Logger.errorHandler.startCatching()

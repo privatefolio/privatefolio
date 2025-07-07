@@ -90,7 +90,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             },
             gap: "16px",
             paddingX: 0.5,
-            paddingY: 1,
+            paddingY: 0.5,
           },
           gap: 1,
           height: "100%",
@@ -110,7 +110,15 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
               sx={{
                 borderRadius: 0.5,
                 justifyContent: "flex-start",
+                minHeight: {
+                  md: "unset !important",
+                  xxl: "unset !important",
+                },
                 paddingX: 2,
+                paddingY: {
+                  md: "12px !important",
+                  xxl: "6px !important",
+                },
               }}
             >
               <LogoText
@@ -123,7 +131,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
                 }}
               />
               <Logo
-                color="var(--mui-palette-primary-main)"
+                // color="var(--mui-palette-primary-main)"
                 width={24}
                 height={24}
                 sx={{

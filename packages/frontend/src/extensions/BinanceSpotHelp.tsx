@@ -8,6 +8,7 @@ import StepLabel from "@mui/material/StepLabel"
 import Stepper from "@mui/material/Stepper"
 import Typography from "@mui/material/Typography"
 import * as React from "react"
+import { AppLink } from "src/components/AppLink"
 import { ExternalLink } from "src/components/ExternalLink"
 
 const steps = [
@@ -41,11 +42,7 @@ const steps = [
         Mouseover the export icon and click on <u>Export Trade History</u>.
         <br />
         <br />
-        <a
-          href="https://public.bnbstatic.com/image/cms/article/body/202204/dadda0c4657590c96a5f2a76eedb6737.png"
-          target="_blank"
-          rel="noreferrer"
-        >
+        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202204/dadda0c4657590c96a5f2a76eedb6737.png">
           <img
             height={203}
             width={433}
@@ -53,7 +50,7 @@ const steps = [
             src="https://public.bnbstatic.com/image/cms/article/body/202204/dadda0c4657590c96a5f2a76eedb6737.png"
             alt="Step visualization"
           />
-        </a>
+        </AppLink>
       </>
     ),
     label: "Open the export pop-up",
@@ -64,11 +61,7 @@ const steps = [
         Select the time range (up to 12 months) and click on <u>Generate</u>.
         <br />
         <br />
-        <a
-          href="https://public.bnbstatic.com/image/cms/article/body/202204/f261f1b2be0f7d5e5ba4a170d48d2647.png"
-          target="_blank"
-          rel="noreferrer"
-        >
+        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202204/f261f1b2be0f7d5e5ba4a170d48d2647.png">
           <img
             height={217}
             width={433}
@@ -76,7 +69,7 @@ const steps = [
             src="https://public.bnbstatic.com/image/cms/article/body/202204/f261f1b2be0f7d5e5ba4a170d48d2647.png"
             alt="Step visualization"
           />
-        </a>
+        </AppLink>
       </>
     ),
     label: "Request a new export",
@@ -88,18 +81,14 @@ const steps = [
         reminder.
         <br />
         <br />
-        <a
-          href="https://public.bnbstatic.com/image/cms/article/body/202204/3c004cfae75a1447a1ca031c81289bc1.png"
-          target="_blank"
-          rel="noreferrer"
-        >
+        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202204/3c004cfae75a1447a1ca031c81289bc1.png">
           <img
             height={217}
             width={433}
             src="https://public.bnbstatic.com/image/cms/article/body/202204/3c004cfae75a1447a1ca031c81289bc1.png"
             alt="Step visualization"
           />
-        </a>
+        </AppLink>
       </>
     ),
     label: "Wait for completion",
@@ -110,18 +99,14 @@ const steps = [
         Once completed, reopen the <u>Export Trade History</u> pop-up and click on <u>Download</u>.
         <br />
         <br />
-        <a
-          href="https://public.bnbstatic.com/image/cms/article/body/202204/2f05f5f78c1a942aa28c4ef447ad4d27.png"
-          target="_blank"
-          rel="noreferrer"
-        >
+        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202204/2f05f5f78c1a942aa28c4ef447ad4d27.png">
           <img
             height={220}
             width={433}
             src="https://public.bnbstatic.com/image/cms/article/body/202204/2f05f5f78c1a942aa28c4ef447ad4d27.png"
             alt="Step visualization"
           />
-        </a>
+        </AppLink>
       </>
     ),
     label: "Download",

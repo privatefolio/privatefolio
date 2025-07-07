@@ -1,7 +1,8 @@
 import { ConstructionRounded } from "@mui/icons-material"
-import { AlertTitle, Box, Chip, Link } from "@mui/material"
+import { AlertTitle, Box, Chip } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo, useState } from "react"
+import { AppLink } from "src/components/AppLink"
 import { Callout } from "src/components/Callout"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
 import { StaggeredList } from "src/components/StaggeredList"
@@ -123,11 +124,8 @@ export default function ExtensionsPage({ show }: { show: boolean }) {
           Soon you will be able to sell your extensions to other users for a flat fee or a recurring
           subscription.
           <br />
-          Tag @kernelwhisperer in{" "}
-          <Link target="_blank" href="https://discord.gg/YHHu9nK8VD">
-            Discord
-          </Link>{" "}
-          to learn more.
+          Tag @kernelwhisperer in <AppLink href="https://discord.gg/YHHu9nK8VD">Discord</AppLink> to
+          learn more.
         </Box>
       </Callout>
     </StaggeredList>

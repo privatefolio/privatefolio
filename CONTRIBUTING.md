@@ -50,6 +50,13 @@ yarn
 yarn build
 ```
 
+On Ubuntu, you need to install the set the permissions for the chrome-sandbox file:
+
+```sh
+sudo chown root:root packages/electron/node_modules/electron/dist/chrome-sandbox
+sudo chmod 4755 packages/electron/node_modules/electron/dist/chrome-sandbox
+```
+
 ## Development
 
 ```sh

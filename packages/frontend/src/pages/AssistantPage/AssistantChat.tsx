@@ -302,7 +302,6 @@ export function AssistantChat() {
                       <ExternalLink
                         key={source.id}
                         href={source.url}
-                        target="_blank"
                         variant="body2"
                         sx={{
                           backgroundColor: "var(--mui-palette-background-paper)",

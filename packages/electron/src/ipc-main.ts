@@ -1,9 +1,10 @@
 import { app, BrowserWindow, IpcMainEvent, Notification, shell } from "electron"
 import path from "path"
 
+import { TITLE_BAR_OPTS } from "./api"
 import * as backendManager from "./backend-manager"
 import { PaletteMode } from "./preload"
-import { getLatestLogFilepath, isProduction, isWindows } from "./utils"
+import { getLatestLogFilepath, isProduction } from "./utils"
 
 export function configureIpcMain(ipcMain: Electron.IpcMain, window: BrowserWindow) {
   ipcMain.on("notify", (_, message: string) => {
@@ -19,19 +20,16 @@ export function configureIpcMain(ipcMain: Electron.IpcMain, window: BrowserWindo
     }, 500)
     event.returnValue = true
   })
-
-  // Backend-related handlers
   ipcMain.on("get-backend-url", handleGetBackendUrl)
   ipcMain.on("is-backend-running", handleIsBackendRunning)
   ipcMain.handle("restart-backend", handleRestartBackend)
+  ipcMain.on("open-external-link", handleOpenExternalLink)
 }
 
-function createSetModeHandler(_window: BrowserWindow) {
+function createSetModeHandler(window: BrowserWindow) {
   return function handleSetMode(event: IpcMainEvent, mode: PaletteMode) {
     console.log("Setting theme mode", mode)
-    if (isWindows) {
-      // window.setTitleBarOverlay(TITLE_BAR_OPTS[mode]) TODO9
-    }
+    window.setTitleBarOverlay(TITLE_BAR_OPTS[mode])
     event.returnValue = true
   }
 }
@@ -77,4 +75,9 @@ async function handleRestartBackend() {
   await backendManager.stop()
   await backendManager.start()
   return backendManager.isRunning()
+}
+
+function handleOpenExternalLink(event: IpcMainEvent, url: string) {
+  shell.openExternal(url)
+  event.returnValue = true
 }

@@ -21,7 +21,6 @@ import {
   Container,
   Fade,
   FormControlLabel,
-  Link,
   Skeleton,
   Stack,
   TextField,
@@ -32,6 +31,7 @@ import { enqueueSnackbar } from "notistack"
 import React, { useEffect, useMemo } from "react"
 import { CloudInstanceStatus, getCheckoutLink, getPortalLink } from "src/api/privatecloud-api"
 import { CloudLoginForm } from "src/components/AccountPicker/CloudLoginForm"
+import { AppLink } from "src/components/AppLink"
 import { BackButton } from "src/components/BackButton"
 import { CircularSpinner } from "src/components/CircularSpinner"
 import { Gravatar } from "src/components/Gravatar"
@@ -60,6 +60,7 @@ import {
   handleUnpauseServer,
   handleUpdateServer,
 } from "src/stores/cloud-user-store"
+import { isElectron, openExternalLink } from "src/utils/electron-utils"
 import { formatDate } from "src/utils/formatting-utils"
 import { $cloudRest } from "src/workers/remotes"
 
@@ -217,18 +218,21 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                               <>
                                 {" "}
                                 -{" "}
-                                <Link
+                                <AppLink
                                   variant="inherit"
                                   href="https://pay.privatefolio.app"
-                                  target="_blank"
-                                  onClick={async (e) => {
-                                    e.preventDefault()
+                                  onClick={async (event) => {
+                                    event.preventDefault()
                                     const paymentLink = await getCheckoutLink()
-                                    window.open(paymentLink.url, "_blank")
+                                    if (isElectron) {
+                                      openExternalLink?.(paymentLink.url)
+                                    } else {
+                                      window.open(paymentLink.url, "_blank")
+                                    }
                                   }}
                                 >
                                   Upgrade to Premium
-                                </Link>
+                                </AppLink>
                               </>
                             )}
                           </Typography>
@@ -612,22 +616,22 @@ export default function CloudUserPage({ show }: { show: boolean }) {
 
             <Stack>
               <SectionTitle>Help</SectionTitle>
-              <Link variant="body2" href="mailto:hello@danielconstantin.net">
+              <AppLink variant="body2" href="mailto:hello@danielconstantin.net">
                 Contact support
-              </Link>
+              </AppLink>
 
               {portalLink && (
                 <Fade in>
-                  <Link variant="body2" href={portalLink} target="_blank">
+                  <AppLink variant="body2" href={portalLink}>
                     Manage my subscription
-                  </Link>
+                  </AppLink>
                 </Fade>
               )}
               {cloudInstance?.url && (
                 <Fade in>
-                  <Link variant="body2" href={cloudInstance.url} target="_blank">
+                  <AppLink variant="body2" href={cloudInstance.url}>
                     Visit server link
-                  </Link>
+                  </AppLink>
                 </Fade>
               )}
             </Stack>

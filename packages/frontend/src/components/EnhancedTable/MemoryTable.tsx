@@ -16,6 +16,7 @@ import React, {
 } from "react"
 import { $debugMode } from "src/stores/app-store"
 import { $showRelativeTime } from "src/stores/device-settings-store"
+import { appBarHeight } from "src/theme"
 
 import { TableFooter } from "../../components/TableFooter"
 import {
@@ -266,6 +267,7 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
                           padding="normal"
                           sortDirection={orderBy === headCell.key ? order : false}
                           sx={{
+                            top: appBarHeight,
                             ...headCell.sx,
                             ...(isLoading || isEmpty
                               ? {

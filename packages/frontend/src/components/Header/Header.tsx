@@ -4,7 +4,7 @@ import { AppBar, Container, Stack, Toolbar, useTheme } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect } from "react"
 import { $activeAccount } from "src/stores/account-store"
-import { setElectronMode, stickyHeader } from "src/utils/electron-utils"
+import { isElectron, setElectronMode } from "src/utils/electron-utils"
 
 import { CurrencySelector } from "../CurrencySelector"
 import { SearchBar } from "../SearchBar/SearchBar"
@@ -23,14 +23,14 @@ export function Header() {
 
   return (
     <AppBar
-      position={stickyHeader ? "sticky" : "static"}
+      position="sticky"
       elevation={0}
       sx={{
-        "& button": {
+        "& button, & .MuiInputBase-root": {
           WebkitAppRegion: "no-drag",
         },
         WebkitAppRegion: "drag",
-        background: "none !important",
+        backgroundColor: "var(--mui-palette-background-default)",
         border: "none",
       }}
     >
@@ -40,18 +40,17 @@ export function Header() {
           maxWidth="xl"
           sx={{ paddingX: 2, paddingY: 0, position: "relative" }}
         >
-          <Stack direction="row" gap={1} justifyContent="space-between">
+          <Stack
+            direction="row"
+            gap={1}
+            justifyContent="space-between"
+            sx={{ marginRight: isElectron ? 9 : 0 }}
+          >
             <Stack direction="row" alignItems="center" sx={{ flex: 1 }} gap={1}>
               <NavigationMenu />
               <SearchBar />
             </Stack>
-            <Stack
-              direction="row"
-              gap={1}
-              alignItems="center"
-              justifyContent="flex-end"
-              sx={{ marginRight: stickyHeader ? "120px" : 0 }}
-            >
+            <Stack direction="row" gap={1} alignItems="center" justifyContent="flex-end">
               <TaskDropdown />
               <CurrencySelector />
               <SettingsButton />
