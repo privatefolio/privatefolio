@@ -1,8 +1,8 @@
 import { Tool, tool } from "ai"
 import { getMyAssets } from "src/api/account/assets-api"
 import { getBalancesAt } from "src/api/account/balances-api"
-import { getConnections } from "src/api/account/connections-api"
 import { getMyPlatforms } from "src/api/account/platforms-api"
+import { getTrades } from "src/api/account/trades-api"
 import { z } from "zod"
 
 export const MAX_STEPS = 5
@@ -13,7 +13,7 @@ export const getAssistantSystemPrompt = (tools: Record<string, Tool>) => {
 
   return `You are a portfolio analysis assistant for Privatefolio. 
 You have access to the user's complete portfolio data and can help them analyze their investments, transactions, and balances.
-The current timestamp is ${timestamp}.
+The current timestamp is ${timestamp} and corresponds to ${new Date(timestamp).toISOString()}.
 
 You can use the following tools to access their data:
 ${Object.entries(tools)
@@ -44,15 +44,7 @@ export interface Balance {
   }
   value?: number
 }`,
-      execute: async ({ timestamp }) => {
-        try {
-          const balances = await getBalancesAt(accountName, timestamp)
-          return { balances }
-        } catch (error) {
-          return { error: `Failed to get balances: ${error}` }
-        }
-      },
-      id: "privatefolio.getBalancesAt",
+      execute: async ({ timestamp }) => await getBalancesAt(accountName, timestamp),
       parameters: z.object({
         timestamp: z
           .number()
@@ -60,19 +52,6 @@ export interface Balance {
             "Unix timestamp (in milliseconds) to get balances at; omit for the latest balance"
           ),
       }),
-    }),
-    getConnections: tool({
-      description: "Get all platform connections configured in the portfolio.",
-      execute: async () => {
-        try {
-          const connections = await getConnections(accountName)
-          return { connections }
-        } catch (error) {
-          return { error: `Failed to get connections: ${error}` }
-        }
-      },
-      id: "privatefolio.getConnections",
-      parameters: z.object({}),
     }),
     getMyAssets: tool({
       description: "Get all assets in the portfolio with their details.",
@@ -84,7 +63,6 @@ export interface Balance {
           return { error: `Failed to get assets: ${error}` }
         }
       },
-      id: "privatefolio.getMyAssets",
       parameters: z.object({}),
     }),
     getPlatforms: tool({
@@ -97,7 +75,31 @@ export interface Balance {
           return { error: `Failed to get platforms: ${error}` }
         }
       },
-      id: "privatefolio.getPlatforms",
+      parameters: z.object({}),
+    }),
+    getTrades: tool({
+      description: `Get all trades in the portfolio. It returns Array<Trade>.
+export interface Trade {
+  amount: number
+  assetId: string
+  auditLogIds?: string[]
+  balance: number
+  closedAt?: Timestamp
+  cost: TradeCost[]
+  createdAt: Timestamp
+  deposits: TradeValue[]
+  duration?: number
+  fees: TradeValue[]
+  id: string
+  proceeds: TradeValue[]
+  tags?: number[]
+  tradeNumber: number
+  tradeStatus: "open" | "closed"
+  tradeType: TradeType
+  txIds?: string[]
+}
+}`,
+      execute: async () => await getTrades(accountName),
       parameters: z.object({}),
     }),
   })
