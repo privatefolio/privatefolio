@@ -22,4 +22,6 @@ export interface Plan {
   coins: PlanCoin[]
   createdAt?: string
   updatedAt?: string
+  lastCalculatedAt?: string
+  calculationStatus?: "idle" | "in_progress" | "completed" | "failed"
 } 

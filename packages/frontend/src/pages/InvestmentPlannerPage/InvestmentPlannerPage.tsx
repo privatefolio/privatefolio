@@ -18,6 +18,7 @@ const headCells: HeadCell<Plan>[] = [
   { key: "name", label: "Name", sortable: true },
   { key: "budget", label: "Budget", numeric: true, sortable: true },
   { key: "updatedAt", label: "Last Updated", timestamp: true, sortable: true },
+  { key: "lastCalculatedAt", label: "Last Calculated", timestamp: true, sortable: true },
   { label: "Actions", numeric: true, sortable: false },
 ]
 
@@ -32,11 +33,28 @@ export default function InvestmentPlannerPage() {
   useEffect(() => {
     document.title = `Investment Planner - ${accountName} - Privatefolio`
     if (accountName) {
-        rpc.initialize(accountName).then(() => {
-            loadPlans()
-        })
+      rpc.initialize(accountName).then(() => {
+        loadPlans()
+      })
     }
   }, [accountName])
+
+  useEffect(() => {
+    const isAnyPlanCalculating = plans.some((p) => p.calculationStatus === "in_progress")
+    let interval: NodeJS.Timeout | null = null
+
+    if (isAnyPlanCalculating) {
+      interval = setInterval(() => {
+        loadPlans()
+      }, 5000) // Poll every 5 seconds
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval)
+      }
+    }
+  }, [plans])
 
   const loadPlans = async () => {
     if (!accountName) return
@@ -80,7 +98,14 @@ export default function InvestmentPlannerPage() {
   }
 
   const handleCalculate = async (id: number) => {
-    const results = await rpc.calculatePlan(accountName, id)
+    if (!accountName) return
+    await rpc.startPlanCalculation(accountName, id)
+    loadPlans() // Immediately refresh to show 'in_progress' status
+  }
+
+  const handleViewReport = async (id: number) => {
+    if (!accountName) return
+    const results = await rpc.getPlanCalculationResult(accountName, id)
     setCalculationResult(results)
   }
 
@@ -108,7 +133,9 @@ export default function InvestmentPlannerPage() {
           TableRowComponent={(props) => (
             <PlanTableRow
               {...props}
+              isCalculating={props.row.calculationStatus === "in_progress"}
               onCalculate={handleCalculate}
+              onViewReport={handleViewReport}
               onEdit={handleEdit}
               onDuplicate={handleDuplicate}
               onDelete={handleDelete}

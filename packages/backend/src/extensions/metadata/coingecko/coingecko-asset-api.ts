@@ -2,7 +2,14 @@ import { CoingeckoMetadataFull } from "src/interfaces"
 
 export const COINGECKO_BASE_API = "https://api.coingecko.com/api/v3"
 
-export async function getFullMetadata(coingeckoId: string): Promise<CoingeckoMetadataFull> {
+// Helper function for delayed execution
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+export async function getFullMetadata(
+  coingeckoId: string,
+  retries = 5,
+  delay = 15000
+): Promise<CoingeckoMetadataFull> {
   const params = new URLSearchParams({
     community_data: "true",
     developer_data: "true",
@@ -15,6 +22,12 @@ export async function getFullMetadata(coingeckoId: string): Promise<CoingeckoMet
 
   try {
     const response = await fetch(url)
+
+    // Coingecko uses 429 for rate limiting
+    if (response.status === 429) {
+      throw new Error("429: Rate limited")
+    }
+
     const result = await response.json()
 
     if ("error" in result) {
@@ -33,11 +46,25 @@ export async function getFullMetadata(coingeckoId: string): Promise<CoingeckoMet
 
     return meta
   } catch (error) {
-    if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
-      // safely assume its a cors error due to rate limit
-      throw new Error("429: Rate limited")
+    // Stop retrying if only 1 retry is left
+    if (retries <= 1) {
+      if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
+        // safely assume its a cors error due to rate limit
+        throw new Error("429: Rate limited by CORS or network issue")
+      }
+      throw error
     }
-    // console.error(error)
-    throw error
+
+    console.log(
+      `Failed to fetch metadata for ${coingeckoId}. Retrying in ${delay / 1000}s... (${
+        retries - 1
+      } retries left)`
+    )
+
+    // Wait for the specified delay
+    await sleep(delay)
+
+    // Retry the request with one less retry and double the delay for next time
+    return getFullMetadata(coingeckoId, retries - 1, delay * 2)
   }
 }
