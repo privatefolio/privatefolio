@@ -42,7 +42,7 @@ const config: Configuration = {
   ],
   linux: {
     category: "Office;Finance",
-    icon: "build/icons/png/1024x1024.png",
+    icon: "build/icons/png/512x512.png",
     target: [
       {
         arch: ["x64"],
