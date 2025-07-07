@@ -357,4 +357,27 @@ export const extensions: Extension[] = [
     ],
     updatedAt: new Date("2025-06-11").getTime(),
   },
+  {
+    authorGithub: "A-SOM",
+    description: "A calculator for planning your crypto investments based on budget and desired portfolio allocation.",
+    extensionLogoUrl: "$STATIC_ASSETS/extensions/investment-planner.svg", // Placeholder icon
+    extensionName: "Investment Planner",
+    extensionType: "file-import", //todo  change to tool
+    extensionVersion: "1.0.0", 
+    githubUrl: "https://github.com/A-SOM/privatefolio",
+    id: "investment-planner",
+    platformIds: [],
+    publishedAt: new Date().getTime(),
+    sources: [
+      {
+        tags: ["root"],
+        url: "https://github.com/privatefolio/privatefolio/tree/main/packages/backend/src/extensions/investment-planner/api.ts",
+      },
+      {
+        tags: ["ui"],
+        url: "https://github.com/privatefolio/privatefolio/tree/main/packages/frontend/src/pages/InvestmentPlannerPage/InvestmentPlannerPage.tsx",
+      },
+    ],
+    updatedAt: new Date().getTime(),
+  },
 ]

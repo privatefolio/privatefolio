@@ -52,6 +52,7 @@ const AuditLogsPage = lazy(() => import("./pages/AuditLogsPage/AuditLogsPage"))
 const ExtensionPage = lazy(() => import("./pages/ExtensionPage/ExtensionPage"))
 const ExtensionsPage = lazy(() => import("./pages/ExtensionsPage/ExtensionsPage"))
 const ImportDataPage = lazy(() => import("./pages/ImportDataPage/ImportDataPage"))
+const InvestmentPlannerPage = lazy(() => import("./pages/InvestmentPlannerPage/InvestmentPlannerPage"))
 const PlatformPage = lazy(() => import("./pages/PlatformPage/PlatformPage"))
 const PlatformsPage = lazy(() => import("./pages/PlatformsPage/PlatformsPage"))
 const ProChartPage = lazy(() => import("./pages/ProChartPage/ProChartPage"))
@@ -266,6 +267,7 @@ export default function App() {
                   <Route path="audit-logs" element={<AuditLogsPage show />} />
                   <Route path="import-data" element={<ImportDataPage show />} />
                   <Route path="assistant" element={<AssistantPage show />} />
+                  <Route path="investment-planner" element={<InvestmentPlannerPage />} />
                   <Route path="server" element={<ServerPage show />} />
                   <Route path="extensions" element={<ExtensionsPage show />} />
                   <Route path="extension/:extensionId" element={<ExtensionPage />} />
