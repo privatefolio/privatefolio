@@ -52,7 +52,7 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  assistantModel: "gpt-4o-mini",
+  assistantModel: "gpt-4.1-mini",
   kioskMode: false,
   metadataRefreshInterval: 7 * 24 * 60, // 7 days
   networthRefreshInterval: 60, // 1 hour

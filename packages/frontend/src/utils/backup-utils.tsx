@@ -4,7 +4,7 @@ import { $rest, RPC } from "src/workers/remotes"
 import { requestFile } from "./utils"
 
 export async function handleBackupRequest(rpc: RPC, accountName: string) {
-  const snackbarKey = enqueueSnackbar("Backup queued", { persist: true, variant: "info" })
+  const snackbarKey = enqueueSnackbar("Enqueuing backup...", { persist: true, variant: "info" })
   try {
     const fileRecord = await rpc.enqueueBackup(accountName, "user")
     closeSnackbar(snackbarKey)
@@ -23,7 +23,7 @@ export async function handleBackupRequest(rpc: RPC, accountName: string) {
 }
 
 export async function handleExportTransactionsRequest(rpc: RPC, accountName: string) {
-  const snackbarKey = enqueueSnackbar("Export queued", { persist: true, variant: "info" })
+  const snackbarKey = enqueueSnackbar("Enqueuing export...", { persist: true, variant: "info" })
   try {
     const fileRecord = await rpc.enqueueExportTransactions(accountName, "user")
     closeSnackbar(snackbarKey)
@@ -42,7 +42,7 @@ export async function handleExportTransactionsRequest(rpc: RPC, accountName: str
 }
 
 export async function handleExportAuditLogsRequest(rpc: RPC, accountName: string) {
-  const snackbarKey = enqueueSnackbar("Export queued", { persist: true, variant: "info" })
+  const snackbarKey = enqueueSnackbar("Enqueuing export...", { persist: true, variant: "info" })
   try {
     const fileRecord = await rpc.enqueueExportAuditLogs(accountName, "user")
     closeSnackbar(snackbarKey)

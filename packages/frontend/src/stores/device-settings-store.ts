@@ -111,5 +111,13 @@ export const $assistantModel = persistentAtom<string>(
   DEFAULT_SETTINGS.assistantModel
 )
 
-export const $preferredInterval = persistentAtom<ResolutionString>("3d" as ResolutionString)
-export const $preferredType = persistentAtom<SeriesType>("Candlestick")
+export const $assistantMode = persistentAtom<string>("privatefolio-assistant-mode", "read")
+
+export const $preferredInterval = persistentAtom<ResolutionString>(
+  "privatefolio-preferred-interval",
+  "3d" as ResolutionString
+)
+export const $preferredType = persistentAtom<SeriesType>(
+  "privatefolio-preferred-type",
+  "Candlestick"
+)

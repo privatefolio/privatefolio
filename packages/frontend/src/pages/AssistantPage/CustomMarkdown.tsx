@@ -1,8 +1,17 @@
-import { Paper, Table, TableCell, TableRow, Typography, TypographyProps } from "@mui/material"
+import {
+  Divider,
+  Paper,
+  Table,
+  TableCell,
+  TableRow,
+  Typography,
+  TypographyProps,
+} from "@mui/material"
 import Markdown from "markdown-to-jsx"
 import React from "react"
 
 import { ThinkComponent } from "./ThinkComponent"
+import { ToolComponent } from "./ToolComponent"
 
 const CustomTable = ({ children }: { children: React.ReactNode }) => (
   <Paper sx={{ width: "fit-content" }}>
@@ -61,6 +70,7 @@ export function CustomMarkdown(props: { children: string } & TypographyProps) {
       <Markdown
         options={{
           overrides: {
+            hr: Divider,
             table: CustomTable,
             td: TableCell,
             th: {
@@ -68,6 +78,7 @@ export function CustomMarkdown(props: { children: string } & TypographyProps) {
               props: { variant: "head" },
             },
             think: ThinkComponent,
+            tool: ToolComponent,
             tr: TableRow,
           },
         }}

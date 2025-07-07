@@ -14,6 +14,8 @@ export function ThinkComponent({ children }: { children: React.ReactNode }) {
           borderRadius: 2,
           color: "text.secondary",
           fontStyle: "italic",
+          marginBottom: 0.5,
+          marginRight: 0.5,
           width: "fit-content",
         }}
       >
@@ -24,6 +26,7 @@ export function ThinkComponent({ children }: { children: React.ReactNode }) {
           startIcon={<BrainSvg sx={{ fontSize: "14px !important" }} />}
           sx={{
             borderRadius: 2,
+            fontSize: "0.875rem",
             fontWeight: 400,
             paddingX: 1.25,
             paddingY: 0.5,

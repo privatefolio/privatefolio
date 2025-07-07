@@ -9,20 +9,42 @@ import {
   TipsAndUpdatesRounded,
   TravelExploreRounded,
 } from "@mui/icons-material"
-import { Box, Button, Input, Paper, Stack, Tooltip, Typography } from "@mui/material"
+import {
+  Avatar,
+  AvatarGroup,
+  Box,
+  Button,
+  Chip,
+  Input,
+  ListItemText,
+  Paper,
+  Select,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React, { useEffect, useRef, useState } from "react"
+import {
+  AVAILABLE_MODELS,
+  AVAILABLE_MODES,
+} from "privatefolio-backend/src/settings/assistant-models"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 import { AssistantModelSelect } from "src/components/AssistantModelSelect"
+import { BrainSvg } from "src/components/BrainSvg"
 import { CircularSpinner } from "src/components/CircularSpinner"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { ExternalLink } from "src/components/ExternalLink"
+import { MenuItemWithTooltip } from "src/components/MenuItemWithTooltip"
 import { $activeAccount } from "src/stores/account-store"
-import { $assistantModel } from "src/stores/device-settings-store"
+import { $assistantMode, $assistantModel } from "src/stores/device-settings-store"
+import { getFilterValueLabel } from "src/stores/metadata-store"
 import { extractRootUrl } from "src/utils/utils"
 import { $rest, $rpc } from "src/workers/remotes"
 
+import { ChatMessageToolbar } from "./ChatMessageToolbar"
 import { CustomMarkdown } from "./CustomMarkdown"
+import { ToolComponent } from "./ToolComponent"
 
 export function AssistantChat() {
   const rpc = useStore($rpc)
@@ -39,6 +61,8 @@ export function AssistantChat() {
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const modelId = useStore($assistantModel)
+  const modeId = useStore($assistantMode)
+  const model = useMemo(() => AVAILABLE_MODELS.find((x) => x.id === modelId), [modelId])
   const [initialMessages, setInitialMessages] = useState<Message[]>([])
   const [isLoadingHistory, setIsLoadingHistory] = useState(!!existingConversationId)
 
@@ -59,14 +83,24 @@ export function AssistantChat() {
           existingConversationId
         )
 
-        const messages: Message[] = chatHistory.map((msg) => ({
-          annotations: msg.metadata ? Object.values(JSON.parse(msg.metadata)) : undefined,
-          content: msg.message,
-          createdAt: new Date(msg.timestamp),
-          id: msg.id,
-          parts: msg.parts ? JSON.parse(msg.parts) : undefined,
-          role: msg.role,
-        }))
+        const messages: Message[] = chatHistory.map((msg) => {
+          const metadata = msg.metadata ? JSON.parse(msg.metadata) : undefined
+          const annotations = metadata
+            ? Object.keys(metadata).map((key) => ({
+                key,
+                value: metadata[key],
+              }))
+            : undefined
+
+          return {
+            annotations,
+            content: msg.message,
+            createdAt: new Date(msg.timestamp),
+            id: msg.id,
+            parts: msg.parts ? JSON.parse(msg.parts) : undefined,
+            role: msg.role,
+          }
+        })
 
         setInitialMessages(messages)
       } catch (error) {
@@ -86,38 +120,12 @@ export function AssistantChat() {
     headers: { Authorization: `Bearer ${localStorage.getItem(rest.jwtKey)}` },
     id: existingConversationId || window.crypto.randomUUID(),
     initialMessages,
-    onError: async (error) => {
-      try {
-        await rpc.upsertChatMessage(activeAccount, {
-          conversationId: existingConversationId || id,
-          message: error.message,
-          metadata: JSON.stringify({ modelId, severity: "error" }),
-          parts: undefined,
-          role: "system",
-          timestamp: Date.now(),
-        })
-      } catch {}
-    },
-    onFinish: async (message) => {
-      try {
-        await rpc.upsertChatMessage(activeAccount, {
-          conversationId: existingConversationId || id,
-          id: message.id,
-          message: message.content,
-          metadata: JSON.stringify({ modelId }),
-          parts: message.parts ? JSON.stringify(message.parts) : undefined,
-          role: message.role as "assistant",
-          timestamp: Date.now(),
-        })
-      } catch {}
-    },
-    onToolCall: (toolCall) => {
-      console.log("📜 LOG > onToolCall > toolCall:", toolCall)
-    },
   })
 
-  const isWaiting = status === "submitted"
+  const latestMessage = messages[messages.length - 1]
+  const isWaiting = status === "submitted" || (status === "streaming" && !latestMessage.content)
   const isStreaming = status === "streaming"
+  const isReady = status === "ready"
   const isLoading = isWaiting || isStreaming
 
   const handleSubmitRequest = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -127,19 +135,8 @@ export function AssistantChat() {
     handleSubmit(event)
     setTimeout(() => inputRef.current?.focus(), 10)
 
-    try {
-      await rpc.upsertChatMessage(activeAccount, {
-        conversationId: existingConversationId || id,
-        message: input,
-        role: "user",
-        timestamp: Date.now(),
-      })
-
-      searchParams.set("new", "false")
-      setSearchParams(searchParams, { replace: true })
-    } catch (error) {
-      console.error("Failed to save user message:", error)
-    }
+    searchParams.set("new", "false")
+    setSearchParams(searchParams, { replace: true })
   }
 
   const handleStop = () => {
@@ -155,6 +152,10 @@ export function AssistantChat() {
     searchParams.set("conversation", id)
     setSearchParams(searchParams, { replace: true })
   }, [existingConversationId, id, hasMessages, searchParams, setSearchParams])
+
+  useEffect(() => {
+    setTimeout(() => inputRef.current?.focus(), 10)
+  }, [id])
 
   if (isLoadingHistory) return <DefaultSpinner wrapper />
 
@@ -269,109 +270,28 @@ export function AssistantChat() {
                 {message.parts
                   .filter((part) => part.type === "tool-invocation")
                   .map((part) => {
-                    const toolPart = part as Extract<typeof part, { type: "tool-invocation" }>
-                    const tool = toolPart.toolInvocation
-                    const toolName = (
-                      <Tooltip
-                        title={
-                          <Stack alignItems="center">
-                            <span className="secondary">Call arguments</span>
-                            <span>{JSON.stringify(tool.args, null, 2)}</span>
-                          </Stack>
-                        }
-                      >
-                        <Box
-                          sx={{
-                            backgroundColor: "action.hover",
-                            borderRadius: 2,
-                            letterSpacing: "0.05rem",
-                            paddingX: 0.75,
-                          }}
-                          component="span"
-                        >
-                          {tool.toolName}
-                        </Box>
-                      </Tooltip>
-                    )
+                    const x = part as Extract<typeof part, { type: "tool-invocation" }>
+                    const { toolCallId, toolName, args, state } = x.toolInvocation
 
                     return (
-                      <Stack key={tool.toolCallId} alignItems="flex-start">
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          component={Stack}
-                          direction="row"
-                          alignItems="center"
-                          gap={1}
-                          sx={{
-                            backgroundColor: "var(--mui-palette-background-paper)",
-                            borderRadius: 3,
-                            marginBottom: 0.5,
-                            marginRight: 0.5,
-                            paddingX: 1,
-                            paddingY: 0.5,
-                          }}
-                        >
-                          {tool.state === "call" && <CircularSpinner size={14} />}
-                          {tool.state === "result" && <HandymanOutlined fontSize="inherit" />}
-                          {tool.state === "partial-call" && <CircularSpinner size={14} />}
-                          {tool.state === "call" && <>Using {toolName}...</>}
-                          {tool.state === "result" && <>Used {toolName}</>}
-                          {tool.state === "partial-call" && `Calling ${toolName}...`}
-                        </Typography>
-                      </Stack>
+                      <ToolComponent key={toolCallId} args={args} state={state}>
+                        {toolName}
+                      </ToolComponent>
                     )
                   })}
                 {message.parts
                   .filter((part) => part.type === "reasoning")
                   .map((part, index) => {
-                    const reasoningPart = part as Extract<typeof part, { type: "reasoning" }>
+                    const { reasoning, details: _details } = part as Extract<
+                      typeof part,
+                      { type: "reasoning" }
+                    >
+
                     return (
-                      <Box
+                      <CustomMarkdown
                         key={index}
-                        sx={{
-                          backgroundColor: "action.hover",
-                          borderRadius: 2,
-                          mb: 1,
-                          px: 2,
-                          py: 1,
-                        }}
-                      >
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ fontStyle: "italic" }}
-                        >
-                          Reasoning:
-                        </Typography>
-                        <Typography variant="body2" color="text.primary">
-                          {reasoningPart.reasoning}
-                        </Typography>
-                        {reasoningPart.details.length > 0 && (
-                          <Box sx={{ mt: 1 }}>
-                            {reasoningPart.details.map((detail, detailIndex) => (
-                              <Typography
-                                key={detailIndex}
-                                variant="caption"
-                                color="text.secondary"
-                                sx={{ display: "block", mt: 0.5 }}
-                              >
-                                {detail.type === "text" ? detail.text : "[Redacted]"}
-                                {detail.type === "text" && detail.signature && (
-                                  <Typography
-                                    component="span"
-                                    variant="caption"
-                                    color="primary.main"
-                                    sx={{ ml: 1 }}
-                                  >
-                                    {detail.signature}
-                                  </Typography>
-                                )}
-                              </Typography>
-                            ))}
-                          </Box>
-                        )}
-                      </Box>
+                        variant="body2"
+                      >{`<think>${reasoning}</think>`}</CustomMarkdown>
                     )
                   })}
                 {message.parts
@@ -470,7 +390,12 @@ export function AssistantChat() {
                   .map((part, index) => {
                     const textPart = part as Extract<typeof part, { type: "text" }>
                     const isError = message.annotations?.find(
-                      (x) => typeof x === "string" && x.includes("error")
+                      (x) =>
+                        x !== null &&
+                        typeof x === "object" &&
+                        "key" in x &&
+                        x.key === "severity" &&
+                        x.value === "error"
                     )
 
                     return (
@@ -502,13 +427,19 @@ export function AssistantChat() {
               ))} */}
               </>
             )}
+            {isReady && !message.content && (
+              <Typography variant="body2" color="text.secondary" marginX={1}>
+                No response from the assistant.
+              </Typography>
+            )}
+            <ChatMessageToolbar message={message} />
           </Box>
         ))}
         {isWaiting && (
           <Stack direction="row" alignItems="center" gap={1}>
             <CircularSpinner size={14} />
             <Typography variant="body2" color="text.secondary">
-              Thinking...
+              Processing...
             </Typography>
           </Stack>
         )}
@@ -575,33 +506,109 @@ export function AssistantChat() {
             }}
           />
           <Stack direction="row" alignItems="flex-end" gap={1} justifyContent="space-between">
-            <AssistantModelSelect
-              size="small"
-              variant="filled"
-              disableUnderline
-              color="secondary"
-              sx={{
-                "& .MuiListItemAvatar-root": {
-                  marginRight: 1,
-                },
-                "& .MuiSelect-select": {
-                  borderRadius: "24px !important",
-                  paddingX: 1.5,
-                  paddingY: 0.5,
-                },
-                "& .MuiTypography-root": {
-                  fontSize: "0.875rem",
-                },
-                "& input": {
+            <Stack direction="row" alignItems="center" gap={1}>
+              <AssistantModelSelect
+                size="small"
+                variant="filled"
+                disableUnderline
+                color="secondary"
+                sx={{
+                  "& .MuiListItemAvatar-root": {
+                    marginRight: 1,
+                  },
+                  "& .MuiSelect-select": {
+                    borderRadius: "24px !important",
+                    paddingX: 1.5,
+                    paddingY: 0.5,
+                  },
+                  "& .MuiTypography-root": {
+                    fontSize: "0.875rem",
+                  },
+                  "& input": {
+                    borderRadius: 3,
+                  },
+                  background: "rgba(var(--mui-palette-common-onBackgroundChannel) / 0.05)",
                   borderRadius: 3,
-                },
-                background: "rgba(var(--mui-palette-common-onBackgroundChannel) / 0.05)",
-                borderRadius: 3,
-              }}
-              value={modelId}
-              onChange={(event) => $assistantModel.set(event.target.value)}
-              disabled={isLoading}
-            />
+                }}
+                value={modelId}
+                onChange={(event) => $assistantModel.set(event.target.value)}
+                disabled={isLoading}
+              />
+              <Select
+                size="small"
+                inputProps={{ name: "mode-select" }}
+                variant="filled"
+                disableUnderline
+                color="secondary"
+                sx={{
+                  "& .MuiListItemAvatar-root": {
+                    marginRight: 1,
+                  },
+                  "& .MuiSelect-select": {
+                    borderRadius: "24px !important",
+                    paddingX: 1.5,
+                    paddingY: 0.5,
+                  },
+                  "& .MuiTypography-root": {
+                    fontSize: "0.875rem",
+                  },
+                  "& input": {
+                    borderRadius: 3,
+                  },
+                  background: "rgba(var(--mui-palette-common-onBackgroundChannel) / 0.05)",
+                  borderRadius: 3,
+                }}
+                value={modeId}
+                onChange={(event) => $assistantMode.set(event.target.value)}
+                disabled={isLoading}
+              >
+                {AVAILABLE_MODES.map((mode) => (
+                  <MenuItemWithTooltip
+                    key={mode.id}
+                    value={mode.id}
+                    tooltipProps={{
+                      placement: "right",
+                      title: mode.description,
+                    }}
+                    // disabled={mode.id !== "read"}
+                  >
+                    <ListItemText
+                      primary={
+                        <>
+                          {mode.label}
+                          {mode.id !== "read" && (
+                            <Chip
+                              size="small"
+                              sx={{ fontSize: "0.625rem", height: 14, marginLeft: 1 }}
+                              label="Coming soon"
+                            />
+                          )}
+                        </>
+                      }
+                    />
+                  </MenuItemWithTooltip>
+                ))}
+              </Select>
+              <AvatarGroup>
+                {model?.capabilities?.map((x) => (
+                  <Tooltip key={x} title={getFilterValueLabel(x)} placement="top">
+                    <Avatar
+                      sx={{
+                        "& svg": { fontSize: 20 },
+                        background: "var(--mui-palette-background-paper)",
+                        color: "text.secondary",
+                        height: 30,
+                        width: 30,
+                      }}
+                    >
+                      {x === "web-search" && <LanguageRounded />}
+                      {x === "reasoning" && <BrainSvg />}
+                      {x === "tools" && <HandymanOutlined />}
+                    </Avatar>
+                  </Tooltip>
+                ))}
+              </AvatarGroup>
+            </Stack>
             <Button
               variant="contained"
               type={isLoading ? "button" : "submit"}

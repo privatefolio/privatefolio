@@ -81,18 +81,18 @@ export interface AssistantModel {
 
 export const AVAILABLE_MODELS: AssistantModel[] = [
   // OpenAI Models
-  {
-    capabilities: ["tools", "web-search"],
-    contextWindow: 128000,
-    costPer1kTokens: {
-      input: 0.0025,
-      output: 0.01,
-    },
-    description: "Great for most tasks",
-    family: "openai",
-    id: "gpt-4o",
-    label: "GPT-4o",
-  },
+  // {
+  //   capabilities: ["tools", "web-search"],
+  //   contextWindow: 128000,
+  //   costPer1kTokens: {
+  //     input: 0.0025,
+  //     output: 0.01,
+  //   },
+  //   description: "Great for most tasks",
+  //   family: "openai",
+  //   id: "gpt-4o",
+  //   label: "GPT-4o",
+  // },
   {
     capabilities: ["tools", "web-search", "reasoning"],
     contextWindow: 128000,
@@ -118,7 +118,7 @@ export const AVAILABLE_MODELS: AssistantModel[] = [
     label: "GPT-o4-mini",
   },
   {
-    capabilities: ["tools", "web-search"],
+    capabilities: ["tools"],
     contextWindow: 200000,
     costPer1kTokens: {
       input: 0.0025,
@@ -127,7 +127,7 @@ export const AVAILABLE_MODELS: AssistantModel[] = [
     description: "Good for writing and exploring ideas",
     family: "openai",
     id: "gpt-4.5-preview",
-    label: "GPT-4.5-preview",
+    label: "GPT-4.5",
   },
   {
     capabilities: ["tools", "web-search"],
@@ -153,42 +153,42 @@ export const AVAILABLE_MODELS: AssistantModel[] = [
     id: "gpt-4.1-mini",
     label: "GPT-4.1-mini",
   },
-  {
-    capabilities: ["tools", "web-search"],
-    contextWindow: 128000,
-    costPer1kTokens: {
-      input: 0.00015,
-      output: 0.0006,
-    },
-    description: "Cost-efficient for most tasks",
-    family: "openai",
-    id: "gpt-4o-mini",
-    label: "GPT-4o-mini",
-  },
-  {
-    capabilities: ["tools", "web-search"],
-    contextWindow: 128000,
-    costPer1kTokens: {
-      input: 0.01,
-      output: 0.03,
-    },
-    description: "Advanced model with large context",
-    family: "openai",
-    id: "gpt-4-turbo",
-    label: "GPT-4-turbo",
-  },
-  {
-    capabilities: ["tools", "web-search"],
-    contextWindow: 16385,
-    costPer1kTokens: {
-      input: 0.0005,
-      output: 0.0015,
-    },
-    description: "Fast and efficient for simple tasks",
-    family: "openai",
-    id: "gpt-3.5-turbo",
-    label: "GPT-3.5-turbo",
-  },
+  // {
+  //   capabilities: ["tools", "web-search"],
+  //   contextWindow: 128000,
+  //   costPer1kTokens: {
+  //     input: 0.00015,
+  //     output: 0.0006,
+  //   },
+  //   description: "Cost-efficient for most tasks",
+  //   family: "openai",
+  //   id: "gpt-4o-mini",
+  //   label: "GPT-4o-mini",
+  // },
+  // {
+  //   capabilities: ["tools", "web-search"],
+  //   contextWindow: 128000,
+  //   costPer1kTokens: {
+  //     input: 0.01,
+  //     output: 0.03,
+  //   },
+  //   description: "Advanced model with large context",
+  //   family: "openai",
+  //   id: "gpt-4-turbo",
+  //   label: "GPT-4-turbo",
+  // },
+  // {
+  //   capabilities: ["tools", "web-search"],
+  //   contextWindow: 16385,
+  //   costPer1kTokens: {
+  //     input: 0.0005,
+  //     output: 0.0015,
+  //   },
+  //   description: "Fast and efficient for simple tasks",
+  //   family: "openai",
+  //   id: "gpt-3.5-turbo",
+  //   label: "GPT-3.5-turbo",
+  // },
   // Perplexity Models
   {
     capabilities: ["web-search"],
@@ -320,5 +320,31 @@ export const AVAILABLE_MODELS: AssistantModel[] = [
     family: "anthropic",
     id: "claude-3-haiku-20240307",
     label: "Claude 3 Haiku",
+  },
+]
+
+type ModeId = "read" | "write" | "deep-research"
+
+type Mode = {
+  description: string
+  id: ModeId
+  label: string
+}
+
+export const AVAILABLE_MODES: Mode[] = [
+  {
+    description: "Give the model read access to your data",
+    id: "read",
+    label: "Read",
+  },
+  {
+    description: "Give the model read-write access to your data",
+    id: "write",
+    label: "Write",
+  },
+  {
+    description: "Give the model a 15-minute window to complete a difficult task",
+    id: "deep-research",
+    label: "Deep Research",
   },
 ]

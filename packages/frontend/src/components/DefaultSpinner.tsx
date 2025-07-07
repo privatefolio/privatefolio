@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react"
 import { CircularSpinner, CircularSpinnerProps } from "src/components/CircularSpinner"
 
 export function DefaultSpinner(props: CircularSpinnerProps & { wrapper?: boolean }) {
-  const { wrapper = false } = props
+  const { wrapper = false, ...rest } = props
   const [showLoading, setShowLoading] = useState(false)
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export function DefaultSpinner(props: CircularSpinnerProps & { wrapper?: boolean
     return (
       <Fade in={showLoading}>
         <span>
-          <CircularSpinner color="secondary" {...props} />
+          <CircularSpinner color="secondary" {...rest} />
         </span>
       </Fade>
     )
@@ -32,7 +32,7 @@ export function DefaultSpinner(props: CircularSpinnerProps & { wrapper?: boolean
         justifyContent="center"
         sx={{ height: 300 }}
       >
-        <CircularSpinner color="secondary" {...props} />
+        <CircularSpinner color="secondary" {...rest} />
       </Stack>
     </Fade>
   )

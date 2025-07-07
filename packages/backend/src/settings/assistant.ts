@@ -7,7 +7,8 @@ import { z } from "zod"
 
 export const MAX_STEPS = 5
 
-export const getAssistantSystemPrompt = () => {
+export const getAssistantSystemPrompt = (tools: Record<string, Tool>) => {
+  if (Object.keys(tools).length === 0) return ""
   const timestamp = Date.now()
 
   return `You are a portfolio analysis assistant for Privatefolio. 
@@ -15,26 +16,34 @@ You have access to the user's complete portfolio data and can help them analyze 
 The current timestamp is ${timestamp}.
 
 You can use the following tools to access their data:
-- web_search_preview: Search the web/internet for current market information, news, and external data
-- getBalancesAt: Get current asset balances at any timestamp (in milliseconds)
-- getMyAssets: Get all assets in the portfolio with details
-- getConnections: Get configured platform connections
-- getPlatforms: Get all platforms used by the account
+${Object.entries(tools)
+  .map(([key, tool]) => `${key}: ${tool.description}`)
+  .join("\n")}
 
 Use these tools to provide accurate, data-driven answers about their portfolio. 
 When analyzing data, be specific and cite actual numbers. You can write SQL queries to filter data as needed.
-
-For market analysis, price predictions, or current news about assets, use web_search_preview to get the latest information.
+When you reference a tool, use this xml format: <tool>toolName</tool>.
 
 Be helpful, concise, and focus on actionable insights.
 You can use a maximum of ${MAX_STEPS} tools.`
 }
+// For market analysis, price predictions, or current news about assets, use webSearch to get the latest information.
 // Please respond in GitHub Flavored Markdown format.
 
 export function getAssistantTools(accountName: string): Record<string, Tool> {
   return Object.freeze({
     getBalancesAt: tool({
-      description: "Get current balances for all assets in the portfolio.",
+      description: `Get the total asset balances at any timestamp (in milliseconds) across all wallets. It returns Array<Balance>.
+export interface Balance {
+  assetId: string
+  balanceN: number
+  id: string 
+  price?: {
+    value: number
+    time: number // unix timestamp in seconds
+  }
+  value?: number
+}`,
       execute: async ({ timestamp }) => {
         try {
           const balances = await getBalancesAt(accountName, timestamp)

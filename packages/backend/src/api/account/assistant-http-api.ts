@@ -1,7 +1,9 @@
 import { AnthropicProviderOptions, createAnthropic } from "@ai-sdk/anthropic"
 import { createOpenAI, OpenAIResponsesProviderOptions } from "@ai-sdk/openai"
 import { createPerplexity } from "@ai-sdk/perplexity"
-import { JSONValue, LanguageModelV1, streamText } from "ai"
+import { JSONValue, LanguageModelV1, Message, StepResult, streamText, Tool } from "ai"
+import { BackendApiShape } from "src/backend-server"
+import { ChatMessage } from "src/interfaces"
 import { getAssistantSystemPrompt, getAssistantTools, MAX_STEPS } from "src/settings/assistant"
 import { AssistantModel, AVAILABLE_MODELS, ModelFamily } from "src/settings/assistant-models"
 import { decryptValue } from "src/utils/jwt-utils"
@@ -11,10 +13,70 @@ import { AuthSecrets, readSecrets } from "../auth-http-api"
 import { getValue } from "./kv-api"
 
 function errorHandler(error: unknown) {
+  console.error(error)
   if (error == null) return "unknown error"
   if (typeof error === "string") return error
   if (error instanceof Error) return error.message
   return JSON.stringify(error)
+}
+
+type ChatResult = Omit<StepResult<Record<string, Tool>>, "stepType" | "isContinued"> & {
+  readonly steps: StepResult<Record<string, Tool>>[]
+}
+
+function resultToChatMessage(
+  result: ChatResult,
+  conversationId: string,
+  systemPrompt: string,
+  modelId: string
+): ChatMessage {
+  const parts: Message["parts"] = []
+
+  if (result.text) parts.push({ text: result.text, type: "text" })
+
+  for (const step of result.steps) {
+    step.toolCalls.forEach((x, index) =>
+      parts.push({
+        toolInvocation: {
+          ...x,
+          result: step.toolResults[index],
+          state: step.toolResults[index] ? "result" : "call",
+        },
+        type: "tool-invocation",
+      })
+    )
+
+    step.sources.forEach((x) =>
+      parts.push({
+        source: x,
+        type: "source",
+      })
+    )
+
+    if (step.reasoning) {
+      parts.push({
+        details: step.reasoningDetails,
+        reasoning: step.reasoning,
+        type: "reasoning",
+      })
+    }
+  }
+
+  return {
+    conversationId,
+    id: result.response.id,
+    message: result.text,
+    metadata: JSON.stringify({
+      exactModelId: result.response.modelId,
+      finishReason: result.finishReason,
+      modelId,
+      systemPrompt,
+      usage: result.usage,
+    }),
+    parts: JSON.stringify(parts),
+    role: "assistant",
+    timestamp: new Date(result.response.timestamp).getTime(),
+  }
 }
 
 function getModel(modelId: string): AssistantModel {
@@ -58,8 +120,18 @@ async function getApiKey(accountName: string, provider: ModelFamily): Promise<st
   return apiKey
 }
 
+type AssistantChatRequest = {
+  accountName: string
+  id: string
+  messages: Message[]
+  modelId: string
+}
+
 // https://ai-sdk.dev/docs/
-export async function handleAssistantChat(request: Request): Promise<Response> {
+export async function handleAssistantChat(
+  request: Request,
+  writeApi: BackendApiShape
+): Promise<Response> {
   const { method } = request
 
   if (method !== "POST") {
@@ -70,7 +142,9 @@ export async function handleAssistantChat(request: Request): Promise<Response> {
   }
 
   try {
-    const { messages, accountName, modelId } = await request.json()
+    const req = (await request.json()) as AssistantChatRequest
+
+    const { messages, accountName, modelId, id: conversationId } = req
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return new Response(JSON.stringify({ error: "Messages are required." }), {
@@ -80,8 +154,20 @@ export async function handleAssistantChat(request: Request): Promise<Response> {
     }
 
     const model = getModel(modelId)
-    const system = getAssistantSystemPrompt()
     const apiKey = await getApiKey(accountName, model.family)
+
+    const lastUserMessage = messages.findLast((message) => message.role === "user")
+    if (!lastUserMessage) {
+      throw new Error("No user message found")
+    }
+
+    await writeApi.upsertChatMessage(accountName, {
+      conversationId,
+      id: lastUserMessage.id,
+      message: lastUserMessage.content,
+      role: lastUserMessage.role,
+      timestamp: Date.now(),
+    })
 
     let tools = getAssistantTools(accountName)
     let llmModel: LanguageModelV1
@@ -96,17 +182,24 @@ export async function handleAssistantChat(request: Request): Promise<Response> {
             reasoningSummary: "detailed",
           } satisfies OpenAIResponsesProviderOptions,
         }
-        tools = {
-          // https://ai-sdk.dev/cookbook/node/web-search-agent#using-native-web-search
-          web_search_preview: createOpenAI({
-            apiKey,
-            compatibility: "strict",
-          }).tools.webSearchPreview(),
-          ...tools,
+        if (model.capabilities?.includes("web-search")) {
+          tools = {
+            // https://ai-sdk.dev/cookbook/node/web-search-agent#using-native-web-search
+            webSearch: {
+              ...createOpenAI({
+                apiKey,
+                compatibility: "strict",
+              }).tools.webSearchPreview(),
+              description:
+                "Search the web/internet for current market information, news, and external data",
+            },
+            ...tools,
+          }
         }
         break
       case "perplexity":
         llmModel = createPerplexity({ apiKey }).languageModel(model.id)
+        tools = {}
         break
       case "anthropic":
         llmModel = createAnthropic({ apiKey }).languageModel(model.id)
@@ -120,11 +213,26 @@ export async function handleAssistantChat(request: Request): Promise<Response> {
         throw new Error(`Unsupported model: ${model.id}`)
     }
 
+    const system = getAssistantSystemPrompt(tools)
+
     const result = streamText({
       maxRetries: 5,
-      maxSteps: MAX_STEPS + 2,
+      maxSteps: MAX_STEPS + 5,
       messages,
       model: llmModel,
+      onFinish: (message) => {
+        // console.log("📜 LOG > onFinish: > message:", message)
+        writeApi
+          .upsertChatMessage(
+            accountName,
+            resultToChatMessage(message, conversationId, system, modelId)
+          )
+          .catch(console.error)
+      },
+      // onStepFinish: async (step) => {
+      //   console.log("📜 LOG > onStepFinish: > step:", step)
+      //   await writeApi.upsertChatMessage(accountName, stepToChatMessage(step, conversationId))
+      // },
       providerOptions,
       system,
       tools,
@@ -133,15 +241,32 @@ export async function handleAssistantChat(request: Request): Promise<Response> {
     return result.toDataStreamResponse({
       experimental_sendFinish: true,
       experimental_sendStart: true,
-      getErrorMessage: errorHandler,
-      headers: corsHeaders,
+      getErrorMessage: (error) => {
+        const errorMessage = errorHandler(error)
+
+        writeApi
+          .upsertChatMessage(accountName, {
+            conversationId,
+            message: errorMessage,
+            metadata: JSON.stringify({ modelId, severity: "error" }),
+            role: "system",
+            timestamp: Date.now(),
+          })
+          .catch(console.error)
+
+        return errorMessage
+      },
+      headers: {
+        Connection: "keep-alive",
+        "Transfer-Encoding": "chunked",
+        ...corsHeaders,
+      },
       sendReasoning: true,
       sendSources: true,
       sendUsage: true,
     })
   } catch (error) {
-    console.error(error)
-    return new Response(JSON.stringify({ error: "Internal server error." }), {
+    return new Response(String(error), {
       headers: { "Content-Type": "application/json", ...corsHeaders },
       status: 500,
     })

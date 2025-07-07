@@ -23,7 +23,6 @@ export const INTERVAL_LABEL_MAP: Record<ResolutionString, string> = {
   ["1d" as ResolutionString]: "1 day",
   ["3d" as ResolutionString]: "3 days",
   ["1h" as ResolutionString]: "1 hour",
-  ["1m" as ResolutionString]: "1 minute",
   ["1w" as ResolutionString]: "1 week",
   ["1m" as ResolutionString]: "1 month",
 }

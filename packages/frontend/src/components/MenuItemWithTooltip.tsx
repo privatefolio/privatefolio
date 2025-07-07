@@ -7,9 +7,7 @@ export function MenuItemWithTooltip(
   const { tooltipProps, ...rest } = props
   return (
     <Tooltip {...tooltipProps}>
-      <span>
-        <MenuItem {...rest} />
-      </span>
+      <MenuItem {...rest} />
     </Tooltip>
   )
 }

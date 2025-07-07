@@ -62,6 +62,7 @@ export class BackendServer<T extends BackendApiShape> {
   start(port: number) {
     const authDisabled = this._authDisabled
     const kioskMode = this._kioskMode
+    const writeApi = this.writeApi
     console.log(`Server starting on port ${port}. Kiosk mode ${kioskMode ? "enabled" : "disabled"}`)
     this.server = Bun.serve({
       async fetch(request, server) {
@@ -113,22 +114,23 @@ export class BackendServer<T extends BackendApiShape> {
         }
 
         const protectedRoutes = ["/download", "/upload", "/assistant-chat"]
-        if (!isAuthenticated) {
-          if (protectedRoutes.includes(pathname)) {
-            console.warn(`Blocked unauthenticated request to ${pathname}.`)
-            return new Response("Unauthorized", { headers: corsHeaders, status: 401 })
-          }
+        if (!isAuthenticated && protectedRoutes.includes(pathname)) {
+          console.warn(`Blocked unauthenticated request to ${pathname}.`)
+          return new Response("Login or sign up to continue.", {
+            headers: corsHeaders,
+            status: 401,
+          })
         }
 
         // Protected routes
-        if (pathname === "/download") {
+        if (pathname === protectedRoutes[0]) {
           return await handleDownload(request)
         }
-        if (pathname === "/upload") {
+        if (pathname === protectedRoutes[1]) {
           return await handleUpload(request)
         }
-        if (pathname === "/assistant-chat") {
-          return await handleAssistantChat(request)
+        if (pathname === protectedRoutes[2]) {
+          return await handleAssistantChat(request, writeApi)
         }
 
         // WebSocket upgrade check (protected)
@@ -151,6 +153,7 @@ export class BackendServer<T extends BackendApiShape> {
           }
         }
       },
+      idleTimeout: 0, // TODO7 disabled https://github.com/oven-sh/bun/issues/15589
       port,
       websocket: {
         close() {

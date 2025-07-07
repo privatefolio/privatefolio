@@ -116,7 +116,7 @@ export function AssistantSettings() {
     }))
   }
 
-  const [showModelComparison, setShowModelComparison] = useState(false)
+  const [showModelComparison, setShowModelComparison] = useState(true)
   const handleToggleModelComparison = () => {
     setShowModelComparison((show) => !show)
   }
@@ -142,40 +142,6 @@ export function AssistantSettings() {
   return (
     <Paper sx={{ paddingX: 2, paddingY: 1 }}>
       <Stack gap={2}>
-        <div>
-          <LearnMore title={`Choose which LLM model to use for the assistant.`}>
-            <SectionTitle>Default AI Model</SectionTitle>
-          </LearnMore>
-          <AssistantModelSelect
-            value={assistantModel}
-            onChange={(event) => setAssistantModel(event.target.value)}
-            disabled={isLoading}
-          />
-          <Button
-            size="small"
-            color="secondary"
-            onClick={handleToggleModelComparison}
-            endIcon={
-              <ExpandMore
-                sx={{
-                  transform: showModelComparison ? "rotate(180deg)" : "rotate(0deg)",
-                  transition: "transform 0.2s",
-                }}
-                fontSize="inherit"
-              />
-            }
-            sx={{
-              display: "flex",
-              marginY: 1,
-              paddingX: 2,
-            }}
-          >
-            <span>AI Model Comparison</span>
-          </Button>
-          <Collapse in={showModelComparison}>
-            <ModelComparisonTable />
-          </Collapse>
-        </div>
         <div>
           <LearnMore
             title={
@@ -256,6 +222,43 @@ export function AssistantSettings() {
               endAdornment: createPasswordAdornment("anthropic"),
             }}
           />
+        </div>
+        <div>
+          <LearnMore title={`Choose which LLM model to use for the assistant.`}>
+            <SectionTitle>Deep research AI Model</SectionTitle>
+          </LearnMore>
+          <AssistantModelSelect
+            value={assistantModel}
+            onChange={(event) => setAssistantModel(event.target.value)}
+            disabled={isLoading}
+          />
+          <div>
+            <Button
+              size="small"
+              color="secondary"
+              onClick={handleToggleModelComparison}
+              endIcon={
+                <ExpandMore
+                  sx={{
+                    transform: showModelComparison ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 0.2s",
+                  }}
+                  fontSize="inherit"
+                />
+              }
+              sx={{
+                display: "flex",
+                marginX: -1,
+                marginY: 1,
+                paddingX: 1.5,
+              }}
+            >
+              <SectionTitle>AI Model Comparison</SectionTitle>
+            </Button>
+            <Collapse in={showModelComparison}>
+              <ModelComparisonTable />
+            </Collapse>
+          </div>
         </div>
         <div>
           <Button variant="contained" onClick={handleSave} disabled={isLoading || isSaving}>
