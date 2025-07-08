@@ -9,30 +9,27 @@ function aggregateByWeeks(data: ChartData[], _interval: ResolutionString): Chart
   const weeksMap = new Map<number, ChartData[]>()
 
   data.forEach((d) => {
-    const date = new Date(d.time * 1000) // Convert timestamp (in seconds) to Date
-    const day = date.getDay() // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    const date = new Date(d.time * 1000)
+    const day = date.getUTCDay() // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
 
     // Calculate the date of the Monday for the current week
-    const diffToMonday = (day + 6) % 7 // Days to subtract to get to Monday
-    const monday = new Date(date)
-    monday.setDate(date.getDate() - diffToMonday)
-    monday.setHours(0, 0, 0, 0) // Set time to midnight
-    const mondayTimestamp = Math.floor(monday.getTime() / 1000) // Timestamp in seconds
+    const diffToMonday = (day + 6) % 7
 
-    if (!weeksMap.has(mondayTimestamp)) {
-      weeksMap.set(mondayTimestamp, [])
+    const monday = new Date(
+      Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() - diffToMonday)
+    )
+    const mondayTime = Math.floor(monday.getTime() / 1000)
+
+    if (!weeksMap.has(mondayTime)) {
+      weeksMap.set(mondayTime, [])
     }
-    weeksMap.get(mondayTimestamp)!.push(d)
+    weeksMap.get(mondayTime)!.push(d)
   })
 
-  // Sort the weeks by their start time to ensure consistent ordering
   const sortedWeekKeys = Array.from(weeksMap.keys()).sort((a, b) => a - b)
 
-  // Iterate over each week to calculate aggregated data
   for (const weekStart of sortedWeekKeys) {
     const weekData = weeksMap.get(weekStart)!
-
-    // Sort the week's data by time to ensure correct open and close values
     weekData.sort((a, b) => a.time - b.time)
 
     const open = previousWeekClose !== undefined ? previousWeekClose : weekData[0]?.value

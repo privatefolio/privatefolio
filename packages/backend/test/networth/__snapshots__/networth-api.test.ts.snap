@@ -28,7 +28,7 @@ exports[`should compute historical networth > as 1w candles 1`] = `
     "high": 178.03,
     "low": 0,
     "open": 0,
-    "time": 1503867600,
+    "time": 1503878400,
     "value": 166.44,
   },
   {
@@ -36,7 +36,7 @@ exports[`should compute historical networth > as 1w candles 1`] = `
     "high": 337.37,
     "low": 159.48,
     "open": 166.44,
-    "time": 1504472400,
+    "time": 1504483200,
     "value": 310.17,
   },
   {
@@ -44,7 +44,7 @@ exports[`should compute historical networth > as 1w candles 1`] = `
     "high": 307.21,
     "low": 237.14,
     "open": 310.17,
-    "time": 1505077200,
+    "time": 1505088000,
     "value": 237.14,
   },
 ]
