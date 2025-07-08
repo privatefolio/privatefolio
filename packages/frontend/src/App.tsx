@@ -178,7 +178,7 @@ export default function App() {
               [theme.breakpoints.up("md")]: {
                 display: "inline-flex",
               },
-              [theme.breakpoints.between("md", "xxl")]: {
+              [theme.breakpoints.between("md", "xl")]: {
                 minWidth: 96,
                 width: 96,
               },
@@ -190,7 +190,7 @@ export default function App() {
           <Box
             className="nav-drawer"
             sx={(theme) => ({
-              [theme.breakpoints.up("xxl")]: {
+              [theme.breakpoints.up("xl")]: {
                 backgroundColor: "var(--mui-palette-background-paper)",
                 borderRight: "1px solid var(--mui-palette-divider)",
                 maxWidth: 300,
@@ -217,9 +217,13 @@ export default function App() {
       )}
       <Box
         sx={(theme) => ({
-          [theme.breakpoints.between("md", "xxl")]: {
+          [theme.breakpoints.between("md", "xl")]: {
             flexBasis: "calc(100% - 96px)",
             width: "calc(100% - 96px)",
+          },
+          [theme.breakpoints.up("xl")]: {
+            flexBasis: "calc(100% - 300px)",
+            width: "calc(100% - 300px)",
           },
           flexBasis: "100%",
           width: "100%",

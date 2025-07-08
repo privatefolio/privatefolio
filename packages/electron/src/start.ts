@@ -97,8 +97,8 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     height: windowState.height,
     icon: appIconPath,
-    minHeight: 480,
-    minWidth: 480,
+    minHeight: 500,
+    minWidth: 500,
     show: false,
     titleBarOverlay: TITLE_BAR_OPTS.light,
     titleBarStyle: "hidden",

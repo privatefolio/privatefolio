@@ -118,9 +118,9 @@ export const theme: CssVarsThemeOptions = {
       lg: 1200,
       md: 900,
       sm: 600,
-      xl: 1536,
+      xl: 1600,
       xs: 0,
-      xxl: 1836, // xl + menu width
+      xxl: 2200,
     },
   },
   colorSchemes: {
@@ -440,6 +440,7 @@ export const theme: CssVarsThemeOptions = {
             border: 0,
             margin: 0,
             maxWidth: "100%",
+            top: isElectron ? appBarHeight : 0,
             width: "100%",
           },
           "&:not(.MuiDialog-paperFullScreen)": {

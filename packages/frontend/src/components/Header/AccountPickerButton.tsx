@@ -36,7 +36,7 @@ export function AccountPickerButton(props: { onClose?: () => void }) {
           onClick={handleClick}
           color="secondary"
           sx={(theme) => ({
-            [theme.breakpoints.between("md", "xxl")]: {
+            [theme.breakpoints.between("md", "xl")]: {
               "& .MuiAvatar-root": {
                 height: 24,
                 width: 24,

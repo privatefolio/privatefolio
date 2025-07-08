@@ -4,7 +4,7 @@ import { AppBar, Container, Stack, Toolbar } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React from "react"
 import { $activeAccount } from "src/stores/account-store"
-import { isElectron } from "src/utils/electron-utils"
+import { isElectron, isWindows } from "src/utils/electron-utils"
 
 import { CurrencySelector } from "../CurrencySelector"
 import { SearchBar } from "../SearchBar/SearchBar"
@@ -39,7 +39,11 @@ export function Header() {
             direction="row"
             gap={1}
             justifyContent="space-between"
-            sx={{ marginRight: isElectron ? 9 : 0 }}
+            sx={(theme) => ({
+              [theme.breakpoints.down("xxl")]: {
+                marginRight: !isElectron ? 0 : isWindows ? 15 : 9,
+              },
+            })}
           >
             <Stack direction="row" alignItems="center" sx={{ flex: 1 }} gap={1}>
               <NavigationMenu />

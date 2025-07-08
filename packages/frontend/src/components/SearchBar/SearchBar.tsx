@@ -38,9 +38,11 @@ import {
 import React, { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { APP_ACTIONS } from "src/AppActions"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { Asset, FindPlatformsResult, RichExtension, Transaction } from "src/interfaces"
 import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
+import { appBarHeight } from "src/theme"
 import { getAssetPlatform } from "src/utils/assets-utils"
 import {
   handleBackupRequest,
@@ -48,6 +50,7 @@ import {
   handleExportTransactionsRequest,
   onRestoreRequest,
 } from "src/utils/backup-utils"
+import { isElectron } from "src/utils/electron-utils"
 import { formatDateRelative, formatPrivatefolioTxId } from "src/utils/formatting-utils"
 import { normalizeTxHash } from "src/utils/parsing-utils"
 import { noop } from "src/utils/utils"
@@ -545,9 +548,16 @@ export const SearchBar = () => {
 function RenderResults({ loading }: { loading: boolean }) {
   const { results } = useMatches()
 
+  const { isMobile } = useBreakpoints()
+
   return (
     <div>
       <KBarResults
+        maxHeight={
+          (isMobile
+            ? `calc(100vh - ${isElectron ? 60 + appBarHeight : 60}px)`
+            : 400) as unknown as number
+        }
         items={results}
         onRender={({ item, active }) => {
           if (typeof item === "string") {

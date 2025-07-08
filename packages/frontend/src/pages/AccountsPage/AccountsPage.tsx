@@ -21,6 +21,7 @@ import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { Gravatar } from "src/components/Gravatar"
 import { LogoText } from "src/components/Header/LogoText"
 import { SettingsButton } from "src/components/Header/SettingsButton"
+import { Logo } from "src/components/Logo"
 import { StaggeredList } from "src/components/StaggeredList"
 import { Truncate } from "src/components/Truncate"
 import { useBoolean } from "src/hooks/useBoolean"
@@ -28,6 +29,7 @@ import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { $activeAccount, $cloudAccounts, $localAccounts } from "src/stores/account-store"
 import { $cloudRpcReady, $cloudUser } from "src/stores/cloud-user-store"
 import { SerifFont } from "src/theme"
+import { isElectron, isWindows } from "src/utils/electron-utils"
 import { cloudEnabled, localServerEnabled, SPRING_CONFIGS } from "src/utils/utils"
 
 export default function AccountsPage() {
@@ -124,10 +126,11 @@ export default function AccountsPage() {
                 alignItems="center"
                 justifyContent="space-between"
                 gap={1}
-                sx={{
-                  height: "100%",
-                  width: "100%",
-                }}
+                sx={(theme) => ({
+                  [theme.breakpoints.down("xxl")]: {
+                    marginRight: !isElectron ? 0 : isWindows ? 15 : 9,
+                  },
+                })}
               >
                 <Button
                   size="small"
@@ -137,7 +140,24 @@ export default function AccountsPage() {
                   component={AppLink}
                   sx={{ marginX: -2, paddingX: 2 }}
                 >
-                  <LogoText />
+                  <LogoText
+                    sx={{
+                      display: {
+                        sm: "inline-flex",
+                        xs: "none",
+                      },
+                    }}
+                  />
+                  <Logo
+                    width={24}
+                    height={24}
+                    sx={{
+                      display: {
+                        sm: "none",
+                        xs: "inline-flex",
+                      },
+                    }}
+                  />
                 </Button>
                 <Stack direction="row" gap={1} alignItems="center">
                   {cloudUser !== undefined && !cloudUser && cloudEnabled && (

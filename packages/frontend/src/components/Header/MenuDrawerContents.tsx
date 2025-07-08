@@ -71,7 +71,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
           "& .MuiListItemAvatar-root svg": {
             fontSize: "1.25rem",
           },
-          [theme.breakpoints.between("md", "xxl")]: {
+          [theme.breakpoints.between("md", "xl")]: {
             "& .MuiListItemAvatar-root": {
               fontSize: "1.5rem",
               marginRight: 0,
@@ -112,12 +112,12 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
                 justifyContent: "flex-start",
                 minHeight: {
                   md: "unset !important",
-                  xxl: "unset !important",
+                  xl: "unset !important",
                 },
                 paddingX: 2,
                 paddingY: {
                   md: "12px !important",
-                  xxl: "6px !important",
+                  xl: "6px !important",
                 },
               }}
             >
@@ -125,20 +125,19 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
                 sx={{
                   display: {
                     md: "none",
+                    xl: "inline-flex",
                     xs: "inline-flex",
-                    xxl: "inline-flex",
                   },
                 }}
               />
               <Logo
-                // color="var(--mui-palette-primary-main)"
                 width={24}
                 height={24}
                 sx={{
                   display: {
                     md: "inline-flex",
+                    xl: "none",
                     xs: "none",
-                    xxl: "none",
                   },
                 }}
               />
