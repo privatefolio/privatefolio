@@ -34,7 +34,7 @@ export function NetworthTableRow(props: TableRowComponentProps<Balance>) {
         </TableCell>
         <TableCell colSpan={Math.floor(headCells.length / 2)} align="right">
           <Stack alignItems="flex-end">
-            <Typography variant="body1">
+            <Typography variant="body1" component="div">
               <QuoteAmountBlock amount={value} />
             </Typography>
             <CaptionText>

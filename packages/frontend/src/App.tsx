@@ -174,29 +174,29 @@ export default function App() {
       {activeAccount !== "" && (
         <>
           <Box
-            sx={{
-              "@media (min-width: 990px)": {
+            sx={(theme) => ({
+              [theme.breakpoints.up("md")]: {
                 display: "inline-flex",
               },
-              "@media (min-width: 990px) and (max-width: 1836px)": {
+              [theme.breakpoints.between("md", "xxl")]: {
                 minWidth: 96,
                 width: 96,
               },
               display: "none",
               minWidth: 300,
               width: 300,
-            }}
+            })}
           />
           <Box
             className="nav-drawer"
-            sx={{
-              "@media (min-width: 1836px)": {
+            sx={(theme) => ({
+              [theme.breakpoints.up("xxl")]: {
                 backgroundColor: "var(--mui-palette-background-paper)",
                 borderRight: "1px solid var(--mui-palette-divider)",
                 maxWidth: 300,
                 minWidth: 300,
               },
-              "@media (min-width: 990px)": {
+              [theme.breakpoints.up("md")]: {
                 display: "inline-flex",
               },
               borderBottom: 0,
@@ -209,21 +209,21 @@ export default function App() {
               maxWidth: 96,
               minWidth: 96,
               position: "fixed",
-            }}
+            })}
           >
             <MenuDrawerContents open toggleOpen={noop} appVer={APP_VERSION} gitHash={GIT_HASH} />
           </Box>
         </>
       )}
       <Box
-        sx={{
-          "@media (min-width: 990px) and (max-width: 1836px)": {
+        sx={(theme) => ({
+          [theme.breakpoints.between("md", "xxl")]: {
             flexBasis: "calc(100% - 96px)",
             width: "calc(100% - 96px)",
           },
           flexBasis: "100%",
           width: "100%",
-        }}
+        })}
       >
         {/* TODO0 */}
         {/* <Box

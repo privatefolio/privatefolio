@@ -12,7 +12,7 @@ export function AddressBookForm({ address, label }: AddressBookFormProps) {
   const [value, onChange] = useState(address ?? "")
 
   return (
-    <Stack gap={2} sx={{ "@media (min-width: 900px)": { minWidth: 520 } }}>
+    <Stack gap={2} sx={(theme) => ({ [theme.breakpoints.up("md")]: { minWidth: 520 } })}>
       <div>
         <SectionTitle>Address</SectionTitle>
         <AddressInput

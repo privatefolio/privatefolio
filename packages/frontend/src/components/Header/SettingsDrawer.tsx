@@ -1,6 +1,7 @@
-import { Drawer, SwipeableDrawer, Typography, useMediaQuery } from "@mui/material"
+import { Drawer, SwipeableDrawer, Typography } from "@mui/material"
 import React from "react"
 import { APP_VERSION, GIT_HASH } from "src/env"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { PopoverToggleProps } from "src/stores/app-store"
 
 import { DrawerHeader } from "../DrawerHeader"
@@ -10,7 +11,7 @@ import { SettingsDrawerContents } from "./SettingsDrawerContents"
 export function SettingsDrawer(props: PopoverToggleProps) {
   const { open, toggleOpen } = props
 
-  const isMobile = useMediaQuery("(max-width: 599px)")
+  const { isMobile } = useBreakpoints()
 
   if (isMobile) {
     return (

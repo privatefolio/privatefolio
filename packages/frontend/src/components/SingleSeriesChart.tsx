@@ -18,7 +18,6 @@ import {
   SvgIcon,
   Tooltip,
   Typography,
-  useMediaQuery,
   useTheme,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
@@ -37,6 +36,7 @@ import {
 } from "lightweight-charts"
 import { merge } from "lodash-es"
 import React, { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { StackedAreaData as LcStackedAreaData } from "src/lightweight-charts/plugins/stacked-area-series/data"
 import {
   defaultOptions as stackedAreaDefaultOpts,
@@ -163,7 +163,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
     ...rest
   } = props
 
-  const isMobile = useMediaQuery("(max-width: 599px)")
+  const { isMobile } = useBreakpoints()
 
   const height = useMemo(() => {
     if (size === "small") {

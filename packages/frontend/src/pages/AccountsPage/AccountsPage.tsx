@@ -10,7 +10,6 @@ import {
   Toolbar,
   Tooltip,
   Typography,
-  useMediaQuery,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo, useState } from "react"
@@ -25,6 +24,7 @@ import { SettingsButton } from "src/components/Header/SettingsButton"
 import { StaggeredList } from "src/components/StaggeredList"
 import { Truncate } from "src/components/Truncate"
 import { useBoolean } from "src/hooks/useBoolean"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { $activeAccount, $cloudAccounts, $localAccounts } from "src/stores/account-store"
 import { $cloudRpcReady, $cloudUser } from "src/stores/cloud-user-store"
 import { SerifFont } from "src/theme"
@@ -68,7 +68,7 @@ export default function AccountsPage() {
     return () => clearTimeout(timeout)
   }, [])
 
-  const isDesktop = useMediaQuery("(min-width: 900px)")
+  const { isDesktop } = useBreakpoints()
 
   const showWelcomeMessage = !localServerEnabled && cloudUser === null
   const showConfigureMessage = !localServerEnabled && cloudUser && cloudRpcReady === false

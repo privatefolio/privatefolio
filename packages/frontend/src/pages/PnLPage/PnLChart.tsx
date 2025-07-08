@@ -1,7 +1,7 @@
-import { useMediaQuery } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { debounce } from "lodash-es"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { ChartData, Time, Trade } from "src/interfaces"
 import { DEFAULT_DEBOUNCE_DURATION } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
@@ -69,7 +69,7 @@ export function PnLChart({ trade }: { trade?: Trade }) {
   )
 
   const currency = useStore($quoteCurrency)
-  const isMobile = useMediaQuery("(max-width: 599px)")
+  const { isMobile } = useBreakpoints()
 
   const chartOptions = useMemo(
     () => ({

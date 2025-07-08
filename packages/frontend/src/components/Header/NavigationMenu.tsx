@@ -1,17 +1,17 @@
 import { MenuRounded } from "@mui/icons-material"
-import { IconButton, SwipeableDrawer, Tooltip, useMediaQuery } from "@mui/material"
+import { IconButton, SwipeableDrawer, Tooltip } from "@mui/material"
 import React from "react"
 import { APP_VERSION, GIT_HASH } from "src/env"
 import { useBoolean } from "src/hooks/useBoolean"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 
 import { MenuDrawerContents } from "./MenuDrawerContents"
 
 export function NavigationMenu() {
   const { value: open, toggle: toggleOpen } = useBoolean(false)
 
-  const isLaptop = useMediaQuery("(min-width: 990px)")
-
-  if (isLaptop) return
+  const { isDesktop } = useBreakpoints()
+  if (isDesktop) return
 
   return (
     <>

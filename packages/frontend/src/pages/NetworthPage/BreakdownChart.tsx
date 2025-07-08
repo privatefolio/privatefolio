@@ -1,4 +1,4 @@
-import { Stack, useMediaQuery } from "@mui/material"
+import { Stack } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useCallback, useEffect, useMemo } from "react"
 import {
@@ -8,6 +8,7 @@ import {
   TooltipOpts,
 } from "src/components/SingleSeriesChart"
 import { WorkInProgressCallout } from "src/components/WorkInProgressCallout"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { $activeAccount } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
 import { $quoteCurrency } from "src/stores/device-settings-store"
@@ -32,7 +33,7 @@ export function BreakdownChart() {
   )
 
   const currency = useStore($quoteCurrency)
-  const isMobile = useMediaQuery("(max-width: 599px)")
+  const { isMobile } = useBreakpoints()
 
   const chartOptions = useMemo(
     () => ({

@@ -67,11 +67,11 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
   return (
     <>
       <Stack
-        sx={{
+        sx={(theme) => ({
           "& .MuiListItemAvatar-root svg": {
             fontSize: "1.25rem",
           },
-          "@media (min-width: 990px) and (max-width: 1836px)": {
+          [theme.breakpoints.between("md", "xxl")]: {
             "& .MuiListItemAvatar-root": {
               fontSize: "1.5rem",
               marginRight: 0,
@@ -98,7 +98,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
           paddingX: 2,
           paddingY: 1,
           width: "100%",
-        }}
+        })}
         justifyContent="space-between"
       >
         <Stack gap={0.25}>

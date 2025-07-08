@@ -1,11 +1,12 @@
 import { TimerSharp } from "@mui/icons-material"
-import { Stack, Tooltip, Typography, TypographyProps, useMediaQuery } from "@mui/material"
+import { Stack, Tooltip, Typography, TypographyProps } from "@mui/material"
 import React, { memo } from "react"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 
 import { formatDuration } from "../utils/formatting-utils"
 
 function QueryTimerBase({ queryTime, ...rest }: { queryTime: number | null } & TypographyProps) {
-  const isMobile = useMediaQuery("(max-width: 599px)")
+  const { isMobile } = useBreakpoints()
 
   return (
     <>

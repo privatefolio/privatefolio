@@ -3,6 +3,16 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.16 - 2025/07/07
+
+### 💡 Feature updates
+
+- Add new chart intervals: 3D (3 days), M (1 month)
+- Add new tooltip for candlestick charts
+
+- Add support for Claude 4 Opus, Claude 4 Sonnet, Claude 3.7 Sonnet, Claude 3.5 Sonnet, Claude 3.5 Haiku, Claude 3 Haiku
+- Add support for Perplexity models
+
 ## v2.0.0-beta.15 - 2025/07/06
 
 ### 🐛 Bug Fixes

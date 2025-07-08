@@ -1,5 +1,6 @@
-import { Menu, MenuList, SwipeableDrawer, Typography, useMediaQuery } from "@mui/material"
+import { Menu, MenuList, SwipeableDrawer, Typography } from "@mui/material"
 import React from "react"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { noop } from "src/utils/utils"
 
 import { Puller } from "../Puller"
@@ -15,7 +16,7 @@ export interface AccountPickerProps {
 export function AccountPicker(props: AccountPickerProps) {
   const { open, anchorEl, handleClose, toggleAddAccount } = props
 
-  const isMobile = useMediaQuery("(max-width: 599px)")
+  const { isMobile } = useBreakpoints()
 
   if (isMobile) {
     return (

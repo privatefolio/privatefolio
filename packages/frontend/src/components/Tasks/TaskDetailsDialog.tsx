@@ -10,11 +10,11 @@ import {
   Paper,
   Stack,
   Typography,
-  useMediaQuery,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { useBoolean } from "src/hooks/useBoolean"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { ProgressLog, ServerTask } from "src/interfaces"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
@@ -111,7 +111,7 @@ export function TaskDetailsDialog({ task, ...props }: DialogProps & { task: Serv
   }, [progressLogs])
 
   const debugMode = useStore($debugMode)
-  const isDesktop = useMediaQuery("(min-width: 900px)")
+  const { isDesktop } = useBreakpoints()
   const { value: fullscreen, toggle: toggleFullscreen } = useBoolean(false)
 
   if (!task) return null
