@@ -48,6 +48,10 @@ const config: Configuration = {
         arch: ["x64"],
         target: "deb",
       },
+      {
+        arch: ["x64"],
+        target: "snap",
+      },
     ],
   },
   mac: {

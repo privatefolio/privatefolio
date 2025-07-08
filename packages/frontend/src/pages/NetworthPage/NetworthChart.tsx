@@ -1,7 +1,7 @@
-import { useMediaQuery } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { debounce } from "lodash-es"
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { DEFAULT_DEBOUNCE_DURATION } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
@@ -40,7 +40,7 @@ function NetworthChartBase() {
   )
 
   const currency = useStore($quoteCurrency)
-  const isMobile = useMediaQuery("(max-width: 599px)")
+  const { isMobile } = useBreakpoints()
 
   const chartOptions = useMemo(
     () => ({

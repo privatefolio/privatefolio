@@ -1,15 +1,7 @@
 import { ArrowRightAltRounded, OpenInNew } from "@mui/icons-material"
-import {
-  Box,
-  Button,
-  Chip,
-  Link as MuiLink,
-  Stack,
-  Tooltip,
-  Typography,
-  useMediaQuery,
-} from "@mui/material"
+import { Box, Button, Chip, Link as MuiLink, Stack, Tooltip, Typography } from "@mui/material"
 import React, { ReactNode, useState } from "react"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { MonoFont } from "src/theme"
 import { noop } from "src/utils/utils"
 
@@ -93,7 +85,7 @@ export function IdentifierBlock(props: IdentifierBlockProps) {
     }, 1_000)
   }
 
-  const isTablet = useMediaQuery("(max-width: 899px)")
+  const { isTablet } = useBreakpoints()
 
   return (
     <Tooltip

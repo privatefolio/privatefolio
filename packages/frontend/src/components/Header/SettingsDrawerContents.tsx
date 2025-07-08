@@ -16,7 +16,7 @@ import { formatDate, formatHour } from "src/utils/formatting-utils"
 
 import { $debugMode, $telemetry, AppVerProps } from "../../stores/app-store"
 import { MonoFont } from "../../theme"
-import { isElectron, openDevTools } from "../../utils/electron-utils"
+import { AppLink } from "../AppLink"
 import { DiscordIcon } from "../DiscordIcon"
 import { SectionTitle } from "../SectionTitle"
 import { ReducedMotion } from "./ReducedMotion"
@@ -24,12 +24,13 @@ import { ThemeMode } from "./ThemeMode"
 
 const CustomLink = ({ children, ...rest }: MenuItemProps & LinkProps) => (
   <MenuItem
-    component={MuiLink}
+    component={AppLink}
     tabIndex={0}
     role="button"
     sx={{
       borderRadius: 0.5,
       minHeight: "auto !important",
+      width: "100%",
     }}
     {...rest}
   >
@@ -75,23 +76,19 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
         <SectionTitle id="social-links" role="listitem">
           Community
         </SectionTitle>
-        {/* <CustomLink target="_blank" href="https://t.me/privatefolio" role="listitem">
+        {/* <CustomLink  href="https://t.me/privatefolio" role="listitem">
           <Telegram fontSize="small" />
           <span>Telegram</span>
         </CustomLink> */}
-        <CustomLink target="_blank" href="https://discord.gg/YHHu9nK8VD" role="listitem">
+        <CustomLink href="https://discord.gg/YHHu9nK8VD" role="listitem">
           <DiscordIcon />
           <span>Discord</span>
         </CustomLink>
-        <CustomLink target="_blank" href="https://twitter.com/PrivatefolioApp" role="listitem">
+        <CustomLink href="https://twitter.com/PrivatefolioApp" role="listitem">
           <Twitter fontSize="small" />
           <span>Twitter</span>
         </CustomLink>
-        <CustomLink
-          target="_blank"
-          href="https://github.com/privatefolio/privatefolio"
-          role="listitem"
-        >
+        <CustomLink href="https://github.com/privatefolio/privatefolio" role="listitem">
           <GitHub fontSize="small" />
           <span>GitHub</span>
         </CustomLink>
@@ -189,7 +186,7 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
           label="Telemetry"
           labelPlacement="start"
         />
-        {isElectron && (
+        {/* {isElectron && (
           <MenuItem
             onClick={() => {
               openDevTools?.()
@@ -210,9 +207,8 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
           >
             <Typography variant="body2">Open Dev Tools</Typography>
           </MenuItem>
-        )}
+        )} */}
         <MenuItem
-          target="_blank"
           href="https://github.com/privatefolio/privatefolio/issues/new"
           role="listitem"
           component={MuiLink}

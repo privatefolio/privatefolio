@@ -311,10 +311,13 @@ export class CandleTooltipElement {
   private _calculateXPosition(positionData: TooltipPosition, chart: IChartApi): string {
     const x = positionData.paneX + chart.priceScale("left").width()
     const deadzoneWidth = this._lastTooltipWidth
-      ? this._lastTooltipWidth / 2 + this._options.horizontalDeadzoneWidth
+      ? Math.ceil(this._lastTooltipWidth / 2)
       : this._options.horizontalDeadzoneWidth
-    const boundedX = Math.max(deadzoneWidth, Math.min(x, chart.timeScale().width() - deadzoneWidth))
-    return `${boundedX - chart.priceScale("left").width()}px`
+    const xAdjusted = Math.min(
+      Math.max(deadzoneWidth, x),
+      chart.timeScale().width() - deadzoneWidth
+    )
+    return `calc(${xAdjusted}px - 50%)`
   }
 
   private _calculateYPosition(positionData: TooltipPosition): string {

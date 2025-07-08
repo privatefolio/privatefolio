@@ -5,15 +5,12 @@ const isProduction = process.argv.includes("--production")
 
 contextBridge.exposeInMainWorld("electron", {
   backend: {
-    // Returns the URL of the backend
     getUrl() {
       return ipcRenderer.sendSync("get-backend-url")
     },
-    // Check if the backend is running
     isRunning() {
       return ipcRenderer.sendSync("is-backend-running")
     },
-    // Restart the backend server
     restart() {
       return ipcRenderer.invoke("restart-backend")
     },
@@ -27,6 +24,9 @@ contextBridge.exposeInMainWorld("electron", {
   openDevTools() {
     return ipcRenderer.sendSync("open-dev-tools")
   },
+  openExternalLink(url: string) {
+    return ipcRenderer.sendSync("open-external-link", url)
+  },
   openLogsDir() {
     return ipcRenderer.sendSync("open-logs-dir")
   },
@@ -34,9 +34,6 @@ contextBridge.exposeInMainWorld("electron", {
   readLogs() {
     return ipcRenderer.sendSync("read-logs")
   },
-  // async sendImage(base64Image: string) {
-  //   return ipcRenderer.invoke("set-image", base64Image)
-  // },
   setMode(mode: PaletteMode) {
     return ipcRenderer.sendSync("set-mode", mode)
   },

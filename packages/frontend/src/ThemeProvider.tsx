@@ -3,7 +3,6 @@ import {
   CssVarsThemeOptions,
   Experimental_CssVarsProvider as CssVarsProvider,
   experimental_extendTheme as extendTheme,
-  useMediaQuery,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { Globals, useReducedMotion } from "@react-spring/web"
@@ -11,6 +10,7 @@ import { merge } from "lodash-es"
 import React, { PropsWithChildren, useEffect, useMemo } from "react"
 
 import { ThemeSideEffects } from "./components/ThemeSideEffects"
+import { useBreakpoints } from "./hooks/useBreakpoints"
 import { $reducedMotion } from "./stores/app-store"
 import { theme } from "./theme"
 
@@ -18,10 +18,7 @@ export function ThemeProvider({ children }: PropsWithChildren) {
   const reducedMotion = useStore($reducedMotion)
   const browserPreference = useReducedMotion()
 
-  const isMobile = useMediaQuery("(max-width: 599px)")
-  const isTablet = useMediaQuery("(max-width: 899px)")
-  const isDesktop = !isMobile && !isTablet
-  // const isMobile = useMediaQuery((theme: any) => theme.breakpoints.down("md")) FIXME TODO0
+  const { isMobile, isTablet, isDesktop } = useBreakpoints()
 
   const skipAnimation = useMemo(() => {
     if (reducedMotion === "never") {

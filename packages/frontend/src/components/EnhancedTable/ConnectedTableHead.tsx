@@ -23,6 +23,7 @@ import {
   FilterKey,
   getFilterValueLabel,
 } from "../../stores/metadata-store"
+import { $colorArray, stringToNumber } from "../../utils/color-utils"
 import { ActiveFilterMap, BaseType, HeadCell, Order } from "../../utils/table-utils"
 
 export interface ConnectedTableHeadProps<T extends BaseType> {
@@ -62,6 +63,8 @@ export function ConnectedTableHead<T extends BaseType>(props: ConnectedTableHead
     if (!key) return
     setFilterKey(key, event.target.value || undefined)
   }
+
+  const colorArray = useStore($colorArray)
 
   return (
     <>
@@ -125,7 +128,16 @@ export function ConnectedTableHead<T extends BaseType>(props: ConnectedTableHead
                 sx={{ marginLeft: -0.75, marginRight: 0.25 }}
                 onClick={toggleOpen}
               >
-                <Badge badgeContent={filterValue ? 1 : 0} color="secondary" variant="dot">
+                <Badge
+                  badgeContent={filterValue ? 1 : 0}
+                  color="secondary"
+                  variant="dot"
+                  sx={{
+                    "& .MuiBadge-dot": {
+                      background: colorArray[stringToNumber(key) % colorArray.length],
+                    },
+                  }}
+                >
                   <FilterListRounded fontSize="inherit" />
                 </Badge>
               </IconButton>

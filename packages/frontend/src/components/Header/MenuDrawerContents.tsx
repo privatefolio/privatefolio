@@ -67,11 +67,11 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
   return (
     <>
       <Stack
-        sx={{
+        sx={(theme) => ({
           "& .MuiListItemAvatar-root svg": {
             fontSize: "1.25rem",
           },
-          "@media (min-width: 990px) and (max-width: 1836px)": {
+          [theme.breakpoints.between("md", "xl")]: {
             "& .MuiListItemAvatar-root": {
               fontSize: "1.5rem",
               marginRight: 0,
@@ -90,7 +90,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             },
             gap: "16px",
             paddingX: 0.5,
-            paddingY: 1,
+            paddingY: 0.5,
           },
           gap: 1,
           height: "100%",
@@ -98,7 +98,7 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
           paddingX: 2,
           paddingY: 1,
           width: "100%",
-        }}
+        })}
         justifyContent="space-between"
       >
         <Stack gap={0.25}>
@@ -110,27 +110,34 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
               sx={{
                 borderRadius: 0.5,
                 justifyContent: "flex-start",
+                minHeight: {
+                  md: "unset !important",
+                  xl: "unset !important",
+                },
                 paddingX: 2,
+                paddingY: {
+                  md: "12px !important",
+                  xl: "6px !important",
+                },
               }}
             >
               <LogoText
                 sx={{
                   display: {
                     md: "none",
+                    xl: "inline-flex",
                     xs: "inline-flex",
-                    xxl: "inline-flex",
                   },
                 }}
               />
               <Logo
-                color="var(--mui-palette-primary-main)"
                 width={24}
                 height={24}
                 sx={{
                   display: {
                     md: "inline-flex",
+                    xl: "none",
                     xs: "none",
-                    xxl: "none",
                   },
                 }}
               />

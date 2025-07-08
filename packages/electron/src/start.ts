@@ -3,6 +3,7 @@ import Logger from "electron-log/main"
 import Store from "electron-store"
 import path from "path"
 
+import { TITLE_BAR_OPTS } from "./api"
 import { getAutoLaunchEnabled, toggleAutoLaunch } from "./auto-launch"
 import { AutoUpdater } from "./auto-updater"
 import * as backendManager from "./backend-manager"
@@ -96,12 +97,11 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     height: windowState.height,
     icon: appIconPath,
-    minHeight: 480,
-    minWidth: 480,
+    minHeight: 500,
+    minWidth: 500,
     show: false,
-    // titleBarOverlay: TITLE_BAR_OPTS.light, TODO9
-    titleBarStyle: "default",
-    // titleBarStyle: isWindows ? "hidden" : "default",
+    titleBarOverlay: TITLE_BAR_OPTS.light,
+    titleBarStyle: "hidden",
     webPreferences: {
       additionalArguments: [`--${appEnvironment}`],
       preload: path.join(__dirname, "./preload.js"),

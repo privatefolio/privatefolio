@@ -1,9 +1,10 @@
-import { Box, Stack, Typography, useMediaQuery } from "@mui/material"
+import { Box, Stack, Typography } from "@mui/material"
 import MuiTablePagination, {
   tablePaginationClasses,
   TablePaginationProps,
 } from "@mui/material/TablePagination"
 import React from "react"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 
 import { QueryTimer } from "./QueryTimer"
 import { TablePaginationActions } from "./TableActions"
@@ -16,7 +17,7 @@ type TableFooterProps = TablePaginationProps & {
 export function TableFooter(props: TableFooterProps) {
   const { queryTime, count, stickyVersion, sx, ...rest } = props
 
-  const isTablet = useMediaQuery("(max-width: 899px)")
+  const { isTablet } = useBreakpoints()
 
   return (
     <Stack

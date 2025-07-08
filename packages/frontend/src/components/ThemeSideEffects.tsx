@@ -2,9 +2,14 @@ import { useTheme } from "@mui/material"
 import React, { useEffect } from "react"
 import { bgColor } from "src/theme"
 import { $colorArray } from "src/utils/color-utils"
+import { setElectronMode } from "src/utils/electron-utils"
 
 export function ThemeSideEffects() {
   const theme = useTheme()
+
+  useEffect(() => {
+    setElectronMode?.(theme.palette.mode)
+  }, [theme.palette.mode])
 
   useEffect(() => {
     document

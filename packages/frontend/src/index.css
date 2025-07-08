@@ -25,60 +25,68 @@ html {
 
 /* Scrollbar */
 @media (hover: hover) and (pointer: fine) {
-::-webkit-scrollbar-corner {
-  background: transparent;
-  border-color: transparent;
-}
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+    border-color: transparent;
+  }
 
-/* Scrollbar for body  */
-body::-webkit-scrollbar,
-body::-webkit-scrollbar-thumb {
-  width: 12px;
-  height: 12px;
-  border-radius: 0px;
-}
+  /* Scrollbar for body  */
+  body::-webkit-scrollbar,
+  body::-webkit-scrollbar-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 0px;
+  }
 
-/* html[data-mui-color-scheme="light"] body::-webkit-scrollbar {
-  background: rgb(255, 255, 255);
-}
+  /* html[data-mui-color-scheme="light"] body::-webkit-scrollbar {
+    background: rgb(255, 255, 255);
+  }
 
-html[data-mui-color-scheme="dark"] body::-webkit-scrollbar {
-  background: rgba(40, 40, 40);
-} */
+  html[data-mui-color-scheme="dark"] body::-webkit-scrollbar {
+    background: rgba(40, 40, 40);
+  } */
 
-/* Scrollbar for the rest of the app  */
-::-webkit-scrollbar {
-  background: transparent;
-}
+  /* Scrollbar for the rest of the app  */
+  ::-webkit-scrollbar {
+    background: transparent;
+  }
 
-::-webkit-scrollbar,
-::-webkit-scrollbar-thumb {
-  width: 8px;
-  height: 8px;
-  border-radius: 8px;
-}
+  ::-webkit-scrollbar,
+  ::-webkit-scrollbar-thumb {
+    width: 8px;
+    height: 8px;
+    border-radius: 8px;
+  }
 
-::-webkit-scrollbar-thumb {
-  /* background: rgba(0, 0, 0, 0.15); */
-  background: rgba(205, 205, 205);
-}
+  ::-webkit-scrollbar-thumb {
+    /* background: rgba(0, 0, 0, 0.15); */
+    background: rgba(205, 205, 205);
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  /* background: rgba(0, 0, 0, 0.25); */
-  background: rgba(185, 185, 185);
-}
+  ::-webkit-scrollbar-thumb:hover {
+    /* background: rgba(0, 0, 0, 0.25); */
+    background: rgba(185, 185, 185);
+  }
 
-html[data-mui-color-scheme="dark"] ::-webkit-scrollbar-thumb {
-  /* background: rgba(255, 255, 255, 0.15); */
-  background: rgba(85, 85, 85);
-}
+  html[data-mui-color-scheme="dark"] ::-webkit-scrollbar-thumb {
+    /* background: rgba(255, 255, 255, 0.15); */
+    background: rgba(85, 85, 85);
+  }
 
-html[data-mui-color-scheme="dark"] ::-webkit-scrollbar-thumb:hover {
-  /* background: rgba(255, 255, 255, 0.25); */
-  background: rgba(95, 95, 95);
-}
-}
+  html[data-mui-color-scheme="dark"] ::-webkit-scrollbar-thumb:hover {
+    /* background: rgba(255, 255, 255, 0.25); */
+    background: rgba(95, 95, 95);
+  }
 
+  .nav-drawer {
+    ::-webkit-scrollbar,
+    ::-webkit-scrollbar-thumb {
+      width: 0px;
+      height: 0px;
+      border-radius: 0px;
+    }
+  }
+}
 
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {

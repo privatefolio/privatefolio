@@ -11,6 +11,7 @@ import {
   Typography,
 } from "@mui/material"
 import React from "react"
+import { AppLink } from "src/components/AppLink"
 import { CoinGeckoIcon } from "src/components/CoinGeckoIcon"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { DiscordIcon } from "src/components/DiscordIcon"
@@ -60,8 +61,7 @@ export function AssetDetails(props: AssetDetailsProps) {
                 <Stack direction="row" gap={1} flexWrap="wrap">
                   <Chip
                     href={`https://coingecko.com/en/coins/${metadata.id}`}
-                    target="_blank"
-                    component="a"
+                    component={AppLink}
                     sx={{ borderRadius: 12 }}
                     onClick={() => {
                       //
@@ -72,8 +72,7 @@ export function AssetDetails(props: AssetDetailsProps) {
                   {metadata.links.homepage && metadata.links.homepage[0] && (
                     <Chip
                       href={metadata.links.homepage[0]}
-                      target="_blank"
-                      component="a"
+                      component={AppLink}
                       sx={{ borderRadius: 12 }}
                       onClick={noop}
                       label={formatWebsiteLink(metadata.links.homepage[0])}
@@ -83,8 +82,7 @@ export function AssetDetails(props: AssetDetailsProps) {
                   {metadata.links.twitter_screen_name && (
                     <Chip
                       href={`https://twitter.com/${metadata.links.twitter_screen_name}`}
-                      target="_blank"
-                      component="a"
+                      component={AppLink}
                       sx={{ borderRadius: 12 }}
                       onClick={noop}
                       label={metadata.links.twitter_screen_name}
@@ -94,8 +92,7 @@ export function AssetDetails(props: AssetDetailsProps) {
                   {metadata.links.subreddit_url && (
                     <Chip
                       href={metadata.links.subreddit_url}
-                      target="_blank"
-                      component="a"
+                      component={AppLink}
                       sx={{ borderRadius: 12 }}
                       onClick={noop}
                       label={formatWebsiteLink(
@@ -107,8 +104,7 @@ export function AssetDetails(props: AssetDetailsProps) {
                   {metadata.links.telegram_channel_identifier && (
                     <Chip
                       href={`https://t.me/${metadata.links.telegram_channel_identifier}`}
-                      target="_blank"
-                      component="a"
+                      component={AppLink}
                       sx={{ borderRadius: 12 }}
                       onClick={noop}
                       label={metadata.links.telegram_channel_identifier}
@@ -118,8 +114,7 @@ export function AssetDetails(props: AssetDetailsProps) {
                   {metadata.links.chat_url && metadata.links.chat_url[0] && (
                     <Chip
                       href={metadata.links.chat_url[0]}
-                      target="_blank"
-                      component="a"
+                      component={AppLink}
                       sx={{ borderRadius: 12 }}
                       onClick={noop}
                       label={formatWebsiteLink(metadata.links.chat_url[0])}
@@ -129,8 +124,7 @@ export function AssetDetails(props: AssetDetailsProps) {
                   {metadata.links.repos_url.github && metadata.links.repos_url.github[0] && (
                     <Chip
                       href={metadata.links.repos_url.github[0]}
-                      target="_blank"
-                      component="a"
+                      component={AppLink}
                       sx={{ borderRadius: 12 }}
                       onClick={noop}
                       label={formatWebsiteLink(

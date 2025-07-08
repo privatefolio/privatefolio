@@ -1,5 +1,5 @@
 import { SdCardRounded } from "@mui/icons-material"
-import { MenuItem, Select, SelectChangeEvent, Stack, Tooltip, useMediaQuery } from "@mui/material"
+import { MenuItem, Select, SelectChangeEvent, Stack, Tooltip } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { debounce } from "lodash-es"
 import { getLivePricesForAsset } from "privatefolio-backend/build/src/extensions/prices/providers"
@@ -7,6 +7,7 @@ import { allPriceApiIds } from "privatefolio-backend/src/settings/price-apis"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 import { ExtensionAvatar } from "src/components/ExtensionAvatar"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { MyAsset } from "src/interfaces"
 import { DEFAULT_DEBOUNCE_DURATION, PRICE_APIS_META, PriceApiId } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
@@ -77,7 +78,7 @@ export function AssetPriceHistory(props: AssetPriceHistoryProps) {
   )
 
   const currency = useStore($quoteCurrency)
-  const isMobile = useMediaQuery("(max-width: 599px)")
+  const { isMobile } = useBreakpoints()
 
   const chartOptions = useMemo(
     () => ({

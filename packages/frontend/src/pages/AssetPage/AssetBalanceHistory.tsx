@@ -1,6 +1,6 @@
-import { useMediaQuery } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useCallback, useMemo } from "react"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { SqlParam, Time, Timestamp } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 import { $quoteCurrency, $showQuotedAmounts } from "src/stores/device-settings-store"
@@ -104,7 +104,7 @@ export function AssetBalanceHistory(props: AssetBalanceHistoryProps) {
     [rpc, activeAccount, assetId, start, end, showQuotedAmounts]
   )
 
-  const isMobile = useMediaQuery("(max-width: 599px)")
+  const { isMobile } = useBreakpoints()
 
   const chartOptions = useMemo(
     () => ({

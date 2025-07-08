@@ -10,23 +10,26 @@ import {
   Toolbar,
   Tooltip,
   Typography,
-  useMediaQuery,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import { AccountAvatar, SIZE_MAP } from "src/components/AccountAvatar"
 import { AddAccountDialog } from "src/components/AccountPicker/AddAccountDialog"
+import { AppLink } from "src/components/AppLink"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { Gravatar } from "src/components/Gravatar"
 import { LogoText } from "src/components/Header/LogoText"
 import { SettingsButton } from "src/components/Header/SettingsButton"
+import { Logo } from "src/components/Logo"
 import { StaggeredList } from "src/components/StaggeredList"
 import { Truncate } from "src/components/Truncate"
 import { useBoolean } from "src/hooks/useBoolean"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { $activeAccount, $cloudAccounts, $localAccounts } from "src/stores/account-store"
 import { $cloudRpcReady, $cloudUser } from "src/stores/cloud-user-store"
 import { SerifFont } from "src/theme"
+import { isElectron, isWindows } from "src/utils/electron-utils"
 import { cloudEnabled, localServerEnabled, SPRING_CONFIGS } from "src/utils/utils"
 
 export default function AccountsPage() {
@@ -67,7 +70,7 @@ export default function AccountsPage() {
     return () => clearTimeout(timeout)
   }, [])
 
-  const isDesktop = useMediaQuery("(min-width: 900px)")
+  const { isDesktop } = useBreakpoints()
 
   const showWelcomeMessage = !localServerEnabled && cloudUser === null
   const showConfigureMessage = !localServerEnabled && cloudUser && cloudRpcReady === false
@@ -100,7 +103,7 @@ export default function AccountsPage() {
         position="fixed"
         elevation={0}
         sx={{
-          "& button": {
+          "& button, & .MuiInputBase-root, & a": {
             WebkitAppRegion: "no-drag",
           },
           WebkitAppRegion: "drag",
@@ -123,20 +126,38 @@ export default function AccountsPage() {
                 alignItems="center"
                 justifyContent="space-between"
                 gap={1}
-                sx={{
-                  height: "100%",
-
-                  width: "100%",
-                }}
+                sx={(theme) => ({
+                  [theme.breakpoints.down("xxl")]: {
+                    marginRight: !isElectron ? 0 : isWindows ? 15 : 9,
+                  },
+                })}
               >
                 <Button
                   size="small"
+                  color="secondary"
                   variant="text"
                   href="https://privatefolio.xyz"
-                  target="_blank"
+                  component={AppLink}
                   sx={{ marginX: -2, paddingX: 2 }}
                 >
-                  <LogoText />
+                  <LogoText
+                    sx={{
+                      display: {
+                        sm: "inline-flex",
+                        xs: "none",
+                      },
+                    }}
+                  />
+                  <Logo
+                    width={24}
+                    height={24}
+                    sx={{
+                      display: {
+                        sm: "none",
+                        xs: "inline-flex",
+                      },
+                    }}
+                  />
                 </Button>
                 <Stack direction="row" gap={1} alignItems="center">
                   {cloudUser !== undefined && !cloudUser && cloudEnabled && (
@@ -193,7 +214,7 @@ export default function AccountsPage() {
           position: "fixed",
           top: 0,
           width: "100%",
-          zIndex: 1000,
+          // zIndex: 1000,
         }}
         alignItems="center"
         justifyContent="center"
@@ -220,7 +241,7 @@ export default function AccountsPage() {
                 size="large"
                 variant="contained"
                 href="https://privatefolio.xyz/downloads"
-                target="_blank"
+                component={AppLink}
                 endIcon={<OpenInNewRounded sx={{ fontSize: "1rem !important" }} />}
                 sx={{
                   paddingY: 0.25,

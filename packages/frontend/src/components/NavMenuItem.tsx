@@ -1,13 +1,7 @@
-import {
-  ListItemAvatar,
-  ListItemText,
-  MenuItem,
-  MenuItemProps,
-  Tooltip,
-  useMediaQuery,
-} from "@mui/material"
+import { ListItemAvatar, ListItemText, MenuItem, MenuItemProps, Tooltip } from "@mui/material"
 import React, { useEffect, useMemo } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { isInputFocused } from "src/utils/browser-utils"
 
 import { Key } from "./SearchBar/Key"
@@ -70,7 +64,7 @@ export function NavMenuItem(props: NavMenuItemProps) {
     return label.toLowerCase().indexOf(shortcutKey.toLowerCase())
   }, [label, shortcutKey])
 
-  const isTablet = useMediaQuery("(max-width: 899px)")
+  const { isTablet } = useBreakpoints()
 
   return (
     <Tooltip

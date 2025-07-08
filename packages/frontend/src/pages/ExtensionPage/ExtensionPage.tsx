@@ -8,7 +8,6 @@ import {
   TableHead,
   TableRow,
   Typography,
-  useMediaQuery,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { lazy, Suspense, useEffect, useMemo, useState } from "react"
@@ -25,6 +24,7 @@ import { SectionTitle } from "src/components/SectionTitle"
 import { SubtitleText } from "src/components/SubtitleText"
 import { Tabs } from "src/components/Tabs"
 import { TimestampBlock } from "src/components/TimestampBlock"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { RichExtension } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 import { getFilterValueLabel } from "src/stores/metadata-store"
@@ -38,7 +38,7 @@ export default function ExtensionPage() {
   const { extensionId } = useParams<{ extensionId: string }>()
   const [searchParams] = useSearchParams()
   const tab = searchParams.get("tab") || "details"
-  const isTablet = useMediaQuery("(max-width: 899px)")
+  const { isTablet } = useBreakpoints()
 
   const [extension, setExtension] = useState<RichExtension | null | undefined>(undefined)
   const [isLoading, setIsLoading] = useState(true)

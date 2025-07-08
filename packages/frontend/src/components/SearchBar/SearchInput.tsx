@@ -50,7 +50,7 @@ export function SearchInput(props: SearchInputProps) {
     <>
       <TextField
         size="small"
-        sx={{
+        sx={(theme) => ({
           [`& .${inputBaseClasses.input}`]: {
             fontWeight: 200,
             paddingY: 0.5,
@@ -62,9 +62,9 @@ export function SearchInput(props: SearchInputProps) {
           [`& .${inputBaseClasses.root} fieldset`]: {
             border: "none",
           },
-          minWidth: 520,
-          width: "100%",
-        }}
+          [theme.breakpoints.up("md")]: { minWidth: 520 },
+          height: "100%",
+        })}
         ref={query.inputRefSetter}
         autoFocus
         autoComplete="off"

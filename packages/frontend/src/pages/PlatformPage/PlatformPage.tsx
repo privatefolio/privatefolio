@@ -5,6 +5,7 @@ import { isBlockchain, isExchange } from "privatefolio-backend/src/utils/utils"
 import React, { useEffect, useState } from "react"
 import { useParams, useSearchParams } from "react-router-dom"
 import { ActionBlock } from "src/components/ActionBlock"
+import { AppLink } from "src/components/AppLink"
 import { AssetBlock } from "src/components/AssetBlock"
 import { BackButton } from "src/components/BackButton"
 import { CoinGeckoIcon } from "src/components/CoinGeckoIcon"
@@ -136,8 +137,7 @@ export default function PlatformPage() {
                     {isExchange(platform) && platform.url && (
                       <Chip
                         href={platform.url}
-                        target="_blank"
-                        component="a"
+                        component={AppLink}
                         sx={{ borderRadius: 12 }}
                         onClick={() => {
                           //
@@ -148,8 +148,7 @@ export default function PlatformPage() {
                     )}
                     <Chip
                       href={`https://coingecko.com/en/${isBlockchain(platform) ? "chains" : "exchanges"}/${platform.id}`}
-                      target="_blank"
-                      component="a"
+                      component={AppLink}
                       sx={{ borderRadius: 12 }}
                       onClick={() => {
                         //
@@ -160,8 +159,7 @@ export default function PlatformPage() {
                     {isBlockchain(platform) && (
                       <Chip
                         href={`https://www.coingecko.com/en/all-cryptocurrencies?filter_asset_platform=${platform.id}`}
-                        target="_blank"
-                        component="a"
+                        component={AppLink}
                         sx={{ borderRadius: 12 }}
                         onClick={() => {
                           //

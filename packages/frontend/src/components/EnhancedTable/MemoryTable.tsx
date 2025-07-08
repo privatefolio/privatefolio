@@ -1,4 +1,4 @@
-import { Paper, Stack, TableHead, Typography, useMediaQuery } from "@mui/material"
+import { Paper, Stack, TableHead, Typography } from "@mui/material"
 import Table from "@mui/material/Table"
 import TableBody from "@mui/material/TableBody"
 import TableCell from "@mui/material/TableCell"
@@ -14,8 +14,10 @@ import React, {
   useMemo,
   useState,
 } from "react"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { $debugMode } from "src/stores/app-store"
 import { $showRelativeTime } from "src/stores/device-settings-store"
+import { appBarHeight } from "src/theme"
 
 import { TableFooter } from "../../components/TableFooter"
 import {
@@ -210,8 +212,7 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
     $showRelativeTime.set(!$showRelativeTime.get())
   }, [])
 
-  const isTablet = useMediaQuery("(max-width: 899px)")
-  const isMobile = useMediaQuery("(max-width: 599px)")
+  const { isMobile, isTablet } = useBreakpoints()
 
   const stickyVersion = true // rowsPerPage > 20
 
@@ -266,6 +267,7 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
                           padding="normal"
                           sortDirection={orderBy === headCell.key ? order : false}
                           sx={{
+                            top: appBarHeight,
                             ...headCell.sx,
                             ...(isLoading || isEmpty
                               ? {

@@ -35,8 +35,8 @@ export function AccountPickerButton(props: { onClose?: () => void }) {
           component={Button}
           onClick={handleClick}
           color="secondary"
-          sx={{
-            "@media (min-width: 990px) and (max-width: 1836px)": {
+          sx={(theme) => ({
+            [theme.breakpoints.between("md", "xl")]: {
               "& .MuiAvatar-root": {
                 height: 24,
                 width: 24,
@@ -56,7 +56,7 @@ export function AccountPickerButton(props: { onClose?: () => void }) {
             paddingRight: 2,
             paddingY: 1,
             textTransform: "none",
-          }}
+          })}
         >
           <Stack
             direction="row"

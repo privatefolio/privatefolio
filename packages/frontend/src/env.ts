@@ -4,6 +4,7 @@ export const GIT_DATE = import.meta.env.VITE_GIT_DATE || "unknown"
 export const POSTHOG_KEY = import.meta.env.VITE_POSTHOG_KEY
 export const TARGET = import.meta.env.VITE_TARGET
 export const PLATFORM = TARGET === "electron" ? "electron" : "web"
+export const PUBLIC_DIR_LOCATION = TARGET === "electron" ? "./" : "/"
 export const STATIC_ASSET_LOCATION = TARGET === "electron" ? "./app-data" : "/app-data"
 
 function extractVersion(version = "") {
