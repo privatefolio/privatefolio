@@ -139,11 +139,11 @@ export function AssistantChat() {
     event.preventDefault()
     if (isLoading) return
 
-    handleSubmit(event)
-    setTimeout(() => inputRef.current?.focus(), 10)
-
     searchParams.set("new", "false")
     setSearchParams(searchParams, { replace: true })
+
+    handleSubmit(event)
+    setTimeout(() => inputRef.current?.focus(), 10)
   }
 
   const handleStop = () => {

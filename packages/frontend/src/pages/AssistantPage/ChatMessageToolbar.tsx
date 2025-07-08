@@ -58,6 +58,7 @@ export function ChatMessageToolbar(props: { message: Message }) {
             handleCopy()
           }}
           size="small"
+          color="secondary"
         >
           <ContentCopyRounded fontSize="inherit" />
         </IconButton>
@@ -79,6 +80,7 @@ export function ChatMessageToolbar(props: { message: Message }) {
         >
           <IconButton
             size="small"
+            color="secondary"
             onClick={() => {
               navigator.clipboard.writeText(String(usage.totalTokens))
               handleCopy()
@@ -99,6 +101,7 @@ export function ChatMessageToolbar(props: { message: Message }) {
         >
           <IconButton
             size="small"
+            color="secondary"
             onClick={() => {
               navigator.clipboard.writeText(modelId)
               handleCopy()

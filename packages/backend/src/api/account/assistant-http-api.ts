@@ -75,7 +75,8 @@ function resultToChatMessage(
     }),
     parts: JSON.stringify(parts),
     role: "assistant",
-    timestamp: new Date(result.response.timestamp).getTime(),
+    // timestamp: new Date(result.response.timestamp).getTime(),
+    timestamp: Date.now(),
   }
 }
 
