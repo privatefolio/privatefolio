@@ -968,5 +968,4 @@ export const theme: CssVarsThemeOptions = {
     },
     fontFamily: MainFont,
   },
-  zIndex: {},
 }

@@ -745,7 +745,6 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
             bottom: 4,
             position: "absolute",
             width: "100%",
-            zIndex: 2,
             ...(isLoading || isEmpty || error
               ? {
                   borderColor: "transparent",
@@ -757,9 +756,9 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
           justifyContent="space-between"
           direction="row"
         >
-          <div>
+          <Box sx={{ zIndex: 2 }}>
             {queryTime !== undefined && <QueryTimer queryTime={queryTime} variant="caption" />}
-          </div>
+          </Box>
           <div>
             <Tooltip title={logScale ? "Switch to linear scale" : "Switch to log scale"}>
               <Button
