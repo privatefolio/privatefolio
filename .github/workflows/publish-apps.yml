@@ -64,10 +64,10 @@ jobs:
           sudo apt update
           sudo apt install -y --install-recommends winehq-stable
           sudo apt install -y mono-complete
-          sudo snap install snapcraft --classic
+          # sudo snap install snapcraft --classic
           wine64 --version
           mono --version
-          snapcraft --version
+          # snapcraft --version
           yarn install --frozen-lockfile
 
       - name: Install Dependencies (macOS)
