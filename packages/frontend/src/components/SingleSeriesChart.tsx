@@ -180,7 +180,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
   // const preferredType = useStore($preferredType)
   const [preferredType, setPreferredType] = useState<SeriesType>(initType)
   const [isLoading, setLoading] = useState<boolean>(true)
-  const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true)
+  const [_isFirstLoad, setIsFirstLoad] = useState<boolean>(true)
   const [queryTime, setQueryTime] = useState<number | null>(null)
   const [data, setData] = useState<ChartData[] | StackedAreaData[]>([])
   const [error, setError] = useState<Error | null>(null)
@@ -483,13 +483,13 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
             borderBottom: "1px solid var(--mui-palette-TableCell-border)",
             marginLeft: -0.5,
             minHeight: 43,
-            // ...((isFirstLoad || isEmpty) && !showToolbarAlways
-            //   ? {
-            //       borderColor: "transparent",
-            //       opacity: 0,
-            //       pointerEvents: "none",
-            //     }
-            //   : {}),
+            ...(isEmpty && !showToolbarAlways
+              ? {
+                  borderColor: "transparent",
+                  opacity: 0,
+                  pointerEvents: "none",
+                }
+              : {}),
           }}
           alignItems="center"
           justifyContent="space-between"

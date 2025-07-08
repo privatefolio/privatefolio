@@ -8,6 +8,14 @@ import { $activeAccount, $activeAccountPath, $connectionStatus } from "src/store
 import { closeSubscription } from "src/utils/browser-utils"
 import { $rpc } from "src/workers/remotes"
 
+export function NoFilterMatch() {
+  return (
+    <Typography color="text.secondary" variant="body2" component="div">
+      <span>No records match the current filters.</span>
+    </Typography>
+  )
+}
+
 export function NoDataButton() {
   const activeAccountPath = useStore($activeAccountPath)
   const connectionStatus = useStore($connectionStatus)
@@ -29,13 +37,7 @@ export function NoDataButton() {
 
   const dataAvailable = lastTx !== null && lastTx !== 0
 
-  if (dataAvailable) {
-    return (
-      <Typography color="text.secondary" variant="body2" component="div">
-        <span>No records match the current filters.</span>
-      </Typography>
-    )
-  }
+  if (dataAvailable) return <NoFilterMatch />
 
   return (
     <Button sx={{ padding: 4 }} component={Link} to={`${activeAccountPath}/import-data`}>

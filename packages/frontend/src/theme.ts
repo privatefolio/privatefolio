@@ -118,7 +118,7 @@ export const theme: CssVarsThemeOptions = {
       lg: 1200,
       md: 900,
       sm: 600,
-      xl: 1600,
+      xl: 1800,
       xs: 0,
       xxl: 2200,
     },

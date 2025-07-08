@@ -105,7 +105,6 @@ export function TagsTable() {
       rows={tags}
       rowCount={tags.length}
       queryTime={queryTime}
-      defaultRowsPerPage={10}
       emptyContent={
         <Button sx={{ padding: 4 }} onClick={handleAddNewRow}>
           <Typography color="text.secondary" variant="body2" component="div">

@@ -36,7 +36,7 @@ import {
 } from "../../utils/table-utils"
 import { DefaultSpinner } from "../DefaultSpinner"
 import { FilterChip } from "../FilterChip"
-import { NoDataButton } from "../NoDataButton"
+import { NoDataButton, NoFilterMatch } from "../NoDataButton"
 import { ConnectedTableHead } from "./ConnectedTableHead"
 
 function descendingComparator<T extends BaseType>(
@@ -308,14 +308,24 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
                 {filteredRows.length === 0 && !isEmpty && !isLoading && !error && (
                   <TableRow>
                     <TableCell colSpan={headCells.length}>
-                      No records match the current filters.
+                      <Stack
+                        justifyContent="center"
+                        alignItems="center"
+                        sx={{ height: defaultRowsPerPage === 10 ? 140 : 260 }}
+                      >
+                        <NoFilterMatch />
+                      </Stack>
                     </TableCell>
                   </TableRow>
                 )}
                 {(isLoading || isEmpty) && (
                   <TableRow>
                     <TableCell colSpan={headCells.length}>
-                      <Stack justifyContent="center" alignItems="center" sx={{ height: 260 }}>
+                      <Stack
+                        justifyContent="center"
+                        alignItems="center"
+                        sx={{ height: defaultRowsPerPage === 10 ? 140 : 260 }}
+                      >
                         {isEmpty && !isLoading && !error && emptyContent}
                         {isLoading && <DefaultSpinner />}
                         {error && (

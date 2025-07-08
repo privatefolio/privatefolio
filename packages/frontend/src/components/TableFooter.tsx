@@ -28,6 +28,7 @@ export function TableFooter(props: TableFooterProps) {
         borderBottomRightRadius: "var(--priv-border-radius)",
         borderTop: "1px solid var(--mui-palette-TableCell-border)",
         bottom: 0,
+        height: 53,
         paddingX: 2,
         position: stickyVersion ? "sticky" : undefined,
         ...sx,

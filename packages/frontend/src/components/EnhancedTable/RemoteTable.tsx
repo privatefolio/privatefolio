@@ -38,7 +38,7 @@ import {
 } from "../../utils/table-utils"
 import { DefaultSpinner } from "../DefaultSpinner"
 import { FilterChip } from "../FilterChip"
-import { NoDataButton } from "../NoDataButton"
+import { NoDataButton, NoFilterMatch } from "../NoDataButton"
 import { TableFooter } from "../TableFooter"
 import { ConnectedTableHead } from "./ConnectedTableHead"
 import { ProgressWithMemory } from "./ProgressWithMemory"
@@ -334,7 +334,13 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
                 {rows.length === 0 && !isEmpty && !loading && !error && (
                   <TableRow>
                     <TableCell colSpan={headCells.length}>
-                      No records match the current filters.
+                      <Stack
+                        justifyContent="center"
+                        alignItems="center"
+                        sx={{ height: defaultRowsPerPage === 10 ? 140 : 260 }}
+                      >
+                        <NoFilterMatch />
+                      </Stack>
                     </TableCell>
                   </TableRow>
                 )}
@@ -344,7 +350,7 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
                       <Stack
                         justifyContent="center"
                         alignItems="center"
-                        sx={{ height: defaultRowsPerPage === 10 ? 100 : 260 }}
+                        sx={{ height: defaultRowsPerPage === 10 ? 140 : 260 }}
                         gap={1}
                       >
                         {isEmpty && !isFirstLoading && emptyContent}

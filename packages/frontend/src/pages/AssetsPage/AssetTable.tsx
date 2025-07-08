@@ -131,7 +131,6 @@ export function AssetTable() {
         rows={filteredRows}
         rowCount={rows.length}
         queryTime={inMemoryDataQueryTime}
-        defaultRowsPerPage={10}
         extraRow={
           !!hiddenAssets && (
             <TableRow>

@@ -72,8 +72,9 @@ export function Tabs({ sx, largeSize, ...rest }: TabsProps) {
         variant="scrollable"
         scrollButtons={false}
         sx={(theme) => ({
-          marginTop: "-9px",
-          marginX: 2,
+          marginX: 1,
+          maxHeight: 42,
+          minHeight: 42,
           [`& .${tabsClasses.indicator}`]: {
             // background: grey[600],
             background: "var(--mui-palette-secondary-main)",
@@ -84,17 +85,21 @@ export function Tabs({ sx, largeSize, ...rest }: TabsProps) {
             height: 4,
           },
           [`& .${tabsClasses.flexContainer}`]: {
-            gap: 3,
+            gap: 1,
           },
           [`& .${tabsClasses.flexContainer} > a`]: {
             ...theme.typography.body1,
+            borderTopLeftRadius: 8,
+            borderTopRightRadius: 8,
             fontFamily: SerifFont,
             fontSize: largeSize ? "1.125rem" : "1rem",
             fontWeight: 500,
             letterSpacing: { sm: "0.0375rem", xs: 0 },
-            //
+            maxHeight: 42,
+            minHeight: 42,
             minWidth: 0,
-            paddingX: 0,
+            paddingTop: "2px !important",
+            paddingX: 1,
             transition: theme.transitions.create("color"),
           },
           [`& .${tabsClasses.flexContainer} > a:hover`]: {

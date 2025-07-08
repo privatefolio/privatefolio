@@ -209,6 +209,7 @@ export default function App() {
               maxWidth: 96,
               minWidth: 96,
               position: "fixed",
+              zIndex: "calc(var(--mui-zIndex-appBar) + 1)",
             })}
           >
             <MenuDrawerContents open toggleOpen={noop} appVer={APP_VERSION} gitHash={GIT_HASH} />

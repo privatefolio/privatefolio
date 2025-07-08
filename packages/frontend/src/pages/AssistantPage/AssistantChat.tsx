@@ -118,7 +118,14 @@ export function AssistantChat() {
     api: `${rest.baseUrl}/assistant-chat`,
     body: { accountName: activeAccount, modelId },
     headers: { Authorization: `Bearer ${localStorage.getItem(rest.jwtKey)}` },
-    id: existingConversationId || window.crypto.randomUUID(),
+    id:
+      existingConversationId ||
+      (function generateId() {
+        if (existingConversationId) return existingConversationId
+        searchParams.set("new", "true")
+        setSearchParams(searchParams, { replace: true })
+        return window.crypto.randomUUID()
+      })(),
     initialMessages,
   })
 
@@ -588,13 +595,14 @@ export function AssistantChat() {
                   </MenuItemWithTooltip>
                 ))}
               </Select>
-              <AvatarGroup>
+              <AvatarGroup sx={{ gap: 0.5 }}>
                 {model?.capabilities?.map((x) => (
                   <Tooltip key={x} title={getFilterValueLabel(x)} placement="top">
                     <Avatar
                       sx={{
                         "& svg": { fontSize: 20 },
-                        background: "var(--mui-palette-background-paper)",
+                        background: "rgba(var(--mui-palette-common-onBackgroundChannel) / 0.05)",
+                        borderColor: "var(--mui-palette-background-paper) !important",
                         color: "text.secondary",
                         height: 30,
                         width: 30,

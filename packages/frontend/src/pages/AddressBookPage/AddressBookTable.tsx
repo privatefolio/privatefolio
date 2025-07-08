@@ -86,7 +86,6 @@ export function AddressBookTable() {
         rows={rows}
         rowCount={rows.length}
         queryTime={inMemoryDataQueryTime}
-        defaultRowsPerPage={10}
         emptyContent={
           <Button sx={{ padding: 4 }} onClick={handleAddNewRow}>
             <Typography color="text.secondary" variant="body2" component="div">
