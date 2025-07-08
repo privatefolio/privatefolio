@@ -1,6 +1,7 @@
 import { Box, useTheme } from "@mui/material"
 import { enqueueSnackbar } from "notistack"
 import React, { useEffect, useRef } from "react"
+import { PUBLIC_DIR_LOCATION } from "src/env"
 
 import { candleStickOptions } from "../../utils/chart-utils"
 import {
@@ -68,7 +69,7 @@ export default function ProChart() {
         intervals: ["1S", "1", "60", "1D", "1W", "1M"] as ResolutionString[],
       },
       interval: "1D" as ResolutionString,
-      library_path: "/charting_library/",
+      library_path: `${PUBLIC_DIR_LOCATION}charting_library/`,
       loading_screen: {
         backgroundColor: theme.palette.background.default,
         foregroundColor: theme.palette.accent.main,

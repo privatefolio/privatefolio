@@ -1,10 +1,10 @@
 "use client"
 
-import { AppBar, Container, Stack, Toolbar, useTheme } from "@mui/material"
+import { AppBar, Container, Stack, Toolbar } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React, { useEffect } from "react"
+import React from "react"
 import { $activeAccount } from "src/stores/account-store"
-import { isElectron, setElectronMode } from "src/utils/electron-utils"
+import { isElectron } from "src/utils/electron-utils"
 
 import { CurrencySelector } from "../CurrencySelector"
 import { SearchBar } from "../SearchBar/SearchBar"
@@ -13,11 +13,6 @@ import { NavigationMenu } from "./NavigationMenu"
 import { SettingsButton } from "./SettingsButton"
 
 export function Header() {
-  const theme = useTheme()
-  useEffect(() => {
-    setElectronMode?.(theme.palette.mode)
-  }, [theme.palette.mode])
-
   const activeAccount = useStore($activeAccount)
   if (activeAccount === "") return null
 
