@@ -78,6 +78,9 @@ const config: Configuration = {
   },
   win: {
     icon: "build/images/icon.ico",
+    /* @ts-expect-error - This is a workaround to disable code signing */
+    sign: false,
+    signAndEditExecutable: false,
     target: [
       {
         arch: ["x64"],
