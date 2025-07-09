@@ -22,6 +22,7 @@ import * as tags from "./account/tags-api"
 import * as trades from "./account/trades-api"
 import * as transactions from "./account/transactions-api"
 import * as accounts from "./accounts-api"
+import * as investmentPlanner from "../extensions/investment-planner/api"
 
 export const api = {
   ...analytics,
@@ -46,6 +47,7 @@ export const api = {
   ...trades,
   ...settings,
   ...platforms,
+  ...investmentPlanner,
 } satisfies BackendApiShape
 
 export type Api = typeof api
