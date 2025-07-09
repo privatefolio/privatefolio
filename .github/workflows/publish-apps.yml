@@ -79,6 +79,12 @@ jobs:
           echo "$CSC_LINK" | base64 -d > cert.p12
           openssl pkcs12 -in cert.p12 -nokeys -passin pass:"$CSC_KEY_PASSWORD"
 
+      - name: Patch code signing password (macOS workaround)
+        if: matrix.os == 'macos-latest'
+        run: |
+          echo -n "$CSC_KEY_PASSWORD" > signing-password.txt
+          export CSC_KEY_PASSWORD="$(cat signing-password.txt)"
+
       - name: Install Dependencies (macOS)
         if: matrix.os == 'macos-latest'
         run: yarn install --frozen-lockfile
