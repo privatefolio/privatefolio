@@ -79,7 +79,9 @@ const config: Configuration = {
   win: {
     icon: "build/images/icon.ico",
     signAndEditExecutable: false,
-    signtoolOptions: null, // explicitly disable advanced signing
+    signtoolOptions: {
+      sign: null,
+    }, // explicitly disable advanced signing
     target: [
       {
         arch: ["x64"],

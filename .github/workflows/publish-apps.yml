@@ -66,11 +66,18 @@ jobs:
           sudo apt update
           sudo apt install -y --install-recommends winehq-stable
           sudo apt install -y mono-complete
+          sudo apt install -y openssl # for code signing
           # sudo snap install snapcraft --classic
           wine64 --version
           mono --version
           # snapcraft --version
           yarn install --frozen-lockfile
+
+      - name: Decode and test p12
+        if: matrix.os == 'macos-latest'
+        run: |
+          echo "$CSC_LINK" | base64 -d > cert.p12
+          openssl pkcs12 -in cert.p12 -nokeys -passin pass:"$CSC_KEY_PASSWORD"
 
       - name: Install Dependencies (macOS)
         if: matrix.os == 'macos-latest'
