@@ -11,8 +11,6 @@ permissions:
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  CSC_LINK: ${{ secrets.CSC_LINK }}
-  CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
 
 jobs:
   build-and-publish:
@@ -66,24 +64,18 @@ jobs:
           sudo apt update
           sudo apt install -y --install-recommends winehq-stable
           sudo apt install -y mono-complete
-          sudo apt install -y libssl1.1 || sudo apt install -y libssl1.1=1.1.1f-1ubuntu2.16
           # sudo snap install snapcraft --classic
           wine64 --version
           mono --version
           # snapcraft --version
           yarn install --frozen-lockfile
 
-      - name: Decode and test p12
+      - name: Export macOS signing secrets
         if: matrix.os == 'macos-latest'
         run: |
-          echo "$CSC_LINK" | base64 -d > cert.p12
-          openssl pkcs12 -in cert.p12 -nokeys -passin pass:"$CSC_KEY_PASSWORD"
+          echo "CSC_LINK=${{ secrets.CSC_LINK }}" >> $GITHUB_ENV
+          echo "CSC_KEY_PASSWORD=${{ secrets.CSC_KEY_PASSWORD }}" >> $GITHUB_ENV
 
-      - name: Patch code signing password (macOS workaround)
-        if: matrix.os == 'macos-latest'
-        run: |
-          echo -n "$CSC_KEY_PASSWORD" > signing-password.txt
-          export CSC_KEY_PASSWORD="$(cat signing-password.txt)"
 
       - name: Install Dependencies (macOS)
         if: matrix.os == 'macos-latest'
