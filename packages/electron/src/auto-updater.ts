@@ -5,8 +5,8 @@ import { autoUpdater, UpdateDownloadedEvent, UpdateInfo } from "electron-updater
 
 import { isProduction } from "./utils"
 
-const CHECK_FOR_UPDATES_INTERVAL = 60 * 60 * 1000 // 1 hour
-const CHECK_FOR_UPDATES_START_DELAY = 10 * 1000 // 10 seconds
+const CHECK_FOR_UPDATES_INTERVAL = 24 * 60 * 60 * 1000 // 24 hours
+const CHECK_FOR_UPDATES_START_DELAY = 60 * 1000 // 60 seconds
 const GITHUB_REPO_URL = "https://github.com/privatefolio/privatefolio"
 const DOWNLOADS_URL = "https://privatefolio.xyz/downloads"
 
