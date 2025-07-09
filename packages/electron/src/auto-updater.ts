@@ -92,7 +92,7 @@ export class AutoUpdater {
     })
 
     if (response === 0) {
-      autoUpdater.quitAndInstall()
+      autoUpdater.quitAndInstall(false, true)
     }
   }
 
