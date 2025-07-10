@@ -54,13 +54,7 @@ jobs:
       - name: Export Snapcraft credentials
         if: matrix.os == 'ubuntu-latest'
         run: |
-          # decode the base-64 secret to a temp file
-          echo "${{ secrets.SNAPCRAFT_LOGIN }}" | base64 -d > snap.json
-      
-          # append a multi-line env-var to $GITHUB_ENV
-          echo "SNAPCRAFT_STORE_CREDENTIALS<<EOF" >> "$GITHUB_ENV"
-          cat snap.json >> "$GITHUB_ENV"
-          echo "EOF" >> "$GITHUB_ENV"
+          echo "SNAPCRAFT_STORE_CREDENTIALS=${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}" >> $GITHUB_ENV
           
       - name: Export macOS signing secrets
         if: matrix.os == 'macos-latest'
