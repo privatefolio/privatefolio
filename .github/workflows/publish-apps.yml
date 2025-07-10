@@ -51,12 +51,18 @@ jobs:
           key: deps-packages-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
           restore-keys: deps-packages-${{ runner.os }}-
 
-      - name: Decode Snapcraft credentials
+      - name: Export Snapcraft credentials
         if: matrix.os == 'ubuntu-latest'
         run: |
-          echo "${{ secrets.SNAPCRAFT_LOGIN }}" | base64 -d > snapcraft_credentials
-          mkdir -p ~/.snap
-          mv snapcraft_credentials ~/.snap/credentials
+          # Decode base 64 -> temp file
+          echo "${{ secrets.SNAPCRAFT_LOGIN }}" | base64 -d > snap.json
+      
+          # Add a multi-line env var for later steps
+          {
+            echo 'SNAPCRAFT_STORE_CREDENTIALS<<EOF'
+            cat snap.json
+            echo 'EOF'
+          } >> "$GITHUB_ENV"
 
       - name: Export macOS signing secrets
         if: matrix.os == 'macos-latest'
