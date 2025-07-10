@@ -55,7 +55,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           echo "SNAPCRAFT_STORE_CREDENTIALS=${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}" >> $GITHUB_ENV
-          
+
       - name: Export macOS signing secrets
         if: matrix.os == 'macos-latest'
         run: |
@@ -65,18 +65,31 @@ jobs:
           echo "APPLE_ID=${{ secrets.APPLE_ID }}" >> $GITHUB_ENV
           echo "APPLE_APP_SPECIFIC_PASSWORD=${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}" >> $GITHUB_ENV
 
-      - name: Export macOS signing secrets
+      - name: Create temp keychain & import cert
         if: matrix.os == 'macos-latest'
         run: |
-          security create-keychain -p temp-password build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p temp-password build.keychain
-          security import <(echo "$CSC_LINK" | base64 -d) -k build.keychain -P "$CSC_KEY_PASSWORD" -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple: -s -k temp-password build.keychain
+          # 1 Create / unlock isolated keychain
+          security create-keychain -p temp-pass build.keychain
+          security default-keychain  -s build.keychain
+          security unlock-keychain   -p temp-pass build.keychain
+
+          # 2 Decode the base64-encoded .p12 coming from CSC_LINK
+          echo "$CSC_LINK" | base64 --decode > /tmp/cert.p12
+
+          # 3 Import the cert (PKCS#12) and allow codesign / productsign
+          security import /tmp/cert.p12 \
+            -k build.keychain \
+            -f pkcs12 \
+            -P "$CSC_KEY_PASSWORD" \
+            -T /usr/bin/codesign \
+            -T /usr/bin/productsign
+
+          # 4 Give build tools non-interactive access
+          security set-key-partition-list -S apple-tool:,apple: -s -k temp-pass build.keychain
         env:
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-  
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
@@ -95,7 +108,6 @@ jobs:
           mono --version
           snapcraft --version
           yarn install --frozen-lockfile
-
 
       - name: Install Dependencies (macOS)
         if: matrix.os == 'macos-latest'
