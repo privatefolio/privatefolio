@@ -3,6 +3,12 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.19 - 2025/07/09
+
+### 💡 Feature updates
+
+- Code-signing for the macOS app
+
 ## v2.0.0-beta.18 - 2025/07/08
 
 ### 💡 Feature updates
