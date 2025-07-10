@@ -89,16 +89,20 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: yarn install --frozen-lockfile
 
-      - name: Build and Publish Binaries (Linux + Windows)
+      - name: Build and Publish Binary (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
           yarn build-bin:linux
-          yarn build-bin:win
 
       - name: Publish Snap
         if: matrix.os == 'ubuntu-latest'
         run: |
-          snapcraft upload --release=stable "$(realpath packages/electron/out/*.snap)"
+          snapcraft upload --release=stable "$(realpath ./packages/electron/out/*.snap)"
+
+      - name: Build and Publish Binary (Windows)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          yarn build-bin:win
 
       - name: Build and Publish Binary (macOS)
         if: matrix.os == 'macos-latest'
