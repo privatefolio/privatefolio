@@ -64,6 +64,9 @@ jobs:
           echo "APPLE_TEAM_ID=${{ secrets.APPLE_TEAM_ID }}" >> $GITHUB_ENV
           echo "APPLE_ID=${{ secrets.APPLE_ID }}" >> $GITHUB_ENV
           echo "APPLE_APP_SPECIFIC_PASSWORD=${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}" >> $GITHUB_ENV
+          # https://github.com/electron/packager/issues/701
+          security unlock-keychain -p "$CSC_KEY_PASSWORD" ~/Library/Keychains/login.keychain-db
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$CSC_KEY_PASSWORD" ~/Library/Keychains/login.keychain-db
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2

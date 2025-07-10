@@ -42,6 +42,7 @@ const config: Configuration = {
   ],
   linux: {
     category: "Finance;Productivity",
+    executableName: "privatefolio",
     icon: "build/icons/png/512x512.png",
     target: [
       {
