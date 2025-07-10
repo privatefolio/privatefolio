@@ -41,26 +41,27 @@ const config: Configuration = {
     },
   ],
   linux: {
-    category: "Office;Finance",
+    category: "Finance;Productivity",
     icon: "build/icons/png/512x512.png",
     target: [
       {
         arch: ["x64"],
         target: "deb",
       },
-      // {
-      //   arch: ["x64"],
-      //   target: "snap",
-      // },
+      {
+        arch: ["x64"],
+        target: "snap",
+      },
     ],
   },
   mac: {
-    category: "public.app-category.utilities",
+    category: "public.app-category.finance",
+    hardenedRuntime: true,
     icon: "build/images/icon.icns",
     target: [
       {
         arch: ["x64", "arm64"],
-        target: "zip",
+        target: "dmg",
       },
     ],
   },
@@ -75,6 +76,9 @@ const config: Configuration = {
     owner: "privatefolio",
     provider: "github",
     repo: "privatefolio",
+  },
+  snap: {
+    confinement: "strict",
   },
   win: {
     icon: "build/images/icon.ico",

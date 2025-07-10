@@ -51,6 +51,19 @@ jobs:
           key: deps-packages-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
           restore-keys: deps-packages-${{ runner.os }}-
 
+      - name: Decode Snapcraft credentials
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          echo "${{ secrets.SNAPCRAFT_LOGIN }}" | base64 -d > snapcraft_credentials
+          mkdir -p ~/.snap
+          mv snapcraft_credentials ~/.snap/credentials
+
+      - name: Export macOS signing secrets
+        if: matrix.os == 'macos-latest'
+        run: |
+          echo "CSC_LINK=${{ secrets.CSC_LINK }}" >> $GITHUB_ENV
+          echo "CSC_KEY_PASSWORD=${{ secrets.CSC_KEY_PASSWORD }}" >> $GITHUB_ENV
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
@@ -64,17 +77,11 @@ jobs:
           sudo apt update
           sudo apt install -y --install-recommends winehq-stable
           sudo apt install -y mono-complete
-          # sudo snap install snapcraft --classic
+          sudo snap install snapcraft --classic
           wine64 --version
           mono --version
-          # snapcraft --version
+          snapcraft --version
           yarn install --frozen-lockfile
-
-      - name: Export macOS signing secrets
-        if: matrix.os == 'macos-latest'
-        run: |
-          echo "CSC_LINK=${{ secrets.CSC_LINK }}" >> $GITHUB_ENV
-          echo "CSC_KEY_PASSWORD=${{ secrets.CSC_KEY_PASSWORD }}" >> $GITHUB_ENV
 
 
       - name: Install Dependencies (macOS)
@@ -86,6 +93,11 @@ jobs:
         run: |
           yarn build-bin:linux
           yarn build-bin:win
+
+      - name: Publish Snap
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          snapcraft upload --release=stable "$(realpath packages/electron/out/*.snap)"
 
       - name: Build and Publish Binary (macOS)
         if: matrix.os == 'macos-latest'
