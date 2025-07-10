@@ -57,7 +57,7 @@ const config: Configuration = {
   },
   mac: {
     category: "public.app-category.finance",
-    hardenedRuntime: true,
+    // hardenedRuntime: true,
     icon: "build/images/icon.icns",
     target: [
       {
