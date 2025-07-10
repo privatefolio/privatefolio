@@ -51,45 +51,6 @@ jobs:
           key: deps-packages-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
           restore-keys: deps-packages-${{ runner.os }}-
 
-      - name: Export Snapcraft credentials
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          echo "SNAPCRAFT_STORE_CREDENTIALS=${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}" >> $GITHUB_ENV
-
-      - name: Export macOS signing secrets
-        if: matrix.os == 'macos-latest'
-        run: |
-          echo "CSC_LINK=${{ secrets.CSC_LINK }}" >> $GITHUB_ENV
-          echo "CSC_KEY_PASSWORD=${{ secrets.CSC_KEY_PASSWORD }}" >> $GITHUB_ENV
-          echo "APPLE_TEAM_ID=${{ secrets.APPLE_TEAM_ID }}" >> $GITHUB_ENV
-          echo "APPLE_ID=${{ secrets.APPLE_ID }}" >> $GITHUB_ENV
-          echo "APPLE_APP_SPECIFIC_PASSWORD=${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}" >> $GITHUB_ENV
-
-      - name: Create temp keychain & import cert
-        if: matrix.os == 'macos-latest'
-        run: |
-          # 1 Create / unlock isolated keychain
-          security create-keychain -p temp-pass build.keychain
-          security default-keychain  -s build.keychain
-          security unlock-keychain   -p temp-pass build.keychain
-
-          # 2 Decode the base64-encoded .p12 coming from CSC_LINK
-          echo "$CSC_LINK" | base64 --decode > /tmp/cert.p12
-
-          # 3 Import the cert (PKCS#12) and allow codesign / productsign
-          security import /tmp/cert.p12 \
-            -k build.keychain \
-            -f pkcs12 \
-            -P "$CSC_KEY_PASSWORD" \
-            -T /usr/bin/codesign \
-            -T /usr/bin/productsign
-
-          # 4 Give build tools non-interactive access
-          security set-key-partition-list -S apple-tool:,apple: -s -k temp-pass build.keychain
-        env:
-          CSC_LINK: ${{ secrets.CSC_LINK }}
-          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
@@ -117,6 +78,8 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           yarn build-bin:linux
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
       - name: Publish Snap
         if: matrix.os == 'ubuntu-latest'
@@ -128,9 +91,33 @@ jobs:
         run: |
           yarn build-bin:win
 
+      - name: Create temp keychain & import cert
+        if: matrix.os == 'macos-latest'
+        run: |
+          security create-keychain -p temp-pass build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p temp-pass build.keychain
+          security list-keychains -d user -s build.keychain
+          security set-keychain-settings -lut 7200 build.keychain
+
+          echo "$CSC_LINK" | base64 --decode > /tmp/cert.p12
+          security import /tmp/cert.p12 \
+            -k build.keychain -f pkcs12 -P "$CSC_KEY_PASSWORD" \
+            -T /usr/bin/codesign -T /usr/bin/productsign
+
+          security set-key-partition-list -S apple-tool:,apple: -s -k temp-pass build.keychain
+          echo "CSC_KEYCHAIN=build.keychain" >> $GITHUB_ENV
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+
       - name: Build and Publish Binary (macOS)
         if: matrix.os == 'macos-latest'
         run: yarn build-bin:mac
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
 
       - name: Notify Discord on success
         if: success()
