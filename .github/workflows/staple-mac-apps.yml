@@ -75,11 +75,12 @@ jobs:
           echo "stapled=$STAPLED" >> "$GITHUB_OUTPUT"
 
       - name: Upload stapled DMGs to draft release
+        if: steps.staple.outputs.stapled == 'true'
         run: |
           cd release
           echo "📤  Uploading stapled DMGs…"
           gh release upload "${{ steps.get_draft.outputs.tag }}" *-stapled.dmg \
-            --repo "$GITHUB_REPOSITORY" --clobber || echo "No stapled DMGs to upload."
+            --repo "$GITHUB_REPOSITORY" --clobber
 
   notify:
     needs: check-and-staple
