@@ -80,6 +80,12 @@ const config: Configuration = {
   },
   snap: {
     confinement: "strict",
+    publish: [
+      {
+        channels: ["stable"],
+        provider: "snapStore",
+      },
+    ],
   },
   win: {
     icon: "build/images/icon.ico",

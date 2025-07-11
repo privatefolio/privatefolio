@@ -76,12 +76,6 @@ jobs:
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
-      - name: Publish Snap
-        if: matrix.os == 'ubuntu-latest'
-        run: snapcraft upload --release=stable "$(realpath ./packages/electron/out/*.snap)"
-        env:
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
-
       - name: Build and Publish Binary (Windows)
         if: matrix.os == 'ubuntu-latest'
         run: yarn build-bin:win

@@ -22,8 +22,9 @@ jobs:
       - name: Get latest draft release tag
         id: get_draft
         run: |
-          tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 5 \
-                 | awk -F'\t' '$3 == "Draft" { print $1; exit }')
+          tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 10 \
+                  --json tagName,isDraft \
+                  --jq '.[] | select(.isDraft) | .tagName' | head -n1)
           if [ -z "$tag" ]; then
             echo "❌  No draft release found."
             exit 1
