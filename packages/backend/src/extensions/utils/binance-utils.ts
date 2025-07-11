@@ -44,7 +44,7 @@ export function extractTransactions(logs: AuditLog[], fileImportId: string): Tra
       const timestamp = group[0].timestamp
       //
       const hash = hashString(`${timestamp}`)
-      const _id = `${fileImportId}_${hash}`
+      const _id = `${fileImportId}_${hash}_MERGED`
       // Incoming
       const buyLogs = group.filter((log) => log.operation === "Buy")
       const incomingAsset: string | undefined = buyLogs[0]?.assetId
@@ -62,11 +62,13 @@ export function extractTransactions(logs: AuditLog[], fileImportId: string): Tra
         : undefined
       // Fee
       const feeLogs = group.filter((log) => log.operation === "Fee")
-      const fee = feeLogs
-        .reduce((acc, log) => acc.plus(Big(log.change)), Big(0))
-        .abs()
-        .toString()
       const feeAsset = feeLogs[0]?.assetId
+      const fee = feeAsset
+        ? feeLogs
+            .reduce((acc, log) => acc.plus(Big(log.change)), Big(0))
+            .abs()
+            .toString()
+        : undefined
       // Price
       const price =
         typeof incoming === "string" && typeof outgoing === "string"

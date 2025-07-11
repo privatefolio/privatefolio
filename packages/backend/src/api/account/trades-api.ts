@@ -258,14 +258,14 @@ export async function patchTrade(
   await upsertTrade(accountName, newValue)
 }
 
-export async function deleteTrade(accountName: string, id: string): Promise<void> {
+export async function deleteTrades(accountName: string): Promise<void> {
+  // TODO: delete trades that are older than since
   const account = await getAccountWithTrades(accountName)
-  // First delete the relationships
-  await account.execute("DELETE FROM trade_tags WHERE trade_id = ?", [id])
-  await account.execute("DELETE FROM trade_audit_logs WHERE trade_id = ?", [id])
-  await account.execute("DELETE FROM trade_transactions WHERE trade_id = ?", [id])
-  // Then delete the trade
-  await account.execute("DELETE FROM trades WHERE id = ?", [id])
+  await account.execute("DELETE FROM trade_audit_logs")
+  await account.execute("DELETE FROM trade_transactions")
+  await account.execute("DELETE FROM trade_pnl")
+  await account.execute("DELETE FROM trades")
+  await setValue(accountName, "trade_seq", 0)
   account.eventEmitter.emit(SubscriptionChannel.Trades, EventCause.Deleted)
 }
 
@@ -304,6 +304,7 @@ export async function invalidateTrades(accountName: string, newValue: Timestamp)
 
   if (newValue < existing) {
     await setValue(accountName, "tradesCursor", newValue)
+    await deleteTrades(accountName)
   }
 }
 
@@ -324,11 +325,9 @@ async function processTransactionForTrade(
   progress: ProgressCallback
 ): Promise<void> {
   const tx = await getTransaction(accountName, txId)
-  const priceMap = await getAssetPriceMap(accountName, tx.timestamp)
+  if (!tx) throw new Error(`Transaction with id ${txId} not found`)
 
-  if (!tx) {
-    throw new Error(`Transaction with id ${txId} not found`)
-  }
+  const priceMap = await getAssetPriceMap(accountName, tx.timestamp)
 
   // Deposits
   if (
@@ -446,14 +445,6 @@ export async function computeTrades(
 
   if (since !== 0) {
     await progress([0, `Refreshing trades starting ${formatDate(since)}`])
-  }
-
-  if (since === 0) {
-    await account.execute("DELETE FROM trade_audit_logs")
-    await account.execute("DELETE FROM trade_transactions")
-    await account.execute("DELETE FROM trade_pnl")
-    await account.execute("DELETE FROM trades")
-    await setValue(accountName, "trade_seq", 0)
   }
 
   await progress([0, "Fetching audit logs"])
@@ -774,6 +765,7 @@ export function enqueueRecomputeTrades(accountName: string, trigger: TaskTrigger
     description: "Recomputing trades from audit logs.",
     determinate: true,
     function: async (progress, signal) => {
+      await deleteTrades(accountName)
       await computeTrades(accountName, progress, { since: 0 }, signal)
     },
     name: "Recompute trades",

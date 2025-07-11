@@ -8,6 +8,7 @@ export async function computeGenesis(accountName: string) {
   )
   const genesis = res.length === 0 ? 0 : res[0].timestamp
   await setValue(accountName, "genesis", genesis)
+  return genesis
 }
 
 export async function computeLastTx(accountName: string) {
@@ -17,4 +18,5 @@ export async function computeLastTx(accountName: string) {
   )
   const lastTx = res.length === 0 ? 0 : res[0].timestamp
   await setValue(accountName, "lastTx", lastTx)
+  return lastTx
 }

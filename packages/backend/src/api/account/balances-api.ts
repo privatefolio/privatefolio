@@ -48,6 +48,7 @@ export async function invalidateBalances(accountName: string, newValue: Timestam
 
   if (newValue < existing) {
     await setValue(accountName, "balancesCursor", newValue)
+    await deleteBalances(accountName, newValue)
   }
 }
 
@@ -340,10 +341,13 @@ export function enqueueRefreshBalances(accountName: string, trigger: TaskTrigger
   })
 }
 
-export async function deleteBalances(accountName: string) {
+export async function deleteBalances(accountName: string, since: Timestamp = 0) {
   const account = await getAccount(accountName)
-  await account.execute("DELETE FROM balances")
-  await account.execute("UPDATE audit_logs SET balance=null, balanceWallet=null")
+  await account.execute("DELETE FROM balances WHERE timestamp >= ?", [since])
+  await account.execute(
+    "UPDATE audit_logs SET balance=null, balanceWallet=null WHERE timestamp >= ?",
+    [since]
+  )
   account.eventEmitter.emit(SubscriptionChannel.AuditLogs, EventCause.Updated)
   account.eventEmitter.emit(SubscriptionChannel.Balances)
 }

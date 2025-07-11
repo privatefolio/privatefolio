@@ -1,6 +1,6 @@
 [
   {
-    "_id": "2822928863_299334120",
+    "_id": "2822928863_299334120_MERGED",
     "fee": "0.1",
     "feeAsset": "ex.binance:MANA",
     "incoming": "100",
@@ -15,7 +15,7 @@
     "wallet": "Binance Spot",
   },
   {
-    "_id": "2822928863_3159699232",
+    "_id": "2822928863_3159699232_MERGED",
     "fee": "0.002",
     "feeAsset": "ex.binance:QTUM",
     "incoming": "2",
@@ -30,7 +30,7 @@
     "wallet": "Binance Spot",
   },
   {
-    "_id": "2822928863_1393704455",
+    "_id": "2822928863_1393704455_MERGED",
     "fee": "0.1",
     "feeAsset": "ex.binance:XLM",
     "incoming": "100",
@@ -45,7 +45,7 @@
     "wallet": "Binance Spot",
   },
   {
-    "_id": "2822928863_4147607242",
+    "_id": "2822928863_4147607242_MERGED",
     "fee": "0.00004982",
     "feeAsset": "ex.binance:ETH",
     "incoming": "0.04982364",
@@ -60,7 +60,7 @@
     "wallet": "Binance Spot",
   },
   {
-    "_id": "2822928863_4147428496",
+    "_id": "2822928863_4147428496_MERGED",
     "fee": "0.0005536",
     "feeAsset": "ex.binance:ETH",
     "incoming": "0.553596",
@@ -85,7 +85,7 @@
     "wallet": "Binance Spot",
   },
   {
-    "_id": "2822928863_4235031565",
+    "_id": "2822928863_4235031565_MERGED",
     "fee": "0.08",
     "feeAsset": "ex.binance:IOTA",
     "incoming": "80",
@@ -100,7 +100,7 @@
     "wallet": "Binance Spot",
   },
   {
-    "_id": "2822928863_659128462",
+    "_id": "2822928863_659128462_MERGED",
     "fee": "0.08",
     "feeAsset": "ex.binance:IOTA",
     "incoming": "80",

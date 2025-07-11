@@ -116,11 +116,11 @@ export function TaskDropdown() {
         anchorEl={anchorEl}
         onClose={handleClose}
         anchorOrigin={{
-          horizontal: "center",
+          horizontal: "right",
           vertical: "bottom",
         }}
         transformOrigin={{
-          horizontal: "center",
+          horizontal: "right",
           vertical: "top",
         }}
         sx={{

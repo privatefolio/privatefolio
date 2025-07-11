@@ -22,6 +22,7 @@ export async function invalidateNetworth(accountName: string, newValue: Timestam
 
   if (newValue < existing) {
     await setValue(accountName, "networthCursor", newValue)
+    await deleteNetworth(accountName, newValue)
   }
 }
 
@@ -33,20 +34,15 @@ export async function getNetworth(
   const account = await getAccount(accountName)
   const result = await account.execute(query)
 
-  const cursor = (await getValue<Timestamp>(accountName, "networthCursor", 0)) as Timestamp
-  const cursorAsTime = cursor / 1000
-
   const list: Networth[] = []
   for (const row of result) {
-    if (row[1] && (row[1] as number) <= cursorAsTime) {
-      list.push({
-        change: row[3] as number,
-        changePercentage: row[4] as number,
-        time: row[1] as Time,
-        timestamp: row[0] as Timestamp,
-        value: row[2] as number,
-      } as Networth)
-    }
+    list.push({
+      change: row[3] as number,
+      changePercentage: row[4] as number,
+      time: row[1] as Time,
+      timestamp: row[0] as Timestamp,
+      value: row[2] as number,
+    } as Networth)
   }
 
   return list
@@ -79,7 +75,7 @@ export async function computeNetworth(
   const count = balances.length
 
   if (count === 0) {
-    await account.execute(`DELETE FROM networth WHERE timestamp > ?`, [since])
+    await deleteNetworth(accountName, since)
     await progress([100, `No balances to compute networth`])
     return
   }
@@ -156,11 +152,18 @@ export async function computeNetworth(
   }
 }
 
+export async function deleteNetworth(accountName: string, since: Timestamp = 0) {
+  const account = await getAccount(accountName)
+  await account.execute("DELETE FROM networth WHERE timestamp >= ?", [since])
+  account.eventEmitter.emit(SubscriptionChannel.Networth)
+}
+
 export function enqueueRecomputeNetworth(accountName: string, trigger: TaskTrigger) {
   return enqueueTask(accountName, {
     description: "Recomputing historical networth.",
     determinate: true,
     function: async (progress, signal) => {
+      await deleteNetworth(accountName)
       await computeNetworth(accountName, 0, progress, signal)
     },
     name: "Recompute networth",

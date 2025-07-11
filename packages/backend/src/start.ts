@@ -141,53 +141,62 @@ async function setupSideEffects(accountName: string) {
   // Make sure the task queue is initialized
   await writeApi.getServerTasks(accountName)
 
-  const subId = await writeApi.subscribeToAuditLogs(
-    accountName,
-    proxy(
-      debounce(
-        async (cause, oldestTimestamp?: Timestamp) => {
-          console.log(
-            getPrefix(accountName, true),
-            `Running side-effects (trigger by audit log changes).`
-          )
-          if (cause === EventCause.Updated) return
+  let nextTimestamp: Timestamp | undefined
 
-          if (oldestTimestamp) {
-            const newCursor = floorTimestamp(oldestTimestamp, "1D" as ResolutionString) - ONE_DAY
-            await writeApi.invalidateBalances(accountName, newCursor)
-            await writeApi.invalidateNetworth(accountName, newCursor)
-            await writeApi.invalidateTrades(accountName, newCursor)
-            await writeApi.invalidateTradePnl(accountName, newCursor)
-          }
-          await writeApi.computeGenesis(accountName)
-          await writeApi.computeLastTx(accountName)
+  const handleAuditLogChange = async (cause: EventCause, oldestTimestamp?: Timestamp) => {
+    if (!nextTimestamp) nextTimestamp = oldestTimestamp
+    if (nextTimestamp > oldestTimestamp) nextTimestamp = oldestTimestamp
+    await handleAuditLogChangeDebounced(cause, nextTimestamp)
+    nextTimestamp = undefined
+  }
 
-          if (cause === EventCause.Created) {
-            await writeApi.enqueueDetectSpamTransactions(accountName, "side-effect")
-            await writeApi.enqueueAutoMerge(accountName, "side-effect")
-          }
-
-          // when created or deleted
-          await writeApi.enqueueRefreshBalances(accountName, "side-effect")
-
-          if (cause === EventCause.Created) {
-            await writeApi.enqueueFetchPrices(accountName, "side-effect")
-          }
-          await writeApi.enqueueRefreshNetworth(accountName, "side-effect")
-          await writeApi.enqueueRefreshTrades(accountName, "side-effect")
-
-          const account = await getAccount(accountName)
-          account.eventEmitter.emit(SubscriptionChannel.Metadata)
-        },
-        SHORT_DEBOUNCE_DURATION,
-        {
-          leading: false,
-          maxWait: MAX_DEBOUNCE_DURATION,
-          trailing: true,
-        }
+  const handleAuditLogChangeDebounced = debounce(
+    async (cause, oldestTimestamp?: Timestamp) => {
+      console.log(
+        getPrefix(accountName, true),
+        `Running side-effects (trigger by audit log changes).`
       )
-    )
+      if (cause === EventCause.Updated) return
+
+      await writeApi.computeGenesis(accountName)
+      const lastTx = await writeApi.computeLastTx(accountName)
+
+      if (oldestTimestamp) {
+        let newCursor = floorTimestamp(oldestTimestamp, "1D" as ResolutionString) - ONE_DAY
+        if (lastTx === 0) newCursor = 0
+        await writeApi.invalidateBalances(accountName, newCursor)
+        await writeApi.invalidateNetworth(accountName, newCursor)
+        await writeApi.invalidateTrades(accountName, newCursor) // TESTME
+        await writeApi.invalidateTradePnl(accountName, newCursor) // TESTME
+      }
+
+      if (lastTx !== 0) {
+        if (cause === EventCause.Created) {
+          await writeApi.enqueueDetectSpamTransactions(accountName, "side-effect")
+          await writeApi.enqueueAutoMerge(accountName, "side-effect")
+        }
+
+        // when created or deleted
+        await writeApi.enqueueRefreshBalances(accountName, "side-effect")
+
+        if (cause === EventCause.Created) {
+          await writeApi.enqueueFetchPrices(accountName, "side-effect")
+        }
+        await writeApi.enqueueRefreshNetworth(accountName, "side-effect")
+        await writeApi.enqueueRefreshTrades(accountName, "side-effect")
+      }
+
+      const account = await getAccount(accountName)
+      account.eventEmitter.emit(SubscriptionChannel.Metadata)
+    },
+    SHORT_DEBOUNCE_DURATION,
+    {
+      leading: false,
+      maxWait: MAX_DEBOUNCE_DURATION,
+      trailing: true,
+    }
   )
+  const subId = await writeApi.subscribeToAuditLogs(accountName, proxy(handleAuditLogChange))
 
   sideEffects[accountName] = subId
 

@@ -67,7 +67,6 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
     platformId,
     // remark,
     timestamp,
-    txId,
     // userId,
     // utcTime,
     wallet,
@@ -89,6 +88,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
         wallet,
       },
     ]
+    log.txId = txId
   }
 
   if (operation === "Withdraw") {
@@ -106,6 +106,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
         wallet,
       },
     ]
+    log.txId = txId
   }
 
   return { logs: [log], txns }
