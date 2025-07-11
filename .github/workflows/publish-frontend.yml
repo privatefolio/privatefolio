@@ -2,9 +2,9 @@ name: Publish Frontend
 
 on:
   push:
-    branches: [ "*" ]
+    branches: ["*"]
   pull_request:
-    branches: [ "*" ]
+    branches: ["*"]
 
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
 
@@ -71,11 +71,11 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
           status: "Success"
-          title: "Privatefolio - Publish Frontend Succeeded"
+          title: "Publish Frontend"
           description: |
             **Branch**: `${{ github.ref_name }}`
             **Commit**: `${{ github.sha }}`
-          color: 0x00FF00 
+          color: 0x00FF00
 
       - name: Notify Discord on failure
         if: failure()
@@ -83,9 +83,8 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
           status: "Failure"
-          title: "Privatefolio - Publish Frontend Failed"
+          title: "Publish Frontend"
           description: |
             **Branch**: `${{ github.ref_name }}`
             **Commit**: `${{ github.sha }}`
           color: 0xFF0000
-    

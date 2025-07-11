@@ -127,7 +127,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
           status: ${{ needs.build-and-publish.result == 'success' && 'Success' || 'Failure' }}
-          title: ${{ format('Privatefolio - Publish Apps {0}', needs.build-and-publish.result == 'success' && 'Succeeded' || 'Failed') }}
+          title: 'Publish Apps'
           description: |
             **Branch**: `${{ github.ref_name }}`
             **Commit**: `${{ github.sha }}`

@@ -1,4 +1,4 @@
-name: Check Notarization Status
+name: Staple Notarized Apps
 
 on:
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
@@ -22,21 +22,6 @@ jobs:
     steps:
       - name: Ensure gh CLI available (pre-installed on macOS runners)
         run: gh --version
-
-      - name: 🔎  Debug draft-release search
-        run: |
-          echo "Repo → $GITHUB_REPOSITORY"
-          echo "gh version → $(gh --version)"
-          gh auth status          # confirms token & scopes
-          echo "--- raw list ---"
-          gh release list --repo "$GITHUB_REPOSITORY" --limit 20
-          echo "--- JSON dump ---"
-          gh release list --repo "$GITHUB_REPOSITORY" --limit 20 \
-            --json tagName,isDraft,isPrerelease,publishedAt \
-            | jq .
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
 
       - name: Get latest draft release tag
         id: get_draft
@@ -110,3 +95,19 @@ jobs:
           echo "📤  Uploading stapled DMGs…"
           gh release upload "${{ steps.get_draft.outputs.tag }}" *-stapled.dmg \
             --repo "$GITHUB_REPOSITORY" --clobber
+
+  notify:
+    needs: check-and-staple
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Discord
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
+          status: ${{ needs.check-and-staple.result == 'success' && 'Success' || 'Failure' }}
+          title: 'Staple Notarized Apps'
+          description: |
+            **Branch**: `${{ github.ref_name }}`
+            **Commit**: `${{ github.sha }}`
+          color: ${{ needs.check-and-staple.result == 'success' && '0x00FF00' || '0xFF0000' }}
