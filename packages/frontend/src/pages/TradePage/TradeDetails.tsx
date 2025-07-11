@@ -94,7 +94,7 @@ export function TradeDetails({ trade }: TradeDetailsProps) {
 
   return (
     <Paper sx={{ paddingX: 2, paddingY: 1 }}>
-      <Typography variant="body2" component={Stack} gap={2}>
+      <Typography variant="body2" component={Stack} gap={2} alignItems="flex-start">
         <div>
           <SectionTitle>Opened at</SectionTitle>
           <TimestampBlock timestamp={trade.createdAt} />

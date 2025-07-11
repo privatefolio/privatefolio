@@ -75,7 +75,7 @@
     "wallet": "Binance Spot",
   },
   {
-    "_id": "2822928863_2549739997",
+    "_id": "2822928863_2549739997_TX",
     "incoming": "0.0000006",
     "incomingAsset": "ex.binance:ETF",
     "metadata": {},
@@ -115,7 +115,7 @@
     "wallet": "Binance Spot",
   },
   {
-    "_id": "2822928863_2832898010",
+    "_id": "2822928863_2832898010_TX",
     "incoming": "1",
     "incomingAsset": "ex.binance:ETH",
     "metadata": {},
@@ -125,7 +125,7 @@
     "wallet": "Binance Spot",
   },
   {
-    "_id": "2822928863_3104915036",
+    "_id": "2822928863_3104915036_TX",
     "incoming": "0.000043",
     "incomingAsset": "ex.binance:ETH",
     "metadata": {},

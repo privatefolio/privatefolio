@@ -3,6 +3,12 @@ import { join } from "path"
 import { countAuditLogs, getAuditLogs } from "src/api/account/audit-logs-api"
 import { computeBalances, getBalances } from "src/api/account/balances-api"
 import { importFile } from "src/api/account/file-imports-api"
+import {
+  computeTrades,
+  getAccountPnL,
+  getTrades,
+  getTradesFullQuery,
+} from "src/api/account/trades-api"
 import { getTransactions } from "src/api/account/transactions-api"
 import { ProgressUpdate } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
@@ -107,11 +113,42 @@ describe("binance test imports", () => {
     `)
   })
 
+  it.sequential("should compute trades from imported data", async () => {
+    mocks.readFile.mockImplementation(fs.promises.readFile)
+    // act
+    const updates: ProgressUpdate[] = []
+    await computeTrades(accountName, async (state) => updates.push(state))
+    // assert
+    expect(updates.join("\n")).toMatchInlineSnapshot(`
+      "0,Fetching audit logs
+      2.5,Processing 27 audit logs
+      6,Found 6 asset groups (skipped 0 unlisted assets)
+      9,Processed all trades for ETH
+      12,Processed all trades for IOTA
+      15,Processed all trades for ETF
+      18,Processed all trades for XLM
+      21,Processed all trades for QTUM
+      25,Processed all trades for MANA
+      25,Computed 6 trades
+      30,Computing PnL for 6 trades
+      40,Processed trade #1 (Long 1.000043 ETH)
+      51,Processed trade #2 (Long 159.84 IOTA)
+      62,Processed trade #3 (Long 6e-7 ETF)
+      73,Processed trade #4 (Long 99.9 XLM)
+      84,Processed trade #5 (Long 1.998 QTUM)
+      95,Processed trade #6 (Long 99.9 MANA)
+      95,Saving 6 records to disk
+      100,PnL computation completed"
+    `)
+  })
+
   it.sequential("should save the correct data", async () => {
     // act
     const balances = await getBalances(accountName)
     const auditLogs = await getAuditLogs(accountName)
     const transactions = await getTransactions(accountName)
+    const trades = await getTrades(accountName, await getTradesFullQuery())
+    const pnl = await getAccountPnL(accountName)
     // assert
     expect(balances.length).toMatchInlineSnapshot(`25`)
     for (let i = 0; i < balances.length; i += 100) {
@@ -131,5 +168,9 @@ describe("binance test imports", () => {
         `../__snapshots__/${snapshotDir}/transactions-${i}.ts.snap`
       )
     }
+    expect(trades.length).toMatchInlineSnapshot(`6`)
+    await expect(trades).toMatchFileSnapshot(`../__snapshots__/${snapshotDir}/trades.ts.snap`)
+    expect(pnl.length).toMatchInlineSnapshot(`3`)
+    await expect(pnl).toMatchFileSnapshot(`../__snapshots__/${snapshotDir}/account-pnl.ts.snap`)
   })
 })

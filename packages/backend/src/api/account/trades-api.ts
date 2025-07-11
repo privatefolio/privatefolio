@@ -339,7 +339,10 @@ async function processTransactionForTrade(
   ) {
     const assetPrice = priceMap[tx.incomingAsset]?.value || 0
     if (!assetPrice && !isTestEnvironment)
-      await progress([undefined, `Warning: price not found for ${tx.incomingAsset}`])
+      await progress([
+        undefined,
+        `Warning: price not found for ${tx.incomingAsset} (Trade Id: ${trade.id})`,
+      ])
     trade.deposits.push([
       tx.incomingAsset,
       tx.incoming,
@@ -358,7 +361,10 @@ async function processTransactionForTrade(
   ) {
     const assetPrice = priceMap[tx.outgoingAsset]?.value || 0
     if (!assetPrice && !isTestEnvironment)
-      await progress([undefined, `Warning: price not found for ${tx.outgoingAsset}`])
+      await progress([
+        undefined,
+        `Warning: price not found for ${tx.outgoingAsset} (Trade Id: ${trade.id})`,
+      ])
     trade.deposits.push([
       tx.outgoingAsset,
       `-${tx.outgoing}`,
@@ -372,7 +378,10 @@ async function processTransactionForTrade(
   if (tx.outgoingAsset && tx.outgoing && tx.incomingAsset === assetId) {
     const assetPrice = priceMap[tx.outgoingAsset]?.value || 0
     if (!assetPrice && !isTestEnvironment)
-      await progress([undefined, `Warning: price not found for ${tx.outgoingAsset}`])
+      await progress([
+        undefined,
+        `Warning: price not found for ${tx.outgoingAsset} (Trade Id: ${trade.id})`,
+      ])
     trade.cost.push([
       tx.outgoingAsset,
       `-${tx.outgoing}`,
@@ -387,7 +396,10 @@ async function processTransactionForTrade(
   if (tx.incomingAsset && tx.incoming && tx.outgoingAsset === assetId) {
     const assetPrice = priceMap[tx.incomingAsset]?.value || 0
     if (!assetPrice && !isTestEnvironment)
-      await progress([undefined, `Warning: price not found for ${tx.incomingAsset}`])
+      await progress([
+        undefined,
+        `Warning: price not found for ${tx.incomingAsset} (Trade Id: ${trade.id})`,
+      ])
     trade.proceeds.push([
       tx.incomingAsset,
       tx.incoming,
@@ -401,7 +413,10 @@ async function processTransactionForTrade(
   if (tx.feeAsset && tx.fee && tx.feeAsset === assetId) {
     const assetPrice = priceMap[tx.feeAsset]?.value || 0
     if (!assetPrice && !isTestEnvironment)
-      await progress([undefined, `Warning: price not found for ${tx.feeAsset}`])
+      await progress([
+        undefined,
+        `Warning: price not found for ${tx.feeAsset} (Trade Id: ${trade.id})`,
+      ])
     trade.fees.push([
       tx.feeAsset,
       tx.fee,
@@ -544,7 +559,8 @@ export async function computeTrades(
       balance = new Big(currentTrade?.balance ?? 0)
     }
 
-    for (const log of logs) {
+    for (let i = 0; i < logs.length; i++) {
+      const log = logs[i]
       const change = new Big(log.change)
       balance = balance.plus(change)
 
@@ -597,25 +613,44 @@ export async function computeTrades(
         // Add to the relationship mapping for bulk insert
         tradeAuditLogs.push([currentTrade.id, log.id])
 
-        // Add the transaction relationship if txId exists
+        // Add the transaction relationship if txId exists and it was not previously added
         if (log.txId) {
-          tradeTransactions.push([currentTrade.id, log.txId])
-          // Update cost, proceeds and fees if this is a transaction
-          await processTransactionForTrade(
-            accountName,
-            currentTrade,
-            log.txId,
-            assetId,
-            log,
-            progress
-          )
+          // TODO8 this can be optimized by using a map
+          if (
+            !tradeTransactions.some(
+              ([tradeId, txId]) => tradeId === currentTrade.id && txId === log.txId
+            )
+          ) {
+            tradeTransactions.push([currentTrade.id, log.txId])
+
+            // Update cost, proceeds and fees if this is a transaction
+            await processTransactionForTrade(
+              accountName,
+              currentTrade,
+              log.txId,
+              assetId,
+              log,
+              progress
+            )
+          }
         }
 
         // Check if we need to close the current trade and start a new one
+        const previousLog = logs[i - 1]
+        const nextLog = logs[i + 1]
+        const tickContinuation = previousLog && log.timestamp === previousLog.timestamp
+        const tickNotFinished = nextLog && log.timestamp === nextLog.timestamp
+
+        // It's possible the type was set incorrectly
+        if (tickContinuation && !balance.eq(0)) {
+          currentTrade.tradeType = balance.gt(0) ? TRADE_TYPES[0] : TRADE_TYPES[1]
+        }
+
         if (
-          (currentTrade.tradeType === TRADE_TYPES[0] && balance.lt(0)) || // Long position going negative
-          (currentTrade.tradeType === TRADE_TYPES[1] && balance.gt(0)) || // Short position going positive
-          balance.eq(0) // Position fully closed
+          !tickNotFinished &&
+          ((currentTrade.tradeType === TRADE_TYPES[0] && balance.lt(0)) || // Long position going negative
+            (currentTrade.tradeType === TRADE_TYPES[1] && balance.gt(0)) || // Short position going positive
+            balance.eq(0)) // Position fully closed
         ) {
           // Close current trade
           currentTrade.tradeStatus = "closed"

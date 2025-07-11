@@ -98,7 +98,7 @@ export function Tabs({ sx, largeSize, ...rest }: TabsProps) {
             maxHeight: 42,
             minHeight: 42,
             minWidth: 0,
-            paddingTop: "2px !important",
+            paddingTop: "5px !important",
             paddingX: 1,
             transition: theme.transitions.create("color"),
           },

@@ -48,7 +48,7 @@ describe("assets", () => {
 
   it("should update an asset", async () => {
     // arrange
-    const assetId = "ethereum:0x0000000000000000000000000000000000000000:ETH"
+    const assetId = "chain.ethereum:0x0000000000000000000000000000000000000000:ETH"
     await upsertAuditLog(accountName, {
       assetId,
       change: "1",
@@ -56,7 +56,7 @@ describe("assets", () => {
       importIndex: 0,
       operation: "Deposit",
       platformId: "chain.ethereum",
-      timestamp: 0,
+      timestamp: 420,
       wallet: "",
     })
     await upsertAsset(accountName, {
@@ -76,8 +76,8 @@ describe("assets", () => {
     expect(asset).toMatchInlineSnapshot(`
       {
         "coingeckoId": "ethereum",
-        "firstOwnedAt": 0,
-        "id": "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "firstOwnedAt": 420,
+        "id": "chain.ethereum:0x0000000000000000000000000000000000000000:ETH",
         "logoUrl": "logo.svg",
         "marketCapRank": 2,
         "name": "Ether",
@@ -90,7 +90,7 @@ describe("assets", () => {
 
   it("should fetch asset infos", async () => {
     // arrange
-    const assetId = "ethereum:0x0000000000000000000000000000000000000000:ETH"
+    const assetId = "chain.ethereum:0x0000000000000000000000000000000000000000:ETH"
     await upsertAsset(accountName, {
       coingeckoId: "ethereum",
       id: assetId,
@@ -108,8 +108,8 @@ describe("assets", () => {
     expect(asset).toMatchInlineSnapshot(`
       {
         "coingeckoId": "ethereum",
-        "firstOwnedAt": 0,
-        "id": "ethereum:0x0000000000000000000000000000000000000000:ETH",
+        "firstOwnedAt": 420,
+        "id": "chain.ethereum:0x0000000000000000000000000000000000000000:ETH",
         "logoUrl": "logo.svg",
         "marketCapRank": 2,
         "name": "Ether",

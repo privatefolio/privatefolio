@@ -31,14 +31,14 @@ it("getMinimumDecimalPrecision should work", () => {
 it("getAutoFormatDigits should work", () => {
   expect(getAutoFormatDigits(5000)).toMatchInlineSnapshot(`
     {
-      "maximumFractionDigits": 2,
-      "minimumFractionDigits": 2,
+      "maximumFractionDigits": 0,
+      "minimumFractionDigits": 0,
     }
   `)
   expect(getAutoFormatDigits(-5000)).toMatchInlineSnapshot(`
     {
-      "maximumFractionDigits": 2,
-      "minimumFractionDigits": 2,
+      "maximumFractionDigits": 0,
+      "minimumFractionDigits": 0,
     }
   `)
   expect(getAutoFormatDigits(0.005)).toMatchInlineSnapshot(`
@@ -97,8 +97,8 @@ it("getAutoFormatDigits should work", () => {
   `)
   expect(getAutoFormatDigits(10000)).toMatchInlineSnapshot(`
     {
-      "maximumFractionDigits": 2,
-      "minimumFractionDigits": 2,
+      "maximumFractionDigits": 0,
+      "minimumFractionDigits": 0,
     }
   `)
   expect(getAutoFormatDigits(10001)).toMatchInlineSnapshot(`

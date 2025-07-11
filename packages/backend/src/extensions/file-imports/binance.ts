@@ -53,6 +53,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
   const timestamp = asUTC(new Date(utcTime))
   const assetId = `${platformId}:${coin}`
   const wallet = `Binance ${account}`
+  const txId = `${id}_TX`
 
   const log: AuditLog = {
     // account,
@@ -66,6 +67,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
     platformId,
     // remark,
     timestamp,
+    txId,
     // userId,
     // utcTime,
     wallet,
@@ -76,7 +78,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
     txns = [
       {
         fileImportId,
-        id,
+        id: txId,
         importIndex: index,
         incoming: change.toFixed(),
         incomingAsset: assetId,
@@ -93,7 +95,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
     txns = [
       {
         fileImportId,
-        id,
+        id: txId,
         importIndex: index,
         metadata: {},
         outgoing: change.mul(-1).toFixed(),
