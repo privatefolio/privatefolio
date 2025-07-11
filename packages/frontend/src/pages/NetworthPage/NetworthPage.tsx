@@ -89,6 +89,7 @@ export default function NetworthPage() {
         numeric: true,
         sortable: true,
         sx: { maxWidth: 220, minWidth: 220, width: 220 },
+        valueSelector: (row: Balance) => (row.value ? Math.abs(row.value) : row.value),
       },
     ],
     []

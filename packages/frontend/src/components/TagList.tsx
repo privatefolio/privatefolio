@@ -3,7 +3,7 @@ import { useStore } from "@nanostores/react"
 import { throttle } from "lodash-es"
 import React, { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
-import { EventCause, Tag } from "src/interfaces"
+import { Tag } from "src/interfaces"
 import { SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { closeSubscription } from "src/utils/browser-utils"
@@ -35,17 +35,9 @@ export function TagList({ itemId, itemType }: TagListProps) {
 
     const subscription = subFn(
       accountName,
-      throttle(
-        (_cause: EventCause) => {
-          console.log("Refreshing")
-          setRefresh(Math.random())
-        },
-        SHORT_THROTTLE_DURATION,
-        {
-          leading: false,
-          trailing: true,
-        }
-      )
+      throttle(() => {
+        setRefresh(Math.random())
+      }, SHORT_THROTTLE_DURATION)
     )
 
     return closeSubscription(subscription, rpc)

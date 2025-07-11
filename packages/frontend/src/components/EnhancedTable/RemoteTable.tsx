@@ -384,7 +384,9 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
-            rowsPerPageOptions={$debugMode.get() ? [1, 10, 20, 50, 100] : [10, 20, 50, 100]}
+            rowsPerPageOptions={
+              $debugMode.get() ? [1, 10, 20, 50, 100, 200] : [10, 20, 50, 100, 200]
+            }
             onRowsPerPageChange={handleChangeRowsPerPage}
             sx={{
               ...(isFirstLoading || isEmpty

@@ -356,7 +356,9 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
             queryTime={queryTime}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
-            rowsPerPageOptions={$debugMode.get() ? [1, 10, 20, 50, 100] : [10, 20, 50, 100]}
+            rowsPerPageOptions={
+              $debugMode.get() ? [1, 10, 20, 50, 100, 200] : [10, 20, 50, 100, 200]
+            }
             count={filteredRows.length}
             rowsPerPage={rowsPerPage}
             sx={{

@@ -104,6 +104,15 @@ export async function getMyAssets(
   }
 }
 
+const customAssets: Asset[] = [
+  {
+    id: `fiat:EUR`,
+    logoUrl: `$STATIC_ASSETS/overrides/EUR.png`,
+    name: "Euro",
+    symbol: "EUR",
+  },
+]
+
 let assets: Asset[] = []
 
 export async function getAssets(): Promise<Asset[]> {
@@ -127,6 +136,7 @@ export async function getAssets(): Promise<Asset[]> {
           symbol: asset.symbol,
         }) as Asset
     )
+    assets = [...list, ...customAssets]
     list.sort((a, b) => (a.marketCapRank ?? Infinity) - (b.marketCapRank ?? Infinity))
     return list
   } catch {

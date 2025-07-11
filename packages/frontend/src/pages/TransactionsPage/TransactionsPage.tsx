@@ -11,6 +11,7 @@ import { TransactionActions } from "./TransactionActions"
 import { TransactionTable } from "./TransactionTable"
 
 const $drawerOpen = atom(false)
+const toggleDrawer = () => $drawerOpen.set(true)
 
 export default function TransactionsPage({ show }: { show: boolean }) {
   const activeAccount = useStore($activeAccount)
@@ -27,15 +28,9 @@ export default function TransactionsPage({ show }: { show: boolean }) {
         <div>
           <Subheading>
             <span>Transactions</span>
-            <TransactionActions
-              tableDataRef={tableDataRef}
-              toggleAddTransactionDrawer={() => $drawerOpen.set(true)}
-            />
+            <TransactionActions tableDataRef={tableDataRef} />
           </Subheading>
-          <TransactionTable
-            tableDataRef={tableDataRef}
-            toggleAddTransactionDrawer={() => $drawerOpen.set(true)}
-          />
+          <TransactionTable tableDataRef={tableDataRef} toggleAddTransactionDrawer={toggleDrawer} />
         </div>
       </StaggeredList>
       <AddTransactionDrawer atom={$drawerOpen} />

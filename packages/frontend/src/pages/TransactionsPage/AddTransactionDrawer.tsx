@@ -54,11 +54,11 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
   }
 
   const binanceWalletsOptions = [
-    "Spot",
-    "Cross Margin",
-    "Isolated Margin",
-    "Coin-M Futures",
-    "USD-M Futures",
+    "Binance Spot",
+    "Binance Cross Margin",
+    "Binance Isolated Margin",
+    "Binance Coin-M Futures",
+    "Binance USD-M Futures",
   ]
 
   const rpc = useStore($rpc)
@@ -88,9 +88,9 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
       let outgoingAsset = formData.get("outgoingAsset") as string
       let feeAsset = formData.get("feeAsset") as string
 
-      const incomingAssetTicker = getAssetTicker(incomingAsset)
-      const outgoingAssetTicker = getAssetTicker(outgoingAsset)
-      const feeAssetTicker = getAssetTicker(feeAsset)
+      const incomingAssetTicker = incomingAsset ? getAssetTicker(incomingAsset) : ""
+      const outgoingAssetTicker = outgoingAsset ? getAssetTicker(outgoingAsset) : ""
+      const feeAssetTicker = feeAsset ? getAssetTicker(feeAsset) : ""
 
       incomingAsset =
         assetsIds.find((assetId) => getAssetTicker(assetId) === incomingAssetTicker) || ""

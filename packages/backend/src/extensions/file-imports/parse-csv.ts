@@ -72,7 +72,7 @@ export async function parseCsv(
   }
 
   await progress([50, `Extracting transactions`])
-  transactions = transactions.concat(extractTransactions(logs, _fileImportId, extensionId))
+  transactions = transactions.concat(extractTransactions(logs, _fileImportId, parserId))
   // transactions = groupTransactions(transactions, _fileImportId, parserId)
 
   const metadata: FileImport["meta"] = {

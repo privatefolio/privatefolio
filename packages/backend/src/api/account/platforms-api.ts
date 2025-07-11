@@ -57,8 +57,8 @@ export async function getExchanges(): Promise<Exchange[]> {
           year: exchange.year_established,
         }) as Exchange
     )
-    list.sort((a, b) => (a.coingeckoTrustRank ?? Infinity) - (b.coingeckoTrustRank ?? Infinity))
     exchanges = [...list, ...customExchanges]
+    list.sort((a, b) => (a.coingeckoTrustRank ?? Infinity) - (b.coingeckoTrustRank ?? Infinity))
 
     const extensions = await getExtensions()
     exchanges = exchanges.map((exchange) => {

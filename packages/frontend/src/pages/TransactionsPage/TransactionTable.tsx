@@ -42,17 +42,9 @@ export function TransactionTable(props: TransactionsTableProps) {
   useEffect(() => {
     const subscription = rpc.subscribeToTransactions(
       accountName,
-      throttle(
-        () => {
-          console.log("Refreshing")
-          setRefresh(Math.random())
-        },
-        SHORT_THROTTLE_DURATION,
-        {
-          leading: false,
-          trailing: true,
-        }
-      )
+      throttle(() => {
+        setRefresh(Math.random())
+      }, SHORT_THROTTLE_DURATION)
     )
 
     return closeSubscription(subscription, rpc)

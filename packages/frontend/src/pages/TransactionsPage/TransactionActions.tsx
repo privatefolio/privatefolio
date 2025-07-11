@@ -20,12 +20,11 @@ import { downloadCsv } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 interface TransactionActionsProps {
-  tableDataRef: MutableRefObject<Transaction[]>
-  toggleAddTransactionDrawer: () => void
+  tableDataRef?: MutableRefObject<Transaction[]>
 }
 
 export function TransactionActions(props: TransactionActionsProps) {
-  const { tableDataRef, toggleAddTransactionDrawer: _toggleAddTransactionDrawer } = props
+  const { tableDataRef } = props
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const menuOpen = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -40,17 +39,6 @@ export function TransactionActions(props: TransactionActionsProps) {
 
   return (
     <Stack direction="row">
-      {/* <Tooltip title="Add Transaction">
-        <IconButton
-          color="secondary"
-          onClick={() => {
-            handleClose()
-            toggleAddTransactionDrawer()
-          }}
-        >
-          <Add fontSize="small" />
-        </IconButton>
-      </Tooltip> */}
       <QuoteCurrencyToggle />
       <HideSpamToggle />
       <Tooltip title="Actions">
@@ -65,19 +53,21 @@ export function TransactionActions(props: TransactionActionsProps) {
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
       >
-        <MenuItem
-          dense
-          onClick={() => {
-            const data = transformTransactionsToCsv(tableDataRef.current)
-            downloadCsv(data, `${activeAccount}-transactions.csv`)
-            handleClose()
-          }}
-        >
-          <ListItemAvatar>
-            <DownloadRounded fontSize="small" />
-          </ListItemAvatar>
-          <ListItemText>Export table</ListItemText>
-        </MenuItem>
+        {tableDataRef && (
+          <MenuItem
+            dense
+            onClick={() => {
+              const data = transformTransactionsToCsv(tableDataRef?.current ?? [])
+              downloadCsv(data, `${activeAccount}-transactions.csv`)
+              handleClose()
+            }}
+          >
+            <ListItemAvatar>
+              <DownloadRounded fontSize="small" />
+            </ListItemAvatar>
+            <ListItemText>Export table</ListItemText>
+          </MenuItem>
+        )}
         <MenuItem
           dense
           onClick={() => {

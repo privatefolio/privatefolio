@@ -318,6 +318,7 @@ export function enqueueRecomputeBalances(accountName: string, trigger: TaskTrigg
     description: "Recomputing balances of owned assets.",
     determinate: true,
     function: async (progress, signal) => {
+      await deleteBalances(accountName)
       await computeBalances(accountName, { since: 0 }, progress, signal)
     },
     name: "Recompute balances",

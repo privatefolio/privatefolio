@@ -34,17 +34,9 @@ export function TradeTable(props: TradesTableProps) {
   useEffect(() => {
     const subscription = rpc.subscribeToTrades(
       accountName,
-      throttle(
-        () => {
-          console.log("Refreshing trades")
-          setRefresh(Math.random())
-        },
-        SHORT_THROTTLE_DURATION,
-        {
-          leading: false,
-          trailing: true,
-        }
-      )
+      throttle(() => {
+        setRefresh(Math.random())
+      }, SHORT_THROTTLE_DURATION)
     )
 
     return closeSubscription(subscription, rpc)

@@ -27,16 +27,9 @@ export function ServerTasksTable() {
   useEffect(() => {
     const subscription = rpc.subscribeToServerTasks(
       accountName,
-      throttle(
-        () => {
-          setRefresh(Math.random())
-        },
-        SHORT_THROTTLE_DURATION,
-        {
-          leading: false,
-          trailing: true,
-        }
-      )
+      throttle(() => {
+        setRefresh(Math.random())
+      }, SHORT_THROTTLE_DURATION)
     )
 
     return closeSubscription(subscription, rpc)

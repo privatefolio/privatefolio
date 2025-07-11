@@ -1,0 +1,139 @@
+[
+  {
+    "timestamp": 1512259200000,
+  },
+  {
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1512345600000,
+  },
+  {
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1512432000000,
+  },
+  {
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1512518400000,
+  },
+  {
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1512604800000,
+  },
+  {
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1512691200000,
+  },
+  {
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1512777600000,
+  },
+  {
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1512864000000,
+  },
+  {
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1512950400000,
+  },
+  {
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1513036800000,
+  },
+  {
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1513123200000,
+  },
+  {
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1513209600000,
+  },
+  {
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1513296000000,
+  },
+  {
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1513382400000,
+  },
+  {
+    "ex.binance:ETF": "0.0000006",
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1513468800000,
+  },
+  {
+    "ex.binance:ETF": "0.0000006",
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1513555200000,
+  },
+  {
+    "ex.binance:ETF": "0.0000006",
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1513641600000,
+  },
+  {
+    "ex.binance:ETF": "0.0000006",
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1513728000000,
+  },
+  {
+    "ex.binance:ETF": "0.0000006",
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1513814400000,
+  },
+  {
+    "ex.binance:ETF": "0.0000006",
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1513900800000,
+  },
+  {
+    "ex.binance:ETF": "0.0000006",
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1513987200000,
+  },
+  {
+    "ex.binance:ETF": "0.0000006",
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1514073600000,
+  },
+  {
+    "ex.binance:ETF": "0.0000006",
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1514160000000,
+  },
+  {
+    "ex.binance:ETF": "0.0000006",
+    "ex.binance:ETH": "0.0000006",
+    "ex.binance:IOTA": "159.84",
+    "timestamp": 1514246400000,
+  },
+  {
+    "ex.binance:ETF": "0.0000006",
+    "ex.binance:ETH": "0.43585882",
+    "ex.binance:IOTA": "50.84",
+    "ex.binance:MANA": "99.9",
+    "ex.binance:QTUM": "1.998",
+    "ex.binance:XLM": "99.9",
+    "timestamp": 1514332800000,
+  },
+]

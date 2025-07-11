@@ -19,7 +19,7 @@ import { TimestampBlock } from "src/components/TimestampBlock"
 import { ValueChip } from "src/components/ValueChip"
 import { useConfirm } from "src/hooks/useConfirm"
 import { ChartData, EtherscanMetadata, Tag, Transaction } from "src/interfaces"
-import { DEFAULT_DEBOUNCE_DURATION, getBlockExplorerName, getBlockExplorerUrl } from "src/settings"
+import { getBlockExplorerName, getBlockExplorerUrl, SHORT_DEBOUNCE_DURATION } from "src/settings"
 import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
 import { PopoverToggleProps } from "src/stores/app-store"
 import { getAddressBookEntry } from "src/stores/metadata-store"
@@ -31,7 +31,7 @@ const patchTransactionDebounced = debounce(
     rpc.patchTransaction(accountName, id, update)
     // TODO0 is this wrapping necessary?
   },
-  DEFAULT_DEBOUNCE_DURATION
+  SHORT_DEBOUNCE_DURATION
 )
 
 type TransactionDrawerProps = DrawerProps &

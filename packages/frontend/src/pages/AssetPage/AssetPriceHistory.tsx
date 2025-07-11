@@ -1,7 +1,7 @@
 import { SdCardRounded } from "@mui/icons-material"
 import { MenuItem, Select, SelectChangeEvent, Stack, Tooltip } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import { debounce } from "lodash-es"
+import { throttle } from "lodash-es"
 import { getLivePricesForAsset } from "privatefolio-backend/build/src/extensions/prices/providers"
 import { allPriceApiIds } from "privatefolio-backend/src/settings/price-apis"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
@@ -9,7 +9,7 @@ import { useSearchParams } from "react-router-dom"
 import { ExtensionAvatar } from "src/components/ExtensionAvatar"
 import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { MyAsset } from "src/interfaces"
-import { DEFAULT_DEBOUNCE_DURATION, PRICE_APIS_META, PriceApiId } from "src/settings"
+import { PRICE_APIS_META, PriceApiId, SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
 import { $quoteCurrency } from "src/stores/device-settings-store"
@@ -53,9 +53,9 @@ export function AssetPriceHistory(props: AssetPriceHistoryProps) {
 
     const subscription = rpc.subscribeToDailyPrices(
       activeAccount,
-      debounce(() => {
+      throttle(() => {
         setRefresh(Math.random())
-      }, DEFAULT_DEBOUNCE_DURATION)
+      }, SHORT_THROTTLE_DURATION)
     )
 
     return closeSubscription(subscription, rpc)

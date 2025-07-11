@@ -192,6 +192,8 @@ export function getAutoFormatDigits(
     if (x > 10_000 || x < -10_000) {
       minimumFractionDigits = 0
     } else if (x > 1000 || x < -1000) {
+      minimumFractionDigits = 0
+    } else if (x > 10 || x < -10) {
       minimumFractionDigits = 2
     } else if (x < 1 && x > -1) {
       const max = getDecimalPrecision(x)

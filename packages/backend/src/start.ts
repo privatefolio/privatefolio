@@ -2,7 +2,7 @@ import "./logger"
 
 import { proxy, wrap } from "comlink"
 import { Cron } from "croner"
-import { throttle } from "lodash-es"
+import { debounce } from "lodash-es"
 
 import { getAccount } from "./api/accounts-api"
 import { Api, api } from "./api/api"
@@ -14,7 +14,7 @@ import {
   SubscriptionId,
   Timestamp,
 } from "./interfaces"
-import { SHORT_THROTTLE_DURATION } from "./settings/settings"
+import { MAX_DEBOUNCE_DURATION, SHORT_DEBOUNCE_DURATION } from "./settings/settings"
 import { ONE_DAY } from "./utils/formatting-utils"
 import { floorTimestamp, getCronExpression, getPrefix, isDevelopment } from "./utils/utils"
 
@@ -144,7 +144,7 @@ async function setupSideEffects(accountName: string) {
   const subId = await writeApi.subscribeToAuditLogs(
     accountName,
     proxy(
-      throttle(
+      debounce(
         async (cause, oldestTimestamp?: Timestamp) => {
           console.log(
             getPrefix(accountName, true),
@@ -179,9 +179,10 @@ async function setupSideEffects(accountName: string) {
           const account = await getAccount(accountName)
           account.eventEmitter.emit(SubscriptionChannel.Metadata)
         },
-        SHORT_THROTTLE_DURATION,
+        SHORT_DEBOUNCE_DURATION,
         {
           leading: false,
+          maxWait: MAX_DEBOUNCE_DURATION,
           trailing: true,
         }
       )

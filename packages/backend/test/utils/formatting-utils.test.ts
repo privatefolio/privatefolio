@@ -73,8 +73,8 @@ it("getAutoFormatDigits should work", () => {
   `)
   expect(getAutoFormatDigits(123.45)).toMatchInlineSnapshot(`
     {
-      "maximumFractionDigits": undefined,
-      "minimumFractionDigits": undefined,
+      "maximumFractionDigits": 2,
+      "minimumFractionDigits": 2,
     }
   `)
   expect(getAutoFormatDigits(123.45, 5)).toMatchInlineSnapshot(`
@@ -91,8 +91,8 @@ it("getAutoFormatDigits should work", () => {
   `)
   expect(getAutoFormatDigits(1000)).toMatchInlineSnapshot(`
     {
-      "maximumFractionDigits": undefined,
-      "minimumFractionDigits": undefined,
+      "maximumFractionDigits": 2,
+      "minimumFractionDigits": 2,
     }
   `)
   expect(getAutoFormatDigits(10000)).toMatchInlineSnapshot(`
@@ -134,8 +134,8 @@ it("getAutoFormatDigits should work", () => {
   `)
   expect(getAutoFormatDigits(-12.798353622471069)).toMatchInlineSnapshot(`
     {
-      "maximumFractionDigits": undefined,
-      "minimumFractionDigits": undefined,
+      "maximumFractionDigits": 2,
+      "minimumFractionDigits": 2,
     }
   `)
   expect(getAutoFormatDigits(-12.798353622471069, 2)).toMatchInlineSnapshot(`
@@ -146,8 +146,8 @@ it("getAutoFormatDigits should work", () => {
   `)
   expect(getAutoFormatDigits(-751.7936902746409)).toMatchInlineSnapshot(`
     {
-      "maximumFractionDigits": undefined,
-      "minimumFractionDigits": undefined,
+      "maximumFractionDigits": 2,
+      "minimumFractionDigits": 2,
     }
   `)
   expect(getAutoFormatDigits(-751.7936902746409, 2)).toMatchInlineSnapshot(`

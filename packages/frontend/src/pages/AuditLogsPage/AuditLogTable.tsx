@@ -38,17 +38,9 @@ export function AuditLogTable(props: AuditLogsTableProps) {
   useEffect(() => {
     const subscription = rpc.subscribeToAuditLogs(
       accountName,
-      throttle(
-        () => {
-          console.log("Refreshing")
-          setRefresh(Math.random())
-        },
-        SHORT_THROTTLE_DURATION,
-        {
-          leading: false,
-          trailing: true,
-        }
-      )
+      throttle(() => {
+        setRefresh(Math.random())
+      }, SHORT_THROTTLE_DURATION)
     )
 
     return closeSubscription(subscription, rpc)

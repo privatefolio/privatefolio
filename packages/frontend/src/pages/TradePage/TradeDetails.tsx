@@ -49,8 +49,12 @@ export function TradeDetails({ trade }: TradeDetailsProps) {
   const costBasis = useMemo<AggregatableValue[]>(() => {
     return cost.map(([assetId, amount, usdValue, exposure, txId, txTimestamp]) => [
       assetId,
-      Big(amount).div(`-${exposure}`).toString(),
-      Big(usdValue).div(`-${exposure}`).toString(),
+      Big(amount)
+        .div(exposure.includes("-") ? exposure : `-${exposure}`)
+        .toString(),
+      Big(usdValue)
+        .div(exposure.includes("-") ? exposure : `-${exposure}`)
+        .toString(),
       txId,
       txTimestamp,
     ])

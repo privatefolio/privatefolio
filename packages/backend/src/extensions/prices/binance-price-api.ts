@@ -15,6 +15,8 @@ export const Identifier: PriceApiId = "binance"
 
 export function getPair(assetId: string) {
   if (assetId === WETH_ASSET_ID) return "ETHUSDT"
+  const ticker = getAssetTicker(assetId)
+  if (ticker === "USDT") return "USDCUSDT"
   return `${getAssetTicker(assetId)}USDT`
 }
 

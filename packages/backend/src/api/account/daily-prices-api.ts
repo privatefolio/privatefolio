@@ -105,10 +105,6 @@ export async function getPricesForAsset(
   end?: Timestamp
 ): Promise<ChartData[]> {
   try {
-    if (assetId === "USDT" && !!timestamp) {
-      return [{ time: timestamp / 1000, value: 1 }] as ChartData[]
-    }
-
     const account = await getAccountWithDailyPrices(accountName)
 
     let query = `

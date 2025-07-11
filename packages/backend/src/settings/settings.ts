@@ -27,11 +27,12 @@ export const corsHeaders = {
 export const GITHUB_CACHE_URL =
   "https://raw.githubusercontent.com/privatefolio/coingecko/refs/heads/main/public"
 
-export const SHORT_THROTTLE_DURATION = 200
-export const MEDIUM_THROTTLE_DURATION = 1_000
-export const LONG_THROTTLE_DURATION = 2_000
+export const SHORT_THROTTLE_DURATION = 1_000
+export const MEDIUM_THROTTLE_DURATION = 2_500
+export const LONG_THROTTLE_DURATION = 5_000
 
-export const DEFAULT_DEBOUNCE_DURATION = 1500
+export const SHORT_DEBOUNCE_DURATION = 1_500
+export const MAX_DEBOUNCE_DURATION = 10_000
 
 export const DB_OPERATION_PAGE_SIZE = 1000
 export const PRICE_API_PAGINATION = 900 // coinbase limit is 300, binance is 1000

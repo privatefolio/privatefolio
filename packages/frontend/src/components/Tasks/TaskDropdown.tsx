@@ -70,19 +70,12 @@ export function TaskDropdown() {
   useEffect(() => {
     const subscription = rpc.subscribeToServerTasks(
       accountName,
-      throttle(
-        () => {
-          setRefresh(Math.random())
-          if (selectedTaskRef.current) {
-            rpc.getServerTask(accountName, selectedTaskRef.current.id).then(setSelectedTask)
-          }
-        },
-        SHORT_THROTTLE_DURATION,
-        {
-          leading: false,
-          trailing: true,
+      throttle(() => {
+        setRefresh(Math.random())
+        if (selectedTaskRef.current) {
+          rpc.getServerTask(accountName, selectedTaskRef.current.id).then(setSelectedTask)
         }
-      )
+      }, SHORT_THROTTLE_DURATION)
     )
 
     return closeSubscription(subscription, rpc)

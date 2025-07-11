@@ -23,8 +23,11 @@ import { AssetAvatar } from "../../components/AssetAvatar"
 import { $assetMap, $filterOptionsMap } from "../../stores/metadata-store"
 import { SerifFont } from "../../theme"
 import FourZeroFourPage from "../404"
+import { AuditLogActions } from "../AuditLogsPage/AuditLogActions"
 import { AuditLogTable } from "../AuditLogsPage/AuditLogTable"
+import { TradeActions } from "../TradesPage/TradeActions"
 import { TradeTable } from "../TradesPage/TradeTable"
+import { TransactionActions } from "../TransactionsPage/TransactionActions"
 import { TransactionTable } from "../TransactionsPage/TransactionTable"
 import { AssetBalanceHistory } from "./AssetBalanceHistory"
 import { AssetDetails } from "./AssetDetails"
@@ -178,58 +181,62 @@ export default function AssetPage() {
           </div>
         </Stack>
       </Stack>
-      <Stack>
-        <Tabs value={tab} defaultValue={tab}>
-          <NavTab value="details" to={`?tab=details`} label="Details" />
-          <NavTab value="markets" to={`?tab=markets`} label="Markets" />
-          <NavTab value="price-history" to={`?tab=price-history`} label="Price history" />
-          <NavTab
-            value="balance"
-            to={`?tab=balance`}
-            label={
-              <span>
-                <UserWalletIcon /> Balance history
-              </span>
-            }
-          />
-          <NavTab
-            value="trades"
-            to={`?tab=trades`}
-            label={
-              <span>
-                <UserWalletIcon /> Trades
-              </span>
-            }
-          />
-          <NavTab
-            value="transactions"
-            to={`?tab=transactions`}
-            label={
-              <span>
-                <UserWalletIcon /> Transactions
-              </span>
-            }
-          />
-          <NavTab
-            value="audit-logs"
-            to={`?tab=audit-logs`}
-            label={
-              <span>
-                <UserWalletIcon /> Audit logs
-              </span>
-            }
-          />
-        </Tabs>
+      <div>
+        <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+          <Tabs value={tab} defaultValue={tab}>
+            <NavTab value="details" to={`?tab=details`} label="Details" />
+            <NavTab value="markets" to={`?tab=markets`} label="Markets" />
+            <NavTab value="price-history" to={`?tab=price-history`} label="Price history" />
+            <NavTab
+              value="balance"
+              to={`?tab=balance`}
+              label={
+                <span>
+                  <UserWalletIcon /> Balance history
+                </span>
+              }
+            />
+            <NavTab
+              value="trades"
+              to={`?tab=trades`}
+              label={
+                <span>
+                  <UserWalletIcon /> Trades
+                </span>
+              }
+            />
+            <NavTab
+              value="transactions"
+              to={`?tab=transactions`}
+              label={
+                <span>
+                  <UserWalletIcon /> Transactions
+                </span>
+              }
+            />
+            <NavTab
+              value="audit-logs"
+              to={`?tab=audit-logs`}
+              label={
+                <span>
+                  <UserWalletIcon /> Audit logs
+                </span>
+              }
+            />
+          </Tabs>
+          {tab === "balance" && <QuoteCurrencyToggle />}
+          {tab === "trades" && <TradeActions />}
+          {tab === "transactions" && <TransactionActions />}
+          {tab === "audit-logs" && <AuditLogActions />}
+        </Stack>
         {tab === "details" && <AssetDetails metadata={metadata} isLoading={isLoading} />}
         {tab === "price-history" && <AssetPriceHistory asset={asset} />}
         {tab === "markets" && <AssetMarketTable metadata={metadata} isLoading={isLoading} />}
         {tab === "trades" && <TradeTable assetId={assetId} defaultRowsPerPage={10} />}
-        {tab === "balance" && (
-          <AssetBalanceHistory assetId={assetId} extraSettings={<QuoteCurrencyToggle />} />
-        )}
+        {tab === "balance" && <AssetBalanceHistory assetId={assetId} />}
         {tab === "transactions" && <TransactionTable assetId={assetId} defaultRowsPerPage={10} />}
         {tab === "audit-logs" && <AuditLogTable assetId={assetId} defaultRowsPerPage={10} />}
-      </Stack>
+      </div>
     </Stack>
   )
 }

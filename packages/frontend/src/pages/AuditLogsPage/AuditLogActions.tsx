@@ -23,7 +23,7 @@ import { downloadCsv } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 interface AuditLogsActionsProps {
-  tableDataRef: MutableRefObject<AuditLog[]>
+  tableDataRef?: MutableRefObject<AuditLog[]>
 }
 
 export function AuditLogActions(props: AuditLogsActionsProps) {
@@ -57,19 +57,21 @@ export function AuditLogActions(props: AuditLogsActionsProps) {
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
       >
-        <MenuItem
-          dense
-          onClick={() => {
-            const data = transformAuditLogsToCsv(tableDataRef.current)
-            downloadCsv(data, `${activeAccount}-audit-logs.csv`)
-            handleClose()
-          }}
-        >
-          <ListItemAvatar>
-            <DownloadRounded fontSize="small" />
-          </ListItemAvatar>
-          <ListItemText>Export table</ListItemText>
-        </MenuItem>
+        {tableDataRef && (
+          <MenuItem
+            dense
+            onClick={() => {
+              const data = transformAuditLogsToCsv(tableDataRef.current)
+              downloadCsv(data, `${activeAccount}-audit-logs.csv`)
+              handleClose()
+            }}
+          >
+            <ListItemAvatar>
+              <DownloadRounded fontSize="small" />
+            </ListItemAvatar>
+            <ListItemText>Export table</ListItemText>
+          </MenuItem>
+        )}
         <MenuItem
           dense
           onClick={() => {

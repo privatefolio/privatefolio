@@ -1,9 +1,9 @@
 import { useStore } from "@nanostores/react"
-import { debounce } from "lodash-es"
+import { throttle } from "lodash-es"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { ChartData, Time, Trade } from "src/interfaces"
-import { DEFAULT_DEBOUNCE_DURATION } from "src/settings"
+import { SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
 import { $quoteCurrency } from "src/stores/device-settings-store"
@@ -22,9 +22,9 @@ export function PnLChart({ trade }: { trade?: Trade }) {
   useEffect(() => {
     const subscription = rpc.subscribeToPnl(
       activeAccount,
-      debounce(() => {
+      throttle(() => {
         setRefresh(Math.random())
-      }, DEFAULT_DEBOUNCE_DURATION)
+      }, SHORT_THROTTLE_DURATION)
     )
 
     return closeSubscription(subscription, rpc)
