@@ -61,7 +61,7 @@ const config: Configuration = {
     icon: "build/images/icon.icns",
     target: [
       {
-        arch: ["universal"],
+        arch: ["x64", "arm64"],
         target: "dmg",
       },
     ],

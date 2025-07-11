@@ -1,0 +1,92 @@
+name: Check Notarization Status
+
+on:
+  workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
+  workflow_run:
+    workflows: ["Publish Apps"]
+    types: [completed]
+
+env:
+  APPLE_ID: ${{ secrets.APPLE_ID }}
+  APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+  APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  check-and-staple:
+    runs-on: macos-latest
+    steps:
+      - name: Ensure gh CLI available (pre-installed on macOS runners)
+        run: gh --version
+
+      - name: Get latest draft release tag
+        id: get_draft
+        run: |
+          tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 5 \
+                 | awk -F'\t' '$3 == "Draft" { print $1; exit }')
+          if [ -z "$tag" ]; then
+            echo "❌  No draft release found."
+            exit 1
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "ℹ️  Using draft release: $tag"
+
+      - name: Download draft release assets
+        run: |
+          mkdir -p release
+          cd release
+          gh release download "${{ steps.get_draft.outputs.tag }}" \
+            --repo "$GITHUB_REPOSITORY"
+
+      - name: Poll notarization (≤ 1 h) and staple DMGs
+        run: |
+          cd release
+          shopt -s nullglob
+          for json in *.json; do
+            uuid=$(jq -r '.id' "$json")
+            dmg="${json%.json}"
+
+            echo ""
+            echo "⏳  Checking notarization for $dmg (UUID: $uuid)…"
+            start=$(date +%s)
+
+            while true; do
+              status=$(xcrun notarytool info "$uuid" \
+                --apple-id "$APPLE_ID" \
+                --team-id "$APPLE_TEAM_ID" \
+                --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+                --output-format json | jq -r '.status')
+
+              echo "   • Status: $status"
+
+              if [[ "$status" == "Accepted" ]]; then
+                echo "✅  Notarized — stapling $dmg"
+                xcrun stapler staple "$dmg"
+                stapled="${dmg%.dmg}-stapled.dmg"
+                mv "$dmg" "$stapled"
+                echo "   • Stapled and renamed to $stapled"
+                break
+
+              elif [[ "$status" == "Invalid" || "$status" == "Rejected" ]]; then
+                echo "❌  Notarization failed for $dmg"
+                exit 1
+              fi
+
+              # timeout after 3 600 s (1 hour)
+              elapsed=$(( $(date +%s) - start ))
+              if (( elapsed >= 3600 )); then
+                echo "⏰  Gave up after 1 hour waiting for $dmg"
+                exit 1
+              fi
+
+              sleep 30
+            done
+          done
+
+      - name: Upload stapled DMGs to draft release
+        run: |
+          cd release
+          echo ""
+          echo "📤  Uploading stapled DMGs…"
+          gh release upload "${{ steps.get_draft.outputs.tag }}" *-stapled.dmg \
+            --repo "$GITHUB_REPOSITORY" --clobber
