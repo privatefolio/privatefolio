@@ -1,16 +1,16 @@
 import { Stack, TableCell, TableRow, Tooltip } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import Big from "big.js"
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { ActionBlock } from "src/components/ActionBlock"
 import { AppLink } from "src/components/AppLink"
 import { AssetAmountBlock } from "src/components/AssetAmountBlock"
-import { AggregatableValue, AssetAmountsBlock } from "src/components/AssetAmountsBlock"
+import { AssetAmountsBlock } from "src/components/AssetAmountsBlock"
 import { AssetBlock } from "src/components/AssetBlock"
 import { CaptionText } from "src/components/CaptionText"
 import { QuoteAmountBlock } from "src/components/QuoteAmountBlock"
 import { TimestampBlock } from "src/components/TimestampBlock"
-import { ChartData, SqlParam, Trade, TradePnL } from "src/interfaces"
+import { useTradeBreakdown } from "src/hooks/useTradeBreakdown"
+import { ChartData, Trade } from "src/interfaces"
 import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
 import { $inspectTime } from "src/stores/pages/balances-store"
 import { TableRowComponentProps } from "src/utils/table-utils"
@@ -24,24 +24,14 @@ export function TradeTableRow({
   relativeTime,
   ...rest
 }: TableRowComponentProps<Trade>) {
-  const {
-    createdAt,
-    tradeStatus: status,
-    assetId,
-    amount,
-    tradeType,
-    cost,
-    tradeNumber,
-    closedAt,
-  } = row
-
+  const { createdAt, tradeStatus: status, assetId, amount, tradeType, tradeNumber, closedAt } = row
   const [priceMap, setPriceMap] = useState<Record<string, ChartData>>()
 
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
   const activeAccountPath = useStore($activeAccountPath)
-  const inspectTime = useStore($inspectTime)
 
+  const inspectTime = useStore($inspectTime)
   useEffect(() => {
     rpc
       .getAssetPriceMap(activeAccount, inspectTime || (status === "closed" ? closedAt : undefined))
@@ -50,45 +40,7 @@ export function TradeTableRow({
       })
   }, [closedAt, rpc, activeAccount, inspectTime, status])
 
-  const costBasis = useMemo<AggregatableValue[]>(() => {
-    return cost.map(([assetId, amount, usdValue, exposure, txId, txTimestamp]) => [
-      assetId,
-      Big(amount)
-        .div(exposure.includes("-") ? exposure : `-${exposure}`)
-        .toString(),
-      Big(usdValue)
-        .div(exposure.includes("-") ? exposure : `-${exposure}`)
-        .toString(),
-      txId,
-      txTimestamp,
-    ])
-  }, [cost])
-
-  const [tradePnl, setTradePnl] = useState<TradePnL | undefined | null>()
-
-  useEffect(() => {
-    const params: SqlParam[] = [row.id]
-    let query = "SELECT * FROM trade_pnl WHERE trade_id = ? ORDER BY timestamp DESC LIMIT 1"
-
-    if (inspectTime) {
-      query = `SELECT * FROM trade_pnl WHERE trade_id = ? AND timestamp <= ? ORDER BY timestamp DESC LIMIT 1`
-      params.push(inspectTime)
-    }
-
-    rpc
-      .getTradePnL(activeAccount, row.id, query, params)
-      .then((pnl) => {
-        if (pnl.length > 0) {
-          setTradePnl(pnl[0])
-        } else {
-          setTradePnl(null)
-        }
-      })
-      .catch((error) => {
-        console.error(error)
-        setTradePnl(null)
-      })
-  }, [activeAccount, rpc, row.id, inspectTime])
+  const { costBasis, tradePnl } = useTradeBreakdown(row)
 
   if (isTablet) {
     return (

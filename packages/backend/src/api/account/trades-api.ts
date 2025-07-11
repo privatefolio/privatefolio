@@ -321,7 +321,6 @@ async function processTransactionForTrade(
   trade: Trade,
   txId: string,
   assetId: string,
-  log: AuditLog,
   progress: ProgressCallback
 ): Promise<void> {
   const tx = await getTransaction(accountName, txId)
@@ -330,12 +329,7 @@ async function processTransactionForTrade(
   const priceMap = await getAssetPriceMap(accountName, tx.timestamp)
 
   // Deposits
-  if (
-    tx.incomingAsset &&
-    tx.incoming &&
-    tx.incomingAsset === assetId &&
-    log.operation === "Deposit"
-  ) {
+  if (tx.incomingAsset && tx.incoming && tx.incomingAsset === assetId && tx.type === "Deposit") {
     const assetPrice = priceMap[tx.incomingAsset]?.value || 0
     if (!assetPrice && !isTestEnvironment)
       await progress([
@@ -352,12 +346,7 @@ async function processTransactionForTrade(
   }
 
   // Withdrawals
-  if (
-    tx.outgoingAsset &&
-    tx.outgoing &&
-    tx.outgoingAsset === assetId &&
-    log.operation === "Withdraw"
-  ) {
+  if (tx.outgoingAsset && tx.outgoing && tx.outgoingAsset === assetId && tx.type === "Withdraw") {
     const assetPrice = priceMap[tx.outgoingAsset]?.value || 0
     if (!assetPrice && !isTestEnvironment)
       await progress([
@@ -385,7 +374,7 @@ async function processTransactionForTrade(
       tx.outgoingAsset,
       `-${tx.outgoing}`,
       assetPrice ? Big(assetPrice).mul(`-${tx.outgoing}`).toString() : "0",
-      log.change,
+      tx.incoming,
       txId,
       tx.timestamp,
     ])
@@ -403,6 +392,7 @@ async function processTransactionForTrade(
       tx.incomingAsset,
       tx.incoming,
       assetPrice ? Big(assetPrice).mul(tx.incoming).toString() : "0",
+      tx.outgoing,
       txId,
       tx.timestamp,
     ])
@@ -511,7 +501,7 @@ export async function computeTrades(
     for (const trade of existingTrades) {
       trade.deposits = trade.deposits.filter((x) => x[4] <= since)
       trade.fees = trade.fees.filter((x) => x[4] <= since)
-      trade.proceeds = trade.proceeds.filter((x) => x[4] <= since)
+      trade.proceeds = trade.proceeds.filter((x) => x[5] <= since)
       trade.cost = trade.cost.filter((x) => x[5] <= since)
       trade.amount = 0
       trade.balance = 0
@@ -579,14 +569,7 @@ export async function computeTrades(
         if (log.txId) {
           tradeTransactions.push([tradeId, log.txId])
           // Track transactions for cost/proceeds/fees
-          await processTransactionForTrade(
-            accountName,
-            currentTrade,
-            log.txId,
-            assetId,
-            log,
-            progress
-          )
+          await processTransactionForTrade(accountName, currentTrade, log.txId, assetId, progress)
         }
       }
       // If we have an active trade, update it
@@ -615,14 +598,7 @@ export async function computeTrades(
             tradeTransactions.push([currentTrade.id, log.txId])
 
             // Update cost, proceeds and fees if this is a transaction
-            await processTransactionForTrade(
-              accountName,
-              currentTrade,
-              log.txId,
-              assetId,
-              log,
-              progress
-            )
+            await processTransactionForTrade(accountName, currentTrade, log.txId, assetId, progress)
           }
         }
 
@@ -1006,7 +982,7 @@ export async function computePnl(
         new Big(0)
       )
       const proceeds = trade.proceeds.reduce(
-        (sum, [_assetId, _amount, usdValue, _txId, txTimestamp]) =>
+        (sum, [_assetId, _amount, usdValue, _cost, _txId, txTimestamp]) =>
           txTimestamp <= bucketEnd ? sum.plus(usdValue) : sum,
         new Big(0)
       )
