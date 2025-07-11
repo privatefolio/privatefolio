@@ -253,8 +253,18 @@ export async function fetchDailyPrices(
       let since: Timestamp | undefined = await getPriceCursor(accountName, asset.id)
       let until: Timestamp | undefined = options.until || today + ONE_DAY
 
-      if (!since) since = until - 86400000 * PRICE_API_PAGINATION - 1
-      if (since === until) since = since - 1
+      const firstOwnedBucket = asset.firstOwnedAt
+        ? floorTimestamp(asset.firstOwnedAt, "1D" as ResolutionString)
+        : 0
+
+      if (!since) {
+        since = until - ONE_DAY * PRICE_API_PAGINATION - 1
+        // Try to limit the range to the first purchase date
+        if (firstOwnedBucket > since) since = firstOwnedBucket
+      }
+      if (since === until) {
+        since = since - 1
+      }
 
       for (const priceApiId of priceApiIds) {
         try {
@@ -329,8 +339,9 @@ export async function fetchDailyPrices(
               break
             }
 
-            until = start - 86400000
-            since = start - 86400000 * PRICE_API_PAGINATION
+            until = start - ONE_DAY
+            since = start - ONE_DAY * PRICE_API_PAGINATION
+            if (firstOwnedBucket > since) since = firstOwnedBucket
           }
           break
         } catch (error) {

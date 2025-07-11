@@ -146,7 +146,7 @@ export async function computeBalances(
   if (since !== 0) {
     try {
       const result = await account.execute("SELECT data FROM balances WHERE timestamp = ?", [
-        since - 86400000,
+        since - ONE_DAY,
       ])
       const data = result[0][0]
       latestBalances = typeof data === "string" ? JSON.parse(data) : latestBalances
@@ -201,10 +201,10 @@ export async function computeBalances(
 
       // fill the daily gaps
       if (latestDay !== 0) {
-        const daysDiff = (nextDay - latestDay) / 86400000
+        const daysDiff = (nextDay - latestDay) / ONE_DAY
         if (daysDiff > 1) {
           for (let i = 1; i < daysDiff; i++) {
-            const gapDay = latestDay + i * 86400000
+            const gapDay = latestDay + i * ONE_DAY
             historicalBalances[gapDay] = Object.assign({}, latestBalances)
           }
         }
@@ -286,7 +286,7 @@ export async function computeBalances(
   if (latestDay === 0) latestDay = since
 
   await progress([96, `Filling balances to reach today`])
-  for (let i = latestDay + 86400000; i <= until; i += 86400000) {
+  for (let i = latestDay + ONE_DAY; i <= until; i += ONE_DAY) {
     historicalBalances[i] = latestBalances
     latestDay = i
   }

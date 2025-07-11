@@ -1,4 +1,5 @@
 import { writesAllowed } from "src/utils/environment-utils"
+import { ONE_DAY } from "src/utils/formatting-utils"
 import { sql } from "src/utils/sql-utils"
 
 import { readSql } from "../accounts-api"
@@ -55,7 +56,7 @@ export async function getBreakdownChartData(
         -- Join with daily_prices to get the price at the given timestamp
         LEFT JOIN daily_prices dp ON
           dp.assetId = eb.assetId AND
-          dp.timestamp = eb.timestamp - (eb.timestamp % 86400000)
+          dp.timestamp = eb.timestamp - (eb.timestamp % ${ONE_DAY})
       ),
       -- Get the list of all unique assetIds and their tickers
       assets_list AS (

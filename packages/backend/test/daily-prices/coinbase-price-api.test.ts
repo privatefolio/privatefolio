@@ -1,6 +1,7 @@
 import { mapToChartData, queryPrices } from "src/extensions/prices/coinbase-price-api"
 import { ResolutionString, Timestamp } from "src/interfaces"
 import { PRICE_API_PAGINATION } from "src/settings/settings"
+import { ONE_DAY } from "src/utils/formatting-utils"
 import { assertTimeConsistency } from "src/utils/test-utils"
 import { expect, it } from "vitest"
 
@@ -70,8 +71,8 @@ it("should throw an error", async () => {
 
 it("should include today when limit is reached", async () => {
   const now = Date.now()
-  const today: Timestamp = now - (now % 86400000)
-  const since = today - 86400000 * (PRICE_API_PAGINATION - 1)
+  const today: Timestamp = now - (now % ONE_DAY)
+  const since = today - ONE_DAY * (PRICE_API_PAGINATION - 1)
 
   // act
   const result = await queryPrices({

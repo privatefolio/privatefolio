@@ -2,6 +2,7 @@ import { getPair, mapToChartData, queryPrices } from "src/extensions/prices/bina
 import { ResolutionString, Timestamp } from "src/interfaces"
 import { GITHUB_CI } from "src/server-env"
 import { PRICE_API_PAGINATION } from "src/settings/settings"
+import { ONE_DAY } from "src/utils/formatting-utils"
 import { expect, it } from "vitest"
 
 it("should fetch BTC prices within a range", async (test) => {
@@ -116,8 +117,8 @@ it("should include today when limit is reached", async (test) => {
     test.skip()
   }
   const now = Date.now()
-  const today: Timestamp = now - (now % 86400000)
-  const since = today - 86400000 * (PRICE_API_PAGINATION - 1)
+  const today: Timestamp = now - (now % ONE_DAY)
+  const since = today - ONE_DAY * (PRICE_API_PAGINATION - 1)
 
   // act
   const result = await queryPrices({
