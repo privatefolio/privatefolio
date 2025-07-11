@@ -130,6 +130,7 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
         run: |
+          mkdir -p notarization
           shopt -s nullglob
           for dmg in packages/electron/out/*.dmg; do
             echo "Notarizing $dmg"
