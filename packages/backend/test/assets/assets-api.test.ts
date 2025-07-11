@@ -31,6 +31,7 @@ describe("assets", () => {
     expect(asset).toMatchInlineSnapshot(`
       {
         "coingeckoId": "wrapped-bitcoin",
+        "firstOwnedAt": 0,
         "id": "chain.ethereum:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC",
         "logoUrl": "https://example.com/logo.png",
         "marketCapRank": 12,
@@ -75,6 +76,7 @@ describe("assets", () => {
     expect(asset).toMatchInlineSnapshot(`
       {
         "coingeckoId": "ethereum",
+        "firstOwnedAt": 0,
         "id": "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "logoUrl": "logo.svg",
         "marketCapRank": 2,
@@ -106,6 +108,7 @@ describe("assets", () => {
     expect(asset).toMatchInlineSnapshot(`
       {
         "coingeckoId": "ethereum",
+        "firstOwnedAt": 0,
         "id": "ethereum:0x0000000000000000000000000000000000000000:ETH",
         "logoUrl": "logo.svg",
         "marketCapRank": 2,

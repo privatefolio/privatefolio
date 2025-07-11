@@ -13,10 +13,10 @@ import {
   Timestamp,
 } from "src/interfaces"
 import { BINANCE_PLATFORM_ID } from "src/settings/platforms"
-import { allPriceApiIds } from "src/settings/price-apis"
+import { allPriceApiIds, PriceApiId } from "src/settings/price-apis"
 import { PRICE_API_PAGINATION, PRICE_APIS_META } from "src/settings/settings"
 import { getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
-import { formatDate } from "src/utils/formatting-utils"
+import { formatDate, ONE_DAY } from "src/utils/formatting-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { floorTimestamp, noop, writesAllowed } from "src/utils/utils"
@@ -222,7 +222,7 @@ export async function fetchDailyPrices(
     assets = assetsParam
   }
 
-  await progress([0, `Fetching asset prices for ${assets.length} assets`])
+  await progress([1, `Fetching asset prices for ${assets.length} assets`])
 
   const now = Date.now()
   const today: Timestamp = floorTimestamp(now, "1D" as ResolutionString)
@@ -243,14 +243,15 @@ export async function fetchDailyPrices(
       if (signal?.aborted) throw new Error(signal.reason)
 
       const preferredPriceApiId = asset.priceApiId
-      const priceApiIds = preferredPriceApiId ? [preferredPriceApiId] : allPriceApiIds
+      let priceApiIds: PriceApiId[] = preferredPriceApiId ? [preferredPriceApiId] : allPriceApiIds
 
       if (!preferredPriceApiId && platform === BINANCE_PLATFORM_ID) {
-        priceApiIds.sort((a) => (a === "binance" ? -1 : 1))
+        // priceApiIds.sort((a) => (a === "binance" ? -1 : 1))
+        priceApiIds = ["binance"]
       }
 
       let since: Timestamp | undefined = await getPriceCursor(accountName, asset.id)
-      let until: Timestamp | undefined = options.until || today
+      let until: Timestamp | undefined = options.until || today + ONE_DAY
 
       if (!since) since = until - 86400000 * PRICE_API_PAGINATION - 1
       if (since === until) since = since - 1
@@ -320,6 +321,14 @@ export async function fetchDailyPrices(
               break
             }
 
+            if (asset.firstOwnedAt && start < asset.firstOwnedAt) {
+              // await progress([
+              //   undefined,
+              //   `Skipping history before the first purchase of ${getAssetTicker(asset.id)} (${formatDate(asset.firstOwnedAt)})`,
+              // ])
+              break
+            }
+
             until = start - 86400000
             since = start - 86400000 * PRICE_API_PAGINATION
           }
@@ -331,16 +340,15 @@ export async function fetchDailyPrices(
     })
   }
 
-  let progressCount = 0
+  const batchSize = 10
+  await progress([2, `Fetching asset prices in batches of ${batchSize}`])
 
-  await Promise.all(
-    promises.map((fetchFn) =>
-      fetchFn().then(async () => {
-        progressCount += 1
-        await progress([(progressCount / assets.length) * 100])
-      })
-    )
-  )
+  for (let i = 0; i < promises.length; i += batchSize) {
+    const batch = promises.slice(i, i + batchSize)
+    await Promise.all(batch.map((fetchFn) => fetchFn()))
+    const completed = Math.min(i + batchSize, promises.length)
+    await progress([(completed / assets.length) * 100])
+  }
 }
 
 export function enqueueFetchPrices(accountName: string, trigger: TaskTrigger) {

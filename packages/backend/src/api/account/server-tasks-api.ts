@@ -28,7 +28,7 @@ export async function getServerTasks(
   query = "SELECT * FROM server_tasks ORDER BY id DESC",
   params?: SqlParam[]
 ): Promise<ServerTask[]> {
-  const account = await ensureTaskQueue(accountName)
+  const account = await getAccountWithTaskQueue(accountName)
 
   try {
     const result = await account.execute(query, params)
@@ -53,6 +53,7 @@ export async function getServerTasks(
       return value as ServerTask
     })
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to query server tasks: ${error}`)
   }
 }
@@ -63,7 +64,7 @@ export async function getServerTask(accountName: string, id: number) {
 }
 
 export async function upsertServerTasks(accountName: string, records: NewServerTask[]) {
-  const account = await ensureTaskQueue(accountName)
+  const account = await getAccountWithTaskQueue(accountName)
 
   try {
     const results = await account.executeMany(
@@ -116,7 +117,7 @@ export async function countServerTasks(
   query = "SELECT COUNT(*) FROM server_tasks",
   params?: SqlParam[]
 ): Promise<number> {
-  const account = await ensureTaskQueue(accountName)
+  const account = await getAccountWithTaskQueue(accountName)
 
   try {
     const result = await account.execute(query, params)
@@ -166,7 +167,7 @@ export async function getTriggers(
 }
 
 async function processQueue(accountName: string) {
-  const account = await ensureTaskQueue(accountName)
+  const account = await getAccountWithTaskQueue(accountName)
 
   // If already processing, don't start another process
   if (account.isProcessing) return
@@ -239,7 +240,7 @@ declare module "../accounts-api" {
   }
 }
 
-async function ensureTaskQueue(accountName: string) {
+export async function getAccountWithTaskQueue(accountName: string) {
   const account = await getAccount(accountName)
 
   if (account.taskQueue === undefined) {
@@ -247,13 +248,14 @@ async function ensureTaskQueue(accountName: string) {
     account.taskQueue = []
     account.pendingTask = undefined
 
-    // Check if there are any pending tasks in the database
+    console.log(getPrefix(accountName), "Checking if there are any pending tasks in the database")
     const tasks = await getServerTasks(
       accountName,
       "SELECT * FROM server_tasks WHERE status = 'queued' or status = 'running'"
     )
     for (const task of tasks) {
       await patchServerTask(accountName, task.id, {
+        completedAt: Date.now(),
         errorMessage: "Server restarted.",
         status: task.status === TaskStatus.Running ? TaskStatus.Aborted : TaskStatus.Cancelled,
       })
@@ -267,7 +269,7 @@ export async function enqueueTask(
   accountName: string,
   task: Omit<QueuedTask, "id" | "startedAt" | "abortController" | "status" | "createdAt">
 ) {
-  const { taskQueue, isProcessing } = await ensureTaskQueue(accountName)
+  const { taskQueue, isProcessing } = await getAccountWithTaskQueue(accountName)
 
   const existing = taskQueue.find((x) => x.name === task.name)
   if (existing) return existing.id
@@ -287,7 +289,7 @@ export async function enqueueTask(
 }
 
 export async function cancelTask(accountName: string, taskId: number) {
-  const account = await ensureTaskQueue(accountName)
+  const account = await getAccountWithTaskQueue(accountName)
 
   if (account.pendingTask?.id === taskId) {
     console.log(getPrefix(accountName), `Aborting task with id: ${account.pendingTask.id}`)

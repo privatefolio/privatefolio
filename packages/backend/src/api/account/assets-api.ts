@@ -26,18 +26,21 @@ import { getAccount } from "../accounts-api"
 import { getAccountWithAuditLogs } from "./audit-logs-api"
 import { enqueueTask } from "./server-tasks-api"
 
-const getQuery = sql`
+const getQuery = (whereClause?: string) => sql`
 SELECT DISTINCT
  audit_logs.assetId AS audit_log_id,
- assets.* 
+ assets.*,
+ MIN(audit_logs.timestamp) AS firstOwnedAt
 FROM
  audit_logs 
 LEFT JOIN
- assets ON assets.id = audit_logs.assetId`
+ assets ON assets.id = audit_logs.assetId
+${whereClause || ""}
+GROUP BY audit_logs.assetId`
 
 export async function getMyAssets(
   accountName: string,
-  query = getQuery,
+  query = getQuery(),
   params?: SqlParam[]
 ): Promise<MyAsset[]> {
   const account = await getAccountWithAuditLogs(accountName)
@@ -53,6 +56,7 @@ export async function getMyAssets(
         logoUrl: row[4],
         priceApiId: row[5],
         coingeckoId: row[6],
+        firstOwnedAt: row[7],
       }
       /* eslint-enable */
       transformNullsToUndefined(value)
@@ -137,7 +141,7 @@ export async function getAssetsByPlatform(platformId: string): Promise<Asset[]> 
 }
 
 export async function getAsset(accountName: string, id: string): Promise<MyAsset | undefined> {
-  const records = await getMyAssets(accountName, `${getQuery} WHERE audit_logs.assetId = ?`, [id])
+  const records = await getMyAssets(accountName, getQuery("WHERE audit_logs.assetId = ?"), [id])
   if (records.length === 0) {
     const contract = getAssetContract(id)
     const platform = getAssetPlatform(id)

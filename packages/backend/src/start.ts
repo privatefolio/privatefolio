@@ -138,6 +138,9 @@ async function setupMetadataCronJob(accountName: string) {
 async function setupSideEffects(accountName: string) {
   console.log(getPrefix(accountName, true), `Setting up side-effects.`)
 
+  // Make sure the task queue is initialized
+  await writeApi.getServerTasks(accountName)
+
   const subId = await writeApi.subscribeToAuditLogs(
     accountName,
     proxy(

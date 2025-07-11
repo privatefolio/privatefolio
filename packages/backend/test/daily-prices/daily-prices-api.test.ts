@@ -47,7 +47,10 @@ it("should fetch no prices", async () => {
   const updates: ProgressUpdate[] = []
   await fetchDailyPrices(accountName, [], async (state) => updates.push(state))
   // assert
-  expect(updates.join("\n")).toMatchInlineSnapshot(`"0,Fetching asset prices for 0 assets"`)
+  expect(updates.join("\n")).toMatchInlineSnapshot(`
+    "1,Fetching asset prices for 0 assets
+    2,Fetching asset prices in batches of 10"
+  `)
 })
 
 it("should fetch BTC prices using Binance", async (test) => {
@@ -69,8 +72,12 @@ it("should fetch BTC prices using Binance", async (test) => {
   expect(updates).toMatchInlineSnapshot(`
     [
       [
-        0,
+        1,
         "Fetching asset prices for 1 assets",
+      ],
+      [
+        2,
+        "Fetching asset prices in batches of 10",
       ],
       [
         undefined,
@@ -150,8 +157,12 @@ it("should fetch BTC prices using Coinbase", async () => {
   expect(updates).toMatchInlineSnapshot(`
     [
       [
-        0,
+        1,
         "Fetching asset prices for 1 assets",
+      ],
+      [
+        2,
+        "Fetching asset prices in batches of 10",
       ],
       [
         undefined,
@@ -238,8 +249,12 @@ it("should fetch WBTC prices using DefiLlama", async () => {
   expect(updates).toMatchInlineSnapshot(`
     [
       [
-        0,
+        1,
         "Fetching asset prices for 1 assets",
+      ],
+      [
+        2,
+        "Fetching asset prices in batches of 10",
       ],
       [
         undefined,
@@ -307,8 +322,12 @@ it("should fetch WBTC prices using Alchemy", async () => {
   expect(updates).toMatchInlineSnapshot(`
     [
       [
-        0,
+        1,
         "Fetching asset prices for 1 assets",
+      ],
+      [
+        2,
+        "Fetching asset prices in batches of 10",
       ],
       [
         undefined,

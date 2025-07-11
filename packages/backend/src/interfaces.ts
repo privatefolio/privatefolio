@@ -680,6 +680,7 @@ export interface Asset extends Partial<AssetMetadata> {
 }
 
 export interface MyAsset extends Asset {
+  firstOwnedAt?: Timestamp
   priceApiId?: PriceApiId
 }
 
