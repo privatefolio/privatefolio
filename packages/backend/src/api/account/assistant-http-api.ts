@@ -2,13 +2,13 @@ import { AnthropicProviderOptions, createAnthropic } from "@ai-sdk/anthropic"
 import { createOpenAI, OpenAIResponsesProviderOptions } from "@ai-sdk/openai"
 import { createPerplexity } from "@ai-sdk/perplexity"
 import { JSONValue, LanguageModelV1, Message, StepResult, streamText, Tool } from "ai"
-import { BackendApiShape } from "src/backend-server"
 import { ChatMessage } from "src/interfaces"
 import { getAssistantSystemPrompt, getAssistantTools, MAX_STEPS } from "src/settings/assistant"
 import { AssistantModel, AVAILABLE_MODELS, ModelFamily } from "src/settings/assistant-models"
 import { decryptValue } from "src/utils/jwt-utils"
 
 import { corsHeaders } from "../../settings/settings"
+import { Api } from "../api"
 import { AuthSecrets, readSecrets } from "../auth-http-api"
 import { getValue } from "./kv-api"
 
@@ -129,10 +129,7 @@ type AssistantChatRequest = {
 }
 
 // https://ai-sdk.dev/docs/
-export async function handleAssistantChat(
-  request: Request,
-  writeApi: BackendApiShape
-): Promise<Response> {
+export async function handleAssistantChat(request: Request, writeApi: Api): Promise<Response> {
   const { method } = request
 
   if (method !== "POST") {
@@ -166,7 +163,7 @@ export async function handleAssistantChat(
       conversationId,
       id: lastUserMessage.id,
       message: lastUserMessage.content,
-      role: lastUserMessage.role,
+      role: lastUserMessage.role as "user" | "assistant" | "system",
       timestamp: Date.now(),
     })
 

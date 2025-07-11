@@ -8,6 +8,7 @@ import { join } from "path"
 
 import { handleAssistantChat } from "./api/account/assistant-http-api"
 import { handleDownload, handlePreflight, handleUpload } from "./api/account/server-files-http-api"
+import { Api } from "./api/api"
 import {
   handleLoginRequest,
   handleSetupRequest,
@@ -124,13 +125,13 @@ export class BackendServer<T extends BackendApiShape> {
 
         // Protected routes
         if (pathname === protectedRoutes[0]) {
-          return await handleDownload(request)
+          return await handleDownload(request, writeApi as unknown as Api)
         }
         if (pathname === protectedRoutes[1]) {
-          return await handleUpload(request)
+          return await handleUpload(request, writeApi as unknown as Api)
         }
         if (pathname === protectedRoutes[2]) {
-          return await handleAssistantChat(request, writeApi)
+          return await handleAssistantChat(request, writeApi as unknown as Api)
         }
 
         // WebSocket upgrade check (protected)

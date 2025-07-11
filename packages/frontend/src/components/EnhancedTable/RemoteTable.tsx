@@ -334,13 +334,7 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
                 {rows.length === 0 && !isEmpty && !loading && !error && (
                   <TableRow>
                     <TableCell colSpan={headCells.length}>
-                      <Stack
-                        justifyContent="center"
-                        alignItems="center"
-                        sx={{ height: defaultRowsPerPage === 10 ? 140 : 260 }}
-                      >
-                        <NoFilterMatch />
-                      </Stack>
+                      <NoFilterMatch />
                     </TableCell>
                   </TableRow>
                 )}

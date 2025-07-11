@@ -308,13 +308,7 @@ export function MemoryTable<T extends BaseType>(props: MemoryTableProps<T>) {
                 {filteredRows.length === 0 && !isEmpty && !isLoading && !error && (
                   <TableRow>
                     <TableCell colSpan={headCells.length}>
-                      <Stack
-                        justifyContent="center"
-                        alignItems="center"
-                        sx={{ height: defaultRowsPerPage === 10 ? 140 : 260 }}
-                      >
-                        <NoFilterMatch />
-                      </Stack>
+                      <NoFilterMatch />
                     </TableCell>
                   </TableRow>
                 )}

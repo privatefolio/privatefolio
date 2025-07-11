@@ -6,7 +6,7 @@ import { corsHeaders, FILES_LOCATION } from "src/settings/settings"
 import { getPrefix } from "src/utils/utils"
 import { promisify } from "util"
 
-import { getServerFile, patchServerFile } from "./server-files-api"
+import { Api } from "../api"
 
 export async function handlePreflight(): Promise<Response> {
   return new Response(null, {
@@ -15,7 +15,7 @@ export async function handlePreflight(): Promise<Response> {
   })
 }
 
-export async function handleDownload(request: Request): Promise<Response> {
+export async function handleDownload(request: Request, writeApi: Api): Promise<Response> {
   const { method } = request
   const { searchParams } = new URL(request.url)
 
@@ -42,7 +42,7 @@ export async function handleDownload(request: Request): Promise<Response> {
   const filePath = join(FILES_LOCATION, accountName, fileId)
 
   // Check if the file exists in the database, and if its status is completed
-  const fileRecord = await getServerFile(accountName, parseInt(fileId))
+  const fileRecord = await writeApi.getServerFile(accountName, parseInt(fileId))
   if (!fileRecord || fileRecord.status === "deleted") {
     return new Response("File not found.", {
       headers: corsHeaders,
@@ -100,7 +100,7 @@ export async function handleDownload(request: Request): Promise<Response> {
   })
 }
 
-export async function handleUpload(request: Request): Promise<Response> {
+export async function handleUpload(request: Request, writeApi: Api): Promise<Response> {
   const { method } = request
 
   if (method !== "POST") {
@@ -145,7 +145,7 @@ export async function handleUpload(request: Request): Promise<Response> {
     })
   }
 
-  const fileRecord = await getServerFile(accountName, Number(fileId))
+  const fileRecord = await writeApi.getServerFile(accountName, Number(fileId))
 
   if (!fileRecord) {
     return new Response("File record not found.", {
@@ -156,7 +156,7 @@ export async function handleUpload(request: Request): Promise<Response> {
 
   console.log(getPrefix(accountName), `Uploading file: ${fileRecord.name}`)
 
-  await patchServerFile(accountName, fileRecord.id, {
+  await writeApi.patchServerFile(accountName, fileRecord.id, {
     startedAt: Date.now(),
     status: "uploading",
     //
@@ -197,14 +197,14 @@ export async function handleUpload(request: Request): Promise<Response> {
     // Finalize the write stream once all chunks are written
     await promisify(writeStream.end.bind(writeStream))()
 
-    await patchServerFile(accountName, fileRecord.id, {
+    await writeApi.patchServerFile(accountName, fileRecord.id, {
       completedAt: Date.now(),
       progress: 100,
       status: "completed",
       //
     })
   } catch (error) {
-    await patchServerFile(accountName, fileRecord.id, {
+    await writeApi.patchServerFile(accountName, fileRecord.id, {
       completedAt: Date.now(),
       status: "aborted",
       //

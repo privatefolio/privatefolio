@@ -46,6 +46,7 @@ export async function checkAuthentication(atom: WritableAtom<AuthState>, api: Re
   const { baseUrl, jwtKey } = api
 
   try {
+    const jwt = localStorage.getItem(jwtKey)
     const statusRes = await fetch(`${baseUrl}/api/setup-status`)
     if (!statusRes.ok) {
       atom.set({ ...atom.get(), errorMessage: "Failed to check setup status." })
@@ -58,7 +59,7 @@ export async function checkAuthentication(atom: WritableAtom<AuthState>, api: Re
         atom.set({ ...atom.get(), checked: true, kioskMode, loading: false, needsSetup })
         return
       }
-      if (kioskMode) {
+      if (kioskMode && !jwt) {
         atom.set({
           ...atom.get(),
           checked: true,
@@ -71,7 +72,6 @@ export async function checkAuthentication(atom: WritableAtom<AuthState>, api: Re
       }
     }
 
-    const jwt = localStorage.getItem(jwtKey)
     if (!jwt) {
       atom.set({ ...atom.get(), checked: true })
       return
@@ -85,10 +85,15 @@ export async function checkAuthentication(atom: WritableAtom<AuthState>, api: Re
     if (data.valid) {
       atom.set({ ...atom.get(), checked: true, isAuthenticated: true, kioskMode: data.kioskMode })
     } else {
+      let errorMessage = data.error
+      if (errorMessage.includes("expired")) {
+        errorMessage = "Session expired. Please login again."
+      }
+
       atom.set({
         ...atom.get(),
         checked: true,
-        errorMessage: data.error,
+        errorMessage,
         isAuthenticated: false,
       })
     }
