@@ -123,7 +123,7 @@ jobs:
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
 
-      - name: Notarize DMGs
+      - name: Submit DMGs for Notarization
         if: matrix.os == 'macos-latest'
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -137,11 +137,16 @@ jobs:
               --apple-id "$APPLE_ID" \
               --team-id "$APPLE_TEAM_ID" \
               --password "$APPLE_APP_SPECIFIC_PASSWORD" \
-              --wait
-            xcrun stapler staple "$dmg"
-            echo "Stapled $dmg"
+              --output-format json > "notarization/$(basename "$dmg").json"
           done
-        
+
+      - name: Upload Notarization JSONs to Existing Draft Release
+        if: matrix.os == 'macos-latest'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          gh release upload "$tag" notarization/*.json --repo ${{ github.repository }} --clobber
 
       - name: Notify Discord on success
         if: success()
