@@ -2,7 +2,7 @@ name: Publish Apps
 
 on:
   push:
-    tags: [ "*" ]
+    tags: ["*"]
 
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
 
@@ -84,34 +84,6 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: yarn install --frozen-lockfile
 
-      # - name: Create temp keychain & import cert
-      #   if: matrix.os == 'macos-latest'
-      #   run: |
-      #     # create & unlock temp keychain
-      #     security create-keychain -p temp-pass build.keychain
-      #     security default-keychain -s build.keychain
-      #     security unlock-keychain -p temp-pass build.keychain
-      #     security list-keychains -d user -s build.keychain
-      #     security set-keychain-settings -lut 7200 build.keychain
-
-      #     # decode and import p12; -A gives non-interactive access
-      #     echo "$CSC_LINK" | base64 --decode > /tmp/cert.p12
-      #     security import /tmp/cert.p12 \
-      #       -k build.keychain -f pkcs12 -P "$CSC_KEY_PASSWORD" \
-      #       -A -T /usr/bin/codesign -T /usr/bin/productsign
-
-      #     # grant key-partition access (include codesign)
-      #     security set-key-partition-list \
-      #       -S apple-tool:,apple:,codesign -s -k temp-pass build.keychain
-
-      #     # quick sanity check - fails fast if cert unusable
-      #     security find-identity -v -p codesigning build.keychain
-
-      #     echo "CSC_KEYCHAIN=build.keychain" >> $GITHUB_ENV
-      #   env:
-      # CSC_LINK: ${{ secrets.CSC_LINK }}
-      # CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-
       - name: Build and Publish Binary (macOS)
         if: matrix.os == 'macos-latest'
         run: yarn build-bin:mac
@@ -145,26 +117,18 @@ jobs:
           tag="${GITHUB_REF#refs/tags/}"
           gh release upload "$tag" notarization/*.json --repo ${{ github.repository }} --clobber
 
-      - name: Notify Discord on success
-        if: success()
+  notify:
+    needs: build-and-publish
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Discord
         uses: sarisia/actions-status-discord@v1
         with:
           webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
-          status: "Success"
-          title: "Privatefolio - Publish Apps Succeeded"
+          status: ${{ needs.build-and-publish.result == 'success' && 'Success' || 'Failure' }}
+          title: ${{ format('Privatefolio - Publish Apps {0}', needs.build-and-publish.result == 'success' && 'Succeeded' || 'Failed') }}
           description: |
             **Branch**: `${{ github.ref_name }}`
             **Commit**: `${{ github.sha }}`
-          color: 0x00FF00
-
-      - name: Notify Discord on failure
-        if: failure()
-        uses: sarisia/actions-status-discord@v1
-        with:
-          webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
-          status: "Failure"
-          title: "Privatefolio - Publish Apps Failed"
-          description: |
-            **Branch**: `${{ github.ref_name }}`
-            **Commit**: `${{ github.sha }}`
-          color: 0xFF0000
+          color: ${{ needs.build-and-publish.result == 'success' && '0x00FF00' || '0xFF0000' }}

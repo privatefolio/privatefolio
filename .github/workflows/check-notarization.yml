@@ -20,6 +20,21 @@ jobs:
       - name: Ensure gh CLI available (pre-installed on macOS runners)
         run: gh --version
 
+      - name: 🔎  Debug draft-release search
+        run: |
+          echo "Repo → $GITHUB_REPOSITORY"
+          echo "gh version → $(gh --version)"
+          gh auth status          # confirms token & scopes
+          echo "--- raw list ---"
+          gh release list --repo "$GITHUB_REPOSITORY" --limit 20
+          echo "--- JSON dump ---"
+          gh release list --repo "$GITHUB_REPOSITORY" --limit 20 \
+            --json tagName,isDraft,isPrerelease,publishedAt \
+            | jq .
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+
       - name: Get latest draft release tag
         id: get_draft
         run: |
