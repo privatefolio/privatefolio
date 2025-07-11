@@ -66,7 +66,7 @@ export function AssetBalanceHistory(props: AssetBalanceHistoryProps) {
         const balance = Number(item[assetId]) || 0
         const time = (item.timestamp / 1000) as Time
 
-        if (!hasHadABalance && balance > 0) hasHadABalance = true
+        if (!hasHadABalance && balance !== 0) hasHadABalance = true
 
         if (balance !== 0) {
           if (firstNonZeroIndex === -1) firstNonZeroIndex = index

@@ -17,7 +17,7 @@ import { transformNullsToUndefined } from "src/utils/db-utils"
 import { saveFile } from "src/utils/file-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
-import { noop } from "src/utils/utils"
+import { noop, writesAllowed } from "src/utils/utils"
 
 import {
   EtherscanTransaction,
@@ -36,8 +36,10 @@ import { assignTagToAuditLog, assignTagToTransaction } from "./tags-api"
 const SCHEMA_VERSION = 1
 
 export async function getAccountWithTransactions(accountName: string) {
-  const schemaVersion = await getValue(accountName, `transactions_schema_version`, 0)
   const account = await getAccount(accountName)
+  if (!writesAllowed) return account
+
+  const schemaVersion = await getValue(accountName, `transactions_schema_version`, 0)
 
   if (schemaVersion < SCHEMA_VERSION) {
     // Drop existing table to recreate with new schema

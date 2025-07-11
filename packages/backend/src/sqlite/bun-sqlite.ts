@@ -54,7 +54,7 @@ export async function createQueryExecutor(
       }
       return rows
     } catch (error) {
-      if (!isTestEnvironment) console.error(error)
+      if (!isTestEnvironment && writesAllowed) console.error(error)
       throw new Error(`Failed to execute query: ${query}, error: ${error}`)
     }
   }

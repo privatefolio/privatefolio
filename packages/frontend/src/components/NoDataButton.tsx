@@ -27,7 +27,7 @@ export function NoDataButton() {
   useEffect(() => {
     const timeout = setTimeout(() => {
       setShowLoading(true)
-    }, 50)
+    }, 100)
     return () => clearTimeout(timeout)
   }, [])
 

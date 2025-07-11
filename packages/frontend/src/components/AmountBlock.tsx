@@ -73,10 +73,18 @@ export function AmountBlock(props: AmountBlockProps) {
   const compactValue = useMemo(() => {
     if (typeof amountN !== "number") return ""
 
+    if (Math.abs(amountN) > 1_000_000 || compact) {
+      return formatNumber(amountN, {
+        maximumFractionDigits: 2,
+        minimumFractionDigits: 0,
+        notation: "compact",
+        ...formatOpts,
+      })
+    }
+
     return formatNumber(amountN, {
       maximumFractionDigits: minimumFractionDigits,
       minimumFractionDigits,
-      notation: amountN > 1_000_000 || compact ? "compact" : undefined,
       ...formatOpts,
     })
   }, [amountN, compact, formatOpts, minimumFractionDigits])

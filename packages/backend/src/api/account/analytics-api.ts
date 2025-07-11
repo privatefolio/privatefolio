@@ -1,6 +1,7 @@
+import { writesAllowed } from "src/utils/environment-utils"
 import { sql } from "src/utils/sql-utils"
 
-import { executeSql } from "../accounts-api"
+import { readSql } from "../accounts-api"
 import { getAccountWithDailyPrices } from "./daily-prices-api"
 
 export async function getBreakdownChartData(
@@ -13,10 +14,11 @@ export async function getBreakdownChartData(
     values: number[]
   }[]
 > {
-  await getAccountWithDailyPrices(accountName)
-  const result = await executeSql(
-    accountName,
-    sql`
+  try {
+    await getAccountWithDailyPrices(accountName)
+    const result = await readSql(
+      accountName,
+      sql`
     -- Construct a JSON array of records directly in SQL
     SELECT '[' || GROUP_CONCAT(json_record) || ']' AS json_data
     FROM (
@@ -103,8 +105,12 @@ export async function getBreakdownChartData(
       ORDER BY timestamp ASC
     ) AS derived_table
     `
-  )
+    )
 
-  const data = JSON.parse(result[0][0] as string) || []
-  return data
+    const data = JSON.parse(result[0][0] as string) || []
+    return data
+  } catch (error) {
+    if (!writesAllowed) return []
+    throw error
+  }
 }

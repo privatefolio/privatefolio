@@ -22,7 +22,7 @@ import { transformNullsToUndefined } from "src/utils/db-utils"
 import { formatDate, ONE_DAY } from "src/utils/formatting-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
-import { floorTimestamp, hashString, isTestEnvironment, noop } from "src/utils/utils"
+import { floorTimestamp, hashString, isTestEnvironment, noop, writesAllowed } from "src/utils/utils"
 
 import { getAccount } from "../accounts-api"
 import { getMyAssets } from "./assets-api"
@@ -35,9 +35,10 @@ import { getTransaction } from "./transactions-api"
 const SCHEMA_VERSION = 17
 
 export async function getAccountWithTrades(accountName: string) {
-  const schemaVersion = await getValue(accountName, `trade_schema_version`, 0)
-
   const account = await getAccount(accountName)
+  if (!writesAllowed) return account
+
+  const schemaVersion = await getValue(accountName, `trade_schema_version`, 0)
 
   if (schemaVersion < SCHEMA_VERSION) {
     await account.execute(sql`DROP TABLE IF EXISTS trade_audit_logs`)

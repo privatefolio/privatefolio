@@ -1,5 +1,6 @@
 import { EventCause, SqlParam, SubscriptionChannel, Tag } from "src/interfaces"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { writesAllowed } from "src/utils/environment-utils"
 import { createSubscription } from "src/utils/sub-utils"
 
 import { getAccount } from "../accounts-api"
@@ -24,6 +25,7 @@ export async function getTags(
       return tag as Tag
     })
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to query tags: ${error}`)
   }
 }

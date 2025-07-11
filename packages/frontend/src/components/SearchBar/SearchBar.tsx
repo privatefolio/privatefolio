@@ -489,8 +489,8 @@ export const SearchBar = () => {
       return {
         ...action,
         perform: (currentActionImpl: ActionImpl) => {
-          addToRecentActions(action.id)
           action.perform?.(currentActionImpl)
+          setTimeout(() => addToRecentActions(action.id), 50)
         },
         priority: isRecent ? -index : action.priority,
         section: isRecent ? SECTIONS.recent : action.section,

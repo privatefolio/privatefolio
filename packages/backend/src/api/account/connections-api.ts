@@ -95,6 +95,7 @@ export async function getConnections(
       return value as Connection
     })
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to query connections: ${error}`)
   }
 }

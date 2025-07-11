@@ -13,7 +13,7 @@ import {
 import { TASK_LOG_CHAR_LIMIT, TASK_LOG_LINE_LIMIT, TASK_LOGS_LOCATION } from "src/settings/settings"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { createSubscription } from "src/utils/sub-utils"
-import { getPrefix, isTestEnvironment, sleep } from "src/utils/utils"
+import { getPrefix, isTestEnvironment, sleep, writesAllowed } from "src/utils/utils"
 
 import { Account, getAccount } from "../accounts-api"
 
@@ -160,6 +160,7 @@ export async function getTriggers(
     const result = await account.execute(query, params)
     return result.map((row) => row[0] as string)
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to query triggers: ${error}`)
   }
 }

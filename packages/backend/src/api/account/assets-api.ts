@@ -17,6 +17,7 @@ import {
   ZERO_ADDRESS,
 } from "src/utils/assets-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { writesAllowed } from "src/utils/environment-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 
@@ -67,15 +68,18 @@ export async function getMyAssets(
       const platform = getAssetPlatform(result.id)
       const coingeckoId = removePlatformPrefix(platform)
       const ticker = getAssetTicker(result.id)
+      // search by ticker
       if (!cachedAsset && !contract && platform) {
         cachedAsset = cachedAssets.find((x) => getAssetTicker(x.id) === ticker)
       }
+      // search by coingeckoId (native assets)
       if (!cachedAsset && contract === ZERO_ADDRESS) {
         cachedAsset = cachedAssets.find((x) => x.coingeckoId === coingeckoId)
       }
       if (!cachedAsset && contract === ZERO_ADDRESS && ticker === "ETH") {
         cachedAsset = cachedAssets.find((x) => x.coingeckoId === "ethereum")
       }
+      // search by contract
       if (!cachedAsset && contract && coingeckoId) {
         cachedAsset = cachedAssets.find(
           (x) =>
@@ -84,9 +88,14 @@ export async function getMyAssets(
             x.platforms[coingeckoId] === contract.toLowerCase()
         )
       }
+      // search by symbol
+      if (!cachedAsset && ticker) {
+        cachedAsset = cachedAssets.find((x) => getAssetTicker(x.id) === ticker)
+      }
       return { ...cachedAsset, ...result }
     })
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to query assets: ${error}`)
   }
 }

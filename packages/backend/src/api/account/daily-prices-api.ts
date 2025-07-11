@@ -12,13 +12,14 @@ import {
   Time,
   Timestamp,
 } from "src/interfaces"
+import { BINANCE_PLATFORM_ID } from "src/settings/platforms"
 import { allPriceApiIds } from "src/settings/price-apis"
 import { PRICE_API_PAGINATION, PRICE_APIS_META } from "src/settings/settings"
-import { getAssetTicker } from "src/utils/assets-utils"
+import { getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
 import { formatDate } from "src/utils/formatting-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
-import { floorTimestamp, noop } from "src/utils/utils"
+import { floorTimestamp, noop, writesAllowed } from "src/utils/utils"
 
 import { getAccount } from "../accounts-api"
 import { getMyAssets, patchAsset } from "./assets-api"
@@ -28,8 +29,10 @@ import { enqueueTask } from "./server-tasks-api"
 const SCHEMA_VERSION = 2
 
 export async function getAccountWithDailyPrices(accountName: string) {
-  const schemaVersion = await getValue(accountName, `daily_prices_schema_version`, 0)
   const account = await getAccount(accountName)
+  if (!writesAllowed) return account
+
+  const schemaVersion = await getValue(accountName, `daily_prices_schema_version`, 0)
 
   if (schemaVersion < SCHEMA_VERSION) {
     await account.execute(sql`
@@ -101,69 +104,79 @@ export async function getPricesForAsset(
   start?: Timestamp,
   end?: Timestamp
 ): Promise<ChartData[]> {
-  if (assetId === "USDT" && !!timestamp) {
-    return [{ time: timestamp / 1000, value: 1 }] as ChartData[]
-  }
+  try {
+    if (assetId === "USDT" && !!timestamp) {
+      return [{ time: timestamp / 1000, value: 1 }] as ChartData[]
+    }
 
-  const account = await getAccountWithDailyPrices(accountName)
+    const account = await getAccountWithDailyPrices(accountName)
 
-  let query = `
+    let query = `
     SELECT price FROM daily_prices
     WHERE assetId = ? 
   `
-  if (timestamp && (start || end)) {
-    throw new Error("You can only pass timestamp or start/end, not both")
+    if (timestamp && (start || end)) {
+      throw new Error("You can only pass timestamp or start/end, not both")
+    }
+
+    const params: SqlParam[] = []
+
+    if (timestamp) {
+      query += " AND timestamp = ?"
+      params.push(timestamp)
+    }
+    if (start && end) {
+      query += " AND timestamp >= ? AND timestamp <= ?"
+      params.push(start, end)
+    } else if (start) {
+      query += " AND timestamp >= ?"
+      params.push(start)
+    } else if (end) {
+      query += " AND timestamp <= ?"
+      params.push(end)
+    }
+
+    query += " ORDER BY timestamp ASC"
+
+    const prices = await account.execute(query, [assetId, ...params])
+
+    return prices.map((x) => JSON.parse(x[0] as string))
+  } catch (error) {
+    if (!writesAllowed) return []
+    throw error
   }
-
-  const params: SqlParam[] = []
-
-  if (timestamp) {
-    query += " AND timestamp = ?"
-    params.push(timestamp)
-  }
-  if (start && end) {
-    query += " AND timestamp >= ? AND timestamp <= ?"
-    params.push(start, end)
-  } else if (start) {
-    query += " AND timestamp >= ?"
-    params.push(start)
-  } else if (end) {
-    query += " AND timestamp <= ?"
-    params.push(end)
-  }
-
-  query += " ORDER BY timestamp ASC"
-
-  const prices = await account.execute(query, [assetId, ...params])
-
-  return prices.map((x) => JSON.parse(x[0] as string))
 }
 
 export async function getAssetPriceMap(
   accountName: string,
   timestamp: Timestamp = new Date().getTime()
 ): Promise<Record<string, ChartData>> {
-  const account = await getAccountWithDailyPrices(accountName)
+  try {
+    const account = await getAccountWithDailyPrices(accountName)
 
-  const day: Timestamp = floorTimestamp(timestamp, "1D" as ResolutionString)
+    const day: Timestamp = floorTimestamp(timestamp, "1D" as ResolutionString)
 
-  const prices = await account.execute(
-    `
+    const prices = await account.execute(
+      `
     SELECT assetId, price FROM daily_prices
     WHERE timestamp = ?
   `,
-    [day]
-  )
+      [day]
+    )
 
-  return prices.reduce(
-    (map: Record<string, ChartData>, x) => {
-      map[x[0] as string] = JSON.parse(x[1] as string)
-      return map
-    },
-    {
-      USDT: { time: (day / 1000) as Time, value: 1 },
-    }
-  )
+    return prices.reduce(
+      (map: Record<string, ChartData>, x) => {
+        map[x[0] as string] = JSON.parse(x[1] as string)
+        return map
+      },
+      {
+        USDT: { time: (day / 1000) as Time, value: 1 },
+      }
+    )
+  } catch (error) {
+    if (!writesAllowed) return {}
+    throw error
+  }
 }
 
 export async function getPriceCursor(
@@ -220,8 +233,9 @@ export async function fetchDailyPrices(
     // eslint-disable-next-line no-loop-func
     promises.push(async () => {
       const asset = assets[i - 1]
+      const platform = getAssetPlatform(asset.id)
 
-      if (!asset.coingeckoId) {
+      if (!asset.coingeckoId && platform !== BINANCE_PLATFORM_ID) {
         await progress([undefined, `Skipped ${getAssetTicker(asset.id)}: No coingeckoId`])
         return
       }
@@ -230,6 +244,10 @@ export async function fetchDailyPrices(
 
       const preferredPriceApiId = asset.priceApiId
       const priceApiIds = preferredPriceApiId ? [preferredPriceApiId] : allPriceApiIds
+
+      if (!preferredPriceApiId && platform === BINANCE_PLATFORM_ID) {
+        priceApiIds.sort((a) => (a === "binance" ? -1 : 1))
+      }
 
       let since: Timestamp | undefined = await getPriceCursor(accountName, asset.id)
       let until: Timestamp | undefined = options.until || today

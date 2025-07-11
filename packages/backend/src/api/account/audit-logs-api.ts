@@ -9,6 +9,7 @@ import {
 import { transformAuditLogsToCsv } from "src/utils/csv-export-utils"
 import { createCsvString } from "src/utils/csv-utils"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { writesAllowed } from "src/utils/environment-utils"
 import { saveFile } from "src/utils/file-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
@@ -21,8 +22,10 @@ import { enqueueTask } from "./server-tasks-api"
 const SCHEMA_VERSION = 3
 
 export async function getAccountWithAuditLogs(accountName: string) {
-  const schemaVersion = await getValue(accountName, `audit_logs_schema_version`, 0)
   const account = await getAccount(accountName)
+  if (!writesAllowed) return account
+
+  const schemaVersion = await getValue(accountName, `audit_logs_schema_version`, 0)
 
   if (schemaVersion < SCHEMA_VERSION) {
     // Drop existing table to recreate with new schema
@@ -189,6 +192,7 @@ export async function getMyPlatformIds(
     const result = await account.execute(query, params)
     return result.map((row) => row[0] as string)
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to query platforms: ${error}`)
   }
 }
@@ -204,6 +208,7 @@ export async function getWallets(
     const result = await account.execute(query, params)
     return result.map((row) => row[0] as string)
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to query wallets: ${error}`)
   }
 }
@@ -219,6 +224,7 @@ export async function getOperations(
     const result = await account.execute(query, params)
     return result.map((row) => row[0] as AuditLogOperation)
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to query operations: ${error}`)
   }
 }
