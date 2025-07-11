@@ -1,10 +1,10 @@
-name: Staple Notarized Apps
+name: Staple Mac Apps
 
 on:
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
-  workflow_run:
-    workflows: ["Publish Apps"]
-    types: [completed]
+
+  schedule:
+    - cron: "0 * * * *" # Run every 1 hour
 
 permissions:
   contents: write
@@ -19,8 +19,10 @@ env:
 jobs:
   check-and-staple:
     runs-on: macos-latest
+    outputs:
+      stapled: ${{ steps.staple.outputs.stapled }}
     steps:
-      - name: Ensure gh CLI available (pre-installed on macOS runners)
+      - name: Ensure gh CLI available
         run: gh --version
 
       - name: Get latest draft release tag
@@ -40,65 +42,48 @@ jobs:
         run: |
           mkdir -p release
           cd release
-          gh release download "${{ steps.get_draft.outputs.tag }}" \
-            --repo "$GITHUB_REPOSITORY"
+          gh release download "${{ steps.get_draft.outputs.tag }}" --repo "$GITHUB_REPOSITORY"
 
-      - name: Poll notarization (≤ 1 h) and staple DMGs
+      - name: Check notarization and staple DMGs
+        id: staple
         run: |
           cd release
           shopt -s nullglob
+          STAPLED=false
           for json in *.json; do
             uuid=$(jq -r '.id' "$json")
             dmg="${json%.json}"
-
-            echo ""
             echo "⏳  Checking notarization for $dmg (UUID: $uuid)…"
-            start=$(date +%s)
-
-            while true; do
-              status=$(xcrun notarytool info "$uuid" \
-                --apple-id "$APPLE_ID" \
-                --team-id "$APPLE_TEAM_ID" \
-                --password "$APPLE_APP_SPECIFIC_PASSWORD" \
-                --output-format json | jq -r '.status')
-
-              echo "   • Status: $status"
-
-              if [[ "$status" == "Accepted" ]]; then
-                echo "✅  Notarized — stapling $dmg"
-                xcrun stapler staple "$dmg"
-                stapled="${dmg%.dmg}-stapled.dmg"
-                mv "$dmg" "$stapled"
-                echo "   • Stapled and renamed to $stapled"
-                break
-
-              elif [[ "$status" == "Invalid" || "$status" == "Rejected" ]]; then
-                echo "❌  Notarization failed for $dmg"
-                exit 1
-              fi
-
-              # timeout after 3 600 s (1 hour)
-              elapsed=$(( $(date +%s) - start ))
-              if (( elapsed >= 3600 )); then
-                echo "⏰  Gave up after 1 hour waiting for $dmg"
-                exit 1
-              fi
-
-              sleep 30
-            done
+            status=$(xcrun notarytool info "$uuid" \
+                      --apple-id "$APPLE_ID" \
+                      --team-id "$APPLE_TEAM_ID" \
+                      --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+                      --output-format json | jq -r '.status')
+            echo "   • Status: $status"
+            if [[ "$status" == "Accepted" ]]; then
+              echo "✅  Stapling $dmg"
+              xcrun stapler staple "$dmg"
+              mv "$dmg" "${dmg%.dmg}-stapled.dmg"
+              STAPLED=true
+            elif [[ "$status" == "Invalid" || "$status" == "Rejected" ]]; then
+              echo "❌  Notarization failed for $dmg"
+              exit 1
+            else
+              echo "⏸️  Not yet notarized — skipping $dmg"
+            fi
           done
+          echo "stapled=$STAPLED" >> "$GITHUB_OUTPUT"
 
       - name: Upload stapled DMGs to draft release
         run: |
           cd release
-          echo ""
           echo "📤  Uploading stapled DMGs…"
           gh release upload "${{ steps.get_draft.outputs.tag }}" *-stapled.dmg \
-            --repo "$GITHUB_REPOSITORY" --clobber
+            --repo "$GITHUB_REPOSITORY" --clobber || echo "No stapled DMGs to upload."
 
   notify:
     needs: check-and-staple
-    if: always()
+    if: needs.check-and-staple.result == 'failure' || needs.check-and-staple.outputs.stapled == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Notify Discord
@@ -106,7 +91,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
           status: ${{ needs.check-and-staple.result == 'success' && 'Success' || 'Failure' }}
-          title: 'Staple Notarized Apps'
+          title: "Staple Mac Apps"
           description: |
             **Branch**: `${{ github.ref_name }}`
             **Commit**: `${{ github.sha }}`
