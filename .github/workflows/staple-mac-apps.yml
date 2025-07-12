@@ -21,66 +21,94 @@ jobs:
     runs-on: macos-latest
     outputs:
       stapled: ${{ steps.staple.outputs.stapled }}
+      stapled_tags: ${{ steps.staple.outputs.stapled_tags }}
+      checked_tags: ${{ steps.staple.outputs.checked_tags }}
     steps:
       - name: Ensure gh CLI available
         run: gh --version
 
-      - name: Get latest draft release tag
-        id: get_draft
+      - name: Get last 5 releases
+        id: releases
         run: |
-          tag=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 10 \
-                  --json tagName,isDraft \
-                  --jq '.[] | select(.isDraft) | .tagName' | head -n1)
-          if [ -z "$tag" ]; then
-            echo "❌  No draft release found."
-            exit 1
-          fi
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
-          echo "ℹ️  Using draft release: $tag"
+          tags=$(gh release list --repo "$GITHUB_REPOSITORY" --limit 5 --json tagName --jq '.[].tagName')
+          echo "tags<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$tags" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
 
-      - name: Download draft release assets
-        run: |
-          mkdir -p release
-          cd release
-          gh release download "${{ steps.get_draft.outputs.tag }}" --repo "$GITHUB_REPOSITORY"
-
-      - name: Check notarization and staple DMGs
+      - name: Staple DMGs if needed
         id: staple
         run: |
-          cd release
-          shopt -s nullglob
-          STAPLED=false
-          for json in *.json; do
-            uuid=$(jq -r '.id' "$json")
-            dmg="${json%.json}"
-            echo "⏳  Checking notarization for $dmg (UUID: $uuid)…"
-            status=$(xcrun notarytool info "$uuid" \
-                      --apple-id "$APPLE_ID" \
-                      --team-id "$APPLE_TEAM_ID" \
-                      --password "$APPLE_APP_SPECIFIC_PASSWORD" \
-                      --output-format json | jq -r '.status')
-            echo "   • Status: $status"
-            if [[ "$status" == "Accepted" ]]; then
-              echo "✅  Stapling $dmg"
-              xcrun stapler staple "$dmg"
-              mv "$dmg" "${dmg%.dmg}-stapled.dmg"
-              STAPLED=true
-            elif [[ "$status" == "Invalid" || "$status" == "Rejected" ]]; then
-              echo "❌  Notarization failed for $dmg"
-              exit 1
-            else
-              echo "⏸️  Not yet notarized — skipping $dmg"
-            fi
-          done
-          echo "stapled=$STAPLED" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
 
-      - name: Upload stapled DMGs to draft release
-        if: steps.staple.outputs.stapled == 'true'
-        run: |
-          cd release
-          echo "📤  Uploading stapled DMGs…"
-          gh release upload "${{ steps.get_draft.outputs.tag }}" *-stapled.dmg \
-            --repo "$GITHUB_REPOSITORY" --clobber
+          tags="${{ steps.releases.outputs.tags }}"
+          if [ -z "$tags" ]; then
+            echo "❌  No releases found."
+            exit 1
+          fi
+
+          STAPLED=false
+          declare -a CHECKED=()
+          declare -a STAPLED_TAGS=()
+
+          for tag in $tags; do
+            CHECKED+=("$tag")
+            STAPLED_THIS_RELEASE=false
+
+            echo "🔍  Processing release $tag"
+            workdir=$(mktemp -d)
+            pushd "$workdir" >/dev/null
+
+            gh release download "$tag" --repo "$GITHUB_REPOSITORY"
+            shopt -s nullglob
+
+            for json in *.json; do
+              dmg="${json%.json}"
+
+              # Skip if stapled variant already present
+              if [[ -f "${dmg%.dmg}-stapled.dmg" ]]; then
+                echo "💤  ${dmg%.dmg}-stapled.dmg already exists — skipping"
+                continue
+              fi
+
+              uuid=$(jq -r '.id' "$json")
+              echo "⏳  Checking notarization for $dmg (UUID: $uuid)…"
+              status=$(xcrun notarytool info "$uuid" \
+                        --apple-id "$APPLE_ID" \
+                        --team-id "$APPLE_TEAM_ID" \
+                        --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+                        --output-format json | jq -r '.status')
+              echo "   • Status: $status"
+
+              if [[ "$status" == "Accepted" ]]; then
+                echo "✅  Stapling $dmg"
+                xcrun stapler staple "$dmg"
+                mv "$dmg" "${dmg%.dmg}-stapled.dmg"
+                STAPLED=true
+                STAPLED_THIS_RELEASE=true
+              elif [[ "$status" == "Invalid" || "$status" == "Rejected" ]]; then
+                echo "❌  Notarization failed for $dmg"
+                exit 1
+              else
+                echo "⏸️  Not yet notarized — skipping $dmg"
+              fi
+            done
+
+            if ls *-stapled.dmg 1> /dev/null 2>&1; then
+              echo "📤  Uploading stapled DMGs for $tag…"
+              gh release upload "$tag" *-stapled.dmg --repo "$GITHUB_REPOSITORY" --clobber
+            fi
+
+            if [ "$STAPLED_THIS_RELEASE" = true ]; then
+              STAPLED_TAGS+=("$tag")
+            fi
+
+            popd >/dev/null
+            rm -rf "$workdir"
+          done
+
+          echo "stapled=$STAPLED" >> "$GITHUB_OUTPUT"
+          echo "stapled_tags=$(IFS=','; echo \"${STAPLED_TAGS[*]}\")" >> "$GITHUB_OUTPUT"
+          echo "checked_tags=$(IFS=','; echo \"${CHECKED[*]}\")" >> "$GITHUB_OUTPUT"
 
   notify:
     needs: check-and-staple
@@ -94,6 +122,8 @@ jobs:
           status: ${{ needs.check-and-staple.result == 'success' && 'Success' || 'Failure' }}
           title: "Staple Mac Apps"
           description: |
+            **Checked versions:** `${{ needs.check-and-staple.outputs.checked_tags }}`
+            **Stapled versions:** `${{ needs.check-and-staple.outputs.stapled_tags }}`
             **Branch**: `${{ github.ref_name }}`
             **Commit**: `${{ github.sha }}`
           color: ${{ needs.check-and-staple.result == 'success' && '0x00FF00' || '0xFF0000' }}
