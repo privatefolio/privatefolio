@@ -60,15 +60,15 @@ jobs:
           # Process each tag line by line to handle special characters
           while IFS= read -r tag; do
             # Skip empty lines
-            [ -z "$tag" ] && continue
-            CHECKED_TAGS+=("$tag")
+            [ -z "$release_tag" ] && continue
+            CHECKED_TAGS+=("$release_tag")
             STAPLED_THIS_RELEASE=false
 
-            echo "🔍  Processing release $tag"
+            echo "🔍  Processing release $release_tag"
             workdir=$(mktemp -d)
             pushd "$workdir" >/dev/null
 
-            gh release download "$tag" --repo "$GITHUB_REPOSITORY"
+            gh release download "$release_tag" --repo "$GITHUB_REPOSITORY"
             shopt -s nullglob
 
             for json in *.json; do
@@ -108,11 +108,11 @@ jobs:
             stapled_files=(*-stapled.dmg)
             if (( ${#stapled_files[@]} )); then
               echo "📤  Uploading stapled DMGs for $tag…"
-              gh release upload "$tag" "${stapled_files[@]}" --repo "$GITHUB_REPOSITORY" --clobber
+              gh release upload "$release_tag" "${stapled_files[@]}" --repo "$GITHUB_REPOSITORY" --clobber
             fi
 
             if [ "$STAPLED_THIS_RELEASE" = true ]; then
-              STAPLED_TAGS+=("$tag")
+              STAPLED_TAGS+=("$release_tag")
             fi
 
             popd >/dev/null
