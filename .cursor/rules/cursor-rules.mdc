@@ -3,18 +3,4 @@ description:
 globs: 
 alwaysApply: true
 ---
-Always read these files:
-- [CONTRIBUTING.md](mdc:CONTRIBUTING.md)
-- [README.md](mdc:README.md)
-- [ARCHITECTURE.md](mdc:docs/ARCHITECTURE.md)
-- [BACKEND.md](mdc:docs/BACKEND.md)
-- [FRONTEND.md](mdc:docs/FRONTEND.md)
-- [TESTING.md](mdc:docs/TESTING.md)
-- [DOCKER_BUILD.md](mdc:docs/DOCKER_BUILD.md)
-- [DOCKER_DEPLOY.md](mdc:docs/DOCKER_DEPLOY.md)
-- [DESIGN.md](mdc:docs/DESIGN.md)
-- [DATABASE_TIPS.md](mdc:docs/DATABASE_TIPS.md)
-- [ELECTRON_SETUP.md](mdc:docs/ELECTRON_SETUP.md)
-Don't forget this is a monorepo. Use `lerna run --scope [project-name]` to run commands.
-If I ever write "ack" reply with "ack".
-Never run the `dev` script.
+Make sure to read [AGENTS.md](/AGENTS.md) before making any changes.

@@ -1,126 +1,1020 @@
-# AGENTS.md
-
-## Project Overview
+# Privatefolio
+  
 Privatefolio is a monorepo investment portfolio manager built with Lerna, featuring a React frontend, Node.js/Bun backend, and Electron desktop app.
 
-## Required Reading
-Before making any changes, read these files:
-- `README.md` - Project overview and setup
-- `CONTRIBUTING.md` - Development guidelines and workflow
-- `docs/ARCHITECTURE.md` - System architecture
-- `docs/BACKEND.md` - Backend implementation details
-- `docs/FRONTEND.md` - Frontend implementation details
-- `docs/TESTING.md` - Testing guidelines
+As an agent, follow these rules:
+- Never run the `start` or `dev` scripts because these are long-lived processes that should be run in the background.
+- To test that something works, run the `test` script or the `build` script.
 
-## Monorepo Structure
-This is a Lerna monorepo with Yarn workspaces:
-- `packages/frontend/` - React application (Vite + TypeScript)
-- `packages/backend/` - Node.js/Bun API server (Express + SQLite)
-- `packages/electron/` - Desktop app wrapper (Electron)
+## ARCHITECTURE.md
 
-## Development Commands
-Always use Lerna for package management:
+# Privatefolio Architecture
+
+## Overview
+Privatefolio is a free, open-source cryptocurrency portfolio manager built as a monorepo using Lerna for package management. It enables users to track all their crypto assets in one place with a focus on privacy and data ownership. The application is structured as a desktop app with a React frontend and a Node.js/Bun backend, packaged with Electron for cross-platform compatibility.
+
+## Structure
+- **Root Config:** Yarn workspaces (v1.22.22) with nohoist, AGPL-3.0 license, Lerna (v8.1.3) for monorepo management, and TypeScript for type safety across all packages.
+
+## Packages Summary
+
+- **`packages/frontend`** — v2.0.0-alpha.5
+  - **Description & Key Tech:** React-based UI that provides the user interface using Material-UI, Vite, and TypeScript.
+  - **Core Features & Tools:**
+    - Interactive portfolio visualization with lightweight-charts
+    - Command palette (kbar) and comprehensive search functionality
+    - WebWorker-based SQLite integration for client-side data processing
+    - State management with nanostores for reactive updates
+
+- **`packages/backend`** — v2.0.0-alpha.5
+  - **Description & Key Tech:** Node.js/Bun server providing data processing, API integration, and SQLite database management.
+  - **Core Features & Tools:**
+    - Multi-chain cryptocurrency data aggregation and processing
+    - SQLite database for persistent storage with cross-platform compatibility
+    - Scheduled tasks with Croner for periodic data updates
+    - Support for both Bun and Node.js SQLite implementations
+
+- **`packages/electron`** — v2.0.0-alpha.5
+  - **Description & Key Tech:** Desktop application wrapper using Electron with platform-specific optimizations.
+  - **Core Features & Tools:**
+    - Cross-platform desktop integration (Windows, Linux, macOS)
+    - Local file system access for database and configuration
+    - Auto-launch capabilities and system tray integration
+    - Inter-process communication between frontend and backend
+
+## Workflow & Integration
+- **Development:** `yarn dev` runs parallel development servers for frontend and backend, `yarn dev:electron` includes Electron.
+- **Building:** `yarn build` for all packages, platform-specific binaries with `yarn build-bin:[win|linux|mac]`.
+- **Testing:** Comprehensive test suite with `yarn test` and `yarn test:bun` for Bun-specific tests, continuous integration with `yarn test:ci`.
+- **Integration:** Packages share common TypeScript interfaces and utilities, with backend exposing APIs consumed by frontend.
+
+## Deployment
+- **Frontend:**
+  - Compiled with Vite for optimal bundle size and performance
+  - Can be deployed as a static site or packaged within Electron
+
+- **Backend:**
+  - Runs as a local service within the Electron app
+  - Optimized for Bun runtime with fallbacks for Node.js compatibility
+
+- **Electron:**
+  - Windows builds with Squirrel installer, Linux with DEB packages, macOS with DMG
+  - Automated deloyment process via GitHub Actions triggered by version changes (`yarn new-version`)
+  - Binaries published to GitHub releases for user distribution
+
+
+---
+
+## BACKEND.md
+
+# Privatefolio Backend
+
+## Overview
+Privatefolio Backend is a Node.js/Bun service that aggregates multi-chain cryptocurrency data, provides a REST and WebSocket API, and persists data in a local SQLite database. It powers the desktop app and frontend with real-time account balances, transactions, and price history.
+
+## Architecture
+```
+Frontend  <── HTTP/WebSocket ──>  Backend Server  <── API SDK ──>  Data Aggregator (Relayer)
+                                              │
+                                              └── SQLite (persistent storage)
+```  
+- **API Server** handles HTTP routes and WebSocket RPC for frontend communication.
+- **Backend Relayer** schedules tasks for data fetching, processing, and side-effects.
+- **Database** uses SQLite for fast, local persistence.
+- **Utilities** provide config management, process control, and inter-service communications.
+
+## Directory Structure
+```
+packages/backend/
+├── src/
+│   ├── api/            # HTTP & WebSocket API definitions
+│   ├── config/         # Environment and settings loaders
+│   ├── sqlite/         # Schema and migration logic
+│   ├── utils/          # Helper functions
+│   ├── backend-server.ts  # HTTP/WebSocket server implementation
+│   ├── backend-relayer.ts # Task scheduler and data aggregator
+│   └── start.ts        # Entry point wiring server + relayer
+├── data/               # Runtime database and log files
+├── build/              # Compiled outputs for production
+├── test/               # Vitest test suites organized by feature
+└── package.json        # Scripts, dependencies, and build setup
+```
+
+## Core Components
+- **API Server** (`src/backend-server.ts`): serves REST (`/ping`, `/info`, `/download`, `/upload`) and WebSocket RPC. Serves static frontend build.
+- **Backend Relayer** (`src/backend-relayer.ts`, `src/start.ts`): uses Cron via `croner` and audit-log subscriptions to enqueue data tasks (balances, prices, net worth).
+- **Database** (`src/sqlite/`): initializes and migrates SQLite database; defines interfaces in `src/interfaces.ts`.
+- **Utilities** (`src/utils/`, `src/backend-comms.ts`): config parsing, throttling, file upload/download handlers, and inter-process messaging.
+- **Configuration** (`src/server-env.ts`, `src/settings.ts`): loads environment variables (PORT, APP_VERSION, GIT_HASH, GIT_DATE) and default settings (throttle durations, data dirs).
+
+## API Endpoints
+- **HTTP**
+  - `GET /ping` → `pong`
+  - `GET /info` → build metadata (version, commit, build date)
+  - `GET /download` & `POST /upload` → file operations for account backups
+  - `OPTIONS /*` → CORS preflight
+  - Static file serving from frontend build
+- **WebSocket RPC**
+  - Dynamic method invocation: send `{ id, method, params }`, receives `{ id, result }` or error.
+  - Supports callback functions via `FunctionReference` messages.
+
+## Database
+- Uses SQLite via `sqlite3` (Node.js) and `sqlite` (Bun) packages.
+- Database files located under `packages/backend/data/databases/`.
+- Schema and migrations defined in `src/sqlite/`; initialized on startup.
+- Data access via typed interfaces (`src/interfaces.ts`).
+
+## Configuration
+- Environment variables:
+  - `PORT` (default 4001 dev, 5555 prod)
+  - `APP_VERSION`, `GIT_HASH`, `GIT_DATE` (populated from git/npm)
+  - `DATA_LOCATION` (overrides default data directory)
+  - `BUN_SQL`, `GITHUB_CI` (test flags)
+- Settings file: `src/settings.ts` defines throttle durations and cron schedule.
+
+## Development
+Prerequisites: Node.js v20+, Bun, Yarn.
+```sh
+yarn             # install dependencies
+yarn build       # compile TypeScript & build frontend
+yarn dev         # runs backend (watch) + relayer
+```
+
+## Testing
+```sh
+yarn test        # run Vitest (Node SQLite)
+yarn test:bun    # run Bun-specific SQLite tests
+yarn test:ci     # CI mode (Node + Bun)
+```
+Tests located in `packages/backend/test/` organized by feature (e.g., `balances`, `tags`, `bun`).
+
+## Deployment
+```sh
+# build production bundle
+yarn build
+# Docker image build & run (from packages/backend)
+yarn docker:build
+yarn docker:run
+yarn docker:remove
+```
+In Electron, backend is started automatically on app launch.
+
+## Contributing
+See [CONTRIBUTING.md](../CONTRIBUTING.md) and [ARCHITECTURE.md](ARCHITECTURE.md) for guidelines on code style, testing, and pull request workflow.
+
+
+---
+
+## DATABASE_TIPS.md
+
+# SQL int/bigint range
+
+[link](https://learn.microsoft.com/en-us/sql/t-sql/data-types/int-bigint-smallint-and-tinyint-transact-sql?view=sql-server-ver16)  
+
+| Data Type | Range                                                   | Range expression      | Storage (bytes) |
+| --------- | ------------------------------------------------------- | --------------------- | --------------- |
+| tinyint   | 0 to 255                                                | 2^0-1 to 2^8-1        | 1               |
+| smallint  | -32.768 to 32.767                                       | -2^15 to 2^15-1       | 2               |
+| mediumint | -8.388.608 to 8.388.607                                 | -2^23 to 2^23-1       | 3               |
+| int       | -2.147.483.648 to 2.147.483.647                         | -2^31 to 2^31-1       | 4               |
+| bigint    | -9.223.372.036.854.775.808 to 9.223.372.036.854.775.807 | -2^63 to 2^63-1       | 8               |
+
+
+---
+
+## DESIGN.md
+
+# Design
+
+## API rate limits
+
+### Asset price API
+
+We use these APIs to get historical price data for assets, usually in a candlestick format.
+
+| Provider  | Rate limit (public endpoint) | Normalized value      | Minimum call interval | Maximum data points per call | Docs                                                                                                           |
+| --------- | ---------------------------- | --------------------- | --------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Binance   | 2400 calls per minute        | 2400 calls per minute | 25ms                  | 1000                         | [link](https://www.binance.com/en/support/faq/rate-limits-on-binance-futures-281596e222414cdd9051664ea621cdc3) |
+| Coinbase  | 10 calls per second          | 600 calls per minute  | 100ms                 | 300                          | [link](https://docs.cloud.coinbase.com/advanced-trade-api/docs/rest-api-rate-limits)                           |
+| DefiLlama | ???                          | ???                   | ???                   | ???                          | [link](https://defillama.com/docs/api)                                                                         |
+
+### Asset metadata API
+
+We use these APIs to get asset metadata such as logo image, website url, asset description, etc.
+Because of the stinginess of the free tier, this app makes use of a local cache.
+
+| Provider  | Rate limit (free tier) | Normalized value    | Minimum call interval | Docs                                            |
+| --------- | ---------------------- | ------------------- | --------------------- | ----------------------------------------------- |
+| Coingecko | 30 calls per minute    | 30 calls per minute | 2000ms                | [link](https://coingecko.com/api/documentation) |
+
+### User data API
+
+We use these APIs to get user data such as deposits, withdrawals, transaction history, etc.
+
+#### Etherscan
+
+| Provider              | Rate limit ([free tier](https://docs.etherscan.io/support/rate-limits)) | Normalized value     | Minimum call interval | Maximum data points per call | Docs                                                                                                             |
+| --------------------- | ----------------------------------------------------------------------- | -------------------- | --------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Normal transactions   | 5 calls per second                                                      | 300 calls per minute | 200ms                 | 10000                        | [link](https://docs.etherscan.io/api-endpoints/accounts#get-a-list-of-normal-transactions-by-address)            |
+| Internal transactions | 5 calls per second                                                      | 300 calls per minute | 200ms                 | 10000                        | [link](https://docs.etherscan.io/api-endpoints/accounts#get-a-list-of-internal-transactions-by-address)          |
+| ERC-20 transfers      | 5 calls per second                                                      | 300 calls per minute | 200ms                 | None                         | [link](https://docs.etherscan.io/api-endpoints/accounts#get-a-list-of-erc20-token-transfer-events-by-address)    |
+| Block rewards         | 5 calls per second                                                      | 300 calls per minute | 200ms                 | None                         | [link](https://docs.etherscan.io/api-endpoints/accounts#get-list-of-blocks-validated-by-address)                 |
+| Staking withdrawals   | 5 calls per second                                                      | 300 calls per minute | 200ms                 | None                         | [link](https://docs.etherscan.io/api-endpoints/accounts#get-beacon-chain-withdrawals-by-address-and-block-range) |
+
+#### Binance
+
+| Endpoint                            | Weight       | Real Weight | Weight limit             | Second rate limit      | Calculated Rate limit | Minimum call interval | Docs                                                                                                           |
+| ----------------------------------- | ------------ | ----------- | ------------------------ | ---------------------- | --------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Deposits `/sapi/*`                  | 1 (IP)       | 1           | 12.000 per minute (IP)   | None                   | 200 calls per second  | 5ms                   | [link](https://binance-docs.github.io/apidocs/spot/en/#deposit-history-supporting-network-user_data)           |
+| Withdrawals `/sapi/*`               | 18.000 (UID) | 18.000      | 180.000 per minute (UID) | 10 requests per second | 1 calls per 6 seconds | 6_000ms               | [link](https://binance-docs.github.io/apidocs/spot/en/#withdraw-history-supporting-network-user_data)          |
+| Exchange Info `/api/*`              | 20 (IP)      | 20          | 6.000 per minute (IP)    | None                   | 300 calls per minute  | 200ms                 | [link](https://binance-docs.github.io/apidocs/spot/en/#exchange-information)                                   |
+| Spot Trades `/api/*`                | 20 (IP)      | 20          | 6.000 per minute (IP)    | None                   | 300 calls per minute  | 200ms                 | [link](https://binance-docs.github.io/apidocs/spot/en/#account-trade-list-user_data)                           |
+| Flexible rewards `/sapi/*`          | 150 (IP)     | 50          | 12.000 per minute (IP)   | None                   | 240 calls per minute  | 250ms                 | [link](https://binance-docs.github.io/apidocs/spot/en/#get-flexible-rewards-history-user_data)                 |
+| Locked rewards `/sapi/*`            | 150 (IP)     | 50          | 12.000 per minute (IP)   | None                   | 240 calls per minute  | 250ms                 | [link](https://binance-docs.github.io/apidocs/spot/en/#get-locked-rewards-history-user_dataa)                  |
+| Margin Borrow-repay `/sapi/*`       | 10 (IP)      | 1           | 12.000 per minute (IP)   | None                   | 200 calls per second  | 5ms                   | [link](https://binance-docs.github.io/apidocs/spot/en/#query-borrow-repay-records-in-margin-account-user_data) |
+| Margin Trades `/sapi/*`             | 10 (IP)      | 1           | 12.000 per minute (IP)   | None                   | 200 calls per second  | 5ms                   | [link](https://binance-docs.github.io/apidocs/spot/en/#query-margin-account-39-s-trade-list-user_data)         |
+| Margin Transfer `/sapi/*`           | 1 (IP)       | 1           | 12.000 per minute (IP)   | None                   | 200 calls per second  | 5ms                   | [link](https://binance-docs.github.io/apidocs/spot/en/#get-cross-margin-transfer-history-user_data)            |
+| Margin Liquidation Record `/sapi/*` | 1 (IP)       | 1           | 12.000 per minute (IP)   | None                   | 200 calls per second  | 5ms                   | [link](https://binance-docs.github.io/apidocs/spot/en/#get-cross-margin-transfer-history-user_data)            |
+| Future USD-M ExchangeInfo `/fapi/*` | 1 (IP)       | 1           | 2.400 per minute (IP)    | None                   | 40 calls per second   | 25ms                  | [link](https://binance-docs.github.io/apidocs/futures/en/#exchange-information)                                |
+| Future USD-M Trades `/fapi/*`       | 5 (IP)       | 5           | 2.400 per minute (IP)    | None                   | 8 calls per second    | 125ms                 | [link](https://binance-docs.github.io/apidocs/futures/en/#account-trade-list-user_data)                        |
+| Future USD-M Income `/fapi/*`       | 30 (IP)      | 30          | 2.400 per minute (IP)    | None                   | 1,3 calls per second  | 751ms                 | [link](https://binance-docs.github.io/apidocs/futures/en/#get-income-history-user_data)                        |
+| Future COIN-M ExchangeInfo`/dapi/*` | 1 (IP)       | 1           | 2.400 per minute (IP)    | None                   | 40 calls per second   | 25ms                  | [link](https://binance-docs.github.io/apidocs/delivery/en/#exchange-information)                               |
+| Future COIN-M Trades `/dapi/*`      | 20/40 (IP)   | 20/40       | 2.400 per minute (IP)    | None                   | 2/1 calls per second  | 500/1_000ms           | [link](https://binance-docs.github.io/apidocs/delivery/en/#account-trade-list-user_data)                       |
+| Future COIN-M Income `/dapi/*`      | 20 (IP)      | 30          | 2.400 per minute (IP)    | None                   | 1.3 calls per second  | 751ms                 | [link](https://binance-docs.github.io/apidocs/delivery/en/#get-income-history-user_data)                       |
+
+Current number of pairs/symbols: ~2600
+
+[Limits docs](https://binance-docs.github.io/apidocs/spot/en/#limits)
+
+IP Limits
+Every request will contain X-MBX-USED-WEIGHT-(intervalNum)(intervalLetter) in the response headers which has the current used weight for the IP for all request rate limiters defined.
+Each route has a weight which determines for the number of requests each endpoint counts for. Heavier endpoints and endpoints that do operations on multiple symbols will have a heavier weight.
+When a 429 is received, it's your obligation as an API to back off and not spam the API.
+Repeatedly violating rate limits and/or failing to back off after receiving 429s will result in an automated IP ban (HTTP status 418).
+IP bans are tracked and scale in duration for repeat offenders, from 2 minutes to 3 days.
+A Retry-After header is sent with a 418 or 429 responses and will give the number of seconds required to wait, in the case of a 429, to prevent a ban, or, in the case of a 418, until the ban is over.
+The limits on the API are based on the IPs, not the API keys.
+
+/api/ and /sapi/ Limit Introduction
+The /api/_ and /sapi/_ endpoints adopt either of two access limiting rules, IP limits or UID (account) limits.
+
+Endpoints related to /api/\*:
+
+According to the two modes of IP and UID (account) limit, each are independent.
+Endpoints share the 6,000 per minute limit based on IP.
+Responses contain the header X-MBX-USED-WEIGHT-(intervalNum)(intervalLetter), defining the weight used by the current IP.
+Successful order responses contain the header X-MBX-ORDER-COUNT-(intervalNum)(intervalLetter), defining the order limit used by the UID.
+
+Endpoints related to /sapi/\*:
+
+Endpoints are marked according to IP or UID limit and their corresponding weight value.
+Each endpoint with IP limits has an independent 12000 per minute limit, or per second limit if specified explicitly
+Each endpoint with UID limits has an independent 180000 per minute limit, or per second limit if specified explicitly
+Responses from endpoints with IP limits contain the header X-SAPI-USED-IP-WEIGHT-1M or X-SAPI-USED-IP-WEIGHT-1S, defining the weight used by the current IP.
+Responses from endpoints with UID limits contain the header X-SAPI-USED-UID-WEIGHT-1M or X-SAPI-USED-UID-WEIGHT-1S, defining the weight used by the current UID.
+
+
+---
+
+## DOCKER_BUILD.md
+
+# Running Privatefolio using Docker
+
+This document explains how to use Docker to run Privatefolio.
+The Docker image uses a multi-stage build process. It builds the frontend bundle and installs backend production dependencies.
+The final image utilizes Bun to run the backend TypeScript source code directly and to serve the frontend bundle.
+
+## Requirements
+
+- [Docker](https://docs.docker.com/get-docker/)
+
+## Building and Running
+
+### Using npm/yarn scripts
+
+From the root directory, you can use the following scripts:
+
+```sh
+# Build the Docker image
+yarn docker:build
+
+# Build and run the Docker container
+yarn docker:run
+
+# Remove the Docker container
+yarn docker:remove
+```
+
+### Using Docker Directly
+
+To build the image from the project root directory:
+
+```sh
+docker build -t privatefolio -f packages/backend/Dockerfile .
+```
+
+To run the container:
+
+```sh
+docker run -d -p ${PORT:-5555}:${PORT:-5555} -v privatefolio-data:/app/data --name privatefolio privatefolio
+```
+
+To stop the container:
+
+```sh
+docker stop privatefolio
+```
+
+### Using Pre-built Images from GitHub Container Registry
+
+Pre-built Docker images are available on GitHub Container Registry:
+
+```sh
+docker pull ghcr.io/privatefolio/privatefolio:latest
+```
+
+To run the pre-built image:
+
+```sh
+docker run -d -p ${PORT:-5555}:${PORT:-5555} -v privatefolio-data:/app/data --name privatefolio ghcr.io/privatefolio/privatefolio:latest
+```
+
+## Configuration
+
+The backend service is configured with the following environment variables, set during the Docker build process or runtime:
+
+- `PORT`: The port to run the server on (default: 5555)
+- `NODE_ENV`: The environment to run in (default: production)
+- `DATA_LOCATION`: The directory to store data in (default: /app/data)
+- `APP_VERSION`: The application version (set via build arg `APP_VERSION_ARG`)
+- `GIT_HASH`: The git commit hash (set via build arg `GIT_HASH_ARG`)
+- `GIT_DATE`: The git commit date (set via build arg `GIT_DATE_ARG`)
+
+You can customize `PORT` and `NODE_ENV` at runtime by passing them to the `docker run` command with the `-e` flag:
+
+```sh
+docker run -d -p 5000:5000 -v privatefolio-data:/app/data -e PORT=5000 -e NODE_ENV=development --name privatefolio privatefolio
+```
+Note: `APP_VERSION`, `GIT_HASH`, and `GIT_DATE` are baked into the image during build and typically aren't overridden at runtime.
+
+## Data Persistence
+
+All data is stored in the `/app/data` directory inside the container, which is mounted to a named volume called `privatefolio-data`. This ensures that your data is persisted even if the container is stopped or removed.
+
+To backup your data, you can use the Docker volume commands:
+
+```sh
+docker volume inspect privatefolio-data # View volume info
+```
+
+## Accessing the API
+
+The backend API will be available at (defaulting to port 5555 if PORT is not set):
+
+- HTTP: `http://localhost:${PORT:-5555}`
+- WebSocket: `ws://localhost:${PORT:-5555}`
+
+You can check if the service is running by visiting `http://localhost:${PORT:-5555}` in your browser or using curl:
+
+```sh
+curl http://localhost:${PORT:-5555}
+```
+
+## Logs
+
+To view logs from the container:
+
+```sh
+docker logs privatefolio
+```
+
+To follow the logs in real-time:
+
+```sh
+docker logs -f privatefolio
+```
+
+## Continuous Integration
+
+A GitHub Actions workflow is set up to automatically build and publish Docker images to GitHub Container Registry (GHCR) on each push to the main branch and on tag creation. The workflow file is located in `.github/workflows/docker-publish.yml`. It passes build arguments like version and git info to the Docker build.
+
+Available image tags:
+- `latest`: Latest build from the main branch
+- `v*.*.*`: Tagged releases (e.g., v2.0.0-alpha.5)
+- `sha-******`: Short commit SHA for each build
+
+
+---
+
+## DOCKER_DEPLOY.md
+
+# Deploying Privatefolio using a Docker image
+
+This document provides instructions on how to deploy Privatefolio using Docker, including examples for direct Docker usage and deployment via Fly.io.
+
+## 1. Docker Deployment
+
+Deploying with Docker utilizes the pre-built container images available on GitHub Container Registry (GHCR). This method encapsulates the application and its dependencies.
+Alternatively, you can build the image locally using the [Docker Build documentation](DOCKER_BUILD.md).
+
+### Prerequisites
+
+- Docker installed
+
+### Steps
+
+1.  **Pull the Image:**
+    ```sh
+    docker pull ghcr.io/privatefolio/privatefolio:latest
+    ```
+
+2.  **Run the Container:**
+    ```sh
+    docker run -d \
+      -p ${PORT:-5555}:5555 \
+      -v privatefolio-data:/app/data \
+      --name privatefolio \
+      ghcr.io/privatefolio/privatefolio:latest
+    ```
+    - `-d`: Run in detached mode.
+    - `-p ${PORT:-5555}:5555`: Map the host port (default 5555) to the container port 5555. Adjust the host port if needed.
+    - `-v privatefolio-data:/app/data`: Mount a named volume `privatefolio-data` to `/app/data` inside the container for persistent data storage.
+    - `--name privatefolio`: Assign a name to the container.
+
+3.  **Configuration:**
+    Environment variables like `PORT` and `DATA_LOCATION` can be passed using the `-e` flag in the `docker run` command. Note that `DATA_LOCATION` inside the container defaults to `/app/data`, which is already mapped to the volume.
+
+    ```sh
+    docker run -d \
+      -p 5000:5000 \
+      -e PORT=5000 \
+      -v privatefolio-data:/app/data \
+      --name privatefolio \
+      ghcr.io/privatefolio/privatefolio:latest
+    ```
+
+For more detailed information on building the image locally, managing data, and accessing logs, refer to the [Docker Build documentation](DOCKER_BUILD.md).
+
+## 2. Fly.io Deployment
+
+Fly.io allows deploying containerized applications globally. Privatefolio includes a `fly.toml` configuration file for easy deployment on this platform using its Docker image.
+
+### Prerequisites
+
+- [flyctl CLI](https://fly.io/docs/hands-on/install-flyctl/) installed
+- A Fly.io account ([Sign up](https://fly.io/))
+
+### Steps
+
+1.  **Login to Fly.io:**
+    ```sh
+    fly auth login
+    ```
+
+2.  **Launch the App (First Time):**
+    Navigate to the root directory of the Privatefolio repository where `fly.toml` is located. Run:
+    ```sh
+    fly launch --no-deploy
+    ```
+    - You will be asked if you wish to copy this configuration file to the new app. Answer `y` (yes).
+    - This command reads the `fly.toml` file and sets up the application on Fly.io based on the configuration.
+    - `--no-deploy`: We skip the initial deploy because we want to ensure the volume is created first.
+
+3.  **Create a Persistent Volume:**
+    The `fly.toml` specifies a volume mount for data persistence. Create the volume before the first deploy:
+    ```sh
+    fly volumes create privatefolio_data --size 1
+    ```
+    - `--size 1`: Specifies the volume size in GB (1 GB is usually sufficient to start).
+    - You will be prompted to choose a region for the volume. Select the same region as your app for optimal performance.
+
+4.  **Deploy the App:**
+    ```sh
+    fly deploy
+    ```
+    - This command uses the pre-built image specified in `fly.toml` from GHCR and deploys it to the Fly.io platform.
+    - It respects the settings in `fly.toml`, including environment variables (`PORT=5555`), volume mounts (`privatefolio_data` to `/data`), and service configuration (HTTP service on the internal port).
+
+### Subsequent Deployments
+
+To deploy updates, simply run:
+```sh
+fly deploy
+```
+Fly.io will pull the latest `:latest` image from GHCR (or rebuild if configured differently) and deploy the new version.
+
+### Accessing the Deployed App
+
+After deployment, `fly deploy` will output the public URL for your application (e.g., `https://privatefolio.fly.dev`). The API will be available at this URL.
+
+### Monitoring and Logs
+
+Use `flyctl` to manage your deployed app:
+- **Logs:** `fly logs -a <your-app-name>`
+- **Status:** `fly status -a <your-app-name>`
+
+
+---
+
+## ELECTRON_SETUP.md
+
+# Electron Setup
+
+This document describes the Electron setup for the Privatefolio desktop application.
+
+## Overview
+
+Privatefolio uses Electron to package and distribute the frontend as a desktop application. The Electron setup is located in the `packages/electron` directory and is built using Electron Forge.
+
+## Project Structure
+
+```
+packages/electron/
+├── build/            # Output directory for compiled TypeScript
+├── out/              # Output directory for packaged app
+├── src/              # Source code
+│   ├── api.ts        # API definitions
+│   ├── backend-manager.ts  # Backend process manager
+│   ├── ipc-main.ts   # IPC communication setup
+│   ├── preload.ts    # Preload script for renderer
+│   ├── start.ts      # Main entry point
+│   └── utils.ts      # Utility functions
+├── forge.config.js   # Electron Forge configuration
+├── package.json      # Package configuration
+└── tsconfig.json     # TypeScript configuration
+```
+
+## Main Components
+
+### Entry Point (`start.ts`)
+
+The main entry point for the Electron app handles:
+- Window creation and configuration
+- System tray setup
+- Development reloading (when not in production)
+- Custom title bar configuration
+- App lifecycle management
+- Starting and stopping the backend server
+
+### Backend Manager (`backend-manager.ts`)
+
+Manages the backend server process:
+- Starting the backend server when the app starts
+- Keeping the backend running when the app is minimized to tray
+- Stopping the backend server when the app is closed
+- Provides methods to check if the backend is running
+- Handles backend server port management
+
+### IPC Communication (`ipc-main.ts`)
+
+Handles communication between the main and renderer processes:
+- Notifications
+- Theme mode switching
+- Log directory access
+- Log reading
+- Backend server management (getting URL, checking status, restarting)
+
+### Preload Script (`preload.ts`)
+
+Exposes a secure API to the renderer process via the contextBridge:
+- Notification sending
+- Log access
+- Platform information
+- Theme mode switching
+- Backend server operations (getting URL, checking status, restarting)
+
+## Build Process
+
+The application uses Electron Forge for packaging and distribution:
+
+1. TypeScript is compiled to JavaScript (`yarn build`)
+2. Icons are generated from source images (`yarn gen-icons`)
+3. The app is packaged with Electron Forge (`yarn package`)
+4. Platform-specific installers are created (`yarn build-bin:win`, `yarn build-bin:linux`, `yarn build-bin:mac`)
+
+## Development
+
+To start the development environment:
+
 ```bash
-# Install dependencies
-yarn
+yarn dev
+```
 
-# Build all packages
+This command:
+1. Compiles TypeScript in watch mode
+2. Starts Electron with hot reloading enabled
+3. Starts the backend server automatically
+
+## Production Builds
+
+To create production builds:
+
+```bash
+# Build for development
 yarn build
 
-# Run tests
+# Create production installers
+yarn build-bin:win
+yarn build-bin:linux
+yarn build-bin:mac
+```
+
+The build process creates platform-specific installers:
+- Windows: Squirrel installer (.exe)
+- macOS: ZIP archive
+- Linux: DEB and RPM packages
+
+## Configuration
+
+The application uses `electron-forge` for building and packaging, with configuration in `forge.config.js`. Key configurations include:
+
+- Custom app icons
+- App metadata
+- Build targets per platform
+- Dependency inclusion rules
+
+## Backend Integration
+
+The Electron app integrates with the Privatefolio backend server:
+
+1. In production, the backend server is started automatically when the app starts
+2. In development, the backend server is started separately by lerna, not by the Electron app
+3. The backend continues running when the app is minimized to tray
+4. The backend is gracefully stopped when the app is closed (in production)
+5. The frontend communicates with the backend via HTTP/WebSocket on localhost
+6. Different ports are used in development (4001) and production (5555)
+
+### Development Setup
+
+In development mode:
+- The backend server is started by lerna through the `yarn dev` command in the root directory
+- The Electron app connects to this already-running backend server
+- The backend runs on port 4001
+
+### Production Setup
+
+In production mode:
+- The backend server is started by the Electron app itself
+- The backend process is managed by the BackendManager
+- The backend runs on port 5555
+
+### Backend API Access
+
+The frontend can access backend functionality through the Electron preload API:
+
+```typescript
+// Get the backend URL (which includes the correct port based on environment)
+const backendUrl = window.electron.backend.getUrl();
+
+// Check if the backend is running
+const isRunning = window.electron.backend.isRunning();
+
+// Restart the backend if needed (only works in production)
+await window.electron.backend.restart();
+```
+
+
+---
+
+## FILES.md
+
+# How do we handle files?
+
+We have a rest api that allows you to download and upload.
+
+We have real-time api using websockets.
+
+
+
+---
+
+## FRONTEND.md
+
+# Privatefolio Frontend
+
+## Overview
+- The Privatefolio Frontend is a React and Vite powered TypeScript application that delivers a responsive and interactive UI for tracking multi-chain cryptocurrency portfolios. It leverages Material‑UI for design, nanostores for state management, and Comlink/WebWorker‑backed SQLite for client‑side data persistence, with seamless integration into Electron.
+
+## Architecture
+- App Shell (`src/App.tsx`) initializes routing and layout.
+- Views & Pages consume shared UI components and data stores.
+- State Management via nanostores stores global state and persists settings.
+- Service Layer communicates through REST/WebSocket (FeathersJS) and Electron IPC.
+- Data Layer runs in a WebWorker using Comlink + wa‑sqlite for local SQLite access.
+
+## Directory Structure
+- packages/frontend/
+  - public/: static assets and PWA manifest
+  - src/
+    - components/: reusable UI elements (charts, tables, forms)
+    - views/: page components (Portfolio, Transactions, Settings)
+    - stores/: nanostores state and persistence logic
+    - api/: REST/WebSocket client setup and hooks
+    - hooks/: custom React hooks (data fetching, IPC)
+    - styles/: theme and global styles
+    - App.tsx, main.tsx: entry point and router
+  - build/: compiled bundles and assets
+  - vite.config.ts, tsconfig.json: build and compiler configuration
+  - vercel.json: deployment settings for Vercel
+
+## Core Components
+- App Shell: routing with React Router Dom, layout and top‑level providers (`src/App.tsx`).
+- Views & Pages: key user screens — Portfolio overview, Transaction history, Search/Command palette, Settings.
+- UI Components: Material‑UI based library for charts (lightweight‑charts), tables, inputs and notifications.
+- State Management: nanostores in `src/stores` for reactive global state, persistent settings via `@nanostores/persistent`.
+- Service Layer: API modules in `src/api` using FeathersJS REST/WebSocket; Electron IPC exposed via preload for desktop.
+
+## API Integration
+- REST calls and real‑time RPC via FeathersJS clients configured at runtime with `VITE_APP_VERSION`, `VITE_GIT_HASH`, `VITE_GIT_DATE`.
+- WebSocket subscriptions for live updates (balances, prices).
+- Electron IPC (`window.electron.*`) for native features (notifications, file import/export).
+
+## Configuration
+- Environment Variables: VITE_APP_VERSION, VITE_GIT_HASH, VITE_GIT_DATE, VITE_PUBLIC_…
+- Vite Config (`vite.config.ts`): aliasing, plugin setup (`@vitejs/plugin-react`, rollup visualizer).
+- Vercel Settings (`vercel.json`) for static deployment and rewrites.
+
+## Features
+- Portfolio Analytics: real‑time balance charts and net worth tracking.
+- Transaction Management: list, search (by hash), and tag transactions.
+- Price History: interactive candlestick and line charts per asset.
+- Command Palette: quick search and actions via kbar.
+- Backup & Restore: import/export data as JSON or CSV.
+
+## Development
+- Prerequisites: Node.js v20+, Yarn 1.22+
+- Install: `yarn`
+- Dev Server: `cd packages/frontend && yarn dev` (runs on port 4000)
+- Build: `yarn build`
+
+## Testing
+- Run Unit & Integration: `yarn test`
+- Test Patterns: files matching `src/**/?(*.)+(test|spec).ts(x)?`
+- CI: included in `yarn test:ci` via root Lerna workflow
+
+## Deployment
+- Static Site: serve `packages/frontend/build` on any web host or Vercel.
+- Electron: packaged into desktop app via `yarn build-bin` in root (see ELECTRON_SETUP.md).
+
+## Contributing
+- Please read [`CONTRIBUTING.md`](../CONTRIBUTING.md) and [`ARCHITECTURE.md`](./ARCHITECTURE.md) for guidelines on code style, testing, and workflow.
+
+
+---
+
+## NEW_PLATFORM.md
+
+# Adding a new platform
+
+    # Adding a new platform - connection
+        1. Go to setting.ts
+        2. Add the new platform to PLATFORMS_META as follows:
+            - (Ethereum Virtual Machine) [Chain ID]: { coingeckoId:[coingeckoId], logoUrl: [platform logo URL], name: [platform name], nativeAssetId:"eip155-[chain ID]:0x0000000000000000000000000000000000000000:[native_Asset]" }
+            - (Others) [platformID]: { logoUrl: [platform_logo_URL], name: [platform_name] } 
+        3. Add the platform ID to PLATFORM_IDS
+        4. Add the platform ID to CONNECTIONS
+        5. If there is no suitable parser for the new platform, create one, add it to PARSERS_META and add it's id to PARSER_IDS.
+   
+    #Adding a new platform - file import .csv
+        1. Go to src/setting.ts
+        2. Add the new platform to PLATFORMS_META 
+        3. Add the platform ID to PLATFORM_IDS
+        4. In the folder api/account/file-imports/integrations create a new file. Write the parser for the new platform
+        5. Go to api/account/file-imports/integrations/index.ts
+        6. Add the new header to HEADER_MATCHER as follows: [platform_name.HEADER]: platform_name.Identifier,
+        7. Add the new parser to PARSER_MATCHER as follows: [platform_name.Identifier]: platform_name.parser,
+        8. Add the new identifier to PLATFORM_MATCHER as follows: [platform_name.Identifier]: platform_name.platform.
+
+# How it works
+
+    # Connection
+        When the Connection Drawer is open, the platform can be chosen. The select component displays the names of all the platforms in PLATFORM_META, defined in settings.ts. Ethereum Virtual Machines (EVM) require just the address, the label is optional; but for the connection with binance additional data is required, such as: the API key, the secret and the wallets. 
+        When the Add button is pressed, it is checked whether the fields are filled in properly. After that, a connection is added with all the entered data. If the connection has been successfully added, the syncConnection task is added to the queue.
+        For EVM and Ethereum is called syncEtherscan, and for binance syncBinance.
+        In syncEtherscan are extracted normal, internal and ERC20 transactions, using the address and the chainId to differentiate the platforms. Then parsers are used to form the txns and logs objects.
+        In syncBinance, for each wallet, the related endpoints are used in order to extract data about the user's activities. Then parsers are used to form the transactions and audit logs objects.
+
+    # File Import
+
+        When a file is uploaded the task addFileImport is added to the queue. With the help of parseCsv function, transactions, audit logs and data information are extracted from the file. 
+        The file header must match one header defined in the HEADER_MATCHER from index.ts. After the header is identified, the parser and platform corresponding to the header are determined. The data si processed and transactions and audit logs are returned.
+
+## Testing
+
+    - Create a new file with the extension test.ts in test/connections
+    - Set an account name and reset the account
+    - Add the connection
+    - Sync the connection
+    - Compute the balances
+    - Merge the transactions
+    - Save the data and compare it with the one already saved
+    - Run the test: yarn test test/connections/file_name.test.ts
+      - The first time the test is run "-u" must be added to the end of the command
+
+---
+
+## TESTING.md
+
+# Privatefolio Testing Guide
+
+## Testing Philosophy
+
+Privatefolio's testing approach focuses on maintaining high code quality and reliability through comprehensive test coverage across the monorepo's packages. The project emphasizes functional correctness, particularly in the backend services that handle critical financial data processing. Tests are designed to validate functionality at multiple levels, from unit to integration tests, with a preference for snapshot testing to prevent regressions. The project aims to ensure that all core functionality remains stable across updates and that new features are thoroughly tested before integration.
+
+## Testing Tools & Frameworks
+
+### Core Testing Stack
+
+- **Vitest**: Primary testing framework used across the project, providing a Jest-compatible API with TypeScript support out of the box
+- **Bun Test**: Used for specific SQLite compatibility tests that need to run in the Bun runtime
+- **Snapshots**: Extensive use of inline snapshots for regression testing
+- **CI Integration**: Tests run automatically as part of the GitHub Actions CI workflow
+
+### Package-specific Tools
+
+- **Backend**: 
+  - Custom diff visualization configuration in `vitest.diff.ts`
+  - Environment flags to enable/disable Bun SQLite testing (`BUN_SQL=true/false`)
+- **Frontend**: 
+  - Utilizes Vitest within the context of the Vite build system
+- **Electron**: 
+  - Limited direct testing, relies on the testing of its constituent parts in backend and frontend packages
+
+## Test Types & Organization
+
+### Backend Package
+
+#### Test Directory Structure
+
+The backend package has a well-organized test directory structure:
+
+```
+/test
+  /__snapshots__/     # Generated snapshot files
+  /assets/            # Tests for asset-related functionality
+  /backend-relayer/   # Tests for the backend relayer service
+  /backup/            # Tests for backup/restore functionality
+  /balances/          # Tests for balance tracking
+  /bun/               # Bun-specific tests for SQLite compatibility
+  /connections/       # Tests for external API connections
+  /daily-prices/      # Tests for price history functionality
+  /database/          # Database-related tests
+  /file-imports/      # Tests for file import functionality
+  /files/             # File handling tests
+  /networth/          # Net worth calculation tests
+  /server-tasks/      # Server task processing tests
+  /tags/              # Tag management tests
+  /trades/            # Trade tracking tests
+  /utils/             # Utility function tests
+```
+
+Tests follow a clear naming convention with `.test.ts` suffix for each test file.
+
+#### Test Categories
+
+- **Unit Tests**: Focused on testing individual functions and modules in isolation
+- **Integration Tests**: Test the interaction between multiple components
+- **SQLite Compatibility Tests**: Special tests that run in the Bun environment to ensure SQLite compatibility
+- **API Tests**: Test the backend API endpoints functionality
+
+#### Key Test Fixtures & Mocks
+
+- Random account names generated per test run to ensure test isolation
+- Test-specific transaction and audit log IDs
+- Snapshot-based assertions for complex data structures
+
+### Frontend Package
+
+The frontend package uses Vitest for testing, though it has less extensive test coverage compared to the backend. Testing focuses primarily on utility functions and critical UI components.
+
+### Electron Package
+
+The Electron package does not have dedicated tests in its own directory. Functionality is primarily tested through the backend and frontend packages that it integrates.
+
+## Running Tests
+
+### Common Commands
+
+To run all tests across the monorepo:
+
+```sh
 yarn test
-
-# Run type checking
-yarn check-types
-
-# Run linting
-yarn lint
-
-# Fix linting issues
-yarn lint:fix
 ```
 
-## Package-Specific Commands
-Use Lerna scoped commands:
-```bash
-# Run command in specific package
-lerna run --scope [package-name] [command]
+For CI-specific test runs (including all test suites):
 
-# Examples:
-lerna run --scope privatefolio-frontend dev
-lerna run --scope privatefolio-backend test
+```sh
+yarn test:ci
 ```
 
-## Code Style & Conventions
-- Use TypeScript for all new code
-- Follow Prettier configuration in `.prettierrc`
-- Run ESLint before committing
-- Use conventional commit messages
-- Prefer `const` over `let`, avoid `var`
-- Use descriptive variable and function names
-- Add JSDoc comments for public APIs
+### Package-specific Commands
 
-## Testing Requirements
-- Write tests for all new features
-- Maintain test coverage above 80%
-- Use Vitest for unit tests
-- Test both Node.js and Bun environments for backend
-- Run all tests before committing
+You can run package-specific tests from the root directory using Lerna:
 
-## Git Workflow
-- Create feature branches from `main`
-- Use conventional commit format: `type(scope): description`
-- Squash commits before merging
-- All commits must pass CI checks
+```sh
+# Run backend tests from root directory
+yarn lerna run test --scope privatefolio-backend
+yarn lerna test <test-file> --scope privatefolio-backend
+```
 
-## Programmatic Checks
-After making any changes, run these validation steps:
+Or navigate to the specific package directory:
 
-1. **Type Check**: `yarn check-types`
-2. **Lint**: `yarn lint`
-3. **Test**: `yarn test`
-4. **Build**: `yarn build`
+```sh
+# For backend tests
+cd packages/backend
+yarn test                # Run standard tests (without Bun SQLite)
+yarn test:bun            # Run Bun-specific SQLite tests
+yarn test <test-file>    # Run a specific test file, e.g., yarn test test/tags/tags-api.test.ts
+```
 
-All checks must pass before considering the work complete.
+### Testing in Watch Mode
 
-## Important Notes
-- **DO NOT** run `yarn dev` (development script should not be used in automated environments)
-- Use `yarn dev:electron` for full development environment
-- Database files are in `packages/backend/data/`
-- Frontend build outputs to `packages/frontend/build/`
-- Backend build outputs to `packages/backend/build/`
+When developing, you can run tests in watch mode in the backend package:
 
-## File Locations
-- Main package.json: `./package.json`
-- Backend source: `packages/backend/src/`
-- Frontend source: `packages/frontend/src/`
-- Electron main: `packages/electron/src/`
-- Documentation: `docs/`
-- Scripts: `scripts/`
+```sh
+cd packages/backend
+yarn test --watch
+```
 
-## Dependencies
-- Node.js 20+ required
-- Yarn 1.22.22 (specified in packageManager)
-- Bun runtime for backend optimization
-- Electron for desktop packaging
+This will rerun the tests automatically when files change.
 
-## PR Message Guidelines
-When creating pull requests:
-- Use clear, descriptive titles
-- Reference any related issues
-- Include testing steps
-- Mention breaking changes
-- Add screenshots for UI changes
-- Ensure all programmatic checks pass
+### Debugging Tests
 
-## Common Tasks
-- **Add new dependency**: Use `yarn workspace [package-name] add [package]`
-- **Update version**: Use `yarn new-version` (Lerna versioning)
-- **Generate documentation**: Use `yarn generate-llms-txt`
-- **Docker operations**: Use `yarn docker:build`, `yarn docker:run`, `yarn docker:remove`
+If tests fail, the output includes detailed error messages and diff comparisons. For snapshot test failures, you can update snapshots with:
 
-## Troubleshooting
-- If Lerna fails, check `lerna.json` configuration
-- If TypeScript fails, check `tsconfig.json` in each package
-- If tests fail, check test configuration in `packages/*/test/`
-- If build fails, ensure all dependencies are installed with `yarn`
+```sh
+yarn test -u
+```
+
+For more complex debugging scenarios:
+
+1. Add `console.log` statements or use the `debug` option in Vitest
+2. Run a specific test file to isolate the issue
+3. Use `it.only` to run just one test case within a file
+
+## CI/CD Integration
+
+Testing is integrated into the Continuous Integration pipeline via GitHub Actions in the `.github/workflows/continuous-integration.yml` file.
+
+The CI process:
+1. Checks out the code
+2. Sets up Node.js and Bun
+3. Installs dependencies
+4. Builds the project
+5. Runs linting checks
+6. Checks TypeScript types
+7. Runs all tests in CI mode
+
+Tests are a critical gate for accepting pull requests and merging code into the main branch.
+
+## Best Practices
+
+### Testing Patterns to Follow
+
+1. **AAA Pattern**: Structure tests using the Arrange-Act-Assert pattern:
+   ```typescript
+   it("should create and retrieve tags", async () => {
+     // arrange
+     const tagNames = ["defi", "staking", "trading"]
+
+     // act
+     const tags = await upsertTags(accountName, tagNames)
+     const allTags = await getTags(accountName)
+
+     // assert
+     expect(tags).toMatchInlineSnapshot(`...`)
+     expect(allTags).toMatchInlineSnapshot(`...`)
+   })
+   ```
+
+2. **Isolation**: Ensure tests are isolated by using random identifiers for account names and test data:
+   ```typescript
+   const accountName = Math.random().toString(36).substring(7)
+   const transactionId = "test_transaction_" + Math.random().toString(36).substring(7)
+   ```
+
+3. **Descriptive Test Names**: Use descriptive `it()` statements that clearly indicate what's being tested
+
+4. **Snapshots for Complex Data**: Use snapshots for testing complex data structures
+
+### Common Pitfalls to Avoid
+
+1. **Hard-coded Data**: Avoid hard-coded account names or IDs that could lead to test interference
+2. **Global State**: Beware of tests that change global state without restoring it
+3. **Time Dependencies**: Tests that rely on specific timestamps may be fragile
+4. **Incomplete Assertions**: Ensure you're asserting all relevant aspects of the test result
+
+### Guidelines for Writing New Tests
+
+1. Place tests in the appropriate subdirectory based on functionality
+2. Follow existing naming conventions: `feature-name.test.ts`
+3. Use descriptive test names in the format "should do something"
+4. Include tests for both success and failure cases
+5. Use snapshots for complex data structures, but be careful not to overuse them
+6. When adding new APIs, include tests for all endpoints and edge cases
+7. Structure tests using the AAA pattern (Arrange-Act-Assert)
+8. Add appropriate comments to explain test setup and assertions
+
+
+---
+

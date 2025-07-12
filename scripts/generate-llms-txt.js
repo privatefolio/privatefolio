@@ -4,7 +4,8 @@ const fs = require('fs');
 const path = require('path');
 
 const DOCS_DIR = path.join(__dirname, '../docs');
-const OUTPUT_FILE = path.join(__dirname, '../llms-full.txt');
+const LLMS_FILE = path.join(__dirname, '../llms.txt');
+const AGENTS_FILE = path.join(__dirname, '../AGENTS.md');
 
 function getAllMarkdownFiles(dir) {
   const files = fs.readdirSync(dir);
@@ -17,10 +18,15 @@ function getAllMarkdownFiles(dir) {
 function generateLlmsTxt() {
   const markdownFiles = getAllMarkdownFiles(DOCS_DIR);
   
-  let content = `# Privatefolio Documentation\n\n`;
-  content += `This file contains all documentation from the /docs directory.\n`;
-  // content += `Generated on: ${new Date().toISOString()}\n\n`;
-  content += `---\n\n`;
+  let content = `# Privatefolio
+  
+Privatefolio is a monorepo investment portfolio manager built with Lerna, featuring a React frontend, Node.js/Bun backend, and Electron desktop app.
+
+As an agent, follow these rules:
+- Never run the \`start\` or \`dev\` scripts because these are long-lived processes that should be run in the background.
+- To test that something works, run the \`test\` script or the \`build\` script.
+
+`;
 
   markdownFiles.forEach(filePath => {
     const fileName = path.basename(filePath);
@@ -31,15 +37,16 @@ function generateLlmsTxt() {
     content += `\n\n---\n\n`;
   });
 
-  fs.writeFileSync(OUTPUT_FILE, content);
-  console.log(`✅ Generated llms-full.txt with ${markdownFiles.length} markdown files`);
+  fs.writeFileSync(LLMS_FILE, content);
+  fs.writeFileSync(AGENTS_FILE, content);
+  console.log(`✅ Generated llms.txt and AGENTS.md with ${markdownFiles.length} markdown files`);
   console.log(`📄 Files included: ${markdownFiles.map(f => path.basename(f)).join(', ')}`);
-  console.log(`📍 Output: ${OUTPUT_FILE}`);
+  console.log(`📍 Output: ${LLMS_FILE}`);
 }
 
 try {
   generateLlmsTxt();
 } catch (error) {
-  console.error('❌ Error generating llms-full.txt:', error.message);
+  console.error('❌ Error generating files:', error.message);
   process.exit(1);
 } 
