@@ -26,6 +26,8 @@ As an agent, follow these rules:
 - Never run the \`start\` or \`dev\` scripts because these are long-lived processes that should be run in the background.
 - To test that something works, run the \`test\` script or the \`build\` script.
 
+Now, the project documentation, all concatenated below.
+
 `;
 
   markdownFiles.forEach(filePath => {
