@@ -3,7 +3,7 @@ import { isServer } from "./utils/environment-utils"
 export const GITHUB_CI = isServer && process.env.GITHUB_CI === "true"
 export const APP_VERSION = isServer && extractVersion(process.env.APP_VERSION)
 
-function extractVersion(version: string) {
+function extractVersion(version = "") {
   try {
     const raw = version.split("\n")[0]
 
