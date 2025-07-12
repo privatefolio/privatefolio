@@ -58,7 +58,7 @@ jobs:
           declare -a STAPLED_TAGS=()
 
           # Process each tag line by line to handle special characters
-          while IFS= read -r tag; do
+          while IFS= read -r release_tag; do
             # Skip empty lines
             [ -z "$release_tag" ] && continue
             CHECKED_TAGS+=("$release_tag")
