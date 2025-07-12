@@ -107,7 +107,7 @@ jobs:
             shopt -s nullglob
             stapled_files=(*-stapled.dmg)
             if (( ${#stapled_files[@]} )); then
-              echo "📤  Uploading stapled DMGs for $tag…"
+              echo "📤  Uploading stapled DMGs for $release_tag"
               gh release upload "$release_tag" "${stapled_files[@]}" --repo "$GITHUB_REPOSITORY" --clobber
             fi
 
