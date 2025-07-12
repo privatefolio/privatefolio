@@ -57,7 +57,10 @@ jobs:
           declare -a CHECKED_TAGS=()
           declare -a STAPLED_TAGS=()
 
-          for tag in $TAG_LIST; do
+          # Process each tag line by line to handle special characters
+          while IFS= read -r tag; do
+            # Skip empty lines
+            [ -z "$tag" ] && continue
             CHECKED_TAGS+=("$tag")
             STAPLED_THIS_RELEASE=false
 
@@ -114,7 +117,7 @@ jobs:
 
             popd >/dev/null
             rm -rf "$workdir"
-          done
+          done <<< "$TAG_LIST"
 
           # Export outputs for downstream jobs
           echo "stapled=$STAPLED" >> "$GITHUB_OUTPUT"
