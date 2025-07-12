@@ -6,6 +6,10 @@ on:
   schedule:
     - cron: "0 * * * *" # Run every 1 hour
 
+  workflow_run:
+    workflows: ["Publish Apps"]
+    types: [completed]
+
 permissions:
   contents: write
 
@@ -40,9 +44,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          tags="${{ steps.releases.outputs.tags }}"
-          if [ -z "$tags" ]; then
-            echo "❌  No releases found."
+          # Convert newline‑separated output into an array, trimming possible CR characters
+          mapfile -t TAG_LIST < <(printf '%s' "${{ steps.releases.outputs.tags }}" | tr -d '\r')
+
+          if [ ${#TAG_LIST[@]} -eq 0 ]; then
+            echo "❌  No releases found." >&2
             exit 1
           fi
 
@@ -50,7 +56,7 @@ jobs:
           declare -a CHECKED=()
           declare -a STAPLED_TAGS=()
 
-          for tag in $tags; do
+          for tag in "${TAG_LIST[@]}"; do
             CHECKED+=("$tag")
             STAPLED_THIS_RELEASE=false
 
@@ -64,7 +70,7 @@ jobs:
             for json in *.json; do
               dmg="${json%.json}"
 
-              # Skip if stapled variant already present
+              # Skip if stapled variant already present in the release assets we just downloaded
               if [[ -f "${dmg%.dmg}-stapled.dmg" ]]; then
                 echo "💤  ${dmg%.dmg}-stapled.dmg already exists — skipping"
                 continue
@@ -86,16 +92,19 @@ jobs:
                 STAPLED=true
                 STAPLED_THIS_RELEASE=true
               elif [[ "$status" == "Invalid" || "$status" == "Rejected" ]]; then
-                echo "❌  Notarization failed for $dmg"
+                echo "❌  Notarization failed for $dmg" >&2
                 exit 1
               else
                 echo "⏸️  Not yet notarized — skipping $dmg"
               fi
             done
 
-            if ls *-stapled.dmg 1> /dev/null 2>&1; then
+            # Upload only if we actually produced stapled DMGs for this release
+            shopt -s nullglob
+            stapled_files=(*-stapled.dmg)
+            if (( ${#stapled_files[@]} )); then
               echo "📤  Uploading stapled DMGs for $tag…"
-              gh release upload "$tag" *-stapled.dmg --repo "$GITHUB_REPOSITORY" --clobber
+              gh release upload "$tag" "${stapled_files[@]}" --repo "$GITHUB_REPOSITORY" --clobber
             fi
 
             if [ "$STAPLED_THIS_RELEASE" = true ]; then
@@ -106,9 +115,10 @@ jobs:
             rm -rf "$workdir"
           done
 
+          # Export boolean and CSV lists to the next job
           echo "stapled=$STAPLED" >> "$GITHUB_OUTPUT"
-          echo "stapled_tags=$(IFS=','; echo \"${STAPLED_TAGS[*]}\")" >> "$GITHUB_OUTPUT"
-          echo "checked_tags=$(IFS=','; echo \"${CHECKED[*]}\")" >> "$GITHUB_OUTPUT"
+          echo "stapled_tags=$(IFS=','; printf '%s' "${STAPLED_TAGS[*]}")" >> "$GITHUB_OUTPUT"
+          echo "checked_tags=$(IFS=','; printf '%s' "${CHECKED[*]}")" >> "$GITHUB_OUTPUT"
 
   notify:
     needs: check-and-staple
