@@ -82,7 +82,7 @@ Privatefolio is a free, open-source cryptocurrency portfolio manager built as a 
 
 ## Packages Summary
 
-- **`packages/frontend`** — v2.0.0-alpha.5
+- **`packages/frontend`**
   - **Description & Key Tech:** React-based UI that provides the user interface using Material-UI, Vite, and TypeScript.
   - **Core Features & Tools:**
     - Interactive portfolio visualization with lightweight-charts
@@ -90,7 +90,7 @@ Privatefolio is a free, open-source cryptocurrency portfolio manager built as a 
     - WebWorker-based SQLite integration for client-side data processing
     - State management with nanostores for reactive updates
 
-- **`packages/backend`** — v2.0.0-alpha.5
+- **`packages/backend`**
   - **Description & Key Tech:** Node.js/Bun server providing data processing, API integration, and SQLite database management.
   - **Core Features & Tools:**
     - Multi-chain cryptocurrency data aggregation and processing
@@ -98,7 +98,7 @@ Privatefolio is a free, open-source cryptocurrency portfolio manager built as a 
     - Scheduled tasks with Croner for periodic data updates
     - Support for both Bun and Node.js SQLite implementations
 
-- **`packages/electron`** — v2.0.0-alpha.5
+- **`packages/electron`**
   - **Description & Key Tech:** Desktop application wrapper using Electron with platform-specific optimizations.
   - **Core Features & Tools:**
     - Cross-platform desktop integration (Windows, Linux, macOS)
@@ -123,7 +123,7 @@ Privatefolio is a free, open-source cryptocurrency portfolio manager built as a 
 
 - **Electron:**
   - Windows builds with Squirrel installer, Linux with DEB packages, macOS with DMG
-  - Automated deloyment process via GitHub Actions triggered by version changes (`yarn new-version`)
+  - Automated deployment process via GitHub Actions triggered by version changes (`yarn new-version`)
   - Binaries published to GitHub releases for user distribution
 
 
@@ -225,117 +225,6 @@ In Electron, backend is started automatically on app launch.
 
 ## Contributing
 See [CONTRIBUTING.md](../CONTRIBUTING.md) and [ARCHITECTURE.md](ARCHITECTURE.md) for guidelines on code style, testing, and pull request workflow.
-
-
----
-
-## DATABASE_TIPS.md
-
-# SQL int/bigint range
-
-[link](https://learn.microsoft.com/en-us/sql/t-sql/data-types/int-bigint-smallint-and-tinyint-transact-sql?view=sql-server-ver16)  
-
-| Data Type | Range                                                   | Range expression      | Storage (bytes) |
-| --------- | ------------------------------------------------------- | --------------------- | --------------- |
-| tinyint   | 0 to 255                                                | 2^0-1 to 2^8-1        | 1               |
-| smallint  | -32.768 to 32.767                                       | -2^15 to 2^15-1       | 2               |
-| mediumint | -8.388.608 to 8.388.607                                 | -2^23 to 2^23-1       | 3               |
-| int       | -2.147.483.648 to 2.147.483.647                         | -2^31 to 2^31-1       | 4               |
-| bigint    | -9.223.372.036.854.775.808 to 9.223.372.036.854.775.807 | -2^63 to 2^63-1       | 8               |
-
-
----
-
-## DESIGN.md
-
-# Design
-
-## API rate limits
-
-### Asset price API
-
-We use these APIs to get historical price data for assets, usually in a candlestick format.
-
-| Provider  | Rate limit (public endpoint) | Normalized value      | Minimum call interval | Maximum data points per call | Docs                                                                                                           |
-| --------- | ---------------------------- | --------------------- | --------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Binance   | 2400 calls per minute        | 2400 calls per minute | 25ms                  | 1000                         | [link](https://www.binance.com/en/support/faq/rate-limits-on-binance-futures-281596e222414cdd9051664ea621cdc3) |
-| Coinbase  | 10 calls per second          | 600 calls per minute  | 100ms                 | 300                          | [link](https://docs.cloud.coinbase.com/advanced-trade-api/docs/rest-api-rate-limits)                           |
-| DefiLlama | ???                          | ???                   | ???                   | ???                          | [link](https://defillama.com/docs/api)                                                                         |
-
-### Asset metadata API
-
-We use these APIs to get asset metadata such as logo image, website url, asset description, etc.
-Because of the stinginess of the free tier, this app makes use of a local cache.
-
-| Provider  | Rate limit (free tier) | Normalized value    | Minimum call interval | Docs                                            |
-| --------- | ---------------------- | ------------------- | --------------------- | ----------------------------------------------- |
-| Coingecko | 30 calls per minute    | 30 calls per minute | 2000ms                | [link](https://coingecko.com/api/documentation) |
-
-### User data API
-
-We use these APIs to get user data such as deposits, withdrawals, transaction history, etc.
-
-#### Etherscan
-
-| Provider              | Rate limit ([free tier](https://docs.etherscan.io/support/rate-limits)) | Normalized value     | Minimum call interval | Maximum data points per call | Docs                                                                                                             |
-| --------------------- | ----------------------------------------------------------------------- | -------------------- | --------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Normal transactions   | 5 calls per second                                                      | 300 calls per minute | 200ms                 | 10000                        | [link](https://docs.etherscan.io/api-endpoints/accounts#get-a-list-of-normal-transactions-by-address)            |
-| Internal transactions | 5 calls per second                                                      | 300 calls per minute | 200ms                 | 10000                        | [link](https://docs.etherscan.io/api-endpoints/accounts#get-a-list-of-internal-transactions-by-address)          |
-| ERC-20 transfers      | 5 calls per second                                                      | 300 calls per minute | 200ms                 | None                         | [link](https://docs.etherscan.io/api-endpoints/accounts#get-a-list-of-erc20-token-transfer-events-by-address)    |
-| Block rewards         | 5 calls per second                                                      | 300 calls per minute | 200ms                 | None                         | [link](https://docs.etherscan.io/api-endpoints/accounts#get-list-of-blocks-validated-by-address)                 |
-| Staking withdrawals   | 5 calls per second                                                      | 300 calls per minute | 200ms                 | None                         | [link](https://docs.etherscan.io/api-endpoints/accounts#get-beacon-chain-withdrawals-by-address-and-block-range) |
-
-#### Binance
-
-| Endpoint                            | Weight       | Real Weight | Weight limit             | Second rate limit      | Calculated Rate limit | Minimum call interval | Docs                                                                                                           |
-| ----------------------------------- | ------------ | ----------- | ------------------------ | ---------------------- | --------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Deposits `/sapi/*`                  | 1 (IP)       | 1           | 12.000 per minute (IP)   | None                   | 200 calls per second  | 5ms                   | [link](https://binance-docs.github.io/apidocs/spot/en/#deposit-history-supporting-network-user_data)           |
-| Withdrawals `/sapi/*`               | 18.000 (UID) | 18.000      | 180.000 per minute (UID) | 10 requests per second | 1 calls per 6 seconds | 6_000ms               | [link](https://binance-docs.github.io/apidocs/spot/en/#withdraw-history-supporting-network-user_data)          |
-| Exchange Info `/api/*`              | 20 (IP)      | 20          | 6.000 per minute (IP)    | None                   | 300 calls per minute  | 200ms                 | [link](https://binance-docs.github.io/apidocs/spot/en/#exchange-information)                                   |
-| Spot Trades `/api/*`                | 20 (IP)      | 20          | 6.000 per minute (IP)    | None                   | 300 calls per minute  | 200ms                 | [link](https://binance-docs.github.io/apidocs/spot/en/#account-trade-list-user_data)                           |
-| Flexible rewards `/sapi/*`          | 150 (IP)     | 50          | 12.000 per minute (IP)   | None                   | 240 calls per minute  | 250ms                 | [link](https://binance-docs.github.io/apidocs/spot/en/#get-flexible-rewards-history-user_data)                 |
-| Locked rewards `/sapi/*`            | 150 (IP)     | 50          | 12.000 per minute (IP)   | None                   | 240 calls per minute  | 250ms                 | [link](https://binance-docs.github.io/apidocs/spot/en/#get-locked-rewards-history-user_dataa)                  |
-| Margin Borrow-repay `/sapi/*`       | 10 (IP)      | 1           | 12.000 per minute (IP)   | None                   | 200 calls per second  | 5ms                   | [link](https://binance-docs.github.io/apidocs/spot/en/#query-borrow-repay-records-in-margin-account-user_data) |
-| Margin Trades `/sapi/*`             | 10 (IP)      | 1           | 12.000 per minute (IP)   | None                   | 200 calls per second  | 5ms                   | [link](https://binance-docs.github.io/apidocs/spot/en/#query-margin-account-39-s-trade-list-user_data)         |
-| Margin Transfer `/sapi/*`           | 1 (IP)       | 1           | 12.000 per minute (IP)   | None                   | 200 calls per second  | 5ms                   | [link](https://binance-docs.github.io/apidocs/spot/en/#get-cross-margin-transfer-history-user_data)            |
-| Margin Liquidation Record `/sapi/*` | 1 (IP)       | 1           | 12.000 per minute (IP)   | None                   | 200 calls per second  | 5ms                   | [link](https://binance-docs.github.io/apidocs/spot/en/#get-cross-margin-transfer-history-user_data)            |
-| Future USD-M ExchangeInfo `/fapi/*` | 1 (IP)       | 1           | 2.400 per minute (IP)    | None                   | 40 calls per second   | 25ms                  | [link](https://binance-docs.github.io/apidocs/futures/en/#exchange-information)                                |
-| Future USD-M Trades `/fapi/*`       | 5 (IP)       | 5           | 2.400 per minute (IP)    | None                   | 8 calls per second    | 125ms                 | [link](https://binance-docs.github.io/apidocs/futures/en/#account-trade-list-user_data)                        |
-| Future USD-M Income `/fapi/*`       | 30 (IP)      | 30          | 2.400 per minute (IP)    | None                   | 1,3 calls per second  | 751ms                 | [link](https://binance-docs.github.io/apidocs/futures/en/#get-income-history-user_data)                        |
-| Future COIN-M ExchangeInfo`/dapi/*` | 1 (IP)       | 1           | 2.400 per minute (IP)    | None                   | 40 calls per second   | 25ms                  | [link](https://binance-docs.github.io/apidocs/delivery/en/#exchange-information)                               |
-| Future COIN-M Trades `/dapi/*`      | 20/40 (IP)   | 20/40       | 2.400 per minute (IP)    | None                   | 2/1 calls per second  | 500/1_000ms           | [link](https://binance-docs.github.io/apidocs/delivery/en/#account-trade-list-user_data)                       |
-| Future COIN-M Income `/dapi/*`      | 20 (IP)      | 30          | 2.400 per minute (IP)    | None                   | 1.3 calls per second  | 751ms                 | [link](https://binance-docs.github.io/apidocs/delivery/en/#get-income-history-user_data)                       |
-
-Current number of pairs/symbols: ~2600
-
-[Limits docs](https://binance-docs.github.io/apidocs/spot/en/#limits)
-
-IP Limits
-Every request will contain X-MBX-USED-WEIGHT-(intervalNum)(intervalLetter) in the response headers which has the current used weight for the IP for all request rate limiters defined.
-Each route has a weight which determines for the number of requests each endpoint counts for. Heavier endpoints and endpoints that do operations on multiple symbols will have a heavier weight.
-When a 429 is received, it's your obligation as an API to back off and not spam the API.
-Repeatedly violating rate limits and/or failing to back off after receiving 429s will result in an automated IP ban (HTTP status 418).
-IP bans are tracked and scale in duration for repeat offenders, from 2 minutes to 3 days.
-A Retry-After header is sent with a 418 or 429 responses and will give the number of seconds required to wait, in the case of a 429, to prevent a ban, or, in the case of a 418, until the ban is over.
-The limits on the API are based on the IPs, not the API keys.
-
-/api/ and /sapi/ Limit Introduction
-The /api/_ and /sapi/_ endpoints adopt either of two access limiting rules, IP limits or UID (account) limits.
-
-Endpoints related to /api/\*:
-
-According to the two modes of IP and UID (account) limit, each are independent.
-Endpoints share the 6,000 per minute limit based on IP.
-Responses contain the header X-MBX-USED-WEIGHT-(intervalNum)(intervalLetter), defining the weight used by the current IP.
-Successful order responses contain the header X-MBX-ORDER-COUNT-(intervalNum)(intervalLetter), defining the order limit used by the UID.
-
-Endpoints related to /sapi/\*:
-
-Endpoints are marked according to IP or UID limit and their corresponding weight value.
-Each endpoint with IP limits has an independent 12000 per minute limit, or per second limit if specified explicitly
-Each endpoint with UID limits has an independent 180000 per minute limit, or per second limit if specified explicitly
-Responses from endpoints with IP limits contain the header X-SAPI-USED-IP-WEIGHT-1M or X-SAPI-USED-IP-WEIGHT-1S, defining the weight used by the current IP.
-Responses from endpoints with UID limits contain the header X-SAPI-USED-UID-WEIGHT-1M or X-SAPI-USED-UID-WEIGHT-1S, defining the weight used by the current UID.
 
 
 ---
@@ -740,18 +629,6 @@ await window.electron.backend.restart();
 
 ---
 
-## FILES.md
-
-# How do we handle files?
-
-We have a rest api that allows you to download and upload.
-
-We have real-time api using websockets.
-
-
-
----
-
 ## FRONTEND.md
 
 # Privatefolio Frontend
@@ -823,57 +700,6 @@ We have real-time api using websockets.
 ## Contributing
 - Please read [`CONTRIBUTING.md`](../CONTRIBUTING.md) and [`ARCHITECTURE.md`](./ARCHITECTURE.md) for guidelines on code style, testing, and workflow.
 
-
----
-
-## NEW_PLATFORM.md
-
-# Adding a new platform
-
-    # Adding a new platform - connection
-        1. Go to setting.ts
-        2. Add the new platform to PLATFORMS_META as follows:
-            - (Ethereum Virtual Machine) [Chain ID]: { coingeckoId:[coingeckoId], logoUrl: [platform logo URL], name: [platform name], nativeAssetId:"eip155-[chain ID]:0x0000000000000000000000000000000000000000:[native_Asset]" }
-            - (Others) [platformID]: { logoUrl: [platform_logo_URL], name: [platform_name] } 
-        3. Add the platform ID to PLATFORM_IDS
-        4. Add the platform ID to CONNECTIONS
-        5. If there is no suitable parser for the new platform, create one, add it to PARSERS_META and add it's id to PARSER_IDS.
-   
-    #Adding a new platform - file import .csv
-        1. Go to src/setting.ts
-        2. Add the new platform to PLATFORMS_META 
-        3. Add the platform ID to PLATFORM_IDS
-        4. In the folder api/account/file-imports/integrations create a new file. Write the parser for the new platform
-        5. Go to api/account/file-imports/integrations/index.ts
-        6. Add the new header to HEADER_MATCHER as follows: [platform_name.HEADER]: platform_name.Identifier,
-        7. Add the new parser to PARSER_MATCHER as follows: [platform_name.Identifier]: platform_name.parser,
-        8. Add the new identifier to PLATFORM_MATCHER as follows: [platform_name.Identifier]: platform_name.platform.
-
-# How it works
-
-    # Connection
-        When the Connection Drawer is open, the platform can be chosen. The select component displays the names of all the platforms in PLATFORM_META, defined in settings.ts. Ethereum Virtual Machines (EVM) require just the address, the label is optional; but for the connection with binance additional data is required, such as: the API key, the secret and the wallets. 
-        When the Add button is pressed, it is checked whether the fields are filled in properly. After that, a connection is added with all the entered data. If the connection has been successfully added, the syncConnection task is added to the queue.
-        For EVM and Ethereum is called syncEtherscan, and for binance syncBinance.
-        In syncEtherscan are extracted normal, internal and ERC20 transactions, using the address and the chainId to differentiate the platforms. Then parsers are used to form the txns and logs objects.
-        In syncBinance, for each wallet, the related endpoints are used in order to extract data about the user's activities. Then parsers are used to form the transactions and audit logs objects.
-
-    # File Import
-
-        When a file is uploaded the task addFileImport is added to the queue. With the help of parseCsv function, transactions, audit logs and data information are extracted from the file. 
-        The file header must match one header defined in the HEADER_MATCHER from index.ts. After the header is identified, the parser and platform corresponding to the header are determined. The data si processed and transactions and audit logs are returned.
-
-## Testing
-
-    - Create a new file with the extension test.ts in test/connections
-    - Set an account name and reset the account
-    - Add the connection
-    - Sync the connection
-    - Compute the balances
-    - Merge the transactions
-    - Save the data and compare it with the one already saved
-    - Run the test: yarn test test/connections/file_name.test.ts
-      - The first time the test is run "-u" must be added to the end of the command
 
 ---
 

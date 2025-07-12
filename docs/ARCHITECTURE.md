@@ -8,7 +8,7 @@ Privatefolio is a free, open-source cryptocurrency portfolio manager built as a 
 
 ## Packages Summary
 
-- **`packages/frontend`** — v2.0.0-alpha.5
+- **`packages/frontend`**
   - **Description & Key Tech:** React-based UI that provides the user interface using Material-UI, Vite, and TypeScript.
   - **Core Features & Tools:**
     - Interactive portfolio visualization with lightweight-charts
@@ -16,7 +16,7 @@ Privatefolio is a free, open-source cryptocurrency portfolio manager built as a 
     - WebWorker-based SQLite integration for client-side data processing
     - State management with nanostores for reactive updates
 
-- **`packages/backend`** — v2.0.0-alpha.5
+- **`packages/backend`**
   - **Description & Key Tech:** Node.js/Bun server providing data processing, API integration, and SQLite database management.
   - **Core Features & Tools:**
     - Multi-chain cryptocurrency data aggregation and processing
@@ -24,7 +24,7 @@ Privatefolio is a free, open-source cryptocurrency portfolio manager built as a 
     - Scheduled tasks with Croner for periodic data updates
     - Support for both Bun and Node.js SQLite implementations
 
-- **`packages/electron`** — v2.0.0-alpha.5
+- **`packages/electron`**
   - **Description & Key Tech:** Desktop application wrapper using Electron with platform-specific optimizations.
   - **Core Features & Tools:**
     - Cross-platform desktop integration (Windows, Linux, macOS)
@@ -49,5 +49,5 @@ Privatefolio is a free, open-source cryptocurrency portfolio manager built as a 
 
 - **Electron:**
   - Windows builds with Squirrel installer, Linux with DEB packages, macOS with DMG
-  - Automated deloyment process via GitHub Actions triggered by version changes (`yarn new-version`)
+  - Automated deployment process via GitHub Actions triggered by version changes (`yarn new-version`)
   - Binaries published to GitHub releases for user distribution
