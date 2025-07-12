@@ -43,7 +43,7 @@ jobs:
         id: staple
         shell: bash
         run: |
-          set -euo pipefail
+          set -eo pipefail
 
           # Clean newline-separated tag list (may contain CRs)
           TAG_LIST=$(printf '%s' "${{ steps.releases.outputs.tags }}" | tr -d '\r')
