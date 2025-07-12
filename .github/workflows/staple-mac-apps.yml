@@ -41,23 +41,24 @@ jobs:
 
       - name: Staple DMGs if needed
         id: staple
+        shell: bash
         run: |
           set -euo pipefail
 
-          # Convert newline‑separated output into an array, trimming possible CR characters
-          mapfile -t TAG_LIST < <(printf '%s' "${{ steps.releases.outputs.tags }}" | tr -d '\r')
+          # Clean newline-separated tag list (may contain CRs)
+          TAG_LIST=$(printf '%s' "${{ steps.releases.outputs.tags }}" | tr -d '\r')
 
-          if [ ${#TAG_LIST[@]} -eq 0 ]; then
+          if [ -z "$TAG_LIST" ]; then
             echo "❌  No releases found." >&2
             exit 1
           fi
 
           STAPLED=false
-          declare -a CHECKED=()
+          declare -a CHECKED_TAGS=()
           declare -a STAPLED_TAGS=()
 
-          for tag in "${TAG_LIST[@]}"; do
-            CHECKED+=("$tag")
+          for tag in $TAG_LIST; do
+            CHECKED_TAGS+=("$tag")
             STAPLED_THIS_RELEASE=false
 
             echo "🔍  Processing release $tag"
@@ -70,7 +71,7 @@ jobs:
             for json in *.json; do
               dmg="${json%.json}"
 
-              # Skip if stapled variant already present in the release assets we just downloaded
+              # Skip if stapled variant already present in the assets
               if [[ -f "${dmg%.dmg}-stapled.dmg" ]]; then
                 echo "💤  ${dmg%.dmg}-stapled.dmg already exists — skipping"
                 continue
@@ -99,7 +100,7 @@ jobs:
               fi
             done
 
-            # Upload only if we actually produced stapled DMGs for this release
+            # Upload any newly-stapled DMGs
             shopt -s nullglob
             stapled_files=(*-stapled.dmg)
             if (( ${#stapled_files[@]} )); then
@@ -115,10 +116,10 @@ jobs:
             rm -rf "$workdir"
           done
 
-          # Export boolean and CSV lists to the next job
+          # Export outputs for downstream jobs
           echo "stapled=$STAPLED" >> "$GITHUB_OUTPUT"
           echo "stapled_tags=$(IFS=','; printf '%s' "${STAPLED_TAGS[*]}")" >> "$GITHUB_OUTPUT"
-          echo "checked_tags=$(IFS=','; printf '%s' "${CHECKED[*]}")" >> "$GITHUB_OUTPUT"
+          echo "checked_tags=$(IFS=','; printf '%s' "${CHECKED_TAGS[*]}")" >> "$GITHUB_OUTPUT"
 
   notify:
     needs: check-and-staple
