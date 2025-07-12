@@ -46,13 +46,11 @@ On Linux, you can run `sudo dpkg -i privatefolio_<version>_amd64.deb` to install
 </td>
 <td>
 
-- **Transaction Management**: Track all your cryptocurrency transactions in one place
-- **Multi-chain Support**: Support for multiple blockchains and platforms
-- **Portfolio Analytics**: View detailed analytics about your portfolio performance
-- **Search Functionality**:
-  - Search for assets, transactions, and actions
-  - Search transactions by transaction hash (just paste a transaction hash into the search bar)
-- **Price History**: View historical price data for your assets
+- Time travel through trades to surface the strengths and weaknesses of your portfolio
+- Inspect and compare your historical net worth with no limitations
+- Use advanced TradingView features on your data like indicators, drawing tools, etc.
+- Prepare your tax report or feed data into your AI assistant
+- Extend the project under the AGPL-3.0 license
 
 </td>
 </tr>

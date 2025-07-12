@@ -36,7 +36,8 @@
     "new-version": "lerna version --force-publish",
     "docker:build": "yarn workspace privatefolio-backend docker:build",
     "docker:run": "yarn workspace privatefolio-backend docker:run",
-    "docker:remove": "yarn workspace privatefolio-backend docker:remove"
+    "docker:remove": "yarn workspace privatefolio-backend docker:remove",
+    "generate-llms-txt": "node scripts/generate-llms-txt.js"
   },
   "devDependencies": {
     "wrangler": "^3.90.0",
