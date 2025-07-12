@@ -71,6 +71,7 @@ jobs:
             gh release download "$release_tag" --repo "$GITHUB_REPOSITORY"
             shopt -s nullglob
 
+            declare -a NEWLY_STAPLED_FILES=()
             for json in *.json; do
               dmg="${json%.json}"
 
@@ -93,6 +94,7 @@ jobs:
                 echo "✅  Stapling $dmg"
                 xcrun stapler staple "$dmg"
                 mv "$dmg" "${dmg%.dmg}-stapled.dmg"
+                NEWLY_STAPLED_FILES+=("${dmg%.dmg}-stapled.dmg")
                 STAPLED=true
                 STAPLED_THIS_RELEASE=true
               elif [[ "$status" == "Invalid" || "$status" == "Rejected" ]]; then
@@ -104,11 +106,9 @@ jobs:
             done
 
             # Upload any newly-stapled DMGs
-            shopt -s nullglob
-            stapled_files=(*-stapled.dmg)
-            if (( ${#stapled_files[@]} )); then
+            if (( ${#NEWLY_STAPLED_FILES[@]} )); then
               echo "📤  Uploading stapled DMGs for $release_tag"
-              gh release upload "$release_tag" "${stapled_files[@]}" --repo "$GITHUB_REPOSITORY" --clobber
+              gh release upload "$release_tag" "${NEWLY_STAPLED_FILES[@]}" --repo "$GITHUB_REPOSITORY" --clobber
             fi
 
             if [ "$STAPLED_THIS_RELEASE" = true ]; then
