@@ -28,6 +28,7 @@ export async function start(): Promise<void> {
     const bunPath = path.join(
       __dirname,
       "..",
+      "..",
       // "..",
       // "app.asar.unpacked",
       "resources",

@@ -142,11 +142,11 @@ yarn cache clean # Clean the cache
 Data is persisted in the following directories:
 
 1. Windows:
-   - Squirrel logs: `C:\Users\daniel\AppData\Local\SquirrelTemp`
+   - Updater logs: `C:\Users\daniel\AppData\Local\privatefolio-electron-updater`
    - Electron logs: `C:\Users\daniel\AppData\Roaming\Privatefolio\logs`
    - User data: `C:\Users\daniel\AppData\Roaming\Privatefolio\data`
    - App config: `C:\Users\daniel\AppData\Roaming\Privatefolio\config.json`
-   - App code: `C:\Users\daniel\AppData\Local\privatefolio_electron`
+   - App code: `C:\Users\daniel\AppData\Local\Programs\Privatefolio`
 
 2. Linux:
    - Electron logs: `~/.config/Privatefolio/logs`

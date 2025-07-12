@@ -3,6 +3,26 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.27 - 2025/07/12
+
+### 🐛 Bug Fixes
+
+- Fix start-up issue in desktop apps
+
+## v2.0.0-beta.25 - 2025/07/12
+
+### 💡 Feature updates
+
+- Notarization for the macOS app
+- Improve `fetchDailyPrices` to not go into the past further than needed
+- Add support for snap packages on Linux
+
+### 🐛 Bug Fixes
+
+- Fix binance file imports
+- Fix trade calculation for binance data
+- Fix bug with authorization in `/download` and `/upload` endpoints
+
 ## v2.0.0-beta.19 - 2025/07/09
 
 ### 💡 Feature updates
