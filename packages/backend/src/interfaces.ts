@@ -244,6 +244,15 @@ export type TradeCost = [
   timestamp: Timestamp,
 ]
 
+export type TradeProceeds = [
+  assetId: string,
+  amount: string,
+  usdValue: string,
+  cost: string,
+  txId: string,
+  timestamp: Timestamp,
+]
+
 export type TradeValue = [
   assetId: string,
   amount: string,
@@ -264,7 +273,7 @@ export interface Trade {
   duration?: number
   fees: TradeValue[]
   id: string
-  proceeds: TradeValue[]
+  proceeds: TradeProceeds[]
   tags?: number[]
   tradeNumber: number
   tradeStatus: "open" | "closed"
@@ -681,6 +690,7 @@ export interface Asset extends Partial<AssetMetadata> {
 
 export interface MyAsset extends Asset {
   firstOwnedAt?: Timestamp
+  lastOwnedAt?: Timestamp
   priceApiId?: PriceApiId
 }
 

@@ -424,7 +424,7 @@ export async function computeTrades(
   accountName: string,
   progress: ProgressCallback = noop,
   request: ComputeTradesRequest = {},
-  _signal?: AbortSignal
+  signal?: AbortSignal
 ): Promise<void> {
   let { since } = request
 
@@ -532,6 +532,8 @@ export async function computeTrades(
   let oldestClosedTrade = 0
 
   for (const [assetId, logs] of Object.entries(assetGroups)) {
+    if (signal?.aborted) throw new Error(signal.reason)
+
     let currentTrade: Trade | null = null
     let balance = new Big(0)
 
