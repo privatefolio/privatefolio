@@ -3,6 +3,12 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.29 - 2025/07/13
+
+### 🐛 Bug Fixes
+
+- Fix an issue with Reset Account
+
 ## v2.0.0-beta.28 - 2025/07/13
 
 ### 🐛 Bug Fixes
