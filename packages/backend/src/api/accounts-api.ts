@@ -167,10 +167,12 @@ export async function deleteAccount(accountName: string, keepAccount = false) {
   if (!isTestEnvironment) console.log(getPrefix(accountName), "Deleting account.")
 
   const account = await getAccount(accountName)
-  await writeFile(
-    join(DATABASES_LOCATION, `${accountName}.deleting`),
-    "This account is marked for deletion."
-  )
+  if (!isTestEnvironment) {
+    await writeFile(
+      join(DATABASES_LOCATION, `${accountName}.deleting`),
+      "This account is marked for deletion."
+    )
+  }
 
   await account.close()
 
