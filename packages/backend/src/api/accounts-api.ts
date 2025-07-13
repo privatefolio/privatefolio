@@ -163,6 +163,16 @@ export async function createAccount(accountName: string) {
   await getAccount(accountName, true)
 }
 
+async function deleteUserData(accountName: string) {
+  // delete logs & database file
+  await safeRemove(join(DATABASES_LOCATION, `${accountName}.sqlite`))
+  await safeRemove(join(DATABASES_LOCATION, `${accountName}.sqlite-shm`))
+  await safeRemove(join(DATABASES_LOCATION, `${accountName}.sqlite-wal`))
+  await safeRemove(join(DATABASES_LOCATION, `${accountName}.deleting`))
+  await safeRemove(join(TASK_LOGS_LOCATION, accountName))
+  await safeRemove(join(FILES_LOCATION, accountName))
+}
+
 export async function deleteAccount(accountName: string, keepAccount = false) {
   if (!isTestEnvironment) console.log(getPrefix(accountName), "Deleting account.")
 
@@ -173,23 +183,19 @@ export async function deleteAccount(accountName: string, keepAccount = false) {
       "This account is marked for deletion."
     )
   }
-
-  await account.close()
-
-  // delete logs & database file
-  await safeRemove(join(DATABASES_LOCATION, `${accountName}.sqlite`))
-  await safeRemove(join(DATABASES_LOCATION, `${accountName}.sqlite-shm`))
-  await safeRemove(join(DATABASES_LOCATION, `${accountName}.sqlite-wal`))
-  await safeRemove(join(DATABASES_LOCATION, `${accountName}.deleting`))
-  await safeRemove(join(TASK_LOGS_LOCATION, accountName))
-  await safeRemove(join(FILES_LOCATION, accountName))
-
-  if (!isTestEnvironment) console.log(getPrefix(accountName), "Deleted account.")
-
   if (!keepAccount) {
     delete accounts[accountName]
     appEventEmitter.emit(SubscriptionChannel.Accounts, EventCause.Deleted, accountName)
   }
+
+  try {
+    await account.close()
+    await deleteUserData(accountName)
+  } catch (error) {
+    console.error(getPrefix(accountName), "Failed to delete user data:", error)
+  }
+
+  if (!isTestEnvironment) console.log(getPrefix(accountName), "Deleted account.")
 }
 
 /**
@@ -422,9 +428,9 @@ export async function getAccountNames() {
     validFiles.map(async (file) => {
       const accountName = file.replace(".sqlite", "")
       if (await isMarkedForDeletion(accountName)) {
-        console.log(getPrefix(accountName), "Account marked for deletion, removing file:", file)
+        console.log(getPrefix(accountName), "Account marked for deletion, removing user data")
         try {
-          await safeRemove(join(DATABASES_LOCATION, file))
+          await deleteUserData(accountName)
         } catch {}
         return null
       }

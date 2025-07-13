@@ -2,6 +2,8 @@ import { access } from "fs/promises"
 import { join } from "path"
 import { DATABASES_LOCATION } from "src/settings/settings"
 
+import { isTestEnvironment } from "./environment-utils"
+
 export function sql(strings: TemplateStringsArray, ...values: unknown[]): string {
   // This function doesn't need to do anything special
   return strings.raw.reduce((prev, curr, i) => prev + curr + (values[i] || ""), "")
@@ -32,6 +34,8 @@ export function isReadQuery(query: string): boolean {
 }
 
 export async function isMarkedForDeletion(accountName: string): Promise<boolean> {
+  if (isTestEnvironment) return false
+
   return access(join(DATABASES_LOCATION, `${accountName}.deleting`))
     .then(() => true)
     .catch(() => false)
