@@ -2,7 +2,7 @@
 
 This document explains how to use Docker to run Privatefolio.
 The Docker image uses a multi-stage build process. It builds the frontend bundle and installs backend production dependencies.
-The final image utilizes Bun to run the backend TypeScript source code directly and to serve the frontend bundle.
+The final image utilizes Bun to serve the compiled JavaScript build of the backend and the pre-built frontend bundle.
 
 ## Requirements
 

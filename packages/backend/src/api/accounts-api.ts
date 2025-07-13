@@ -11,9 +11,9 @@ import {
 } from "src/interfaces"
 import { DATABASES_LOCATION, FILES_LOCATION, TASK_LOGS_LOCATION } from "src/settings/settings"
 import { createSqliteDatabaseConnection } from "src/sqlite/sqlite"
-import { isDevelopment, isTestEnvironment } from "src/utils/environment-utils"
+import { isDevelopment, isTestEnvironment, writesAllowed } from "src/utils/environment-utils"
 import { safeRemove } from "src/utils/file-utils"
-import { sql } from "src/utils/sql-utils"
+import { ensureActiveAccount, isMarkedForDeletion, sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { getPrefix, sleep, wasteCpuCycles } from "src/utils/utils"
 
@@ -39,6 +39,7 @@ async function createDatabaseConnection(accountName: string, createIfNeeded = fa
   if (databaseFilePath !== IN_MEMORY_DB) {
     // ensure the file exists
     try {
+      await ensureActiveAccount(accountName)
       await access(databaseFilePath)
       console.log(getPrefix(accountName), "Connecting to existing database", databaseFilePath)
     } catch {
@@ -134,12 +135,16 @@ export async function getAccount(accountName: string, createIfNeeded = false): P
 }
 
 export async function reconnectAccount(accountName: string) {
+  await disconnectAccount(accountName)
+  return getAccount(accountName)
+}
+
+export async function disconnectAccount(accountName: string) {
   try {
     const account = await getAccount(accountName)
     await account.close()
   } catch {}
   delete accounts[accountName]
-  return getAccount(accountName)
 }
 
 function isValidFilename(name: string): boolean {
@@ -161,15 +166,19 @@ export async function createAccount(accountName: string) {
 export async function deleteAccount(accountName: string, keepAccount = false) {
   if (!isTestEnvironment) console.log(getPrefix(accountName), "Deleting account.")
 
-  if (!isTestEnvironment) console.log(getPrefix(accountName), "Closing database connection.")
   const account = await getAccount(accountName)
+  await writeFile(
+    join(DATABASES_LOCATION, `${accountName}.deleting`),
+    "This account is marked for deletion."
+  )
+
   await account.close()
-  if (!isTestEnvironment) console.log(getPrefix(accountName), "Closed database connection.")
 
   // delete logs & database file
   await safeRemove(join(DATABASES_LOCATION, `${accountName}.sqlite`))
   await safeRemove(join(DATABASES_LOCATION, `${accountName}.sqlite-shm`))
   await safeRemove(join(DATABASES_LOCATION, `${accountName}.sqlite-wal`))
+  await safeRemove(join(DATABASES_LOCATION, `${accountName}.deleting`))
   await safeRemove(join(TASK_LOGS_LOCATION, accountName))
   await safeRemove(join(FILES_LOCATION, accountName))
 
@@ -225,6 +234,10 @@ async function initializeDatabaseIfNeeded(
     FROM sqlite_master
     `)
   )[0][0] as number
+
+  if (writesAllowed) {
+    await account.execute(`PRAGMA busy_timeout = 2000;`)
+  }
 
   if (tablesCount > 0) {
     console.log(getPrefix(accountName), "Skipping database initialization.")
@@ -403,9 +416,16 @@ export async function getAccountNames() {
     (file) => file.endsWith(".sqlite") && !file.endsWith("-journal.sqlite")
   )
 
-  const files = await Promise.all(
+  let files = await Promise.all(
     validFiles.map(async (file) => {
       const accountName = file.replace(".sqlite", "")
+      if (await isMarkedForDeletion(accountName)) {
+        console.log(getPrefix(accountName), "Account marked for deletion, removing file:", file)
+        try {
+          await safeRemove(join(DATABASES_LOCATION, file))
+        } catch {}
+        return null
+      }
       const filePath = join(DATABASES_LOCATION, file)
       const stats = await stat(filePath)
 
@@ -423,6 +443,7 @@ export async function getAccountNames() {
     })
   )
 
+  files = files.filter((x) => x !== null)
   files.sort((a, b) => a.createdAt - b.createdAt)
 
   return files.map(({ file }) => file.replace(".sqlite", ""))
@@ -444,19 +465,23 @@ export async function readSql(accountName: string, query: string, params?: SqlPa
   return account.execute(query, params)
 }
 
-export async function unsubscribe(subscriptionId: SubscriptionId) {
-  const subscription = allSubscriptions.get(subscriptionId)
-  if (!subscription) throw new Error(`Subscription not found: ${subscriptionId}`)
+export async function unsubscribe(subscriptionId: SubscriptionId, throwOnError = true) {
+  try {
+    const subscription = allSubscriptions.get(subscriptionId)
+    if (!subscription) throw new Error(`Subscription not found: ${subscriptionId}`)
 
-  const { channel, accountName, listener } = subscription
-  // console.log("Unsubscribing", subscriptionId)
+    const { channel, accountName, listener } = subscription
+    // console.log("Unsubscribing", subscriptionId)
 
-  if (accountName) {
-    const account = await getAccount(accountName)
-    account.eventEmitter.off(channel, listener)
-  } else {
-    appEventEmitter.off(channel, listener)
+    if (accountName) {
+      const account = await getAccount(accountName)
+      account.eventEmitter.off(channel, listener)
+    } else {
+      appEventEmitter.off(channel, listener)
+    }
+
+    allSubscriptions.delete(subscriptionId)
+  } catch (error) {
+    if (throwOnError) throw error
   }
-
-  allSubscriptions.delete(subscriptionId)
 }

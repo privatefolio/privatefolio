@@ -143,7 +143,7 @@ export default function App() {
     const subscription = rpc.subscribeToMetadata(
       activeAccount,
       throttle(() => fetchInMemoryData(rpc, activeAccount), SHORT_THROTTLE_DURATION, {
-        leading: false,
+        leading: true,
         trailing: true,
       })
     )

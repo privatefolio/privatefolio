@@ -62,13 +62,14 @@ export async function saveFile(
   return fileRecord
 }
 
-export async function safeRemove(path: string) {
-  for (let i = 0; i < 5; i++) {
+export async function safeRemove(path: string, retries = 20) {
+  for (let i = 0; i < retries; i++) {
     try {
       await rm(path, { force: true, recursive: true })
       break
     } catch (err) {
-      if (err.code === "EBUSY") {
+      if (err.code === "ENOENT") return
+      if (err.code === "EBUSY" && i < retries - 1) {
         await sleep(100)
       } else {
         throw err

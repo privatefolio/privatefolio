@@ -92,13 +92,6 @@ yarn test:ci
 
 ### Package-specific Commands
 
-You can run package-specific tests from the root directory using Lerna:
-
-```sh
-# Run backend tests from root directory
-yarn lerna run test --scope privatefolio-backend
-yarn lerna test <test-file> --scope privatefolio-backend
-```
 
 Or navigate to the specific package directory:
 

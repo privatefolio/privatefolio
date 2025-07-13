@@ -21,7 +21,7 @@ export function closeSubscription(sub: Promise<SubscriptionId>, rpc: RPC) {
     sub.then((subscriptionId) => {
       // console.log("Closing subscription", subscriptionId)
       rpc
-        .unsubscribe(subscriptionId)
+        .unsubscribe(subscriptionId, false)
         .then(() => {
           // console.log("Subscription closed", subscriptionId)
         })

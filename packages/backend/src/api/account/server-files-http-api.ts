@@ -216,7 +216,7 @@ export async function handleUpload(request: Request, writeApi: Api): Promise<Res
     })
   }
 
-  console.log(getPrefix(accountName), `File uploaded successfully: ${fileRecord.name}`)
+  console.log(getPrefix(accountName), `File uploaded: ${fileRecord.name}`)
 
-  return new Response("File uploaded successfully.", { headers: corsHeaders, status: 200 })
+  return new Response("File uploaded.", { headers: corsHeaders, status: 200 })
 }

@@ -5,7 +5,7 @@ import {
   isTestEnvironment,
   writesAllowed,
 } from "src/utils/environment-utils"
-import { isReadQuery } from "src/utils/sql-utils"
+import { ensureActiveAccount, isReadQuery } from "src/utils/sql-utils"
 import { getPrefix } from "src/utils/utils"
 
 export type SQLiteCompatibleType = boolean | string | number | null | Uint8Array
@@ -20,16 +20,26 @@ export async function createQueryExecutor(
   databaseFilePath: string,
   accountName: string
 ): Promise<QueryExecutor> {
+  await ensureActiveAccount(accountName)
+
   const db = new Database(databaseFilePath, {
     create: true,
     readonly: !writesAllowed, // doesn't work
     readwrite: writesAllowed, // doesn't work
   })
 
+  const close = async () => {
+    if (!isTestEnvironment) console.log(getPrefix(accountName), "Closing database connection.")
+    db.exec("PRAGMA wal_checkpoint(FULL);")
+    db.close(true)
+    if (!isTestEnvironment) console.log(getPrefix(accountName), "Closed database connection.")
+  }
+
   async function executeFn(
     query: string,
     params: SQLiteCompatibleType[] = []
   ): Promise<SQLiteCompatibleType[][]> {
+    await ensureActiveAccount(accountName, close)
     if (!writesAllowed && !isReadQuery(query)) throw new Error("Illegal write query")
     try {
       const start = process.hrtime.bigint() // Start time in nanoseconds
@@ -63,6 +73,7 @@ export async function createQueryExecutor(
     query: string,
     params: SQLiteCompatibleType[][] = []
   ): Promise<SQLiteCompatibleType[][]> {
+    await ensureActiveAccount(accountName, close)
     if (!writesAllowed && !isReadQuery(query)) throw new Error("Illegal write query")
 
     const results: SQLiteCompatibleType[][] = []
@@ -91,9 +102,7 @@ export async function createQueryExecutor(
   }
 
   return {
-    async close() {
-      db.close()
-    },
+    close,
     async execute(
       query: string,
       params?: SQLiteCompatibleType[]

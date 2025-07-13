@@ -12,7 +12,7 @@ Privatefolio is a free, open-source cryptocurrency portfolio manager built as a 
   - **Description & Key Tech:** React-based UI that provides the user interface using Material-UI, Vite, and TypeScript.
   - **Core Features & Tools:**
     - Interactive portfolio visualization with lightweight-charts
-    - Command palette (kbar) and comprehensive search functionality
+    - Command palette (`kbar`) and comprehensive search functionality
     - WebWorker-based SQLite integration for client-side data processing
     - State management with nanostores for reactive updates
 

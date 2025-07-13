@@ -95,7 +95,7 @@ export async function handleRestoreRequest(rpc: RPC, accountName: string, file: 
   })
 
   if (response.ok) {
-    console.log("File uploaded successfully")
+    console.log("File uploaded")
   } else {
     const errorText = await response.text()
     console.error("Error uploading file:", errorText)

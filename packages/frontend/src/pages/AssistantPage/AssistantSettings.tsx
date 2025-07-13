@@ -94,7 +94,7 @@ export function AssistantSettings() {
         await rpc.setEncryptedValue(activeAccount, "assistant_anthropic_key", anthropicApiKey)
       }
 
-      enqueueSnackbar("Assistant settings saved successfully", { variant: "success" })
+      enqueueSnackbar("Assistant settings saved", { variant: "success" })
     } catch (error) {
       console.error("Failed to save assistant settings:", error)
       enqueueSnackbar("Failed to save assistant settings", { variant: "error" })

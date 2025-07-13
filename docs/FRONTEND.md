@@ -46,7 +46,7 @@
 - Portfolio Analytics: real‑time balance charts and net worth tracking.
 - Transaction Management: list, search (by hash), and tag transactions.
 - Price History: interactive candlestick and line charts per asset.
-- Command Palette: quick search and actions via kbar.
+- Command Palette: quick search and actions via `kbar`.
 - Backup & Restore: import/export data as JSON or CSV.
 
 ## Development

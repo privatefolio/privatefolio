@@ -40,6 +40,7 @@ export function AccountPickerContents(props: AccountPickerContentsProps) {
   const rpc = useStore($rpc)
 
   const [deleting, setDeleting] = useState(false)
+  const [resetting, setResetting] = useState(false)
 
   const allAccounts = useMemo<
     {
@@ -99,6 +100,7 @@ export function AccountPickerContents(props: AccountPickerContentsProps) {
       </MenuItem>
       <MenuItem
         aria-label="Reset account"
+        disabled={resetting}
         onClick={async () => {
           const { confirmed } = await confirm({
             content: (
@@ -113,7 +115,19 @@ export function AccountPickerContents(props: AccountPickerContentsProps) {
             variant: "warning",
           })
           if (confirmed) {
-            await rpc.resetAccount(activeAccount)
+            setResetting(true)
+            rpc
+              .resetAccount(activeAccount)
+              .then(() => {
+                setResetting(false)
+                onClose()
+                enqueueSnackbar("Account reset", { variant: "success" })
+              })
+              .catch((error) => {
+                console.error(error)
+                setResetting(false)
+                enqueueSnackbar(error.message, { variant: "error" })
+              })
             onClose()
           }
         }}
@@ -121,7 +135,7 @@ export function AccountPickerContents(props: AccountPickerContentsProps) {
         <ListItemAvatar>
           <RestartAltRounded fontSize="small" />
         </ListItemAvatar>
-        <ListItemText>Reset account</ListItemText>
+        <ListItemText>{resetting ? "Resetting account" : "Reset account"}</ListItemText>
       </MenuItem>
       <MenuItem
         aria-label="Delete account"
@@ -147,6 +161,7 @@ export function AccountPickerContents(props: AccountPickerContentsProps) {
                 setDeleting(false)
                 onClose()
                 navigate("/")
+                enqueueSnackbar("Account deleted", { variant: "success" })
               })
               .catch((error) => {
                 console.error(error)

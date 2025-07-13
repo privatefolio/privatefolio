@@ -86,7 +86,7 @@ Privatefolio is a free, open-source cryptocurrency portfolio manager built as a 
   - **Description & Key Tech:** React-based UI that provides the user interface using Material-UI, Vite, and TypeScript.
   - **Core Features & Tools:**
     - Interactive portfolio visualization with lightweight-charts
-    - Command palette (kbar) and comprehensive search functionality
+    - Command palette (`kbar`) and comprehensive search functionality
     - WebWorker-based SQLite integration for client-side data processing
     - State management with nanostores for reactive updates
 
@@ -235,7 +235,7 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) and [ARCHITECTURE.md](ARCHITECTURE.md)
 
 This document explains how to use Docker to run Privatefolio.
 The Docker image uses a multi-stage build process. It builds the frontend bundle and installs backend production dependencies.
-The final image utilizes Bun to run the backend TypeScript source code directly and to serve the frontend bundle.
+The final image utilizes Bun to serve the compiled JavaScript build of the backend and the pre-built frontend bundle.
 
 ## Requirements
 
@@ -679,7 +679,7 @@ await window.electron.backend.restart();
 - Portfolio Analytics: real‑time balance charts and net worth tracking.
 - Transaction Management: list, search (by hash), and tag transactions.
 - Price History: interactive candlestick and line charts per asset.
-- Command Palette: quick search and actions via kbar.
+- Command Palette: quick search and actions via `kbar`.
 - Backup & Restore: import/export data as JSON or CSV.
 
 ## Development
@@ -799,13 +799,6 @@ yarn test:ci
 
 ### Package-specific Commands
 
-You can run package-specific tests from the root directory using Lerna:
-
-```sh
-# Run backend tests from root directory
-yarn lerna run test --scope privatefolio-backend
-yarn lerna test <test-file> --scope privatefolio-backend
-```
 
 Or navigate to the specific package directory:
 

@@ -32,6 +32,7 @@
     "@nanostores/persistent": "^0.9.1",
     "@nanostores/react": "^0.7.1",
     "@react-spring/web": "^9.7.3",
+    "@tanstack/react-query": "^5.83.0",
     "ai": "^4.3.16",
     "big.js": "^6.2.1",
     "comlink": "^4.4.1",

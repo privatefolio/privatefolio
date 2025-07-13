@@ -5,7 +5,7 @@ import { Cron } from "croner"
 import { debounce } from "lodash-es"
 
 import { getAccount } from "./api/accounts-api"
-import { Api, api } from "./api/api"
+import { Api, api as readApi } from "./api/api"
 import { BackendServer } from "./backend-server"
 import {
   EventCause,
@@ -53,7 +53,7 @@ let server: BackendServer<Api>
 async function startServer() {
   const kioskMode = await getKioskMode()
   server?.close()
-  server = new BackendServer(api, writeApi as Api, false, kioskMode, function shutdown() {
+  server = new BackendServer(readApi, writeApi as Api, false, kioskMode, function shutdown() {
     console.log("Shutting down server.")
     worker.terminate()
     if (!isDevelopment) process.exit()
@@ -238,7 +238,7 @@ await writeApi.subscribeToAccounts(
       console.log(getPrefix(accountName, true), `Tearing down side-effects.`)
       const subId = sideEffects[accountName]
       try {
-        await writeApi.unsubscribe(subId)
+        await writeApi.unsubscribe(subId, false)
 
         if (networthCronJobs[accountName]) {
           networthCronJobs[accountName].stop()
@@ -251,19 +251,21 @@ await writeApi.subscribeToAccounts(
         }
 
         if (networthIntervalSubs[accountName]) {
-          await writeApi.unsubscribe(networthIntervalSubs[accountName])
+          await writeApi.unsubscribe(networthIntervalSubs[accountName], false)
           delete networthIntervalSubs[accountName]
         }
         if (metadataIntervalSubs[accountName]) {
-          await writeApi.unsubscribe(metadataIntervalSubs[accountName])
+          await writeApi.unsubscribe(metadataIntervalSubs[accountName], false)
           delete metadataIntervalSubs[accountName]
         }
       } catch {}
+      console.log(getPrefix(accountName, true), `Tore down side-effects.`)
+      await readApi.disconnectAccount(accountName)
     }
 
     if (cause === EventCause.Reset) {
       try {
-        await api.reconnectAccount(accountName)
+        await readApi.reconnectAccount(accountName)
       } catch {}
     }
 

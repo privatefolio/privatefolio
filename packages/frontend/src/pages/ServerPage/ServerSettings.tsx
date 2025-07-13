@@ -117,7 +117,7 @@ export function ServerSettings() {
         metadataRefreshInterval,
         networthRefreshInterval,
       })
-      enqueueSnackbar("Settings saved successfully", { variant: "success" })
+      enqueueSnackbar("Settings saved", { variant: "success" })
     } catch (error) {
       console.error("Failed to save settings:", error)
       enqueueSnackbar("Failed to save settings", { variant: "error" })

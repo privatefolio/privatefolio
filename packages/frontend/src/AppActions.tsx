@@ -65,7 +65,7 @@ export const APP_ACTIONS: Record<ActionId, Action> = {
         }
         await rpc.setValue(activeAccount, "address_book", JSON.stringify(addressBook))
         $addressBook.set(addressBook)
-        enqueueSnackbar("Address book restored successfully", { variant: "success" })
+        enqueueSnackbar("Address book restored", { variant: "success" })
       } catch (err) {
         enqueueSnackbar(`Failed to restore address book: ${String(err)}`, {
           variant: "error",
