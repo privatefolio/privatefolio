@@ -183,10 +183,9 @@ export async function deleteAccount(accountName: string, keepAccount = false) {
       "This account is marked for deletion."
     )
   }
-  if (!keepAccount) {
-    delete accounts[accountName]
-    appEventEmitter.emit(SubscriptionChannel.Accounts, EventCause.Deleted, accountName)
-  }
+
+  appEventEmitter.emit(SubscriptionChannel.Accounts, EventCause.Deleted, accountName)
+  if (!keepAccount) delete accounts[accountName]
 
   try {
     await account.close()

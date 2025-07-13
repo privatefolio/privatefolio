@@ -128,7 +128,6 @@ export function AccountPickerContents(props: AccountPickerContentsProps) {
                 setResetting(false)
                 enqueueSnackbar(error.message, { variant: "error" })
               })
-            onClose()
           }
         }}
       >
