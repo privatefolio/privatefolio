@@ -4,7 +4,7 @@ import path from "path"
 import { TITLE_BAR_OPTS } from "./api"
 import * as backendManager from "./backend-manager"
 import { PaletteMode } from "./preload"
-import { getLatestLogFilepath, isProduction } from "./utils"
+import { getLatestLogFilepath, isMac, isProduction } from "./utils"
 
 export function configureIpcMain(ipcMain: Electron.IpcMain, window: BrowserWindow) {
   ipcMain.on("notify", (_, message: string) => {
@@ -29,7 +29,9 @@ export function configureIpcMain(ipcMain: Electron.IpcMain, window: BrowserWindo
 function createSetModeHandler(window: BrowserWindow) {
   return function handleSetMode(event: IpcMainEvent, mode: PaletteMode) {
     console.log("Setting theme mode", mode)
-    window.setTitleBarOverlay(TITLE_BAR_OPTS[mode])
+    try {
+      if (!isMac) window.setTitleBarOverlay(TITLE_BAR_OPTS[mode])
+    } catch {}
     event.returnValue = true
   }
 }

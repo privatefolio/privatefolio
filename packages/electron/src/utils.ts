@@ -9,6 +9,7 @@ export const appEnvironment = isProduction && !hasDevFlag ? "production" : "deve
 
 export const isWindows = process.platform === "win32"
 export const isLinux = process.platform === "linux"
+export const isMac = process.platform === "darwin"
 
 export function getLatestLogFilepath() {
   const date = new Date().toISOString().split("T")[0]
