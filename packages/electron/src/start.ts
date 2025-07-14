@@ -390,14 +390,20 @@ if (!gotTheLock) {
     console.log("Creating tray")
     tray = new Tray(appIconPath)
     tray.setToolTip("Privatefolio")
-    tray.on("double-click", () => {
-      if (mainWindow) {
+    function handleClick() {
+      if (!mainWindow) return
+
+      if (mainWindow.isMinimized()) {
+        mainWindow.restore()
+      } else if (!mainWindow.isVisible()) {
         mainWindow.show()
-        // force focus
-        setTimeout(() => mainWindow.focus(), 100)
-        updateTrayMenu(mainWindow)
       }
-    })
+
+      setTimeout(() => mainWindow.focus(), 100)
+      updateTrayMenu(mainWindow)
+    }
+    tray.on("click", handleClick)
+    tray.on("double-click", handleClick)
     if (mainWindow) {
       updateTrayMenu(mainWindow)
     }
