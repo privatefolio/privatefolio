@@ -21,7 +21,7 @@ export function parseMarginLiquidation(
 
   const changeBN = new Big(executedQty)
   const outgoing = changeBN.toFixed()
-  const outgoingAsset = `binance:${symbol}`
+  const outgoingAsset = `${platformId}:${symbol}`
   const logs: AuditLog[] = [
     {
       assetId: outgoingAsset,

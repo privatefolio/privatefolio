@@ -1336,14 +1336,14 @@
     "fee": "-0.00000716117",
     "feeAsset": "chain.arbitrum-one:0x0000000000000000000000000000000000000000:ETH",
     "metadata": {
-      "method": "Allocate ERC20 Permit",
+      "contractAddress": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
       "txHash": "0x796ad4796a857a0b7b5db7723ee52eb6dd029cf2153aa4b2cf59ffd14effa82f",
     },
     "outgoing": "10",
     "outgoingAsset": "chain.arbitrum-one:0xaf88d065e77c8cC2239327C5EDb3A432268e5831:USDC",
     "platform": "chain.arbitrum-one",
     "timestamp": 1715106660000,
-    "type": "Unknown",
+    "type": "Withdraw",
     "wallet": "0xB6e32891033D8578ebC79Dd8D202310bF6b7FEcC",
   },
   {

@@ -1,12 +1,15 @@
+import { Timestamp } from "src/interfaces"
+
 import { isServer, isWebWorker } from "../../../utils/utils"
 
 export const BASE_URL =
   isServer && !isWebWorker ? "https://api.binance.com" : "http://localhost:8080/api.binance.com"
 
-export const ninetyDays = 7_776_000_000
-export const sevenDays = 604_800_000
-export const thirtyDays = 2_592_000_000
-export const twoHundredDays = 17_280_000_000
+// TODO9
+export const _90_DAYS = 7_776_000_000
+export const _7_DAYS = 604_800_000
+export const _30_DAYS = 2_592_000_000
+export const _200_DAYS = 17_280_000_000
 
 export const BINANCE_WALLET_IDS = [
   "coinFutures",
@@ -25,3 +28,7 @@ export const BINANCE_WALLET_LABELS: Record<BinanceWalletId, string> = {
   spot: "Spot",
   usdFutures: "USD-M Futures",
 }
+
+export const binanceConnExtension = "binance-connection"
+
+export const FOUNDING_DATE: Timestamp = 1498867200000

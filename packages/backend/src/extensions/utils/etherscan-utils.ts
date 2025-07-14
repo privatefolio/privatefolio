@@ -2,9 +2,6 @@ import Big from "big.js"
 import spamTokens from "src/config/spam-tokens.json"
 import { EtherscanTransaction, Transaction } from "src/interfaces"
 
-import { trimTxId } from "../../utils/test-utils"
-import { ETHEREUM_PLATFORM_ID } from "./evm-utils"
-
 function toTitleCase(text: string): string {
   return (
     text
@@ -46,21 +43,29 @@ function validTransactionGrouping(transactions: EtherscanTransaction[]) {
   return true
 }
 
-export function sortTransactions(
+function trimTxId(id: string) {
+  const parts = id.split("_")
+
+  // Example "1682669678_0xb41d6819932845278e7c451400f1778a952b35c6358dc51b49436438753f5113_NORMAL_0"
+  const trimmedId = [parts[1], parts[2]].join("_")
+  return trimmedId
+}
+
+function sortEvmTransactions(
   a: Pick<Transaction, "timestamp" | "platformId" | "id">,
   b: Pick<Transaction, "timestamp" | "platformId" | "id">
 ) {
   const delta = b.timestamp - a.timestamp
 
-  if (delta === 0 && a.platformId === ETHEREUM_PLATFORM_ID) {
-    return trimTxId(a.id, a.platformId).localeCompare(trimTxId(b.id, b.platformId))
+  if (delta === 0) {
+    return trimTxId(a.id).localeCompare(trimTxId(b.id))
   }
 
   return delta
 }
 
 export function mergeTransactions(transactions: EtherscanTransaction[]) {
-  const sorted = transactions.sort(sortTransactions)
+  const sorted = transactions.sort(sortEvmTransactions)
 
   const merged: EtherscanTransaction[] = []
   const deduplicateMap: Record<string, EtherscanTransaction[]> = {}

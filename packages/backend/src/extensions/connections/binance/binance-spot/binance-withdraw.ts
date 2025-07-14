@@ -28,7 +28,7 @@ export function parseWithdraw(
     throw new Error(`Invalid timestamp: ${applyTime}`)
   }
 
-  const assetId = `binance:${coin}`
+  const assetId = `${platformId}:${coin}`
   const txId = `${connection.id}_${txHash}_Binance_withdraw_${index}`
   const operation: AuditLogOperation = "Withdraw"
   const type: TransactionType = "Withdraw"

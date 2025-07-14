@@ -34,9 +34,9 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
   const [, executed, executedSymbol] = executedWithSymbol.match(/([0-9.]+)([A-Za-z]+)/) || []
   const [, amount, amountSymbol] = amountWithSymbol.match(/([0-9.]+)([A-Za-z]+)/) || []
   const [, fee, feeSymbol] = feeWithSymbol.match(/([0-9.]+)([A-Za-z]+)/) || []
-  const feeAssetId = `binance:${feeSymbol}`
-  const baseAssetId = `binance:${executedSymbol}`
-  const quoteAssetId = `binance:${amountSymbol}`
+  const feeAssetId = `${platformId}:${feeSymbol}`
+  const baseAssetId = `${platformId}:${executedSymbol}`
+  const quoteAssetId = `${platformId}:${amountSymbol}`
   //
   const txns: Transaction[] = []
   const logs: AuditLog[] = []

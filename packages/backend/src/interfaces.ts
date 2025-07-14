@@ -90,12 +90,6 @@ export type EtherscanTransaction = Transaction & {
   metadata: EtherscanMetadata
 }
 
-export type BinanceSpotTransaction = Transaction & {
-  metadata: {
-    pair: BinancePair
-  }
-}
-
 export type AuditLogOperation =
   | "Deposit"
   | "Buy"

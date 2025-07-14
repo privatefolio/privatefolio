@@ -1,4 +1,4 @@
-import { BinanceConnection, ProgressCallback } from "src/interfaces"
+import { BinanceConnection, ProgressCallback, Timestamp } from "src/interfaces"
 import { formatDate } from "src/utils/formatting-utils"
 import { noop, sleep } from "src/utils/utils"
 
@@ -13,21 +13,19 @@ import {
   getBinanceMarginTransfer,
   getBinanceSymbols,
 } from "../binance-account-api"
-import { sevenDays, thirtyDays } from "../binance-settings"
+import { _7_DAYS, _30_DAYS } from "../binance-settings"
 
 export async function syncBinanceIsolatedMargin(
   progress: ProgressCallback = noop,
   connection: BinanceConnection,
   debugMode: boolean,
-  since: string,
-  until: string,
+  since: Timestamp,
+  until: Timestamp,
   signal?: AbortSignal
 ) {
-  await progress([0, `Starting from block number ${since}`])
-  // const genesis = 1498867200000
-  // const currentTime = Date.now()
-  const genesis = since !== "0" ? parseFloat(since) : 1498867200000
-  const currentTime = parseFloat(until)
+  await progress([0, `Starting from ${formatDate(since)}`])
+  const genesis = since
+  const currentTime = until
 
   await progress([10, `Fetching symbols`])
   const symbols = connection.options?.symbols || (await getBinanceSymbols(connection))
@@ -76,22 +74,20 @@ export async function syncBinanceIsolatedMargin(
   let loans: BinanceMarginLoanRepayment[] = []
   let repayments: BinanceMarginLoanRepayment[] = []
   const promisesMargin: (() => Promise<void>)[] = []
-  for (let startTime = genesis; startTime <= currentTime; startTime += sevenDays) {
+  for (let start = genesis; start <= currentTime; start += _7_DAYS) {
     // eslint-disable-next-line no-loop-func
     promisesMargin.push(async () => {
-      const endTime = startTime + sevenDays
+      const end = start + _7_DAYS
       try {
         if (signal?.aborted) throw new Error(signal.reason)
         await progress([
           undefined,
-          `Fetching margin loans and repayments from ${formatDate(startTime)} to ${formatDate(
-            endTime
-          )}`,
+          `Fetching margin loans and repayments from ${formatDate(start)} to ${formatDate(end)}`,
         ])
         const borrow = await getBinanceMarginLoanRepayment(
           connection,
-          startTime,
-          endTime,
+          start,
+          end,
           "BORROW",
           true,
           progress,
@@ -99,8 +95,8 @@ export async function syncBinanceIsolatedMargin(
         )
         const repay = await getBinanceMarginLoanRepayment(
           connection,
-          startTime,
-          endTime,
+          start,
+          end,
           "REPAY",
           true,
           progress,
@@ -111,7 +107,7 @@ export async function syncBinanceIsolatedMargin(
       } catch (err) {
         await progress([
           undefined,
-          `Skipping ${formatDate(startTime)}-${formatDate(endTime)}. ${String(err)}`,
+          `Skipping ${formatDate(start)}-${formatDate(end)}. ${String(err)}`,
         ])
       }
     })
@@ -129,30 +125,30 @@ export async function syncBinanceIsolatedMargin(
   let transfers: BinanceMarginTransfer[] = []
   let liquidations: BinanceMarginLiquidation[] = []
   const promisesMarginTransfer: (() => Promise<void>)[] = []
-  for (let startTime = genesis; startTime <= currentTime; startTime += thirtyDays) {
+  for (let start = genesis; start <= currentTime; start += _30_DAYS) {
     // eslint-disable-next-line no-loop-func
     promisesMarginTransfer.push(async () => {
-      const endTime = startTime + thirtyDays > currentTime ? currentTime : startTime + thirtyDays
+      const end = start + _30_DAYS > currentTime ? currentTime : start + _30_DAYS
       try {
         if (signal?.aborted) throw new Error(signal.reason)
         await progress([
           undefined,
-          `Fetching margin transfers and liquidations from ${formatDate(startTime)} to ${formatDate(
-            endTime
+          `Fetching margin transfers and liquidations from ${formatDate(start)} to ${formatDate(
+            end
           )}`,
         ])
         const transfer = await getBinanceMarginTransfer(
           connection,
-          startTime,
-          endTime,
+          start,
+          end,
           true,
           progress,
           debugMode
         )
         const liquidation = await getBinanceMarginLiquidation(
           connection,
-          startTime,
-          endTime,
+          start,
+          end,
           true,
           progress,
           debugMode
@@ -162,7 +158,7 @@ export async function syncBinanceIsolatedMargin(
       } catch (err) {
         await progress([
           undefined,
-          `Skipping ${formatDate(startTime)}-${formatDate(endTime)}. ${String(err)}`,
+          `Skipping ${formatDate(start)}-${formatDate(end)}. ${String(err)}`,
         ])
       }
     })

@@ -1,4 +1,4 @@
-import { BinanceConnection, ProgressCallback } from "src/interfaces"
+import { BinanceConnection, ProgressCallback, Timestamp } from "src/interfaces"
 import { formatDate } from "src/utils/formatting-utils"
 import { noop, sleep } from "src/utils/utils"
 
@@ -9,21 +9,19 @@ import {
   getBinanceFuturesUSDSymbols,
   getBinanceFuturesUSDTrades,
 } from "../binance-account-api"
-import { sevenDays } from "../binance-settings"
+import { _7_DAYS } from "../binance-settings"
 
 export async function syncBinanceUsdFutures(
   progress: ProgressCallback = noop,
   connection: BinanceConnection,
   debugMode: boolean,
-  since: string,
-  until: string,
+  since: Timestamp,
+  until: Timestamp,
   signal?: AbortSignal
 ) {
-  await progress([0, `Starting from block number ${since}`])
-  // const genesis = 1498867200000
-  // const currentTime = Date.now()
-  const genesis = since !== "0" ? parseFloat(since) : 1498867200000
-  const currentTime = parseFloat(until)
+  const genesis = since
+  const currentTime = until
+  await progress([0, `Starting from ${formatDate(since)}`])
 
   await progress([0, `Fetching Futures symbols`])
   const symbols = connection.options?.symbols || (await getBinanceFuturesUSDSymbols(connection))
@@ -33,8 +31,8 @@ export async function syncBinanceUsdFutures(
   await progress([5, `Fetching futures USD trade history`])
   let trades: BinanceFuturesUSDTrades[] = []
   let progressCount = 0
-  for (let startTime = genesis; startTime <= currentTime; startTime += sevenDays) {
-    const endTime = startTime + sevenDays
+  for (let start = genesis; start <= currentTime; start += _7_DAYS) {
+    const end = start + _7_DAYS
     for (let i = 0; i < symbols.length; i += 10) {
       const batch = symbols.slice(i, i + 10)
 
@@ -46,14 +44,14 @@ export async function syncBinanceUsdFutures(
             await progress([
               undefined,
               `Fetching futures USD-M trade history for ${symbol.symbol}, from ${formatDate(
-                startTime
-              )} to ${formatDate(endTime)}`,
+                start
+              )} to ${formatDate(end)}`,
             ])
             const trade = await getBinanceFuturesUSDTrades(
               connection,
               symbol,
-              startTime,
-              endTime,
+              start,
+              end,
               progress,
               debugMode
             )
@@ -80,30 +78,22 @@ export async function syncBinanceUsdFutures(
   await progress([70, `Fetching futures USD-M income history`])
   let incomes: BinanceFuturesUSDIncome[] = []
   const promises: (() => Promise<void>)[] = []
-  for (let startTime = genesis; startTime <= currentTime; startTime += sevenDays) {
+  for (let start = genesis; start <= currentTime; start += _7_DAYS) {
     // eslint-disable-next-line no-loop-func
     promises.push(async () => {
-      const endTime = startTime + sevenDays > currentTime ? currentTime : startTime + sevenDays
+      const end = start + _7_DAYS > currentTime ? currentTime : start + _7_DAYS
       try {
         if (signal?.aborted) throw new Error(signal.reason)
         await progress([
           undefined,
-          `Fetching futures USD-M income history from ${formatDate(startTime)} to ${formatDate(
-            endTime
-          )}`,
+          `Fetching futures USD-M income history from ${formatDate(start)} to ${formatDate(end)}`,
         ])
-        const income = await getBinanceFuturesUSDIncome(
-          connection,
-          startTime,
-          endTime,
-          progress,
-          debugMode
-        )
+        const income = await getBinanceFuturesUSDIncome(connection, start, end, progress, debugMode)
         incomes = incomes.concat(income)
       } catch (err) {
         await progress([
           undefined,
-          `Skipping ${formatDate(startTime)}-${formatDate(endTime)}. ${String(err)}`,
+          `Skipping ${formatDate(start)}-${formatDate(end)}. ${String(err)}`,
         ])
       }
     })

@@ -4,6 +4,7 @@ import { enqueueSnackbar } from "notistack"
 import {
   BINANCE_WALLET_IDS,
   BINANCE_WALLET_LABELS,
+  binanceConnExtension,
 } from "privatefolio-backend/src/extensions/connections/binance/binance-settings"
 import React, { useState } from "react"
 import { AmountBlock } from "src/components/AmountBlock"
@@ -59,7 +60,7 @@ export function ConnectionDrawer(props: ConnectionDrawerProps) {
           <ExtensionBlock id={extensionId} />
         </div>
 
-        {extensionId === "binance-connection" ? (
+        {extensionId === binanceConnExtension ? (
           <div>
             <SectionTitle>API Key</SectionTitle>
             <Stack gap={0.5} alignItems="flex-start">
@@ -113,7 +114,7 @@ export function ConnectionDrawer(props: ConnectionDrawerProps) {
             </Typography>
           )}
         </div>
-        {extensionId === "binance-connection" && (
+        {extensionId === binanceConnExtension && (
           <>
             {(options?.sinceLimit || options?.untilLimit) && (
               <div>

@@ -12,6 +12,7 @@ import {
   countTransactions,
   getTransactions,
 } from "src/api/account/transactions-api"
+import { etherscanConnExtension } from "src/extensions/connections/etherscan/etherscan-settings"
 import { Connection, ProgressUpdate } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
 import { describe, expect, it } from "vitest"
@@ -27,7 +28,7 @@ describe("should import 0x003dc via connection", () => {
     // act
     connection = await upsertConnection(accountName, {
       address,
-      extensionId: "etherscan-connection",
+      extensionId: etherscanConnExtension,
       platformId: "chain.ethereum",
     })
     // assert

@@ -3,9 +3,11 @@ import {
   AuditLog,
   BinanceConnection,
   ParserResult,
+  ResolutionString,
   Transaction,
   TransactionType,
 } from "src/interfaces"
+import { floorTimestamp } from "src/utils/utils"
 
 import { BinanceFuturesUSDTrades } from "../binance-account-api"
 
@@ -17,7 +19,7 @@ export function parseFuturesUSDTrade(
   const { platformId } = connection
   const { baseAsset, buyer, commission, commissionAsset, id, qty, quoteQty, quoteAsset, time } = row
   const wallet = `Binance USD-M Futures`
-  const timestamp = new Date(Number(time)).getTime()
+  const timestamp = floorTimestamp(time, "1S" as ResolutionString)
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${time}`)
   }
@@ -34,10 +36,10 @@ export function parseFuturesUSDTrade(
   if (buyer) {
     incomingBN = new Big(qty)
     incoming = incomingBN.toFixed()
-    incomingAsset = `binance:${baseAsset}`
+    incomingAsset = `${platformId}:${baseAsset}`
     outgoingBN = new Big(quoteQty)
     outgoing = outgoingBN.toFixed()
-    outgoingAsset = `binance:${quoteAsset}`
+    outgoingAsset = `${platformId}:${quoteAsset}`
     logs = [
       {
         assetId: outgoingAsset,
@@ -67,10 +69,10 @@ export function parseFuturesUSDTrade(
   } else {
     incomingBN = new Big(quoteQty)
     incoming = incomingBN.toFixed()
-    incomingAsset = `binance:${quoteAsset}`
+    incomingAsset = `${platformId}:${quoteAsset}`
     outgoingBN = new Big(qty)
     outgoing = outgoingBN.toFixed()
-    outgoingAsset = `binance:${baseAsset}`
+    outgoingAsset = `${platformId}:${baseAsset}`
     logs = [
       {
         assetId: outgoingAsset,
@@ -102,7 +104,7 @@ export function parseFuturesUSDTrade(
   if (commission) {
     const feeBN = new Big(commission)
     logs.push({
-      assetId: `binance:${commissionAsset}`,
+      assetId: `${platformId}:${commissionAsset}`,
       change: `-${feeBN.toFixed()}`,
       fileImportId: importId,
       id: `${txId}_FEE`,
@@ -118,7 +120,7 @@ export function parseFuturesUSDTrade(
   const priceBN = incomingBN.div(outgoingBN)
   const tx: Transaction = {
     fee: commission === "0" ? undefined : commission,
-    feeAsset: commission === "0" ? undefined : `binance:${commissionAsset}`,
+    feeAsset: commission === "0" ? undefined : `${platformId}:${commissionAsset}`,
     fileImportId: importId,
     id: txId,
     importIndex,

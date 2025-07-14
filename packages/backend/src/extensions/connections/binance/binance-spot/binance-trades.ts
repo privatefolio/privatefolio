@@ -38,9 +38,9 @@ export function parseTrade(
 
   if (isBuyer) {
     incoming = qtyBN.toFixed()
-    incomingAsset = `binance:${baseAsset}`
+    incomingAsset = `${platformId}:${baseAsset}`
     outgoing = quoteQtyBN.toFixed()
-    outgoingAsset = `binance:${quoteAsset}`
+    outgoingAsset = `${platformId}:${quoteAsset}`
     logs = [
       {
         assetId: outgoingAsset,
@@ -69,9 +69,9 @@ export function parseTrade(
     ]
   } else {
     incoming = quoteQtyBN.toFixed()
-    incomingAsset = `binance:${quoteAsset}`
+    incomingAsset = `${platformId}:${quoteAsset}`
     outgoing = qtyBN.toFixed()
-    outgoingAsset = `binance:${baseAsset}`
+    outgoingAsset = `${platformId}:${baseAsset}`
     logs = [
       {
         assetId: outgoingAsset,
@@ -102,7 +102,7 @@ export function parseTrade(
 
   if (commission) {
     logs.push({
-      assetId: `binance:${commissionAsset}`,
+      assetId: `${platformId}:${commissionAsset}`,
       change: `-${feeBN.toFixed()}`,
       fileImportId: importId,
       id: `${txId}_FEE`,
@@ -117,7 +117,7 @@ export function parseTrade(
   const price = Big(outgoing).div(Big(incoming)).toString()
   const tx: Transaction = {
     fee: commission === "0" ? undefined : feeBN.toFixed(),
-    feeAsset: commission === "0" ? undefined : `binance:${commissionAsset}`,
+    feeAsset: commission === "0" ? undefined : `${platformId}:${commissionAsset}`,
     fileImportId: importId,
     id: txId,
     importIndex,

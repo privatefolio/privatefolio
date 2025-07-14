@@ -18,15 +18,3 @@ export function extractTransactions(
 
   return transactions
 }
-
-export function groupTransactions(
-  transactions: Transaction[],
-  _fileImportId: string,
-  _parserId: string
-): Transaction[] {
-  // if (parserId === "binance-spot-history") {
-  //   return binance.groupTransactions(transactions)
-  // }
-
-  return transactions
-}

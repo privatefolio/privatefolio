@@ -34,6 +34,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
     // .replace("Commission History", "Fee")
     .replace("Binance Convert", "Conversion")
     .replace("Withdrawal", "Withdraw")
+    .replace("Revenue", "Buy")
     .replace("Spend", "Sell") as AuditLogOperation
   if (operation.includes("Small Assets Exchange")) {
     operation = "Conversion"

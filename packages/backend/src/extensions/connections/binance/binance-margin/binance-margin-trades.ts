@@ -3,9 +3,11 @@ import {
   AuditLog,
   BinanceConnection,
   ParserResult,
+  ResolutionString,
   Transaction,
   TransactionType,
 } from "src/interfaces"
+import { floorTimestamp } from "src/utils/utils"
 
 import { BinanceMarginTrade } from "../binance-account-api"
 
@@ -27,9 +29,8 @@ export function parseMarginTrade(
     quoteAsset,
     time,
   } = row
-
   const wallet = isIsolated ? `Binance Isolated Margin` : `Binance Cross Margin`
-  const timestamp = new Date(Number(time)).getTime()
+  const timestamp = floorTimestamp(time, "1S" as ResolutionString)
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${time}`)
   }
@@ -49,9 +50,9 @@ export function parseMarginTrade(
 
   if (isBuyer) {
     incoming = qtyBN.toFixed()
-    incomingAsset = `binance:${baseAsset}`
+    incomingAsset = `${platformId}:${baseAsset}`
     outgoing = quoteQtyBN.toFixed()
-    outgoingAsset = `binance:${quoteAsset}`
+    outgoingAsset = `${platformId}:${quoteAsset}`
     logs = [
       {
         assetId: outgoingAsset,
@@ -80,9 +81,9 @@ export function parseMarginTrade(
     ]
   } else {
     incoming = quoteQtyBN.toFixed()
-    incomingAsset = `binance:${quoteAsset}`
+    incomingAsset = `${platformId}:${quoteAsset}`
     outgoing = qtyBN.toFixed()
-    outgoingAsset = `binance:${baseAsset}`
+    outgoingAsset = `${platformId}:${baseAsset}`
     logs = [
       {
         assetId: outgoingAsset,
@@ -113,7 +114,7 @@ export function parseMarginTrade(
 
   if (commission) {
     logs.push({
-      assetId: `binance:${commissionAsset}`,
+      assetId: `${platformId}:${commissionAsset}`,
       change: `-${feeBN.toFixed()}`,
       fileImportId: importId,
       id: `${txId}_FEE`,
@@ -127,7 +128,7 @@ export function parseMarginTrade(
   }
   const tx: Transaction = {
     fee: commission === "0" ? undefined : commission,
-    feeAsset: commission === "0" ? undefined : `binance:${commissionAsset}`,
+    feeAsset: commission === "0" ? undefined : `${platformId}:${commissionAsset}`,
     fileImportId: importId,
     id: txId,
     importIndex,

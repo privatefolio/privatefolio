@@ -1,4 +1,4 @@
-import { BinanceConnection, ProgressCallback } from "src/interfaces"
+import { BinanceConnection, ProgressCallback, Timestamp } from "src/interfaces"
 import { formatDate } from "src/utils/formatting-utils"
 import { isTestEnvironment } from "src/utils/utils"
 
@@ -78,7 +78,7 @@ export interface BinanceTrade {
   quoteAsset: string
   quoteQty: string
   symbol: string
-  time: number
+  time: Timestamp
 }
 export interface BinancePair {
   baseAsset: string
@@ -92,7 +92,7 @@ export interface BinanceReward {
   positionId?: string
   projectId?: string
   rewards?: string
-  time: number
+  time: Timestamp
   type?: string
 }
 
@@ -103,7 +103,7 @@ export interface BinanceMarginLoanRepayment {
   isolatedSymbol: string
   principal: string
   status: string
-  timestamp: number
+  time: Timestamp // TODO9
   txId: number
 }
 
@@ -121,7 +121,7 @@ export interface BinanceMarginTrade {
   qty: string
   quoteAsset: string
   symbol: string
-  time: number
+  time: Timestamp
 }
 
 export interface BinanceMarginTransfer {
@@ -129,7 +129,7 @@ export interface BinanceMarginTransfer {
   asset: string
   fromSymbol: string
   status: string
-  timestamp: number
+  timestamp: Timestamp // TODO9 TESTME
   toSymbol: string
   transFrom: string
   transTo: string
@@ -165,7 +165,7 @@ export interface BinanceFuturesUSDTrades {
   realizedPnl: string
   side: string
   symbol: string
-  time: number
+  time: Timestamp
 }
 
 export interface BinanceFuturesCOINTrades {
@@ -186,7 +186,7 @@ export interface BinanceFuturesCOINTrades {
   realizedPnl: string
   side: string
   symbol: string
-  time: number
+  time: Timestamp
 }
 
 export interface BinanceFuturesCOINIncome {
@@ -195,7 +195,7 @@ export interface BinanceFuturesCOINIncome {
   incomeType: string
   info: string
   symbol: string
-  time: number
+  time: Timestamp
   tradeId: string
   tranId: number
 }
@@ -206,7 +206,7 @@ export interface BinanceFuturesUSDIncome {
   incomeType: string
   info: string
   symbol: string
-  time: number
+  time: Timestamp
   tradeId: number
   tranId: string
 }
@@ -214,20 +214,26 @@ export interface BinanceFuturesUSDIncome {
 // https://binance-docs.github.io/apidocs/spot/en/#deposit-history-supporting-network-user_data
 export async function getBinanceDeposit(
   connection: BinanceConnection,
-  startTime: number,
-  endTime: number,
+  start: Timestamp,
+  end: Timestamp,
   progress: ProgressCallback,
   debugMode: boolean
 ): Promise<Array<BinanceDeposit>> {
-  const timestamp = Date.now()
-  const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
+  const params = new URLSearchParams({
+    end: String(end),
+    recvWindow: "60000",
+    start: String(start),
+    timestamp: String(Date.now()),
+  })
+
+  const query = params.toString()
   const encoder = new TextEncoder()
-  const encodedData = encoder.encode(queryString)
+  const encodedData = encoder.encode(query)
   const encodedSecret = encoder.encode(connection.apiSecret)
 
   const signature = await generateSignature(encodedData, encodedSecret)
   const endpoint = "/sapi/v1/capital/deposit/hisrec"
-  const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
+  const url = `${BASE_URL}${endpoint}?${query}&signature=${signature}`
 
   const res = await fetch(url, {
     headers: {
@@ -237,8 +243,8 @@ export async function getBinanceDeposit(
   if (debugMode) {
     await progress([
       undefined,
-      `Fetched deposit history for ${formatDate(startTime)} to ${formatDate(
-        endTime
+      `Fetched deposit history for ${formatDate(start)} to ${formatDate(
+        end
       )} - Weight used: ${res.headers.get("X-Sapi-Used-Uid-Weight-1s")}`,
     ])
   }
@@ -254,20 +260,26 @@ export async function getBinanceDeposit(
 // https://binance-docs.github.io/apidocs/spot/en/#withdraw-history-supporting-network-user_data
 export async function getBinanceWithdraw(
   connection: BinanceConnection,
-  startTime: number,
-  endTime: number,
+  start: number,
+  end: number,
   progress: ProgressCallback,
   debugMode: boolean
 ): Promise<Array<BinanceWithdrawal>> {
-  const timestamp = Date.now()
-  const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
+  const params = new URLSearchParams({
+    end: String(end),
+    recvWindow: "60000",
+    start: String(start),
+    timestamp: String(Date.now()),
+  })
+
+  const query = params.toString()
   const encoder = new TextEncoder()
-  const encodedData = encoder.encode(queryString)
+  const encodedData = encoder.encode(query)
   const encodedSecret = encoder.encode(connection.apiSecret)
   const signature = await generateSignature(encodedData, encodedSecret)
 
   const endpoint = "/sapi/v1/capital/withdraw/history"
-  const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
+  const url = `${BASE_URL}${endpoint}?${query}&signature=${signature}`
 
   const res = await fetch(url, {
     headers: {
@@ -277,8 +289,8 @@ export async function getBinanceWithdraw(
   if (debugMode) {
     await progress([
       undefined,
-      `Fetched withdrawals history for ${formatDate(startTime)} to ${formatDate(
-        endTime
+      `Fetched withdrawals history for ${formatDate(start)} to ${formatDate(
+        end
       )} - Weight used: ${res.headers.get("X-Sapi-Used-Uid-Weight-1s")}`,
     ])
   }
@@ -308,23 +320,30 @@ export async function getBinanceSymbols(
 }
 
 // https://binance-docs.github.io/apidocs/spot/en/#account-trade-list-user_data
+// https://developers.binance.com/docs/binance-spot-api-docs/rest-api/account-endpoints
 export async function getBinanceTradesForSymbol(
   connection: BinanceConnection,
   symbol: BinancePair,
   progress: ProgressCallback,
-  since: number,
-  until: number,
+  start: Timestamp,
+  end: Timestamp,
   debugMode: boolean
 ): Promise<Array<BinanceTrade>> {
-  const timestamp = Date.now()
-  const queryString = `symbol=${symbol.symbol}&timestamp=${timestamp}&recvWindow=60000`
+  const params = new URLSearchParams({
+    // endTime: String(end),
+    recvWindow: "60000",
+    // startTime: String(start),
+    symbol: symbol.symbol,
+    timestamp: String(Date.now()),
+  })
+  const query = params.toString()
   const encoder = new TextEncoder()
-  const encodedData = encoder.encode(queryString)
+  const encodedData = encoder.encode(query)
   const encodedSecret = encoder.encode(connection.apiSecret)
   const signature = await generateSignature(encodedData, encodedSecret)
 
   const endpoint = "/api/v3/myTrades"
-  const url = `${BASE_URL}${endpoint}?${queryString}&signature=${signature}`
+  const url = `${BASE_URL}${endpoint}?${query}&signature=${signature}`
 
   const res = await fetch(url, {
     headers: {
@@ -354,20 +373,20 @@ export async function getBinanceTradesForSymbol(
 
   return data
     .map((x) => ({ ...x, baseAsset: symbol.baseAsset, quoteAsset: symbol.quoteAsset }))
-    .filter((x) => x.time > since && x.time < until)
+    .filter((x) => x.time > start && x.time < end)
 }
 
 // https://binance-docs.github.io/apidocs/spot/en/#get-flexible-rewards-history-user_data
 export async function getBinanceFlexibleRewards(
   connection: BinanceConnection,
-  startTime: number,
-  endTime: number,
+  start: number,
+  end: number,
   progress: ProgressCallback,
   debugMode: boolean,
   type: string
 ): Promise<Array<BinanceReward>> {
   const timestamp = Date.now()
-  const queryString = `timestamp=${timestamp}&type=${type}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
+  const queryString = `timestamp=${timestamp}&type=${type}&start=${start}&end=${end}&recvWindow=60000`
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
   const encodedSecret = encoder.encode(connection.apiSecret)
@@ -384,8 +403,8 @@ export async function getBinanceFlexibleRewards(
   if (debugMode) {
     await progress([
       undefined,
-      `Fetched flexible rewards - ${type} from ${formatDate(startTime)} to ${formatDate(
-        endTime
+      `Fetched flexible rewards - ${type} from ${formatDate(start)} to ${formatDate(
+        end
       )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
     ])
   }
@@ -396,13 +415,13 @@ export async function getBinanceFlexibleRewards(
 // https://binance-docs.github.io/apidocs/spot/en/#get-locked-rewards-history-user_data
 export async function getBinanceLockedRewards(
   connection: BinanceConnection,
-  startTime: number,
-  endTime: number,
+  start: number,
+  end: number,
   progress: ProgressCallback,
   debugMode: boolean
 ): Promise<Array<BinanceReward>> {
   const timestamp = Date.now()
-  const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
+  const queryString = `timestamp=${timestamp}&start=${start}&end=${end}&recvWindow=60000`
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
   const encodedSecret = encoder.encode(connection.apiSecret)
@@ -419,8 +438,8 @@ export async function getBinanceLockedRewards(
   if (debugMode) {
     await progress([
       undefined,
-      `Fetched locked rewards from ${formatDate(startTime)} to ${formatDate(
-        endTime
+      `Fetched locked rewards from ${formatDate(start)} to ${formatDate(
+        end
       )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
     ])
   }
@@ -431,15 +450,15 @@ export async function getBinanceLockedRewards(
 // https://binance-docs.github.io/apidocs/spot/en/#query-borrow-repay-records-in-margin-account-user_data
 export async function getBinanceMarginLoanRepayment(
   connection: BinanceConnection,
-  startTime: number,
-  endTime: number,
+  start: number,
+  end: number,
   type: string,
   isolated: boolean,
   progress: ProgressCallback,
   debugMode: boolean
 ): Promise<Array<BinanceMarginLoanRepayment>> {
   const timestamp = Date.now()
-  const queryString = `timestamp=${timestamp}&type=${type}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
+  const queryString = `timestamp=${timestamp}&type=${type}&start=${start}&end=${end}&recvWindow=60000`
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
   const encodedSecret = encoder.encode(connection.apiSecret)
@@ -456,8 +475,8 @@ export async function getBinanceMarginLoanRepayment(
   if (debugMode) {
     await progress([
       undefined,
-      `Fetched margin loans and repayments from ${formatDate(startTime)} to ${formatDate(
-        endTime
+      `Fetched margin loans and repayments from ${formatDate(start)} to ${formatDate(
+        end
       )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
     ])
   }
@@ -519,14 +538,14 @@ export async function getBinanceMarginTrades(
 // https://binance-docs.github.io/apidocs/spot/en/#get-cross-margin-transfer-history-user_data
 export async function getBinanceMarginTransfer(
   connection: BinanceConnection,
-  startTime: number,
-  endTime: number,
+  start: number,
+  end: number,
   isolated: boolean,
   progress: ProgressCallback,
   debugMode: boolean
 ): Promise<Array<BinanceMarginTransfer>> {
   const timestamp = Date.now()
-  const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
+  const queryString = `timestamp=${timestamp}&start=${start}&end=${end}&recvWindow=60000`
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
   const encodedSecret = encoder.encode(connection.apiSecret)
@@ -543,8 +562,8 @@ export async function getBinanceMarginTransfer(
   if (debugMode) {
     await progress([
       undefined,
-      `Fetched margin transfers from ${formatDate(startTime)} to ${formatDate(
-        endTime
+      `Fetched margin transfers from ${formatDate(start)} to ${formatDate(
+        end
       )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
     ])
   }
@@ -562,14 +581,14 @@ export async function getBinanceMarginTransfer(
 // https://binance-docs.github.io/apidocs/spot/en/#get-force-liquidation-record-user_data
 export async function getBinanceMarginLiquidation(
   connection: BinanceConnection,
-  startTime: number,
-  endTime: number,
+  start: number,
+  end: number,
   isolated: boolean,
   progress: ProgressCallback,
   debugMode: boolean
 ): Promise<Array<BinanceMarginLiquidation>> {
   const timestamp = Date.now()
-  const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}&recvWindow=60000`
+  const queryString = `timestamp=${timestamp}&start=${start}&end=${end}&recvWindow=60000`
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
   const encodedSecret = encoder.encode(connection.apiSecret)
@@ -586,8 +605,8 @@ export async function getBinanceMarginLiquidation(
   if (debugMode) {
     await progress([
       undefined,
-      `Fetched margin liquidation record from ${formatDate(startTime)} to ${formatDate(
-        endTime
+      `Fetched margin liquidation record from ${formatDate(start)} to ${formatDate(
+        end
       )} - Weight used: ${res.headers.get("X-Sapi-Used-Ip-Weight-1m")}`,
     ])
   }
@@ -626,13 +645,13 @@ export async function getBinanceFuturesUSDSymbols(
 export async function getBinanceFuturesUSDTrades(
   connection: BinanceConnection,
   symbol: BinancePair,
-  startTime: number,
-  endTime: number,
+  start: number,
+  end: number,
   progress: ProgressCallback,
   debugMode: boolean
 ): Promise<Array<BinanceFuturesUSDTrades>> {
   const timestamp = Date.now()
-  const queryString = `symbol=${symbol.symbol}&timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
+  const queryString = `symbol=${symbol.symbol}&timestamp=${timestamp}&start=${start}&end=${end}`
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
   const encodedSecret = encoder.encode(connection.apiSecret)
@@ -652,8 +671,8 @@ export async function getBinanceFuturesUSDTrades(
     await progress([
       undefined,
       `Fetched futures USD-M trade history for ${symbol.symbol}, from ${formatDate(
-        startTime
-      )} to ${formatDate(endTime)} - Weight used: ${res.headers.get("X-Mbx-Used-Weight-1m")}`,
+        start
+      )} to ${formatDate(end)} - Weight used: ${res.headers.get("X-Mbx-Used-Weight-1m")}`,
     ])
   }
   // check if status is 429
@@ -694,13 +713,13 @@ export async function getBinanceFuturesCOINSymbols(
 export async function getBinanceFuturesCOINTrades(
   connection: BinanceConnection,
   symbol: BinancePair,
-  startTime: number,
-  endTime: number,
+  start: number,
+  end: number,
   progress: ProgressCallback,
   debugMode: boolean
 ): Promise<Array<BinanceFuturesCOINTrades>> {
   const timestamp = Date.now()
-  const queryString = `pair=${symbol.symbol}&timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
+  const queryString = `pair=${symbol.symbol}&timestamp=${timestamp}&start=${start}&end=${end}`
 
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
@@ -740,13 +759,13 @@ export async function getBinanceFuturesCOINTrades(
 // https://binance-docs.github.io/apidocs/delivery/en/#get-income-history-user_data
 export async function getBinanceFuturesCOINIncome(
   connection: BinanceConnection,
-  startTime: number,
-  endTime: number,
+  start: number,
+  end: number,
   progress: ProgressCallback,
   debugMode: boolean
 ): Promise<Array<BinanceFuturesCOINIncome>> {
   const timestamp = Date.now()
-  const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
+  const queryString = `timestamp=${timestamp}&start=${start}&end=${end}`
 
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
@@ -766,8 +785,8 @@ export async function getBinanceFuturesCOINIncome(
   if (debugMode) {
     await progress([
       undefined,
-      `Fetched Futures Coin-M income history from ${formatDate(startTime)} to ${formatDate(
-        endTime
+      `Fetched Futures Coin-M income history from ${formatDate(start)} to ${formatDate(
+        end
       )} - Weight used: ${res.headers.get("X-Mbx-Used-Weight-1m")}`,
     ])
   }
@@ -781,13 +800,13 @@ export async function getBinanceFuturesCOINIncome(
 // https://binance-docs.github.io/apidocs/futures/en/#get-income-history-user_data
 export async function getBinanceFuturesUSDIncome(
   connection: BinanceConnection,
-  startTime: number,
-  endTime: number,
+  start: number,
+  end: number,
   progress: ProgressCallback,
   debugMode: boolean
 ): Promise<Array<BinanceFuturesUSDIncome>> {
   const timestamp = Date.now()
-  const queryString = `timestamp=${timestamp}&startTime=${startTime}&endTime=${endTime}`
+  const queryString = `timestamp=${timestamp}&start=${start}&end=${end}`
 
   const encoder = new TextEncoder()
   const encodedData = encoder.encode(queryString)
@@ -807,8 +826,8 @@ export async function getBinanceFuturesUSDIncome(
   if (debugMode) {
     await progress([
       undefined,
-      `Fetched futures USD-M income history from ${formatDate(startTime)} to ${formatDate(
-        endTime
+      `Fetched futures USD-M income history from ${formatDate(start)} to ${formatDate(
+        end
       )} - Weight used: ${res.headers.get("X-Mbx-Used-Weight-1m")}`,
     ])
   }

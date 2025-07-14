@@ -1,5 +1,6 @@
 import Big from "big.js"
-import { AuditLog, BinanceConnection, ParserResult } from "src/interfaces"
+import { AuditLog, BinanceConnection, ParserResult, ResolutionString } from "src/interfaces"
+import { floorTimestamp } from "src/utils/utils"
 
 import { BinanceFuturesCOINIncome } from "../binance-account-api"
 import { BINANCE_WALLET_LABELS } from "../binance-settings"
@@ -13,7 +14,7 @@ export function parseFuturesCOINIncome(
   const { asset, income: amount, incomeType, time, tranId: id } = row
 
   const wallet = `Binance ${BINANCE_WALLET_LABELS.coinFutures}`
-  const timestamp = new Date(Number(time)).getTime()
+  const timestamp = floorTimestamp(time, "1S" as ResolutionString)
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${time}`)
   }
@@ -30,7 +31,7 @@ export function parseFuturesCOINIncome(
     case "TRANSFER":
       logs = [
         {
-          assetId: `binance:${asset}`,
+          assetId: `${platformId}:${asset}`,
           change: income,
           fileImportId: importId,
           id: `${txId}_TRANSFER_FUTURES`,
@@ -42,7 +43,7 @@ export function parseFuturesCOINIncome(
           wallet,
         },
         {
-          assetId: `binance:${asset}`,
+          assetId: `${platformId}:${asset}`,
           change: incomeN > 0 ? `-${income}` : income.replace("-", ""),
           fileImportId: importId,
           id: `${txId}_TRASNFER_SPOT`,
@@ -58,7 +59,7 @@ export function parseFuturesCOINIncome(
     case "WELCOME_BONUS":
       logs = [
         {
-          assetId: `binance:${asset}`,
+          assetId: `${platformId}:${asset}`,
           change: income,
           fileImportId: importId,
           id: `${txId}_WELCOME_BONUS`,
@@ -74,7 +75,7 @@ export function parseFuturesCOINIncome(
     case "FUNDING_FEE":
       logs = [
         {
-          assetId: `binance:${asset}`,
+          assetId: `${platformId}:${asset}`,
           change: income,
           fileImportId: importId,
           id: `${txId}_FUNDING_FEE`,
@@ -90,7 +91,7 @@ export function parseFuturesCOINIncome(
     case "REALIZED_PNL":
       logs = [
         {
-          assetId: `binance:${asset}`,
+          assetId: `${platformId}:${asset}`,
           change: income,
           fileImportId: importId,
           id: `${txId}_REALIZED_PNL`,
@@ -106,7 +107,7 @@ export function parseFuturesCOINIncome(
     case "COMMISSION":
       logs = [
         {
-          assetId: `binance:${asset}`,
+          assetId: `${platformId}:${asset}`,
           change: income,
           fileImportId: importId,
           id: `${txId}_COMMISSION`,
@@ -122,7 +123,7 @@ export function parseFuturesCOINIncome(
     case "INSURANCE_CLEAR":
       logs = [
         {
-          assetId: `binance:${asset}`,
+          assetId: `${platformId}:${asset}`,
           change: income,
           fileImportId: importId,
           id: `${txId}_INSURANCE_CLEAR`,
@@ -138,7 +139,7 @@ export function parseFuturesCOINIncome(
     case "API_REBATE":
       logs = [
         {
-          assetId: `binance:${asset}`,
+          assetId: `${platformId}:${asset}`,
           change: income,
           fileImportId: importId,
           id: `${txId}_API_REBATE`,
@@ -154,7 +155,7 @@ export function parseFuturesCOINIncome(
     case "DELIVERED_SETTELMENT":
       logs = [
         {
-          assetId: `binance:${asset}`,
+          assetId: `${platformId}:${asset}`,
           change: income,
           fileImportId: importId,
           id: `${txId}_DELIVERED_SETTLEMENT`,

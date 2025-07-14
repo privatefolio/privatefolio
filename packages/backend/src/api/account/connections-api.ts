@@ -1,4 +1,6 @@
 import { getAddress } from "ethers"
+import { binanceConnExtension } from "src/extensions/connections/binance/binance-settings"
+import { etherscanConnExtension } from "src/extensions/connections/etherscan/etherscan-settings"
 import { SqlParam, TaskCompletionCallback } from "src/interfaces"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { sql } from "src/utils/sql-utils"
@@ -280,9 +282,9 @@ export async function syncConnection(
     until = String(Date.now())
   }
 
-  if (connection.extensionId === "etherscan-connection") {
+  if (connection.extensionId === etherscanConnExtension) {
     result = await syncEtherscan(progress, connection as EtherscanConnection, since, until)
-  } else if (connection.extensionId === "binance-connection") {
+  } else if (connection.extensionId === binanceConnExtension) {
     result = await syncBinance(
       progress,
       connection as BinanceConnection,

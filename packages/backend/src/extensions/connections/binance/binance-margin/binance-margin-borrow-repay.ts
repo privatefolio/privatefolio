@@ -1,5 +1,6 @@
 import Big from "big.js"
-import { AuditLog, BinanceConnection, ParserResult } from "src/interfaces"
+import { AuditLog, BinanceConnection, ParserResult, ResolutionString } from "src/interfaces"
+import { floorTimestamp } from "src/utils/utils"
 
 import { BinanceMarginLoanRepayment } from "../binance-account-api"
 
@@ -9,9 +10,9 @@ export function parseLoan(
   connection: BinanceConnection
 ): ParserResult {
   const { platformId } = connection
-  const { asset, isolatedSymbol, principal, timestamp: time, txId: id } = row
+  const { asset, isolatedSymbol, principal, time, txId: id } = row
   const wallet = isolatedSymbol ? `Binance Isolated Margin` : `Binance Cross Margin`
-  const timestamp = new Date(Number(time)).getTime()
+  const timestamp = floorTimestamp(time, "1S" as ResolutionString)
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${time}`)
   }
@@ -22,7 +23,7 @@ export function parseLoan(
   const principalBN = new Big(principal)
 
   const incoming = principalBN.toFixed()
-  const incomingAsset = `binance:${asset}`
+  const incomingAsset = `${platformId}:${asset}`
   const logs: AuditLog[] = [
     {
       assetId: incomingAsset,
@@ -47,10 +48,10 @@ export function parseRepayment(
   index: number,
   connection: BinanceConnection
 ): ParserResult {
-  const { platformId: platform } = connection
-  const { amount, asset, isolatedSymbol, timestamp: time, txId: id } = row
+  const { platformId } = connection
+  const { amount, asset, isolatedSymbol, time, txId: id } = row
   const wallet = isolatedSymbol ? `Binance isolated margin` : `Binance cross margin`
-  const timestamp = new Date(Number(time)).getTime()
+  const timestamp = floorTimestamp(time, "1S" as ResolutionString)
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${time}`)
   }
@@ -60,7 +61,7 @@ export function parseRepayment(
 
   const amountBN = new Big(amount)
   const outgoing = amountBN.toFixed()
-  const outgoingAsset = `binance:${asset}`
+  const outgoingAsset = `${platformId}:${asset}`
   const logs: AuditLog[] = [
     {
       assetId: outgoingAsset,
@@ -69,7 +70,7 @@ export function parseRepayment(
       id: `${txId}_Repayment`,
       importIndex,
       operation: "Loan Repayment",
-      platformId: platform,
+      platformId,
       timestamp,
       txId,
       wallet,

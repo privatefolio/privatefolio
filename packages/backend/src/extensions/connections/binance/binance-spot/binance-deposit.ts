@@ -26,7 +26,7 @@ export function parseDeposit(
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${insertTime}`)
   }
-  const assetId = `binance:${coin}`
+  const assetId = `${platformId}:${coin}`
   const txId = `${connection.id}_${txHash}_Binance_deposit_${index}`
   const operation: AuditLogOperation = "Deposit"
   const type: TransactionType = "Deposit"

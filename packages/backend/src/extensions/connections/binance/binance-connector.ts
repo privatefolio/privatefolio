@@ -1,9 +1,13 @@
+import { extractTransactions } from "src/extensions/utils/binance-utils"
 import {
+  AuditLog,
   BinanceConnection,
   BinanceConnectionOptions,
   ProgressCallback,
   SyncResult,
+  Timestamp,
 } from "src/interfaces"
+import { formatDate } from "src/utils/formatting-utils"
 import { noop } from "src/utils/utils"
 
 import {
@@ -32,7 +36,7 @@ import { parseLoan, parseRepayment } from "./binance-margin/binance-margin-borro
 import { parseMarginTrade } from "./binance-margin/binance-margin-trades"
 import { parseMarginTransfer } from "./binance-margin/binance-margin-transfer"
 import { parseMarginLiquidation } from "./binance-margin/binance-margine-liquidation"
-import { BINANCE_WALLET_LABELS } from "./binance-settings"
+import { BINANCE_WALLET_LABELS, binanceConnExtension, FOUNDING_DATE } from "./binance-settings"
 import { parseDeposit } from "./binance-spot/binance-deposit"
 import { parseReward } from "./binance-spot/binance-rewards"
 import { syncBinanceSpot } from "./binance-spot/binance-spot-account"
@@ -55,38 +59,45 @@ const parserList = [
   parseFuturesUSDIncome,
 ]
 
+export const extensionId = binanceConnExtension
+
 export async function syncBinance(
   progress: ProgressCallback = noop,
   connection: BinanceConnection,
   debugMode: boolean,
-  since: string,
-  until: string,
+  sinceCursor: string,
+  untilCursor: string,
   signal?: AbortSignal
 ): Promise<SyncResult> {
-  if (until === undefined) {
-    until = String(Date.now())
+  let since: Timestamp, until: Timestamp
+
+  if (untilCursor === undefined) {
+    until = Date.now()
+  } else {
+    until = Number(untilCursor)
+  }
+
+  if (sinceCursor === undefined) {
+    since = FOUNDING_DATE
+  } else {
+    since = Number(sinceCursor)
   }
 
   const options = connection.options as BinanceConnectionOptions
   const { wallets, sinceLimit, untilLimit } = options
 
-  if (sinceLimit && parseFloat(since) < sinceLimit) {
-    since = String(sinceLimit)
-  }
+  if (sinceLimit && since < sinceLimit) since = sinceLimit
+  if (untilLimit && until > untilLimit) until = untilLimit
 
-  if (untilLimit && parseFloat(until) > untilLimit) {
-    until = String(untilLimit)
-  }
-
-  await progress([0, `Starting from timestamp ${since}`])
+  await progress([0, `Starting from ${formatDate(since)}`])
   if (untilLimit) {
-    await progress([0, `Stopping at timestamp ${untilLimit}`])
+    await progress([0, `Stopping at ${formatDate(untilLimit)}`])
   }
 
   const result: SyncResult = {
     assetMap: {},
     logMap: {},
-    newCursor: since,
+    newCursor: String(since),
     operationMap: {},
     rows: 0,
     txMap: {},
@@ -210,7 +221,8 @@ export async function syncBinance(
     futuresUSDIncome,
   ]
 
-  await progress([98, "Parsing all transactions"])
+  await progress([98, "Extracting all the transactions & audit logs"])
+  const allLogs: AuditLog[] = []
   for (let i = 0; i < transactionArrays.length; i++) {
     const parse = parserList[i]
     const txArray = transactionArrays[i]
@@ -221,9 +233,7 @@ export async function syncBinance(
       const rowIndex = j
 
       try {
-        const { logs, txns = [] } = parse(row, rowIndex, connection)
-
-        // if (logs.length === 0) throw new Error(JSON.stringify(row, null, 2))
+        const { logs } = parse(row, rowIndex, connection)
 
         for (const log of logs) {
           result.logMap[log.id] = log
@@ -231,16 +241,21 @@ export async function syncBinance(
           result.walletMap[log.wallet] = true
           result.operationMap[log.operation] = true
         }
-
-        for (const transaction of txns) {
-          result.txMap[transaction.id] = transaction
-        }
+        allLogs.push(...logs)
       } catch (error) {
         await progress([undefined, `Error parsing row ${rowIndex + 1}: ${String(error)}`])
       }
     }
   }
 
-  result.newCursor = String(parseFloat(until) + 1)
+  // TODO9
+  const transactions = extractTransactions(allLogs, connection.id)
+  // transactions = transactions.concat(extractTransactions(logs, _fileImportId, parserId))
+
+  for (const transaction of transactions) {
+    result.txMap[transaction.id] = transaction
+  }
+
+  result.newCursor = String(until + 1)
   return result
 }

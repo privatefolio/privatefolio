@@ -3,9 +3,11 @@ import {
   AuditLog,
   BinanceConnection,
   ParserResult,
+  ResolutionString,
   Transaction,
   TransactionType,
 } from "src/interfaces"
+import { floorTimestamp } from "src/utils/utils"
 
 import { BinanceFuturesCOINTrades } from "../binance-account-api"
 import { BINANCE_WALLET_LABELS } from "../binance-settings"
@@ -18,7 +20,7 @@ export function parseFuturesCOINTrade(
   const { platformId } = connection
   const { baseAsset, buyer, commission, commissionAsset, id, qty, baseQty, quoteAsset, time } = row
   const wallet = `Binance ${BINANCE_WALLET_LABELS.coinFutures}`
-  const timestamp = new Date(Number(time)).getTime()
+  const timestamp = floorTimestamp(time, "1S" as ResolutionString)
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${time}`)
   }
@@ -35,10 +37,10 @@ export function parseFuturesCOINTrade(
   if (buyer) {
     incomingBN = new Big(qty)
     incoming = incomingBN.toFixed()
-    incomingAsset = `binance:${baseAsset}`
+    incomingAsset = `${platformId}:${baseAsset}`
     outgoingBN = new Big(baseQty)
     outgoing = outgoingBN.toFixed()
-    outgoingAsset = `binance:${quoteAsset}`
+    outgoingAsset = `${platformId}:${quoteAsset}`
     logs = [
       {
         assetId: outgoingAsset,
@@ -68,10 +70,10 @@ export function parseFuturesCOINTrade(
   } else {
     incomingBN = new Big(baseQty)
     incoming = incomingBN.toFixed()
-    incomingAsset = `binance:${quoteAsset}`
+    incomingAsset = `${platformId}:${quoteAsset}`
     outgoingBN = new Big(qty)
     outgoing = outgoingBN.toFixed()
-    outgoingAsset = `binance:${baseAsset}`
+    outgoingAsset = `${platformId}:${baseAsset}`
     logs = [
       {
         assetId: outgoingAsset,
@@ -103,7 +105,7 @@ export function parseFuturesCOINTrade(
   if (commission) {
     const feeBN = new Big(commission)
     logs.push({
-      assetId: `binance:${commissionAsset}`,
+      assetId: `${platformId}:${commissionAsset}`,
       change: `-${feeBN.toFixed()}`,
       fileImportId: importId,
       id: `${txId}_FEE`,
@@ -119,7 +121,7 @@ export function parseFuturesCOINTrade(
   const priceBN = incomingBN.div(outgoingBN)
   const tx: Transaction = {
     fee: commission === "0" ? undefined : commission,
-    feeAsset: commission === "0" ? undefined : `binance:${commissionAsset}`,
+    feeAsset: commission === "0" ? undefined : `${platformId}:${commissionAsset}`,
     fileImportId: importId,
     id: txId,
     importIndex,

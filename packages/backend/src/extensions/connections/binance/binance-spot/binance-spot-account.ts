@@ -1,4 +1,4 @@
-import { BinanceConnection, ProgressCallback } from "src/interfaces"
+import { BinanceConnection, ProgressCallback, Timestamp } from "src/interfaces"
 import { formatDate } from "src/utils/formatting-utils"
 import { noop, sleep } from "src/utils/utils"
 
@@ -14,38 +14,36 @@ import {
   getBinanceTradesForSymbol,
   getBinanceWithdraw,
 } from "../binance-account-api"
-import { ninetyDays } from "../binance-settings"
+import { _90_DAYS } from "../binance-settings"
 
 export async function syncBinanceSpot(
   progress: ProgressCallback = noop,
   connection: BinanceConnection,
   debugMode: boolean,
-  since: string,
-  until: string,
+  since: Timestamp,
+  until: Timestamp,
   signal?: AbortSignal
 ) {
-  const genesis = since !== "0" ? parseFloat(since) : 1498867200000
-  const currentTime = parseFloat(until)
-
   await progress([0, `Fetching deposits`])
   let deposits: BinanceDeposit[] = []
+
   const promisesDeposits: (() => Promise<void>)[] = []
-  for (let startTime = genesis; startTime <= currentTime; startTime += ninetyDays) {
+  for (let start = since; start <= until; start += _90_DAYS) {
     // eslint-disable-next-line no-loop-func
     promisesDeposits.push(async () => {
-      const endTime = startTime + ninetyDays > currentTime ? currentTime : startTime + ninetyDays
+      const end = start + _90_DAYS > until ? until : start + _90_DAYS
       try {
         if (signal?.aborted) throw new Error(signal.reason)
         await progress([
           undefined,
-          `Fetching deposit history for ${formatDate(startTime)} to ${formatDate(endTime)}`,
+          `Fetching deposit history for ${formatDate(start)} to ${formatDate(end)}`,
         ])
-        const deposit = await getBinanceDeposit(connection, startTime, endTime, progress, debugMode)
+        const deposit = await getBinanceDeposit(connection, start, end, progress, debugMode)
         deposits = deposits.concat(deposit)
       } catch (err) {
         await progress([
           undefined,
-          `Skipping ${formatDate(startTime)}-${formatDate(endTime)}. ${String(err)}`,
+          `Skipping ${formatDate(start)}-${formatDate(end)}. ${String(err)}`,
         ])
       }
     })
@@ -62,28 +60,22 @@ export async function syncBinanceSpot(
   await progress([15, `Fetching withdrawals`])
   let withdrawals: BinanceWithdrawal[] = []
   const promisesWithdrawals: (() => Promise<void>)[] = []
-  for (let startTime = genesis; startTime <= currentTime; startTime += ninetyDays) {
+  for (let start = since; start <= until; start += _90_DAYS) {
     // eslint-disable-next-line no-loop-func
     promisesWithdrawals.push(async () => {
-      const endTime = startTime + ninetyDays > currentTime ? currentTime : startTime + ninetyDays
+      const end = start + _90_DAYS > until ? until : start + _90_DAYS
       try {
         if (signal?.aborted) throw new Error(signal.reason)
         await progress([
           undefined,
-          `Fetching withdrawals history for ${formatDate(startTime)} to ${formatDate(endTime)}`,
+          `Fetching withdrawals history for ${formatDate(start)} to ${formatDate(end)}`,
         ])
-        const withdraw = await getBinanceWithdraw(
-          connection,
-          startTime,
-          endTime,
-          progress,
-          debugMode
-        )
+        const withdraw = await getBinanceWithdraw(connection, start, end, progress, debugMode)
         withdrawals = withdrawals.concat(withdraw)
       } catch (err) {
         await progress([
           undefined,
-          `Skipping ${formatDate(startTime)}-${formatDate(endTime)}. ${String(err)}`,
+          `Skipping ${formatDate(start)}-${formatDate(end)}. ${String(err)}`,
         ])
       }
     })
@@ -119,13 +111,16 @@ export async function syncBinanceSpot(
       batch.map(async (symbol) => {
         try {
           if (signal?.aborted) throw new Error(signal.reason)
-          await progress([undefined, `Fetching trade history for ${symbol.symbol}`])
+          await progress([
+            undefined,
+            `Fetching trade history for ${symbol.symbol} (${formatDate(since)} - ${formatDate(until)})`,
+          ])
           const tradesForSymbol = await getBinanceTradesForSymbol(
             connection,
             symbol,
             progress,
-            genesis,
-            currentTime,
+            since,
+            until,
             debugMode
           )
           trades = trades.concat(tradesForSymbol)
@@ -149,44 +144,44 @@ export async function syncBinanceSpot(
   await progress([90, `Fetching rewards`])
   let rewards: BinanceReward[] = []
   const promisesRewards: (() => Promise<void>)[] = []
-  for (let startTime = genesis; startTime <= currentTime; startTime += ninetyDays) {
+  for (let start = since; start <= until; start += _90_DAYS) {
     // eslint-disable-next-line no-loop-func
     promisesRewards.push(async () => {
-      const endTime = startTime + ninetyDays > currentTime ? currentTime : startTime + ninetyDays
+      const end = start + _90_DAYS > until ? until : start + _90_DAYS
       try {
         if (signal?.aborted) throw new Error(signal.reason)
         await progress([
           undefined,
-          `Fetching rewards from ${formatDate(startTime)} to ${formatDate(endTime)}`,
+          `Fetching rewards from ${formatDate(start)} to ${formatDate(end)}`,
         ])
         const flexibleReward = await getBinanceFlexibleRewards(
           connection,
-          startTime,
-          endTime,
+          start,
+          end,
           progress,
           debugMode,
           "REWARDS"
         )
         const flexibleBonus = await getBinanceFlexibleRewards(
           connection,
-          startTime,
-          endTime,
+          start,
+          end,
           progress,
           debugMode,
           "BONUS"
         )
         const flexibleRealtime = await getBinanceFlexibleRewards(
           connection,
-          startTime,
-          endTime,
+          start,
+          end,
           progress,
           debugMode,
           "REALTIME"
         )
         const lockedReward = await getBinanceLockedRewards(
           connection,
-          startTime,
-          endTime,
+          start,
+          end,
           progress,
           debugMode
         )
@@ -194,7 +189,7 @@ export async function syncBinanceSpot(
       } catch (err) {
         await progress([
           undefined,
-          `Skipping ${formatDate(startTime)}-${formatDate(endTime)}. ${String(err)}`,
+          `Skipping ${formatDate(start)}-${formatDate(end)}. ${String(err)}`,
         ])
       }
     })

@@ -15,7 +15,7 @@ import {
   NormalTransaction,
   StakingWithdrawalTransaction,
 } from "./etherscan-rpc"
-import { ETHERSCAN_API_KEY_V2 } from "./etherscan-settings"
+import { ETHERSCAN_API_KEY_V2, etherscanConnExtension } from "./etherscan-settings"
 import { parseStakingWithdrawal } from "./etherscan-staking-withdrawal"
 
 const parserList = [
@@ -25,6 +25,8 @@ const parserList = [
   parseStakingWithdrawal,
   parseBlockReward,
 ]
+
+export const extensionId = etherscanConnExtension
 
 export async function syncEtherscan(
   progress: ProgressCallback = noop,
