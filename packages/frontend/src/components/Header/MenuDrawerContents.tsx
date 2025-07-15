@@ -15,6 +15,7 @@ import { useStore } from "@nanostores/react"
 import React from "react"
 import { Link } from "react-router-dom"
 import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
+import { isMac } from "src/utils/electron-utils"
 
 import { AppVerProps, PopoverToggleProps } from "../../stores/app-store"
 import { TransactionIcon } from "../icons"
@@ -101,7 +102,12 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
         })}
         justifyContent="space-between"
       >
-        <Stack gap={0.25}>
+        <Stack
+          gap={0.25}
+          sx={{
+            marginTop: isMac ? 5 : 0,
+          }}
+        >
           <Tooltip title="Visit Welcome">
             <MenuItem
               color="secondary"

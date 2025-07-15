@@ -29,7 +29,7 @@ import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { $activeAccount, $cloudAccounts, $localAccounts } from "src/stores/account-store"
 import { $cloudRpcReady, $cloudUser } from "src/stores/cloud-user-store"
 import { SerifFont } from "src/theme"
-import { isElectron, isWindows } from "src/utils/electron-utils"
+import { isLinux, isMac, isWindows } from "src/utils/electron-utils"
 import { cloudEnabled, localServerEnabled, SPRING_CONFIGS } from "src/utils/utils"
 
 export default function AccountsPage() {
@@ -128,7 +128,8 @@ export default function AccountsPage() {
                 gap={1}
                 sx={(theme) => ({
                   [theme.breakpoints.down("xxl")]: {
-                    marginRight: !isElectron ? 0 : isWindows ? 15 : 9,
+                    marginLeft: isMac ? 10 : 0,
+                    marginRight: isWindows ? 15 : isLinux ? 9 : 0,
                   },
                 })}
               >

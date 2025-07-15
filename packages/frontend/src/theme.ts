@@ -2,7 +2,7 @@ import { ExpandMoreRounded } from "@mui/icons-material"
 import { alpha, colors, CssVarsThemeOptions, Fade } from "@mui/material"
 import { blue, grey } from "@mui/material/colors"
 
-import { isElectron } from "./utils/electron-utils"
+import { isElectron, isLinux, isWindows } from "./utils/electron-utils"
 
 export const MainFont = "'IBM Plex Sans', sans-serif"
 export const SerifFont = "'Roboto Serif', serif"
@@ -120,7 +120,7 @@ export const theme: CssVarsThemeOptions = {
       sm: 600,
       xl: 1800,
       xs: 0,
-      xxl: 2200,
+      xxl: 2250,
     },
   },
   colorSchemes: {
@@ -484,10 +484,9 @@ export const theme: CssVarsThemeOptions = {
         paperAnchorRight: {
           borderBottom: "none",
           borderRight: "none",
-          borderTop: isElectron ? undefined : "none",
-          // borderBottomLeftRadius: 16,
-          borderTopLeftRadius: isElectron ? "16px !important" : 0,
-          top: isElectron ? appBarHeight : 0,
+          borderTop: isWindows || isLinux ? undefined : "none",
+          borderTopLeftRadius: isWindows || isLinux ? "16px !important" : 0,
+          top: isWindows || isLinux ? appBarHeight : 0,
         },
       },
     },

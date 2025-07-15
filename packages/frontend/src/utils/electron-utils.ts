@@ -24,6 +24,9 @@ export const setElectronMode = window.electron?.setMode
 export const openExternalLink = window.electron?.openExternalLink
 export const isElectron = Boolean(window.electron)
 export const isWindows = window.electron && window.electron.platform === "win32"
+export const isLinux = window.electron && window.electron.platform === "linux"
+export const isMac = window.electron && window.electron.platform === "darwin"
+
 export const isProductionElectron = !!window.electron?.isProduction
 
 console.log(`Electron API ${isElectron ? "available" : "not available"}`)

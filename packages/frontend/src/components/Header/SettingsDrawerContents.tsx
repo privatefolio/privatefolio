@@ -186,28 +186,6 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
           label="Telemetry"
           labelPlacement="start"
         />
-        {/* {isElectron && (
-          <MenuItem
-            onClick={() => {
-              openDevTools?.()
-            }}
-            role="listitem"
-            tabIndex={0}
-            sx={{
-              "&:hover": {
-                color: "text.primary",
-              },
-              borderRadius: 0.5,
-              color: "text.secondary",
-              display: "flex",
-              gap: 1,
-              marginX: -1,
-              paddingX: 1,
-            }}
-          >
-            <Typography variant="body2">Open Dev Tools</Typography>
-          </MenuItem>
-        )} */}
         <MenuItem
           href="https://github.com/privatefolio/privatefolio/issues/new"
           role="listitem"
