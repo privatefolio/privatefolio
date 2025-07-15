@@ -429,7 +429,6 @@ export async function syncBinance(
     walletMap: {},
   }
 
-  // TODO9
   let allLogs: AuditLog[] = []
   let rows = 0
 

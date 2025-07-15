@@ -14,7 +14,7 @@ export function parseMarginTransfer(
   const { amount, asset, transFrom, transTo, txId: id } = row
   const timestamp = floorTimestamp(row.timestamp, "1S" as ResolutionString)
   if (isNaN(timestamp)) {
-    throw new Error(`Invalid timestamp: ${row.timestamp}`) // TODO9
+    throw new Error(`Invalid timestamp: ${row.timestamp}`)
   }
   const txId = `${connection.id}_${id}_binance`
   const importId = connection.id
