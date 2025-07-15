@@ -3,6 +3,20 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.31 - 2025/07/15
+
+### 🐛 Bug Fixes
+
+- Fix window buttons in the Mac app
+- Fix copy & paste in the Mac app
+- Fix tray icon in the Mac app
+
+## v2.0.0-beta.30 - 2025/07/13
+
+### 🐛 Bug Fixes
+
+- Fix start-up issue in the Mac app
+
 ## v2.0.0-beta.29 - 2025/07/13
 
 ### 🐛 Bug Fixes
