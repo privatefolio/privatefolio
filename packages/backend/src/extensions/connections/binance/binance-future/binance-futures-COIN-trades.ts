@@ -36,10 +36,10 @@ export function parseCoinFuturesTrade(
 
   if (buyer) {
     incomingBN = new Big(qty)
-    incoming = incomingBN.toString()
+    incoming = incomingBN.toFixed()
     incomingAsset = `${platformId}:${baseAsset}`
     outgoingBN = new Big(baseQty)
-    outgoing = outgoingBN.toString()
+    outgoing = outgoingBN.toFixed()
     outgoingAsset = `${platformId}:${quoteAsset}`
     logs = [
       {
@@ -67,10 +67,10 @@ export function parseCoinFuturesTrade(
     ]
   } else {
     incomingBN = new Big(baseQty)
-    incoming = incomingBN.toString()
+    incoming = incomingBN.toFixed()
     incomingAsset = `${platformId}:${quoteAsset}`
     outgoingBN = new Big(qty)
-    outgoing = outgoingBN.toString()
+    outgoing = outgoingBN.toFixed()
     outgoingAsset = `${platformId}:${baseAsset}`
     logs = [
       {
@@ -102,7 +102,7 @@ export function parseCoinFuturesTrade(
     const feeBN = new Big(commission)
     logs.push({
       assetId: `${platformId}:${commissionAsset}`,
-      change: `-${feeBN.toString()}`,
+      change: `-${feeBN.toFixed()}`,
       fileImportId: importId,
       id: `${txId}_FEE`,
       importIndex,
@@ -127,7 +127,7 @@ export function parseCoinFuturesTrade(
     outgoing: outgoing === "0" ? undefined : outgoing,
     outgoingAsset: outgoing === "0" ? undefined : outgoingAsset,
     platformId,
-    price: priceBN.toString(),
+    price: priceBN.toFixed(),
     timestamp,
     type,
     wallet,

@@ -24,7 +24,7 @@ export function parseUsdFuturesIncome(
 
   let logs: AuditLog[] = []
   const incomeBN = new Big(amount)
-  const income = incomeBN.toString()
+  const income = incomeBN.toFixed()
   const incomeN = incomeBN.toNumber()
 
   switch (incomeType) {

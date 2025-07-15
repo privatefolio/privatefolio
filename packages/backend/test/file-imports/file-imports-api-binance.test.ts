@@ -73,7 +73,7 @@ describe("binance test imports", () => {
             "ex.binance:XLM",
           ],
           "extensionId": "binance-file-import",
-          "logs": 27,
+          "logs": 24,
           "operations": [
             "Buy",
             "Deposit",
@@ -93,7 +93,7 @@ describe("binance test imports", () => {
         "size": 1970,
       }
     `)
-    expect(auditLogsCount).toMatchInlineSnapshot(`27`)
+    expect(auditLogsCount).toMatchInlineSnapshot(`24`)
   })
 
   it.sequential("should compute balances", async () => {
@@ -104,8 +104,8 @@ describe("binance test imports", () => {
     await computeBalances(accountName, { until }, async (state) => updates.push(state))
     // assert
     expect(updates.join("\n")).toMatchInlineSnapshot(`
-      "0,Computing balances for 27 audit logs
-      0,Processing logs 1 to 27
+      "0,Computing balances for 24 audit logs
+      0,Processing logs 1 to 24
       90,Processed 24 daily balances
       96,Filling balances to reach today
       99,Setting balances cursor to Dec 27, 2017
@@ -121,7 +121,7 @@ describe("binance test imports", () => {
     // assert
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Fetching audit logs
-      2.5,Processing 27 audit logs
+      2.5,Processing 24 audit logs
       6,Found 6 asset groups (skipped 0 unlisted assets)
       9,Processed all trades for ETH
       12,Processed all trades for IOTA
@@ -156,7 +156,7 @@ describe("binance test imports", () => {
         `../__snapshots__/${snapshotDir}/balances-${i}.ts.snap`
       )
     }
-    expect(auditLogs.length).toMatchInlineSnapshot(`27`)
+    expect(auditLogs.length).toMatchInlineSnapshot(`24`)
     for (let i = 0; i < auditLogs.length; i += 100) {
       await expect(auditLogs.slice(i, i + 100).map(sanitizeAuditLog)).toMatchFileSnapshot(
         `../__snapshots__/${snapshotDir}/audit-logs-${i}.ts.snap`

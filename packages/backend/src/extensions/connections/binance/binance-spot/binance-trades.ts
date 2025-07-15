@@ -40,7 +40,7 @@ export function parseTrade(
 
   const quantityBN = new Big(qty)
   const quoteQuantityBN = new Big(quoteQty)
-  // const price = Big(outgoing).div(Big(incoming)).toString()
+  // const price = Big(outgoing).div(Big(incoming)).toFixed()
 
   let incoming: string | undefined, incomingAsset: string | undefined
   let outgoing: string | undefined, outgoingAsset: string | undefined
@@ -49,9 +49,9 @@ export function parseTrade(
   let logs: AuditLog[]
 
   if (isBuyer) {
-    incoming = quantityBN.toString()
+    incoming = quantityBN.toFixed()
     incomingAsset = `${platformId}:${baseAsset}`
-    outgoing = quoteQuantityBN.toString()
+    outgoing = quoteQuantityBN.toFixed()
     outgoingAsset = `${platformId}:${quoteAsset}`
     // txId = `${connection.id}_${hashString(`${outgoingAsset}_${incomingAsset}_${price}`)}`
     logs = [
@@ -81,9 +81,9 @@ export function parseTrade(
       },
     ]
   } else {
-    incoming = quoteQuantityBN.toString()
+    incoming = quoteQuantityBN.toFixed()
     incomingAsset = `${platformId}:${quoteAsset}`
-    outgoing = quantityBN.toString()
+    outgoing = quantityBN.toFixed()
     outgoingAsset = `${platformId}:${baseAsset}`
     // txId = `${connection.id}_${hashString(`${outgoingAsset}_${incomingAsset}_${price}`)}`
     logs = [
@@ -141,7 +141,7 @@ export function parseTrade(
   //   outgoing: outgoing === "0" ? undefined : outgoing,
   //   outgoingAsset: outgoing === "0" ? undefined : outgoingAsset,
   //   platformId,
-  //   price: priceBN.toString(),
+  //   price: priceBN.toFixed(),
   //   timestamp,
   //   type,
   //   wallet,

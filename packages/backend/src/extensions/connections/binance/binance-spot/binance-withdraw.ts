@@ -39,7 +39,7 @@ export function parseWithdraw(
   const amountBN = new Big(amount)
   const feeBN = new Big(transactionFee)
 
-  const outgoing = amountBN.plus(feeBN).toString()
+  const outgoing = amountBN.plus(feeBN).toFixed()
   const outgoingAsset = assetId
   const change = `-${outgoing}`
   const logs: AuditLog[] = [

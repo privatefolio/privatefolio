@@ -23,7 +23,7 @@ export function parseLoan(
 
   const principalBN = new Big(principal)
 
-  const incoming = principalBN.toString()
+  const incoming = principalBN.toFixed()
   const incomingAsset = `${platformId}:${asset}`
   const logs: AuditLog[] = [
     {
@@ -60,7 +60,7 @@ export function parseRepayment(
   const importIndex = index
 
   const amountBN = new Big(amount)
-  const outgoing = amountBN.toString()
+  const outgoing = amountBN.toFixed()
   const outgoingAsset = `${platformId}:${asset}`
   const logs: AuditLog[] = [
     {

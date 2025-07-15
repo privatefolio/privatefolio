@@ -38,7 +38,7 @@ export function parseReward(
     throw new Error("This should never happen.")
   }
 
-  const incoming = amountBN.toString()
+  const incoming = amountBN.toFixed()
   const incomingAsset = `${platformId}:${asset}`
   const logs: AuditLog[] = [
     {

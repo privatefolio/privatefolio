@@ -37,7 +37,7 @@ export function parseDeposit(
   const importIndex = index
 
   const amountBN = new Big(amount)
-  const incoming = amountBN.toString()
+  const incoming = amountBN.toFixed()
   const incomingAsset = assetId
 
   const change = incoming

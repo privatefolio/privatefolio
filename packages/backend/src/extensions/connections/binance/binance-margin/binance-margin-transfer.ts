@@ -21,7 +21,7 @@ export function parseMarginTransfer(
   const importIndex = index
 
   const changeBN = new Big(amount)
-  const change = changeBN.toString()
+  const change = changeBN.toFixed()
   const incomingAsset = `${platformId}:${asset}`
 
   const logs: AuditLog[] = [

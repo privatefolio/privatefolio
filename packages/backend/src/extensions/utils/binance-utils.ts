@@ -49,7 +49,11 @@ function isMergeableAuditLogGroup(logs: AuditLog[]) {
   return true
 }
 
-export function mergeAuditLogs(logs: AuditLog[], importId: string): AuditLog[] {
+export function mergeAuditLogs(logs: AuditLog[], importId: string, platformId: string): AuditLog[] {
+  if (platformId.startsWith(PlatformPrefix.Chain)) {
+    return logs
+  }
+
   const mergedLogs: AuditLog[] = []
 
   const timestampGroups = groupBy(
@@ -60,14 +64,14 @@ export function mergeAuditLogs(logs: AuditLog[], importId: string): AuditLog[] {
   for (const i in timestampGroups) {
     const group = timestampGroups[i]
 
-    if (isMergeableAuditLogGroup(group)) {
+    if (group.length > 1 && isMergeableAuditLogGroup(group)) {
       const change = group.reduce((acc, log) => acc.plus(Big(log.change)), Big(0))
       const auditLog = group[0]
 
       mergedLogs.push({
         ...auditLog,
-        change: change.toString(),
-        id: `${importId}_${hashString(`${auditLog.assetId}_${auditLog.operation}_${change.toString()}`)}`,
+        change: change.toFixed(),
+        id: `${importId}_${hashString(`${auditLog.assetId}_${auditLog.operation}_${change.toFixed()}`)}`,
       })
     } else {
       mergedLogs.push(...group)
@@ -90,7 +94,7 @@ export function extractTransactions(logs: AuditLog[], importId: string): Transac
   for (const i in timestampGroups) {
     const group = timestampGroups[i]
 
-    if (isValidTransactionGroup(group)) {
+    if (group.length > 1 && isValidTransactionGroup(group)) {
       const wallet = group[0].wallet
       const platformId = group[0].platformId
       const timestamp = group[0].timestamp

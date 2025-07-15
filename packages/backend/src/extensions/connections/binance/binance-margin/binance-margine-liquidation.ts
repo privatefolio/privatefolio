@@ -30,7 +30,7 @@ export function parseMarginLiquidation(
     changeBN = changeBN.div(priceBN)
   }
 
-  const outgoing = changeBN.toString()
+  const outgoing = changeBN.toFixed()
   let outgoingAsset = `${platformId}:${symbol}`
   if (isIsolated && pair) {
     outgoingAsset = `${platformId}:${side === "SELL" ? pair.quoteAsset : pair.baseAsset}`
