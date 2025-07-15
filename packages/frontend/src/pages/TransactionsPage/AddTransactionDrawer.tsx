@@ -13,7 +13,7 @@ import { DatePicker, TimePicker } from "@mui/x-date-pickers"
 import { useStore } from "@nanostores/react"
 import { WritableAtom } from "nanostores"
 import { enqueueSnackbar } from "notistack"
-import { BINANCE_WALLET_LABELS } from "privatefolio-backend/src/extensions/connections/binance/binance-settings"
+import { BINANCE_WALLETS } from "privatefolio-backend/src/extensions/connections/binance/binance-settings"
 import { BINANCE_PLATFORM_ID } from "privatefolio-backend/src/extensions/utils/binance-utils"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { AddressInput } from "src/components/AddressInput"
@@ -192,7 +192,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
                 value={binanceWallet}
                 onChange={(event) => setBinanceWallet(event.target.value)}
               >
-                {Object.values(BINANCE_WALLET_LABELS).map((x) => (
+                {Object.values(BINANCE_WALLETS).map((x) => (
                   <MenuItem key={x} value={x}>
                     <ListItemText primary={x} />
                   </MenuItem>

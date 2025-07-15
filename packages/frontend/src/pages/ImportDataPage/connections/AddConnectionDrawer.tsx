@@ -19,7 +19,7 @@ import { isAddress } from "ethers"
 import { WritableAtom } from "nanostores"
 import { enqueueSnackbar } from "notistack"
 import {
-  BINANCE_WALLET_LABELS,
+  BINANCE_WALLETS,
   binanceConnExtension,
   BinanceWalletId,
 } from "privatefolio-backend/src/extensions/connections/binance/binance-settings"
@@ -354,7 +354,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                       onChange={handleWalletsChange}
                     />
                   }
-                  label={BINANCE_WALLET_LABELS.spot}
+                  label={BINANCE_WALLETS.spot}
                 />
                 <FormControlLabel
                   control={
@@ -365,7 +365,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                       onChange={handleWalletsChange}
                     />
                   }
-                  label={BINANCE_WALLET_LABELS.crossMargin}
+                  label={BINANCE_WALLETS.crossMargin}
                 />
                 <FormControlLabel
                   control={
@@ -376,7 +376,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                       onChange={handleWalletsChange}
                     />
                   }
-                  label={BINANCE_WALLET_LABELS.isolatedMargin}
+                  label={BINANCE_WALLETS.isolatedMargin}
                 />
                 <FormControlLabel
                   control={
@@ -387,7 +387,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                       onChange={handleWalletsChange}
                     />
                   }
-                  label={BINANCE_WALLET_LABELS.coinFutures}
+                  label={BINANCE_WALLETS.coinFutures}
                 />
                 <FormControlLabel
                   control={
@@ -398,7 +398,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                       onChange={handleWalletsChange}
                     />
                   }
-                  label={BINANCE_WALLET_LABELS.usdFutures}
+                  label={BINANCE_WALLETS.usdFutures}
                 />
                 {walletsError ? (
                   <FormHelperText>You need to choose at least one</FormHelperText>

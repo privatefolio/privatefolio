@@ -3,7 +3,7 @@ import { useStore } from "@nanostores/react"
 import { enqueueSnackbar } from "notistack"
 import {
   BINANCE_WALLET_IDS,
-  BINANCE_WALLET_LABELS,
+  BINANCE_WALLETS,
   binanceConnExtension,
 } from "privatefolio-backend/src/extensions/connections/binance/binance-settings"
 import React, { useState } from "react"
@@ -142,7 +142,7 @@ export function ConnectionDrawer(props: ConnectionDrawerProps) {
                   {BINANCE_WALLET_IDS.filter(
                     (x) => (options as BinanceConnectionOptions).wallets[x]
                   )
-                    .map((x) => BINANCE_WALLET_LABELS[x])
+                    .map((x) => BINANCE_WALLETS[x])
                     .join(", ")}
                 </Typography>
               </div>
