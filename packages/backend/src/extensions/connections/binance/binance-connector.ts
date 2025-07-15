@@ -447,7 +447,7 @@ export async function syncBinance(
   }
   result.rows = rows
 
-  allLogs = mergeAuditLogs(allLogs, connection.id)
+  allLogs = mergeAuditLogs(allLogs, connection.id, connection.platformId)
   for (const log of allLogs) {
     result.logMap[log.id] = log
   }
