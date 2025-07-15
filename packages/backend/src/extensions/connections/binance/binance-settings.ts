@@ -21,14 +21,17 @@ export const BINANCE_WALLET_IDS = [
 
 export type BinanceWalletId = (typeof BINANCE_WALLET_IDS)[number]
 
-export const BINANCE_WALLET_LABELS: Record<BinanceWalletId, string> = {
-  coinFutures: "Coin-M Futures",
-  crossMargin: "Cross Margin",
-  isolatedMargin: "Isolated Margin",
-  spot: "Spot",
-  usdFutures: "USD-M Futures",
+export const BINANCE_WALLETS: Record<BinanceWalletId, string> = {
+  coinFutures: "Binance Coin-M Futures",
+  crossMargin: "Binance Cross Margin",
+  isolatedMargin: "Binance Isolated Margin",
+  spot: "Binance Spot",
+  usdFutures: "Binance USD-M Futures",
 }
 
 export const binanceConnExtension = "binance-connection"
 
 export const FOUNDING_DATE: Timestamp = 1498867200000
+
+export const BINANCE_REWARD_TYPES = ["REWARDS", "BONUS", "REALTIME"] as const
+export type BinanceRewardType = (typeof BINANCE_REWARD_TYPES)[number]

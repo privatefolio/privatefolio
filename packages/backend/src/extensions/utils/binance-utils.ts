@@ -7,7 +7,11 @@ import { hashString } from "../../utils/utils"
 
 export const BINANCE_PLATFORM_ID = `${PlatformPrefix.Exchange}binance`
 
-function validAuditLogGrouping(logs: AuditLog[]) {
+function isGroupableOperation(operation: string) {
+  return ["Buy", "Sell", "Fee"].includes(operation)
+}
+
+function isValidTransactionGroup(logs: AuditLog[]) {
   let hasBuy = false
   let hasSell = false
   //
@@ -18,8 +22,7 @@ function validAuditLogGrouping(logs: AuditLog[]) {
     if (log.operation === "Sell") {
       hasSell = true
     }
-    if (!["Buy", "Sell", "Fee"].includes(log.operation)) {
-      // hasInvalidOperation
+    if (!isGroupableOperation(log.operation)) {
       return false
     }
   }
@@ -27,24 +30,70 @@ function validAuditLogGrouping(logs: AuditLog[]) {
   return hasBuy && hasSell
 }
 
-/**
- * @warn This function mutates the logs param
- */
-export function extractTransactions(logs: AuditLog[], fileImportId: string): Transaction[] {
-  const transactions: Transaction[] = []
+function isMergeableAuditLogGroup(logs: AuditLog[]) {
+  let assetId: string | undefined
+  let operation: string | undefined
+  //
+  for (const log of logs) {
+    if (assetId === undefined) {
+      assetId = log.assetId
+    }
+    if (operation === undefined) {
+      operation = log.operation
+    }
+    if (assetId !== log.assetId || operation !== log.operation) {
+      return false
+    }
+  }
 
-  const timestampGroups = groupBy(logs, "timestamp")
+  return true
+}
+
+export function mergeAuditLogs(logs: AuditLog[], importId: string): AuditLog[] {
+  const mergedLogs: AuditLog[] = []
+
+  const timestampGroups = groupBy(
+    logs,
+    (x) => `${x.timestamp}_${x.assetId}_${x.operation}_${x.wallet}`
+  )
 
   for (const i in timestampGroups) {
     const group = timestampGroups[i]
 
-    if (validAuditLogGrouping(group)) {
+    if (isMergeableAuditLogGroup(group)) {
+      const change = group.reduce((acc, log) => acc.plus(Big(log.change)), Big(0))
+      const auditLog = group[0]
+
+      mergedLogs.push({
+        ...auditLog,
+        change: change.toString(),
+        id: `${importId}_${hashString(`${auditLog.assetId}_${auditLog.operation}_${change.toString()}`)}`,
+      })
+    } else {
+      mergedLogs.push(...group)
+    }
+  }
+  return mergedLogs
+}
+
+/**
+ * @warn This function mutates the logs param
+ */
+export function extractTransactions(logs: AuditLog[], importId: string): Transaction[] {
+  const transactions: Transaction[] = []
+
+  const timestampGroups = groupBy(
+    logs,
+    (x) => `${x.timestamp}_${x.wallet}_${isGroupableOperation(x.operation)}`
+  )
+
+  for (const i in timestampGroups) {
+    const group = timestampGroups[i]
+
+    if (isValidTransactionGroup(group)) {
       const wallet = group[0].wallet
       const platformId = group[0].platformId
       const timestamp = group[0].timestamp
-      //
-      const hash = hashString(`${timestamp}`)
-      const _id = `${fileImportId}_${hash}_MERGED`
       // Incoming
       const buyLogs = group.filter((log) => log.operation === "Buy")
       const incomingAsset: string | undefined = buyLogs[0]?.assetId
@@ -77,11 +126,12 @@ export function extractTransactions(logs: AuditLog[], fileImportId: string): Tra
       //
       const type = "Swap"
 
+      const txId = `${importId}_${hashString(`${incomingAsset}_${outgoingAsset}_${price}`)}`
       transactions.push({
         fee,
         feeAsset,
-        fileImportId,
-        id: _id,
+        fileImportId: importId,
+        id: txId,
         importIndex: parseInt(i),
         incoming,
         incomingAsset,
@@ -97,7 +147,7 @@ export function extractTransactions(logs: AuditLog[], fileImportId: string): Tra
 
       // update audit logs with txId
       for (const log of group) {
-        log.txId = _id
+        log.txId = txId
       }
     }
   }

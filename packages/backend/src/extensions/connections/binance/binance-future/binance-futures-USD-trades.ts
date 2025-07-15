@@ -9,10 +9,10 @@ import {
 } from "src/interfaces"
 import { floorTimestamp } from "src/utils/utils"
 
-import { BinanceFuturesUSDTrades } from "../binance-account-api"
+import { BinanceUsdFuturesTrades } from "../binance-api"
 
-export function parseFuturesUSDTrade(
-  row: BinanceFuturesUSDTrades,
+export function parseUsdFuturesTrade(
+  row: BinanceUsdFuturesTrades,
   index: number,
   connection: BinanceConnection
 ): ParserResult {
@@ -23,7 +23,7 @@ export function parseFuturesUSDTrade(
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${time}`)
   }
-  const txId = `${connection.id}_${id}_binance_${index}`
+  const txId = `${connection.id}_${id}_binance`
   const type: TransactionType = "Swap"
   const importId = connection.id
   const importIndex = index
@@ -35,10 +35,10 @@ export function parseFuturesUSDTrade(
 
   if (buyer) {
     incomingBN = new Big(qty)
-    incoming = incomingBN.toFixed()
+    incoming = incomingBN.toString()
     incomingAsset = `${platformId}:${baseAsset}`
     outgoingBN = new Big(quoteQty)
-    outgoing = outgoingBN.toFixed()
+    outgoing = outgoingBN.toString()
     outgoingAsset = `${platformId}:${quoteAsset}`
     logs = [
       {
@@ -68,10 +68,10 @@ export function parseFuturesUSDTrade(
     ]
   } else {
     incomingBN = new Big(quoteQty)
-    incoming = incomingBN.toFixed()
+    incoming = incomingBN.toString()
     incomingAsset = `${platformId}:${quoteAsset}`
     outgoingBN = new Big(qty)
-    outgoing = outgoingBN.toFixed()
+    outgoing = outgoingBN.toString()
     outgoingAsset = `${platformId}:${baseAsset}`
     logs = [
       {
@@ -105,7 +105,7 @@ export function parseFuturesUSDTrade(
     const feeBN = new Big(commission)
     logs.push({
       assetId: `${platformId}:${commissionAsset}`,
-      change: `-${feeBN.toFixed()}`,
+      change: `-${feeBN.toString()}`,
       fileImportId: importId,
       id: `${txId}_FEE`,
       importIndex,
@@ -130,7 +130,7 @@ export function parseFuturesUSDTrade(
     outgoing: outgoing === "0" ? undefined : outgoing,
     outgoingAsset: outgoing === "0" ? undefined : outgoingAsset,
     platformId,
-    price: priceBN.toFixed(),
+    price: priceBN.toString(),
     timestamp,
     type,
     wallet,

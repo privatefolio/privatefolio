@@ -2,29 +2,29 @@ import Big from "big.js"
 import { AuditLog, BinanceConnection, ParserResult, ResolutionString } from "src/interfaces"
 import { floorTimestamp } from "src/utils/utils"
 
-import { BinanceFuturesCOINIncome } from "../binance-account-api"
-import { BINANCE_WALLET_LABELS } from "../binance-settings"
+import { BinanceCoinFuturesIncome } from "../binance-api"
+import { BINANCE_WALLETS } from "../binance-settings"
 
-export function parseFuturesCOINIncome(
-  row: BinanceFuturesCOINIncome,
+export function parseCoinFuturesIncome(
+  row: BinanceCoinFuturesIncome,
   index: number,
   connection: BinanceConnection
 ): ParserResult {
   const { platformId } = connection
   const { asset, income: amount, incomeType, time, tranId: id } = row
 
-  const wallet = `Binance ${BINANCE_WALLET_LABELS.coinFutures}`
+  const wallet = `Binance ${BINANCE_WALLETS.coinFutures}`
   const timestamp = floorTimestamp(time, "1S" as ResolutionString)
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${time}`)
   }
-  const txId = `${connection.id}_${id}_binance_${index}`
+  const txId = `${connection.id}_${id}_binance`
   const importId = connection.id
   const importIndex = index
 
   let logs: AuditLog[] = []
   const incomeBN = new Big(amount)
-  const income = incomeBN.toFixed()
+  const income = incomeBN.toString()
   const incomeN = incomeBN.toNumber()
 
   switch (incomeType) {
@@ -39,7 +39,6 @@ export function parseFuturesCOINIncome(
           operation: "Transfer",
           platformId,
           timestamp,
-          txId,
           wallet,
         },
         {
@@ -51,8 +50,7 @@ export function parseFuturesCOINIncome(
           operation: "Transfer",
           platformId,
           timestamp,
-          txId,
-          wallet: "Binance Spot",
+          wallet: BINANCE_WALLETS.spot,
         },
       ]
       break
@@ -67,7 +65,6 @@ export function parseFuturesCOINIncome(
           operation: "Reward",
           platformId,
           timestamp,
-          txId,
           wallet,
         },
       ]
@@ -83,7 +80,6 @@ export function parseFuturesCOINIncome(
           operation: "Funding Fee",
           platformId,
           timestamp,
-          txId,
           wallet,
         },
       ]
@@ -99,7 +95,6 @@ export function parseFuturesCOINIncome(
           operation: "Realized Profit and Loss",
           platformId,
           timestamp,
-          txId,
           wallet,
         },
       ]
@@ -115,7 +110,6 @@ export function parseFuturesCOINIncome(
           operation: "Commission",
           platformId,
           timestamp,
-          txId,
           wallet,
         },
       ]
@@ -131,7 +125,6 @@ export function parseFuturesCOINIncome(
           operation: "Insurance Fund",
           platformId,
           timestamp,
-          txId,
           wallet,
         },
       ]
@@ -147,7 +140,6 @@ export function parseFuturesCOINIncome(
           operation: "API Rebate",
           platformId,
           timestamp,
-          txId,
           wallet,
         },
       ]
@@ -163,7 +155,6 @@ export function parseFuturesCOINIncome(
           operation: "Delivered Settelment",
           platformId,
           timestamp,
-          txId,
           wallet,
         },
       ]

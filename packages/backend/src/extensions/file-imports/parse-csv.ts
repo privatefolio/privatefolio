@@ -9,6 +9,8 @@ import {
 import { splitRows } from "src/utils/csv-utils"
 import { extractTransactions } from "src/utils/extract-utils"
 
+import { mergeAuditLogs } from "../utils/binance-utils"
+
 export function sanitizeHeader(headerRow: string) {
   return headerRow
     .replace("ï»¿", "") // mexc
@@ -35,7 +37,7 @@ export async function parseCsv(
 
   const { extensionId, platformId, parse } = parser
 
-  const logs: AuditLog[] = []
+  let logs: AuditLog[] = []
   let transactions: Transaction[] = []
   const assetMap: Record<string, boolean> = {}
   const walletMap: Record<string, boolean> = {}
@@ -72,19 +74,20 @@ export async function parseCsv(
   }
 
   await progress([50, `Extracting transactions`])
+  logs = mergeAuditLogs(logs, _fileImportId)
   transactions = transactions.concat(extractTransactions(logs, _fileImportId, parserId))
 
   const metadata: FileImport["meta"] = {
-    assetIds: Object.keys(assetMap),
+    assetIds: Object.keys(assetMap).sort(),
     extensionId,
     logs: logs.length,
-    operations: Object.keys(operationMap) as AuditLogOperation[],
+    operations: Object.keys(operationMap).sort() as AuditLogOperation[],
     parserId,
     // pairList: Array.from(pairList),
     platformId,
     rows: rows.length - 1,
     transactions: transactions.length,
-    wallets: Object.keys(walletMap),
+    wallets: Object.keys(walletMap).sort(),
   }
 
   return { logs, metadata, transactions }

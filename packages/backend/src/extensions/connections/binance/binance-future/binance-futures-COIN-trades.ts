@@ -9,22 +9,22 @@ import {
 } from "src/interfaces"
 import { floorTimestamp } from "src/utils/utils"
 
-import { BinanceFuturesCOINTrades } from "../binance-account-api"
-import { BINANCE_WALLET_LABELS } from "../binance-settings"
+import { BinanceCoinFuturesTrades } from "../binance-api"
+import { BINANCE_WALLETS } from "../binance-settings"
 
-export function parseFuturesCOINTrade(
-  row: BinanceFuturesCOINTrades,
+export function parseCoinFuturesTrade(
+  row: BinanceCoinFuturesTrades,
   index: number,
   connection: BinanceConnection
 ): ParserResult {
   const { platformId } = connection
   const { baseAsset, buyer, commission, commissionAsset, id, qty, baseQty, quoteAsset, time } = row
-  const wallet = `Binance ${BINANCE_WALLET_LABELS.coinFutures}`
+  const wallet = `Binance ${BINANCE_WALLETS.coinFutures}`
   const timestamp = floorTimestamp(time, "1S" as ResolutionString)
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${time}`)
   }
-  const txId = `${connection.id}_${id}_binance_${index}`
+  const txId = `${connection.id}_${id}_binance`
   const type: TransactionType = "Swap"
   const importId = connection.id
   const importIndex = index
@@ -36,10 +36,10 @@ export function parseFuturesCOINTrade(
 
   if (buyer) {
     incomingBN = new Big(qty)
-    incoming = incomingBN.toFixed()
+    incoming = incomingBN.toString()
     incomingAsset = `${platformId}:${baseAsset}`
     outgoingBN = new Big(baseQty)
-    outgoing = outgoingBN.toFixed()
+    outgoing = outgoingBN.toString()
     outgoingAsset = `${platformId}:${quoteAsset}`
     logs = [
       {
@@ -51,7 +51,6 @@ export function parseFuturesCOINTrade(
         operation: "Sell",
         platformId,
         timestamp,
-        txId,
         wallet,
       },
       {
@@ -63,16 +62,15 @@ export function parseFuturesCOINTrade(
         operation: "Buy",
         platformId,
         timestamp,
-        txId,
         wallet,
       },
     ]
   } else {
     incomingBN = new Big(baseQty)
-    incoming = incomingBN.toFixed()
+    incoming = incomingBN.toString()
     incomingAsset = `${platformId}:${quoteAsset}`
     outgoingBN = new Big(qty)
-    outgoing = outgoingBN.toFixed()
+    outgoing = outgoingBN.toString()
     outgoingAsset = `${platformId}:${baseAsset}`
     logs = [
       {
@@ -84,7 +82,6 @@ export function parseFuturesCOINTrade(
         operation: "Sell",
         platformId,
         timestamp,
-        txId,
         wallet,
       },
       {
@@ -96,7 +93,6 @@ export function parseFuturesCOINTrade(
         operation: "Buy",
         platformId,
         timestamp,
-        txId,
         wallet,
       },
     ]
@@ -106,7 +102,7 @@ export function parseFuturesCOINTrade(
     const feeBN = new Big(commission)
     logs.push({
       assetId: `${platformId}:${commissionAsset}`,
-      change: `-${feeBN.toFixed()}`,
+      change: `-${feeBN.toString()}`,
       fileImportId: importId,
       id: `${txId}_FEE`,
       importIndex,
@@ -131,7 +127,7 @@ export function parseFuturesCOINTrade(
     outgoing: outgoing === "0" ? undefined : outgoing,
     outgoingAsset: outgoing === "0" ? undefined : outgoingAsset,
     platformId,
-    price: priceBN.toFixed(),
+    price: priceBN.toString(),
     timestamp,
     type,
     wallet,

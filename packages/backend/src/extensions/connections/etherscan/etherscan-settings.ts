@@ -1,7 +1,8 @@
 // https://api.etherscan.io/v2/chainlist
 
-import { ETHEREUM_PLATFORM_ID } from "src/extensions/utils/evm-utils"
 import { PlatformPrefix } from "src/settings/settings"
+
+export const ETHEREUM_PLATFORM_ID = `${PlatformPrefix.Chain}ethereum`
 
 export const SUPPORTED_PLATFORMS = [
   ETHEREUM_PLATFORM_ID,

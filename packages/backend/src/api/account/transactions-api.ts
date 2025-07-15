@@ -119,6 +119,7 @@ export async function getTransactions(
       return value as Transaction
     })
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to query transactions: ${error}`)
   }
 }

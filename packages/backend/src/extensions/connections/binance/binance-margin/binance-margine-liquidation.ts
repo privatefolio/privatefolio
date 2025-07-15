@@ -1,27 +1,44 @@
 import Big from "big.js"
-import { AuditLog, BinanceConnection, ParserResult } from "src/interfaces"
+import { AuditLog, BinanceConnection, ParserResult, ResolutionString } from "src/interfaces"
+import { floorTimestamp } from "src/utils/utils"
 
-import { BinanceMarginLiquidation } from "../binance-account-api"
+import { BinanceMarginLiquidation, BinancePair } from "../binance-api"
+import { BINANCE_WALLETS } from "../binance-settings"
 
 export function parseMarginLiquidation(
   row: BinanceMarginLiquidation,
   index: number,
-  connection: BinanceConnection
+  connection: BinanceConnection,
+  pair?: BinancePair
 ): ParserResult {
   const { platformId } = connection
-  const { executedQty, isIsolated, orderId, symbol, updatedTime } = row
-  const wallet = isIsolated ? `Binance Isolated Margin` : `Binance Cross Margin`
-  const timestamp = new Date(Number(updatedTime)).getTime()
+  const { executedQty, isIsolated, orderId, symbol, time, side, avgPrice } = row
+  const wallet = isIsolated ? BINANCE_WALLETS.isolatedMargin : BINANCE_WALLETS.crossMargin
+  const timestamp = floorTimestamp(time, "1S" as ResolutionString)
   if (isNaN(timestamp)) {
-    throw new Error(`Invalid timestamp: ${updatedTime}`)
+    throw new Error(`Invalid timestamp: ${time}`)
   }
-  const txId = `${connection.id}_${orderId}_binance_${index}`
+  const txId = `${connection.id}_${orderId}_binance`
   const importId = connection.id
   const importIndex = index
 
-  const changeBN = new Big(executedQty)
-  const outgoing = changeBN.toFixed()
-  const outgoingAsset = `${platformId}:${symbol}`
+  let changeBN = new Big(executedQty)
+  const priceBN = new Big(avgPrice)
+  if (side === "SELL") {
+    changeBN = changeBN.times(priceBN)
+  } else {
+    changeBN = changeBN.div(priceBN)
+  }
+
+  const outgoing = changeBN.toString()
+  let outgoingAsset = `${platformId}:${symbol}`
+  if (isIsolated && pair) {
+    outgoingAsset = `${platformId}:${side === "SELL" ? pair.quoteAsset : pair.baseAsset}`
+  }
+
+  // TODO9
+  return { logs: [] }
+
   const logs: AuditLog[] = [
     {
       assetId: outgoingAsset,
@@ -32,7 +49,6 @@ export function parseMarginLiquidation(
       operation: "Liquidation Repayment",
       platformId,
       timestamp,
-      txId,
       wallet,
     },
   ]

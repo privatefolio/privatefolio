@@ -3,6 +3,7 @@ import { binanceConnExtension } from "src/extensions/connections/binance/binance
 import { etherscanConnExtension } from "src/extensions/connections/etherscan/etherscan-settings"
 import { SqlParam, TaskCompletionCallback } from "src/interfaces"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { formatDate } from "src/utils/formatting-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 
@@ -264,22 +265,29 @@ export async function syncConnection(
   connectionId: string,
   accountName: string,
   debugMode = false,
-  since?: string,
-  until?: string,
+  since?: number,
+  until?: number,
   signal?: AbortSignal
 ) {
   const connection = await getConnection(accountName, connectionId)
   let result: SyncResult
 
   if (since === undefined) {
-    since = (await getValue<string>(
-      accountName,
-      `connection_cursor_${connection.id}`,
-      "0"
-    )) as string
+    // cast to maintain backwards compatibility
+    since = Number(await getValue<number>(accountName, `connection_cursor_${connection.id}`, 0))
   }
   if (until === undefined) {
-    until = String(Date.now())
+    until = Date.now()
+  }
+
+  const { sinceLimit, untilLimit } = connection.options || {}
+
+  if (sinceLimit && since < sinceLimit) since = sinceLimit
+  if (untilLimit && until > untilLimit) until = untilLimit
+
+  await progress([0, `Starting from ${formatDate(since)}`])
+  if (untilLimit) {
+    await progress([0, `Stopping at ${formatDate(untilLimit)}`])
   }
 
   if (connection.extensionId === etherscanConnExtension) {
@@ -322,7 +330,7 @@ export async function syncConnection(
     wallets: Object.keys(result.walletMap),
   }
 
-  if (connection.meta && since !== "0") {
+  if (connection.meta && since !== 0) {
     connection.meta = {
       assetIds: [...new Set(connection.meta.assetIds.concat(metadata.assetIds))],
       logs: connection.meta.logs + metadata.logs,
@@ -334,6 +342,9 @@ export async function syncConnection(
   } else {
     connection.meta = metadata
   }
+  connection.meta.assetIds.sort()
+  connection.meta.operations.sort()
+  connection.meta.wallets.sort()
   connection.syncedAt = new Date().getTime()
 
   await progress([80, `Saving metadata`])

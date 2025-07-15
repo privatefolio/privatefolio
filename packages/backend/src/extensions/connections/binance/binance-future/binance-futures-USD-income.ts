@@ -2,10 +2,11 @@ import Big from "big.js"
 import { AuditLog, BinanceConnection, ParserResult, ResolutionString } from "src/interfaces"
 import { floorTimestamp } from "src/utils/utils"
 
-import { BinanceFuturesUSDIncome } from "../binance-account-api"
+import { BinanceUsdFuturesIncome } from "../binance-api"
+import { BINANCE_WALLETS } from "../binance-settings"
 
-export function parseFuturesUSDIncome(
-  row: BinanceFuturesUSDIncome,
+export function parseUsdFuturesIncome(
+  row: BinanceUsdFuturesIncome,
   index: number,
   connection: BinanceConnection
 ): ParserResult {
@@ -17,13 +18,13 @@ export function parseFuturesUSDIncome(
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${time}`)
   }
-  const txId = `${connection.id}_${id}_binance_${index}`
+  const txId = `${connection.id}_${id}_binance`
   const importId = connection.id
   const importIndex = index
 
   let logs: AuditLog[] = []
   const incomeBN = new Big(amount)
-  const income = incomeBN.toFixed()
+  const income = incomeBN.toString()
   const incomeN = incomeBN.toNumber()
 
   switch (incomeType) {
@@ -51,7 +52,7 @@ export function parseFuturesUSDIncome(
           platformId,
           timestamp,
           txId,
-          wallet: "Binance Spot",
+          wallet: BINANCE_WALLETS.spot,
         },
       ]
       break

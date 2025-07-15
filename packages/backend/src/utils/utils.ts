@@ -4,6 +4,7 @@ import {
   ChartData,
   Exchange,
   Platform,
+  ProgressCallback,
   ProgressLog,
   ResolutionString,
   Time,
@@ -11,6 +12,7 @@ import {
 } from "src/interfaces"
 
 import { isBunWorker } from "./environment-utils"
+import { formatDate } from "./formatting-utils"
 
 /**
  * Returns a hash code from a string
@@ -178,6 +180,13 @@ export function floorTimestamp(timestamp: Timestamp, timeInterval: ResolutionStr
   return timestamp - remainder
 }
 
+export function roundTimestamp(timestamp: Timestamp, timeInterval: ResolutionString) {
+  const bucketSize = getBucketSize(timeInterval) * 1000
+  const remainder = timestamp % bucketSize
+  if (remainder > bucketSize / 2) return timestamp - remainder + bucketSize
+  return timestamp - remainder
+}
+
 export function ensureValidBuckets(
   prices: ChartData[],
   timeInterval: ResolutionString
@@ -238,4 +247,115 @@ export async function paginatePriceRequest<T>(options: {
   }
 
   return { previousPage, validSince }
+}
+
+interface PaginateParams<T> {
+  /**
+   * @default 10
+   */
+  concurrency?: number
+  /**
+   * Interval between pages
+   * @default 0
+   */
+  cooldown?: number
+  fn: (start: Timestamp, end: Timestamp) => Promise<T[]>
+  progress?: ProgressCallback
+  signal?: AbortSignal
+  since: Timestamp
+  until: Timestamp
+  window: number
+}
+
+export async function paginate<T>(params: PaginateParams<T>): Promise<T[]> {
+  const { since, until, window, concurrency = 10, fn, progress = noop, signal, cooldown } = params
+
+  const pages: (() => Promise<T[]>)[] = []
+  const data: T[] = []
+
+  for (let start = since; start <= until; start += window) {
+    const end = Math.min(start + window, until)
+
+    pages.push(async () => {
+      if (signal?.aborted) throw new Error(signal.reason)
+      // await progress([undefined, `Fetching ${formatDate(start)} - ${formatDate(end)}`])
+      try {
+        const result = await fn(start, end)
+        await progress([
+          undefined,
+          `Fetched ${result.length} records from ${formatDate(start)} - ${formatDate(end)}`,
+        ])
+        return result
+      } catch (error) {
+        if (String(error).includes("429")) throw error
+        await progress([
+          undefined,
+          `Warn: skipping ${formatDate(start)} to ${formatDate(end)}. ${String(error)}`,
+        ])
+        return []
+      }
+    })
+  }
+
+  for (let i = 0; i < pages.length; i += concurrency) {
+    if (i && cooldown) await sleep(cooldown)
+
+    const page = pages.slice(i, i + concurrency)
+    const results = await Promise.all(page.map((x) => x()))
+    for (const result of results) {
+      data.push(...result)
+    }
+  }
+  await progress([undefined, `Fetched ${data.length} records`])
+
+  return data
+}
+
+interface PaginateExactParams<T> {
+  /**
+   * @default 10
+   */
+  concurrency?: number
+  /**
+   * Interval between pages
+   * @default 0
+   */
+  cooldown?: number
+  count: number
+  fn: (index: number) => Promise<T[]>
+  progress?: ProgressCallback
+  signal?: AbortSignal
+}
+
+export async function paginateExact<T>(params: PaginateExactParams<T>): Promise<T[]> {
+  const { count, concurrency = 10, fn, progress = noop, signal, cooldown } = params
+
+  const pages: (() => Promise<T[]>)[] = []
+  const data: T[] = []
+
+  for (let i = 0; i < count; i++) {
+    pages.push(async () => {
+      if (signal?.aborted) throw new Error(signal.reason)
+      try {
+        const result = await fn(i)
+        return result
+      } catch (error) {
+        if (String(error).includes("429")) throw error
+        await progress([undefined, `Warn: skipping ${i}. ${String(error)}`])
+        return []
+      }
+    })
+  }
+
+  for (let i = 0; i < pages.length; i += concurrency) {
+    if (i && cooldown) await sleep(cooldown)
+
+    const page = pages.slice(i, i + concurrency)
+    const results = await Promise.all(page.map((x) => x()))
+    for (const result of results) {
+      data.push(...result)
+    }
+  }
+
+  return data
 }

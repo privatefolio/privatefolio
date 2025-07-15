@@ -1,5 +1,5 @@
 import { ETHEREUM_PLATFORM_ID } from "src/extensions/utils/evm-utils"
-import { EtherscanConnection, ProgressCallback, SyncResult } from "src/interfaces"
+import { BlockNumber, EtherscanConnection, ProgressCallback, SyncResult } from "src/interfaces"
 import { PLATFORMS_META } from "src/settings/settings"
 import { noop } from "src/utils/utils"
 
@@ -31,8 +31,8 @@ export const extensionId = etherscanConnExtension
 export async function syncEtherscan(
   progress: ProgressCallback = noop,
   connection: EtherscanConnection,
-  since: string,
-  until: string
+  since: BlockNumber,
+  until: BlockNumber
 ) {
   const chainId = PLATFORMS_META[connection.platformId].chainId
   if (!chainId) {
@@ -130,6 +130,6 @@ export async function syncEtherscan(
     }
   }
 
-  result.newCursor = String(blockNumber + 1)
+  result.newCursor = blockNumber + 1
   return result
 }

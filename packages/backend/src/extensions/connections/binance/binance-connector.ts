@@ -1,63 +1,33 @@
-import { extractTransactions } from "src/extensions/utils/binance-utils"
+import { extractTransactions, mergeAuditLogs } from "src/extensions/utils/binance-utils"
 import {
   AuditLog,
   BinanceConnection,
-  BinanceConnectionOptions,
+  ParserResult,
   ProgressCallback,
   SyncResult,
   Timestamp,
 } from "src/interfaces"
-import { formatDate } from "src/utils/formatting-utils"
-import { noop } from "src/utils/utils"
+import { formatDate, ONE_DAY } from "src/utils/formatting-utils"
+import { noop, paginate, paginateExact } from "src/utils/utils"
 
-import {
-  BinanceDeposit,
-  BinanceFuturesCOINIncome,
-  BinanceFuturesCOINTrades,
-  BinanceFuturesUSDIncome,
-  BinanceFuturesUSDTrades,
-  BinanceMarginLiquidation,
-  BinanceMarginLoanRepayment,
-  BinanceMarginTrade,
-  BinanceMarginTransfer,
-  BinanceReward,
-  BinanceTrade,
-  BinanceWithdrawal,
-} from "./binance-account-api"
-import { syncBinanceCoinFutures } from "./binance-future/binance-futures-COIN-account"
-import { parseFuturesCOINIncome } from "./binance-future/binance-futures-COIN-income"
-import { parseFuturesCOINTrade } from "./binance-future/binance-futures-COIN-trades"
-import { syncBinanceUsdFutures } from "./binance-future/binance-futures-USD-account"
-import { parseFuturesUSDIncome } from "./binance-future/binance-futures-USD-income"
-import { parseFuturesUSDTrade } from "./binance-future/binance-futures-USD-trades"
-import { syncBinanceCrossMargin } from "./binance-margin/binance-cross-margin-account"
-import { syncBinanceIsolatedMargin } from "./binance-margin/binance-isolated-margin-account"
+import { BinanceApi } from "./binance-api"
+import { parseCoinFuturesIncome } from "./binance-future/binance-futures-COIN-income"
+import { parseCoinFuturesTrade } from "./binance-future/binance-futures-COIN-trades"
+import { parseUsdFuturesIncome } from "./binance-future/binance-futures-USD-income"
+import { parseUsdFuturesTrade } from "./binance-future/binance-futures-USD-trades"
 import { parseLoan, parseRepayment } from "./binance-margin/binance-margin-borrow-repay"
-import { parseMarginTrade } from "./binance-margin/binance-margin-trades"
 import { parseMarginTransfer } from "./binance-margin/binance-margin-transfer"
 import { parseMarginLiquidation } from "./binance-margin/binance-margine-liquidation"
-import { BINANCE_WALLET_LABELS, binanceConnExtension, FOUNDING_DATE } from "./binance-settings"
+import {
+  BINANCE_REWARD_TYPES,
+  BINANCE_WALLETS,
+  binanceConnExtension,
+  FOUNDING_DATE,
+} from "./binance-settings"
 import { parseDeposit } from "./binance-spot/binance-deposit"
 import { parseReward } from "./binance-spot/binance-rewards"
-import { syncBinanceSpot } from "./binance-spot/binance-spot-account"
 import { parseTrade } from "./binance-spot/binance-trades"
 import { parseWithdraw } from "./binance-spot/binance-withdraw"
-
-const parserList = [
-  parseDeposit,
-  parseWithdraw,
-  parseTrade,
-  parseReward,
-  parseLoan,
-  parseRepayment,
-  parseMarginTrade,
-  parseMarginTransfer,
-  parseMarginLiquidation,
-  parseFuturesCOINTrade,
-  parseFuturesCOINIncome,
-  parseFuturesUSDTrade,
-  parseFuturesUSDIncome,
-]
 
 export const extensionId = binanceConnExtension
 
@@ -65,197 +35,428 @@ export async function syncBinance(
   progress: ProgressCallback = noop,
   connection: BinanceConnection,
   debugMode: boolean,
-  sinceCursor: string,
-  untilCursor: string,
+  since: Timestamp,
+  until: Timestamp,
   signal?: AbortSignal
 ): Promise<SyncResult> {
-  let since: Timestamp, until: Timestamp
-
-  if (untilCursor === undefined) {
-    until = Date.now()
-  } else {
-    until = Number(untilCursor)
-  }
-
-  if (sinceCursor === undefined) {
+  if (since < FOUNDING_DATE) {
     since = FOUNDING_DATE
-  } else {
-    since = Number(sinceCursor)
   }
 
-  const options = connection.options as BinanceConnectionOptions
-  const { wallets, sinceLimit, untilLimit } = options
+  const { wallets } = connection.options
 
-  if (sinceLimit && since < sinceLimit) since = sinceLimit
-  if (untilLimit && until > untilLimit) until = untilLimit
+  const binanceApi = new BinanceApi(connection.apiKey, connection.apiSecret)
 
-  await progress([0, `Starting from ${formatDate(since)}`])
-  if (untilLimit) {
-    await progress([0, `Stopping at ${formatDate(untilLimit)}`])
+  let results: ParserResult[] = []
+
+  let symbols = connection.options?.symbols ?? []
+  if (symbols.length === 0) {
+    await progress([undefined, `Fetching trade pairs`])
+    symbols = await binanceApi.getPairs()
+    await progress([undefined, `Fetched ${symbols.length} symbols`])
+  }
+  if (wallets.spot) {
+    await progress([undefined, `Fetching data for ${BINANCE_WALLETS.spot}`])
+    await progress([undefined, `Fetching deposits`])
+    results = results.concat(
+      await paginate({
+        fn: (start, end) =>
+          binanceApi
+            .getDeposits(start, end)
+            .then((x) => x.map((row, index) => parseDeposit(row, index, connection))),
+        progress,
+        signal,
+        since,
+        until,
+        window: 90 * ONE_DAY,
+      })
+    )
+    await progress([undefined, `Fetching withdrawals`])
+    results = results.concat(
+      await paginate({
+        cooldown: 1_000,
+        fn: (start, end) =>
+          binanceApi
+            .getWithdrawals(start, end)
+            .then((x) => x.map((row, index) => parseWithdraw(row, index, connection))),
+        progress,
+        signal,
+        since,
+        until,
+        window: 90 * ONE_DAY,
+      })
+    )
+    await progress([undefined, `Fetching trades`])
+    results = results.concat(
+      await paginateExact({
+        cooldown: 1_000,
+        count: symbols.length,
+        fn: async (symbolIndex) => {
+          const records = await binanceApi.getTrades(symbols[symbolIndex], since, until)
+          await progress([
+            undefined,
+            `Fetched ${records.length} records from ${formatDate(since)} - ${formatDate(until)} for ${symbols[symbolIndex].symbol}`,
+          ])
+          return records.map((row, index) =>
+            parseTrade(row, index, connection, BINANCE_WALLETS.spot)
+          )
+        },
+        progress,
+        signal,
+      })
+    )
+    await progress([undefined, `Fetching rewards`])
+    for (const rewardType of BINANCE_REWARD_TYPES) {
+      results = results.concat(
+        await paginate({
+          fn: (start, end) =>
+            binanceApi
+              .getFlexibleRewards(start, end, rewardType)
+              .then((x) => x.map((row, index) => parseReward(row, index, connection))),
+          progress,
+          signal,
+          since,
+          until,
+          window: 90 * ONE_DAY,
+        })
+      )
+    }
+    await progress([undefined, `Fetching locked rewards`])
+    results = results.concat(
+      await paginate({
+        fn: (start, end) =>
+          binanceApi
+            .getLockedRewards(start, end)
+            .then((x) => x.map((row, index) => parseReward(row, index, connection))),
+        progress,
+        signal,
+        since,
+        until,
+        window: 90 * ONE_DAY,
+      })
+    )
+    await progress([undefined, `Fetched data for ${BINANCE_WALLETS.spot}`])
+  }
+  if (wallets.crossMargin) {
+    await progress([undefined, `Fetching data for ${BINANCE_WALLETS.crossMargin}`])
+    await progress([undefined, `Fetching cross margin trades`])
+    results = results.concat(
+      await paginateExact({
+        concurrency: 40,
+        cooldown: 1_000,
+        count: symbols.length,
+        fn: async (symbolIndex) => {
+          const records = await binanceApi.getMarginTrades(
+            symbols[symbolIndex],
+            false,
+            since,
+            until
+          )
+          await progress([
+            undefined,
+            `Fetched ${records.length} records from ${formatDate(since)} - ${formatDate(until)} for ${symbols[symbolIndex].symbol}`,
+          ])
+          return records.map((row, index) =>
+            parseTrade(row, index, connection, BINANCE_WALLETS.crossMargin)
+          )
+        },
+        progress,
+        signal,
+      })
+    )
+    await progress([undefined, `Fetching cross margin loans`])
+    results = results.concat(
+      await paginate({
+        fn: (start, end) =>
+          binanceApi
+            .getMarginLoansAndRepayments(start, end, "BORROW")
+            .then((x) => x.map((row, index) => parseLoan(row, index, connection))),
+        progress,
+        signal,
+        since,
+        until,
+        window: 7 * ONE_DAY,
+      })
+    )
+    await progress([undefined, `Fetching cross margin repayments`])
+    results = results.concat(
+      await paginate({
+        fn: (start, end) =>
+          binanceApi
+            .getMarginLoansAndRepayments(start, end, "REPAY")
+            .then((x) => x.map((row, index) => parseRepayment(row, index, connection))),
+        progress,
+        signal,
+        since,
+        until,
+        window: 7 * ONE_DAY,
+      })
+    )
+    await progress([undefined, `Fetching cross margin transfers`])
+    results = results.concat(
+      await paginate({
+        fn: (start, end) =>
+          binanceApi
+            .getMarginTransfers(start, end, false)
+            .then((x) => x.map((row, index) => parseMarginTransfer(row, index, connection))),
+        progress,
+        signal,
+        since,
+        until,
+        window: 360 * ONE_DAY,
+      })
+    )
+    await progress([undefined, `Fetching cross margin liquidations`])
+    results = results.concat(
+      await paginate({
+        fn: (start, end) =>
+          binanceApi
+            .getMarginLiquidation(start, end)
+            .then((x) => x.map((row, index) => parseMarginLiquidation(row, index, connection))),
+        progress,
+        signal,
+        since,
+        until,
+        window: 360 * ONE_DAY,
+      })
+    )
+    await progress([undefined, `Fetched data for ${BINANCE_WALLETS.crossMargin}`])
+  }
+  if (wallets.isolatedMargin) {
+    await progress([undefined, `Fetching data for ${BINANCE_WALLETS.isolatedMargin}`])
+    await progress([undefined, `Fetching isolated margin trades`])
+    results = results.concat(
+      await paginateExact({
+        count: symbols.length,
+        fn: async (symbolIndex) => {
+          const records = await binanceApi.getMarginTrades(symbols[symbolIndex], true, since, until)
+          await progress([
+            undefined,
+            `Fetched ${records.length} records from ${formatDate(since)} - ${formatDate(until)} for ${symbols[symbolIndex].symbol}`,
+          ])
+          return records.map((row, index) =>
+            parseTrade(row, index, connection, BINANCE_WALLETS.isolatedMargin)
+          )
+        },
+        progress,
+        signal,
+      })
+    )
+    await progress([undefined, `Fetching isolated margin loans`])
+    results = results.concat(
+      await paginateExact({
+        concurrency: 40,
+        cooldown: 1_000,
+        count: symbols.length,
+        fn: (symbolIndex) =>
+          paginate({
+            fn: async (start, end) => {
+              const records = await binanceApi.getMarginLoansAndRepayments(
+                start,
+                end,
+                "BORROW",
+                symbols[symbolIndex].symbol
+              )
+              await progress([
+                undefined,
+                `Fetched ${records.length} records from ${formatDate(start)} - ${formatDate(end)} for ${symbols[symbolIndex].symbol}`,
+              ])
+              return records.map((row, index) => parseLoan(row, index, connection))
+            },
+            signal,
+            since,
+            until,
+            window: 30 * ONE_DAY,
+          }),
+        progress,
+        signal,
+      })
+    )
+    await progress([undefined, `Fetching isolated margin repayments`])
+    results = results.concat(
+      await paginateExact({
+        concurrency: 40,
+        cooldown: 1_000,
+        count: symbols.length,
+        fn: (symbolIndex) =>
+          paginate({
+            fn: async (start, end) => {
+              const records = await binanceApi.getMarginLoansAndRepayments(
+                start,
+                end,
+                "REPAY",
+                symbols[symbolIndex].symbol
+              )
+              await progress([
+                undefined,
+                `Fetched ${records.length} records from ${formatDate(start)} - ${formatDate(end)} for ${symbols[symbolIndex].symbol}`,
+              ])
+              return records.map((row, index) => parseRepayment(row, index, connection))
+            },
+            signal,
+            since,
+            until,
+            window: 30 * ONE_DAY,
+          }),
+        progress,
+        signal,
+      })
+    )
+    await progress([undefined, `Fetching isolated margin transfers`])
+    results = results.concat(
+      await paginate({
+        fn: (start, end) =>
+          binanceApi
+            .getMarginTransfers(start, end, true)
+            .then((x) => x.map((row, index) => parseMarginTransfer(row, index, connection))),
+        progress,
+        signal,
+        since,
+        until,
+        window: 30 * ONE_DAY,
+      })
+    )
+    await progress([undefined, `Fetching isolated margin liquidations`])
+    results = results.concat(
+      await paginateExact({
+        concurrency: 40,
+        cooldown: 1_000,
+        count: symbols.length,
+        fn: async (symbolIndex) => {
+          const records = await binanceApi.getMarginLiquidation(
+            since,
+            until,
+            symbols[symbolIndex].symbol
+          )
+          await progress([
+            undefined,
+            `Fetched ${records.length} records from ${formatDate(since)} - ${formatDate(until)} for ${symbols[symbolIndex].symbol}`,
+          ])
+          return records.map((row, index) =>
+            parseMarginLiquidation(row, index, connection, symbols[symbolIndex])
+          )
+        },
+        progress,
+        signal,
+      })
+    )
+  }
+  if (wallets.coinFutures) {
+    await progress([undefined, `Fetching data from ${BINANCE_WALLETS.coinFutures} wallet`])
+    await progress([0, `Fetching Futures symbols`])
+    const symbols = await binanceApi.getCoinFuturesSymbols()
+    await progress([undefined, `Fetching COIN-M futures trades`])
+    results = results.concat(
+      await paginateExact({
+        count: symbols.length,
+        fn: async (symbolIndex) => {
+          const records = await binanceApi.getCoinFuturesTrades(symbols[symbolIndex], since, until)
+          await progress([
+            undefined,
+            `Fetched ${records.length} records from ${formatDate(since)} - ${formatDate(until)} for ${symbols[symbolIndex].symbol}`,
+          ])
+          return records.map((row, index) => parseCoinFuturesTrade(row, index, connection))
+        },
+        progress,
+        signal,
+        // cooldown: 10_000,
+        // window: 200 * ONE_DAY,
+      })
+    )
+    await progress([undefined, `Fetching COIN-M futures income`])
+    results = results.concat(
+      await paginate({
+        fn: (start, end) =>
+          binanceApi
+            .getCoinFuturesIncome(start, end)
+            .then((x) => x.map((row, index) => parseCoinFuturesIncome(row, index, connection))),
+        progress,
+        signal,
+        since,
+        until,
+        window: 200 * ONE_DAY,
+      })
+    )
+    await progress([undefined, `Fetched data from ${BINANCE_WALLETS.coinFutures} wallet`])
+  }
+
+  if (wallets.usdFutures) {
+    await progress([undefined, `Fetching data from ${BINANCE_WALLETS.usdFutures} wallet`])
+    await progress([0, `Fetching Futures symbols`])
+    const symbols = await binanceApi.getUsdFuturesPairs()
+    await progress([undefined, `Fetching USD-M futures trades`])
+    results = results.concat(
+      await paginateExact({
+        count: symbols.length,
+        fn: async (symbolIndex) => {
+          const records = await binanceApi.getUsdFuturesTrades(symbols[symbolIndex], since, until)
+          await progress([
+            undefined,
+            `Fetched ${records.length} records from ${formatDate(since)} - ${formatDate(until)} for ${symbols[symbolIndex].symbol}`,
+          ])
+          return records.map((row, index) => parseUsdFuturesTrade(row, index, connection))
+        },
+        progress,
+        signal,
+        // cooldown: 1_250,
+        // window: 7 * ONE_DAY,
+      })
+    )
+    await progress([undefined, `Fetching USD-M futures income`])
+    results = results.concat(
+      await paginate({
+        fn: (start, end) =>
+          binanceApi
+            .getUsdFuturesIncome(start, end)
+            .then((x) => x.map((row, index) => parseUsdFuturesIncome(row, index, connection))),
+        progress,
+        signal,
+        since,
+        until,
+        window: 7 * ONE_DAY,
+      })
+    )
+    await progress([undefined, `Fetched data from ${BINANCE_WALLETS.usdFutures} wallet`])
   }
 
   const result: SyncResult = {
     assetMap: {},
     logMap: {},
-    newCursor: String(since),
+    newCursor: since,
     operationMap: {},
     rows: 0,
     txMap: {},
     walletMap: {},
   }
 
-  let deposits: BinanceDeposit[] = []
-  let withdrawals: BinanceWithdrawal[] = []
-  let trades: BinanceTrade[] = []
-  let rewards: BinanceReward[] = []
-  let crossLoans: BinanceMarginLoanRepayment[] = []
-  let crossRepayments: BinanceMarginLoanRepayment[] = []
-  let crossTrades: BinanceMarginTrade[] = []
-  let crossTransfers: BinanceMarginTransfer[] = []
-  let crossLiquidations: BinanceMarginLiquidation[] = []
-  let isolatedLoans: BinanceMarginLoanRepayment[] = []
-  let isolatedRepayments: BinanceMarginLoanRepayment[] = []
-  let isolatedTrades: BinanceMarginTrade[] = []
-  let isolatedTransfers: BinanceMarginTransfer[] = []
-  let isolatedLiquidations: BinanceMarginLiquidation[] = []
-  let futuresCOINTrades: BinanceFuturesCOINTrades[] = []
-  let futuresCOINIncome: BinanceFuturesCOINIncome[] = []
-  let futuresUSDTrades: BinanceFuturesUSDTrades[] = []
-  let futuresUSDIncome: BinanceFuturesUSDIncome[] = []
+  // TODO9
+  let allLogs: AuditLog[] = []
+  let rows = 0
 
-  if (wallets.spot) {
-    await progress([undefined, `Fetching data from Binance Spot`])
-    const result = await syncBinanceSpot(progress, connection, debugMode, since, until, signal)
-    deposits = result.deposits
-    withdrawals = result.withdrawals
-    trades = result.trades
-    rewards = result.rewards
-    await progress([undefined, `Fetched data from Binance Spot`])
-  }
+  await progress([98, "Computing metadata"])
+  for (let i = 0; i < results.length; i++) {
+    const { logs, txns } = results[i]
 
-  if (wallets.crossMargin) {
-    await progress([undefined, `Fetching data from Binance Cross Margin`])
-    const result = await syncBinanceCrossMargin(
-      progress,
-      connection,
-      debugMode,
-      since,
-      until,
-      signal
-    )
-    crossLoans = result.loans
-    crossRepayments = result.repayments
-    crossTrades = result.trades
-    crossTransfers = result.transfers
-    crossLiquidations = result.liquidations
-    await progress([undefined, `Fetched data from Binance Cross Margin`])
-  }
-
-  if (wallets.isolatedMargin) {
-    await progress([undefined, `Fetching data from Binance Isolated Margin`])
-    const result = await syncBinanceIsolatedMargin(
-      progress,
-      connection,
-      debugMode,
-      since,
-      until,
-      signal
-    )
-    isolatedLoans = result.loans
-    isolatedRepayments = result.repayments
-    isolatedTrades = result.trades
-    isolatedTransfers = result.transfers
-    isolatedLiquidations = result.liquidations
-    await progress([undefined, `Fetched data from Binance Isolated Margin`])
-  }
-
-  if (wallets.coinFutures) {
-    await progress([undefined, `Fetching data from ${BINANCE_WALLET_LABELS.coinFutures} wallet`])
-    const result = await syncBinanceCoinFutures(
-      progress,
-      connection,
-      debugMode,
-      since,
-      until,
-      signal
-    )
-    futuresCOINTrades = result.trades
-    futuresCOINIncome = result.incomes
-    await progress([undefined, `Fetched data from ${BINANCE_WALLET_LABELS.coinFutures} wallet`])
-  }
-
-  if (wallets.usdFutures) {
-    await progress([undefined, `Fetching data from Binance USD-M Futures`])
-    const result = await syncBinanceUsdFutures(
-      progress,
-      connection,
-      debugMode,
-      since,
-      until,
-      signal
-    )
-    futuresUSDTrades = result.trades
-    futuresUSDIncome = result.incomes
-    await progress([undefined, `Fetched data from Binance USD-M Futures`])
-  }
-  const loans: BinanceMarginLoanRepayment[] = crossLoans.concat(isolatedLoans)
-  const repayments: BinanceMarginLoanRepayment[] = crossRepayments.concat(isolatedRepayments)
-  const marginTrades: BinanceMarginTrade[] = crossTrades.concat(isolatedTrades)
-  const marginTransfers: BinanceMarginTransfer[] = crossTransfers.concat(isolatedTransfers)
-  const marginLiquidations: BinanceMarginLiquidation[] =
-    crossLiquidations.concat(isolatedLiquidations)
-
-  const transactionArrays = [
-    deposits,
-    withdrawals,
-    trades,
-    rewards,
-    loans,
-    repayments,
-    marginTrades,
-    marginTransfers,
-    marginLiquidations,
-    futuresCOINTrades,
-    futuresCOINIncome,
-    futuresUSDTrades,
-    futuresUSDIncome,
-  ]
-
-  await progress([98, "Extracting all the transactions & audit logs"])
-  const allLogs: AuditLog[] = []
-  for (let i = 0; i < transactionArrays.length; i++) {
-    const parse = parserList[i]
-    const txArray = transactionArrays[i]
-    result.rows += txArray.length
-
-    for (let j = 0; j < txArray.length; j++) {
-      const row = txArray[j] as never
-      const rowIndex = j
-
-      try {
-        const { logs } = parse(row, rowIndex, connection)
-
-        for (const log of logs) {
-          result.logMap[log.id] = log
-          result.assetMap[log.assetId] = true
-          result.walletMap[log.wallet] = true
-          result.operationMap[log.operation] = true
-        }
-        allLogs.push(...logs)
-      } catch (error) {
-        await progress([undefined, `Error parsing row ${rowIndex + 1}: ${String(error)}`])
-      }
+    for (const log of logs) {
+      rows += 1
+      result.assetMap[log.assetId] = true
+      result.walletMap[log.wallet] = true
+      result.operationMap[log.operation] = true
+      allLogs.push(log)
     }
   }
+  result.rows = rows
 
-  // TODO9
+  allLogs = mergeAuditLogs(allLogs, connection.id)
+  for (const log of allLogs) {
+    result.logMap[log.id] = log
+  }
   const transactions = extractTransactions(allLogs, connection.id)
-  // transactions = transactions.concat(extractTransactions(logs, _fileImportId, parserId))
 
   for (const transaction of transactions) {
     result.txMap[transaction.id] = transaction
   }
 
-  result.newCursor = String(until + 1)
+  result.newCursor = until + 1
   return result
 }
