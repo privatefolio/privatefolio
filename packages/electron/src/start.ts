@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu, shell, Tray } from "electron"
+import { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, shell, Tray } from "electron"
 import Logger from "electron-log/main"
 import Store from "electron-store"
 import path from "path"
@@ -419,7 +419,11 @@ if (!gotTheLock) {
     if (getAutoUpdateEnabled()) appUpdater.startPeriodicCheck()
 
     console.log("Creating tray")
-    tray = new Tray(appIconPath)
+    const trayIcon = nativeImage.createFromPath(appIconPath)
+    if (trayIcon.isEmpty()) {
+      console.error("Failed to load tray icon from path:", appIconPath)
+    }
+    tray = new Tray(trayIcon)
     tray.setToolTip("Privatefolio")
     function handleClick() {
       if (!mainWindow) return
