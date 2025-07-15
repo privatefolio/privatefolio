@@ -13,6 +13,7 @@ import {
   getLatestLogFilepath,
   getLogsPath,
   hasDevFlag,
+  isMac,
   isProduction,
   isWindows,
 } from "./utils"
@@ -75,8 +76,38 @@ const appIconPath = isWindows
 
 console.log("App icon path", appIconPath)
 
-// Hide the "File Edit View Window Help" submenu
-Menu.setApplicationMenu(null)
+Menu.setApplicationMenu(
+  !isMac
+    ? null
+    : Menu.buildFromTemplate([
+        {
+          label: app.getName(),
+          submenu: [
+            { role: "about" },
+            { type: "separator" },
+            { role: "services" },
+            { type: "separator" },
+            { role: "hide" },
+            { role: "hideOthers" },
+            { role: "unhide" },
+            { type: "separator" },
+            { role: "quit" },
+          ],
+        },
+        {
+          label: "Edit",
+          submenu: [
+            { role: "undo" },
+            { role: "redo" },
+            { type: "separator" },
+            { role: "cut" },
+            { role: "copy" },
+            { role: "paste" },
+            { role: "selectAll" },
+          ],
+        },
+      ])
+)
 
 let isQuitting = false
 let tray: Tray | null = null
