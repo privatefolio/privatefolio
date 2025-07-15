@@ -9,7 +9,8 @@ import {
 } from "src/interfaces"
 import { asUTC } from "src/utils/formatting-utils"
 
-import { BinanceWithdrawal } from "../binance-account-api"
+import { BinanceWithdrawal } from "../binance-api"
+import { BINANCE_WALLETS } from "../binance-settings"
 
 export function parseWithdraw(
   row: BinanceWithdrawal,
@@ -19,7 +20,7 @@ export function parseWithdraw(
   const { platformId } = connection
   const { transactionFee, amount, coin, applyTime, txId: txHash } = row
 
-  const wallet = `Binance Spot`
+  const wallet = BINANCE_WALLETS.spot
   if (amount === "0") {
     return { logs: [] }
   }
@@ -28,8 +29,8 @@ export function parseWithdraw(
     throw new Error(`Invalid timestamp: ${applyTime}`)
   }
 
-  const assetId = `binance:${coin}`
-  const txId = `${connection.id}_${txHash}_Binance_withdraw_${index}`
+  const assetId = `${platformId}:${coin}`
+  const txId = `${connection.id}_${txHash}_Binance_withdraw`
   const operation: AuditLogOperation = "Withdraw"
   const type: TransactionType = "Withdraw"
   const importId = connection.id
@@ -46,7 +47,7 @@ export function parseWithdraw(
       assetId,
       change,
       fileImportId: importId,
-      id: `${txId}_TRANSFER_${index}`,
+      id: `${txId}_TRANSFER`,
       importIndex,
       operation,
       platformId,

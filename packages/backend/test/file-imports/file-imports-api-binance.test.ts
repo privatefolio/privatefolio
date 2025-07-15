@@ -65,21 +65,21 @@ describe("binance test imports", () => {
         "lastModified": 0,
         "meta": {
           "assetIds": [
+            "ex.binance:ETF",
             "ex.binance:ETH",
             "ex.binance:IOTA",
-            "ex.binance:ETF",
-            "ex.binance:XLM",
-            "ex.binance:QTUM",
             "ex.binance:MANA",
+            "ex.binance:QTUM",
+            "ex.binance:XLM",
           ],
           "extensionId": "binance-file-import",
-          "logs": 27,
+          "logs": 24,
           "operations": [
-            "Deposit",
-            "Sell",
             "Buy",
+            "Deposit",
             "Fee",
             "Reward",
+            "Sell",
           ],
           "parserId": "binance-account-statement",
           "platformId": "ex.binance",
@@ -93,19 +93,19 @@ describe("binance test imports", () => {
         "size": 1970,
       }
     `)
-    expect(auditLogsCount).toMatchInlineSnapshot(`27`)
+    expect(auditLogsCount).toMatchInlineSnapshot(`24`)
   })
 
   it.sequential("should compute balances", async () => {
     // arrange
-    const until = Date.UTC(2000, 0, 0, 0, 0, 0, 0) // 1 Jan 2000
+    const until = 0 // no gap filling
     // act
     const updates: ProgressUpdate[] = []
     await computeBalances(accountName, { until }, async (state) => updates.push(state))
     // assert
     expect(updates.join("\n")).toMatchInlineSnapshot(`
-      "0,Computing balances for 27 audit logs
-      0,Processing logs 1 to 27
+      "0,Computing balances for 24 audit logs
+      0,Processing logs 1 to 24
       90,Processed 24 daily balances
       96,Filling balances to reach today
       99,Setting balances cursor to Dec 27, 2017
@@ -121,7 +121,7 @@ describe("binance test imports", () => {
     // assert
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Fetching audit logs
-      2.5,Processing 27 audit logs
+      2.5,Processing 24 audit logs
       6,Found 6 asset groups (skipped 0 unlisted assets)
       9,Processed all trades for ETH
       12,Processed all trades for IOTA
@@ -156,13 +156,13 @@ describe("binance test imports", () => {
         `../__snapshots__/${snapshotDir}/balances-${i}.ts.snap`
       )
     }
-    expect(auditLogs.length).toMatchInlineSnapshot(`27`)
+    expect(auditLogs.length).toMatchInlineSnapshot(`24`)
     for (let i = 0; i < auditLogs.length; i += 100) {
       await expect(auditLogs.slice(i, i + 100).map(sanitizeAuditLog)).toMatchFileSnapshot(
         `../__snapshots__/${snapshotDir}/audit-logs-${i}.ts.snap`
       )
     }
-    expect(transactions.length).toMatchInlineSnapshot(`10`)
+    expect(transactions.length).toMatchInlineSnapshot(`9`)
     for (let i = 0; i < transactions.length; i += 100) {
       await expect(transactions.slice(i, i + 100).map(normalizeTransaction)).toMatchFileSnapshot(
         `../__snapshots__/${snapshotDir}/transactions-${i}.ts.snap`

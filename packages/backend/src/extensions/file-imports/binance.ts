@@ -32,8 +32,10 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
     // .replace("Launchpool Subscription/Redemption", "")
     .replace("Insurance Fund Compensation", "Insurance Fund")
     // .replace("Commission History", "Fee")
+    .replace("Isolated ", "")
     .replace("Binance Convert", "Conversion")
     .replace("Withdrawal", "Withdraw")
+    .replace("Revenue", "Buy")
     .replace("Spend", "Sell") as AuditLogOperation
   if (operation.includes("Small Assets Exchange")) {
     operation = "Conversion"
@@ -44,16 +46,28 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
   const change = new Big(columns[5])
   const remark = columns[6]
   //
-  if (remark === "Duplicate") {
+  if (remark.toLocaleLowerCase().includes("duplicate")) {
     return { logs: [] }
   }
+  // if (!["Buy", "Fee", "Sell"].includes(operation)) {
+  //   return { logs: [] }
+  // }
+  // if (account.toLowerCase().includes("isolated")) {
+  //   return { logs: [] }
+  // }
   //
-  const hash = hashString(`${index}_${csvRow}`)
-  const id = `${fileImportId}_${hash}`
-  const timestamp = asUTC(new Date(utcTime))
+  // Sometimes Transaction Buy/Sell is wrong and has to be corrected by on sign
+  if (operation === "Buy" && change.lt(0)) {
+    operation = "Sell"
+  } else if (operation === "Sell" && change.gt(0)) {
+    operation = "Buy"
+  }
+
   const assetId = `${platformId}:${coin}`
-  const wallet = `Binance ${account}`
+  const id = `${fileImportId}_${hashString(`${assetId}_${operation}_${change.toString()}`)}_${index}`
   const txId = `${id}_TX`
+  const timestamp = asUTC(new Date(utcTime))
+  const wallet = `Binance ${account}`
 
   const log: AuditLog = {
     // account,

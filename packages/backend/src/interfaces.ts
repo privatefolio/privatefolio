@@ -1,4 +1,4 @@
-import type { BinancePair } from "./extensions/connections/binance/binance-account-api"
+import type { BinancePair } from "./extensions/connections/binance/binance-api"
 import { BinanceWalletId } from "./extensions/connections/binance/binance-settings"
 import type {
   Erc20Transaction,
@@ -90,12 +90,6 @@ export type EtherscanTransaction = Transaction & {
   metadata: EtherscanMetadata
 }
 
-export type BinanceSpotTransaction = Transaction & {
-  metadata: {
-    pair: BinancePair
-  }
-}
-
 export type AuditLogOperation =
   | "Deposit"
   | "Buy"
@@ -111,8 +105,8 @@ export type AuditLogOperation =
   | "Smart Contract"
   | "Realized Profit and Loss"
   | "Reward"
-  | "Loan"
-  | "Loan Repayment"
+  | "Margin Loan"
+  | "Margin Repayment"
   | "Liquidation Repayment"
   | "API Rebate"
   | "Delivered Settelment"
@@ -492,7 +486,7 @@ export type SyncResult = {
   /**
    * blockNumber or timestamp
    */
-  newCursor: string
+  newCursor: number
   operationMap: Partial<Record<AuditLogOperation, boolean>>
   rows: number
   txMap: Record<string, Transaction>
@@ -953,3 +947,5 @@ export interface ChatConversation {
   model?: string
   startTime: number
 }
+
+export type BlockNumber = number

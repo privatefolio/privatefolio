@@ -3,138 +3,152 @@ import {
   AuditLog,
   BinanceConnection,
   ParserResult,
-  Transaction,
+  ResolutionString,
   TransactionType,
 } from "src/interfaces"
+import { floorTimestamp, hashString } from "src/utils/utils"
 
-import { BinanceTrade } from "../binance-account-api"
+import { BinanceTrade } from "../binance-api"
 
 export function parseTrade(
   row: BinanceTrade,
   index: number,
-  connection: BinanceConnection
+  connection: BinanceConnection,
+  wallet: string
 ): ParserResult {
   const { platformId } = connection
-  const { id, qty, quoteQty, commission, commissionAsset, time, isBuyer, baseAsset, quoteAsset } =
-    row
-  const wallet = `Binance Spot`
+  const {
+    id: binanceId,
+    qty,
+    commission,
+    commissionAsset,
+    time,
+    isBuyer,
+    baseAsset,
+    quoteAsset,
+    quoteQty,
+  } = row
 
-  const timestamp = new Date(Number(time)).getTime()
+  const timestamp = floorTimestamp(time, "1S" as ResolutionString)
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${time}`)
   }
-  const txId = `${connection.id}_${id}_binance_${index}`
+
   const type: TransactionType = "Swap"
   const importId = connection.id
   const importIndex = index
 
-  const feeBN = new Big(commission)
-  const qtyBN = new Big(qty)
-  const quoteQtyBN = new Big(quoteQty)
+  const quantityBN = new Big(qty)
+  const quoteQuantityBN = new Big(quoteQty)
+  // const price = Big(outgoing).div(Big(incoming)).toFixed()
 
   let incoming: string | undefined, incomingAsset: string | undefined
   let outgoing: string | undefined, outgoingAsset: string | undefined
+  let feeAsset: string | undefined
+  // let txId: string | undefined
   let logs: AuditLog[]
 
   if (isBuyer) {
-    incoming = qtyBN.toFixed()
-    incomingAsset = `binance:${baseAsset}`
-    outgoing = quoteQtyBN.toFixed()
-    outgoingAsset = `binance:${quoteAsset}`
+    incoming = quantityBN.toFixed()
+    incomingAsset = `${platformId}:${baseAsset}`
+    outgoing = quoteQuantityBN.toFixed()
+    outgoingAsset = `${platformId}:${quoteAsset}`
+    // txId = `${connection.id}_${hashString(`${outgoingAsset}_${incomingAsset}_${price}`)}`
     logs = [
       {
         assetId: outgoingAsset,
         change: `-${outgoing}`,
         fileImportId: importId,
-        id: `${txId}_SELL`,
+        id: `${connection.id}_${hashString(`${outgoingAsset}_Sell_-${outgoing}`)}`,
         importIndex,
         operation: "Sell",
         platformId,
         timestamp,
-        txId,
+        // txId,
         wallet,
       },
       {
         assetId: incomingAsset,
         change: incoming,
         fileImportId: importId,
-        id: `${txId}_BUY`,
+        id: `${connection.id}_${hashString(`${incomingAsset}_Buy_${incoming}`)}`,
         importIndex,
         operation: "Buy",
         platformId,
         timestamp,
-        txId,
+        // txId,
         wallet,
       },
     ]
   } else {
-    incoming = quoteQtyBN.toFixed()
-    incomingAsset = `binance:${quoteAsset}`
-    outgoing = qtyBN.toFixed()
-    outgoingAsset = `binance:${baseAsset}`
+    incoming = quoteQuantityBN.toFixed()
+    incomingAsset = `${platformId}:${quoteAsset}`
+    outgoing = quantityBN.toFixed()
+    outgoingAsset = `${platformId}:${baseAsset}`
+    // txId = `${connection.id}_${hashString(`${outgoingAsset}_${incomingAsset}_${price}`)}`
     logs = [
       {
         assetId: outgoingAsset,
         change: `-${outgoing}`,
         fileImportId: importId,
-        id: `${txId}_SELL`,
+        id: `${connection.id}_${hashString(`${outgoingAsset}_Sell_-${outgoing}`)}`,
         importIndex,
         operation: "Sell",
         platformId,
         timestamp,
-        txId,
+        // txId,
         wallet,
       },
       {
         assetId: incomingAsset,
         change: incoming,
         fileImportId: importId,
-        id: `${txId}_BUY`,
+        id: `${connection.id}_${hashString(`${incomingAsset}_Buy_${incoming}`)}`,
         importIndex,
         operation: "Buy",
         platformId,
         timestamp,
-        txId,
+        // txId,
         wallet,
       },
     ]
   }
 
   if (commission) {
+    feeAsset = `${platformId}:${commissionAsset}`
     logs.push({
-      assetId: `binance:${commissionAsset}`,
-      change: `-${feeBN.toFixed()}`,
+      assetId: feeAsset,
+      change: `-${commission}`,
       fileImportId: importId,
-      id: `${txId}_FEE`,
+      id: `${connection.id}_${hashString(`${feeAsset}_Fee_-${commission}`)}`,
       importIndex,
       operation: "Fee",
       platformId,
       timestamp,
-      txId,
+      // txId,
       wallet,
     })
   }
-  const price = Big(outgoing).div(Big(incoming)).toString()
-  const tx: Transaction = {
-    fee: commission === "0" ? undefined : feeBN.toFixed(),
-    feeAsset: commission === "0" ? undefined : `binance:${commissionAsset}`,
-    fileImportId: importId,
-    id: txId,
-    importIndex,
-    incoming: incoming === "0" ? undefined : incoming,
-    incomingAsset: incoming === "0" ? undefined : incomingAsset,
-    metadata: {},
-    outgoing: outgoing === "0" ? undefined : outgoing,
-    outgoingAsset: outgoing === "0" ? undefined : outgoingAsset,
-    platformId,
-    price,
-    timestamp,
-    type,
-    wallet,
-  }
+  // const tx: Transaction = {
+  //   fee: commission === "0" ? undefined : commission,
+  //   feeAsset: commission === "0" ? undefined : feeAsset,
+  //   fileImportId: importId,
+  //   id: txId,
+  //   importIndex,
+  //   incoming: incoming === "0" ? undefined : incoming,
+  //   incomingAsset: incoming === "0" ? undefined : incomingAsset,
+  //   metadata: {},
+  //   outgoing: outgoing === "0" ? undefined : outgoing,
+  //   outgoingAsset: outgoing === "0" ? undefined : outgoingAsset,
+  //   platformId,
+  //   price: priceBN.toFixed(),
+  //   timestamp,
+  //   type,
+  //   wallet,
+  // }
 
   return {
     logs,
-    txns: [tx],
+    // txns: [tx],
   }
 }

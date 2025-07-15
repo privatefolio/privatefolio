@@ -57,23 +57,7 @@ describe("0xf98 file import", () => {
       [fileImport.id]
     )
     delete fileImport.timestamp
-    expect(fileImport).toEqual({
-      id: "1151263496",
-      lastModified: 0,
-      meta: {
-        assetIds: ["chain.ethereum:0x0000000000000000000000000000000000000000:ETH"],
-        extensionId: "etherscan-file-import",
-        logs: 16,
-        operations: ["Deposit", "Withdraw", "Fee"],
-        parserId: "etherscan-default",
-        platformId: "chain.ethereum",
-        rows: 9,
-        transactions: 9,
-        wallets: ["0xf98C96B5d10faAFc2324847c82305Bd5fd7E5ad3"],
-      },
-      name: "0xf98/etherscan.csv",
-      size: 2898,
-    })
+    expect(fileImport).toMatchSnapshot(`file-import`)
     expect(auditLogsCount).toEqual(16)
   })
 
@@ -106,37 +90,12 @@ describe("0xf98 file import", () => {
       [fileImport.id]
     )
     delete fileImport.timestamp
-    expect(fileImport).toEqual({
-      id: "3477221057",
-      lastModified: 0,
-      meta: {
-        assetIds: [
-          "chain.ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN",
-          "chain.ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA",
-          "chain.ethereum:0x519475b31653E46D20cD09F9FdcF3B12BDAcB4f5:VIU",
-          "chain.ethereum:0x52903256dd18D85c2Dc4a6C999907c9793eA61E3:INSP",
-          "chain.ethereum:0x1d462414fe14cf489c7A21CaC78509f4bF8CD7c0:CAN",
-          "chain.ethereum:0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0:LOOM",
-          "chain.ethereum:0x7B2f9706CD8473B4F5B7758b0171a9933Fc6C4d6:HEALP",
-          "chain.ethereum:0x58b6A8A3302369DAEc383334672404Ee733aB239:LPT",
-        ],
-        extensionId: "etherscan-file-import",
-        logs: 8,
-        operations: ["Deposit"],
-        parserId: "etherscan-erc20",
-        platformId: "chain.ethereum",
-        rows: 8,
-        transactions: 8,
-        wallets: ["0xf98C96B5d10faAFc2324847c82305Bd5fd7E5ad3"],
-      },
-      name: "0xf98/etherscan-erc20.csv",
-      size: 2447,
-    })
+    expect(fileImport).toMatchSnapshot(`file-import-erc20`)
     expect(auditLogsCount).toEqual(8)
   })
 
   it("should compute balances", async () => {
-    const until = Date.UTC(2021, 0, 0, 0, 0, 0, 0) // 1 Jan 2021
+    const until = 0 // no gap filling
     const updates: ProgressUpdate[] = []
     await computeBalances(accountName, { until }, async (state) => updates.push(state))
     expect(updates.join("\n")).toMatchSnapshot()
@@ -157,11 +116,11 @@ describe("0xf98 file import", () => {
     expect(transactions.map(normalizeTransaction)).toMatchSnapshot(`transactions`)
     expect(auditLogs.length).toEqual(24)
     expect(auditLogs.map(sanitizeAuditLog)).toMatchSnapshot(`audit logs`)
-    expect(balances.length).toEqual(1211)
+    expect(balances.length).toEqual(1154)
     for (let i = 0; i < balances.length; i += 100) {
       expect(balances.slice(i, i + 100)).toMatchSnapshot(`balances - page ${i / 100}`)
     }
-    expect(networth.length).toEqual(1211)
+    expect(networth.length).toEqual(1154)
     expect(networth).toMatchSnapshot(`networth`)
   })
 

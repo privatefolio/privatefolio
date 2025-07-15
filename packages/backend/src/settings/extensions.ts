@@ -1,3 +1,5 @@
+import { extensionId as binanceConnectionId } from "src/extensions/connections/binance/binance-connector"
+import { extensionId as etherscanConnectionId } from "src/extensions/connections/etherscan/etherscan-connector"
 import { SUPPORTED_PLATFORMS as etherscanPlatforms } from "src/extensions/connections/etherscan/etherscan-settings"
 import {
   extensionId as binanceFileImportId,
@@ -214,7 +216,7 @@ export const extensions: Extension[] = [
     extensionType: "connection",
     extensionVersion: "1.0.0",
     githubUrl: "https://github.com/privatefolio/privatefolio",
-    id: "binance-connection",
+    id: binanceConnectionId,
     platformIds: [BINANCE_PLATFORM_ID],
     priceUsd: 20,
     publishedAt: new Date("2025-06-01").getTime(),
@@ -229,7 +231,7 @@ export const extensions: Extension[] = [
     extensionType: "connection",
     extensionVersion: "1.0.0",
     githubUrl: "https://github.com/privatefolio/privatefolio",
-    id: "etherscan-connection",
+    id: etherscanConnectionId,
     platformIds: etherscanPlatforms,
     publishedAt: new Date("2025-06-01").getTime(),
     sources: [

@@ -1,7 +1,9 @@
 import Big from "big.js"
-import { AuditLog, BinanceConnection, ParserResult } from "src/interfaces"
+import { AuditLog, BinanceConnection, ParserResult, ResolutionString } from "src/interfaces"
+import { floorTimestamp } from "src/utils/utils"
 
-import { BinanceMarginTransfer } from "../binance-account-api"
+import { BinanceMarginTransfer } from "../binance-api"
+import { BINANCE_WALLETS } from "../binance-settings"
 
 export function parseMarginTransfer(
   row: BinanceMarginTransfer,
@@ -9,18 +11,18 @@ export function parseMarginTransfer(
   connection: BinanceConnection
 ): ParserResult {
   const { platformId } = connection
-  const { amount, asset, timestamp: time, transFrom, transTo, txId: id } = row
-  const timestamp = new Date(Number(time)).getTime()
+  const { amount, asset, transFrom, transTo, txId: id } = row
+  const timestamp = floorTimestamp(row.timestamp, "1S" as ResolutionString)
   if (isNaN(timestamp)) {
-    throw new Error(`Invalid timestamp: ${time}`)
+    throw new Error(`Invalid timestamp: ${row.timestamp}`)
   }
-  const txId = `${connection.id}_${id}_binance_${index}`
+  const txId = `${connection.id}_${id}_binance`
   const importId = connection.id
   const importIndex = index
 
   const changeBN = new Big(amount)
   const change = changeBN.toFixed()
-  const incomingAsset = `binance:${asset}`
+  const incomingAsset = `${platformId}:${asset}`
 
   const logs: AuditLog[] = [
     {
@@ -32,11 +34,10 @@ export function parseMarginTransfer(
       operation: "Transfer",
       platformId,
       timestamp,
-      txId,
-      wallet: `Binance ${(transFrom.charAt(0) + transFrom.substring(1).toLowerCase()).replace(
-        "_",
-        " "
-      )}`,
+      wallet:
+        transTo === "ISOLATED_MARGIN"
+          ? BINANCE_WALLETS.isolatedMargin
+          : BINANCE_WALLETS.crossMargin,
     },
     {
       assetId: incomingAsset,
@@ -47,11 +48,10 @@ export function parseMarginTransfer(
       operation: "Transfer",
       platformId,
       timestamp,
-      txId,
-      wallet: `Binance ${(transTo.charAt(0) + transTo.substring(1).toLowerCase()).replace(
-        "_",
-        " "
-      )}`,
+      wallet:
+        transFrom === "ISOLATED_MARGIN"
+          ? BINANCE_WALLETS.isolatedMargin
+          : BINANCE_WALLETS.crossMargin,
     },
   ]
   return {

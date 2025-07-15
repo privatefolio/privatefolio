@@ -2,6 +2,7 @@ import { getAuditLogs } from "src/api/account/audit-logs-api"
 import { computeBalances, getBalances } from "src/api/account/balances-api"
 import { syncConnection, upsertConnection } from "src/api/account/connections-api"
 import { autoMergeTransactions, getTransactions } from "src/api/account/transactions-api"
+import { etherscanConnExtension } from "src/extensions/connections/etherscan/etherscan-settings"
 import { Connection, ProgressUpdate } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
 import { describe, expect, it } from "vitest"
@@ -17,7 +18,7 @@ describe.skip("should import 0x003dc from optimism via connection", () => {
     // act
     connection = await upsertConnection(accountName, {
       address,
-      extensionId: "etherscan-connection",
+      extensionId: etherscanConnExtension,
       platformId: "optimistic-ethereum",
     })
     // assert
@@ -47,7 +48,7 @@ describe.skip("should import 0x003dc from optimism via connection", () => {
 
   it.sequential("should compute balances", async () => {
     // arrange
-    const until = Date.UTC(2021, 0, 0, 0, 0, 0, 0) // 1 Jan 2021
+    const until = 0 // no gap filling
     const updates: ProgressUpdate[] = []
     // act
     await computeBalances(accountName, { until }, async (state) => updates.push(state))

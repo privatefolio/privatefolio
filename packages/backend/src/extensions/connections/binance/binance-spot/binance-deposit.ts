@@ -4,11 +4,14 @@ import {
   AuditLogOperation,
   BinanceConnection,
   ParserResult,
+  ResolutionString,
   Transaction,
   TransactionType,
 } from "src/interfaces"
+import { floorTimestamp } from "src/utils/utils"
 
-import { BinanceDeposit } from "../binance-account-api"
+import { BinanceDeposit } from "../binance-api"
+import { BINANCE_WALLETS } from "../binance-settings"
 
 export function parseDeposit(
   row: BinanceDeposit,
@@ -18,16 +21,16 @@ export function parseDeposit(
   const { platformId } = connection
   const { amount, coin, insertTime, txId: txHash } = row
 
-  const wallet = `Binance Spot`
+  const wallet = BINANCE_WALLETS.spot
   if (amount === "0") {
     return { logs: [] }
   }
-  const timestamp = new Date(Number(insertTime)).getTime()
+  const timestamp = floorTimestamp(insertTime, "1S" as ResolutionString)
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${insertTime}`)
   }
-  const assetId = `binance:${coin}`
-  const txId = `${connection.id}_${txHash}_Binance_deposit_${index}`
+  const assetId = `${platformId}:${coin}`
+  const txId = `${connection.id}_${txHash}_Binance_deposit`
   const operation: AuditLogOperation = "Deposit"
   const type: TransactionType = "Deposit"
   const importId = connection.id
@@ -43,7 +46,7 @@ export function parseDeposit(
       assetId,
       change,
       fileImportId: importId,
-      id: `${txId}_TRANSFER_${index}`,
+      id: `${txId}_TRANSFER`,
       importIndex,
       operation,
       platformId,

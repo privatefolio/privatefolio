@@ -19,9 +19,11 @@ import { isAddress } from "ethers"
 import { WritableAtom } from "nanostores"
 import { enqueueSnackbar } from "notistack"
 import {
-  BINANCE_WALLET_LABELS,
+  BINANCE_WALLETS,
+  binanceConnExtension,
   BinanceWalletId,
 } from "privatefolio-backend/src/extensions/connections/binance/binance-settings"
+import { etherscanConnExtension } from "privatefolio-backend/src/extensions/connections/etherscan/etherscan-settings"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { DrawerHeader } from "src/components/DrawerHeader"
 import { ExtensionAvatar } from "src/components/ExtensionAvatar"
@@ -49,7 +51,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
   const activeAccount = useStore($activeAccount)
   const debugMode = useStore($debugMode)
 
-  const [extensionId, setExtensionId] = useState<string>("etherscan-connection")
+  const [extensionId, setExtensionId] = useState<string>(etherscanConnExtension)
   const [extensions, setExtensions] = useState<RichExtension[]>([])
 
   useEffect(() => {
@@ -73,7 +75,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
   useEffect(() => {
     if (open) return
 
-    setExtensionId("etherscan-connection")
+    setExtensionId(etherscanConnExtension)
     setPlatformId("all")
     setState({
       coinFutures: false,
@@ -127,14 +129,14 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
         setError("Extension not found")
         return
       }
-      if (extension.id === "etherscan-connection") {
+      if (extension.id === etherscanConnExtension) {
         const isValidAddress = address && isAddress(address)
         if (!isValidAddress) {
           setError("Invalid wallet address")
           return
         }
         //
-      } else if (extension.id === "binance-connection") {
+      } else if (extension.id === binanceConnExtension) {
         if (apiKey.length === 0) {
           setError("API key is required")
           return
@@ -214,7 +216,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                 <MenuItem
                   key={x.id}
                   value={x.id}
-                  disabled={x.id === "binance-connection" && isProduction}
+                  disabled={x.id === binanceConnExtension && isProduction}
                 >
                   <Stack direction="row" alignItems="center">
                     <ListItemAvatar>
@@ -228,7 +230,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                       primary={
                         <>
                           {x.extensionName}{" "}
-                          {x.id === "binance-connection" && (
+                          {x.id === binanceConnExtension && (
                             <Chip
                               size="small"
                               sx={{ fontSize: "0.625rem", height: 16 }}
@@ -243,7 +245,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
               ))}
             </Select>
           </div>
-          {extensionId !== "binance-connection" ? (
+          {extensionId !== binanceConnExtension ? (
             <>
               <div>
                 <SectionTitle>Platform</SectionTitle>
@@ -352,7 +354,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                       onChange={handleWalletsChange}
                     />
                   }
-                  label={BINANCE_WALLET_LABELS.spot}
+                  label={BINANCE_WALLETS.spot}
                 />
                 <FormControlLabel
                   control={
@@ -363,7 +365,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                       onChange={handleWalletsChange}
                     />
                   }
-                  label={BINANCE_WALLET_LABELS.crossMargin}
+                  label={BINANCE_WALLETS.crossMargin}
                 />
                 <FormControlLabel
                   control={
@@ -374,7 +376,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                       onChange={handleWalletsChange}
                     />
                   }
-                  label={BINANCE_WALLET_LABELS.isolatedMargin}
+                  label={BINANCE_WALLETS.isolatedMargin}
                 />
                 <FormControlLabel
                   control={
@@ -385,7 +387,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                       onChange={handleWalletsChange}
                     />
                   }
-                  label={BINANCE_WALLET_LABELS.coinFutures}
+                  label={BINANCE_WALLETS.coinFutures}
                 />
                 <FormControlLabel
                   control={
@@ -396,7 +398,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                       onChange={handleWalletsChange}
                     />
                   }
-                  label={BINANCE_WALLET_LABELS.usdFutures}
+                  label={BINANCE_WALLETS.usdFutures}
                 />
                 {walletsError ? (
                   <FormHelperText>You need to choose at least one</FormHelperText>

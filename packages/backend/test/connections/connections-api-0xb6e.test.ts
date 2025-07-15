@@ -21,6 +21,7 @@ import {
   countTransactions,
   getTransactions,
 } from "src/api/account/transactions-api"
+import { etherscanConnExtension } from "src/extensions/connections/etherscan/etherscan-settings"
 import { Connection, ProgressUpdate } from "src/interfaces"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
 import { describe, expect, it } from "vitest"
@@ -36,7 +37,7 @@ describe("should import 0xb6e via connection", () => {
     // act
     connection = await upsertConnection(accountName, {
       address,
-      extensionId: "etherscan-connection",
+      extensionId: etherscanConnExtension,
       platformId: "chain.arbitrum-one",
     })
     // assert
@@ -51,7 +52,7 @@ describe("should import 0xb6e via connection", () => {
 
   it.sequential("should compute balances", async () => {
     // arrange
-    const until = Date.UTC(2021, 0, 0, 0, 0, 0, 0) // 1 Jan 2021
+    const until = 0 // no gap filling
     // act
     const updates: ProgressUpdate[] = []
     await computeBalances(accountName, { until }, async (state) => updates.push(state))

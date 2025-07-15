@@ -1,9 +1,10 @@
-import type { BinancePair } from "src/extensions/connections/binance/binance-account-api"
+import type { BinancePair } from "src/extensions/connections/binance/binance-api"
 import { AuditLog, ParserResult, Transaction, TransactionSide } from "src/interfaces"
 import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
 
+import { BINANCE_WALLETS } from "../connections/binance/binance-settings"
 import { BINANCE_PLATFORM_ID } from "../utils/binance-utils"
 
 export const extensionId = "binance-file-import"
@@ -29,14 +30,14 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
   const hash = hashString(`${index}_${csvRow}`)
   const txId = `${fileImportId}_${hash}`
   const timestamp = asUTC(new Date(utcTime))
-  const wallet = `Binance Spot`
+  const wallet = BINANCE_WALLETS.spot
   //
   const [, executed, executedSymbol] = executedWithSymbol.match(/([0-9.]+)([A-Za-z]+)/) || []
   const [, amount, amountSymbol] = amountWithSymbol.match(/([0-9.]+)([A-Za-z]+)/) || []
   const [, fee, feeSymbol] = feeWithSymbol.match(/([0-9.]+)([A-Za-z]+)/) || []
-  const feeAssetId = `binance:${feeSymbol}`
-  const baseAssetId = `binance:${executedSymbol}`
-  const quoteAssetId = `binance:${amountSymbol}`
+  const feeAssetId = `${platformId}:${feeSymbol}`
+  const baseAssetId = `${platformId}:${executedSymbol}`
+  const quoteAssetId = `${platformId}:${amountSymbol}`
   //
   const txns: Transaction[] = []
   const logs: AuditLog[] = []

@@ -1195,6 +1195,13 @@
       ],
       [
         "chain.arbitrum-one:0xaf88d065e77c8cC2239327C5EDb3A432268e5831:USDC",
+        "-10",
+        "-9.997641074",
+        "1080536866_0x796ad4796a857a0b7b5db7723ee52eb6dd029cf2153aa4b2cf59ffd14effa82f_MERGED",
+        1715106660000,
+      ],
+      [
+        "chain.arbitrum-one:0xaf88d065e77c8cC2239327C5EDb3A432268e5831:USDC",
         "484.200424",
         "484.2126717044649528",
         "1080536866_0x178557ecfaf1e52fcd0fab9d41af7ade1d0887c9076188f23adc0cbf96cbc08a_ERC20_24",

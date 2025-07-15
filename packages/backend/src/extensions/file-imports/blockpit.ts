@@ -29,17 +29,17 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
   if (columns[9]) {
     incomingBN = new Big(columns[9])
     incoming = incomingBN.toFixed()
-    incomingAsset = `binance:${columns[8]}`
+    incomingAsset = `${platformId}:${columns[8]}`
   }
   if (columns[7]) {
     outgoingBN = new Big(columns[7])
     outgoing = outgoingBN.toFixed()
-    outgoingAsset = `binance:${columns[6]}`
+    outgoingAsset = `${platformId}:${columns[6]}`
   }
   if (columns[11]) {
     feeBN = new Big(columns[11])
     fee = feeBN.toFixed()
-    feeAsset = `binance:${columns[10]}`
+    feeAsset = `${platformId}:${columns[10]}`
   }
 
   // const txHash = columns[12]

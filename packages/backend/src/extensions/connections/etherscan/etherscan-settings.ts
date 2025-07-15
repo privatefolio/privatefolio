@@ -1,7 +1,8 @@
 // https://api.etherscan.io/v2/chainlist
 
-import { ETHEREUM_PLATFORM_ID } from "src/extensions/utils/evm-utils"
 import { PlatformPrefix } from "src/settings/settings"
+
+export const ETHEREUM_PLATFORM_ID = `${PlatformPrefix.Chain}ethereum`
 
 export const SUPPORTED_PLATFORMS = [
   ETHEREUM_PLATFORM_ID,
@@ -42,3 +43,5 @@ export const SUPPORTED_PLATFORMS = [
 ]
 
 export const ETHERSCAN_API_KEY_V2 = "3JHR8S44XRG5VAN774EGSBY175A1QE2EZA"
+
+export const etherscanConnExtension = "etherscan-connection"

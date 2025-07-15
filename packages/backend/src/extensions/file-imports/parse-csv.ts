@@ -7,7 +7,7 @@ import {
   Transaction,
 } from "src/interfaces"
 import { splitRows } from "src/utils/csv-utils"
-import { extractTransactions } from "src/utils/extract-utils"
+import { extractTransactions, mergeAuditLogs } from "src/utils/extract-utils"
 
 export function sanitizeHeader(headerRow: string) {
   return headerRow
@@ -18,7 +18,7 @@ export function sanitizeHeader(headerRow: string) {
 
 export async function parseCsv(
   text: string,
-  _fileImportId: string,
+  fileImportId: string,
   progress: ProgressCallback,
   parserContext: Record<string, unknown>
 ) {
@@ -35,7 +35,7 @@ export async function parseCsv(
 
   const { extensionId, platformId, parse } = parser
 
-  const logs: AuditLog[] = []
+  let logs: AuditLog[] = []
   let transactions: Transaction[] = []
   const assetMap: Record<string, boolean> = {}
   const walletMap: Record<string, boolean> = {}
@@ -50,7 +50,7 @@ export async function parseCsv(
       if (index !== 0 && (index + 1) % 1000 === 0) {
         await progress([undefined, `Parsing row ${index + 1}`])
       }
-      const { logs: newLogs, txns } = parse(row, index, _fileImportId, parserContext, header)
+      const { logs: newLogs, txns } = parse(row, index, fileImportId, parserContext, header)
 
       // const x = txns?.[0]?.incomingAsset?.replace("binance:", "")
       // const y = txns?.[0]?.outgoingAsset?.replace("binance:", "")
@@ -72,20 +72,20 @@ export async function parseCsv(
   }
 
   await progress([50, `Extracting transactions`])
-  transactions = transactions.concat(extractTransactions(logs, _fileImportId, parserId))
-  // transactions = groupTransactions(transactions, _fileImportId, parserId)
+  logs = mergeAuditLogs(logs, fileImportId, platformId)
+  transactions = transactions.concat(extractTransactions(logs, fileImportId, parserId))
 
   const metadata: FileImport["meta"] = {
-    assetIds: Object.keys(assetMap),
+    assetIds: Object.keys(assetMap).sort(),
     extensionId,
     logs: logs.length,
-    operations: Object.keys(operationMap) as AuditLogOperation[],
+    operations: Object.keys(operationMap).sort() as AuditLogOperation[],
     parserId,
     // pairList: Array.from(pairList),
     platformId,
     rows: rows.length - 1,
     transactions: transactions.length,
-    wallets: Object.keys(walletMap),
+    wallets: Object.keys(walletMap).sort(),
   }
 
   return { logs, metadata, transactions }
