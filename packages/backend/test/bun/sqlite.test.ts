@@ -136,7 +136,7 @@ describe("0xf98 file import", () => {
   })
 
   it("should compute balances", async () => {
-    const until = Date.UTC(2021, 0, 0, 0, 0, 0, 0) // 1 Jan 2021
+    const until = 0 // no gap filling
     const updates: ProgressUpdate[] = []
     await computeBalances(accountName, { until }, async (state) => updates.push(state))
     expect(updates.join("\n")).toMatchSnapshot()
@@ -157,11 +157,11 @@ describe("0xf98 file import", () => {
     expect(transactions.map(normalizeTransaction)).toMatchSnapshot(`transactions`)
     expect(auditLogs.length).toEqual(24)
     expect(auditLogs.map(sanitizeAuditLog)).toMatchSnapshot(`audit logs`)
-    expect(balances.length).toEqual(1211)
+    expect(balances.length).toEqual(1154)
     for (let i = 0; i < balances.length; i += 100) {
       expect(balances.slice(i, i + 100)).toMatchSnapshot(`balances - page ${i / 100}`)
     }
-    expect(networth.length).toEqual(1211)
+    expect(networth.length).toEqual(1154)
     expect(networth).toMatchSnapshot(`networth`)
   })
 

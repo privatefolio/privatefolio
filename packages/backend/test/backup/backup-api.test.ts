@@ -92,7 +92,7 @@ describe.todo("should backup and restore", () => {
 
   it.sequential("should compute balances", async () => {
     // arrange
-    const until = Date.UTC(2021, 0, 0, 0, 0, 0, 0) // 1 Jan 2021
+    const until = 0 // no gap filling
     // act
     const updates: ProgressUpdate[] = []
     await computeBalances(accountName, { until }, async (state) => updates.push(state))

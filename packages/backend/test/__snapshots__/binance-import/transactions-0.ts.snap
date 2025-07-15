@@ -1,6 +1,6 @@
 [
   {
-    "_id": "MERGED",
+    "_id": "3645047795",
     "fee": "0.1",
     "feeAsset": "ex.binance:MANA",
     "incoming": "100",
@@ -15,7 +15,7 @@
     "wallet": "Binance Spot",
   },
   {
-    "_id": "MERGED",
+    "_id": "2795338023",
     "fee": "0.002",
     "feeAsset": "ex.binance:QTUM",
     "incoming": "2",
@@ -30,7 +30,7 @@
     "wallet": "Binance Spot",
   },
   {
-    "_id": "MERGED",
+    "_id": "3733094937",
     "fee": "0.1",
     "feeAsset": "ex.binance:XLM",
     "incoming": "100",
@@ -45,7 +45,7 @@
     "wallet": "Binance Spot",
   },
   {
-    "_id": "MERGED",
+    "_id": "1700257332",
     "fee": "0.00004982",
     "feeAsset": "ex.binance:ETH",
     "incoming": "0.04982364",
@@ -60,22 +60,7 @@
     "wallet": "Binance Spot",
   },
   {
-    "_id": "MERGED",
-    "fee": "0.0005536",
-    "feeAsset": "ex.binance:ETH",
-    "incoming": "0.553596",
-    "incomingAsset": "ex.binance:ETH",
-    "metadata": {},
-    "outgoing": "100",
-    "outgoingAsset": "ex.binance:IOTA",
-    "platform": "ex.binance",
-    "price": "180.63714333196049104401",
-    "timestamp": 1514369670000,
-    "type": "Swap",
-    "wallet": "Binance Spot",
-  },
-  {
-    "_id": "TX",
+    "_id": "230883362",
     "incoming": "0.0000006",
     "incomingAsset": "ex.binance:ETF",
     "metadata": {},
@@ -85,7 +70,7 @@
     "wallet": "Binance Spot",
   },
   {
-    "_id": "MERGED",
+    "_id": "3358466330",
     "fee": "0.08",
     "feeAsset": "ex.binance:IOTA",
     "incoming": "80",
@@ -100,7 +85,7 @@
     "wallet": "Binance Spot",
   },
   {
-    "_id": "MERGED",
+    "_id": "3357542932",
     "fee": "0.08",
     "feeAsset": "ex.binance:IOTA",
     "incoming": "80",
@@ -115,7 +100,7 @@
     "wallet": "Binance Spot",
   },
   {
-    "_id": "TX",
+    "_id": "811824843",
     "incoming": "1",
     "incomingAsset": "ex.binance:ETH",
     "metadata": {},
@@ -125,7 +110,7 @@
     "wallet": "Binance Spot",
   },
   {
-    "_id": "TX",
+    "_id": "3264965155",
     "incoming": "0.000043",
     "incomingAsset": "ex.binance:ETH",
     "metadata": {},

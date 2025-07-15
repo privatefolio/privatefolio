@@ -37,7 +37,7 @@ describe.skip("should import 0xab08B from base via connection", () => {
 
   it.sequential("should compute balances", async () => {
     // arrange
-    const until = Date.UTC(2021, 0, 0, 0, 0, 0, 0) // 1 Jan 2021
+    const until = 0 // no gap filling
     const updates: ProgressUpdate[] = []
     // act
     await computeBalances(accountName, { until }, async (state) => updates.push(state))

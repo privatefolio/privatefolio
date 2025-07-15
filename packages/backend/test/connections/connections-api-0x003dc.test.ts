@@ -45,12 +45,13 @@ describe("should import 0x003dc via connection", () => {
       accountName,
       false,
       undefined,
-      "16727786" // until
+      16727786 // until
     )
     // assert
     // assert
     expect(updates.join("\n")).toMatchInlineSnapshot(`
-      "0,Starting from block number 0
+      "0,Starting from Jan 01, 1970
+      0,Starting from block number 0
       0,Fetching all transactions
       10,Fetched 482 Normal transactions
       20,Fetched 48 Internal transactions
@@ -67,7 +68,7 @@ describe("should import 0x003dc via connection", () => {
 
   it.sequential("should compute balances", async () => {
     // arrange
-    const until = Date.UTC(2021, 0, 0, 0, 0, 0, 0) // 1 Jan 2021
+    const until = 0 // no gap filling
     const updates: ProgressUpdate[] = []
     // act
     await computeBalances(accountName, { until }, async (state) => updates.push(state))

@@ -79,8 +79,8 @@ describe("0xf98 file import", () => {
           "logs": 16,
           "operations": [
             "Deposit",
-            "Withdraw",
             "Fee",
+            "Withdraw",
           ],
           "parserId": "etherscan-default",
           "platformId": "chain.ethereum",
@@ -135,14 +135,14 @@ describe("0xf98 file import", () => {
         "lastModified": 0,
         "meta": {
           "assetIds": [
-            "chain.ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN",
             "chain.ethereum:0x0Cf0Ee63788A0849fE5297F3407f701E122cC023:XDATA",
+            "chain.ethereum:0x1d462414fe14cf489c7A21CaC78509f4bF8CD7c0:CAN",
             "chain.ethereum:0x519475b31653E46D20cD09F9FdcF3B12BDAcB4f5:VIU",
             "chain.ethereum:0x52903256dd18D85c2Dc4a6C999907c9793eA61E3:INSP",
-            "chain.ethereum:0x1d462414fe14cf489c7A21CaC78509f4bF8CD7c0:CAN",
-            "chain.ethereum:0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0:LOOM",
-            "chain.ethereum:0x7B2f9706CD8473B4F5B7758b0171a9933Fc6C4d6:HEALP",
             "chain.ethereum:0x58b6A8A3302369DAEc383334672404Ee733aB239:LPT",
+            "chain.ethereum:0x7B2f9706CD8473B4F5B7758b0171a9933Fc6C4d6:HEALP",
+            "chain.ethereum:0xA4e8C3Ec456107eA67d3075bF9e3DF3A75823DB0:LOOM",
+            "chain.ethereum:0xab95E915c123fdEd5BDfB6325e35ef5515F1EA69:XNN",
           ],
           "extensionId": "etherscan-file-import",
           "logs": 8,
@@ -166,7 +166,7 @@ describe("0xf98 file import", () => {
 
   it.sequential("should compute balances", async () => {
     // arrange
-    const until = Date.UTC(2021, 0, 0, 0, 0, 0, 0) // 1 Jan 2021
+    const until = 0 // no gap filling
     // act
     const updates: ProgressUpdate[] = []
     await computeBalances(accountName, { until }, async (state) => updates.push(state))
@@ -176,8 +176,8 @@ describe("0xf98 file import", () => {
       0,Processing logs 1 to 24
       90,Processed 1153 daily balances
       96,Filling balances to reach today
-      99,Setting balances cursor to Dec 31, 2020
-      100,Saved 1211 records to disk"
+      99,Setting balances cursor to Nov 04, 2020
+      100,Saved 1154 records to disk"
     `)
   })
 
@@ -243,7 +243,7 @@ describe("0xf98 file import", () => {
     await expect(auditLogs.map(sanitizeAuditLog)).toMatchFileSnapshot(
       "../__snapshots__/0xf98/audit-logs.ts.snap"
     )
-    expect(balances.length).toMatchInlineSnapshot(`1211`)
+    expect(balances.length).toMatchInlineSnapshot(`1154`)
     for (let i = 0; i < balances.length; i += 100) {
       await expect(balances.slice(i, i + 100)).toMatchFileSnapshot(
         `../__snapshots__/0xf98/balances-${i}.ts.snap`
