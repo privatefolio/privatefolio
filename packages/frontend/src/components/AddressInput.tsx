@@ -80,6 +80,7 @@ export function AddressInput(props: AddressInputProps) {
         disableClearable
         openOnFocus
         options={options}
+        groupBy={(option) => (option.label ? "Address book" : "My wallets")}
         getOptionLabel={(option) => (typeof option === "string" ? option : option.address)}
         renderOption={(props, option) => (
           <Box component="li" {...props} key={option.address}>
@@ -95,12 +96,7 @@ export function AddressInput(props: AddressInputProps) {
                 </Typography>
               </>
             ) : (
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ fontFamily: MonoFont }}
-                component={Truncate}
-              >
+              <Typography variant="body2" sx={{ fontFamily: MonoFont }} component={Truncate}>
                 {option.address}
               </Typography>
             )}
@@ -155,10 +151,8 @@ export function AddressInput(props: AddressInputProps) {
   )
 }
 
-export type AddressInputUncontrolledProps = Omit<TextFieldProps, "onChange" | "value"> & {
+export type AddressInputUncontrolledProps = Omit<AddressInputProps, "onChange" | "value"> & {
   initialValue?: string
-  showAddressBook?: boolean
-  showWallets?: boolean
 }
 
 export function AddressInputUncontrolled({

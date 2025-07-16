@@ -1,14 +1,4 @@
-import {
-  Autocomplete,
-  Box,
-  Drawer,
-  ListItemAvatar,
-  ListItemText,
-  MenuItem,
-  Select,
-  Stack,
-  TextField,
-} from "@mui/material"
+import { Drawer, ListItemText, MenuItem, Select, Stack, TextField } from "@mui/material"
 import { DatePicker, TimePicker } from "@mui/x-date-pickers"
 import { useStore } from "@nanostores/react"
 import { WritableAtom } from "nanostores"
@@ -17,17 +7,16 @@ import { BINANCE_WALLETS } from "privatefolio-backend/src/extensions/connections
 import { BINANCE_PLATFORM_ID } from "privatefolio-backend/src/extensions/utils/binance-utils"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { AddressInput } from "src/components/AddressInput"
-import { AssetBlock } from "src/components/AssetBlock"
+import { AssetInputUncontrolled } from "src/components/AssetInput"
 import { DrawerHeader } from "src/components/DrawerHeader"
 import { LoadingButton } from "src/components/LoadingButton"
+import { PlatformInput } from "src/components/PlatformInput"
 import { SectionTitle } from "src/components/SectionTitle"
 import { MANUAL_TX_TYPES, TransactionType } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 import { $assetMap, $platformMap } from "src/stores/metadata-store"
 import { formatTicker, getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
 import { $rpc } from "src/workers/remotes"
-
-import { PlatformAvatar } from "../../components/PlatformAvatar"
 
 export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
   const { atom } = props
@@ -38,7 +27,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
 
   const [platformId, setPlatform] = useState<string>("")
   const [type, setType] = useState<TransactionType>("Swap")
-  const [binanceWallet, setBinanceWallet] = useState("Spot")
+  const [binanceWallet, setBinanceWallet] = useState(BINANCE_WALLETS.spot)
 
   const [notes, setNotes] = useState("")
 
@@ -142,19 +131,11 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
     if (open) return
 
     setPlatform(platforms[0]?.id || "")
-    setBinanceWallet("Spot")
+    setBinanceWallet(BINANCE_WALLETS.spot)
     setType("Swap")
     setNotes("")
     setLoading(false)
   }, [open, platforms])
-
-  const renderOption = (props, option) => (
-    <Box component="li" {...props} key={option}>
-      <AssetBlock id={option} variant="tablecell" href={undefined} hideTooltip />
-    </Box>
-  )
-
-  const getOptionLabel = (option: string) => (!option ? "" : getAssetTicker(option))
 
   return (
     <Drawer open={open} onClose={() => atom.set(false)}>
@@ -163,23 +144,14 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
           <DrawerHeader toggleOpen={() => atom.set(false)}>Add transaction</DrawerHeader>
           <div>
             <SectionTitle>Platform</SectionTitle>
-            <Select
-              variant="outlined"
+            <PlatformInput
+              size="small"
               fullWidth
               value={platformId}
-              onChange={(event) => setPlatform(event.target.value)}
-            >
-              {platforms?.map((x) => (
-                <MenuItem key={x.id} value={x.id}>
-                  <Stack direction="row" alignItems="center">
-                    <ListItemAvatar>
-                      <PlatformAvatar src={x.image} alt={x.name} size="small" />
-                    </ListItemAvatar>
-                    <ListItemText primary={x.name} />
-                  </Stack>
-                </MenuItem>
-              ))}
-            </Select>
+              onChange={setPlatform}
+              required
+              //
+            />
           </div>
           <div>
             <SectionTitle>Wallet</SectionTitle>
@@ -243,16 +215,12 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
                 />
               </Stack>
               <Stack width="50%">
-                <Autocomplete
-                  freeSolo
-                  disableClearable
-                  openOnFocus
+                <AssetInputUncontrolled
+                  name="incomingAsset"
+                  platformId={platformId}
+                  required
                   fullWidth
-                  options={assetsIds}
-                  renderOption={renderOption}
-                  getOptionLabel={getOptionLabel}
                   size="small"
-                  renderInput={(params) => <TextField name="incomingAsset" {...params} required />}
                 />
               </Stack>
             </Stack>
@@ -272,16 +240,12 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
                 />
               </Stack>
               <Stack width="50%">
-                <Autocomplete
-                  freeSolo
-                  disableClearable
-                  openOnFocus
+                <AssetInputUncontrolled
+                  name="outgoingAsset"
+                  platformId={platformId}
+                  required
                   fullWidth
-                  options={assetsIds}
-                  renderOption={renderOption}
-                  getOptionLabel={getOptionLabel}
                   size="small"
-                  renderInput={(params) => <TextField name="outgoingAsset" {...params} required />}
                 />
               </Stack>
             </Stack>
@@ -300,16 +264,12 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
               />
             </Stack>
             <Stack width="50%">
-              <Autocomplete
-                freeSolo
-                disableClearable
-                openOnFocus
+              <AssetInputUncontrolled
+                name="feeAsset"
+                platformId={platformId}
                 fullWidth
-                options={assetsIds}
-                renderOption={renderOption}
-                getOptionLabel={getOptionLabel}
                 size="small"
-                renderInput={(params) => <TextField name="feeAsset" {...params} />}
+                //
               />
             </Stack>
           </Stack>

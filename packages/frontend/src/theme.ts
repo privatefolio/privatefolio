@@ -305,6 +305,14 @@ export const theme: CssVarsThemeOptions = {
             },
             transparent: "on",
           },
+          popper: {
+            sx: {
+              "& .MuiAutocomplete-groupLabel": {
+                background: "transparent",
+                position: "static",
+              },
+            },
+          },
         },
       },
     },

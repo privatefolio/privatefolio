@@ -12,11 +12,11 @@ import { AssetMarketTableRow, TickerData } from "./AssetMarketTableRow"
 
 interface AssetMarketsProps {
   isLoading: boolean
-  metadata: CoingeckoMetadataFull | null
+  metadata?: CoingeckoMetadataFull
 }
 
 export function AssetMarketTable({ metadata, isLoading }: AssetMarketsProps) {
-  const isEmpty = metadata === null || !metadata.tickers
+  const isEmpty = !metadata || !metadata.tickers
 
   const rows: TickerData[] = useMemo(() => {
     if (!metadata || !metadata.tickers) return []

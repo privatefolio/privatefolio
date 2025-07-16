@@ -321,17 +321,6 @@ CREATE TABLE networth (
 `)
 
   await account.execute(sql`
-CREATE TABLE assets (
-  id VARCHAR PRIMARY KEY,
-  symbol VARCHAR NOT NULL,
-  name VARCHAR,
-  logoUrl VARCHAR,
-  priceApiId VARCHAR,
-  coingeckoId VARCHAR
-);
-`)
-
-  await account.execute(sql`
 CREATE TABLE IF NOT EXISTS server_tasks (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT,

@@ -24,26 +24,76 @@ import { createSubscription } from "src/utils/sub-utils"
 import { getCoingeckoCoins } from "../../extensions/metadata/coingecko/coingecko-asset-cache"
 import { getAccount } from "../accounts-api"
 import { getAccountWithAuditLogs } from "./audit-logs-api"
+import { getValue, setValue } from "./kv-api"
 import { enqueueTask } from "./server-tasks-api"
 
-const getQuery = (whereClause?: string) => sql`
-SELECT DISTINCT
- audit_logs.assetId AS audit_log_id,
- assets.*,
- MIN(audit_logs.timestamp) AS firstOwnedAt
-FROM
- audit_logs 
-LEFT JOIN
- assets ON assets.id = audit_logs.assetId
-${whereClause || ""}
-GROUP BY audit_logs.assetId`
+const SCHEMA_VERSION = 2
+
+export async function getAccountWithAssets(accountName: string) {
+  const account = await getAccount(accountName)
+  if (!writesAllowed) return account
+
+  const schemaVersion = await getValue<number>(accountName, `assets_schema_version`, 0)
+  if (schemaVersion < 1) {
+    await account.execute(sql`DROP TABLE IF EXISTS assets`)
+
+    await account.execute(sql`
+      CREATE TABLE assets (
+        id VARCHAR PRIMARY KEY,
+        symbol VARCHAR NOT NULL,
+        name VARCHAR,
+        logoUrl VARCHAR,
+        priceApiId VARCHAR,
+        coingeckoId VARCHAR,
+        favorite BOOLEAN
+      );`)
+  }
+  if (schemaVersion < SCHEMA_VERSION) {
+    await account.execute(sql`DROP VIEW IF EXISTS favorite_assets`)
+    await account.execute(sql`
+      CREATE VIEW favorite_assets AS
+      SELECT * FROM assets WHERE favorite = true;`)
+  }
+  if (schemaVersion !== SCHEMA_VERSION) {
+    await setValue(accountName, `assets_schema_version`, SCHEMA_VERSION)
+  }
+
+  return account
+}
+
+const getQuery = (singleAsset?: boolean) => sql`
+SELECT id, name, symbol, logoUrl, priceApiId, coingeckoId, favorite, MAX(firstOwnedAt) FROM (
+  SELECT DISTINCT
+    audit_logs.assetId AS id,
+    assets.*,
+    MIN(audit_logs.timestamp) AS firstOwnedAt
+  FROM
+    audit_logs
+  LEFT JOIN
+    assets ON assets.id = audit_logs.assetId
+  ${singleAsset ? `WHERE audit_logs.assetId = ?` : ""}
+  GROUP BY audit_logs.assetId
+
+  UNION
+
+  SELECT
+    favorite_assets.id AS id,
+    favorite_assets.*,
+    NULL AS firstOwnedAt
+  FROM
+    favorite_assets
+  ${singleAsset ? `WHERE favorite_assets.id = ?` : ""}
+) AS combined
+GROUP BY id
+`
 
 export async function getMyAssets(
   accountName: string,
   query = getQuery(),
   params?: SqlParam[]
 ): Promise<MyAsset[]> {
-  const account = await getAccountWithAuditLogs(accountName)
+  await getAccountWithAuditLogs(accountName)
+  const account = await getAccountWithAssets(accountName)
 
   try {
     const result = await account.execute(query, params)
@@ -51,11 +101,12 @@ export async function getMyAssets(
       /* eslint-disable sort-keys-fix/sort-keys-fix */
       const value = {
         id: row[0],
+        name: row[1],
         symbol: getAssetTicker(row[0] as string),
-        name: row[3],
-        logoUrl: row[4],
-        priceApiId: row[5],
-        coingeckoId: row[6],
+        logoUrl: row[3],
+        priceApiId: row[4],
+        coingeckoId: row[5],
+        favorite: row[6] ? Boolean(row[6]) : null,
         firstOwnedAt: row[7],
       }
       /* eslint-enable */
@@ -151,7 +202,7 @@ export async function getAssetsByPlatform(platformId: string): Promise<Asset[]> 
 }
 
 export async function getAsset(accountName: string, id: string): Promise<MyAsset | undefined> {
-  const records = await getMyAssets(accountName, getQuery("WHERE audit_logs.assetId = ?"), [id])
+  const records = await getMyAssets(accountName, getQuery(true), [id, id])
   if (records.length === 0) {
     const contract = getAssetContract(id)
     const platform = getAssetPlatform(id)
@@ -176,13 +227,13 @@ export async function getAsset(accountName: string, id: string): Promise<MyAsset
 }
 
 export async function upsertAssets(accountName: string, records: MyAsset[]) {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithAssets(accountName)
 
   try {
     await account.executeMany(
       `INSERT OR REPLACE INTO assets (
-        id, symbol, name, logoUrl, priceApiId, coingeckoId
-      ) VALUES (?, ?, ?, ?, ?, ?)`,
+        id, symbol, name, logoUrl, priceApiId, coingeckoId, favorite
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
       records.map((record) => [
         record.id,
         getAssetTicker(record.id),
@@ -190,6 +241,7 @@ export async function upsertAssets(accountName: string, records: MyAsset[]) {
         record.logoUrl || null,
         record.priceApiId || null,
         record.coingeckoId || null,
+        typeof record.favorite === "boolean" ? record.favorite : null,
       ])
     )
 
@@ -220,7 +272,7 @@ export async function findAssets(
 
   const assets = searchSet === "coingecko" ? await getAssets() : await getMyAssets(accountName)
 
-  if (normalizedQuery === "") {
+  if (!normalizedQuery) {
     return assets.slice(0, limit)
   }
 
@@ -290,7 +342,7 @@ export function enqueueRefetchAssets(
         return
       }
       const data = await refetchAssets()
-      const account = await getAccount(accountName)
+      const account = await getAccountWithAssets(accountName)
       account.eventEmitter.emit(SubscriptionChannel.Metadata)
       await progress([undefined, `Refetched ${data.length} assets from coingecko.com.`])
     },
@@ -305,7 +357,7 @@ export async function subscribeToMetadata(accountName: string, callback: () => v
 }
 
 export async function deleteAssetPreferences(accountName: string) {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithAssets(accountName)
   await account.execute("DELETE FROM assets")
   account.eventEmitter.emit(SubscriptionChannel.Metadata)
 }
