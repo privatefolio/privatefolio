@@ -56,17 +56,46 @@ export function NoDataButton() {
 
   return (
     <Fade in={showLoading}>
-      <Button sx={{ padding: 4 }} component={Link} to={`${activeAccountPath}/import-data`}>
+      <Box sx={{ padding: 4, paddingTop: 2 }}>
         <Typography color="text.secondary" variant="body2" component="div">
           <Stack alignItems="center">
             <DataArrayRounded sx={{ height: 64, width: 64 }} />
-            <span>No records could be found…</span>
-            <Box sx={{ marginTop: 2 }}>
-              Visit <u>Data</u> to get started.
-            </Box>
+            <span>No records found…</span>
+            <Button
+              component={Link}
+              to={`${activeAccountPath}/import-data`}
+              sx={{
+                background: "rgba(var(--mui-palette-common-onBackgroundChannel) / 0.05)",
+                fontSize: "inherit",
+                fontWeight: "inherit",
+                marginTop: 1,
+                paddingX: 2,
+                paddingY: 1,
+              }}
+            >
+              <span>
+                Import your <u>data</u> using files or connections.
+              </span>
+            </Button>
+            <Button
+              component={Link}
+              to={`${activeAccountPath}/transactions`}
+              sx={{
+                background: "rgba(var(--mui-palette-common-onBackgroundChannel) / 0.05)",
+                fontSize: "inherit",
+                fontWeight: "inherit",
+                marginTop: 1,
+                paddingX: 2,
+                paddingY: 1,
+              }}
+            >
+              <span>
+                Add a <u>transaction</u> manually.
+              </span>
+            </Button>
           </Stack>
         </Typography>
-      </Button>
+      </Box>
     </Fade>
   )
 }

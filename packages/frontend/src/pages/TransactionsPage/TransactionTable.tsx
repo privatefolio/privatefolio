@@ -1,9 +1,10 @@
 import { Add, InfoOutlined } from "@mui/icons-material"
-import { Button, TableCell, TableRow } from "@mui/material"
+import { Button, Stack, TableCell, TableRow, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { throttle } from "lodash-es"
 import React, { MutableRefObject, useCallback, useEffect, useMemo, useState } from "react"
 import { AttentionBlock } from "src/components/AttentionBlock"
+import { TransactionIcon } from "src/components/icons"
 import { SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { $hideSpam } from "src/stores/device-settings-store"
@@ -235,6 +236,18 @@ export function TransactionTable(props: TransactionsTableProps) {
         headCells={headCells}
         queryFn={queryFn}
         TableRowComponent={TransactionTableRow}
+        emptyContent={
+          <Button sx={{ padding: 4 }} onClick={toggleAddTransactionDrawer}>
+            <Typography color="text.secondary" variant="body2" component="div">
+              <Stack alignItems="center">
+                <TransactionIcon sx={{ height: 64, width: 64 }} />
+                <span>
+                  Click to <u>add a new transaction</u>.
+                </span>
+              </Stack>
+            </Typography>
+          </Button>
+        }
         addNewRow={
           !toggleAddTransactionDrawer ? undefined : (
             <AttentionBlock component={Button} onClick={toggleAddTransactionDrawer} fullWidth>

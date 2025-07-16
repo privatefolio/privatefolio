@@ -1,6 +1,7 @@
 import { NewServerFile, ServerFile, SqlParam, SubscriptionChannel } from "src/interfaces"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { createSubscription } from "src/utils/sub-utils"
+import { writesAllowed } from "src/utils/utils"
 
 import { getAccount } from "../accounts-api"
 
@@ -33,6 +34,7 @@ export async function getServerFiles(
       return value as ServerFile
     })
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to query server files: ${error}`)
   }
 }
@@ -102,6 +104,7 @@ export async function countServerFiles(
     const result = await account.execute(query, params)
     return result[0][0] as number
   } catch (error) {
+    if (!writesAllowed) return 0
     throw new Error(`Failed to count server files: ${error}`)
   }
 }

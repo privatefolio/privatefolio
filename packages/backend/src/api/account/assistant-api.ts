@@ -89,6 +89,7 @@ export async function getChatHistory(
       return value as ChatMessage
     })
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to query chat history: ${error}`)
   }
 }
@@ -214,6 +215,7 @@ export async function getConversationIds(
     const result = await account.execute(query, params)
     return result.map((row) => row[0] as string)
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to query conversation IDs: ${error}`)
   }
 }
@@ -229,6 +231,7 @@ export async function getChatRoles(
     const result = await account.execute(query, params)
     return result.map((row) => row[0] as string)
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to query chat roles: ${error}`)
   }
 }
@@ -320,6 +323,7 @@ export async function getConversationSummaries(
       return value as ChatConversation
     })
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to query conversation summaries: ${error}`)
   }
 }
@@ -335,6 +339,7 @@ export async function countConversations(
     const result = await account.execute(query, params)
     return result[0][0] as number
   } catch (error) {
+    if (!writesAllowed) return 0
     throw new Error(`Failed to count conversations: ${error}`)
   }
 }

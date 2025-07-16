@@ -169,6 +169,7 @@ export async function getTrades(
       return value as Trade
     })
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to query trades: ${error}`)
   }
 }
@@ -280,6 +281,7 @@ export async function countTrades(
     const result = await account.execute(query, params)
     return result[0][0] as number
   } catch (error) {
+    if (!writesAllowed) return 0
     throw new Error(`Failed to count trades: ${error}`)
   }
 }
@@ -761,6 +763,7 @@ export async function getTradeAuditLogs(accountName: string, tradeId: string): P
     )
     return result.map((row) => row[0] as string)
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to get audit logs for trade: ${error}`)
   }
 }
@@ -777,6 +780,7 @@ export async function getTradeTransactions(
     )
     return result.map((row) => row[0] as string)
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to get transactions for trade: ${error}`)
   }
 }
@@ -804,6 +808,7 @@ export async function getTradePnL(
     }))
     /* eslint-enable */
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to get pnl for trade: ${error}`)
   }
 }
@@ -890,6 +895,7 @@ export async function getAccountPnL(
 
     return Array.from(timestampMap.values()).sort((a, b) => a.timestamp - b.timestamp)
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to get account pnl: ${error}`)
   }
 }

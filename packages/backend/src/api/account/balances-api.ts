@@ -4,7 +4,7 @@ import { EventCause, ResolutionString, SqlParam } from "src/interfaces"
 import { PLATFORMS_META } from "src/settings/platforms"
 import { getAssetContract, getAssetPlatform, isEvmPlatform } from "src/utils/assets-utils"
 import { formatDate, ONE_DAY } from "src/utils/formatting-utils"
-import { floorTimestamp, noop } from "src/utils/utils"
+import { floorTimestamp, noop, writesAllowed } from "src/utils/utils"
 
 import {
   Balance,
@@ -39,6 +39,7 @@ export async function getBalances(
       return value
     })
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to query balances: ${error}`)
   }
 }
