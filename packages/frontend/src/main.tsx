@@ -21,7 +21,6 @@ import { ConfirmDialogProvider } from "./hooks/useConfirm"
 import { ONE_DAY_CACHE } from "./settings"
 import { ThemeProvider } from "./ThemeProvider"
 import { isElectron } from "./utils/electron-utils"
-import { isDevelopment } from "./utils/environment-utils"
 import { ONE_DAY } from "./utils/formatting-utils"
 
 const Router = isElectron ? HashRouter : BrowserRouter
@@ -79,7 +78,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           </ConfirmDialogProvider>
         </ThemeProvider>
       </LocalizationProvider>
-      {isDevelopment && <ReactQueryDevtools />}
+      {/* {isDevelopment && <ReactQueryDevtools />} */}
     </PersistQueryClientProvider>
   </Router>
 )
