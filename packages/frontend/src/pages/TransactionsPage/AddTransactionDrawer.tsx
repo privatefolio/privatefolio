@@ -1,7 +1,6 @@
 import {
-  Autocomplete,
-  Box,
   Drawer,
+  FormHelperText,
   ListItemAvatar,
   ListItemText,
   MenuItem,
@@ -15,19 +14,18 @@ import { WritableAtom } from "nanostores"
 import { enqueueSnackbar } from "notistack"
 import { BINANCE_WALLETS } from "privatefolio-backend/src/extensions/connections/binance/binance-settings"
 import { BINANCE_PLATFORM_ID } from "privatefolio-backend/src/extensions/utils/binance-utils"
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
+import { iconMap } from "src/components/ActionBlock"
 import { AddressInput } from "src/components/AddressInput"
-import { AssetBlock } from "src/components/AssetBlock"
+import { AssetInput } from "src/components/AssetInput"
 import { DrawerHeader } from "src/components/DrawerHeader"
 import { LoadingButton } from "src/components/LoadingButton"
+import { PlatformInput } from "src/components/PlatformInput"
 import { SectionTitle } from "src/components/SectionTitle"
 import { MANUAL_TX_TYPES, TransactionType } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
-import { $assetMap, $platformMap } from "src/stores/metadata-store"
-import { formatTicker, getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
+import { formatTicker, getAssetPlatform } from "src/utils/assets-utils"
 import { $rpc } from "src/workers/remotes"
-
-import { PlatformAvatar } from "../../components/PlatformAvatar"
 
 export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
   const { atom } = props
@@ -35,19 +33,23 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
   const open = useStore(atom)
 
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string>()
 
   const [platformId, setPlatform] = useState<string>("")
   const [type, setType] = useState<TransactionType>("Swap")
-  const [binanceWallet, setBinanceWallet] = useState("Spot")
+  const [walletInput, setWallet] = useState<string>("")
+  const [binanceWallet, setBinanceWallet] = useState(BINANCE_WALLETS.spot)
+
+  const [incomingInput, setIncoming] = useState<string>("")
+  const [incomingAssetInput, setIncomingAsset] = useState<string>("")
+
+  const [outgoingInput, setOutgoing] = useState<string>("")
+  const [outgoingAssetInput, setOutgoingAsset] = useState<string>("")
+
+  const [feeInput, setFee] = useState<string>("")
+  const [feeAssetInput, setFeeAsset] = useState<string>("")
 
   const [notes, setNotes] = useState("")
-
-  const assetMap = useStore($assetMap)
-
-  const assetsIds: string[] = useMemo(
-    () => Object.keys(assetMap).filter((x) => getAssetPlatform(x) === platformId),
-    [assetMap, platformId]
-  )
 
   const handleTextInputChange = (event) => {
     const newValue = event.target.value.replace("\n", "")
@@ -62,6 +64,9 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
       event.preventDefault()
       const formData = new FormData(event.target as HTMLFormElement)
 
+      /**
+       * 1. Extract
+       */
       const dateAndTime = new Date(formData.get("date") as string)
       const timeValue = formData.get("time") as string
       const [hrs, minutes] = timeValue.split(":")
@@ -70,28 +75,29 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
       dateAndTime.setSeconds(0)
       const timestamp = dateAndTime.getTime()
 
-      const wallet =
-        platformId === BINANCE_PLATFORM_ID ? binanceWallet : (formData.get("walletAddr") as string)
+      const wallet = platformId === BINANCE_PLATFORM_ID ? binanceWallet : walletInput
 
-      const incoming = formData.get("incoming") as string
-      const outgoing = formData.get("outgoing") as string
-      const fee = formData.get("fee") as string
+      let incoming: string | undefined
+      let incomingAsset: string | undefined
+      let outgoing: string | undefined
+      let outgoingAsset: string | undefined
+      let feeAsset = feeAssetInput
+      const fee = feeInput
 
-      let incomingAsset = formData.get("incomingAsset") as string
-      let outgoingAsset = formData.get("outgoingAsset") as string
-      let feeAsset = formData.get("feeAsset") as string
+      if (type === "Deposit") {
+        incomingAsset = incomingAssetInput
+        incoming = incomingInput
+      } else if (type === "Withdraw") {
+        outgoingAsset = outgoingAssetInput
+        outgoing = outgoingInput
+      } else {
+        incomingAsset = incomingAssetInput
+        incoming = incomingInput
+        outgoingAsset = outgoingAssetInput
+        outgoing = outgoingInput
+      }
 
-      const incomingAssetTicker = incomingAsset ? getAssetTicker(incomingAsset) : ""
-      const outgoingAssetTicker = outgoingAsset ? getAssetTicker(outgoingAsset) : ""
-      const feeAssetTicker = feeAsset ? getAssetTicker(feeAsset) : ""
-
-      incomingAsset =
-        assetsIds.find((assetId) => getAssetTicker(assetId) === incomingAssetTicker) || ""
-      outgoingAsset =
-        assetsIds.find((assetId) => getAssetTicker(assetId) === outgoingAssetTicker) || ""
-      feeAsset = assetsIds.find((assetId) => getAssetTicker(assetId) === feeAssetTicker) || ""
-
-      // if assets don't have a platforms (free solo), set it to platformId
+      // if the assets don't have a platformId (free solo), set them to platformId
       if (incomingAsset && !getAssetPlatform(incomingAsset)) {
         incomingAsset = `${platformId}:${formatTicker(incomingAsset)}`
       }
@@ -102,59 +108,84 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
         feeAsset = `${platformId}:${formatTicker(feeAsset)}`
       }
 
-      if (!incoming && !outgoing && !fee) return
+      /**
+       * 2. Validate
+       */
+      if (!wallet) return setError("Wallet is required")
+      if (incoming && !incomingAsset) return setError("Incoming asset is required")
+      if (!incoming && incomingAsset) return setError("Incoming amount is required")
+      if (outgoing && !outgoingAsset) return setError("Outgoing asset is required")
+      if (!outgoing && outgoingAsset) return setError("Outgoing amount is required")
+      if (fee && !feeAsset) return setError("Fee asset is required")
+      if (!fee && feeAsset) return setError("Fee amount is required")
+      if (type === "Deposit" && !incoming) return setError("Deposit requires a incoming amount")
+      if (type === "Withdraw" && !outgoing) return setError("Withdraw requires a outgoing amount")
+      if (type === "Swap" && (!incoming || !outgoing))
+        return setError("Swap requires a incoming and outgoing amount")
 
+      if (!incomingInput && !outgoingInput && !feeInput) return setError("Fill at least one field")
+
+      /**
+       * 3. Submit
+       */
+      const tx = {
+        fee,
+        feeAsset,
+        incoming,
+        incomingAsset,
+        metadata: {},
+        notes,
+        outgoing,
+        outgoingAsset,
+        platformId,
+        timestamp,
+        type,
+        wallet,
+      }
+      console.log("New transaction:", tx)
+
+      setError(undefined)
       setLoading(true)
       rpc
-        .addTransaction(
-          {
-            fee,
-            feeAsset,
-            incoming,
-            incomingAsset,
-            metadata: {},
-            notes,
-            outgoing,
-            outgoingAsset,
-            platformId,
-            timestamp,
-            type,
-            wallet,
-          },
-          activeAccount
-        )
+        .addTransaction(tx, activeAccount)
         .then(() => {
           atom.set(false)
           enqueueSnackbar("Transaction added", { variant: "success" })
         })
         .catch((error) => {
-          enqueueSnackbar(error.message, { variant: "error" })
+          console.error(error)
+          setError(String(error))
           setLoading(false)
         })
     },
-    [atom, platformId, binanceWallet, type, notes, rpc, activeAccount, assetsIds]
+    [
+      platformId,
+      binanceWallet,
+      walletInput,
+      feeAssetInput,
+      feeInput,
+      type,
+      incomingInput,
+      outgoingInput,
+      notes,
+      rpc,
+      activeAccount,
+      incomingAssetInput,
+      outgoingAssetInput,
+      atom,
+    ]
   )
-
-  const platformMap = useStore($platformMap)
-  const platforms = useMemo(() => Object.values(platformMap), [platformMap])
 
   useEffect(() => {
     if (open) return
 
-    setPlatform(platforms[0]?.id || "")
-    setBinanceWallet("Spot")
+    setPlatform("")
+    setBinanceWallet(BINANCE_WALLETS.spot)
     setType("Swap")
     setNotes("")
     setLoading(false)
-  }, [open, platforms])
-
-  const renderOption = (props, option) => (
-    <Box component="li" {...props} key={option}>
-      <AssetBlock id={option} variant="tablecell" href={undefined} hideTooltip />
-    </Box>
-  )
-
-  const getOptionLabel = (option: string) => (!option ? "" : getAssetTicker(option))
+    setError(undefined)
+  }, [open])
 
   return (
     <Drawer open={open} onClose={() => atom.set(false)}>
@@ -163,23 +194,14 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
           <DrawerHeader toggleOpen={() => atom.set(false)}>Add transaction</DrawerHeader>
           <div>
             <SectionTitle>Platform</SectionTitle>
-            <Select
-              variant="outlined"
+            <PlatformInput
+              size="small"
               fullWidth
               value={platformId}
-              onChange={(event) => setPlatform(event.target.value)}
-            >
-              {platforms?.map((x) => (
-                <MenuItem key={x.id} value={x.id}>
-                  <Stack direction="row" alignItems="center">
-                    <ListItemAvatar>
-                      <PlatformAvatar src={x.image} alt={x.name} size="small" />
-                    </ListItemAvatar>
-                    <ListItemText primary={x.name} />
-                  </Stack>
-                </MenuItem>
-              ))}
-            </Select>
+              onChange={setPlatform}
+              required
+              //
+            />
           </div>
           <div>
             <SectionTitle>Wallet</SectionTitle>
@@ -200,7 +222,8 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
               </Select>
             ) : (
               <AddressInput
-                name="walletAddr"
+                value={walletInput}
+                onChange={setWallet}
                 autoComplete="off"
                 variant="outlined"
                 fullWidth
@@ -221,11 +244,19 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
               value={type}
               onChange={(event) => setType(event.target.value as TransactionType)}
             >
-              {MANUAL_TX_TYPES.map((x) => (
-                <MenuItem key={x} value={x}>
-                  <ListItemText primary={x} />
-                </MenuItem>
-              ))}
+              {MANUAL_TX_TYPES.map((x) => {
+                const IconComponent = iconMap[x]
+                return (
+                  <MenuItem key={x} value={x}>
+                    <Stack direction="row" alignItems="center">
+                      <ListItemAvatar>
+                        {IconComponent && <IconComponent sx={{ fontSize: "inherit" }} />}
+                      </ListItemAvatar>
+                      <ListItemText primary={x} />
+                    </Stack>
+                  </MenuItem>
+                )
+              })}
             </Select>
           </div>
           {type !== "Withdraw" ? (
@@ -233,26 +264,25 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
               <Stack width="50%">
                 <SectionTitle>Incoming</SectionTitle>
                 <TextField
-                  name="incoming"
+                  value={incomingInput}
+                  onChange={(event) => setIncoming(event.target.value)}
                   type="text"
                   autoComplete="off"
                   variant="outlined"
                   fullWidth
                   size="small"
                   inputProps={{ inputMode: "decimal", pattern: "[0-9]*[.]?[0-9]*" }}
+                  error={error?.includes("Incoming amount")}
                 />
               </Stack>
               <Stack width="50%">
-                <Autocomplete
-                  freeSolo
-                  disableClearable
-                  openOnFocus
+                <AssetInput
+                  value={incomingAssetInput}
+                  onChange={setIncomingAsset}
+                  platformId={platformId}
                   fullWidth
-                  options={assetsIds}
-                  renderOption={renderOption}
-                  getOptionLabel={getOptionLabel}
                   size="small"
-                  renderInput={(params) => <TextField name="incomingAsset" {...params} required />}
+                  error={error?.includes("Incoming asset")}
                 />
               </Stack>
             </Stack>
@@ -262,26 +292,25 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
               <Stack width="50%">
                 <SectionTitle>Outgoing</SectionTitle>
                 <TextField
-                  name="outgoing"
+                  value={outgoingInput}
+                  onChange={(event) => setOutgoing(event.target.value)}
                   type="text"
                   autoComplete="off"
                   variant="outlined"
                   fullWidth
                   size="small"
                   inputProps={{ inputMode: "decimal", pattern: "[0-9]*[.]?[0-9]*" }}
+                  error={error?.includes("Outgoing amount")}
                 />
               </Stack>
               <Stack width="50%">
-                <Autocomplete
-                  freeSolo
-                  disableClearable
-                  openOnFocus
+                <AssetInput
+                  value={outgoingAssetInput}
+                  onChange={setOutgoingAsset}
+                  platformId={platformId}
                   fullWidth
-                  options={assetsIds}
-                  renderOption={renderOption}
-                  getOptionLabel={getOptionLabel}
                   size="small"
-                  renderInput={(params) => <TextField name="outgoingAsset" {...params} required />}
+                  error={error?.includes("Outgoing asset")}
                 />
               </Stack>
             </Stack>
@@ -290,26 +319,25 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
             <Stack width="50%">
               <SectionTitle>Fee</SectionTitle>
               <TextField
-                name="fee"
+                value={feeInput}
+                onChange={(event) => setFee(event.target.value)}
                 type="text"
                 autoComplete="off"
                 variant="outlined"
                 fullWidth
                 size="small"
                 inputProps={{ inputMode: "decimal", pattern: "[0-9]*[.]?[0-9]*" }}
+                error={error?.includes("Fee amount")}
               />
             </Stack>
             <Stack width="50%">
-              <Autocomplete
-                freeSolo
-                disableClearable
-                openOnFocus
+              <AssetInput
+                value={feeAssetInput}
+                onChange={setFeeAsset}
+                platformId={platformId}
                 fullWidth
-                options={assetsIds}
-                renderOption={renderOption}
-                getOptionLabel={getOptionLabel}
                 size="small"
-                renderInput={(params) => <TextField name="feeAsset" {...params} />}
+                error={error?.includes("Fee asset")}
               />
             </Stack>
           </Stack>
@@ -363,6 +391,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
               placeholder="Write a custom note…"
             />
           </div>
+          {error && <FormHelperText error>{error}</FormHelperText>}
           <div>
             <LoadingButton
               loading={loading}

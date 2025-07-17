@@ -1,7 +1,9 @@
-import { Skeleton, Stack, Typography } from "@mui/material"
+import { StarOutlineRounded, StarRounded } from "@mui/icons-material"
+import { IconButton, Skeleton, Stack, Tooltip, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
+import { useQuery } from "@tanstack/react-query"
 import { getFullMetadata } from "privatefolio-backend/build/src/extensions/metadata/coingecko/coingecko-asset-api"
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useParams, useSearchParams } from "react-router-dom"
 import { AmountBlock } from "src/components/AmountBlock"
 import { BackButton } from "src/components/BackButton"
@@ -14,7 +16,8 @@ import { SectionTitle } from "src/components/SectionTitle"
 import { SubtitleText } from "src/components/SubtitleText"
 import { Tabs } from "src/components/Tabs"
 import { UserWalletIcon } from "src/components/UserWalletIcon"
-import { Balance, CoingeckoMetadataFull, MyAsset } from "src/interfaces"
+import { useAsset } from "src/hooks/useAsset"
+import { Balance } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 import { getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
 import { $rpc } from "src/workers/remotes"
@@ -39,7 +42,6 @@ export default function AssetPage() {
   const assetId = params.assetId // ?.toLocaleUpperCase()
   const [searchParams] = useSearchParams()
   const tab = searchParams.get("tab") || "details"
-  const assetMap = useStore($assetMap)
 
   const filterMap = useStore($filterOptionsMap)
 
@@ -47,8 +49,6 @@ export default function AssetPage() {
 
   const activeAccount = useStore($activeAccount)
   const rpc = useStore($rpc)
-
-  const [asset, setAsset] = useState<MyAsset | undefined>()
 
   useEffect(() => {
     document.title = `${getAssetTicker(assetId)} (Asset) - ${activeAccount} - Privatefolio`
@@ -70,29 +70,24 @@ export default function AssetPage() {
     [balances, assetId]
   )
 
-  const [isLoading, setLoading] = useState(false)
-  const [metadata, setMetadata] = useState<CoingeckoMetadataFull | null>(null)
+  const [asset, isAssetLoading] = useAsset(assetId)
 
-  useEffect(() => {
-    if (!assetId) return
+  const { data: metadata, isLoading: isMetadataLoading } = useQuery({
+    enabled: !!asset?.coingeckoId,
+    queryFn: () => {
+      if (!asset?.coingeckoId) throw new Error("Asset has no coingeckoId")
+      return getFullMetadata(asset.coingeckoId)
+    },
+    queryKey: ["asset-full-metadata", asset?.coingeckoId],
+  })
 
-    if (assetMap[assetId]) {
-      setAsset(assetMap[assetId])
-      if (!assetMap[assetId].coingeckoId) return
-      getFullMetadata(assetMap[assetId].coingeckoId).then(setMetadata)
-      return
-    }
+  const isLoading = isAssetLoading || isMetadataLoading
 
-    setLoading(true)
-    rpc
-      .getAsset(activeAccount, assetId)
-      .then((x) => {
-        setAsset(x)
-        return x?.coingeckoId ? getFullMetadata(x.coingeckoId) : null
-      })
-      .then(setMetadata)
-      .finally(() => setLoading(false))
-  }, [activeAccount, assetId, assetMap, rpc])
+  const handleStarClick = useCallback(() => {
+    if (!asset) return
+    $assetMap.setKey(asset.id, { ...asset, favorite: !asset.favorite })
+    rpc.patchAsset(activeAccount, asset.id, { favorite: !asset.favorite })
+  }, [activeAccount, asset, rpc])
 
   if (!filterMap.assetId) return <DefaultSpinner wrapper />
   if (!assetId) return <FourZeroFourPage show type="Asset" />
@@ -119,13 +114,46 @@ export default function AssetPage() {
             alt={getAssetTicker(assetId)}
           />
           <Stack>
-            <Typography variant="h6" fontFamily={SerifFont} sx={{ marginBottom: -0.5 }}>
-              <span>{getAssetTicker(assetId)}</span>
-            </Typography>
+            <Stack direction="row" alignItems="flex-end" gap={0.25}>
+              <Typography variant="h6" fontFamily={SerifFont} sx={{ marginBottom: -0.5 }}>
+                <span>{getAssetTicker(assetId)}</span>
+              </Typography>
+              <Tooltip
+                title={
+                  asset?.firstOwnedAt
+                    ? "Assets you own are automatically favorited"
+                    : asset?.favorite
+                      ? "Remove from favorites"
+                      : "Add to favorites"
+                }
+              >
+                <span>
+                  <IconButton
+                    size="small"
+                    sx={{ marginY: -0.5 }}
+                    onClick={handleStarClick}
+                    disabled={!!asset?.firstOwnedAt}
+                  >
+                    {asset?.favorite || !!asset?.firstOwnedAt ? (
+                      <StarRounded fontSize="small" />
+                    ) : (
+                      <StarOutlineRounded fontSize="small" />
+                    )}
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Stack>
             <SubtitleText>{asset?.name || metadata?.name}</SubtitleText>
           </Stack>
         </Stack>
-        <Stack gap={6} direction="row" flexWrap="wrap">
+        <Stack
+          gap={6}
+          direction="row"
+          flexWrap="wrap"
+          sx={{
+            "& > div": { minHeight: 51.45 },
+          }}
+        >
           {getAssetPlatform(assetId) && getAssetPlatform(assetId) !== "coingecko" && (
             <div>
               <SectionTitle>Platform</SectionTitle>

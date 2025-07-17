@@ -26,7 +26,7 @@ import { formatWebsiteLink, noop } from "src/utils/utils"
 
 type AssetDetailsProps = {
   isLoading: boolean
-  metadata: CoingeckoMetadataFull | null
+  metadata?: CoingeckoMetadataFull
 }
 
 const descriptionCharLimit = 500
@@ -34,7 +34,7 @@ const descriptionCharLimit = 500
 export function AssetDetails(props: AssetDetailsProps) {
   const { metadata, isLoading } = props
 
-  const isEmpty = metadata === null
+  const isEmpty = !metadata
 
   const [showAllCategories, setShowAllCategories] = React.useState(false)
   const [showFullDescription, setShowFullDescription] = React.useState(false)

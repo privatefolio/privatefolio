@@ -35,11 +35,20 @@ import {
   useRegisterActions,
   VisualState,
 } from "kbar"
-import React, { useEffect, useMemo, useState } from "react"
+import { debounce } from "lodash-es"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { APP_ACTIONS } from "src/AppActions"
 import { useBreakpoints } from "src/hooks/useBreakpoints"
-import { Asset, FindPlatformsResult, RichExtension, Transaction } from "src/interfaces"
+import {
+  Asset,
+  Blockchain,
+  Exchange,
+  FindPlatformsResult,
+  RichExtension,
+  Transaction,
+} from "src/interfaces"
+import { INPUT_DEBOUNCE_DURATION, INPUT_MAX_DEBOUNCE_DURATION } from "src/settings"
 import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
 import { appBarHeight } from "src/theme"
@@ -121,85 +130,180 @@ export const SearchBar = () => {
   const [extensionsFound, setExtensionsFound] = useState<RichExtension[]>([])
   const [extensionsLoading, setExtensionsLoading] = useState(false)
 
-  useEffect(() => {
-    setAssetsFound([])
-    setAssetsLoading(false)
-    ;(async () => {
-      try {
-        setAssetsLoading(true)
-        const assets = await rpc.findAssets(activeAccount, searchQuery, 5, false, "coingecko")
-        const myAssets = await rpc.findAssets(activeAccount, searchQuery, 5, false, "my-assets")
-        setAssetsFound([...myAssets, ...assets])
-      } catch {
-        setAssetsFound([])
-      } finally {
-        setAssetsLoading(false)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleAssetsSearch = useCallback(
+    debounce(
+      async (query: string, signal: AbortSignal) => {
+        if (!query || query.length < 1) {
+          setAssetsFound([])
+          return
+        }
+
+        try {
+          setAssetsLoading(true)
+          const [assets, myAssets] = await Promise.all([
+            rpc.findAssets(activeAccount, query, 5, false, "coingecko"),
+            rpc.findAssets(activeAccount, query, 5, false, "my-assets"),
+          ])
+
+          if (signal.aborted) throw new Error(signal.reason)
+
+          const assetsMap = new Map<string, Asset>()
+          assets.forEach((asset) => {
+            assetsMap.set(asset.id, asset)
+          })
+          myAssets.forEach((asset) => {
+            assetsMap.set(asset.id, asset)
+          })
+
+          setAssetsFound(Array.from(assetsMap.values()))
+        } catch {
+          setAssetsFound([])
+        } finally {
+          setAssetsLoading(false)
+        }
+      },
+      INPUT_DEBOUNCE_DURATION,
+      {
+        leading: false,
+        maxWait: INPUT_MAX_DEBOUNCE_DURATION,
+        trailing: true,
       }
-    })()
-  }, [searchQuery, rpc, activeAccount])
+    ),
+    [rpc, activeAccount]
+  )
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleTxnsSearch = useCallback(
+    debounce(
+      async (query: string, signal: AbortSignal) => {
+        try {
+          const txHash = normalizeTxHash(query)
+          setTxnsLoading(true)
+          const transaction = await rpc.getTransactionsByTxHash(activeAccount, txHash)
+
+          if (signal.aborted) throw new Error(signal.reason)
+
+          setTxnsFound(transaction)
+        } catch {
+          setTxnsFound([])
+        } finally {
+          setTxnsLoading(false)
+        }
+      },
+      INPUT_DEBOUNCE_DURATION,
+      {
+        leading: false,
+        maxWait: INPUT_MAX_DEBOUNCE_DURATION,
+        trailing: true,
+      }
+    ),
+    [rpc, activeAccount]
+  )
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handlePlatformsSearch = useCallback(
+    debounce(
+      async (query: string, signal: AbortSignal) => {
+        if (!query || query.length < 1) {
+          setPlatformsFound({ blockchains: [], exchanges: [] })
+          return
+        }
+
+        try {
+          setPlatformsLoading(true)
+          const [platforms, myPlatforms] = await Promise.all([
+            rpc.findPlatforms(activeAccount, query, 5, false, "coingecko"),
+            rpc.findPlatforms(activeAccount, query, 5, false, "my-platforms"),
+          ])
+
+          if (signal.aborted) throw new Error(signal.reason)
+
+          const blockchainsMap = new Map<string, Blockchain>()
+          platforms.blockchains.forEach((blockchain) => {
+            blockchainsMap.set(blockchain.id, blockchain)
+          })
+          myPlatforms.blockchains.forEach((blockchain) => {
+            blockchainsMap.set(blockchain.id, blockchain)
+          })
+
+          const exchangesMap = new Map<string, Exchange>()
+          platforms.exchanges.forEach((exchange) => {
+            exchangesMap.set(exchange.id, exchange)
+          })
+          myPlatforms.exchanges.forEach((exchange) => {
+            exchangesMap.set(exchange.id, exchange)
+          })
+
+          setPlatformsFound({
+            blockchains: Array.from(blockchainsMap.values()),
+            exchanges: Array.from(exchangesMap.values()),
+          })
+        } catch {
+          setPlatformsFound({ blockchains: [], exchanges: [] })
+        } finally {
+          setPlatformsLoading(false)
+        }
+      },
+      INPUT_DEBOUNCE_DURATION,
+      {
+        leading: false,
+        maxWait: INPUT_MAX_DEBOUNCE_DURATION,
+        trailing: true,
+      }
+    ),
+    [rpc, activeAccount]
+  )
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleExtensionsSearch = useCallback(
+    debounce(
+      async (query: string, signal: AbortSignal) => {
+        if (!query || query.length < 1) {
+          setExtensionsFound([])
+          return
+        }
+
+        try {
+          setExtensionsLoading(true)
+          const extensions = await rpc.findExtensions(query)
+
+          if (signal.aborted) throw new Error(signal.reason)
+
+          setExtensionsFound(extensions)
+        } catch {
+          setExtensionsFound([])
+        } finally {
+          setExtensionsLoading(false)
+        }
+      },
+      INPUT_DEBOUNCE_DURATION,
+      {
+        leading: false,
+        maxWait: INPUT_MAX_DEBOUNCE_DURATION,
+        trailing: true,
+      }
+    ),
+    [rpc]
+  )
 
   useEffect(() => {
-    setTxnsFound([])
-    setTxnsLoading(false)
-    ;(async () => {
-      try {
-        const txHash = normalizeTxHash(searchQuery)
-        setTxnsLoading(true)
-        const transaction = await rpc.getTransactionsByTxHash(activeAccount, txHash)
-        setTxnsFound(transaction)
-      } catch {
-        setTxnsFound([])
-      } finally {
-        setTxnsLoading(false)
-      }
-    })()
-  }, [searchQuery, rpc, activeAccount])
+    const controller = new AbortController()
+    handleAssetsSearch(searchQuery, controller.signal)
+    handleTxnsSearch(searchQuery, controller.signal)
+    handlePlatformsSearch(searchQuery, controller.signal)
+    handleExtensionsSearch(searchQuery, controller.signal)
 
-  useEffect(() => {
-    setPlatformsFound({ blockchains: [], exchanges: [] })
-    setPlatformsLoading(false)
-    ;(async () => {
-      if (!searchQuery || searchQuery.length < 1) {
-        setPlatformsFound({ blockchains: [], exchanges: [] })
-        return
-      }
-
-      try {
-        setPlatformsLoading(true)
-        const platforms = await rpc.findPlatforms(activeAccount, searchQuery, 5, "coingecko")
-        const myPlatforms = await rpc.findPlatforms(activeAccount, searchQuery, 5, "my-platforms")
-        setPlatformsFound({
-          blockchains: [...myPlatforms.blockchains, ...platforms.blockchains],
-          exchanges: [...myPlatforms.exchanges, ...platforms.exchanges],
-        })
-      } catch {
-        setPlatformsFound({ blockchains: [], exchanges: [] })
-      } finally {
-        setPlatformsLoading(false)
-      }
-    })()
-  }, [searchQuery, rpc, activeAccount])
-
-  useEffect(() => {
-    setExtensionsFound([])
-    setExtensionsLoading(false)
-    ;(async () => {
-      if (!searchQuery || searchQuery.length < 1) {
-        setExtensionsFound([])
-        return
-      }
-
-      try {
-        setExtensionsLoading(true)
-        const extensions = await rpc.findExtensions(searchQuery)
-        setExtensionsFound(extensions)
-      } catch {
-        setExtensionsFound([])
-      } finally {
-        setExtensionsLoading(false)
-      }
-    })()
-  }, [searchQuery, rpc])
+    return function cleanup() {
+      controller.abort("Result no longer needed.")
+    }
+  }, [
+    searchQuery,
+    handleAssetsSearch,
+    handleTxnsSearch,
+    handlePlatformsSearch,
+    handleExtensionsSearch,
+  ])
 
   const txnsFoundActions = useMemo<Action[]>(() => {
     const txHash = searchQuery

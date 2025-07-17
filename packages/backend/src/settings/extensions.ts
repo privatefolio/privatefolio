@@ -28,9 +28,9 @@ import { Extension } from "src/interfaces"
 export const extensions: Extension[] = [
   {
     authorGithub: "kernelwhisperer",
-    description: "Get assets, exchanges and blockchain data from Coingecko.",
+    description: "Get assets, exchanges and blockchain data from CoinGecko.",
     extensionLogoUrl: "$STATIC_ASSETS/extensions/coingecko.svg",
-    extensionName: "Coingecko",
+    extensionName: "CoinGecko",
     extensionType: "metadata",
     extensionVersion: "1.0.0",
     githubUrl: "https://github.com/privatefolio/privatefolio",

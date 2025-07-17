@@ -27,6 +27,7 @@ import {
   Typography,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
+import { useQuery } from "@tanstack/react-query"
 import { enqueueSnackbar } from "notistack"
 import React, { useEffect, useMemo } from "react"
 import { CloudInstanceStatus, getCheckoutLink, getPortalLink } from "src/api/privatecloud-api"
@@ -38,8 +39,10 @@ import { Gravatar } from "src/components/Gravatar"
 import { LogoText } from "src/components/Header/LogoText"
 import { SectionTitle } from "src/components/SectionTitle"
 import { StaggeredList } from "src/components/StaggeredList"
+import { APP_VERSION } from "src/env"
 import { useConfirm } from "src/hooks/useConfirm"
-import { $latestVersion } from "src/stores/app-store"
+import { ONE_HOUR_CACHE } from "src/settings"
+import { getLatestAppVersion } from "src/stores/app-store"
 import { $cloudAuth, unlockApp } from "src/stores/auth-store"
 import {
   $cloudInstance,
@@ -77,7 +80,12 @@ export default function CloudUserPage({ show }: { show: boolean }) {
   const serverMutating = useStore($cloudServerMutating)
   const serverInfo = useStore($cloudServerInfo)
   const auth = useStore($cloudAuth)
-  const latestVersion = useStore($latestVersion)
+
+  const { data: latestVersion = APP_VERSION } = useQuery({
+    queryFn: getLatestAppVersion,
+    queryKey: ["latest-app-version"],
+    ...ONE_HOUR_CACHE,
+  })
 
   const serverStatus = useMemo(() => {
     if (auth.needsSetup) return "needs setup"

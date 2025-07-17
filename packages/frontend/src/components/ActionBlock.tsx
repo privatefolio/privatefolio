@@ -1,10 +1,12 @@
 import {
   AddRounded,
+  CardGiftcardRounded,
   CloudOutlined,
   CurrencyExchangeRounded,
   DataObjectRounded,
   DoneRounded,
   FolderOutlined,
+  InterestsRounded,
   NorthEastRounded,
   QuestionMarkRounded,
   RemoveRounded,
@@ -46,7 +48,7 @@ const colorMap: Partial<Record<Action, string>> = {
   Swap: blue[500],
 }
 
-const iconMap: Partial<Record<Action, SvgIconComponent>> = {
+export const iconMap: Partial<Record<Action, SvgIconComponent>> = {
   Approve: DoneRounded,
   Buy: AddRounded,
   Closed: StopRounded,
@@ -54,10 +56,12 @@ const iconMap: Partial<Record<Action, SvgIconComponent>> = {
   Deposit: AddRounded,
   Fee: RemoveRounded,
   "File Import": FolderOutlined,
+  Gift: CardGiftcardRounded,
   Long: NorthEastRounded,
   Metadata: DataObjectRounded,
   Mint: SwapHoriz,
   Open: ShowChartOutlined,
+  Other: InterestsRounded,
   "Price API": CurrencyExchangeRounded,
   Reward: AddRounded,
   Sell: RemoveRounded,

@@ -1,12 +1,11 @@
 import { VerifiedRounded } from "@mui/icons-material"
 import { Box, Skeleton, Stack, Tooltip } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React, { useEffect, useMemo, useState } from "react"
+import React from "react"
+import { usePlatform } from "src/hooks/usePlatform"
 import { Platform } from "src/interfaces"
 import { $activeAccountPath } from "src/stores/account-store"
-import { $inMemoryDataQueryTime, $platformMap } from "src/stores/metadata-store"
 import { MonoFont } from "src/theme"
-import { $rpc } from "src/workers/remotes"
 
 import { IdentifierBlock, IdentifierBlockProps } from "./IdentifierBlock"
 import { PlatformAvatar } from "./PlatformAvatar"
@@ -21,36 +20,12 @@ export type PlatformBlockProps = Omit<IdentifierBlockProps, "id"> & {
 export function PlatformBlock(props: PlatformBlockProps) {
   const { id, platform: cachedValue, size = "small", showLoading, showSupported, ...rest } = props
 
-  const [platform, setPlatform] = useState<Platform | undefined | null>(cachedValue)
+  const [platform, isLoading, platformId] = usePlatform(id, cachedValue)
 
-  const inMemoryDataQueryTime = useStore($inMemoryDataQueryTime)
-  const platformMap = useStore($platformMap)
-
-  const rpc = useStore($rpc)
   const activeAccountPath = useStore($activeAccountPath)
 
-  useEffect(() => {
-    if (!id || inMemoryDataQueryTime === null) return
-
-    if (platformMap[id]) {
-      setPlatform(platformMap[id])
-      return
-    }
-
-    if (!cachedValue) {
-      rpc.getPlatform(id).then((x) => {
-        setPlatform(x ?? null)
-      })
-    }
-  }, [id, cachedValue, rpc, platformMap, inMemoryDataQueryTime])
-
-  const platformId = useMemo(() => {
-    if (!platform) return id!
-    return platform.id
-  }, [platform, id])
-
-  if (platform === undefined && !showLoading) return null
-  if (platform === undefined && showLoading) return <Skeleton width={80} sx={{ marginX: 2 }} />
+  if (isLoading && showLoading) return <Skeleton width={80} sx={{ marginX: 2 }} />
+  if (!platform) return null
 
   return (
     <IdentifierBlock

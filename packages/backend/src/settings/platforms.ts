@@ -1,4 +1,4 @@
-import { PlatformMeta } from "../interfaces"
+import { BlockchainMeta } from "../interfaces"
 
 /**
  * This is used to avoid conflicts with other platforms.
@@ -17,7 +17,7 @@ export const WETH_ASSET_ID = `${ETHEREUM_PLATFORM_ID}:0xC02aaA39b223FE8D0A0e5C4F
 export const WBTC_ASSET_ID = `${ETHEREUM_PLATFORM_ID}:0x2260fac5e5542a773aa44fbcfedf7c193bc2c599:WBTC`
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
 
-export const PLATFORMS_META: Record<string, PlatformMeta> = {
+export const PLATFORMS_META: Record<string, BlockchainMeta> = {
   [`${PlatformPrefix.Chain}abstract`]: {
     blockExplorer: {
       name: "AbsScan",

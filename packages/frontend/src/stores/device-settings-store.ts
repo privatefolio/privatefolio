@@ -100,7 +100,7 @@ export const $hideUnsupportedPlatforms = persistentAtom<boolean>(
 
 export const $hideInactiveConnections = persistentAtom<boolean>(
   "privatefolio-hide-inactive-connections",
-  true,
+  false,
   booleanTransformer
 )
 
