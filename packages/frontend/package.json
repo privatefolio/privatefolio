@@ -32,7 +32,9 @@
     "@nanostores/persistent": "^0.9.1",
     "@nanostores/react": "^0.7.1",
     "@react-spring/web": "^9.7.3",
+    "@tanstack/query-async-storage-persister": "^5.83.0",
     "@tanstack/react-query": "^5.83.0",
+    "@tanstack/react-query-persist-client": "^5.83.0",
     "ai": "^4.3.16",
     "big.js": "^6.2.1",
     "comlink": "^4.4.1",
@@ -56,6 +58,7 @@
     "wa-sqlite": "rhashimoto/wa-sqlite"
   },
   "devDependencies": {
+    "@tanstack/react-query-devtools": "^5.83.0",
     "@types/big.js": "^6.2.2",
     "@types/lodash-es": "^4.17.12",
     "@types/md5": "^2.3.2",

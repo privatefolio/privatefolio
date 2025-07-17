@@ -28,7 +28,6 @@ import {
   $localConnectionStatus,
   $localConnectionStatusText,
 } from "./stores/account-store"
-import { checkLatestAppVersion } from "./stores/app-store"
 import { $auth, $cloudAuth, $localAuth, checkAuthentication } from "./stores/auth-store"
 import {
   $cloudAvailable,
@@ -114,7 +113,6 @@ export default function App() {
 
   useEffect(() => {
     checkCloudUser()
-    checkLatestAppVersion()
   }, [])
 
   const cloudUser = useStore($cloudUser)
@@ -197,6 +195,7 @@ export default function App() {
                 minWidth: 300,
               },
               [theme.breakpoints.up("md")]: {
+                backgroundColor: "var(--mui-palette-background-default)",
                 display: "inline-flex",
               },
               borderBottom: 0,

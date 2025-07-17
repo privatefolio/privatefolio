@@ -1,5 +1,4 @@
 import { atom } from "nanostores"
-import { APP_VERSION } from "src/env"
 
 import { logAtoms } from "../utils/browser-utils"
 
@@ -23,9 +22,7 @@ export const $telemetry = atom<boolean>(
   localStorage.getItem("privatefolio-no-telemetry") !== "true"
 )
 
-export const $latestVersion = atom<string>(APP_VERSION)
-
-logAtoms({ $debugMode, $latestVersion, $loopsAllowed, $reducedMotion })
+logAtoms({ $debugMode, $loopsAllowed, $reducedMotion })
 
 async function getLatestGitHubRelease() {
   const res = await fetch("https://api.github.com/repos/privatefolio/privatefolio/releases/latest")
@@ -34,7 +31,7 @@ async function getLatestGitHubRelease() {
   return release
 }
 
-export async function checkLatestAppVersion() {
+export async function getLatestAppVersion() {
   const release = await getLatestGitHubRelease()
-  $latestVersion.set(release.tag_name)
+  return release.tag_name as string
 }

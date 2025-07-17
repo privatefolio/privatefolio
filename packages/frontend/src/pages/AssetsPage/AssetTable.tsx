@@ -38,7 +38,7 @@ export function AssetTable() {
       price: priceMap ? priceMap[x.id] : null,
     }))
 
-    // sort by market cap rank asc, then price desc then symbol asc
+    // sort by market cap rank asc, then symbol asc
     all.sort((a, b) => {
       // Primary sort: market cap rank ascending (nulls/undefined last)
       const aRank = a.marketCapRank ?? null
@@ -49,16 +49,7 @@ export function AssetTable() {
         return aRank - bRank
       }
 
-      // Secondary sort: price descending (nulls last)
-      // const aPrice = a.price?.value ?? null
-      // const bPrice = b.price?.value ?? null
-      // if (aPrice !== bPrice) {
-      //   if (aPrice === null) return 1
-      //   if (bPrice === null) return -1
-      //   return bPrice - aPrice // descending
-      // }
-
-      // Tertiary sort: symbol ascending
+      // Secondary sort: symbol ascending
       return a.symbol.localeCompare(b.symbol)
     })
 

@@ -42,9 +42,12 @@ export const removePlatformPrefix = memoize(function removePlatformPrefix(platfo
   } catch {}
 })
 
+// TODO rename to getAssetInternalId
 export const getAssetContract = memoize(function getAssetContract(assetId: string) {
   try {
-    const contractAddress = assetId.split(":")[1]
+    const parts = assetId.split(":")
+    if (parts.length < 3) return
+    const contractAddress = parts[1]
     return formatAddress(contractAddress) as Web3Address
   } catch {}
 })

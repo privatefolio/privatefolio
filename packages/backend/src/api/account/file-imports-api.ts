@@ -18,7 +18,7 @@ import {
 import { FILES_LOCATION } from "src/settings/settings"
 import { splitRows } from "src/utils/csv-utils"
 import { createSubscription } from "src/utils/sub-utils"
-import { hashString, noop } from "src/utils/utils"
+import { hashString, noop, writesAllowed } from "src/utils/utils"
 
 import { countAuditLogs, upsertAuditLogs } from "./audit-logs-api"
 import { getServerFile } from "./server-files-api"
@@ -125,6 +125,7 @@ export async function getFileImports(
       timestamp: row[4] as number,
     })) satisfies FileImport[]
   } catch (error) {
+    if (!writesAllowed) return []
     throw new Error(`Failed to query file imports: ${error}`)
   }
 }
@@ -144,6 +145,7 @@ export async function countFileImports(
     const result = await account.execute(query, params)
     return result[0][0] as number
   } catch (error) {
+    if (!writesAllowed) return 0
     throw new Error(`Failed to count file imports: ${error}`)
   }
 }

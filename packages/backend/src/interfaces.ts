@@ -21,11 +21,12 @@ export const TRANSACTIONS_TYPES = [
   "Unwrap",
   "Wrap",
   "Approve",
+  "Gift",
   "Other",
 ] as const
 export type TransactionType = (typeof TRANSACTIONS_TYPES)[number]
 
-export const MANUAL_TX_TYPES: TransactionType[] = ["Swap", "Deposit", "Withdraw", "Other"]
+export const MANUAL_TX_TYPES: TransactionType[] = ["Swap", "Deposit", "Withdraw", "Gift", "Other"]
 
 export const TRADE_TYPES = [
   "Long",
@@ -120,28 +121,30 @@ export type AuditLogOperation =
   | "Mint"
   | "Wrap"
 
-export interface Exchange {
+export interface PlatformMetadata {
+  extensionsIds?: string[]
+  supported?: boolean
+}
+
+export interface Exchange extends PlatformMetadata {
   coingeckoTrustRank?: number
   /**
    * 0-10
    */
   coingeckoTrustScore: number
   country?: string
-  extensionsIds?: string[]
   id: string
   image: string
   name: string
-  supported?: boolean
   url: string
   year: number
 }
 
-export interface Blockchain {
+export interface Blockchain extends PlatformMetadata {
   /**
    * EVM chainId
    */
   chainId: number
-  extensionsIds?: string[]
   id: string
   image: string
   name: string
@@ -149,10 +152,15 @@ export interface Blockchain {
    * coingeckoId of the native coin
    */
   nativeCoinId: string
-  supported?: boolean
 }
 
-export type Platform = Exchange | Blockchain
+export interface DataPlatform extends PlatformMetadata {
+  id: string
+  image: string
+  name: string
+}
+
+export type Platform = Exchange | Blockchain | DataPlatform
 
 export interface AuditLog {
   assetId: string
@@ -683,6 +691,7 @@ export interface Asset extends Partial<AssetMetadata> {
 }
 
 export interface MyAsset extends Asset {
+  favorite?: boolean
   firstOwnedAt?: Timestamp
   lastOwnedAt?: Timestamp
   priceApiId?: PriceApiId
@@ -894,7 +903,7 @@ export type FindPlatformsResult = {
   exchanges: Exchange[]
 }
 
-export type PlatformMeta = {
+export type BlockchainMeta = {
   blockExplorer?: {
     name: string
     url: string

@@ -193,6 +193,7 @@ export async function countTransactions(
     const result = await account.execute(query, params)
     return result[0][0] as number
   } catch (error) {
+    if (!writesAllowed) return 0
     throw new Error(`Failed to count transactions: ${error}`)
   }
 }

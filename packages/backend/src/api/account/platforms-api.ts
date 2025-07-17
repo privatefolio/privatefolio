@@ -12,6 +12,7 @@ import {
 } from "../../extensions/metadata/coingecko/coingecko-interfaces"
 import {
   Blockchain,
+  DataPlatform,
   Exchange,
   FindPlatformsResult,
   Platform,
@@ -21,6 +22,16 @@ import {
 import { getMyPlatformIds } from "./audit-logs-api"
 import { getExtensions } from "./extensions-api"
 import { enqueueTask } from "./server-tasks-api"
+
+const dataPlatforms: DataPlatform[] = [
+  {
+    extensionsIds: ["coingecko-metadata"],
+    id: "coingecko",
+    image: "$STATIC_ASSETS/extensions/coingecko.svg",
+    name: "CoinGecko",
+    supported: true,
+  },
+]
 
 const customExchanges: Exchange[] = [
   {
@@ -168,13 +179,10 @@ export async function findPlatforms(
   accountName: string,
   query: string,
   limit = 5,
+  strict = false,
   searchSet: "coingecko" | "my-platforms" = "coingecko"
 ): Promise<FindPlatformsResult> {
   const normalizedQuery = query.toLowerCase().trim()
-
-  if (!normalizedQuery) {
-    return { blockchains: [], exchanges: [] }
-  }
 
   let blockchains: Blockchain[] = []
   let exchanges: Exchange[] = []
@@ -194,10 +202,15 @@ export async function findPlatforms(
       break
     }
     if (
+      !normalizedQuery ||
       blockchain.name.toLowerCase().includes(normalizedQuery) ||
-      blockchain.id.toLowerCase().includes(normalizedQuery) ||
-      blockchain.chainId?.toString().includes(normalizedQuery)
+      blockchain.id.toLowerCase().includes(normalizedQuery)
     ) {
+      matchingBlockchains.push(blockchain)
+    }
+    if (strict) continue
+
+    if (blockchain.chainId?.toString().includes(normalizedQuery)) {
       matchingBlockchains.push(blockchain)
     }
   }
@@ -208,10 +221,14 @@ export async function findPlatforms(
       break
     }
     if (
+      !normalizedQuery ||
       exchange.name.toLowerCase().includes(normalizedQuery) ||
-      exchange.id.toLowerCase().includes(normalizedQuery) ||
-      exchange.country?.toLowerCase().includes(normalizedQuery)
+      exchange.id.toLowerCase().includes(normalizedQuery)
     ) {
+      matchingExchanges.push(exchange)
+    }
+    if (strict) continue
+    if (exchange.country?.toLowerCase().includes(normalizedQuery)) {
       matchingExchanges.push(exchange)
     }
   }
@@ -237,7 +254,8 @@ export async function getPlatform(id: string): Promise<Platform | undefined> {
   const exchanges = await getExchanges()
   return (
     blockchains.find((blockchain) => blockchain.id === id) ||
-    exchanges.find((exchange) => exchange.id === id)
+    exchanges.find((exchange) => exchange.id === id) ||
+    dataPlatforms.find((platform) => platform.id === id)
   )
 }
 
