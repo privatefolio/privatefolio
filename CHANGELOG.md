@@ -3,6 +3,16 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.32 - 2025/07/17
+
+### 💡 Feature updates
+
+- Improve experience for adding manual transactions
+
+### Other updates
+
+- New `WalletInput`, `PlatformInput` and `AssetInput` components for extension developers
+
 ## v2.0.0-beta.31 - 2025/07/15
 
 ### 🐛 Bug Fixes
