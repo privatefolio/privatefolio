@@ -41,6 +41,7 @@ import { SectionTitle } from "src/components/SectionTitle"
 import { StaggeredList } from "src/components/StaggeredList"
 import { APP_VERSION } from "src/env"
 import { useConfirm } from "src/hooks/useConfirm"
+import { ONE_HOUR_CACHE } from "src/settings"
 import { getLatestAppVersion } from "src/stores/app-store"
 import { $cloudAuth, unlockApp } from "src/stores/auth-store"
 import {
@@ -83,7 +84,7 @@ export default function CloudUserPage({ show }: { show: boolean }) {
   const { data: latestVersion = APP_VERSION } = useQuery({
     queryFn: getLatestAppVersion,
     queryKey: ["latest-app-version"],
-    // TODO9: use staleTime
+    ...ONE_HOUR_CACHE,
   })
 
   const serverStatus = useMemo(() => {

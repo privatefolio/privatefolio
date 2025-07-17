@@ -130,7 +130,8 @@ export function formatPrivatefolioTxId(txId: string) {
   return `${txId.slice(0, 6)}...${txId.slice(-12)}`
 }
 
-export const ONE_DAY = 24 * 60 * 60 * 1000
+export const ONE_HOUR = 60 * 60 * 1000
+export const ONE_DAY = 24 * ONE_HOUR
 
 export function formatContextWindow(tokens: number): string {
   if (tokens >= 1000000) {

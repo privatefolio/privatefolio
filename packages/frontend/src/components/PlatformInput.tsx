@@ -1,5 +1,5 @@
 import { StarRounded } from "@mui/icons-material"
-import { Autocomplete, Box, Fade, ListItemText, TextField, TextFieldProps } from "@mui/material"
+import { Autocomplete, Box, Fade, TextField, TextFieldProps } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { debounce } from "lodash-es"
 import { isBlockchain } from "privatefolio-backend/src/utils/utils"
@@ -11,20 +11,22 @@ import { $platformMap } from "src/stores/metadata-store"
 import { $rpc } from "src/workers/remotes"
 
 import { CircularSpinner } from "./CircularSpinner"
+import { PlatformAvatar } from "./PlatformAvatar"
 import { PlatformBlock } from "./PlatformBlock"
 
 type PlatformInputProps = Omit<TextFieldProps, "onChange" | "value"> & {
-  onChange?: (value: string) => void
-  value?: string
+  onChange: (value: string) => void
+  value: string
 }
 
 export function PlatformInput(props: PlatformInputProps) {
-  const { value = "", onChange, ...rest } = props
+  const { value, onChange, ...rest } = props
 
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
   const myPlatformsMap = useStore($platformMap)
 
+  const [query, setQuery] = useState(value)
   const [searchResults, setSearchResults] = useState<Platform[]>([])
   const [loading, setLoading] = useState(false)
 
@@ -38,7 +40,8 @@ export function PlatformInput(props: PlatformInputProps) {
           rpc.findPlatforms(activeAccount, query, 3, true, "my-platforms"),
         ])
 
-        if (signal.aborted) throw new Error(signal.reason)
+        setLoading(false)
+        if (signal.aborted) return
 
         const platforms = [
           ...coingecko.blockchains,
@@ -48,8 +51,6 @@ export function PlatformInput(props: PlatformInputProps) {
         ]
 
         setSearchResults(platforms)
-
-        setLoading(false)
       },
       INPUT_DEBOUNCE_DURATION,
       {
@@ -63,12 +64,12 @@ export function PlatformInput(props: PlatformInputProps) {
 
   useEffect(() => {
     const controller = new AbortController()
-    handleSearch(value, controller.signal)
+    handleSearch(query, controller.signal)
 
     return function cleanup() {
       controller.abort("Result no longer needed.")
     }
-  }, [value, handleSearch])
+  }, [query, handleSearch])
 
   const { platformsMap, platformIds } = useMemo(() => {
     const platformsMap: Record<string, Platform> = {}
@@ -80,19 +81,19 @@ export function PlatformInput(props: PlatformInputProps) {
     const platforms = Object.values(platformsMap)
 
     platforms.sort((a, b) => {
-      // Primary sort: entries from myPlatformsMap first
+      // Primary sort: type
+      const aIsBlockchain = isBlockchain(a)
+      const bIsBlockchain = isBlockchain(b)
+      if (aIsBlockchain !== bIsBlockchain) {
+        return aIsBlockchain ? -1 : 1
+      }
+
+      // Secondary sort: entries from myPlatformsMap first
       const aIsFavorited = a.id in myPlatformsMap
       const bIsFavorited = b.id in myPlatformsMap
 
       if (aIsFavorited && !bIsFavorited) return -1
       if (!aIsFavorited && bIsFavorited) return 1
-
-      // Secondary sort: type
-      const aIsBlockchain = isBlockchain(a)
-      const bIsBlockchain = isBlockchain(b)
-      if (aIsBlockchain !== bIsBlockchain) {
-        return aIsBlockchain ? 1 : -1
-      }
 
       return a.name.localeCompare(b.name)
     })
@@ -109,7 +110,6 @@ export function PlatformInput(props: PlatformInputProps) {
       disableClearable
       openOnFocus
       groupBy={(option) => {
-        if (myPlatformsMap[option]) return "Favorites"
         const platform = platformsMap[option]
         return platform ? (isBlockchain(platform) ? "Blockchains" : "Exchanges") : "Unknown"
       }}
@@ -123,25 +123,20 @@ export function PlatformInput(props: PlatformInputProps) {
             hideTooltip
           />
           {myPlatformsMap[option] && (
-            <ListItemText
-              primary={<StarRounded sx={{ fontSize: "1rem" }} />}
-              primaryTypographyProps={{ variant: "caption" }}
-              sx={{ textAlign: "right" }}
-            />
+            <StarRounded sx={{ color: "text.secondary", fontSize: "1rem", marginLeft: "auto" }} />
           )}
         </Box>
       )}
-      getOptionLabel={(option) =>
-        !option ? "" : platformsMap[option]?.name || myPlatformsMap[option]?.name || option || ""
-      }
+      getOptionLabel={(option) => (!option ? "" : platformsMap[option]?.name || option || "")}
       value={value}
       onChange={(event, newValue) => {
         if (typeof newValue === "string") {
-          onChange?.(newValue)
+          onChange(newValue)
         }
       }}
       onInputChange={(event, newInputValue) => {
-        onChange?.(newInputValue)
+        setQuery(newInputValue)
+        onChange(newInputValue)
       }}
       renderInput={(params) => (
         <TextField
@@ -157,22 +152,17 @@ export function PlatformInput(props: PlatformInputProps) {
                 </span>
               </Fade>
             ),
+            startAdornment: platformsMap[value] && (
+              <PlatformAvatar
+                src={platformsMap[value].image}
+                alt={platformsMap[value].name}
+                size="small"
+                sx={{ marginLeft: 0.5, marginRight: -0.25 }}
+              />
+            ),
           }}
         />
       )}
     />
   )
-}
-
-export type PlatformInputUncontrolledProps = Omit<PlatformInputProps, "onChange" | "value"> & {
-  initialValue?: string
-}
-
-export function PlatformInputUncontrolled({
-  initialValue = "",
-  ...rest
-}: PlatformInputUncontrolledProps) {
-  const [value, onChange] = useState(initialValue)
-
-  return <PlatformInput value={value} onChange={onChange} {...rest} />
 }

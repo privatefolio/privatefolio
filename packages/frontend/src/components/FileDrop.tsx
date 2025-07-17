@@ -220,6 +220,7 @@ async function getParserContext(
                 name={requirement}
                 showAddressBook
                 showWallets
+                onlyEVM
               />
             </div>
           )

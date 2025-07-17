@@ -309,6 +309,7 @@ export const theme: CssVarsThemeOptions = {
             sx: {
               "& .MuiAutocomplete-groupLabel": {
                 background: "transparent",
+                lineHeight: "32px",
                 position: "static",
               },
             },

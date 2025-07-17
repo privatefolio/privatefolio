@@ -18,6 +18,7 @@ import { AnalyticsProvider } from "./AnalyticsProvider"
 import App from "./App"
 import { FileDownloadSnackbar } from "./components/FileDownloadSnackbar"
 import { ConfirmDialogProvider } from "./hooks/useConfirm"
+import { ONE_DAY_CACHE } from "./settings"
 import { ThemeProvider } from "./ThemeProvider"
 import { isElectron } from "./utils/electron-utils"
 import { isDevelopment } from "./utils/environment-utils"
@@ -27,10 +28,7 @@ const Router = isElectron ? HashRouter : BrowserRouter
 
 const queryClient = new QueryClient({
   defaultOptions: {
-    queries: {
-      gcTime: ONE_DAY,
-      staleTime: ONE_DAY,
-    },
+    queries: ONE_DAY_CACHE,
   },
 })
 

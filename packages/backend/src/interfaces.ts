@@ -21,11 +21,12 @@ export const TRANSACTIONS_TYPES = [
   "Unwrap",
   "Wrap",
   "Approve",
+  "Gift",
   "Other",
 ] as const
 export type TransactionType = (typeof TRANSACTIONS_TYPES)[number]
 
-export const MANUAL_TX_TYPES: TransactionType[] = ["Swap", "Deposit", "Withdraw", "Other"]
+export const MANUAL_TX_TYPES: TransactionType[] = ["Swap", "Deposit", "Withdraw", "Gift", "Other"]
 
 export const TRADE_TYPES = [
   "Long",

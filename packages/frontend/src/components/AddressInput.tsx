@@ -1,4 +1,4 @@
-import { Check } from "@mui/icons-material"
+import { CheckRounded } from "@mui/icons-material"
 import { Autocomplete, Box, Typography } from "@mui/material"
 import InputAdornment from "@mui/material/InputAdornment"
 import TextField, { TextFieldProps } from "@mui/material/TextField"
@@ -12,16 +12,30 @@ import { MonoFont } from "../theme"
 import { Truncate } from "./Truncate"
 
 type AddressInputProps = Omit<TextFieldProps, "onChange" | "value"> & {
-  onChange?: (value: string) => void
+  /**
+   * For uncontrolled inputs
+   */
+  disableLabels?: boolean
+  onChange: (value: string) => void
+  onlyEVM?: boolean
   showAddressBook?: boolean
   showWallets?: boolean
-  value?: string
+  value: string
 }
 
-const placeholder = "0x000…"
+const placeholderEvm = "0x000…"
+const placeholderAll = ""
 
 export function AddressInput(props: AddressInputProps) {
-  const { value, onChange, showAddressBook, showWallets, ...rest } = props
+  const {
+    value,
+    onChange,
+    showAddressBook,
+    showWallets,
+    onlyEVM = false,
+    disableLabels = false,
+    ...rest
+  } = props
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<boolean>()
   const addressBook = useStore($addressBook, { keys: showAddressBook ? [] : undefined })
@@ -39,17 +53,20 @@ export function AddressInput(props: AddressInputProps) {
       newValue = getAddress(newValue)
       setSuccess(true)
       setError(null)
-    } else {
-      setError("Invalid address")
+    } else if (onlyEVM || (newValue as string).startsWith("0x")) {
+      setError("Invalid EVM address")
       setSuccess(false)
+    } else {
+      setSuccess(false)
+      setError(null)
     }
 
-    onChange?.(newValue)
+    onChange(newValue)
   }
 
   const endAdornment = success ? (
     <InputAdornment position="end">
-      <Check style={{ color: "green" }} />
+      <CheckRounded style={{ color: "green" }} />
     </InputAdornment>
   ) : null
 
@@ -57,22 +74,17 @@ export function AddressInput(props: AddressInputProps) {
   const displayWallets = showWallets && unlabelledWallets && unlabelledWallets.length > 0
 
   if (displayAddresBook || displayWallets) {
-    const options: { address: string; label?: string }[] = []
+    const options: string[] = []
 
     if (displayAddresBook) {
-      options.push(
-        ...Object.entries(addressBook).map(([address, label]) => ({
-          address,
-          label,
-        }))
-      )
+      options.push(...Object.keys(addressBook))
     }
 
     if (displayWallets) {
-      options.push(...unlabelledWallets.map((wallet) => ({ address: wallet })))
+      options.push(...unlabelledWallets)
     }
 
-    options.sort((a, b) => a.label?.localeCompare(b.label ?? "") ?? 0)
+    options.sort((a, b) => addressBook[a]?.localeCompare(addressBook[b] ?? "") ?? 0)
 
     return (
       <Autocomplete
@@ -80,24 +92,32 @@ export function AddressInput(props: AddressInputProps) {
         disableClearable
         openOnFocus
         options={options}
-        groupBy={(option) => (option.label ? "Address book" : "My wallets")}
-        getOptionLabel={(option) => (typeof option === "string" ? option : option.address)}
+        filterOptions={(options, state) => {
+          const query = state.inputValue.toLowerCase().trim()
+          return options.filter(
+            (option) =>
+              option.toLowerCase().includes(query) ||
+              addressBook[option]?.toLowerCase().includes(query)
+          )
+        }}
+        groupBy={(option) => (addressBook[option] ? "Address book" : "My wallets")}
+        getOptionLabel={(option) => (disableLabels ? option : addressBook[option] || option)}
         renderOption={(props, option) => (
-          <Box component="li" {...props} key={option.address}>
-            {option.label ? (
+          <Box component="li" {...props} key={option}>
+            {addressBook[option] ? (
               <>
-                <Typography variant="body2">{option.label}</Typography>
+                <Typography variant="body2">{addressBook[option]}</Typography>
                 <Typography
                   variant="caption"
                   color="text.secondary"
                   sx={{ fontFamily: MonoFont, marginLeft: "auto" }}
                 >
-                  {formatHex(option.address)}
+                  {formatHex(option)}
                 </Typography>
               </>
             ) : (
               <Typography variant="body2" sx={{ fontFamily: MonoFont }} component={Truncate}>
-                {option.address}
+                {option}
               </Typography>
             )}
           </Box>
@@ -107,7 +127,7 @@ export function AddressInput(props: AddressInputProps) {
             {...params}
             {...rest}
             autoComplete="off"
-            placeholder={placeholder}
+            placeholder={onlyEVM ? placeholderEvm : placeholderAll}
             variant="outlined"
             error={!!error}
             helperText={error}
@@ -119,14 +139,12 @@ export function AddressInput(props: AddressInputProps) {
             }}
           />
         )}
-        inputValue={value}
-        onInputChange={(event, newValue) => {
+        value={value}
+        onChange={(event, newValue) => {
           handleChange(newValue)
         }}
-        onChange={(event, newValue) => {
-          if (newValue && typeof newValue === "object") {
-            handleChange(newValue.address)
-          }
+        onInputChange={(event, newInputValue) => {
+          handleChange(newInputValue)
         }}
       />
     )
@@ -135,7 +153,7 @@ export function AddressInput(props: AddressInputProps) {
   return (
     <TextField
       autoComplete="off"
-      placeholder={placeholder}
+      placeholder={onlyEVM ? placeholderEvm : placeholderAll}
       variant="outlined"
       value={value}
       onChange={(event) => handleChange(event.target.value)}
@@ -161,5 +179,5 @@ export function AddressInputUncontrolled({
 }: AddressInputUncontrolledProps) {
   const [value, onChange] = useState(initialValue)
 
-  return <AddressInput value={value} onChange={onChange} {...rest} />
+  return <AddressInput value={value} onChange={onChange} {...rest} disableLabels />
 }

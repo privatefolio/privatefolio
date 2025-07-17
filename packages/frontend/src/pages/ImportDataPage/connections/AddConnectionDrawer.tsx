@@ -51,6 +51,8 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
   const activeAccount = useStore($activeAccount)
   const debugMode = useStore($debugMode)
 
+  const [walletInput, setWallet] = useState<string>("")
+
   const [extensionId, setExtensionId] = useState<string>(etherscanConnExtension)
   const [extensions, setExtensions] = useState<RichExtension[]>([])
 
@@ -106,7 +108,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
       /**
        * 1. Extract
        */
-      const address = formData.get("walletAddr") as string
+      const wallet = walletInput
       const apiKey = formData.get("apiKey") as string
       const apiSecret = formData.get("secret") as string
       // const label = formData.get("label") as string // TODO5 rethink
@@ -130,9 +132,9 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
         return
       }
       if (extension.id === etherscanConnExtension) {
-        const isValidAddress = address && isAddress(address)
+        const isValidAddress = wallet && isAddress(wallet)
         if (!isValidAddress) {
-          setError("Invalid wallet address")
+          setError("Invalid wallet")
           return
         }
         //
@@ -156,6 +158,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
       /**
        * 3. Submit
        */
+      setError(undefined)
       setLoading(true)
       try {
         const platformIds = platformId === "all" ? extension.platformIds! : [platformId]
@@ -163,7 +166,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
         await Promise.all(
           platformIds.map(async (platformId) => {
             const connection = await rpc.upsertConnection(activeAccount, {
-              address,
+              address: wallet,
               apiKey,
               apiSecret,
               extensionId,
@@ -173,7 +176,6 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
             await rpc.enqueueSyncConnection(activeAccount, "user", connection.id, debugMode)
           })
         )
-
         atom.set(false)
         enqueueSnackbar(
           `${platformIds.length > 1 ? "Connections" : "Connection"} added, syncing...`,
@@ -186,15 +188,16 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
       }
     },
     [
-      binanceWallets,
-      extensionId,
-      platformId,
+      walletInput,
+      extension,
       walletsError,
+      binanceWallets,
+      platformId,
       atom,
       rpc,
       activeAccount,
+      extensionId,
       debugMode,
-      extension,
     ]
   )
 
@@ -283,7 +286,8 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
               <div>
                 <SectionTitle>Wallet</SectionTitle>
                 <AddressInput
-                  name="walletAddr"
+                  value={walletInput}
+                  onChange={setWallet}
                   autoComplete="off"
                   variant="outlined"
                   fullWidth
@@ -291,6 +295,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                   required
                   showAddressBook
                   showWallets
+                  onlyEVM
                 />
               </div>
             </>
