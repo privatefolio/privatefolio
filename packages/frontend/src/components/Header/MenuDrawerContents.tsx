@@ -6,6 +6,7 @@ import {
   ExtensionRounded,
   HomeRounded,
   ReceiptLong,
+  RequestQuoteOutlined,
   SdStorageRounded,
   TimelineRounded,
   Workspaces,
@@ -199,6 +200,15 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             onClick={toggleOpen}
             shortcutKey="i"
             avatar={<AutoAwesomeRounded />}
+          />
+          <NavMenuItem
+            value="investment-planner"
+            to={`${activeAccountPath}/investment-planner`}
+            label="Invest Planner"
+            aria-label="Visit Investment Planner"
+            onClick={toggleOpen}
+            shortcutKey="n"
+            avatar={<RequestQuoteOutlined />}
           />
           <NavMenuItem
             value="assets"
