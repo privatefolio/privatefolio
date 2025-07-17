@@ -1,7 +1,7 @@
 import { Stack, TextField } from "@mui/material"
 import React, { useState } from "react"
-import { AddressInput } from "src/components/AddressInput"
 import { SectionTitle } from "src/components/SectionTitle"
+import { WalletInput } from "src/components/WalletInput"
 
 interface AddressBookFormProps {
   address?: string
@@ -15,7 +15,7 @@ export function AddressBookForm({ address, label }: AddressBookFormProps) {
     <Stack gap={2} sx={(theme) => ({ [theme.breakpoints.up("md")]: { minWidth: 520 } })}>
       <div>
         <SectionTitle>Address</SectionTitle>
-        <AddressInput
+        <WalletInput
           value={value}
           onChange={onChange}
           variant="outlined"

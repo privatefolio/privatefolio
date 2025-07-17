@@ -9,9 +9,9 @@ import { handleRestoreRequest } from "src/utils/backup-utils"
 import { formatCamelCase } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
-import { AddressInputUncontrolled } from "./AddressInput"
 import { CircularSpinner } from "./CircularSpinner"
 import { SectionTitle } from "./SectionTitle"
+import { WalletInputUncontrolled } from "./WalletInput"
 
 export function FileDrop(props: ButtonProps) {
   const theme = useTheme()
@@ -211,7 +211,7 @@ async function getParserContext(
           return (
             <div key={index}>
               <SectionTitle>{formatCamelCase(requirement)}</SectionTitle>
-              <AddressInputUncontrolled
+              <WalletInputUncontrolled
                 variant="outlined"
                 fullWidth
                 initialValue={requirement === "userAddress" ? possibleUserAddress : undefined}

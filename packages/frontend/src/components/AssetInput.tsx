@@ -23,7 +23,7 @@ type AssetInputProps = Omit<TextFieldProps, "onChange" | "value"> & {
 }
 
 export function AssetInput(props: AssetInputProps) {
-  const { value, onChange, platformId, ...rest } = props
+  const { value, onChange, platformId, sx, ...rest } = props
 
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
@@ -125,6 +125,7 @@ export function AssetInput(props: AssetInputProps) {
 
   return (
     <Autocomplete
+      sx={sx}
       filterOptions={(x) => x}
       freeSolo
       disableClearable

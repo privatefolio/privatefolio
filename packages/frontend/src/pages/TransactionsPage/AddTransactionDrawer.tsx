@@ -16,12 +16,12 @@ import { BINANCE_WALLETS } from "privatefolio-backend/src/extensions/connections
 import { BINANCE_PLATFORM_ID } from "privatefolio-backend/src/extensions/utils/binance-utils"
 import React, { useCallback, useEffect, useState } from "react"
 import { iconMap } from "src/components/ActionBlock"
-import { AddressInput } from "src/components/AddressInput"
 import { AssetInput } from "src/components/AssetInput"
 import { DrawerHeader } from "src/components/DrawerHeader"
 import { LoadingButton } from "src/components/LoadingButton"
 import { PlatformInput } from "src/components/PlatformInput"
 import { SectionTitle } from "src/components/SectionTitle"
+import { WalletInput } from "src/components/WalletInput"
 import { MANUAL_TX_TYPES, TransactionType } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 import { formatTicker, getAssetPlatform } from "src/utils/assets-utils"
@@ -221,7 +221,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
                 ))}
               </Select>
             ) : (
-              <AddressInput
+              <WalletInput
                 value={walletInput}
                 onChange={setWallet}
                 autoComplete="off"

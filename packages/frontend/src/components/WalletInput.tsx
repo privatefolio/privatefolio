@@ -11,7 +11,7 @@ import { formatHex } from "src/utils/utils"
 import { MonoFont } from "../theme"
 import { Truncate } from "./Truncate"
 
-type AddressInputProps = Omit<TextFieldProps, "onChange" | "value"> & {
+type WalletInputProps = Omit<TextFieldProps, "onChange" | "value"> & {
   /**
    * For uncontrolled inputs
    */
@@ -26,7 +26,7 @@ type AddressInputProps = Omit<TextFieldProps, "onChange" | "value"> & {
 const placeholderEvm = "0x000…"
 const placeholderAll = ""
 
-export function AddressInput(props: AddressInputProps) {
+export function WalletInput(props: WalletInputProps) {
   const {
     value,
     onChange,
@@ -34,6 +34,7 @@ export function AddressInput(props: AddressInputProps) {
     showWallets,
     onlyEVM = false,
     disableLabels = false,
+    sx,
     ...rest
   } = props
   const [error, setError] = useState<string | null>(null)
@@ -88,6 +89,7 @@ export function AddressInput(props: AddressInputProps) {
 
     return (
       <Autocomplete
+        sx={sx}
         freeSolo
         disableClearable
         openOnFocus
@@ -152,6 +154,7 @@ export function AddressInput(props: AddressInputProps) {
 
   return (
     <TextField
+      sx={sx}
       autoComplete="off"
       placeholder={onlyEVM ? placeholderEvm : placeholderAll}
       variant="outlined"
@@ -169,15 +172,15 @@ export function AddressInput(props: AddressInputProps) {
   )
 }
 
-export type AddressInputUncontrolledProps = Omit<AddressInputProps, "onChange" | "value"> & {
+export type WalletInputUncontrolledProps = Omit<WalletInputProps, "onChange" | "value"> & {
   initialValue?: string
 }
 
-export function AddressInputUncontrolled({
+export function WalletInputUncontrolled({
   initialValue = "",
   ...rest
-}: AddressInputUncontrolledProps) {
+}: WalletInputUncontrolledProps) {
   const [value, onChange] = useState(initialValue)
 
-  return <AddressInput value={value} onChange={onChange} {...rest} disableLabels />
+  return <WalletInput value={value} onChange={onChange} {...rest} disableLabels />
 }

@@ -20,7 +20,7 @@ type PlatformInputProps = Omit<TextFieldProps, "onChange" | "value"> & {
 }
 
 export function PlatformInput(props: PlatformInputProps) {
-  const { value, onChange, ...rest } = props
+  const { value, onChange, sx, ...rest } = props
 
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
@@ -112,6 +112,7 @@ export function PlatformInput(props: PlatformInputProps) {
 
   return (
     <Autocomplete
+      sx={sx}
       filterOptions={(x) => x}
       freeSolo
       disableClearable

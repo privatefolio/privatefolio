@@ -35,8 +35,8 @@ import { asUTC } from "src/utils/formatting-utils"
 import { isProduction, resolveUrl } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
-import { AddressInput } from "../../../components/AddressInput"
 import { SectionTitle } from "../../../components/SectionTitle"
+import { WalletInput } from "../../../components/WalletInput"
 import { BinanceConnectionOptions, ConnectionOptions, RichExtension } from "../../../interfaces"
 import { $debugMode } from "../../../stores/app-store"
 
@@ -285,7 +285,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
               </div>
               <div>
                 <SectionTitle>Wallet</SectionTitle>
-                <AddressInput
+                <WalletInput
                   value={walletInput}
                   onChange={setWallet}
                   autoComplete="off"
