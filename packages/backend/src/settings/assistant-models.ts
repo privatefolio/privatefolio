@@ -60,9 +60,11 @@ export type AnthropicModelId =
   | "claude-3-5-haiku-20241022"
   | "claude-3-haiku-20240307"
 
-export type ModelId = OpenAIChatModelId | PerplexityModelId | AnthropicModelId
+export type CustomModelId = "ai/smollm2"
 
-export type ModelFamily = "openai" | "perplexity" | "anthropic"
+export type ModelId = OpenAIChatModelId | PerplexityModelId | AnthropicModelId | CustomModelId
+
+export type ModelFamily = "openai" | "perplexity" | "anthropic" | "custom"
 
 export type ModelCapability = "web-search" | "reasoning" | "tools"
 
@@ -338,6 +340,19 @@ export const AVAILABLE_MODELS: AssistantModel[] = [
     family: "anthropic",
     id: "claude-3-haiku-20240307",
     label: "Claude 3 Haiku",
+  },
+  // Custom Models
+  {
+    capabilities: [],
+    contextWindow: 8192,
+    costPer1kTokens: {
+      input: 0,
+      output: 0,
+    },
+    description: "Local SmolLM2 model",
+    family: "custom",
+    id: "ai/smollm2",
+    label: "SmolLM2",
   },
 ]
 

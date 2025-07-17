@@ -20,6 +20,7 @@ const StyledAvatar = styled(Avatar)`
 
 export interface AssetAvatarProps extends AvatarProps {
   alt?: string
+  fallback?: React.ReactNode
   /**
    * @default "small"
    */
@@ -41,7 +42,7 @@ const FONT_SIZE_MAP = {
 }
 
 export function AssetAvatar(props: AssetAvatarProps) {
-  const { alt = "", src, size = "small", sx, ...rest } = props
+  const { alt = "", fallback, src, size = "small", sx, ...rest } = props
 
   const colorArray = useStore($colorArray)
   const color = colorArray[stringToNumber(alt) % colorArray.length]
@@ -60,16 +61,18 @@ export function AssetAvatar(props: AssetAvatarProps) {
       src={source}
       {...rest}
     >
-      <Typography
-        fontWeight={500}
-        fontSize={FONT_SIZE_MAP[size]}
-        lineHeight={1.5}
-        fontFamily={MonoFont}
-        color={color}
-        component="div"
-      >
-        {alt.slice(0, size === "small" ? 1 : 3)}
-      </Typography>
+      {fallback || (
+        <Typography
+          fontWeight={500}
+          fontSize={FONT_SIZE_MAP[size]}
+          lineHeight={1.5}
+          fontFamily={MonoFont}
+          color={color}
+          component="div"
+        >
+          {alt.slice(0, size === "small" ? 1 : 3)}
+        </Typography>
+      )}
     </StyledAvatar>
   )
 }

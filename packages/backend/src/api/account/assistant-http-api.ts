@@ -1,5 +1,6 @@
 import { AnthropicProviderOptions, createAnthropic } from "@ai-sdk/anthropic"
 import { createOpenAI, OpenAIResponsesProviderOptions } from "@ai-sdk/openai"
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible"
 import { createPerplexity } from "@ai-sdk/perplexity"
 import { JSONValue, LanguageModelV1, Message, StepResult, streamText, Tool } from "ai"
 import { ChatMessage } from "src/interfaces"
@@ -106,6 +107,15 @@ async function getApiKey(accountName: string, provider: ModelFamily): Promise<st
       apiKeyEncrypted = await getValue(accountName, "assistant_anthropic_key")
       keyPrefix = "sk-ant-"
       break
+    case "custom": {
+      // Custom models may need API keys depending on the server
+      apiKeyEncrypted = await getValue(accountName, "assistant_custom_api_key")
+      if (!apiKeyEncrypted) {
+        return "" // No API key configured - some custom servers don't need one
+      }
+      const apiKey = await decryptValue(apiKeyEncrypted, secrets.jwtSecret)
+      return apiKey || ""
+    }
     default:
       throw new Error(`Unsupported provider: ${provider}`)
   }
@@ -121,6 +131,18 @@ async function getApiKey(accountName: string, provider: ModelFamily): Promise<st
   }
 
   return apiKey
+}
+
+async function getCustomApiUrl(accountName: string): Promise<string> {
+  const secrets = (await readSecrets()) as AuthSecrets
+  const apiUrlEncrypted = await getValue(accountName, "assistant_custom_api_url")
+
+  if (!apiUrlEncrypted) {
+    return "http://localhost:12434/engines/v1" // Default fallback URL
+  }
+
+  const apiUrl = await decryptValue(apiUrlEncrypted, secrets.jwtSecret)
+  return apiUrl || "http://localhost:12434/engines/v1"
 }
 
 type AssistantChatRequest = {
@@ -217,6 +239,17 @@ export async function handleAssistantChat(request: Request, writeApi: Api): Prom
           // https://github.com/vercel/ai/issues/6666#issuecomment-3005289250
         }
         break
+      case "custom": {
+        const customApiUrl = await getCustomApiUrl(accountName)
+        llmModel = createOpenAICompatible({
+          apiKey: apiKey || undefined,
+          baseURL: customApiUrl,
+          name: "custom",
+        }).languageModel(model.id)
+        providerOptions = {}
+        tools = {}
+        break
+      }
       default:
         throw new Error(`Unsupported model: ${model.id}`)
     }
