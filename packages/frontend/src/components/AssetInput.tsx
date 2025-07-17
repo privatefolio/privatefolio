@@ -48,8 +48,14 @@ export function AssetInput(props: AssetInputProps) {
         setLoading(false)
         if (signal.aborted) return
 
-        const assets = [...myAssets, ...coingecko]
-        setSearchResults(assets)
+        const assetMap = new Map<string, Asset>()
+        coingecko.forEach((asset) => {
+          assetMap.set(asset.id, asset)
+        })
+        myAssets.forEach((asset) => {
+          assetMap.set(asset.id, asset)
+        })
+        setSearchResults(Array.from(assetMap.values()))
       },
       INPUT_DEBOUNCE_DURATION,
       {

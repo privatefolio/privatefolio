@@ -43,14 +43,21 @@ export function PlatformInput(props: PlatformInputProps) {
         setLoading(false)
         if (signal.aborted) return
 
-        const platforms = [
-          ...coingecko.blockchains,
-          ...coingecko.exchanges,
-          ...myPlatforms.blockchains,
-          ...myPlatforms.exchanges,
-        ]
+        const platformMap = new Map<string, Platform>()
+        coingecko.blockchains.forEach((platform) => {
+          platformMap.set(platform.id, platform)
+        })
+        coingecko.exchanges.forEach((platform) => {
+          platformMap.set(platform.id, platform)
+        })
+        myPlatforms.blockchains.forEach((platform) => {
+          platformMap.set(platform.id, platform)
+        })
+        myPlatforms.exchanges.forEach((platform) => {
+          platformMap.set(platform.id, platform)
+        })
 
-        setSearchResults(platforms)
+        setSearchResults(Array.from(platformMap.values()))
       },
       INPUT_DEBOUNCE_DURATION,
       {

@@ -40,7 +40,14 @@ import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { APP_ACTIONS } from "src/AppActions"
 import { useBreakpoints } from "src/hooks/useBreakpoints"
-import { Asset, FindPlatformsResult, RichExtension, Transaction } from "src/interfaces"
+import {
+  Asset,
+  Blockchain,
+  Exchange,
+  FindPlatformsResult,
+  RichExtension,
+  Transaction,
+} from "src/interfaces"
 import { INPUT_DEBOUNCE_DURATION, INPUT_MAX_DEBOUNCE_DURATION } from "src/settings"
 import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
@@ -141,7 +148,15 @@ export const SearchBar = () => {
 
           if (signal.aborted) throw new Error(signal.reason)
 
-          setAssetsFound([...myAssets, ...assets])
+          const assetsMap = new Map<string, Asset>()
+          assets.forEach((asset) => {
+            assetsMap.set(asset.id, asset)
+          })
+          myAssets.forEach((asset) => {
+            assetsMap.set(asset.id, asset)
+          })
+
+          setAssetsFound(Array.from(assetsMap.values()))
         } catch {
           setAssetsFound([])
         } finally {
@@ -204,9 +219,25 @@ export const SearchBar = () => {
 
           if (signal.aborted) throw new Error(signal.reason)
 
+          const blockchainsMap = new Map<string, Blockchain>()
+          platforms.blockchains.forEach((blockchain) => {
+            blockchainsMap.set(blockchain.id, blockchain)
+          })
+          myPlatforms.blockchains.forEach((blockchain) => {
+            blockchainsMap.set(blockchain.id, blockchain)
+          })
+
+          const exchangesMap = new Map<string, Exchange>()
+          platforms.exchanges.forEach((exchange) => {
+            exchangesMap.set(exchange.id, exchange)
+          })
+          myPlatforms.exchanges.forEach((exchange) => {
+            exchangesMap.set(exchange.id, exchange)
+          })
+
           setPlatformsFound({
-            blockchains: [...myPlatforms.blockchains, ...platforms.blockchains],
-            exchanges: [...myPlatforms.exchanges, ...platforms.exchanges],
+            blockchains: Array.from(blockchainsMap.values()),
+            exchanges: Array.from(exchangesMap.values()),
           })
         } catch {
           setPlatformsFound({ blockchains: [], exchanges: [] })
