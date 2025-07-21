@@ -1,3 +1,4 @@
+import { AutoFixHighRounded } from "@mui/icons-material"
 import { Stack } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect } from "react"
@@ -12,10 +13,11 @@ import { TagsTable } from "../TagsPage/TagsTable"
 import { ConnectionsTable } from "./connections/ConnectionsTable"
 import { FileImportsTable } from "./file-imports/FileImportsTable"
 import { ImportDataActions } from "./ImportDataActions"
+import { ImportDataWizard } from "./ImportDataWizard"
 
 export default function ImportDataPage({ show }: { show: boolean }) {
   const [searchParams] = useSearchParams()
-  const tab = searchParams.get("tab") || "connections"
+  const tab = searchParams.get("tab") || "wizard"
 
   const activeAccount = useStore($activeAccount)
 
@@ -28,6 +30,16 @@ export default function ImportDataPage({ show }: { show: boolean }) {
       <Stack>
         <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
           <Tabs value={tab} defaultValue={tab} largeSize>
+            <NavTab
+              value="wizard"
+              to={"?tab=wizard"}
+              label={
+                <span>
+                  <AutoFixHighRounded fontSize="small" sx={{ verticalAlign: "text-bottom" }} />{" "}
+                  Wizard
+                </span>
+              }
+            />
             <NavTab value="connections" to={"?tab=connections"} label="Connections" />
             <NavTab value="file-imports" to={"?tab=file-imports"} label="File imports" />
             <NavTab value="address-book" to={"?tab=address-book"} label="Address book" />
@@ -35,6 +47,7 @@ export default function ImportDataPage({ show }: { show: boolean }) {
           </Tabs>
           <ImportDataActions currentTab={tab} />
         </Stack>
+        {tab === "wizard" && <ImportDataWizard />}
         {tab === "file-imports" && <FileImportsTable />}
         {tab === "connections" && <ConnectionsTable />}
         {tab === "address-book" && <AddressBookTable />}

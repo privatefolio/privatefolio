@@ -4,6 +4,7 @@ import { EventCause, ResolutionString, SqlParam } from "src/interfaces"
 import { PLATFORMS_META } from "src/settings/platforms"
 import { getAssetContract, getAssetPlatform, isEvmPlatform } from "src/utils/assets-utils"
 import { formatDate, ONE_DAY } from "src/utils/formatting-utils"
+import { sql } from "src/utils/sql-utils"
 import { floorTimestamp, noop, writesAllowed } from "src/utils/utils"
 
 import {
@@ -24,12 +25,35 @@ import { getValue, setValue } from "./kv-api"
 import { getPlatform } from "./platforms-api"
 import { enqueueTask } from "./server-tasks-api"
 
+const SCHEMA_VERSION = 1
+
+export async function getAccountWithBalances(accountName: string) {
+  const account = await getAccount(accountName)
+  if (!writesAllowed) return account
+
+  const schemaVersion = await getValue<number>(accountName, `balances_schema_version`, 0)
+
+  if (schemaVersion < 1) {
+    await account.execute(sql`
+      CREATE TABLE IF NOT EXISTS balances (
+        timestamp INTEGER PRIMARY KEY,
+        data JSON
+      );
+    `)
+  }
+  if (schemaVersion !== SCHEMA_VERSION) {
+    await setValue(accountName, `balances_schema_version`, SCHEMA_VERSION)
+  }
+
+  return account
+}
+
 export async function getBalances(
   accountName: string,
   query = "SELECT * FROM balances ORDER BY timestamp ASC",
   params?: SqlParam[]
 ): Promise<BalanceMap[]> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithBalances(accountName)
 
   try {
     const result = await account.execute(query, params)
@@ -57,7 +81,7 @@ export async function getBalancesAt(
   accountName: string,
   cursor: Timestamp = -1
 ): Promise<Balance[]> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithBalances(accountName)
   let balancesCursor =
     cursor !== -1
       ? cursor
@@ -119,7 +143,7 @@ export async function computeBalances(
 
   // TODO8 skip assets tagged as spam
 
-  const account = await getAccount(accountName)
+  const account = await getAccountWithBalances(accountName)
   if (since === undefined) {
     since = (await getValue<Timestamp>(accountName, "balancesCursor", 0)) as Timestamp
   }
@@ -329,13 +353,18 @@ export function enqueueRecomputeBalances(accountName: string, trigger: TaskTrigg
   })
 }
 
-export function enqueueRefreshBalances(accountName: string, trigger: TaskTrigger) {
+export function enqueueRefreshBalances(
+  accountName: string,
+  trigger: TaskTrigger,
+  groupId?: string
+) {
   return enqueueTask(accountName, {
     description: "Refreshing balances of owned assets.",
     determinate: true,
     function: async (progress, signal) => {
       await computeBalances(accountName, undefined, progress, signal)
     },
+    groupId,
     name: "Refresh balances",
     priority: TaskPriority.Medium,
     trigger,
@@ -343,7 +372,7 @@ export function enqueueRefreshBalances(accountName: string, trigger: TaskTrigger
 }
 
 export async function deleteBalances(accountName: string, since: Timestamp = 0) {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithBalances(accountName)
   await account.execute("DELETE FROM balances WHERE timestamp >= ?", [since])
   await account.execute(
     "UPDATE audit_logs SET balance=null, balanceWallet=null WHERE timestamp >= ?",

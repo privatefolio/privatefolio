@@ -7,7 +7,11 @@ import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
 import { useConfirm } from "src/hooks/useConfirm"
 import { LabeledAddress } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
-import { $addressBook, $inMemoryDataQueryTime } from "src/stores/metadata-store"
+import {
+  $addressBook,
+  $inMemoryDataQueryTime,
+  addWalletToAddressBook,
+} from "src/stores/metadata-store"
 import { HeadCell } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
 
@@ -68,11 +72,7 @@ export function AddressBookTable() {
 
       if (!label) return
 
-      const addressBook = $addressBook.get()
-      const newAddressBook = Object.assign({}, addressBook, { [address]: label })
-
-      rpc.setValue(activeAccount, "address_book", JSON.stringify(newAddressBook))
-      $addressBook.set(newAddressBook)
+      await addWalletToAddressBook(rpc, activeAccount, address, label)
     }
   }, [rpc, confirm, activeAccount])
 

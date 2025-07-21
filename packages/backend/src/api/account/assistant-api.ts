@@ -25,13 +25,10 @@ export async function getAccountWithChatHistory(accountName: string) {
   const account = await getAccount(accountName)
   if (!writesAllowed) return account
 
-  const schemaVersion = await getValue(accountName, `chat_history_schema_version`, 0)
-  if (schemaVersion < SCHEMA_VERSION) {
-    // Drop existing table to recreate with new schema
-    await account.execute(sql`DROP TABLE IF EXISTS chat_history`)
-
+  const schemaVersion = await getValue<number>(accountName, `chat_history_schema_version`, 0)
+  if (schemaVersion < 1) {
     await account.execute(sql`
-      CREATE TABLE chat_history (
+      CREATE TABLE IF NOT EXISTS chat_history (
         id VARCHAR PRIMARY KEY,
         conversationId VARCHAR NOT NULL,
         role VARCHAR NOT NULL CHECK (role IN ('user', 'assistant', 'system')),
@@ -44,12 +41,13 @@ export async function getAccountWithChatHistory(accountName: string) {
       );
     `)
 
-    // Create indices for better query performance
     await account.execute(
       sql`CREATE INDEX idx_chat_history_conversation ON chat_history(conversationId)`
     )
     await account.execute(sql`CREATE INDEX idx_chat_history_timestamp ON chat_history(timestamp)`)
+  }
 
+  if (schemaVersion !== SCHEMA_VERSION) {
     await setValue(accountName, `chat_history_schema_version`, SCHEMA_VERSION)
   }
 

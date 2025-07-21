@@ -13,10 +13,14 @@ import { CircularSpinner } from "./CircularSpinner"
 import { SectionTitle } from "./SectionTitle"
 import { WalletInputUncontrolled } from "./WalletInput"
 
-export function FileDrop(props: ButtonProps) {
+type FileDropProps = ButtonProps & {
+  onSuccess?: (groupId: string) => void
+}
+
+export function FileDrop(props: FileDropProps) {
   const theme = useTheme()
 
-  const { size, sx, ...rest } = props
+  const { size, sx, children, onSuccess, ...rest } = props
 
   const [cloning, setCloning] = useState(false)
   const [dragOver, setDragOver] = useState(false)
@@ -54,9 +58,11 @@ export function FileDrop(props: ButtonProps) {
 
   const handleFileImport = useCallback(
     async (fileRecord: ServerFile, parserContext: Record<string, unknown>) => {
-      rpc.enqueueImportFile(activeAccount, "user", fileRecord.id, parserContext)
+      const groupId = window.crypto.randomUUID()
+      rpc.enqueueImportFile(activeAccount, "user", fileRecord.id, parserContext, groupId)
+      onSuccess?.(groupId)
     },
-    [rpc, activeAccount]
+    [rpc, activeAccount, onSuccess]
   )
 
   // ProTip: this callback cannot be async because it doesn't work on mobile
@@ -166,21 +172,23 @@ export function FileDrop(props: ButtonProps) {
             </span>
           </Stack>
         ) : (
-          <Stack
-            alignItems={size === "large" ? "center" : "flex-start"}
-            direction={size === "large" ? "column" : "row"}
-          >
-            {size === "large" ? (
-              <FolderOutlined sx={{ height: 64, width: 64 }} />
-            ) : (
-              <Add sx={{ height: 20, marginRight: 1, width: 20 }} />
-            )}
+          children || (
+            <Stack
+              alignItems={size === "large" ? "center" : "flex-start"}
+              direction={size === "large" ? "column" : "row"}
+            >
+              {size === "large" ? (
+                <FolderOutlined sx={{ height: 64, width: 64 }} />
+              ) : (
+                <Add sx={{ height: 20, marginRight: 1, width: 20 }} />
+              )}
 
-            <span>
-              Click to <u>browse files</u> from your computer or <u>drag and drop</u> your{" "}
-              <code>.csv</code> files here.
-            </span>
-          </Stack>
+              <span>
+                Click to <u>browse files</u> from your computer or <u>drag and drop</u> your{" "}
+                <code>.csv</code> files here.
+              </span>
+            </Stack>
+          )
         )}
       </Typography>
       <input

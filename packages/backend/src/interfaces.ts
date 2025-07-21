@@ -829,6 +829,7 @@ export interface ServerTask {
    */
   duration?: number
   errorMessage?: string
+  groupId?: string
   id: number
   name: string
   priority: TaskPriority
@@ -870,7 +871,12 @@ export interface Tag {
   name: string
 }
 
-export type ExtensionType = "file-import" | "connection" | "price-api" | "metadata"
+export type ExtensionType =
+  | "file-import"
+  | "connection"
+  | "price-api"
+  | "metadata"
+  | "manual-import"
 
 export type SourceCode = {
   tags: string[]

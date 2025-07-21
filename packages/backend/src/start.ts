@@ -143,15 +143,19 @@ async function setupSideEffects(accountName: string) {
 
   let nextTimestamp: Timestamp | undefined
 
-  const handleAuditLogChange = async (cause: EventCause, oldestTimestamp?: Timestamp) => {
+  const handleAuditLogChange = async (
+    cause: EventCause,
+    oldestTimestamp?: Timestamp,
+    groupId?: string
+  ) => {
     if (!nextTimestamp) nextTimestamp = oldestTimestamp
     if (nextTimestamp > oldestTimestamp) nextTimestamp = oldestTimestamp
-    await handleAuditLogChangeDebounced(cause, nextTimestamp)
+    await handleAuditLogChangeDebounced(cause, nextTimestamp, groupId)
     nextTimestamp = undefined
   }
 
   const handleAuditLogChangeDebounced = debounce(
-    async (cause, oldestTimestamp?: Timestamp) => {
+    async (cause, oldestTimestamp?: Timestamp, groupId?: string) => {
       console.log(
         getPrefix(accountName, true),
         `Running side-effects (trigger by audit log changes).`
@@ -172,18 +176,18 @@ async function setupSideEffects(accountName: string) {
 
       if (lastTx !== 0) {
         if (cause === EventCause.Created) {
-          await writeApi.enqueueDetectSpamTransactions(accountName, "side-effect")
-          await writeApi.enqueueAutoMerge(accountName, "side-effect")
+          await writeApi.enqueueDetectSpamTransactions(accountName, "side-effect", groupId)
+          await writeApi.enqueueAutoMerge(accountName, "side-effect", groupId)
         }
 
         // when created or deleted
-        await writeApi.enqueueRefreshBalances(accountName, "side-effect")
+        await writeApi.enqueueRefreshBalances(accountName, "side-effect", groupId)
 
         if (cause === EventCause.Created) {
-          await writeApi.enqueueFetchPrices(accountName, "side-effect")
+          await writeApi.enqueueFetchPrices(accountName, "side-effect", groupId)
         }
-        await writeApi.enqueueRefreshNetworth(accountName, "side-effect")
-        await writeApi.enqueueRefreshTrades(accountName, "side-effect")
+        await writeApi.enqueueRefreshNetworth(accountName, "side-effect", groupId)
+        await writeApi.enqueueRefreshTrades(accountName, "side-effect", groupId)
       }
 
       const account = await getAccount(accountName)
@@ -266,6 +270,8 @@ await writeApi.subscribeToAccounts(
     if (cause === EventCause.Reset) {
       try {
         await readApi.reconnectAccount(accountName)
+        await setupSideEffects(accountName)
+        await handleAccountsSideEffects()
       } catch {}
     }
 

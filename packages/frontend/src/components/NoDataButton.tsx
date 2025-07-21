@@ -1,5 +1,5 @@
 import { DataArrayRounded } from "@mui/icons-material"
-import { Box, Button, Fade, Stack, Typography } from "@mui/material"
+import { Box, Button, Fade, Stack, Typography, TypographyProps } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
@@ -8,9 +8,9 @@ import { $activeAccount, $activeAccountPath, $connectionStatus } from "src/store
 import { closeSubscription } from "src/utils/browser-utils"
 import { $rpc } from "src/workers/remotes"
 
-export function NoFilterMatch() {
+export function NoFilterMatch(props: TypographyProps) {
   return (
-    <Typography color="text.secondary" variant="body2" component="div">
+    <Typography color="text.secondary" variant="body2" component="div" {...props}>
       <span>No records match the current filters.</span>
     </Typography>
   )
@@ -63,7 +63,7 @@ export function NoDataButton() {
             <span>No records found…</span>
             <Button
               component={Link}
-              to={`${activeAccountPath}/import-data`}
+              to={`${activeAccountPath}/import-data?tab=wizard`}
               sx={{
                 background: "rgba(var(--mui-palette-common-onBackgroundChannel) / 0.05)",
                 fontSize: "inherit",
@@ -74,23 +74,7 @@ export function NoDataButton() {
               }}
             >
               <span>
-                Import your <u>data</u> using files or connections.
-              </span>
-            </Button>
-            <Button
-              component={Link}
-              to={`${activeAccountPath}/transactions`}
-              sx={{
-                background: "rgba(var(--mui-palette-common-onBackgroundChannel) / 0.05)",
-                fontSize: "inherit",
-                fontWeight: "inherit",
-                marginTop: 1,
-                paddingX: 2,
-                paddingY: 1,
-              }}
-            >
-              <span>
-                Add a <u>transaction</u> manually.
+                Visit <u>Data</u> to get started.
               </span>
             </Button>
           </Stack>

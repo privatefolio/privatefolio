@@ -259,97 +259,9 @@ async function initializeDatabaseIfNeeded(
   }
 
   await account.execute(sql`
-CREATE TABLE file_imports (
-  id VARCHAR PRIMARY KEY,
-  lastModified INTEGER NOT NULL,
-  name VARCHAR NOT NULL,
-  size FLOAT NOT NULL,
-  timestamp TIMESTAMP,
-  meta JSON
-);
-`)
-
-  await account.execute(sql`
-CREATE TABLE tags (
-  id INTEGER PRIMARY KEY,
-  name VARCHAR UNIQUE NOT NULL
-);
-`)
-
-  await account.execute(sql`
-CREATE TABLE audit_log_tags (
-  audit_log_id VARCHAR NOT NULL,
-  tag_id INTEGER NOT NULL,
-  PRIMARY KEY (audit_log_id, tag_id),
-  FOREIGN KEY (audit_log_id) REFERENCES audit_logs(id),
-  FOREIGN KEY (tag_id) REFERENCES tags(id)
-);
-`)
-
-  await account.execute(sql`
-CREATE TABLE transaction_tags (
-  transaction_id VARCHAR NOT NULL,
-  tag_id INTEGER NOT NULL,
-  PRIMARY KEY (transaction_id, tag_id),
-  FOREIGN KEY (transaction_id) REFERENCES transactions(id),
-  FOREIGN KEY (tag_id) REFERENCES tags(id)
-);
-`)
-
-  await account.execute(sql`
-CREATE TABLE balances (
-  timestamp INTEGER PRIMARY KEY,
-  data JSON
-);
-`)
-
-  await account.execute(sql`
 CREATE TABLE key_value (
   key VARCHAR PRIMARY KEY,
   value JSON
-);
-`)
-
-  await account.execute(sql`
-CREATE TABLE networth (
-  timestamp INTEGER PRIMARY KEY,
-  time INTEGER NOT NULL,
-  value FLOAT NOT NULL,
-  change FLOAT NOT NULL,
-  changePercentage FLOAT NOT NULL
-);
-`)
-
-  await account.execute(sql`
-CREATE TABLE IF NOT EXISTS server_tasks (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT,
-  description TEXT,
-  priority INTEGER,
-  startedAt INTEGER,
-  completedAt INTEGER,
-  duration INTEGER,
-  errorMessage TEXT,
-  trigger TEXT,
-  status TEXT,
-  createdAt INTEGER NOT NULL,
-  determinate BOOLEAN
-);
-`)
-
-  await account.execute(sql`
-CREATE TABLE IF NOT EXISTS server_files (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL, -- The name of the file
-  description TEXT, -- Optional description of the file
-  scheduledAt INTEGER NOT NULL, -- Timestamp of when the file task was scheduled
-  status TEXT, -- Tracks the current status: scheduled, uploading, creating, aborted, completed, deleted
-  progress INTEGER, -- From 0 to 100, for tracking upload or creation progress
-  startedAt INTEGER, -- Timestamp of when the upload/creation started
-  completedAt INTEGER, -- Timestamp of when the upload/creation was completed (NULL if not completed)
-  deletedAt INTEGER, -- Timestamp of when the file was deleted (NULL if not deleted)
-  metadata JSON, -- Additional metadata about the file (e.g., content type, encoding, creation time, etc.)
-  createdBy TEXT NOT NULL -- 'user' or 'system'
 );
 `)
 

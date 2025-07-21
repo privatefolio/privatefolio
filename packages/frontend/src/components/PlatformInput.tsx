@@ -137,6 +137,7 @@ export function PlatformInput(props: PlatformInputProps) {
       )}
       getOptionLabel={(option) => (!option ? "" : platformsMap[option]?.name || option || "")}
       value={value}
+      inputValue={platformsMap[value]?.name || myPlatformsMap[value]?.name || value}
       onChange={(event, newValue) => {
         if (typeof newValue === "string") {
           onChange(newValue)

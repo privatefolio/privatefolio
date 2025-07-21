@@ -35,10 +35,8 @@ export async function getAccountWithAssets(accountName: string) {
 
   const schemaVersion = await getValue<number>(accountName, `assets_schema_version`, 0)
   if (schemaVersion < 1) {
-    await account.execute(sql`DROP TABLE IF EXISTS assets`)
-
     await account.execute(sql`
-      CREATE TABLE assets (
+      CREATE TABLE IF NOT EXISTS assets (
         id VARCHAR PRIMARY KEY,
         symbol VARCHAR NOT NULL,
         name VARCHAR,
@@ -48,7 +46,7 @@ export async function getAccountWithAssets(accountName: string) {
         favorite BOOLEAN
       );`)
   }
-  if (schemaVersion < SCHEMA_VERSION) {
+  if (schemaVersion < 2) {
     await account.execute(sql`DROP VIEW IF EXISTS favorite_assets`)
     await account.execute(sql`
       CREATE VIEW favorite_assets AS

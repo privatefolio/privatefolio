@@ -11,7 +11,6 @@ import {
   Select,
   Stack,
   TextField,
-  Typography,
 } from "@mui/material"
 import { DatePicker } from "@mui/x-date-pickers"
 import { useStore } from "@nanostores/react"
@@ -30,6 +29,7 @@ import { ExtensionAvatar } from "src/components/ExtensionAvatar"
 import { LoadingButton } from "src/components/LoadingButton"
 import { PlatformAvatar } from "src/components/PlatformAvatar"
 import { $activeAccount } from "src/stores/account-store"
+import { $addressBook, addWalletToAddressBook } from "src/stores/metadata-store"
 import { MonoFont } from "src/theme"
 import { asUTC } from "src/utils/formatting-utils"
 import { isProduction, resolveUrl } from "src/utils/utils"
@@ -40,8 +40,15 @@ import { WalletInput } from "../../../components/WalletInput"
 import { BinanceConnectionOptions, ConnectionOptions, RichExtension } from "../../../interfaces"
 import { $debugMode } from "../../../stores/app-store"
 
-export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
-  const { atom } = props
+type AddConnectionDrawerProps = {
+  atom: WritableAtom<boolean>
+  initialExtensionId?: string
+  initialPlatformId?: string
+  onSuccess?: (groupId: string) => void
+}
+
+export function AddConnectionDrawer(props: AddConnectionDrawerProps) {
+  const { atom, initialPlatformId, initialExtensionId, onSuccess } = props
 
   const open = useStore(atom)
 
@@ -50,6 +57,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
   const debugMode = useStore($debugMode)
+  const addressBook = useStore($addressBook)
 
   const [walletInput, setWallet] = useState<string>("")
 
@@ -75,10 +83,23 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
   })
 
   useEffect(() => {
-    if (open) return
+    if (open) {
+      // Set initial values when drawer opens
+      if (initialExtensionId) {
+        setExtensionId(initialExtensionId)
+      }
+      if (initialPlatformId) {
+        setPlatformId(initialPlatformId)
+      }
+      // Clear wallet input when opening with new values
+      setWallet("")
+      return
+    }
 
+    // Reset to defaults when drawer closes
     setExtensionId(etherscanConnExtension)
     setPlatformId("all")
+    setWallet("")
     setState({
       coinFutures: false,
       crossMargin: true,
@@ -88,7 +109,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
     })
     setLoading(false)
     setError(undefined)
-  }, [open])
+  }, [open, initialExtensionId, initialPlatformId])
 
   const handleWalletsChange = (event) => {
     setState({
@@ -111,7 +132,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
       const wallet = walletInput
       const apiKey = formData.get("apiKey") as string
       const apiSecret = formData.get("secret") as string
-      // const label = formData.get("label") as string // TODO5 rethink
+      const walletLabel = formData.get("walletLabel") as string
       const sinceLimit = formData.get("sinceLimit")
         ? asUTC(new Date(formData.get("sinceLimit") as string))
         : undefined
@@ -136,6 +157,9 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
         if (!isValidAddress) {
           setError("Invalid wallet")
           return
+        }
+        if (walletLabel) {
+          await addWalletToAddressBook(rpc, activeAccount, wallet, walletLabel)
         }
         //
       } else if (extension.id === binanceConnExtension) {
@@ -162,21 +186,31 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
       setLoading(true)
       try {
         const platformIds = platformId === "all" ? extension.platformIds! : [platformId]
+        const groupId = window.crypto.randomUUID()
 
-        await Promise.all(
-          platformIds.map(async (platformId) => {
-            const connection = await rpc.upsertConnection(activeAccount, {
-              address: wallet,
-              apiKey,
-              apiSecret,
-              extensionId,
-              options,
-              platformId,
-            })
-            await rpc.enqueueSyncConnection(activeAccount, "user", connection.id, debugMode)
-          })
+        const connections = await rpc.upsertConnections(
+          activeAccount,
+          platformIds.map((platformId) => ({
+            address: wallet,
+            apiKey,
+            apiSecret,
+            extensionId,
+            options,
+            platformId,
+          }))
         )
+        for (const connection of connections) {
+          await rpc.enqueueSyncConnection(
+            activeAccount,
+            "user",
+            connection.id,
+            debugMode,
+            undefined,
+            groupId
+          )
+        }
         atom.set(false)
+        onSuccess?.(groupId)
         enqueueSnackbar(
           `${platformIds.length > 1 ? "Connections" : "Connection"} added, syncing...`,
           { variant: "success" }
@@ -194,6 +228,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
       binanceWallets,
       platformId,
       atom,
+      onSuccess,
       rpc,
       activeAccount,
       extensionId,
@@ -298,6 +333,18 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                   onlyEVM
                 />
               </div>
+              {walletInput && isAddress(walletInput) && !addressBook[walletInput] && (
+                <div>
+                  <SectionTitle optional>Wallet label</SectionTitle>
+                  <TextField
+                    name="walletLabel"
+                    autoComplete="off"
+                    variant="outlined"
+                    fullWidth
+                    size="small"
+                  />
+                </div>
+              )}
             </>
           ) : (
             <>
@@ -334,18 +381,6 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                       fontFamily: MonoFont,
                     },
                   }}
-                />
-              </div>
-              <div>
-                <SectionTitle>
-                  Label <Typography variant="caption">(optional)</Typography>
-                </SectionTitle>
-                <TextField
-                  name="label"
-                  autoComplete="off"
-                  variant="outlined"
-                  fullWidth
-                  size="small"
                 />
               </div>
               <FormControl sx={{ color: "var(--mui-palette-text-secondary)" }} error={walletsError}>
@@ -390,6 +425,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                       color="secondary"
                       name={"coinFutures" satisfies BinanceWalletId}
                       onChange={handleWalletsChange}
+                      disabled
                     />
                   }
                   label={BINANCE_WALLETS.coinFutures}
@@ -401,6 +437,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
                       color="secondary"
                       name={"usdFutures" satisfies BinanceWalletId}
                       onChange={handleWalletsChange}
+                      disabled
                     />
                   }
                   label={BINANCE_WALLETS.usdFutures}
@@ -412,9 +449,7 @@ export function AddConnectionDrawer(props: { atom: WritableAtom<boolean> }) {
             </>
           )}
           <div>
-            <SectionTitle>
-              Import range <Typography variant="caption">(optional)</Typography>
-            </SectionTitle>
+            <SectionTitle optional>Import range</SectionTitle>
             <Stack gap={1.5} marginTop={1.5}>
               <DatePicker
                 name="sinceLimit"

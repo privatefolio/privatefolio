@@ -1,5 +1,4 @@
-import { VerifiedRounded } from "@mui/icons-material"
-import { Box, Skeleton, Stack, Tooltip } from "@mui/material"
+import { Box, Skeleton, Stack } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React from "react"
 import { usePlatform } from "src/hooks/usePlatform"
@@ -9,6 +8,7 @@ import { MonoFont } from "src/theme"
 
 import { IdentifierBlock, IdentifierBlockProps } from "./IdentifierBlock"
 import { PlatformAvatar } from "./PlatformAvatar"
+import { SupportedCheckmark } from "./SupportedCheckmark"
 
 export type PlatformBlockProps = Omit<IdentifierBlockProps, "id"> & {
   id?: string
@@ -34,15 +34,7 @@ export function PlatformBlock(props: PlatformBlockProps) {
       label={
         <>
           {platform?.name || "Unknown"}{" "}
-          {showSupported && platform?.supported && (
-            <Tooltip title={`Supported by ${platform?.extensionsIds?.length} extensions`}>
-              <VerifiedRounded
-                color="primary"
-                fontSize="inherit"
-                sx={{ verticalAlign: "middle" }}
-              />
-            </Tooltip>
-          )}
+          {showSupported && <SupportedCheckmark extensions={platform?.extensionsIds} />}
         </>
       }
       avatar={<PlatformAvatar src={platform?.image} alt={platform?.name} size={size} />}

@@ -32,9 +32,9 @@ export async function getAccountWithDailyPrices(accountName: string) {
   const account = await getAccount(accountName)
   if (!writesAllowed) return account
 
-  const schemaVersion = await getValue(accountName, `daily_prices_schema_version`, 0)
+  const schemaVersion = await getValue<number>(accountName, `daily_prices_schema_version`, 0)
 
-  if (schemaVersion < SCHEMA_VERSION) {
+  if (schemaVersion < 2) {
     await account.execute(sql`
       CREATE TABLE IF NOT EXISTS daily_prices (
         id VARCHAR PRIMARY KEY NOT NULL UNIQUE,
@@ -54,7 +54,8 @@ export async function getAccountWithDailyPrices(accountName: string) {
     await account.execute(sql`
       CREATE INDEX IF NOT EXISTS idx_daily_prices_timestamp ON daily_prices (timestamp);
     `)
-
+  }
+  if (schemaVersion !== SCHEMA_VERSION) {
     await setValue(accountName, `daily_prices_schema_version`, SCHEMA_VERSION)
   }
 
@@ -358,13 +359,14 @@ export async function fetchDailyPrices(
   }
 }
 
-export function enqueueFetchPrices(accountName: string, trigger: TaskTrigger) {
+export function enqueueFetchPrices(accountName: string, trigger: TaskTrigger, groupId?: string) {
   return enqueueTask(accountName, {
     description: "Fetching price data for all assets.",
     determinate: true,
     function: async (progress, signal) => {
       await fetchDailyPrices(accountName, undefined, progress, signal)
     },
+    groupId,
     name: "Fetch asset prices",
     priority: TaskPriority.Low,
     trigger,

@@ -154,6 +154,7 @@ export function AssetInput(props: AssetInputProps) {
       )}
       getOptionLabel={(option) => (!option ? "" : getAssetTicker(option))}
       value={value}
+      // inputValue={assetsMap[value]?.symbol || myAssetsMap[value]?.symbol || value} TODO7
       onChange={(event, newValue) => {
         onChange(newValue)
       }}

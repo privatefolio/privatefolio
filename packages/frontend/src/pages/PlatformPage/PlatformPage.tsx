@@ -1,5 +1,5 @@
-import { LanguageRounded, VerifiedRounded } from "@mui/icons-material"
-import { Chip, Paper, Stack, Tooltip, Typography } from "@mui/material"
+import { LanguageRounded } from "@mui/icons-material"
+import { Chip, Paper, Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { isBlockchain, isExchange } from "privatefolio-backend/src/utils/utils"
 import React, { useEffect, useState } from "react"
@@ -15,6 +15,7 @@ import { NavTab } from "src/components/NavTab"
 import { PlatformAvatar } from "src/components/PlatformAvatar"
 import { SectionTitle } from "src/components/SectionTitle"
 import { SubtitleText } from "src/components/SubtitleText"
+import { SupportedCheckmark } from "src/components/SupportedCheckmark"
 import { Tabs } from "src/components/Tabs"
 import { TrustScoreIndicator } from "src/components/TrustScoreIndicator"
 import { Platform } from "src/interfaces"
@@ -83,16 +84,7 @@ export default function PlatformPage() {
           <PlatformAvatar src={logoUrl} alt={name} size="large" />
           <Stack>
             <Typography variant="h6" fontFamily={SerifFont} sx={{ marginBottom: -0.5 }}>
-              <span>{name}</span>{" "}
-              {platform?.supported && (
-                <Tooltip title={`Supported by ${platform?.extensionsIds?.length} extensions`}>
-                  <VerifiedRounded
-                    color="primary"
-                    fontSize="inherit"
-                    sx={{ verticalAlign: "middle" }}
-                  />
-                </Tooltip>
-              )}
+              <span>{name}</span> <SupportedCheckmark extensions={platform?.extensionsIds} />
             </Typography>
             <SubtitleText>{platform.id}</SubtitleText>
           </Stack>

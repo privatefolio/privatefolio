@@ -99,7 +99,7 @@ export async function fetchInMemoryData(rpc: RPC, accountName: string) {
   console.log("Fetched in-memory database")
 }
 
-type DirectFilterKey = "id" | "txId" | "txHash" | "tradeId"
+type DirectFilterKey = "id" | "txId" | "txHash" | "tradeId" | "groupId"
 
 // TODO0 this union type can be improved
 export const FILTER_LABEL_MAP: Record<FilterKey | DirectFilterKey, string> = {
@@ -110,6 +110,7 @@ export const FILTER_LABEL_MAP: Record<FilterKey | DirectFilterKey, string> = {
   extensionType: "Type",
   family: "Model family",
   feeAsset: "Fee asset",
+  groupId: "Group Id",
   id: "Id",
   incomingAsset: "Incoming asset",
   operation: "Operation",
@@ -173,10 +174,23 @@ export function getFilterValueLabel(value: string | number | undefined) {
   if (value === "tools") return "Tools"
   if (value === "open") return "Open"
   if (value === "closed") return "Closed"
+  if (value === "manual-import") return "Manual import"
 
   if (value in $addressBook.get()) {
     return $addressBook.get()[value]
   }
 
   return value
+}
+
+export async function addWalletToAddressBook(
+  rpc: RPC,
+  accountName: string,
+  wallet: string,
+  label: string
+) {
+  const addressBook = $addressBook.get()
+  const newAddressBook = Object.assign({}, addressBook, { [wallet]: label })
+  await rpc.setValue(accountName, "address_book", JSON.stringify(newAddressBook))
+  $addressBook.set(newAddressBook)
 }

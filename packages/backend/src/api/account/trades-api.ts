@@ -38,17 +38,11 @@ export async function getAccountWithTrades(accountName: string) {
   const account = await getAccount(accountName)
   if (!writesAllowed) return account
 
-  const schemaVersion = await getValue(accountName, `trade_schema_version`, 0)
+  const schemaVersion = await getValue<number>(accountName, `trade_schema_version`, 0)
 
-  if (schemaVersion < SCHEMA_VERSION) {
-    await account.execute(sql`DROP TABLE IF EXISTS trade_audit_logs`)
-    await account.execute(sql`DROP TABLE IF EXISTS trade_transactions`)
-    await account.execute(sql`DROP TABLE IF EXISTS trade_tags`)
-    await account.execute(sql`DROP TABLE IF EXISTS trade_pnl`)
-    await account.execute(sql`DROP TABLE IF EXISTS trades`)
-
+  if (schemaVersion < 17) {
     await account.execute(sql`
-      CREATE TABLE trades (
+      CREATE TABLE IF NOT EXISTS trades (
         id VARCHAR PRIMARY KEY,
         tradeNumber INTEGER NOT NULL,
         assetId VARCHAR NOT NULL,
@@ -68,7 +62,7 @@ export async function getAccountWithTrades(accountName: string) {
     `)
 
     await account.execute(sql`
-      CREATE TABLE trade_audit_logs (
+      CREATE TABLE IF NOT EXISTS trade_audit_logs (
         trade_id VARCHAR NOT NULL,
         audit_log_id VARCHAR NOT NULL,
         PRIMARY KEY (trade_id, audit_log_id),
@@ -78,7 +72,7 @@ export async function getAccountWithTrades(accountName: string) {
     `)
 
     await account.execute(sql`
-      CREATE TABLE trade_transactions (
+      CREATE TABLE IF NOT EXISTS trade_transactions (
         trade_id VARCHAR NOT NULL,
         transaction_id VARCHAR NOT NULL,
         PRIMARY KEY (trade_id, transaction_id),
@@ -88,7 +82,7 @@ export async function getAccountWithTrades(accountName: string) {
     `)
 
     await account.execute(sql`
-      CREATE TABLE trade_tags (
+      CREATE TABLE IF NOT EXISTS trade_tags (
         trade_id VARCHAR NOT NULL,
         tag_id INTEGER NOT NULL,
         PRIMARY KEY (trade_id, tag_id),
@@ -98,7 +92,7 @@ export async function getAccountWithTrades(accountName: string) {
     `)
 
     await account.execute(sql`
-      CREATE TABLE trade_pnl (
+      CREATE TABLE IF NOT EXISTS trade_pnl (
         id VARCHAR PRIMARY KEY,
         trade_id VARCHAR NOT NULL,
         timestamp INTEGER NOT NULL,
@@ -116,7 +110,8 @@ export async function getAccountWithTrades(accountName: string) {
       INSERT OR IGNORE INTO key_value (key, value)
       VALUES ('trade_seq', 0);
     `)
-
+  }
+  if (schemaVersion !== SCHEMA_VERSION) {
     await setValue(accountName, `trade_schema_version`, SCHEMA_VERSION)
   }
 
@@ -727,13 +722,14 @@ export async function computeTrades(
   await computePnl(accountName, progress, trades, since === 0 ? 0 : undefined)
 }
 
-export function enqueueRefreshTrades(accountName: string, trigger: TaskTrigger) {
+export function enqueueRefreshTrades(accountName: string, trigger: TaskTrigger, groupId?: string) {
   return enqueueTask(accountName, {
     description: "Refreshing trades from audit logs.",
     determinate: true,
     function: async (progress, signal) => {
       await computeTrades(accountName, progress, undefined, signal)
     },
+    groupId,
     name: "Refresh trades",
     priority: TaskPriority.Low,
     trigger,

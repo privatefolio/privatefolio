@@ -25,14 +25,11 @@ export async function getAccountWithAuditLogs(accountName: string) {
   const account = await getAccount(accountName)
   if (!writesAllowed) return account
 
-  const schemaVersion = await getValue(accountName, `audit_logs_schema_version`, 0)
+  const schemaVersion = await getValue<number>(accountName, `audit_logs_schema_version`, 0)
 
-  if (schemaVersion < SCHEMA_VERSION) {
-    // Drop existing table to recreate with new schema
-    await account.execute(sql`DROP TABLE IF EXISTS audit_logs`)
-
+  if (schemaVersion < 3) {
     await account.execute(sql`
-      CREATE TABLE audit_logs (
+      CREATE TABLE IF NOT EXISTS audit_logs (
         id VARCHAR PRIMARY KEY,
         assetId VARCHAR NOT NULL,
         balance VARCHAR,
@@ -55,7 +52,8 @@ export async function getAccountWithAuditLogs(accountName: string) {
         FOREIGN KEY (txId) REFERENCES transactions(id)
       );
     `)
-
+  }
+  if (schemaVersion !== SCHEMA_VERSION) {
     await setValue(accountName, `audit_logs_schema_version`, SCHEMA_VERSION)
   }
 
@@ -114,7 +112,7 @@ export async function getAuditLogsByTxId(accountName: string, txId: string) {
   return getAuditLogs(accountName, "SELECT * FROM audit_logs WHERE txId = ?", [txId])
 }
 
-export async function upsertAuditLogs(accountName: string, records: AuditLog[]) {
+export async function upsertAuditLogs(accountName: string, records: AuditLog[], groupId?: string) {
   const account = await getAccountWithAuditLogs(accountName)
 
   try {
@@ -144,7 +142,12 @@ export async function upsertAuditLogs(accountName: string, records: AuditLog[]) 
       if (record.timestamp < oldestTimestamp) oldestTimestamp = record.timestamp
     }
 
-    account.eventEmitter.emit(SubscriptionChannel.AuditLogs, EventCause.Created, oldestTimestamp)
+    account.eventEmitter.emit(
+      SubscriptionChannel.AuditLogs,
+      EventCause.Created,
+      oldestTimestamp,
+      groupId
+    )
   } catch (error) {
     throw new Error(`Failed to add or replace audit logs: ${error}`)
   }

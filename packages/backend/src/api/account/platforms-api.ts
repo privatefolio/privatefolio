@@ -268,6 +268,14 @@ export async function getPlatformsByIds(ids: string[]): Promise<Platform[]> {
   ]
 }
 
+export async function getAllPlatforms() {
+  const blockchains = await getBlockchains()
+  const exchanges = await getExchanges()
+  const platforms = [...blockchains, ...exchanges]
+  platforms.sort((a, b) => (b.extensionsIds?.length ?? 0) - (a.extensionsIds?.length ?? 0))
+  return platforms
+}
+
 export async function getMyPlatforms(accountName: string) {
   const platformIds = await getMyPlatformIds(accountName)
   return getPlatformsByIds(platformIds)

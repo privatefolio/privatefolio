@@ -27,8 +27,14 @@ import { $activeAccount } from "src/stores/account-store"
 import { formatTicker, getAssetPlatform } from "src/utils/assets-utils"
 import { $rpc } from "src/workers/remotes"
 
-export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
-  const { atom } = props
+type AddTransactionDrawerProps = {
+  atom: WritableAtom<boolean>
+  initialPlatformId?: string
+  onSuccess?: (groupId: string) => void
+}
+
+export function AddTransactionDrawer(props: AddTransactionDrawerProps) {
+  const { atom, initialPlatformId, onSuccess } = props
 
   const open = useStore(atom)
 
@@ -146,11 +152,13 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
 
       setError(undefined)
       setLoading(true)
+      const groupId = window.crypto.randomUUID()
       rpc
-        .addTransaction(tx, activeAccount)
+        .addTransaction(tx, activeAccount, groupId)
         .then(() => {
           atom.set(false)
           enqueueSnackbar("Transaction added", { variant: "success" })
+          onSuccess?.(groupId)
         })
         .catch((error) => {
           console.error(error)
@@ -173,19 +181,43 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
       incomingAssetInput,
       outgoingAssetInput,
       atom,
+      onSuccess,
     ]
   )
 
   useEffect(() => {
-    if (open) return
+    if (open) {
+      // When opening, reset all form fields first
+      setBinanceWallet(BINANCE_WALLETS.spot)
+      setType("Swap")
+      setNotes("")
+      setLoading(false)
+      setError(undefined)
+      setIncoming("")
+      setIncomingAsset("")
+      setOutgoing("")
+      setOutgoingAsset("")
+      setFee("")
+      setFeeAsset("")
+      setWallet("")
 
+      // Then set the platform ID if provided
+      if (initialPlatformId) {
+        setPlatform(initialPlatformId)
+      } else {
+        setPlatform("")
+      }
+      return
+    }
+
+    // When closing, reset the form
     setPlatform("")
     setBinanceWallet(BINANCE_WALLETS.spot)
     setType("Swap")
     setNotes("")
     setLoading(false)
     setError(undefined)
-  }, [open])
+  }, [open, initialPlatformId])
 
   return (
     <Drawer open={open} onClose={() => atom.set(false)}>
@@ -200,7 +232,6 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
               value={platformId}
               onChange={setPlatform}
               required
-              //
             />
           </div>
           <div>
@@ -317,7 +348,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
           ) : null}
           <Stack direction="row" gap={1} alignItems="flex-end">
             <Stack width="50%">
-              <SectionTitle>Fee</SectionTitle>
+              <SectionTitle optional>Fee</SectionTitle>
               <TextField
                 value={feeInput}
                 onChange={(event) => setFee(event.target.value)}
@@ -380,7 +411,7 @@ export function AddTransactionDrawer(props: { atom: WritableAtom<boolean> }) {
             />
           </div>
           <div>
-            <SectionTitle>Notes</SectionTitle>
+            <SectionTitle optional>Notes</SectionTitle>
             <TextField
               autoComplete="off"
               multiline
