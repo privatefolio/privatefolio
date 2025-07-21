@@ -1,6 +1,7 @@
 import { formatDate } from "src/utils/formatting-utils"
+import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
-import { noop } from "src/utils/utils"
+import { noop, writesAllowed } from "src/utils/utils"
 
 import {
   Networth,
@@ -17,6 +18,31 @@ import { getAssetPriceMap } from "./daily-prices-api"
 import { getValue, setValue } from "./kv-api"
 import { enqueueTask } from "./server-tasks-api"
 
+const SCHEMA_VERSION = 1
+
+export async function getAccountWithNetworth(accountName: string) {
+  const account = await getAccount(accountName)
+  if (!writesAllowed) return account
+
+  const schemaVersion = await getValue<number>(accountName, `networth_schema_version`, 0)
+
+  if (schemaVersion < 1) {
+    await account.execute(sql`
+      CREATE TABLE IF NOT EXISTS networth (
+        timestamp INTEGER PRIMARY KEY,
+        time INTEGER NOT NULL,
+        value FLOAT NOT NULL,
+        change FLOAT NOT NULL,
+        changePercentage FLOAT NOT NULL
+      );
+    `)
+  }
+  if (schemaVersion !== SCHEMA_VERSION) {
+    await setValue(accountName, `networth_schema_version`, SCHEMA_VERSION)
+  }
+  return account
+}
+
 export async function invalidateNetworth(accountName: string, newValue: Timestamp) {
   const existing = (await getValue<Timestamp>(accountName, "networthCursor", 0)) as Timestamp
 
@@ -31,21 +57,26 @@ export async function getNetworth(
   query = "SELECT * FROM networth"
   //
 ) {
-  const account = await getAccount(accountName)
-  const result = await account.execute(query)
+  try {
+    const account = await getAccountWithNetworth(accountName)
+    const result = await account.execute(query)
 
-  const list: Networth[] = []
-  for (const row of result) {
-    list.push({
-      change: row[3] as number,
-      changePercentage: row[4] as number,
-      time: row[1] as Time,
-      timestamp: row[0] as Timestamp,
-      value: row[2] as number,
-    } as Networth)
+    const list: Networth[] = []
+    for (const row of result) {
+      list.push({
+        change: row[3] as number,
+        changePercentage: row[4] as number,
+        time: row[1] as Time,
+        timestamp: row[0] as Timestamp,
+        value: row[2] as number,
+      } as Networth)
+    }
+
+    return list
+  } catch (error) {
+    if (!writesAllowed) return []
+    throw new Error(`Failed to get networth: ${error}`)
   }
-
-  return list
 }
 
 const pageSize = 250
@@ -56,7 +87,7 @@ export async function computeNetworth(
   progress: ProgressCallback = noop,
   signal?: AbortSignal
 ) {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithNetworth(accountName)
 
   if (since === undefined) {
     since = (await getValue<Timestamp>(accountName, "networthCursor", 0)) as Timestamp
@@ -153,7 +184,7 @@ export async function computeNetworth(
 }
 
 export async function deleteNetworth(accountName: string, since: Timestamp = 0) {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithNetworth(accountName)
   await account.execute("DELETE FROM networth WHERE timestamp >= ?", [since])
   account.eventEmitter.emit(SubscriptionChannel.Networth)
 }
@@ -172,13 +203,18 @@ export function enqueueRecomputeNetworth(accountName: string, trigger: TaskTrigg
   })
 }
 
-export function enqueueRefreshNetworth(accountName: string, trigger: TaskTrigger) {
+export function enqueueRefreshNetworth(
+  accountName: string,
+  trigger: TaskTrigger,
+  groupId?: string
+) {
   return enqueueTask(accountName, {
     description: "Refresh historical networth.",
     determinate: true,
     function: async (progress, signal) => {
       await computeNetworth(accountName, undefined, progress, signal)
     },
+    groupId,
     name: "Refresh networth",
     priority: TaskPriority.Low,
     trigger,

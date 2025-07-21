@@ -12,15 +12,55 @@ import {
 } from "src/interfaces"
 import { TASK_LOG_CHAR_LIMIT, TASK_LOG_LINE_LIMIT, TASK_LOGS_LOCATION } from "src/settings/settings"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { getPrefix, isTestEnvironment, sleep, writesAllowed } from "src/utils/utils"
 
 import { Account, getAccount } from "../accounts-api"
+import { getValue, setValue } from "./kv-api"
+
+const SCHEMA_VERSION = 2
 
 export interface QueuedTask extends ServerTask {
   abortController?: AbortController
   function: (progressCallback: ProgressCallback, signal: AbortSignal) => Promise<unknown>
   onCompletion?: TaskCompletionCallback
+}
+
+export async function getAccountWithServerTasks(accountName: string) {
+  const account = await getAccount(accountName)
+  if (!writesAllowed) return account
+
+  const schemaVersion = await getValue<number>(accountName, `server_tasks_schema_version`, 0)
+
+  if (schemaVersion < 1) {
+    await account.execute(sql`
+      CREATE TABLE IF NOT EXISTS server_tasks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        description TEXT,
+        priority INTEGER,
+        startedAt INTEGER,
+        completedAt INTEGER,
+        duration INTEGER,
+        errorMessage TEXT,
+        trigger TEXT,
+        status TEXT,
+        createdAt INTEGER NOT NULL,
+        determinate BOOLEAN
+      );`)
+  }
+  if (schemaVersion < 2) {
+    try {
+      await account.execute(sql`
+      ALTER TABLE server_tasks ADD COLUMN groupId TEXT;
+    `)
+    } catch {}
+  }
+  if (schemaVersion !== SCHEMA_VERSION) {
+    await setValue(accountName, `server_tasks_schema_version`, SCHEMA_VERSION)
+  }
+  return account
 }
 
 export async function getServerTasks(
@@ -47,6 +87,7 @@ export async function getServerTasks(
         status: row[9],
         createdAt: row[10],
         determinate: row[11],
+        groupId: row[12],
       }
       /* eslint-enable */
       transformNullsToUndefined(value)
@@ -69,8 +110,8 @@ export async function upsertServerTasks(accountName: string, records: NewServerT
   try {
     const results = await account.executeMany(
       `INSERT OR REPLACE INTO server_tasks (
-        id, name, description, priority, startedAt, completedAt, duration, errorMessage, trigger, status, createdAt, determinate
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        id, name, description, priority, startedAt, completedAt, duration, errorMessage, trigger, status, createdAt, determinate, groupId
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       records.map((record) => [
         record.id || null,
         record.name,
@@ -84,6 +125,7 @@ export async function upsertServerTasks(accountName: string, records: NewServerT
         record.status || null,
         record.createdAt || null,
         record.determinate || null,
+        record.groupId || null,
       ])
     )
     account.eventEmitter.emit(SubscriptionChannel.ServerTasks)
@@ -242,7 +284,8 @@ declare module "../accounts-api" {
 }
 
 export async function getAccountWithTaskQueue(accountName: string) {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithServerTasks(accountName)
+  if (!writesAllowed) return account
 
   if (account.taskQueue === undefined) {
     account.isProcessing = false

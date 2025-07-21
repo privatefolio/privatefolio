@@ -1,4 +1,4 @@
-import { BlockchainMeta } from "../interfaces"
+import { BlockchainMeta, DataPlatform, Exchange } from "../interfaces"
 
 /**
  * This is used to avoid conflicts with other platforms.
@@ -445,3 +445,41 @@ export const RPC_PROVIDERS: Record<number, string[]> = {
     "https://base-mainnet.g.alchemy.com/v2/demo",
   ],
 }
+
+export const customDataPlatforms: DataPlatform[] = [
+  {
+    extensionsIds: ["coingecko-metadata"],
+    id: "coingecko", // TODO9
+    image: "$STATIC_ASSETS/extensions/coingecko.svg",
+    name: "CoinGecko",
+    supported: true,
+    url: "https://coingecko.com",
+  },
+  {
+    extensionsIds: ["blockpit-file-import"],
+    id: `${PlatformPrefix.App}blockpit`,
+    image: "$STATIC_ASSETS/extensions/blockpit.png",
+    name: "Blockpit",
+    supported: true,
+    url: "https://blockpit.io",
+  },
+  {
+    extensionsIds: ["privatefolio-file-import"],
+    id: `${PlatformPrefix.App}privatefolio`,
+    image: "$STATIC_ASSETS/extensions/privatefolio.svg",
+    name: "Privatefolio",
+    supported: true,
+    url: "https://privatefolio.xyz",
+  },
+]
+
+export const customExchanges: Exchange[] = [
+  {
+    coingeckoTrustScore: 0,
+    id: `${PlatformPrefix.Exchange}coinmama`,
+    image: "$STATIC_ASSETS/extensions/coinmama.png",
+    name: "Coinmama",
+    url: "https://www.coinmama.com",
+    year: 2013,
+  },
+]

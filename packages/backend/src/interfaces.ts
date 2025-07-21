@@ -158,6 +158,7 @@ export interface DataPlatform extends PlatformMetadata {
   id: string
   image: string
   name: string
+  url?: string
 }
 
 export type Platform = Exchange | Blockchain | DataPlatform
@@ -466,6 +467,13 @@ export type BinanceConnection = Connection & {
 
 export type ParserResult = { logs: AuditLog[]; txns?: Transaction[] }
 
+export type ParserRequirementType = "platform" | "asset" | "address" | "text"
+
+export type ParserRequirement = {
+  name: string
+  type: ParserRequirementType
+}
+
 export type CsvParseFn = (
   csvRow: string,
   index: number,
@@ -478,8 +486,8 @@ export type CsvParser = {
   extensionId: string
   parse: CsvParseFn
   parserId: string
-  platformId: string
-  requirements?: string[]
+  platformId?: string
+  requirements?: ParserRequirement[]
 }
 
 export type EvmParser = (
@@ -676,6 +684,32 @@ export interface CoingeckoMetadataFull {
   web_slug: string
 }
 
+export interface CoingeckoExMetadataFull {
+  alert_notice?: string
+  centralized: boolean
+  coins: number
+  country: string
+  description: string
+  facebook_url?: string
+  has_trading_incentive: boolean
+  image: string
+  name: string
+  other_url_1?: string
+  other_url_2?: string
+  pairs: number
+  public_notice?: string
+  reddit_url?: string
+  slack_url?: string
+  telegram_url?: string
+  tickers?: CoingeckoTickerData[]
+  trade_volume_24h_btc: number
+  trust_score: number
+  trust_score_rank: number
+  twitter_handle?: string
+  url: string
+  year_established: number
+}
+
 export interface AssetMetadata {
   coingeckoId?: string
   logoUrl: string
@@ -829,6 +863,7 @@ export interface ServerTask {
    */
   duration?: number
   errorMessage?: string
+  groupId?: string
   id: number
   name: string
   priority: TaskPriority
@@ -870,7 +905,12 @@ export interface Tag {
   name: string
 }
 
-export type ExtensionType = "file-import" | "connection" | "price-api" | "metadata"
+export type ExtensionType =
+  | "file-import"
+  | "connection"
+  | "price-api"
+  | "metadata"
+  | "manual-import"
 
 export type SourceCode = {
   tags: string[]

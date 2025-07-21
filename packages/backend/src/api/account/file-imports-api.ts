@@ -17,13 +17,42 @@ import {
 } from "src/interfaces"
 import { FILES_LOCATION } from "src/settings/settings"
 import { splitRows } from "src/utils/csv-utils"
+import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { hashString, noop, writesAllowed } from "src/utils/utils"
 
 import { countAuditLogs, upsertAuditLogs } from "./audit-logs-api"
+import { getValue, setValue } from "./kv-api"
 import { getServerFile } from "./server-files-api"
 import { enqueueTask } from "./server-tasks-api"
 import { countTransactions, upsertTransactions } from "./transactions-api"
+
+const SCHEMA_VERSION = 1
+
+export async function getAccountWithFileImports(accountName: string) {
+  const account = await getAccount(accountName)
+  if (!writesAllowed) return account
+
+  const schemaVersion = await getValue<number>(accountName, `file_imports_schema_version`, 0)
+
+  if (schemaVersion < 1) {
+    await account.execute(sql`
+      CREATE TABLE IF NOT EXISTS file_imports (
+        id VARCHAR PRIMARY KEY,
+        lastModified INTEGER NOT NULL,
+        name VARCHAR NOT NULL,
+        size FLOAT NOT NULL,
+        timestamp TIMESTAMP,
+        meta JSON
+      );
+    `)
+  }
+  if (schemaVersion !== SCHEMA_VERSION) {
+    await setValue(accountName, `file_imports_schema_version`, SCHEMA_VERSION)
+  }
+
+  return account
+}
 
 async function readFileImportText(accountName: string, fileRecord: ServerFile) {
   const filePath = join(FILES_LOCATION, accountName, String(fileRecord.id))
@@ -45,9 +74,10 @@ export async function importFile(
   accountName: string,
   fileRecord: ServerFile,
   parserContext: Record<string, unknown> = {},
-  progress: ProgressCallback = noop
+  progress: ProgressCallback = noop,
+  groupId?: string
 ): Promise<FileImport> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithFileImports(accountName)
 
   const { name } = fileRecord
   const { type, lastModified, size } = fileRecord.metadata
@@ -80,7 +110,7 @@ export async function importFile(
     const { metadata, logs, transactions } = await parseCsv(text, id, progress, parserContext)
 
     await progress([60, `Saving ${logs.length} audit logs to disk`])
-    await upsertAuditLogs(accountName, logs)
+    await upsertAuditLogs(accountName, logs, groupId)
 
     await progress([80, `Saving ${transactions.length} transactions to disk`])
     await upsertTransactions(accountName, transactions)
@@ -113,7 +143,7 @@ export async function getFileImports(
   query = "SELECT * FROM file_imports ORDER BY timestamp DESC",
   params?: SqlParam[]
 ) {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithFileImports(accountName)
   try {
     const result = await account.execute(query, params)
     return result.map((row) => ({
@@ -139,7 +169,7 @@ export async function countFileImports(
   query = "SELECT COUNT(*) FROM file_imports",
   params?: SqlParam[]
 ): Promise<number> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithFileImports(accountName)
 
   try {
     const result = await account.execute(query, params)
@@ -156,7 +186,7 @@ export async function deleteFileImport(
   progress: ProgressCallback = noop
 ) {
   await progress([0, `Removing file import with id ${fileImport.id}`])
-  const account = await getAccount(accountName)
+  const account = await getAccountWithFileImports(accountName)
 
   const oldestTimestamp = (
     await account.execute(
@@ -201,13 +231,15 @@ export async function enqueueImportFile(
   accountName: string,
   trigger: TaskTrigger,
   fileId: number,
-  parserContext?: Record<string, unknown>
+  parserContext?: Record<string, unknown>,
+  groupId?: string
 ) {
   const fileRecord = await getServerFile(accountName, fileId)
   return enqueueTask(accountName, {
     description: `Importing "${fileRecord.name}".`,
     determinate: true,
-    function: (progress) => importFile(accountName, fileRecord, parserContext, progress),
+    function: (progress) => importFile(accountName, fileRecord, parserContext, progress, groupId),
+    groupId,
     name: `Import "${fileRecord.name}"`,
     priority: TaskPriority.VeryHigh,
     trigger,

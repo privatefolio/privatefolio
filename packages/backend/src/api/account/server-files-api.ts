@@ -1,16 +1,49 @@
 import { NewServerFile, ServerFile, SqlParam, SubscriptionChannel } from "src/interfaces"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { writesAllowed } from "src/utils/utils"
 
 import { getAccount } from "../accounts-api"
+import { getValue, setValue } from "./kv-api"
+
+const SCHEMA_VERSION = 1
+
+export async function getAccountWithServerFiles(accountName: string) {
+  const account = await getAccount(accountName)
+  if (!writesAllowed) return account
+
+  const schemaVersion = await getValue<number>(accountName, `server_files_schema_version`, 0)
+
+  if (schemaVersion < 1) {
+    await account.execute(sql`
+      CREATE TABLE IF NOT EXISTS server_files (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        description TEXT,
+        scheduledAt INTEGER NOT NULL,
+        status TEXT,
+        progress INTEGER,
+        startedAt INTEGER,
+        completedAt INTEGER,
+        deletedAt INTEGER,
+        metadata JSON,
+        createdBy TEXT NOT NULL
+      );
+    `)
+  }
+  if (schemaVersion !== SCHEMA_VERSION) {
+    await setValue(accountName, `server_files_schema_version`, SCHEMA_VERSION)
+  }
+  return account
+}
 
 export async function getServerFiles(
   accountName: string,
   query = "SELECT * FROM server_files ORDER BY id DESC",
   params?: SqlParam[]
 ): Promise<ServerFile[]> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithServerFiles(accountName)
 
   try {
     const result = await account.execute(query, params)
@@ -45,7 +78,7 @@ export async function getServerFile(accountName: string, id: number) {
 }
 
 export async function upsertServerFiles(accountName: string, records: NewServerFile[]) {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithServerFiles(accountName)
 
   try {
     const results = await account.executeMany(
@@ -98,7 +131,7 @@ export async function countServerFiles(
   query = "SELECT COUNT(*) FROM server_files",
   params?: SqlParam[]
 ): Promise<number> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithServerFiles(accountName)
 
   try {
     const result = await account.execute(query, params)

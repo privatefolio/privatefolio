@@ -94,6 +94,7 @@ export function ServerTasksTable() {
         key: "description",
         label: "Description",
         sortable: true,
+        sx: { width: "100%" },
       },
       {
         filterable: true,
@@ -123,6 +124,11 @@ export function ServerTasksTable() {
       },
       {
         sx: { maxWidth: 88, minWidth: 88, width: 88 },
+      },
+      {
+        filterable: true,
+        hidden: true,
+        key: "groupId",
       },
     ],
     []

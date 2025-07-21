@@ -1,7 +1,9 @@
 import { Typography, TypographyProps } from "@mui/material"
 import React from "react"
 
-export function SectionTitle(props: TypographyProps) {
+export function SectionTitle(props: TypographyProps & { optional?: boolean }) {
+  const { optional, children, ...rest } = props
+
   return (
     <Typography
       variant="subtitle2"
@@ -9,7 +11,9 @@ export function SectionTitle(props: TypographyProps) {
       letterSpacing="0.025rem"
       // fontWeight={500} (the default)
       sx={{ marginBottom: 0.5 }}
-      {...props}
-    />
+      {...rest}
+    >
+      {children} {optional && <Typography variant="caption">(optional)</Typography>}
+    </Typography>
   )
 }

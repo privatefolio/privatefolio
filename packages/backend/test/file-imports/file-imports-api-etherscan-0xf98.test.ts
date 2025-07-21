@@ -20,6 +20,7 @@ import {
   getTransactions,
 } from "src/api/account/transactions-api"
 import { ProgressUpdate } from "src/interfaces"
+import { ETHEREUM_PLATFORM_ID } from "src/settings/platforms"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
 import { beforeAll, describe, expect, it, vi } from "vitest"
 
@@ -48,18 +49,22 @@ describe("0xf98 file import", () => {
     const buffer = await fs.promises.readFile(filePath, "utf8")
     mocks.readFile.mockResolvedValue(buffer)
     // act
-    const fileImport = await importFile(accountName, {
-      createdBy: "user",
-      id: 0,
-      metadata: {
-        lastModified: 0,
-        size: buffer.length,
-        type: "text/csv",
+    const fileImport = await importFile(
+      accountName,
+      {
+        createdBy: "user",
+        id: 0,
+        metadata: {
+          lastModified: 0,
+          size: buffer.length,
+          type: "text/csv",
+        },
+        name: fileName,
+        scheduledAt: 0,
+        status: "completed",
       },
-      name: fileName,
-      scheduledAt: 0,
-      status: "completed",
-    })
+      { platform: ETHEREUM_PLATFORM_ID }
+    )
     const auditLogsCount = await countAuditLogs(
       accountName,
       `SELECT COUNT(*) FROM audit_logs WHERE fileImportId = ?`,
@@ -82,7 +87,7 @@ describe("0xf98 file import", () => {
             "Fee",
             "Withdraw",
           ],
-          "parserId": "etherscan-default",
+          "parserId": "etherscan-user-txns",
           "platformId": "chain.ethereum",
           "rows": 9,
           "transactions": 9,
@@ -119,6 +124,7 @@ describe("0xf98 file import", () => {
         status: "completed",
       },
       {
+        platform: ETHEREUM_PLATFORM_ID,
         userAddress: "0xf98c96b5d10faafc2324847c82305bd5fd7e5ad3",
       }
     )
@@ -149,7 +155,7 @@ describe("0xf98 file import", () => {
           "operations": [
             "Deposit",
           ],
-          "parserId": "etherscan-erc20",
+          "parserId": "etherscan-erc20-txns",
           "platformId": "chain.ethereum",
           "rows": 8,
           "transactions": 8,

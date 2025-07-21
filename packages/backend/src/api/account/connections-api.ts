@@ -37,12 +37,10 @@ export async function getAccountWithConnections(accountName: string) {
   const account = await getAccount(accountName)
   if (!writesAllowed) return account
 
-  const schemaVersion = await getValue(accountName, `connections_schema_version`, 0)
-  if (schemaVersion < SCHEMA_VERSION) {
-    await account.execute(sql`DROP TABLE IF EXISTS connections`)
-
+  const schemaVersion = await getValue<number>(accountName, `connections_schema_version`, 0)
+  if (schemaVersion < 6) {
     await account.execute(sql`
-      CREATE TABLE connections (
+      CREATE TABLE IF NOT EXISTS connections (
         id VARCHAR PRIMARY KEY,
         connectionNumber INTEGER NOT NULL UNIQUE,
         address VARCHAR,
@@ -61,7 +59,8 @@ export async function getAccountWithConnections(accountName: string) {
       INSERT OR IGNORE INTO key_value (key, value)
       VALUES ('connection_seq', 0);
     `)
-
+  }
+  if (schemaVersion !== SCHEMA_VERSION) {
     await setValue(accountName, `connections_schema_version`, SCHEMA_VERSION)
   }
 
@@ -135,6 +134,9 @@ function deriveConnectionId(record: NewConnection) {
   return hashString(`${record.extensionId}_${record.platformId}_${record.address || record.apiKey}`)
 }
 
+/**
+ * Beware: do not add single connections asynchronously, it will fail.
+ */
 export async function upsertConnections(accountName: string, records: NewConnection[]) {
   const account = await getAccountWithConnections(accountName)
 
@@ -184,6 +186,10 @@ export async function upsertConnections(accountName: string, records: NewConnect
 
 export async function upsertConnection(accountName: string, record: NewConnection) {
   const results = await upsertConnections(accountName, [record])
+  if (results.length === 0) {
+    console.error("Failed to upsert connection", record.platformId)
+    throw new Error("Failed to upsert connection")
+  }
   return results[0]
 }
 
@@ -268,7 +274,8 @@ export async function syncConnection(
   debugMode = false,
   since?: number,
   until?: number,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  groupId?: string
 ) {
   const connection = await getConnection(accountName, connectionId)
   let result: SyncResult
@@ -311,7 +318,7 @@ export async function syncConnection(
 
   if (logIds.length > 0) {
     await progress([60, `Saving ${logIds.length} audit logs to disk`])
-    await upsertAuditLogs(accountName, Object.values(result.logMap))
+    await upsertAuditLogs(accountName, Object.values(result.logMap), groupId)
   }
 
   // Save transactions
@@ -385,7 +392,8 @@ export async function enqueueSyncConnection(
   trigger: TaskTrigger,
   connectionId: string,
   debugMode?: boolean,
-  onCompletion?: TaskCompletionCallback
+  onCompletion?: TaskCompletionCallback,
+  groupId?: string
 ) {
   const connection = await getConnection(accountName, connectionId)
   const addressBook = JSON.parse(await getValue(accountName, "address_book", "{}"))
@@ -407,9 +415,11 @@ export async function enqueueSyncConnection(
         debugMode,
         undefined,
         undefined,
-        signal
+        signal,
+        groupId
       )
     },
+    groupId,
     name: `Sync connection #${connection.connectionNumber}`,
     onCompletion,
     priority: TaskPriority.High,

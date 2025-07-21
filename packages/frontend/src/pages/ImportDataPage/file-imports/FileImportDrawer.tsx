@@ -1,7 +1,6 @@
 import { Drawer, DrawerProps, Skeleton, Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { MouseEvent, useState } from "react"
-import { AmountBlock } from "src/components/AmountBlock"
 import { DrawerHeader } from "src/components/DrawerHeader"
 import { ExtensionBlock } from "src/components/ExtensionBlock"
 import { FileSizeBlock } from "src/components/FileSizeBlock"
@@ -14,6 +13,7 @@ import { useConfirm } from "src/hooks/useConfirm"
 import { FileImport } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 import { PopoverToggleProps } from "src/stores/app-store"
+import { formatNumber } from "src/utils/formatting-utils"
 import { $rpc } from "src/workers/remotes"
 
 type FileImportDrawerProps = DrawerProps &
@@ -117,11 +117,11 @@ export function FileImportDrawer(props: FileImportDrawerProps) {
         </div>
         <div>
           <SectionTitle>Audit logs</SectionTitle>
-          {!meta ? <Skeleton height={20} width={80} /> : <AmountBlock amount={meta.logs} />}
+          {!meta ? <Skeleton height={20} width={80} /> : formatNumber(meta.logs)}
         </div>
         <div>
           <SectionTitle>Transactions</SectionTitle>
-          {!meta ? <Skeleton height={20} width={80} /> : <AmountBlock amount={meta.transactions} />}
+          {!meta ? <Skeleton height={20} width={80} /> : formatNumber(meta.transactions)}
         </div>
         <div>
           <SectionTitle>Actions</SectionTitle>

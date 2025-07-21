@@ -1,4 +1,5 @@
 import { access, mkdir, readFile, writeFile } from "fs/promises"
+import { customDataPlatforms, customExchanges } from "src/settings/platforms"
 import { CACHE_LOCATION, PlatformPrefix } from "src/settings/settings"
 import { isBlockchain, isExchange } from "src/utils/utils"
 
@@ -12,7 +13,6 @@ import {
 } from "../../extensions/metadata/coingecko/coingecko-interfaces"
 import {
   Blockchain,
-  DataPlatform,
   Exchange,
   FindPlatformsResult,
   Platform,
@@ -22,27 +22,6 @@ import {
 import { getMyPlatformIds } from "./audit-logs-api"
 import { getExtensions } from "./extensions-api"
 import { enqueueTask } from "./server-tasks-api"
-
-const dataPlatforms: DataPlatform[] = [
-  {
-    extensionsIds: ["coingecko-metadata"],
-    id: "coingecko",
-    image: "$STATIC_ASSETS/extensions/coingecko.svg",
-    name: "CoinGecko",
-    supported: true,
-  },
-]
-
-const customExchanges: Exchange[] = [
-  {
-    coingeckoTrustScore: 0,
-    id: `${PlatformPrefix.Exchange}coinmama`,
-    image: "$STATIC_ASSETS/extensions/coinmama.png",
-    name: "Coinmama",
-    url: "https://www.coinmama.com",
-    year: 2013,
-  },
-]
 
 let exchanges: Exchange[] = []
 let blockchains: Blockchain[] = []
@@ -255,7 +234,7 @@ export async function getPlatform(id: string): Promise<Platform | undefined> {
   return (
     blockchains.find((blockchain) => blockchain.id === id) ||
     exchanges.find((exchange) => exchange.id === id) ||
-    dataPlatforms.find((platform) => platform.id === id)
+    customDataPlatforms.find((platform) => platform.id === id)
   )
 }
 
@@ -266,6 +245,14 @@ export async function getPlatformsByIds(ids: string[]): Promise<Platform[]> {
     ...blockchains.filter((blockchain) => ids.includes(blockchain.id)),
     ...exchanges.filter((exchange) => ids.includes(exchange.id)),
   ]
+}
+
+export async function getAllPlatforms() {
+  const blockchains = await getBlockchains()
+  const exchanges = await getExchanges()
+  const platforms = [...blockchains, ...exchanges, ...customDataPlatforms]
+  platforms.sort((a, b) => (b.extensionsIds?.length ?? 0) - (a.extensionsIds?.length ?? 0))
+  return platforms
 }
 
 export async function getMyPlatforms(accountName: string) {

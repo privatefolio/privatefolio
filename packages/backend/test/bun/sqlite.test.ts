@@ -14,6 +14,7 @@ import { upsertServerTask } from "src/api/account/server-tasks-api"
 import { countTransactions, getTransactions } from "src/api/account/transactions-api"
 import { getAccount, resetAccount } from "src/api/accounts-api"
 import { ProgressUpdate, TaskPriority, TaskStatus } from "src/interfaces"
+import { ETHEREUM_PLATFORM_ID } from "src/settings/platforms"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
 import { sleep } from "src/utils/utils"
 import { beforeAll } from "vitest"
@@ -39,18 +40,22 @@ describe("0xf98 file import", () => {
     const filePath = join("test/files", fileName)
     const buffer = await fs.promises.readFile(filePath, "utf8")
     mocks.readFile.mockResolvedValue(buffer)
-    const fileImport = await importFile(accountName, {
-      createdBy: "user",
-      id: 0,
-      metadata: {
-        lastModified: 0,
-        size: buffer.length,
-        type: "text/csv",
+    const fileImport = await importFile(
+      accountName,
+      {
+        createdBy: "user",
+        id: 0,
+        metadata: {
+          lastModified: 0,
+          size: buffer.length,
+          type: "text/csv",
+        },
+        name: fileName,
+        scheduledAt: 0,
+        status: "completed",
       },
-      name: fileName,
-      scheduledAt: 0,
-      status: "completed",
-    })
+      { platform: ETHEREUM_PLATFORM_ID }
+    )
     const auditLogsCount = await countAuditLogs(
       accountName,
       `SELECT COUNT(*) FROM audit_logs WHERE fileImportId = ?`,
@@ -81,6 +86,7 @@ describe("0xf98 file import", () => {
         status: "completed",
       },
       {
+        platform: ETHEREUM_PLATFORM_ID,
         userAddress: "0xf98c96b5d10faafc2324847c82305bd5fd7e5ad3",
       }
     )

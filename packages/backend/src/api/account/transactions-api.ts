@@ -302,13 +302,14 @@ export async function autoMergeTransactions(
   await progress([100, "Done"])
 }
 
-export function enqueueAutoMerge(accountName: string, trigger: TaskTrigger) {
+export function enqueueAutoMerge(accountName: string, trigger: TaskTrigger, groupId?: string) {
   return enqueueTask(accountName, {
     description: "Auto-merging transactions.",
     determinate: true,
     function: async (progress, signal) => {
       await autoMergeTransactions(accountName, progress, signal)
     },
+    groupId,
     name: "Auto-merge transactions",
     priority: TaskPriority.MediumHigh,
     trigger,
@@ -379,13 +380,18 @@ export async function detectSpamTransactions(
   await progress([100, "Done"])
 }
 
-export function enqueueDetectSpamTransactions(accountName: string, trigger: TaskTrigger) {
+export function enqueueDetectSpamTransactions(
+  accountName: string,
+  trigger: TaskTrigger,
+  groupId?: string
+) {
   return enqueueTask(accountName, {
     description: "Detect spam transactions.",
     determinate: true,
     function: async (progress, signal) => {
       await detectSpamTransactions(accountName, progress, signal)
     },
+    groupId,
     name: "Detect spam transactions",
     priority: TaskPriority.Medium,
     trigger,
@@ -394,7 +400,8 @@ export function enqueueDetectSpamTransactions(accountName: string, trigger: Task
 
 export async function addTransaction(
   transaction: Omit<Transaction, "id" | "_rev" | "importId" | "importIndex">,
-  accountName: string
+  accountName: string,
+  groupId?: string
 ) {
   const {
     fee,
@@ -495,7 +502,7 @@ export async function addTransaction(
     },
   ]
   await upsertTransactions(accountName, tx)
-  await upsertAuditLogs(accountName, logs)
+  await upsertAuditLogs(accountName, logs, groupId)
   await setValue(accountName, "transaction_man_seq", seq + 1)
 }
 

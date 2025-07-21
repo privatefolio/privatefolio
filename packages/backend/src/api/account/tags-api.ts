@@ -1,9 +1,54 @@
 import { EventCause, SqlParam, SubscriptionChannel, Tag } from "src/interfaces"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { writesAllowed } from "src/utils/environment-utils"
+import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 
 import { getAccount } from "../accounts-api"
+import { getValue, setValue } from "./kv-api"
+
+const SCHEMA_VERSION = 1
+
+export async function getAccountWithTags(accountName: string) {
+  const account = await getAccount(accountName)
+  if (!writesAllowed) return account
+
+  const schemaVersion = await getValue<number>(accountName, `tags_schema_version`, 0)
+
+  if (schemaVersion < 1) {
+    await account.execute(sql`
+      CREATE TABLE IF NOT EXISTS tags (
+        id INTEGER PRIMARY KEY,
+        name VARCHAR UNIQUE NOT NULL
+      );
+    `)
+
+    await account.execute(sql`
+      CREATE TABLE IF NOT EXISTS audit_log_tags (
+        audit_log_id VARCHAR NOT NULL,
+        tag_id INTEGER NOT NULL,
+        PRIMARY KEY (audit_log_id, tag_id),
+        FOREIGN KEY (audit_log_id) REFERENCES audit_logs(id),
+        FOREIGN KEY (tag_id) REFERENCES tags(id)
+      );
+    `)
+
+    await account.execute(sql`
+      CREATE TABLE IF NOT EXISTS transaction_tags (
+        transaction_id VARCHAR NOT NULL,
+        tag_id INTEGER NOT NULL,
+        PRIMARY KEY (transaction_id, tag_id),
+        FOREIGN KEY (transaction_id) REFERENCES transactions(id),
+        FOREIGN KEY (tag_id) REFERENCES tags(id)
+      );
+    `)
+  }
+  if (schemaVersion !== SCHEMA_VERSION) {
+    await setValue(accountName, `tags_schema_version`, SCHEMA_VERSION)
+  }
+
+  return account
+}
 
 /**
  * Retrieves tags based on the given query and parameters.
@@ -13,7 +58,7 @@ export async function getTags(
   query = "SELECT id, name FROM tags ORDER BY id ASC",
   params?: SqlParam[]
 ): Promise<Tag[]> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTags(accountName)
   try {
     const result = await account.execute(query, params)
     return result.map((row) => {
@@ -42,7 +87,7 @@ export async function getTag(accountName: string, id: number): Promise<Tag | und
  * Inserts multiple tags (ignoring duplicates) and returns the inserted or existing tags.
  */
 export async function upsertTags(accountName: string, tags: string[]): Promise<Tag[]> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTags(accountName)
   try {
     await account.executeMany(
       `INSERT OR IGNORE INTO tags (name) VALUES (?)`,
@@ -73,7 +118,7 @@ export async function upsertTag(accountName: string, tag: string): Promise<Tag> 
 }
 
 export async function updateTag(accountName: string, id: number, name: string): Promise<void> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTags(accountName)
   try {
     await account.execute("UPDATE tags SET name = ? WHERE id = ?", [name, id])
     account.eventEmitter.emit(SubscriptionChannel.Tags, EventCause.Updated)
@@ -83,7 +128,7 @@ export async function updateTag(accountName: string, id: number, name: string): 
 }
 
 export async function deleteTag(accountName: string, id: number): Promise<void> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTags(accountName)
   try {
     await account.execute("DELETE FROM tags WHERE id = ?", [id])
     account.eventEmitter.emit(SubscriptionChannel.Tags, EventCause.Deleted)
@@ -97,7 +142,7 @@ export async function assignTagToAuditLog(
   auditLogId: string,
   tagName: string
 ): Promise<void> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTags(accountName)
   try {
     const tag = await upsertTag(accountName, tagName)
     await account.execute(
@@ -115,7 +160,7 @@ export async function assignTagToTransaction(
   transactionId: string,
   tagName: string
 ): Promise<void> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTags(accountName)
   try {
     const tag = await upsertTag(accountName, tagName)
     await account.execute(
@@ -133,7 +178,7 @@ export async function assignTagToTrade(
   tradeId: string,
   tagName: string
 ): Promise<void> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTags(accountName)
   try {
     const tag = await upsertTag(accountName, tagName)
     await account.execute("INSERT OR IGNORE INTO trade_tags (trade_id, tag_id) VALUES (?, ?)", [
@@ -151,7 +196,7 @@ export async function removeTagFromAuditLog(
   auditLogId: string,
   tagId: number
 ): Promise<void> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTags(accountName)
   try {
     await account.execute(`DELETE FROM audit_log_tags WHERE audit_log_id = ? AND tag_id = ?`, [
       auditLogId,
@@ -168,7 +213,7 @@ export async function removeTagFromTransaction(
   transactionId: string,
   tagId: number
 ): Promise<void> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTags(accountName)
   try {
     await account.execute(`DELETE FROM transaction_tags WHERE transaction_id = ? AND tag_id = ?`, [
       transactionId,
@@ -185,7 +230,7 @@ export async function removeTagFromTrade(
   tradeId: string,
   tagId: number
 ): Promise<void> {
-  const account = await getAccount(accountName)
+  const account = await getAccountWithTags(accountName)
   try {
     await account.execute("DELETE FROM trade_tags WHERE trade_id = ? AND tag_id = ?", [
       tradeId,

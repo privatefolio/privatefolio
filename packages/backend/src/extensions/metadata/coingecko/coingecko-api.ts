@@ -1,4 +1,4 @@
-import { CoingeckoMetadataFull } from "src/interfaces"
+import { CoingeckoExMetadataFull, CoingeckoMetadataFull } from "src/interfaces"
 
 export const COINGECKO_BASE_API = "https://api.coingecko.com/api/v3"
 
@@ -31,6 +31,33 @@ export async function getFullMetadata(coingeckoId: string): Promise<CoingeckoMet
       )
     }
 
+    return meta
+  } catch (error) {
+    if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
+      // safely assume its a cors error due to rate limit
+      throw new Error("429: Rate limited")
+    }
+    // console.error(error)
+    throw error
+  }
+}
+export async function getFullExchangeMetadata(
+  coingeckoId: string
+): Promise<CoingeckoExMetadataFull> {
+  const params = new URLSearchParams({})
+
+  const url = `${COINGECKO_BASE_API}/exchanges/${coingeckoId}?${params}`
+
+  try {
+    const response = await fetch(url)
+    const result = await response.json()
+
+    if ("error" in result) {
+      // not found
+      throw new Error(result.error as string)
+    }
+
+    const meta = result as unknown as CoingeckoExMetadataFull
     return meta
   } catch (error) {
     if (error instanceof TypeError && error.message.includes("Failed to fetch")) {

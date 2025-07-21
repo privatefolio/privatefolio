@@ -15,7 +15,7 @@ import { useStore } from "@nanostores/react"
 import { throttle } from "lodash-es"
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { Link } from "react-router-dom"
-import { ServerTask } from "src/interfaces"
+import { ServerTask, TaskStatus } from "src/interfaces"
 import { SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $activeAccountPath, $connectionStatus } from "src/stores/account-store"
 import { closeSubscription } from "src/utils/browser-utils"
@@ -82,9 +82,19 @@ export function TaskDropdown() {
   }, [rpc, accountName, connectionStatus])
 
   const pendingTask = useMemo(
-    () => latestTasks.find((task) => task.status === "running"),
+    () => latestTasks.find((task) => task.status === TaskStatus.Running),
     [latestTasks]
   )
+
+  const displayedTasks = useMemo(() => {
+    const list = latestTasks.slice(0, SHOW_LIMIT)
+
+    if (pendingTask && !list.some((task) => task.id === pendingTask.id)) {
+      list.push(pendingTask)
+    }
+
+    return list
+  }, [latestTasks, pendingTask])
 
   return (
     <>
@@ -137,7 +147,7 @@ export function TaskDropdown() {
         }}
         MenuListProps={{ dense: true }}
       >
-        {latestTasks.slice(0, 15).map((task) => (
+        {displayedTasks.map((task) => (
           <ListItem
             key={task.id}
             secondaryAction={

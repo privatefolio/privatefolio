@@ -5,23 +5,23 @@ import React, { useMemo } from "react"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
 import { NoDataAvailable } from "src/components/NoDataAvailable"
-import { CoingeckoMetadataFull } from "src/interfaces"
+import { CoingeckoTickerData } from "src/interfaces"
 import { HeadCell } from "src/utils/table-utils"
 
 import { AssetMarketTableRow, TickerData } from "./AssetMarketTableRow"
 
 interface AssetMarketsProps {
   isLoading: boolean
-  metadata?: CoingeckoMetadataFull
+  tickers?: CoingeckoTickerData[]
 }
 
-export function AssetMarketTable({ metadata, isLoading }: AssetMarketsProps) {
-  const isEmpty = !metadata || !metadata.tickers
+export function AssetMarketTable({ tickers, isLoading }: AssetMarketsProps) {
+  const isEmpty = !tickers || !tickers.length
 
   const rows: TickerData[] = useMemo(() => {
-    if (!metadata || !metadata.tickers) return []
+    if (!tickers || !tickers.length) return []
 
-    return metadata.tickers.map((ticker, index) => {
+    return tickers.map((ticker, index) => {
       const base = formatAddress(ticker.base)
       const target = formatAddress(ticker.target)
       const isDex = isAddress(ticker.base.toLowerCase())
@@ -42,7 +42,7 @@ export function AssetMarketTable({ metadata, isLoading }: AssetMarketsProps) {
         volume: ticker.converted_volume.usd,
       }
     })
-  }, [metadata])
+  }, [tickers])
 
   const headCells = useMemo<HeadCell<TickerData>[]>(
     () => [
