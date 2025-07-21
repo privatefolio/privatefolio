@@ -453,6 +453,7 @@ export const customDataPlatforms: DataPlatform[] = [
     image: "$STATIC_ASSETS/extensions/coingecko.svg",
     name: "CoinGecko",
     supported: true,
+    url: "https://coingecko.com",
   },
   {
     extensionsIds: ["blockpit-file-import"],
@@ -460,6 +461,7 @@ export const customDataPlatforms: DataPlatform[] = [
     image: "$STATIC_ASSETS/extensions/blockpit.png",
     name: "Blockpit",
     supported: true,
+    url: "https://blockpit.io",
   },
   {
     extensionsIds: ["privatefolio-file-import"],
@@ -467,6 +469,7 @@ export const customDataPlatforms: DataPlatform[] = [
     image: "$STATIC_ASSETS/extensions/privatefolio.svg",
     name: "Privatefolio",
     supported: true,
+    url: "https://privatefolio.xyz",
   },
 ]
 

@@ -11,6 +11,7 @@ import {
   Timestamp,
 } from "src/interfaces"
 
+import { PlatformPrefix } from "../settings/platforms"
 import { isBunWorker } from "./environment-utils"
 import { formatDate } from "./formatting-utils"
 
@@ -138,8 +139,8 @@ export function getPrefix(accountName: string, isCron = false): string {
   // )
 }
 
-export const isExchange = (x: Platform): x is Exchange => "coingeckoTrustScore" in x
-export const isBlockchain = (x: Platform): x is Blockchain => !("coingeckoTrustScore" in x)
+export const isExchange = (x: Platform): x is Exchange => x.id.startsWith(PlatformPrefix.Exchange)
+export const isBlockchain = (x: Platform): x is Blockchain => x.id.startsWith(PlatformPrefix.Chain)
 
 export function getBucketSize(timeInterval: ResolutionString): Time {
   timeInterval = timeInterval.toUpperCase() as ResolutionString

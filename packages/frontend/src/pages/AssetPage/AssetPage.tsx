@@ -2,7 +2,7 @@ import { StarOutlineRounded, StarRounded } from "@mui/icons-material"
 import { IconButton, Skeleton, Stack, Tooltip, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { useQuery } from "@tanstack/react-query"
-import { getFullMetadata } from "privatefolio-backend/build/src/extensions/metadata/coingecko/coingecko-asset-api"
+import { getFullMetadata } from "privatefolio-backend/build/src/extensions/metadata/coingecko/coingecko-api"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useParams, useSearchParams } from "react-router-dom"
 import { AmountBlock } from "src/components/AmountBlock"
@@ -259,7 +259,9 @@ export default function AssetPage() {
         </Stack>
         {tab === "details" && <AssetDetails metadata={metadata} isLoading={isLoading} />}
         {tab === "price-history" && <AssetPriceHistory asset={asset} />}
-        {tab === "markets" && <AssetMarketTable metadata={metadata} isLoading={isLoading} />}
+        {tab === "markets" && (
+          <AssetMarketTable tickers={metadata?.tickers} isLoading={isLoading} />
+        )}
         {tab === "trades" && <TradeTable assetId={assetId} defaultRowsPerPage={10} />}
         {tab === "balance" && <AssetBalanceHistory assetId={assetId} />}
         {tab === "transactions" && <TransactionTable assetId={assetId} defaultRowsPerPage={10} />}

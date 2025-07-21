@@ -158,6 +158,7 @@ export interface DataPlatform extends PlatformMetadata {
   id: string
   image: string
   name: string
+  url?: string
 }
 
 export type Platform = Exchange | Blockchain | DataPlatform
@@ -681,6 +682,32 @@ export interface CoingeckoMetadataFull {
   tickers?: CoingeckoTickerData[]
   watchlist_portfolio_users?: number
   web_slug: string
+}
+
+export interface CoingeckoExMetadataFull {
+  alert_notice?: string
+  centralized: boolean
+  coins: number
+  country: string
+  description: string
+  facebook_url?: string
+  has_trading_incentive: boolean
+  image: string
+  name: string
+  other_url_1?: string
+  other_url_2?: string
+  pairs: number
+  public_notice?: string
+  reddit_url?: string
+  slack_url?: string
+  telegram_url?: string
+  tickers?: CoingeckoTickerData[]
+  trade_volume_24h_btc: number
+  trust_score: number
+  trust_score_rank: number
+  twitter_handle?: string
+  url: string
+  year_established: number
 }
 
 export interface AssetMetadata {
