@@ -3,24 +3,35 @@ import { Button, ButtonProps, Stack, Typography, useTheme } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useCallback, useRef, useState } from "react"
 import { ConfirmDialogContextType, useConfirm } from "src/hooks/useConfirm"
-import { ServerFile } from "src/interfaces"
+import { ParserRequirement, ServerFile } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 import { handleRestoreRequest } from "src/utils/backup-utils"
 import { formatCamelCase } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 import { CircularSpinner } from "./CircularSpinner"
+import { PlatformInputUncontrolled } from "./PlatformInput"
 import { SectionTitle } from "./SectionTitle"
 import { WalletInputUncontrolled } from "./WalletInput"
 
 type FileDropProps = ButtonProps & {
   onSuccess?: (groupId: string) => void
+  suggestedExtensionId?: string
+  suggestedPlatformId?: string
 }
 
 export function FileDrop(props: FileDropProps) {
   const theme = useTheme()
 
-  const { size, sx, children, onSuccess, ...rest } = props
+  const {
+    size,
+    sx,
+    children,
+    onSuccess,
+    suggestedExtensionId: _suggestedExtensionId,
+    suggestedPlatformId,
+    ...rest
+  } = props
 
   const [cloning, setCloning] = useState(false)
   const [dragOver, setDragOver] = useState(false)
@@ -49,11 +60,11 @@ export function FileDrop(props: FileDropProps) {
 
       const parserContext = !requirements
         ? {}
-        : await getParserContext(confirm, fileRecord.name, requirements)
+        : await getParserContext(confirm, fileRecord.name, requirements, suggestedPlatformId)
 
       return { fileRecord, parserContext }
     },
-    [confirm, rpc, activeAccount]
+    [rpc, activeAccount, confirm, suggestedPlatformId]
   )
 
   const handleFileImport = useCallback(
@@ -206,7 +217,8 @@ export function FileDrop(props: FileDropProps) {
 async function getParserContext(
   confirm: ConfirmDialogContextType["confirm"],
   fileName: string,
-  requirements: string[]
+  requirements: ParserRequirement[],
+  suggestedPlatformId?: string
 ) {
   const possibleUserAddress = fileName.match(/0x[a-fA-F0-9]{40}/)?.[0]
   const { confirmed, event } = await confirm({
@@ -215,28 +227,46 @@ async function getParserContext(
         Before this file import can be processed you need to fill the following form.
         <br />
         <br />
-        {requirements.map((requirement, index) => {
-          return (
-            <div key={index}>
-              <SectionTitle>{formatCamelCase(requirement)}</SectionTitle>
-              <WalletInputUncontrolled
-                variant="outlined"
-                fullWidth
-                initialValue={requirement === "userAddress" ? possibleUserAddress : undefined}
-                size="small"
-                required
-                name={requirement}
-                showAddressBook
-                showWallets
-                onlyEVM
-              />
-            </div>
-          )
-        })}
+        <Stack gap={2}>
+          {requirements.map((requirement, index) => {
+            return (
+              <div key={index}>
+                <SectionTitle>{formatCamelCase(requirement.name)}</SectionTitle>
+                {requirement.type === "address" && (
+                  <WalletInputUncontrolled
+                    variant="outlined"
+                    fullWidth
+                    initialValue={
+                      requirement.name === "userAddress" ? possibleUserAddress : undefined
+                    }
+                    size="small"
+                    required
+                    name={requirement.name}
+                    showAddressBook
+                    showWallets
+                    onlyEVM
+                  />
+                )}
+                {requirement.type === "platform" && (
+                  <PlatformInputUncontrolled
+                    variant="outlined"
+                    fullWidth
+                    size="small"
+                    required
+                    InputProps={{
+                      name: requirement.name,
+                    }}
+                    initialValue={requirement.name === "platform" ? suggestedPlatformId : undefined}
+                  />
+                )}
+              </div>
+            )
+          })}
+        </Stack>
       </>
     ),
     dismissable: false,
-    focusInput: requirements[0],
+    // focusInput: requirements[0].name,
     title: "Import file needs extra information",
   })
 
@@ -245,11 +275,10 @@ async function getParserContext(
     const responses = requirements.reduce(
       (acc, requirement) => ({
         ...acc,
-        [requirement]: formData.get(requirement),
+        [requirement.name]: formData.get(requirement.name),
       }),
       {} as Record<string, unknown>
     )
-
     return responses
   }
 

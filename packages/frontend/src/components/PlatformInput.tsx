@@ -15,12 +15,16 @@ import { PlatformAvatar } from "./PlatformAvatar"
 import { PlatformBlock } from "./PlatformBlock"
 
 type PlatformInputProps = Omit<TextFieldProps, "onChange" | "value"> & {
+  /**
+   * For uncontrolled inputs
+   */
+  disableLabels?: boolean
   onChange: (value: string) => void
   value: string
 }
 
 export function PlatformInput(props: PlatformInputProps) {
-  const { value, onChange, sx, ...rest } = props
+  const { value, onChange, sx, disableLabels = false, ...rest } = props
 
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
@@ -135,9 +139,13 @@ export function PlatformInput(props: PlatformInputProps) {
           )}
         </Box>
       )}
-      getOptionLabel={(option) => (!option ? "" : platformsMap[option]?.name || option || "")}
+      getOptionLabel={(option) =>
+        disableLabels ? option : !option ? "" : platformsMap[option]?.name || option || ""
+      }
       value={value}
-      inputValue={platformsMap[value]?.name || myPlatformsMap[value]?.name || value}
+      inputValue={
+        disableLabels ? value : platformsMap[value]?.name || myPlatformsMap[value]?.name || value
+      }
       onChange={(event, newValue) => {
         if (typeof newValue === "string") {
           onChange(newValue)
@@ -174,4 +182,17 @@ export function PlatformInput(props: PlatformInputProps) {
       )}
     />
   )
+}
+
+export type PlatformInputUncontrolledProps = Omit<PlatformInputProps, "onChange" | "value"> & {
+  initialValue?: string
+}
+
+export function PlatformInputUncontrolled({
+  initialValue = "",
+  ...rest
+}: PlatformInputUncontrolledProps) {
+  const [value, onChange] = useState(initialValue)
+
+  return <PlatformInput value={value} onChange={onChange} {...rest} disableLabels />
 }

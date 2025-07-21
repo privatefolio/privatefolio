@@ -3,6 +3,7 @@ import { isSpamToken } from "src/extensions/utils/etherscan-utils"
 import {
   AuditLog,
   AuditLogOperation,
+  ParserRequirement,
   ParserResult,
   Transaction,
   TransactionType,
@@ -11,18 +12,18 @@ import { formatAddress } from "src/utils/assets-utils"
 import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { asUTC } from "src/utils/formatting-utils"
 
-import { ETHEREUM_PLATFORM_ID } from "../utils/evm-utils"
-
 export const extensionId = "etherscan-file-import"
-export const parserId = "etherscan-erc20"
-export const platformId = ETHEREUM_PLATFORM_ID
+export const parserId = "etherscan-erc20-txns"
 
 export const HEADERS = [
   '"Txhash","Blockno","UnixTimestamp","DateTime (UTC)","From","To","TokenValue","USDValueDayOfTx","ContractAddress","TokenName","TokenSymbol"',
   '"Transaction Hash","Blockno","UnixTimestamp","DateTime (UTC)","From","To","TokenValue","USDValueDayOfTx","ContractAddress","TokenName","TokenSymbol"',
 ]
 
-export const requirements = ["userAddress"]
+export const requirements: ParserRequirement[] = [
+  { name: "platform", type: "platform" },
+  { name: "userAddress", type: "address" },
+]
 
 export function parse(
   csvRow: string,
@@ -39,6 +40,10 @@ export function parse(
     throw new Error("'userAddress' is not valid.")
   }
   userAddress = formatAddress(userAddress)
+  const platformId = parserContext.platform as string
+  if (!platformId) {
+    throw new Error("'platform' is required for this type of file import")
+  }
   const columns = extractColumnsFromRow(csvRow, 11)
   //
   const txHash = columns[0]

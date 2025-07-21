@@ -33,7 +33,7 @@ export async function parseCsv(
     throw new Error(`File import unsupported, unknown header: ${header}`)
   }
 
-  const { extensionId, platformId, parse } = parser
+  let { extensionId, platformId, parse } = parser
 
   let logs: AuditLog[] = []
   let transactions: Transaction[] = []
@@ -61,6 +61,7 @@ export async function parseCsv(
         assetMap[log.assetId] = true
         walletMap[log.wallet] = true
         operationMap[log.operation] = true
+        if (!platformId) platformId = log.platformId
       }
 
       if (txns) {

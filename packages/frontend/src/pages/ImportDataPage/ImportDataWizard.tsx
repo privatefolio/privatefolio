@@ -20,7 +20,6 @@ import {
   etherscanConnExtension,
   etherscanFileExtension,
 } from "privatefolio-backend/src/extensions/connections/etherscan/etherscan-settings"
-import { isBlockchain } from "privatefolio-backend/src/utils/utils"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import { AppLink } from "src/components/AppLink"
@@ -32,6 +31,7 @@ import { PlatformAvatar } from "src/components/PlatformAvatar"
 import { SupportedCheckmark } from "src/components/SupportedCheckmark"
 import { Truncate } from "src/components/Truncate"
 import { Platform, RichExtension } from "src/interfaces"
+import { PlatformPrefix } from "src/settings"
 import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
 import { getFilterValueLabel } from "src/stores/metadata-store"
 import { resolveUrl } from "src/utils/utils"
@@ -39,11 +39,12 @@ import { $rpc } from "src/workers/remotes"
 
 import { AddTransactionDrawer } from "../TransactionsPage/AddTransactionDrawer"
 import { AddConnectionDrawer } from "./connections/AddConnectionDrawer"
+import { SingleFileImportHelp } from "./wizard/SingleFileImportHelp"
 import { TrackProgressStep } from "./wizard/TrackProgressStep"
 
 const steps = [
   {
-    label: "Where are your assets?",
+    label: "Where is your data?",
   },
   {
     label: "How do you wish to import?",
@@ -52,8 +53,6 @@ const steps = [
     label: "Import",
   },
 ]
-
-type PlatformFilter = "all" | "blockchains" | "exchanges"
 
 const PLATFORMS_PER_PAGE = 22
 
@@ -127,7 +126,7 @@ export function ImportDataWizard() {
   const [extensions, setExtensions] = useState<RichExtension[]>([])
 
   const [searchQuery, setSearchQuery] = useState("")
-  const [platformFilter, setPlatformFilter] = useState<PlatformFilter>("all")
+  const [platformFilter, setPlatformFilter] = useState<PlatformPrefix | null>(null)
 
   const [visiblePlatformsCount, setVisiblePlatformsCount] = useState(PLATFORMS_PER_PAGE - 1)
   const [loading, setLoading] = useState(true)
@@ -138,8 +137,7 @@ export function ImportDataWizard() {
     Promise.all([
       rpc.getAllPlatforms().then((x) => {
         const platforms = [...customPlatforms, ...x]
-        platforms.sort((a, b) => (b.extensionsIds?.length ?? 0) - (a.extensionsIds?.length ?? 0))
-        setPlatforms(platforms)
+        return platforms
       }),
       rpc.getExtensions().then((x) => {
         const importExtensions = x.filter(
@@ -157,11 +155,22 @@ export function ImportDataWizard() {
           }
           return 0
         })
-        setExtensions([...importExtensions, ...customExtensions])
+        return [...importExtensions, ...customExtensions]
       }),
-    ]).finally(() => {
-      setLoading(false)
-    })
+    ])
+      .then(([platforms, extensions]) => {
+        // We only care about import extensions
+        platforms = platforms.map((x) => {
+          x.extensionsIds = x.extensionsIds?.filter((id) => extensions.some((e) => e.id === id))
+          return x
+        })
+        platforms.sort((a, b) => (b.extensionsIds?.length ?? 0) - (a.extensionsIds?.length ?? 0))
+        setPlatforms(platforms)
+        setExtensions(extensions)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
   }, [rpc, activeAccount])
 
   const platform = useMemo(() => {
@@ -196,14 +205,19 @@ export function ImportDataWizard() {
       )
     }
 
-    if (platformFilter === "blockchains") {
-      filtered = filtered.filter((platform) => isBlockchain(platform))
-    } else if (platformFilter === "exchanges") {
-      filtered = filtered.filter((platform) => !isBlockchain(platform))
+    if (platformFilter) {
+      filtered = filtered.filter((platform) => platform.id.startsWith(platformFilter))
     }
 
     return filtered
   }, [platforms, searchQuery, platformFilter])
+
+  useEffect(() => {
+    if (!compatibleExtensions.find((x) => x.id === extensionId)) {
+      searchParams.delete("extensionId")
+      setSearchParams(searchParams)
+    }
+  }, [compatibleExtensions, extensionId, searchParams, setSearchParams])
 
   useEffect(() => {
     setVisiblePlatformsCount(PLATFORMS_PER_PAGE - 1)
@@ -220,7 +234,7 @@ export function ImportDataWizard() {
   const handleReset = () => {
     setSearchParams(new URLSearchParams())
     setSearchQuery("")
-    setPlatformFilter("all")
+    setPlatformFilter(null)
     setVisiblePlatformsCount(PLATFORMS_PER_PAGE - 1)
   }
 
@@ -250,11 +264,11 @@ export function ImportDataWizard() {
         return (
           <Stack gap={2} alignItems="flex-start">
             <Typography variant="body2" color="text.secondary">
-              Select the blockchain or exchange where your assets are located.
+              Select the blockchain, exchange or app that has your data.
             </Typography>
             <Stack gap={1}>
               <TextField
-                placeholder="Search for blockchains, exchanges..."
+                placeholder="Search for blockchains, exchanges or apps..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 size="small"
@@ -282,27 +296,35 @@ export function ImportDataWizard() {
               >
                 <Button
                   variant="outlined"
-                  color={platformFilter === "all" ? "primary" : "secondary"}
-                  onClick={() => setPlatformFilter("all")}
+                  color={platformFilter === null ? "primary" : "secondary"}
+                  onClick={() => setPlatformFilter(null)}
                   size="small"
                 >
                   All
                 </Button>
                 <Button
                   variant="outlined"
-                  color={platformFilter === "blockchains" ? "primary" : "secondary"}
-                  onClick={() => setPlatformFilter("blockchains")}
+                  color={platformFilter === PlatformPrefix.Chain ? "primary" : "secondary"}
+                  onClick={() => setPlatformFilter(PlatformPrefix.Chain)}
                   size="small"
                 >
                   Blockchains
                 </Button>
                 <Button
                   variant="outlined"
-                  color={platformFilter === "exchanges" ? "primary" : "secondary"}
-                  onClick={() => setPlatformFilter("exchanges")}
+                  color={platformFilter === PlatformPrefix.Exchange ? "primary" : "secondary"}
+                  onClick={() => setPlatformFilter(PlatformPrefix.Exchange)}
                   size="small"
                 >
                   Exchanges
+                </Button>
+                <Button
+                  variant="outlined"
+                  color={platformFilter === PlatformPrefix.App ? "primary" : "secondary"}
+                  onClick={() => setPlatformFilter(PlatformPrefix.App)}
+                  size="small"
+                >
+                  Apps
                 </Button>
               </Stack>
             </Stack>
@@ -412,6 +434,7 @@ export function ImportDataWizard() {
                 </OptionButton>
               ))}
             </Stack>
+            {extension && <SingleFileImportHelp extension={extension} />}
           </Stack>
         )
       case 2:
@@ -452,6 +475,8 @@ export function ImportDataWizard() {
                 paddingX: 1,
                 paddingY: 0.5,
               }}
+              suggestedPlatformId={platformId}
+              suggestedExtensionId={extensionId}
               onSuccess={handleSuccess}
             >
               <Stack direction="row" alignItems="center" gap={1} marginX={0.5}>

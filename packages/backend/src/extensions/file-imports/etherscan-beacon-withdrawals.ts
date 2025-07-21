@@ -1,6 +1,7 @@
 import {
   AuditLog,
   AuditLogOperation,
+  ParserRequirement,
   ParserResult,
   Transaction,
   TransactionType,
@@ -12,13 +13,23 @@ import { ETHEREUM_PLATFORM_ID } from "../utils/evm-utils"
 
 export const extensionId = "etherscan-file-import"
 export const parserId = "etherscan-beacon-withdrawals"
-export const platformId = ETHEREUM_PLATFORM_ID
 
 export const HEADER =
   '"Index","Blockno","UnixTimestamp","DateTime (UTC)","Validator Index","Recipient","Value"'
 
-export function parse(csvRow: string, index: number, fileImportId: string): ParserResult {
+export const requirements: ParserRequirement[] = [{ name: "platform", type: "platform" }]
+
+export function parse(
+  csvRow: string,
+  index: number,
+  fileImportId: string,
+  parserContext: Record<string, unknown>
+): ParserResult {
   // ----------------------------------------------------------------- Parse
+  const platformId = parserContext.platform as string
+  if (!platformId) {
+    throw new Error("'platform' is required for this type of file import")
+  }
   const columns = csvRow
     .split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
     .map((column) => column.replaceAll('"', ""))

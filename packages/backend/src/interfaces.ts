@@ -466,6 +466,13 @@ export type BinanceConnection = Connection & {
 
 export type ParserResult = { logs: AuditLog[]; txns?: Transaction[] }
 
+export type ParserRequirementType = "platform" | "asset" | "address" | "text"
+
+export type ParserRequirement = {
+  name: string
+  type: ParserRequirementType
+}
+
 export type CsvParseFn = (
   csvRow: string,
   index: number,
@@ -478,8 +485,8 @@ export type CsvParser = {
   extensionId: string
   parse: CsvParseFn
   parserId: string
-  platformId: string
-  requirements?: string[]
+  platformId?: string
+  requirements?: ParserRequirement[]
 }
 
 export type EvmParser = (

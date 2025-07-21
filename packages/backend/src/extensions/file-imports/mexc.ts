@@ -12,7 +12,7 @@ import { hashString } from "src/utils/utils"
 
 export const extensionId = "mexc-file-import"
 export const parserId = "mexc"
-export const platformId = `${PlatformPrefix.Exchange}mexc`
+export const platformId = `${PlatformPrefix.Exchange}mxc`
 
 export const HEADER = "Pairs,Time,Side,Filled Price,Executed Amount,Total,Fee,Role"
 
