@@ -15,6 +15,7 @@ import {
   getTransactions,
 } from "src/api/account/transactions-api"
 import { ProgressUpdate } from "src/interfaces"
+import { ETHEREUM_PLATFORM_ID } from "src/settings/platforms"
 import { normalizeTransaction, sanitizeAuditLog } from "src/utils/test-utils"
 import { beforeAll, describe, expect, it, vi } from "vitest"
 
@@ -43,18 +44,22 @@ describe("0x003dc file import", () => {
     const buffer = await fs.promises.readFile(filePath, "utf8")
     mocks.readFile.mockResolvedValue(buffer)
     // act
-    const fileImport = await importFile(accountName, {
-      createdBy: "user",
-      id: 0,
-      metadata: {
-        lastModified: 0,
-        size: buffer.length,
-        type: "text/csv",
+    const fileImport = await importFile(
+      accountName,
+      {
+        createdBy: "user",
+        id: 0,
+        metadata: {
+          lastModified: 0,
+          size: buffer.length,
+          type: "text/csv",
+        },
+        name: fileName,
+        scheduledAt: 0,
+        status: "completed",
       },
-      name: fileName,
-      scheduledAt: 0,
-      status: "completed",
-    })
+      { platform: ETHEREUM_PLATFORM_ID }
+    )
     const auditLogsCount = await countAuditLogs(
       accountName,
       `SELECT COUNT(*) FROM audit_logs WHERE fileImportId = ?`,
@@ -77,7 +82,7 @@ describe("0x003dc file import", () => {
             "Fee",
             "Withdraw",
           ],
-          "parserId": "etherscan-default",
+          "parserId": "etherscan-user-txns",
           "platformId": "chain.ethereum",
           "rows": 482,
           "transactions": 482,
@@ -99,18 +104,22 @@ describe("0x003dc file import", () => {
     const buffer = await fs.promises.readFile(filePath, "utf8")
     mocks.readFile.mockResolvedValue(buffer)
     // act
-    const fileImport = await importFile(accountName, {
-      createdBy: "user",
-      id: 0,
-      metadata: {
-        lastModified: 0,
-        size: buffer.length,
-        type: "text/csv",
+    const fileImport = await importFile(
+      accountName,
+      {
+        createdBy: "user",
+        id: 0,
+        metadata: {
+          lastModified: 0,
+          size: buffer.length,
+          type: "text/csv",
+        },
+        name: fileName,
+        scheduledAt: 0,
+        status: "completed",
       },
-      name: fileName,
-      scheduledAt: 0,
-      status: "completed",
-    })
+      { platform: ETHEREUM_PLATFORM_ID }
+    )
     const auditLogsCount = await countAuditLogs(
       accountName,
       `SELECT COUNT(*) FROM audit_logs WHERE fileImportId = ?`,
@@ -133,7 +142,7 @@ describe("0x003dc file import", () => {
             "Deposit",
             "Withdraw",
           ],
-          "parserId": "etherscan-internal",
+          "parserId": "etherscan-internal-txns",
           "platformId": "chain.ethereum",
           "rows": 48,
           "transactions": 48,
@@ -170,6 +179,7 @@ describe("0x003dc file import", () => {
         status: "completed",
       },
       {
+        platform: ETHEREUM_PLATFORM_ID,
         userAddress: "0x003dC32fE920a4aAeeD12dC87E145F030aa753f3",
       }
     )
@@ -261,7 +271,7 @@ describe("0x003dc file import", () => {
             "Deposit",
             "Withdraw",
           ],
-          "parserId": "etherscan-erc20",
+          "parserId": "etherscan-erc20-txns",
           "platformId": "chain.ethereum",
           "rows": 428,
           "transactions": 419,
