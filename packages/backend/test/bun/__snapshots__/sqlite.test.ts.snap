@@ -15,7 +15,7 @@ exports[`0xf98 file import should add a file import: file-import 1`] = `
       "Fee",
       "Withdraw",
     ],
-    "parserId": "etherscan-default",
+    "parserId": "etherscan-user-txns",
     "platformId": "chain.ethereum",
     "rows": 9,
     "transactions": 9,
@@ -48,7 +48,7 @@ exports[`0xf98 file import should add an erc20 file import: file-import-erc20 1`
     "operations": [
       "Deposit",
     ],
-    "parserId": "etherscan-erc20",
+    "parserId": "etherscan-erc20-txns",
     "platformId": "chain.ethereum",
     "rows": 8,
     "transactions": 8,
