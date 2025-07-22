@@ -1,6 +1,5 @@
 import {
   Checkbox,
-  Chip,
   Drawer,
   FormControl,
   FormControlLabel,
@@ -131,7 +130,7 @@ export function AddConnectionDrawer(props: AddConnectionDrawerProps) {
        */
       const wallet = walletInput
       const apiKey = formData.get("apiKey") as string
-      const apiSecret = formData.get("secret") as string
+      const apiSecret = formData.get("apiSecret") as string
       const walletLabel = formData.get("walletLabel") as string
       const sinceLimit = formData.get("sinceLimit")
         ? asUTC(new Date(formData.get("sinceLimit") as string))
@@ -168,7 +167,7 @@ export function AddConnectionDrawer(props: AddConnectionDrawerProps) {
           return
         }
         if (apiSecret.length === 0) {
-          setError("Secret is required")
+          setError("API secret is required")
           return
         }
         if (walletsError) {
@@ -264,20 +263,7 @@ export function AddConnectionDrawer(props: AddConnectionDrawerProps) {
                         size="small"
                       />
                     </ListItemAvatar>
-                    <ListItemText
-                      primary={
-                        <>
-                          {x.extensionName}{" "}
-                          {x.id === binanceConnExtension && (
-                            <Chip
-                              size="small"
-                              sx={{ fontSize: "0.625rem", height: 16 }}
-                              label="Coming soon"
-                            />
-                          )}
-                        </>
-                      }
-                    />
+                    <ListItemText primary={x.extensionName} />
                   </Stack>
                 </MenuItem>
               ))}
@@ -349,7 +335,7 @@ export function AddConnectionDrawer(props: AddConnectionDrawerProps) {
           ) : (
             <>
               <div>
-                <SectionTitle>API Key</SectionTitle>
+                <SectionTitle>API key</SectionTitle>
                 <TextField
                   name="apiKey"
                   autoFocus
@@ -359,28 +345,20 @@ export function AddConnectionDrawer(props: AddConnectionDrawerProps) {
                   size="small"
                   required
                   multiline
-                  InputProps={{
-                    sx: {
-                      fontFamily: MonoFont,
-                    },
-                  }}
+                  InputProps={{ sx: { fontFamily: MonoFont } }}
                 />
               </div>
               <div>
-                <SectionTitle>Secret</SectionTitle>
+                <SectionTitle>API secret</SectionTitle>
                 <TextField
-                  name="secret"
+                  name="apiSecret"
                   autoComplete="off"
                   variant="outlined"
                   fullWidth
                   size="small"
                   required
                   multiline
-                  InputProps={{
-                    sx: {
-                      fontFamily: MonoFont,
-                    },
-                  }}
+                  InputProps={{ sx: { fontFamily: MonoFont } }}
                 />
               </div>
               <FormControl sx={{ color: "var(--mui-palette-text-secondary)" }} error={walletsError}>

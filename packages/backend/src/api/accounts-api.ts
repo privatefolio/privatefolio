@@ -17,10 +17,26 @@ import { ensureActiveAccount, isMarkedForDeletion, sql } from "src/utils/sql-uti
 import { createSubscription } from "src/utils/sub-utils"
 import { getPrefix, sleep, wasteCpuCycles } from "src/utils/utils"
 
-import { enqueueRefetchAssets } from "./account/assets-api"
+import { enqueueRefetchAssets, getAccountWithAssets } from "./account/assets-api"
+import { getAccountWithChatHistory } from "./account/assistant-api"
+import { getAccountWithAuditLogs } from "./account/audit-logs-api"
+import { getAccountWithBalances } from "./account/balances-api"
+import { getAccountWithConnections } from "./account/connections-api"
+import { getAccountWithDailyPrices } from "./account/daily-prices-api"
+import { getAccountWithFileImports } from "./account/file-imports-api"
 import { getValue, setValue } from "./account/kv-api"
+import { getAccountWithNetworth } from "./account/networth-api"
 import { enqueueRefetchPlatforms } from "./account/platforms-api"
-import { enqueueTask, upsertServerTask } from "./account/server-tasks-api"
+import { getAccountWithServerFiles } from "./account/server-files-api"
+import {
+  enqueueTask,
+  getAccountWithServerTasks,
+  getAccountWithTaskQueue,
+  upsertServerTask,
+} from "./account/server-tasks-api"
+import { getAccountWithTags } from "./account/tags-api"
+import { getAccountWithTrades } from "./account/trades-api"
+import { getAccountWithTransactions } from "./account/transactions-api"
 import { allSubscriptions, appEventEmitter } from "./internal"
 
 if (typeof window !== "undefined") {
@@ -392,4 +408,21 @@ export async function unsubscribe(subscriptionId: SubscriptionId, throwOnError =
   } catch (error) {
     if (throwOnError) throw error
   }
+}
+
+export async function migrateTables(accountName: string) {
+  await getAccountWithAssets(accountName)
+  await getAccountWithAuditLogs(accountName)
+  await getAccountWithBalances(accountName)
+  await getAccountWithChatHistory(accountName)
+  await getAccountWithConnections(accountName)
+  await getAccountWithDailyPrices(accountName)
+  await getAccountWithFileImports(accountName)
+  await getAccountWithNetworth(accountName)
+  await getAccountWithServerFiles(accountName)
+  await getAccountWithServerTasks(accountName)
+  await getAccountWithTags(accountName)
+  await getAccountWithTaskQueue(accountName)
+  await getAccountWithTrades(accountName)
+  await getAccountWithTransactions(accountName)
 }

@@ -26,12 +26,12 @@ import { hashString, noop, writesAllowed } from "../../utils/utils"
 import { getAccount } from "../accounts-api"
 import { countAuditLogs, upsertAuditLogs } from "./audit-logs-api"
 import { getExtension } from "./extensions-api"
-import { getValue, setValue } from "./kv-api"
+import { getValue, setEncryptedValue, setValue } from "./kv-api"
 import { getPlatform } from "./platforms-api"
 import { enqueueTask } from "./server-tasks-api"
 import { countTransactions, upsertTransactions } from "./transactions-api"
 
-const SCHEMA_VERSION = 6
+const SCHEMA_VERSION = 7
 
 export async function getAccountWithConnections(accountName: string) {
   const account = await getAccount(accountName)
@@ -58,6 +58,11 @@ export async function getAccountWithConnections(accountName: string) {
     await account.execute(sql`
       INSERT OR IGNORE INTO key_value (key, value)
       VALUES ('connection_seq', 0);
+    `)
+  }
+  if (schemaVersion < 7) {
+    await account.execute(sql`
+      ALTER TABLE connections DROP COLUMN secret;
     `)
   }
   if (schemaVersion !== SCHEMA_VERSION) {
@@ -88,9 +93,8 @@ export async function getConnections(
         options: JSON.parse(row[5] as string),
         extensionId: row[6] as string,
         platformId: row[7] as string,
-        apiSecret: row[8] as string,
-        syncedAt: row[9] as number,
-        timestamp: row[10] as number,
+        syncedAt: row[8] as number,
+        timestamp: row[9] as number,
       }
       /* eslint-enable */
       transformNullsToUndefined(value)
@@ -128,7 +132,9 @@ type PartialProps<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 export type NewConnection = PartialProps<
   Connection,
   "id" | "timestamp" | "syncedAt" | "connectionNumber"
->
+> & {
+  apiSecret?: string
+}
 
 function deriveConnectionId(record: NewConnection) {
   return hashString(`${record.extensionId}_${record.platformId}_${record.address || record.apiKey}`)
@@ -144,8 +150,8 @@ export async function upsertConnections(accountName: string, records: NewConnect
     const seq = await getValue(accountName, "connection_seq", 0)
     await account.executeMany(
       `INSERT OR REPLACE INTO connections (
-        id, connectionNumber, address, key, meta, options, extensionId, platformId, secret, syncedAt, timestamp
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        id, connectionNumber, address, key, meta, options, extensionId, platformId, syncedAt, timestamp
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       records.map((record, index) => [
         record.id || deriveConnectionId(record),
         typeof record.connectionNumber === "number" ? record.connectionNumber : seq + index + 1,
@@ -155,13 +161,21 @@ export async function upsertConnections(accountName: string, records: NewConnect
         JSON.stringify(record.options) || null,
         record.extensionId,
         record.platformId,
-        record.apiSecret || null,
         record.syncedAt || null,
         record.timestamp || Date.now(),
       ])
     )
     for (const record of records) {
-      await setValue(accountName, `connection_cursor_${record.id || deriveConnectionId(record)}`, 0)
+      const connectionId = record.id || deriveConnectionId(record)
+      await setValue(accountName, `connection_cursor_${connectionId}`, 0)
+
+      if (record.apiSecret) {
+        await setEncryptedValue(
+          accountName,
+          `connection_api_secret_${connectionId}`,
+          record.apiSecret
+        )
+      }
     }
     const latestConnectionNumber = await account.execute(
       sql`SELECT MAX(connectionNumber) FROM connections`
@@ -302,6 +316,7 @@ export async function syncConnection(
     result = await syncEtherscan(progress, connection as EtherscanConnection, since, until)
   } else if (connection.extensionId === binanceConnExtension) {
     result = await syncBinance(
+      accountName,
       progress,
       connection as BinanceConnection,
       debugMode,

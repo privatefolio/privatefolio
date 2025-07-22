@@ -136,6 +136,9 @@ async function setupMetadataCronJob(accountName: string) {
 }
 
 async function setupSideEffects(accountName: string) {
+  console.log(getPrefix(accountName, true), `Migrating database tables.`)
+  await writeApi.migrateTables(accountName)
+
   console.log(getPrefix(accountName, true), `Setting up side-effects.`)
 
   // Make sure the task queue is initialized

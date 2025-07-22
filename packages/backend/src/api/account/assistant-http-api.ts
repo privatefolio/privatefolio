@@ -87,7 +87,7 @@ function getModel(modelId: string): AssistantModel {
 }
 
 async function getApiKey(accountName: string, provider: ModelFamily): Promise<string> {
-  const secrets = (await readSecrets()) as AuthSecrets
+  const { jwtSecret } = (await readSecrets()) as AuthSecrets
   let apiKeyEncrypted: string | null = null
   let keyPrefix = ""
 
@@ -112,7 +112,7 @@ async function getApiKey(accountName: string, provider: ModelFamily): Promise<st
     throw new Error(`${provider} API key not configured`)
   }
 
-  const apiKey = await decryptValue(apiKeyEncrypted, secrets.jwtSecret)
+  const apiKey = await decryptValue(apiKeyEncrypted, jwtSecret)
 
   if (!apiKey || !apiKey.startsWith(keyPrefix)) {
     throw new Error(`Invalid ${provider} API key`)

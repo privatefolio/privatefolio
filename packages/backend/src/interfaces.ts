@@ -435,7 +435,6 @@ export type BinanceConnectionOptions = ConnectionOptions & {
 export interface Connection {
   address?: string
   apiKey?: string
-  apiSecret?: string
   connectionNumber: number
   extensionId: string
   id: string
@@ -462,7 +461,6 @@ export type EtherscanConnection = Connection & {
 export type BinanceConnection = Connection & {
   key: string
   options: BinanceConnectionOptions
-  secret: string
 }
 
 export type ParserResult = { logs: AuditLog[]; txns?: Transaction[] }

@@ -1,3 +1,5 @@
+import { getValue } from "src/api/account/kv-api"
+import { AuthSecrets, readSecrets } from "src/api/auth-http-api"
 import { extractTransactions, mergeAuditLogs } from "src/extensions/utils/binance-utils"
 import {
   AuditLog,
@@ -8,6 +10,7 @@ import {
   Timestamp,
 } from "src/interfaces"
 import { formatDate, ONE_DAY } from "src/utils/formatting-utils"
+import { decryptValue } from "src/utils/jwt-utils"
 import { noop, paginate, paginateExact } from "src/utils/utils"
 
 import { BinanceApi } from "./binance-api"
@@ -32,6 +35,7 @@ import { parseWithdraw } from "./binance-spot/binance-withdraw"
 export const extensionId = binanceConnExtension
 
 export async function syncBinance(
+  accountName: string,
   progress: ProgressCallback = noop,
   connection: BinanceConnection,
   debugMode: boolean,
@@ -45,7 +49,21 @@ export async function syncBinance(
 
   const { wallets } = connection.options
 
-  const binanceApi = new BinanceApi(connection.apiKey, connection.apiSecret)
+  const apiSecretEncrypted = await getValue<string | null>(
+    accountName,
+    `connection_api_secret_${connection.id}`
+  )
+  if (!apiSecretEncrypted) {
+    throw new Error("Binance API secret not found for this connection")
+  }
+
+  const { jwtSecret } = (await readSecrets()) as AuthSecrets
+  const apiSecret = await decryptValue(apiSecretEncrypted, jwtSecret)
+  if (!apiSecret) {
+    throw new Error("Failed to decrypt Binance API secret")
+  }
+
+  const binanceApi = new BinanceApi(connection.apiKey, apiSecret)
 
   let results: ParserResult[] = []
 
