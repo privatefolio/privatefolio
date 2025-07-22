@@ -92,8 +92,28 @@ export function TaskDetailsDialog({ task, ...props }: DialogProps & { task: Serv
   }, [task, progressLogs])
 
   const detailsRef = useRef<HTMLDivElement>(null)
+  const [autoScrollEnabled, setAutoScrollEnabled] = useState(true)
+
+  const isNearBottom = (element: HTMLDivElement) => {
+    return element.scrollHeight - element.scrollTop - element.clientHeight < 10
+  }
 
   useEffect(() => {
+    const element = detailsRef.current
+    if (!element) return
+
+    const handleScroll = () => {
+      setAutoScrollEnabled(isNearBottom(element))
+    }
+
+    element.addEventListener("scroll", handleScroll)
+    return () => element.removeEventListener("scroll", handleScroll)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [detailsRef.current])
+
+  useEffect(() => {
+    if (!autoScrollEnabled) return
+
     const scrollToEnd = () => {
       if (detailsRef.current) {
         detailsRef.current.scrollTop = detailsRef.current.scrollHeight
@@ -108,7 +128,7 @@ export function TaskDetailsDialog({ task, ...props }: DialogProps & { task: Serv
 
     // Clear the timeout when the component is unmounted or dependencies change
     return () => clearTimeout(timer)
-  }, [progressLogs])
+  }, [progressLogs, autoScrollEnabled])
 
   const debugMode = useStore($debugMode)
   const { isDesktop } = useBreakpoints()

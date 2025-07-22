@@ -38,6 +38,7 @@ const persister = createAsyncStoragePersister({
   // throttleTime: 1_000,
 })
 
+// eslint-disable-next-line unused-imports/no-unused-vars
 const ReactQueryDevtools = lazy(() =>
   import("@tanstack/react-query-devtools").then((x) => ({
     default: x.ReactQueryDevtools,
