@@ -8,7 +8,7 @@ export type AppLinkProps = BoxProps & {
 } & MuiLinkProps
 
 const AppLink = forwardRef<HTMLAnchorElement, AppLinkProps>((props, ref) => {
-  const { href, onClick, ...rest } = props
+  const { href, onClick, sx, ...rest } = props
 
   const isLocalLink = href && !(href.includes("http") || href.startsWith("mailto:"))
 
@@ -20,7 +20,7 @@ const AppLink = forwardRef<HTMLAnchorElement, AppLinkProps>((props, ref) => {
         ref={ref}
         component={RouterLink}
         to={href}
-        sx={{ color: "inherit", textDecoration: "none" }}
+        sx={{ color: "inherit", textDecoration: "none", ...sx }}
         {...rest}
       />
     )
@@ -48,7 +48,7 @@ const AppLink = forwardRef<HTMLAnchorElement, AppLinkProps>((props, ref) => {
       component={MuiLink}
       href={href}
       target="_blank"
-      sx={{ color: "inherit", textDecoration: "none" }}
+      sx={{ color: "inherit", textDecoration: "none", ...sx }}
       {...rest}
     />
   )

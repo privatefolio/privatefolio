@@ -39,7 +39,7 @@ import { $rpc } from "src/workers/remotes"
 
 import { AddTransactionDrawer } from "../TransactionsPage/AddTransactionDrawer"
 import { AddConnectionDrawer } from "./connections/AddConnectionDrawer"
-import { SingleFileImportHelp } from "./wizard/SingleFileImportHelp"
+import { ImportHelp } from "./ImportHelp"
 import { TrackProgressStep } from "./wizard/TrackProgressStep"
 
 const steps = [
@@ -438,7 +438,9 @@ export function ImportDataWizard() {
                 </OptionButton>
               ))}
             </Stack>
-            {extension && <SingleFileImportHelp extension={extension} />}
+            {extension && (
+              <ImportHelp extensionType={extension.extensionType} extension={extension} />
+            )}
           </Stack>
         )
       case 2:

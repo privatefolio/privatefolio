@@ -412,7 +412,7 @@ export async function enqueueSyncConnection(
 ) {
   const connection = await getConnection(accountName, connectionId)
   const addressBook = JSON.parse(await getValue(accountName, "address_book", "{}"))
-  const walletId = connection.address || connection.apiKey
+  const walletId = connection.address || connection.apiKey.slice(0, 8) + "..."
   const platform = await getPlatform(connection.platformId)
   const extension = await getExtension(connection.extensionId)
   const walletLabel = addressBook[walletId] || walletId
@@ -420,7 +420,7 @@ export async function enqueueSyncConnection(
   const extensionLabel = extension?.extensionName || connection.extensionId
 
   return enqueueTask(accountName, {
-    description: `Sync "${walletLabel}" from ${platformLabel} (${extensionLabel})`,
+    description: `Sync "${walletLabel}" from ${platformLabel} with the ${extensionLabel} extension`,
     determinate: true,
     function: async (progress, signal) => {
       await syncConnection(

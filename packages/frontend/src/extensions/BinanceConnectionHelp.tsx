@@ -15,104 +15,101 @@ const steps = [
   {
     description: (
       <>
-        Log in to your Binance account. Afterwards, mouseover the wallet icon and click on{" "}
-        <ExternalLink href="https://www.binance.com/en/my/wallet/history/all-crypto">
-          Transaction History
+        Log in to your Binance account. Afterwards, mouseover the wallet icon, click on Account and
+        then go to{" "}
+        <ExternalLink href="https://www.binance.com/en/my/settings/api-management">
+          API Management
         </ExternalLink>
         .
         <br />
         <br />
-        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202401/66f3d1ab78ec47cd25bc7f1f47681fe0.png">
+        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202503/318a1f12ee5fd78036a6b10162cc0b7c.png">
           <img
             // width="100%" FIXME TODO0 this is to avoid layout jumps
-            height={201}
-            width={433}
-            src="https://public.bnbstatic.com/image/cms/article/body/202401/66f3d1ab78ec47cd25bc7f1f47681fe0.png"
+            height={400}
+            width={306}
+            src="https://public.bnbstatic.com/image/cms/article/body/202503/318a1f12ee5fd78036a6b10162cc0b7c.png"
+            alt="Step visualization"
+          />
+        </AppLink>
+        <br />
+        <br />
+        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202503/0fc80b025fea0b65813aad616ed56ca7.png">
+          <img
+            // width="100%" FIXME TODO0 this is to avoid layout jumps
+            height={185}
+            width={400}
+            src="https://public.bnbstatic.com/image/cms/article/body/202503/0fc80b025fea0b65813aad616ed56ca7.png"
             alt="Step visualization"
           />
         </AppLink>
       </>
     ),
-    label: "Visit the transaction history page",
+    label: "Visit the API management page",
   },
   {
     description: (
       <>
-        Mouseover the export icon and click on <u>Export Transaction Records</u>.
+        Click on <b>Create Tax Report API</b>.
         <br />
         <br />
-        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202401/7f5790d524eeb91156ff2cd2e0f26972.png">
+        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202311/d3e513ab89bb7beba3fcf11e140bbe1c.png">
           <img
-            height={203}
-            width={433}
-            // width="100%"
-            src="https://public.bnbstatic.com/image/cms/article/body/202401/7f5790d524eeb91156ff2cd2e0f26972.png"
+            // width="100%" FIXME TODO0 this is to avoid layout jumps
+            height={93}
+            width={420}
+            src="https://public.bnbstatic.com/image/cms/article/body/202311/d3e513ab89bb7beba3fcf11e140bbe1c.png"
             alt="Step visualization"
           />
         </AppLink>
       </>
     ),
-    label: "Open the export pop-up",
+    label: "Create a Tax report API key",
   },
   {
     description: (
       <>
-        Select the time range (up to 12 months) and click on <u>Generate</u>.
+        Verify your request with 2FA devices or passkeys.
         <br />
         <br />
-        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202401/a8d16a3f1114ae1bc62ff84e8affdd07.png">
+        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202311/8baa2ba8fb25db05f8dabbd51770c19c.png">
           <img
-            height={415}
-            width={433}
-            src="https://public.bnbstatic.com/image/cms/article/body/202401/a8d16a3f1114ae1bc62ff84e8affdd07.png"
+            // width="100%" FIXME TODO0 this is to avoid layout jumps
+            height={399}
+            width={420}
+            src="https://public.bnbstatic.com/image/cms/article/body/202311/8baa2ba8fb25db05f8dabbd51770c19c.png"
             alt="Step visualization"
           />
         </AppLink>
       </>
     ),
-    label: "Request a new export",
+    label: "Verify your request with 2FA",
   },
   {
     description: (
       <>
-        Next step is to simply wait until the export is generated, you will receive an email
-        reminder.
+        Your API key and API secret will be displayed.
+        <br />
+        Store these keys in a secure password manager or encrypted file, or directly into the{" "}
+        <b>Privatefolio</b> app.
         <br />
         <br />
-        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202401/3e36984bc3e1bde5f0fd5cb8db8d1987.png">
+        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202311/994407a18b399e9cdcaf1593a8d13d6b.png">
           <img
-            height={419}
-            width={433}
-            src="https://public.bnbstatic.com/image/cms/article/body/202401/3e36984bc3e1bde5f0fd5cb8db8d1987.png"
+            // width="100%" FIXME TODO0 this is to avoid layout jumps
+            height={217}
+            width={420}
+            src="https://public.bnbstatic.com/image/cms/article/body/202311/994407a18b399e9cdcaf1593a8d13d6b.png"
             alt="Step visualization"
           />
         </AppLink>
       </>
     ),
-    label: "Wait for completion",
-  },
-  {
-    description: (
-      <>
-        Once completed, reopen the <u>Export Transaction Records</u> pop-up and click on{" "}
-        <u>Download</u>.
-        <br />
-        <br />
-        <AppLink href="https://public.bnbstatic.com/image/cms/article/body/202401/0b6cb437fc9d280c3ddbe4466e7d5069.png">
-          <img
-            height={421}
-            width={433}
-            src="https://public.bnbstatic.com/image/cms/article/body/202401/0b6cb437fc9d280c3ddbe4466e7d5069.png"
-            alt="Step visualization"
-          />
-        </AppLink>
-      </>
-    ),
-    label: "Download",
+    label: "Save your API credentials",
   },
 ]
 
-export default function BinanceHelp() {
+export default function BinanceConnectionHelp() {
   const [activeStep, setActiveStep] = React.useState(0)
 
   const handleNext = () => {
@@ -133,11 +130,7 @@ export default function BinanceHelp() {
         <Stepper activeStep={activeStep} orientation="vertical">
           {steps.map((step, index) => (
             <Step key={step.label}>
-              <StepLabel
-              // optional={index === 2 ? <Typography variant="caption">Last step</Typography> : null}
-              >
-                {step.label}
-              </StepLabel>
+              <StepLabel>{step.label}</StepLabel>
               <StepContent>
                 <Typography variant="body2">{step.description}</Typography>
                 <Box sx={{ marginTop: 2 }}>
@@ -166,7 +159,7 @@ export default function BinanceHelp() {
           <Box paddingTop={2}>
             <Typography variant="body2">Congratulations!</Typography>
             <Typography variant="body2" color="text.secondary">
-              Now you can drag and drop the files to Privatefolio to get started.
+              Now you can connect your Binance account to Privatefolio.
             </Typography>
             <br />
             <Link
@@ -181,13 +174,21 @@ export default function BinanceHelp() {
           </Box>
         )}
       </Paper>
-      <ExternalLink
-        sx={{ marginTop: 1, paddingX: 2 }}
-        variant="caption"
-        href="https://www.binance.com/en/support/faq/how-to-generate-transaction-history-990afa0a0a9341f78e7a9298a9575163"
-      >
-        Visit official binance guide
-      </ExternalLink>
+      <Box sx={{ marginTop: 1, paddingX: 2 }}>
+        <ExternalLink
+          variant="caption"
+          href="https://www.binance.com/en/support/faq/detail/538e05e2fd394c489b4cf89e92c55f70"
+        >
+          Visit official binance guide
+        </ExternalLink>
+        <br />
+        <ExternalLink
+          variant="caption"
+          href="https://www.binance.com/en/my/settings/api-management"
+        >
+          Go to API management
+        </ExternalLink>
+      </Box>
     </>
   )
 }

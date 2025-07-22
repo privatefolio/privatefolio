@@ -33,7 +33,7 @@ const steps = [
         </AppLink>
       </>
     ),
-    label: "Visit the Transactions page",
+    label: "Visit the transactions page",
   },
   {
     description: (

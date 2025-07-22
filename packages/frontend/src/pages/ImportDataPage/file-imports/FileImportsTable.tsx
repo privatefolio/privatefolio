@@ -9,7 +9,7 @@ import { closeSubscription } from "src/utils/browser-utils"
 import { HeadCell } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
 
-import { FileImportHelp } from "./FileImportHelp"
+import { ImportHelp } from "../ImportHelp"
 import { FileImportTableRow } from "./FileImportTableRow"
 
 export function FileImportsTable() {
@@ -108,7 +108,7 @@ export function FileImportsTable() {
         emptyContent={<FileDrop sx={{ padding: 6 }} size="large" />}
         addNewRow={<FileDrop fullWidth sx={{ borderRadius: 0, paddingX: 1.5 }} />}
       />
-      <FileImportHelp />
+      <ImportHelp extensionType="file-import" />
     </Stack>
   )
 }

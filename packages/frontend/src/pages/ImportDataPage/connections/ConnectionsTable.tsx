@@ -13,6 +13,7 @@ import { closeSubscription } from "src/utils/browser-utils"
 import { HeadCell } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
 
+import { ImportHelp } from "../ImportHelp"
 import { AddConnectionDrawer } from "./AddConnectionDrawer"
 import { ConnectionTableRow } from "./ConnectionTableRow"
 
@@ -138,7 +139,7 @@ export function ConnectionsTable() {
           </AttentionBlock>
         }
       />
-      <Stack paddingTop={1}>
+      <Stack paddingTop={1} gap={1}>
         <Callout>
           <AlertTitle>What are connections?</AlertTitle>
           <Box sx={{ maxWidth: 590 }}>
@@ -148,6 +149,7 @@ export function ConnectionsTable() {
             wallet address, or from a supported exchange given an API Key.
           </Box>
         </Callout>
+        <ImportHelp extensionType="connection" />
       </Stack>
       <AddConnectionDrawer atom={$drawerOpen} />
     </>

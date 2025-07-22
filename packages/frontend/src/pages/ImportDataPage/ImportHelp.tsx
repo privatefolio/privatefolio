@@ -19,30 +19,43 @@ import { useBoolean } from "src/hooks/useBoolean"
 import { RichExtension } from "src/interfaces"
 import { $rpc } from "src/workers/remotes"
 
-export function SingleFileImportHelp(props: { extension: RichExtension }) {
-  const { extension } = props
+type ImportHelpProps = {
+  extension?: RichExtension
+  extensionType: RichExtension["extensionType"]
+}
+
+export function ImportHelp(props: ImportHelpProps) {
+  const { extensionType, extension } = props
   const { value: modalOpen, toggle: toggleModalOpen } = useBoolean(false)
 
-  const [tab, setTab] = useState<string>(extension.id)
+  const [tab, setTab] = useState<string>("")
   const [extensions, setExtensions] = useState<RichExtension[]>([])
 
   const rpc = useStore($rpc)
 
   useEffect(() => {
+    if (!extension) return
     setTab(extension.id)
-  }, [extension.id])
+  }, [extension])
 
   useEffect(() => {
-    rpc.getExtensions(true).then(setExtensions)
-  }, [rpc])
+    rpc
+      .getExtensions(true)
+      .then((extensions) => {
+        const filteredExtensions = extensions.filter((x) => x.extensionType === extensionType)
+        setTab(filteredExtensions[0]?.id)
+        return filteredExtensions
+      })
+      .then(setExtensions)
+  }, [rpc, extensionType])
 
   const HowToComponent = useMemo(() => {
-    const extension = extensions.find((x) => x.id === tab)
-    if (!extension?.howTo) return null
-    return lazy(() => import(`../../../extensions/${extension.howTo}.tsx`))
-  }, [extensions, tab])
+    const ext = extension || extensions.find((x) => x.id === tab)
+    if (!ext?.howTo) return null
+    return lazy(() => import(`../../extensions/${ext.howTo}.tsx`))
+  }, [extension, extensions, tab])
 
-  if (extension.extensionType !== "file-import" || !extension.howTo) return null
+  if (extension && !extension.howTo) return null
 
   return (
     <>
@@ -55,15 +68,30 @@ export function SingleFileImportHelp(props: { extension: RichExtension }) {
           cursor: "pointer",
         }}
       >
-        <AlertTitle>Need help with exporting your data?</AlertTitle>
-        <Typography variant="body2" color="text.secondary">
-          Click here to learn how to export your data from {extension.extensionName}.
-        </Typography>
+        {extensionType === "file-import" && (
+          <>
+            <AlertTitle>Need help with exporting your data?</AlertTitle>
+            <Typography variant="body2" color="text.secondary">
+              Click here to learn how to export your data from{" "}
+              {extension ? extension.extensionName : "Etherscan, Binance and more"}.
+            </Typography>
+          </>
+        )}
+        {extensionType === "connection" && (
+          <>
+            <AlertTitle>Need help with connecting to your data?</AlertTitle>
+            <Typography variant="body2" color="text.secondary">
+              Click here to learn how to connect to your data on{" "}
+              {extension ? extension.extensionName : "Etherscan, Binance and more"}.
+            </Typography>
+          </>
+        )}
       </Callout>
       <Dialog open={modalOpen} onClose={toggleModalOpen}>
         {/* TODO add fullscreen on desktop and scrollbar on mobile */}
         <DialogTitle>
-          <span>How to create file imports</span>
+          {extensionType === "file-import" && <span>How to export your data</span>}
+          {extensionType === "connection" && <span>How to connect to your data</span>}
         </DialogTitle>
         <DialogContent sx={{ maxWidth: 540, minWidth: 320, paddingX: 2, width: 540 }}>
           <div>

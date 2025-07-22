@@ -124,7 +124,7 @@ export function TaskDetailsDialog({ task, ...props }: DialogProps & { task: Serv
           minHeight: "calc(100vh - 218px)",
         },
         "& .MuiDialog-paper:not(.MuiDialog-paperFullScreen)": {
-          height: 500,
+          minHeight: 500,
           minWidth: 320,
           width: 800,
         },
@@ -160,7 +160,9 @@ export function TaskDetailsDialog({ task, ...props }: DialogProps & { task: Serv
       </DialogTitle>
       <DialogContent>
         <StaggeredList gap={1} tertiary>
-          <DialogContentText sx={{ mb: 1 }}>{task?.description}</DialogContentText>
+          <DialogContentText sx={{ mb: 1 }} component={Truncate}>
+            {task?.description}
+          </DialogContentText>
           <Stack direction="row" gap={2}>
             <SectionTitle>Progress</SectionTitle>
             <Box sx={{ width: "100%" }}>
