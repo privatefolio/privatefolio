@@ -1,4 +1,4 @@
-import { getValue } from "src/api/account/kv-api"
+import { getValue, setValue } from "src/api/account/kv-api"
 import { AuthSecrets, readSecrets } from "src/api/auth-http-api"
 import { extractTransactions, mergeAuditLogs } from "src/extensions/utils/binance-utils"
 import {
@@ -64,6 +64,18 @@ export async function syncBinance(
   }
 
   const binanceApi = new BinanceApi(connection.apiKey, apiSecret)
+
+  await progress([undefined, `Checking API key permissions`])
+  await binanceApi.getAccount()
+  try {
+    await binanceApi.ensureReadOnlyPermissions()
+  } catch (error) {
+    await progress([undefined, `API key permissions are bad, deleting secret`])
+    await setValue(accountName, `connection_api_secret_${connection.id}`, null)
+    await progress([undefined, `API secret deleted`])
+    throw error
+  }
+  await progress([undefined, `API key permissions are good`])
 
   let results: ParserResult[] = []
 
@@ -452,7 +464,8 @@ export async function syncBinance(
 
   await progress([98, "Computing metadata"])
   for (let i = 0; i < results.length; i++) {
-    const { logs, txns } = results[i]
+    // TODO5
+    const { logs, txns: _txns } = results[i]
 
     for (const log of logs) {
       rows += 1

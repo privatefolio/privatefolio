@@ -224,7 +224,7 @@ export class BinanceApi {
   }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
-  async callBinanceApi(endpoint: string, params: URLSearchParams) {
+  async callBinanceApi(endpoint: string, params: URLSearchParams, post = false) {
     params.set("timestamp", String(Date.now()))
     params.set("recvWindow", "60000")
     const query = params.toString()
@@ -237,6 +237,7 @@ export class BinanceApi {
 
     const res = await fetch(url, {
       headers: { "X-MBX-APIKEY": this.apiKey },
+      method: post ? "POST" : "GET",
     })
 
     // console.log(`Weight used: ${getWeightUsed(res.headers)} ${getRetryAfter(res.headers)}`)
@@ -249,7 +250,7 @@ export class BinanceApi {
       )
     }
     if (res.status !== 200) {
-      throw new Error(`Binance: ${data.msg}`)
+      throw new Error(`Binance: ${data !== null ? data.msg : `${res.status} ${res.statusText}`}`)
     }
 
     return data
@@ -535,5 +536,44 @@ export class BinanceApi {
     const data = await this.callBinanceApi(endpoint, params)
 
     return data as BinanceUsdFuturesIncome[]
+  }
+
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  async getAccount() {
+    const endpoint = "/api/v3/account"
+    const params = new URLSearchParams()
+
+    return await this.callBinanceApi(endpoint, params)
+  }
+
+  // https://binance-docs.github.io/apidocs/spot/en/#test-new-order-trade
+  async placeTestOrder() {
+    const endpoint = "/api/v3/order/test"
+    const params = new URLSearchParams({
+      quantity: "10",
+      side: "BUY",
+      symbol: "USDCUSDT",
+      type: "MARKET",
+    })
+
+    return await this.callBinanceApi(endpoint, params, true)
+  }
+
+  // eslint-disable-next-line @typescript-eslint/member-ordering
+  async ensureReadOnlyPermissions() {
+    try {
+      await this.placeTestOrder()
+    } catch (error) {
+      const errorMessage = String(error)
+      if (
+        errorMessage.includes("-2015") ||
+        errorMessage.includes("Invalid API-key, IP, or permissions for action") ||
+        errorMessage.includes("permissions for action")
+      ) {
+        return
+      }
+      throw error
+    }
+    throw new Error("API key has trading permissions. For better security use read-only API keys.")
   }
 }
