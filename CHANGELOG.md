@@ -3,6 +3,13 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.33 - 2025/07/21
+
+### 💡 Feature updates
+
+- Add Import data wizard
+- Improve PlatformPage
+
 ## v2.0.0-beta.32 - 2025/07/17
 
 ### 💡 Feature updates

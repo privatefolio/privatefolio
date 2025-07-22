@@ -112,13 +112,17 @@ const $addConnectionDrawer = atom(false)
 const $addTransactionDrawer = atom(false)
 
 export function ImportDataWizard() {
+  const activeAccount = useStore($activeAccount)
+  useEffect(() => {
+    document.title = `Import data wizard - ${activeAccount} - Privatefolio`
+  }, [activeAccount])
+
   const [searchParams, setSearchParams] = useSearchParams()
   const platformId = searchParams.get("platformId") || undefined
   const extensionId = searchParams.get("extensionId") || undefined
   const activeStep = searchParams.get("step") ? Number(searchParams.get("step")) : 0
 
   const navigate = useNavigate()
-  const activeAccount = useStore($activeAccount)
   const rpc = useStore($rpc)
   const activeAccountPath = useStore($activeAccountPath)
 
