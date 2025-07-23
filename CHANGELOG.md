@@ -3,6 +3,12 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.34 - 2025/07/23
+
+### 💡 Feature updates
+
+- Soft-launch the Binance connection
+
 ## v2.0.0-beta.33 - 2025/07/21
 
 ### 💡 Feature updates
