@@ -256,7 +256,7 @@ export class BinanceApi {
     return data
   }
 
-  // https://binance-docs.github.io/apidocs/spot/en/#deposit-history-supporting-network-user_data
+  // https://developers.binance.com/docs/wallet/capital/deposite-history
   async getDeposits(start: Timestamp, end: Timestamp) {
     const endpoint = "/sapi/v1/capital/deposit/hisrec"
     const params = new URLSearchParams({
@@ -267,7 +267,7 @@ export class BinanceApi {
     return (await this.callBinanceApi(endpoint, params)) as BinanceDeposit[]
   }
 
-  // https://binance-docs.github.io/apidocs/spot/en/#withdraw-history-supporting-network-user_data
+  // https://developers.binance.com/docs/wallet/capital/withdraw-history
   async getWithdrawals(start: number, end: number) {
     const endpoint = "/sapi/v1/capital/withdraw/history"
     const params = new URLSearchParams({
@@ -278,7 +278,7 @@ export class BinanceApi {
     return (await this.callBinanceApi(endpoint, params)) as BinanceWithdrawal[]
   }
 
-  // https://binance-docs.github.io/apidocs/spot/en/#exchange-information
+  // https://developers.binance.com/docs/binance-spot-api-docs/rest-api/general-endpoints#exchangeInfo
   // eslint-disable-next-line @typescript-eslint/member-ordering
   async getPairs() {
     const endpoint = "/api/v3/exchangeInfo"
@@ -292,7 +292,7 @@ export class BinanceApi {
     return symbols
   }
 
-  // https://developers.binance.com/docs/binance-spot-api-docs/rest-api/account-endpoints
+  // https://developers.binance.com/docs/binance-spot-api-docs/rest-api/account-endpoints#account-trade-list-user_data
   async getTrades(symbol: BinancePair, start: Timestamp, end: Timestamp) {
     const endpoint = "/api/v3/myTrades"
     const params = new URLSearchParams({
@@ -308,7 +308,7 @@ export class BinanceApi {
       .filter((x) => x.time > start && x.time < end) as BinanceTrade[]
   }
 
-  // https://binance-docs.github.io/apidocs/spot/en/#get-flexible-rewards-history-user_data
+  // https://developers.binance.com/docs/simple_earn/history/Get-Flexible-Rewards-History
   // eslint-disable-next-line @typescript-eslint/member-ordering
   async getFlexibleRewards(start: number, end: number, rewardType: BinanceRewardType) {
     const endpoint = "/sapi/v1/simple-earn/flexible/history/rewardsRecord"
@@ -322,7 +322,7 @@ export class BinanceApi {
     return data.rows as BinanceReward[]
   }
 
-  // https://binance-docs.github.io/apidocs/spot/en/#get-locked-rewards-history-user_data
+  // https://developers.binance.com/docs/simple_earn/history/Get-Locked-Rewards-History
   async getLockedRewards(start: number, end: number) {
     const endpoint = "/sapi/v1/simple-earn/locked/history/rewardsRecord"
     const params = new URLSearchParams({
@@ -376,7 +376,7 @@ export class BinanceApi {
     }
   }
 
-  // https://binance-docs.github.io/apidocs/spot/en/#query-margin-account-39-s-trade-list-user_data
+  // https://developers.binance.com/docs/margin_trading/trade/Query-Margin-Account-Trade-List
   async getMarginTrades(symbol: BinancePair, isIsolated: boolean, start: number, end: number) {
     const endpoint = "/sapi/v1/margin/myTrades"
     const params = new URLSearchParams({
@@ -402,7 +402,7 @@ export class BinanceApi {
     }
   }
 
-  // https://binance-docs.github.io/apidocs/spot/en/#get-cross-margin-transfer-history-user_data
+  // https://developers.binance.com/docs/margin_trading/transfer
   async getMarginTransfers(start: number, end: number, isolated: boolean) {
     const endpoint = "/sapi/v1/margin/transfer"
     const params = new URLSearchParams({
@@ -446,7 +446,6 @@ export class BinanceApi {
     }
   }
 
-  // https://binance-docs.github.io/apidocs/futures/en/#exchange-information
   async getUsdFuturesPairs(): Promise<Array<BinancePair>> {
     // const BASE_URL = "https://fapi.binance.com"
     const endpoint = "/fapi/v1/exchangeInfo"
@@ -460,7 +459,6 @@ export class BinanceApi {
     return symbols
   }
 
-  // https://binance-docs.github.io/apidocs/futures/en/#account-trade-list-user_data
   async getUsdFuturesTrades(symbol: BinancePair, start: number, end: number) {
     const endpoint = "/fapi/v1/userTrades"
     const params = new URLSearchParams({
@@ -478,7 +476,6 @@ export class BinanceApi {
     })) as BinanceUsdFuturesTrades[]
   }
 
-  // https://binance-docs.github.io/apidocs/delivery/en/#exchange-information
   // eslint-disable-next-line @typescript-eslint/member-ordering
   async getCoinFuturesSymbols(): Promise<Array<BinancePair>> {
     // const BASE_URL = "https://dapi.binance.com" // TODO9
@@ -493,7 +490,6 @@ export class BinanceApi {
     return symbols
   }
 
-  // https://binance-docs.github.io/apidocs/delivery/en/#account-trade-list-user_data
   async getCoinFuturesTrades(symbol: BinancePair, start: number, end: number) {
     const endpoint = "/dapi/v1/userTrades"
     const params = new URLSearchParams({
@@ -511,7 +507,6 @@ export class BinanceApi {
     })) as BinanceCoinFuturesTrades[]
   }
 
-  // https://binance-docs.github.io/apidocs/delivery/en/#get-income-history-user_data
   // eslint-disable-next-line @typescript-eslint/member-ordering
   async getCoinFuturesIncome(start: number, end: number) {
     const endpoint = "/dapi/v1/income"
@@ -525,7 +520,6 @@ export class BinanceApi {
     return data as BinanceCoinFuturesIncome[]
   }
 
-  // https://binance-docs.github.io/apidocs/futures/en/#get-income-history-user_data
   async getUsdFuturesIncome(start: number, end: number) {
     const endpoint = "/fapi/v1/income"
     const params = new URLSearchParams({
@@ -546,7 +540,6 @@ export class BinanceApi {
     return await this.callBinanceApi(endpoint, params)
   }
 
-  // https://binance-docs.github.io/apidocs/spot/en/#test-new-order-trade
   async placeTestOrder() {
     const endpoint = "/api/v3/order/test"
     const params = new URLSearchParams({

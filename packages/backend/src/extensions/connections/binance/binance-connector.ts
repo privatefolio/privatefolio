@@ -34,6 +34,8 @@ import { parseWithdraw } from "./binance-spot/binance-withdraw"
 
 export const extensionId = binanceConnExtension
 
+const SLOW_DOWN_FACTOR = 2
+
 export async function syncBinance(
   accountName: string,
   progress: ProgressCallback = noop,
@@ -83,7 +85,7 @@ export async function syncBinance(
   if (symbols.length === 0) {
     await progress([undefined, `Fetching trade pairs`])
     symbols = await binanceApi.getPairs()
-    await progress([undefined, `Fetched ${symbols.length} symbols`])
+    await progress([undefined, `Fetched ${symbols.length} trade pairs`])
   }
   if (wallets.spot) {
     await progress([undefined, `Fetching data for ${BINANCE_WALLETS.spot}`])
@@ -119,7 +121,8 @@ export async function syncBinance(
     await progress([undefined, `Fetching trades`])
     results = results.concat(
       await paginateExact({
-        cooldown: 1_000,
+        concurrency: 10,
+        cooldown: SLOW_DOWN_FACTOR * 200 * 10,
         count: symbols.length,
         fn: async (symbolIndex) => {
           const records = await binanceApi.getTrades(symbols[symbolIndex], since, until)
@@ -173,7 +176,7 @@ export async function syncBinance(
     results = results.concat(
       await paginateExact({
         concurrency: 40,
-        cooldown: 1_000,
+        cooldown: SLOW_DOWN_FACTOR * 50 * 40,
         count: symbols.length,
         fn: async (symbolIndex) => {
           const records = await binanceApi.getMarginTrades(
@@ -197,6 +200,8 @@ export async function syncBinance(
     await progress([undefined, `Fetching cross margin loans`])
     results = results.concat(
       await paginate({
+        concurrency: 10,
+        cooldown: SLOW_DOWN_FACTOR * 50 * 10,
         fn: (start, end) =>
           binanceApi
             .getMarginLoansAndRepayments(start, end, "BORROW")
@@ -211,6 +216,8 @@ export async function syncBinance(
     await progress([undefined, `Fetching cross margin repayments`])
     results = results.concat(
       await paginate({
+        concurrency: 10,
+        cooldown: SLOW_DOWN_FACTOR * 50 * 10,
         fn: (start, end) =>
           binanceApi
             .getMarginLoansAndRepayments(start, end, "REPAY")
@@ -225,6 +232,7 @@ export async function syncBinance(
     await progress([undefined, `Fetching cross margin transfers`])
     results = results.concat(
       await paginate({
+        concurrency: 10,
         fn: (start, end) =>
           binanceApi
             .getMarginTransfers(start, end, false)
@@ -239,6 +247,7 @@ export async function syncBinance(
     await progress([undefined, `Fetching cross margin liquidations`])
     results = results.concat(
       await paginate({
+        concurrency: 10,
         fn: (start, end) =>
           binanceApi
             .getMarginLiquidation(start, end)
@@ -257,6 +266,8 @@ export async function syncBinance(
     await progress([undefined, `Fetching isolated margin trades`])
     results = results.concat(
       await paginateExact({
+        concurrency: 40,
+        cooldown: SLOW_DOWN_FACTOR * 50 * 40,
         count: symbols.length,
         fn: async (symbolIndex) => {
           const records = await binanceApi.getMarginTrades(symbols[symbolIndex], true, since, until)
@@ -275,11 +286,13 @@ export async function syncBinance(
     await progress([undefined, `Fetching isolated margin loans`])
     results = results.concat(
       await paginateExact({
-        concurrency: 40,
-        cooldown: 1_000,
+        concurrency: 1,
+        cooldown: SLOW_DOWN_FACTOR * 50,
         count: symbols.length,
         fn: (symbolIndex) =>
           paginate({
+            concurrency: 10,
+            cooldown: SLOW_DOWN_FACTOR * 50 * 10,
             fn: async (start, end) => {
               const records = await binanceApi.getMarginLoansAndRepayments(
                 start,
@@ -305,11 +318,13 @@ export async function syncBinance(
     await progress([undefined, `Fetching isolated margin repayments`])
     results = results.concat(
       await paginateExact({
-        concurrency: 40,
-        cooldown: 1_000,
+        concurrency: 1,
+        cooldown: SLOW_DOWN_FACTOR * 50,
         count: symbols.length,
         fn: (symbolIndex) =>
           paginate({
+            concurrency: 10,
+            cooldown: SLOW_DOWN_FACTOR * 50 * 10,
             fn: async (start, end) => {
               const records = await binanceApi.getMarginLoansAndRepayments(
                 start,
@@ -350,7 +365,7 @@ export async function syncBinance(
     results = results.concat(
       await paginateExact({
         concurrency: 40,
-        cooldown: 1_000,
+        cooldown: SLOW_DOWN_FACTOR * 5 * 40,
         count: symbols.length,
         fn: async (symbolIndex) => {
           const records = await binanceApi.getMarginLiquidation(
@@ -378,6 +393,8 @@ export async function syncBinance(
     await progress([undefined, `Fetching COIN-M futures trades`])
     results = results.concat(
       await paginateExact({
+        concurrency: 5,
+        cooldown: SLOW_DOWN_FACTOR * 125 * 5,
         count: symbols.length,
         fn: async (symbolIndex) => {
           const records = await binanceApi.getCoinFuturesTrades(symbols[symbolIndex], since, until)
@@ -417,6 +434,8 @@ export async function syncBinance(
     await progress([undefined, `Fetching USD-M futures trades`])
     results = results.concat(
       await paginateExact({
+        concurrency: 5,
+        cooldown: SLOW_DOWN_FACTOR * 2000 * 5,
         count: symbols.length,
         fn: async (symbolIndex) => {
           const records = await binanceApi.getUsdFuturesTrades(symbols[symbolIndex], since, until)
