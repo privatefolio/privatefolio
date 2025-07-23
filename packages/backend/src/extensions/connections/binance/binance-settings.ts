@@ -15,13 +15,15 @@ export const BINANCE_WALLET_IDS = [
 
 export type BinanceWalletId = (typeof BINANCE_WALLET_IDS)[number]
 
+/* eslint-disable sort-keys-fix/sort-keys-fix */
 export const BINANCE_WALLETS: Record<BinanceWalletId, string> = {
-  coinFutures: "Binance Coin-M Futures",
+  spot: "Binance Spot",
   crossMargin: "Binance Cross Margin",
   isolatedMargin: "Binance Isolated Margin",
-  spot: "Binance Spot",
   usdFutures: "Binance USD-M Futures",
+  coinFutures: "Binance Coin-M Futures",
 }
+/* eslint-enable */
 
 export const binanceConnExtension = "binance-connection"
 

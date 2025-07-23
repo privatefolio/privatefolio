@@ -217,11 +217,11 @@ export function ImportDataWizard() {
   }, [platforms, searchQuery, platformFilter])
 
   useEffect(() => {
-    if (!compatibleExtensions.find((x) => x.id === extensionId)) {
+    if (platform && !compatibleExtensions.find((x) => x.id === extensionId)) {
       searchParams.delete("extensionId")
       setSearchParams(searchParams)
     }
-  }, [compatibleExtensions, extensionId, searchParams, setSearchParams])
+  }, [compatibleExtensions, extensionId, platform, searchParams, setSearchParams])
 
   useEffect(() => {
     setVisiblePlatformsCount(PLATFORMS_PER_PAGE - 1)

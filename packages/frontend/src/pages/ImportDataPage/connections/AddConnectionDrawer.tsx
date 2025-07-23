@@ -26,7 +26,9 @@ import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { DrawerHeader } from "src/components/DrawerHeader"
 import { ExtensionAvatar } from "src/components/ExtensionAvatar"
 import { LoadingButton } from "src/components/LoadingButton"
+import { PaymentPlanChip } from "src/components/PaymentPlanChip"
 import { PlatformAvatar } from "src/components/PlatformAvatar"
+import { PAYMENT_PLANS } from "src/settings"
 import { $activeAccount } from "src/stores/account-store"
 import { $addressBook, addWalletToAddressBook } from "src/stores/metadata-store"
 import { MonoFont } from "src/theme"
@@ -110,15 +112,13 @@ export function AddConnectionDrawer(props: AddConnectionDrawerProps) {
     setError(undefined)
   }, [open, initialExtensionId, initialPlatformId])
 
-  const handleWalletsChange = (event) => {
+  const handleWalletsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setState({
       ...binanceWallets,
       [event.target.name]: event.target.checked,
     })
   }
-  const { coinFutures, crossMargin, isolatedMargin, spot, usdFutures } = binanceWallets
-  const walletsError =
-    [spot, crossMargin, isolatedMargin, coinFutures, usdFutures].filter((v) => v).length === 0
+  const walletsError = Object.values(binanceWallets).filter((x) => x).length === 0
 
   const handleSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
@@ -181,6 +181,14 @@ export function AddConnectionDrawer(props: AddConnectionDrawerProps) {
       /**
        * 3. Submit
        */
+      // console.log({
+      //   address: wallet,
+      //   apiKey,
+      //   extensionId,
+      //   options,
+      //   platformId,
+      // })
+      // return
       setError(undefined)
       setLoading(true)
       try {
@@ -234,6 +242,8 @@ export function AddConnectionDrawer(props: AddConnectionDrawerProps) {
       debugMode,
     ]
   )
+
+  if (extensions.length === 0) return null
 
   return (
     <Drawer open={open} onClose={() => atom.set(false)}>
@@ -359,66 +369,30 @@ export function AddConnectionDrawer(props: AddConnectionDrawerProps) {
               </div>
               <FormControl sx={{ color: "var(--mui-palette-text-secondary)" }} error={walletsError}>
                 <SectionTitle>Wallets</SectionTitle>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={spot}
-                      color="secondary"
-                      name={"spot" satisfies BinanceWalletId}
-                      onChange={handleWalletsChange}
-                    />
-                  }
-                  label={BINANCE_WALLETS.spot}
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={crossMargin}
-                      color="secondary"
-                      name={"crossMargin" satisfies BinanceWalletId}
-                      onChange={handleWalletsChange}
-                    />
-                  }
-                  label={BINANCE_WALLETS.crossMargin}
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={isolatedMargin}
-                      color="secondary"
-                      name={"isolatedMargin" satisfies BinanceWalletId}
-                      onChange={handleWalletsChange}
-                    />
-                  }
-                  label={BINANCE_WALLETS.isolatedMargin}
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={coinFutures}
-                      color="secondary"
-                      name={"coinFutures" satisfies BinanceWalletId}
-                      onChange={handleWalletsChange}
-                      disabled
-                    />
-                  }
-                  label={BINANCE_WALLETS.coinFutures}
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={usdFutures}
-                      color="secondary"
-                      name={"usdFutures" satisfies BinanceWalletId}
-                      onChange={handleWalletsChange}
-                      disabled
-                    />
-                  }
-                  label={BINANCE_WALLETS.usdFutures}
-                />
-                {walletsError ? (
-                  <FormHelperText>You need to choose at least one</FormHelperText>
-                ) : null}
+                <Stack paddingX={0.5}>
+                  {Object.keys(BINANCE_WALLETS).map((walletId) => (
+                    <Stack key={walletId} direction="row" alignItems="center">
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={binanceWallets[walletId as BinanceWalletId]}
+                            color="secondary"
+                            name={walletId}
+                            onChange={handleWalletsChange}
+                            disabled={walletId === "coinFutures" || walletId === "usdFutures"}
+                          />
+                        }
+                        label={BINANCE_WALLETS[walletId as BinanceWalletId].replace("Binance ", "")}
+                      />
+                      {(walletId === "coinFutures" || walletId === "usdFutures") && (
+                        <PaymentPlanChip plan={PAYMENT_PLANS.premium} includeLink />
+                      )}
+                    </Stack>
+                  ))}
+                  {walletsError ? (
+                    <FormHelperText>You need to choose at least one</FormHelperText>
+                  ) : null}
+                </Stack>
               </FormControl>
             </>
           )}

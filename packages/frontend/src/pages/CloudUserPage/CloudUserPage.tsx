@@ -37,11 +37,13 @@ import { BackButton } from "src/components/BackButton"
 import { CircularSpinner } from "src/components/CircularSpinner"
 import { Gravatar } from "src/components/Gravatar"
 import { LogoText } from "src/components/Header/LogoText"
+import { PaymentPlanChip } from "src/components/PaymentPlanChip"
 import { SectionTitle } from "src/components/SectionTitle"
 import { StaggeredList } from "src/components/StaggeredList"
 import { APP_VERSION } from "src/env"
 import { useConfirm } from "src/hooks/useConfirm"
 import { ONE_HOUR_CACHE } from "src/settings"
+import { $activeAccount } from "src/stores/account-store"
 import { getLatestAppVersion } from "src/stores/app-store"
 import { $cloudAuth, unlockApp } from "src/stores/auth-store"
 import {
@@ -70,6 +72,13 @@ import { $cloudRest } from "src/workers/remotes"
 import { ServerStatusIcon } from "./ServerStatusIcon"
 
 export default function CloudUserPage({ show }: { show: boolean }) {
+  const activeAccount = useStore($activeAccount)
+  useEffect(() => {
+    if (activeAccount) {
+      $activeAccount.set("")
+    }
+  }, [activeAccount])
+
   useEffect(() => {
     document.title = "PrivateCloud"
   }, [])
@@ -135,12 +144,12 @@ export default function CloudUserPage({ show }: { show: boolean }) {
       return { isPremium: false, loading: true, name: "Loading…" }
     }
     if (sub === null) {
-      return { isPremium: false, name: "Hobby" }
+      return { isPremium: false, name: "Free" }
     }
 
     const item = sub.items.data[0]
     if (!item) {
-      return { isPremium: false, name: "Hobby" }
+      return { isPremium: false, name: "Free" }
     }
 
     const { plan } = item
@@ -220,8 +229,8 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                         </Stack>
                       ) : (
                         <>
-                          <Typography variant="inherit">
-                            {paymentPlan.name}
+                          <Typography variant="inherit" component="div">
+                            <PaymentPlanChip plan={paymentPlan.name} />
                             {!paymentPlan.loading && !paymentPlan.isPremium && (
                               <>
                                 {" "}

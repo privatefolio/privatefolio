@@ -32,6 +32,7 @@ const AppLink = forwardRef<HTMLAnchorElement, AppLinkProps>((props, ref) => {
         ref={ref}
         component={MuiLink}
         href={href}
+        sx={sx}
         {...rest}
         onClick={(event) => {
           if (onClick) return onClick(event)
@@ -42,16 +43,7 @@ const AppLink = forwardRef<HTMLAnchorElement, AppLinkProps>((props, ref) => {
     )
   }
 
-  return (
-    <Box
-      ref={ref}
-      component={MuiLink}
-      href={href}
-      target="_blank"
-      sx={{ color: "inherit", textDecoration: "none", ...sx }}
-      {...rest}
-    />
-  )
+  return <Box ref={ref} component={MuiLink} href={href} target="_blank" sx={sx} {...rest} />
 })
 
 AppLink.displayName = "AppLink"

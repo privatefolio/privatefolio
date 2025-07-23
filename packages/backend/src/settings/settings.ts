@@ -66,3 +66,14 @@ export const TASK_LOG_CHAR_LIMIT = 50_000
 export const TASK_LOG_LINE_LIMIT = 1000
 
 export { PlatformPrefix } from "./platforms"
+
+export const PAYMENT_PLANS_IDS = ["premium", "free"] as const
+
+export type PaymentPlanId = (typeof PAYMENT_PLANS_IDS)[number]
+
+/* eslint-disable sort-keys-fix/sort-keys-fix */
+export const PAYMENT_PLANS: Record<PaymentPlanId, string> = {
+  free: "Free",
+  premium: "Premium",
+}
+/* eslint-enable */
