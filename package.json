@@ -40,7 +40,7 @@
     "generate-llms-txt": "node scripts/generate-llms-txt.js"
   },
   "devDependencies": {
-    "wrangler": "^3.90.0",
+    "wrangler": "^4.25.1",
     "cross-env": "7.0.3",
     "lerna": "^8.1.3"
   }
