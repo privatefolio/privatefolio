@@ -8,7 +8,7 @@ import {
   Transaction,
   TransactionType,
 } from "src/interfaces"
-import { floorTimestamp } from "src/utils/utils"
+import { floorTimestamp, hashString } from "src/utils/utils"
 
 import { BinanceDeposit } from "../binance-api"
 import { BINANCE_WALLETS } from "../binance-settings"
@@ -30,7 +30,6 @@ export function parseDeposit(
     throw new Error(`Invalid timestamp: ${insertTime}`)
   }
   const assetId = `${platformId}:${coin}`
-  const txId = `${connection.id}_${txHash}_Binance_deposit`
   const operation: AuditLogOperation = "Deposit"
   const type: TransactionType = "Deposit"
   const importId = connection.id
@@ -41,6 +40,9 @@ export function parseDeposit(
   const incomingAsset = assetId
 
   const change = incoming
+  const id = `${connection.id}_${hashString(`${assetId}_${operation}_${change}`)}_${index}`
+  const txId = `${id}_TX`
+
   const logs: AuditLog[] = [
     {
       assetId,

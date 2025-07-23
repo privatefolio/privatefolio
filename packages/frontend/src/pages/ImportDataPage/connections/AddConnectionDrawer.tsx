@@ -31,7 +31,7 @@ import { $activeAccount } from "src/stores/account-store"
 import { $addressBook, addWalletToAddressBook } from "src/stores/metadata-store"
 import { MonoFont } from "src/theme"
 import { asUTC } from "src/utils/formatting-utils"
-import { isProduction, resolveUrl } from "src/utils/utils"
+import { resolveUrl } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 import { SectionTitle } from "../../../components/SectionTitle"
@@ -250,11 +250,7 @@ export function AddConnectionDrawer(props: AddConnectionDrawerProps) {
               onChange={(event) => setExtensionId(event.target.value)}
             >
               {extensions.map((x) => (
-                <MenuItem
-                  key={x.id}
-                  value={x.id}
-                  disabled={x.id === binanceConnExtension && isProduction}
-                >
+                <MenuItem key={x.id} value={x.id}>
                   <Stack direction="row" alignItems="center">
                     <ListItemAvatar>
                       <ExtensionAvatar

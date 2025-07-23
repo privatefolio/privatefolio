@@ -19,8 +19,8 @@ import { parseCoinFuturesTrade } from "./binance-future/binance-futures-COIN-tra
 import { parseUsdFuturesIncome } from "./binance-future/binance-futures-USD-income"
 import { parseUsdFuturesTrade } from "./binance-future/binance-futures-USD-trades"
 import { parseLoan, parseRepayment } from "./binance-margin/binance-margin-borrow-repay"
+import { parseMarginLiquidation } from "./binance-margin/binance-margin-liquidation"
 import { parseMarginTransfer } from "./binance-margin/binance-margin-transfer"
-import { parseMarginLiquidation } from "./binance-margin/binance-margine-liquidation"
 import {
   BINANCE_REWARD_TYPES,
   BINANCE_WALLETS,
@@ -51,6 +51,18 @@ export async function syncBinance(
 
   const { wallets } = connection.options
 
+  const totalWallets = Object.keys(BINANCE_WALLETS).filter((x) => wallets[x]).length
+  if (totalWallets === 0) throw new Error("No wallets enabled for sync")
+
+  const SETUP_PROGRESS = 10 // 0-10% for setup
+  const WALLET_PROGRESS_RANGE = 80 // 10-90% for wallets (80% total)
+
+  const progressPerWallet = WALLET_PROGRESS_RANGE / totalWallets
+
+  let currentWalletIndex = 0
+  const getWalletProgressStart = (walletIndex: number) =>
+    SETUP_PROGRESS + walletIndex * progressPerWallet
+
   const apiSecretEncrypted = await getValue<string | null>(
     accountName,
     `connection_api_secret_${connection.id}`
@@ -67,31 +79,34 @@ export async function syncBinance(
 
   const binanceApi = new BinanceApi(connection.apiKey, apiSecret)
 
-  await progress([undefined, `Checking API key permissions`])
+  await progress([2, `Checking API key permissions`])
   await binanceApi.getAccount()
   try {
     await binanceApi.ensureReadOnlyPermissions()
   } catch (error) {
-    await progress([undefined, `API key permissions are bad, deleting secret`])
+    await progress([4, `API key permissions are bad, deleting secret`])
     await setValue(accountName, `connection_api_secret_${connection.id}`, null)
-    await progress([undefined, `API secret deleted`])
+    await progress([6, `API secret deleted`])
     throw error
   }
-  await progress([undefined, `API key permissions are good`])
+  await progress([8, `API key permissions are good`])
 
   let results: ParserResult[] = []
 
   let symbols = connection.options?.symbols ?? []
   if (symbols.length === 0) {
-    await progress([undefined, `Fetching trade pairs`])
+    await progress([9, `Fetching trade pairs`])
     symbols = await binanceApi.getPairs()
-    await progress([undefined, `Fetched ${symbols.length} trade pairs`])
+    await progress([SETUP_PROGRESS, `Fetched ${symbols.length} trade pairs`])
   }
+
   if (wallets.spot) {
-    await progress([undefined, `Fetching data for ${BINANCE_WALLETS.spot}`])
-    await progress([undefined, `Fetching deposits`])
+    const startProgress = getWalletProgressStart(currentWalletIndex)
+
+    await progress([startProgress + progressPerWallet * 0.1, `Fetching deposits`])
     results = results.concat(
       await paginate({
+        debugMode,
         fn: (start, end) =>
           binanceApi
             .getDeposits(start, end)
@@ -103,10 +118,11 @@ export async function syncBinance(
         window: 90 * ONE_DAY,
       })
     )
-    await progress([undefined, `Fetching withdrawals`])
+    await progress([startProgress + progressPerWallet * 0.3, `Fetching withdrawals`])
     results = results.concat(
       await paginate({
         cooldown: 1_000,
+        debugMode,
         fn: (start, end) =>
           binanceApi
             .getWithdrawals(start, end)
@@ -118,18 +134,21 @@ export async function syncBinance(
         window: 90 * ONE_DAY,
       })
     )
-    await progress([undefined, `Fetching trades`])
+    await progress([startProgress + progressPerWallet * 0.5, `Fetching trades`])
     results = results.concat(
       await paginateExact({
         concurrency: 10,
         cooldown: SLOW_DOWN_FACTOR * 200 * 10,
         count: symbols.length,
+        debugMode,
         fn: async (symbolIndex) => {
           const records = await binanceApi.getTrades(symbols[symbolIndex], since, until)
-          await progress([
-            undefined,
-            `Fetched ${records.length} records from ${formatDate(since)} - ${formatDate(until)} for ${symbols[symbolIndex].symbol}`,
-          ])
+          if (debugMode) {
+            await progress([
+              undefined,
+              `Fetched ${records.length} records from ${formatDate(since)} - ${formatDate(until)} for ${symbols[symbolIndex].symbol}`,
+            ])
+          }
           return records.map((row, index) =>
             parseTrade(row, index, connection, BINANCE_WALLETS.spot)
           )
@@ -138,10 +157,11 @@ export async function syncBinance(
         signal,
       })
     )
-    await progress([undefined, `Fetching rewards`])
+    await progress([startProgress + progressPerWallet * 0.8, `Fetching rewards (3 types)`])
     for (const rewardType of BINANCE_REWARD_TYPES) {
       results = results.concat(
         await paginate({
+          debugMode,
           fn: (start, end) =>
             binanceApi
               .getFlexibleRewards(start, end, rewardType)
@@ -154,9 +174,10 @@ export async function syncBinance(
         })
       )
     }
-    await progress([undefined, `Fetching locked rewards`])
+    await progress([startProgress + progressPerWallet * 0.9, `Fetching locked rewards`])
     results = results.concat(
       await paginate({
+        debugMode,
         fn: (start, end) =>
           binanceApi
             .getLockedRewards(start, end)
@@ -168,16 +189,19 @@ export async function syncBinance(
         window: 90 * ONE_DAY,
       })
     )
-    await progress([undefined, `Fetched data for ${BINANCE_WALLETS.spot}`])
+    currentWalletIndex++
   }
+
   if (wallets.crossMargin) {
-    await progress([undefined, `Fetching data for ${BINANCE_WALLETS.crossMargin}`])
-    await progress([undefined, `Fetching cross margin trades`])
+    const startProgress = getWalletProgressStart(currentWalletIndex)
+
+    await progress([startProgress + progressPerWallet * 0.1, `Fetching cross margin trades`])
     results = results.concat(
       await paginateExact({
         concurrency: 40,
         cooldown: SLOW_DOWN_FACTOR * 50 * 40,
         count: symbols.length,
+        debugMode,
         fn: async (symbolIndex) => {
           const records = await binanceApi.getMarginTrades(
             symbols[symbolIndex],
@@ -185,10 +209,12 @@ export async function syncBinance(
             since,
             until
           )
-          await progress([
-            undefined,
-            `Fetched ${records.length} records from ${formatDate(since)} - ${formatDate(until)} for ${symbols[symbolIndex].symbol}`,
-          ])
+          if (debugMode) {
+            await progress([
+              undefined,
+              `Fetched ${records.length} records from ${formatDate(since)} - ${formatDate(until)} for ${symbols[symbolIndex].symbol}`,
+            ])
+          }
           return records.map((row, index) =>
             parseTrade(row, index, connection, BINANCE_WALLETS.crossMargin)
           )
@@ -197,11 +223,12 @@ export async function syncBinance(
         signal,
       })
     )
-    await progress([undefined, `Fetching cross margin loans`])
+    await progress([startProgress + progressPerWallet * 0.3, `Fetching cross margin loans`])
     results = results.concat(
       await paginate({
         concurrency: 10,
         cooldown: SLOW_DOWN_FACTOR * 50 * 10,
+        debugMode,
         fn: (start, end) =>
           binanceApi
             .getMarginLoansAndRepayments(start, end, "BORROW")
@@ -213,11 +240,12 @@ export async function syncBinance(
         window: 7 * ONE_DAY,
       })
     )
-    await progress([undefined, `Fetching cross margin repayments`])
+    await progress([startProgress + progressPerWallet * 0.5, `Fetching cross margin repayments`])
     results = results.concat(
       await paginate({
         concurrency: 10,
         cooldown: SLOW_DOWN_FACTOR * 50 * 10,
+        debugMode,
         fn: (start, end) =>
           binanceApi
             .getMarginLoansAndRepayments(start, end, "REPAY")
@@ -229,10 +257,11 @@ export async function syncBinance(
         window: 7 * ONE_DAY,
       })
     )
-    await progress([undefined, `Fetching cross margin transfers`])
+    await progress([startProgress + progressPerWallet * 0.7, `Fetching cross margin transfers`])
     results = results.concat(
       await paginate({
         concurrency: 10,
+        debugMode,
         fn: (start, end) =>
           binanceApi
             .getMarginTransfers(start, end, false)
@@ -244,10 +273,11 @@ export async function syncBinance(
         window: 360 * ONE_DAY,
       })
     )
-    await progress([undefined, `Fetching cross margin liquidations`])
+    await progress([startProgress + progressPerWallet * 0.9, `Fetching cross margin liquidations`])
     results = results.concat(
       await paginate({
         concurrency: 10,
+        debugMode,
         fn: (start, end) =>
           binanceApi
             .getMarginLiquidation(start, end)
@@ -259,22 +289,27 @@ export async function syncBinance(
         window: 360 * ONE_DAY,
       })
     )
-    await progress([undefined, `Fetched data for ${BINANCE_WALLETS.crossMargin}`])
+    currentWalletIndex++
   }
+
   if (wallets.isolatedMargin) {
-    await progress([undefined, `Fetching data for ${BINANCE_WALLETS.isolatedMargin}`])
-    await progress([undefined, `Fetching isolated margin trades`])
+    const startProgress = getWalletProgressStart(currentWalletIndex)
+
+    await progress([startProgress + progressPerWallet * 0.1, `Fetching isolated margin trades`])
     results = results.concat(
       await paginateExact({
         concurrency: 40,
         cooldown: SLOW_DOWN_FACTOR * 50 * 40,
         count: symbols.length,
+        debugMode,
         fn: async (symbolIndex) => {
           const records = await binanceApi.getMarginTrades(symbols[symbolIndex], true, since, until)
-          await progress([
-            undefined,
-            `Fetched ${records.length} records from ${formatDate(since)} - ${formatDate(until)} for ${symbols[symbolIndex].symbol}`,
-          ])
+          if (debugMode) {
+            await progress([
+              undefined,
+              `Fetched ${records.length} records from ${formatDate(since)} - ${formatDate(until)} for ${symbols[symbolIndex].symbol}`,
+            ])
+          }
           return records.map((row, index) =>
             parseTrade(row, index, connection, BINANCE_WALLETS.isolatedMargin)
           )
@@ -283,12 +318,13 @@ export async function syncBinance(
         signal,
       })
     )
-    await progress([undefined, `Fetching isolated margin loans`])
+    await progress([startProgress + progressPerWallet * 0.25, `Fetching isolated margin loans`])
     results = results.concat(
       await paginateExact({
         concurrency: 1,
         cooldown: SLOW_DOWN_FACTOR * 50,
         count: symbols.length,
+        debugMode,
         fn: (symbolIndex) =>
           paginate({
             concurrency: 10,
@@ -300,10 +336,12 @@ export async function syncBinance(
                 "BORROW",
                 symbols[symbolIndex].symbol
               )
-              await progress([
-                undefined,
-                `Fetched ${records.length} records from ${formatDate(start)} - ${formatDate(end)} for ${symbols[symbolIndex].symbol}`,
-              ])
+              if (debugMode) {
+                await progress([
+                  undefined,
+                  `Fetched ${records.length} records from ${formatDate(start)} - ${formatDate(end)} for ${symbols[symbolIndex].symbol}`,
+                ])
+              }
               return records.map((row, index) => parseLoan(row, index, connection))
             },
             signal,
@@ -315,12 +353,16 @@ export async function syncBinance(
         signal,
       })
     )
-    await progress([undefined, `Fetching isolated margin repayments`])
+    await progress([
+      startProgress + progressPerWallet * 0.45,
+      `Fetching isolated margin repayments`,
+    ])
     results = results.concat(
       await paginateExact({
         concurrency: 1,
         cooldown: SLOW_DOWN_FACTOR * 50,
         count: symbols.length,
+        debugMode,
         fn: (symbolIndex) =>
           paginate({
             concurrency: 10,
@@ -332,10 +374,12 @@ export async function syncBinance(
                 "REPAY",
                 symbols[symbolIndex].symbol
               )
-              await progress([
-                undefined,
-                `Fetched ${records.length} records from ${formatDate(start)} - ${formatDate(end)} for ${symbols[symbolIndex].symbol}`,
-              ])
+              if (debugMode) {
+                await progress([
+                  undefined,
+                  `Fetched ${records.length} records from ${formatDate(start)} - ${formatDate(end)} for ${symbols[symbolIndex].symbol}`,
+                ])
+              }
               return records.map((row, index) => parseRepayment(row, index, connection))
             },
             signal,
@@ -347,9 +391,10 @@ export async function syncBinance(
         signal,
       })
     )
-    await progress([undefined, `Fetching isolated margin transfers`])
+    await progress([startProgress + progressPerWallet * 0.65, `Fetching isolated margin transfers`])
     results = results.concat(
       await paginate({
+        debugMode,
         fn: (start, end) =>
           binanceApi
             .getMarginTransfers(start, end, true)
@@ -361,22 +406,28 @@ export async function syncBinance(
         window: 30 * ONE_DAY,
       })
     )
-    await progress([undefined, `Fetching isolated margin liquidations`])
+    await progress([
+      startProgress + progressPerWallet * 0.8,
+      `Fetching isolated margin liquidations`,
+    ])
     results = results.concat(
       await paginateExact({
         concurrency: 40,
         cooldown: SLOW_DOWN_FACTOR * 5 * 40,
         count: symbols.length,
+        debugMode,
         fn: async (symbolIndex) => {
           const records = await binanceApi.getMarginLiquidation(
             since,
             until,
             symbols[symbolIndex].symbol
           )
-          await progress([
-            undefined,
-            `Fetched ${records.length} records from ${formatDate(since)} - ${formatDate(until)} for ${symbols[symbolIndex].symbol}`,
-          ])
+          if (debugMode) {
+            await progress([
+              undefined,
+              `Fetched ${records.length} records from ${formatDate(since)} - ${formatDate(until)} for ${symbols[symbolIndex].symbol}`,
+            ])
+          }
           return records.map((row, index) =>
             parseMarginLiquidation(row, index, connection, symbols[symbolIndex])
           )
@@ -385,23 +436,29 @@ export async function syncBinance(
         signal,
       })
     )
+    currentWalletIndex++
   }
+
   if (wallets.coinFutures) {
-    await progress([undefined, `Fetching data from ${BINANCE_WALLETS.coinFutures} wallet`])
-    await progress([0, `Fetching Futures symbols`])
+    const startProgress = getWalletProgressStart(currentWalletIndex)
+
+    await progress([startProgress + progressPerWallet * 0.1, `Fetching Futures symbols`])
     const symbols = await binanceApi.getCoinFuturesSymbols()
-    await progress([undefined, `Fetching COIN-M futures trades`])
+    await progress([startProgress + progressPerWallet * 0.2, `Fetching COIN-M futures trades`])
     results = results.concat(
       await paginateExact({
         concurrency: 5,
         cooldown: SLOW_DOWN_FACTOR * 125 * 5,
         count: symbols.length,
+        debugMode,
         fn: async (symbolIndex) => {
           const records = await binanceApi.getCoinFuturesTrades(symbols[symbolIndex], since, until)
-          await progress([
-            undefined,
-            `Fetched ${records.length} records from ${formatDate(since)} - ${formatDate(until)} for ${symbols[symbolIndex].symbol}`,
-          ])
+          if (debugMode) {
+            await progress([
+              undefined,
+              `Fetched ${records.length} records from ${formatDate(since)} - ${formatDate(until)} for ${symbols[symbolIndex].symbol}`,
+            ])
+          }
           return records.map((row, index) => parseCoinFuturesTrade(row, index, connection))
         },
         progress,
@@ -410,9 +467,10 @@ export async function syncBinance(
         // window: 200 * ONE_DAY,
       })
     )
-    await progress([undefined, `Fetching COIN-M futures income`])
+    await progress([startProgress + progressPerWallet * 0.7, `Fetching COIN-M futures income`])
     results = results.concat(
       await paginate({
+        debugMode,
         fn: (start, end) =>
           binanceApi
             .getCoinFuturesIncome(start, end)
@@ -424,25 +482,29 @@ export async function syncBinance(
         window: 200 * ONE_DAY,
       })
     )
-    await progress([undefined, `Fetched data from ${BINANCE_WALLETS.coinFutures} wallet`])
+    currentWalletIndex++
   }
 
   if (wallets.usdFutures) {
-    await progress([undefined, `Fetching data from ${BINANCE_WALLETS.usdFutures} wallet`])
-    await progress([0, `Fetching Futures symbols`])
+    const startProgress = getWalletProgressStart(currentWalletIndex)
+
+    await progress([startProgress + progressPerWallet * 0.1, `Fetching Futures symbols`])
     const symbols = await binanceApi.getUsdFuturesPairs()
-    await progress([undefined, `Fetching USD-M futures trades`])
+    await progress([startProgress + progressPerWallet * 0.2, `Fetching USD-M futures trades`])
     results = results.concat(
       await paginateExact({
         concurrency: 5,
         cooldown: SLOW_DOWN_FACTOR * 2000 * 5,
         count: symbols.length,
+        debugMode,
         fn: async (symbolIndex) => {
           const records = await binanceApi.getUsdFuturesTrades(symbols[symbolIndex], since, until)
-          await progress([
-            undefined,
-            `Fetched ${records.length} records from ${formatDate(since)} - ${formatDate(until)} for ${symbols[symbolIndex].symbol}`,
-          ])
+          if (debugMode) {
+            await progress([
+              undefined,
+              `Fetched ${records.length} records from ${formatDate(since)} - ${formatDate(until)} for ${symbols[symbolIndex].symbol}`,
+            ])
+          }
           return records.map((row, index) => parseUsdFuturesTrade(row, index, connection))
         },
         progress,
@@ -451,9 +513,10 @@ export async function syncBinance(
         // window: 7 * ONE_DAY,
       })
     )
-    await progress([undefined, `Fetching USD-M futures income`])
+    await progress([startProgress + progressPerWallet * 0.7, `Fetching USD-M futures income`])
     results = results.concat(
       await paginate({
+        debugMode,
         fn: (start, end) =>
           binanceApi
             .getUsdFuturesIncome(start, end)
@@ -465,7 +528,7 @@ export async function syncBinance(
         window: 7 * ONE_DAY,
       })
     )
-    await progress([undefined, `Fetched data from ${BINANCE_WALLETS.usdFutures} wallet`])
+    currentWalletIndex++
   }
 
   const result: SyncResult = {
@@ -481,7 +544,7 @@ export async function syncBinance(
   let allLogs: AuditLog[] = []
   let rows = 0
 
-  await progress([98, "Computing metadata"])
+  await progress([92, "Computing portfolio changes"])
   for (let i = 0; i < results.length; i++) {
     // TODO5
     const { logs, txns: _txns } = results[i]

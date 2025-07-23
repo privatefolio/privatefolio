@@ -1,6 +1,6 @@
 import Big from "big.js"
 import { AuditLog, BinanceConnection, ParserResult, ResolutionString } from "src/interfaces"
-import { floorTimestamp } from "src/utils/utils"
+import { floorTimestamp, hashString } from "src/utils/utils"
 
 import { BinanceMarginTransfer } from "../binance-api"
 import { BINANCE_WALLETS } from "../binance-settings"
@@ -11,12 +11,11 @@ export function parseMarginTransfer(
   connection: BinanceConnection
 ): ParserResult {
   const { platformId } = connection
-  const { amount, asset, transFrom, transTo, txId: id } = row
+  const { amount, asset, transFrom, transTo, txId: _txId } = row
   const timestamp = floorTimestamp(row.timestamp, "1S" as ResolutionString)
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${row.timestamp}`)
   }
-  const txId = `${connection.id}_${id}_binance`
   const importId = connection.id
   const importIndex = index
 
@@ -29,7 +28,7 @@ export function parseMarginTransfer(
       assetId: incomingAsset,
       change,
       fileImportId: importId,
-      id: `${txId}_Transfer_From`,
+      id: `${connection.id}_${hashString(`${incomingAsset}_Transfer_${change}`)}_${index}`,
       importIndex,
       operation: "Transfer",
       platformId,
@@ -43,7 +42,7 @@ export function parseMarginTransfer(
       assetId: incomingAsset,
       change: `-${change}`,
       fileImportId: importId,
-      id: `${txId}_Transfer_To`,
+      id: `${connection.id}_${hashString(`${incomingAsset}_Transfer_-${change}`)}_${index}`,
       importIndex,
       operation: "Transfer",
       platformId,

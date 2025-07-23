@@ -260,6 +260,7 @@ interface PaginateParams<T> {
    * @default 0
    */
   cooldown?: number
+  debugMode?: boolean
   fn: (start: Timestamp, end: Timestamp) => Promise<T[]>
   progress?: ProgressCallback
   signal?: AbortSignal
@@ -269,7 +270,17 @@ interface PaginateParams<T> {
 }
 
 export async function paginate<T>(params: PaginateParams<T>): Promise<T[]> {
-  const { since, until, window, concurrency = 10, fn, progress = noop, signal, cooldown } = params
+  const {
+    since,
+    until,
+    window,
+    concurrency = 10,
+    fn,
+    progress = noop,
+    signal,
+    cooldown,
+    debugMode,
+  } = params
 
   const pages: (() => Promise<T[]>)[] = []
   const data: T[] = []
@@ -282,17 +293,21 @@ export async function paginate<T>(params: PaginateParams<T>): Promise<T[]> {
       // await progress([undefined, `Fetching ${formatDate(start)} - ${formatDate(end)}`])
       try {
         const result = await fn(start, end)
-        await progress([
-          undefined,
-          `Fetched ${result.length} records from ${formatDate(start)} - ${formatDate(end)}`,
-        ])
+        if (debugMode) {
+          await progress([
+            undefined,
+            `Fetched ${result.length} records from ${formatDate(start)} - ${formatDate(end)}`,
+          ])
+        }
         return result
       } catch (error) {
         if (String(error).includes("429")) throw error
-        await progress([
-          undefined,
-          `Warn: skipping ${formatDate(start)} to ${formatDate(end)}. ${String(error)}`,
-        ])
+        if (debugMode) {
+          await progress([
+            undefined,
+            `Warn: skipping ${formatDate(start)} to ${formatDate(end)}. ${String(error)}`,
+          ])
+        }
         return []
       }
     })
@@ -323,13 +338,14 @@ interface PaginateExactParams<T> {
    */
   cooldown?: number
   count: number
+  debugMode?: boolean
   fn: (index: number) => Promise<T[]>
   progress?: ProgressCallback
   signal?: AbortSignal
 }
 
 export async function paginateExact<T>(params: PaginateExactParams<T>): Promise<T[]> {
-  const { count, concurrency = 10, fn, progress = noop, signal, cooldown } = params
+  const { count, concurrency = 10, fn, progress = noop, signal, cooldown, debugMode } = params
 
   const pages: (() => Promise<T[]>)[] = []
   const data: T[] = []
@@ -342,7 +358,9 @@ export async function paginateExact<T>(params: PaginateExactParams<T>): Promise<
         return result
       } catch (error) {
         if (String(error).includes("429")) throw error
-        await progress([undefined, `Warn: skipping ${i}. ${String(error)}`])
+        if (debugMode) {
+          await progress([undefined, `Warn: skipping ${i}. ${String(error)}`])
+        }
         return []
       }
     })
@@ -357,6 +375,7 @@ export async function paginateExact<T>(params: PaginateExactParams<T>): Promise<
       data.push(...result)
     }
   }
+  await progress([undefined, `Fetched ${data.length} records`])
 
   return data
 }

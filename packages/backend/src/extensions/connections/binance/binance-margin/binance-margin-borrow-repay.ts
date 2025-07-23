@@ -1,6 +1,6 @@
 import Big from "big.js"
 import { AuditLog, BinanceConnection, ParserResult, ResolutionString } from "src/interfaces"
-import { floorTimestamp } from "src/utils/utils"
+import { floorTimestamp, hashString } from "src/utils/utils"
 
 import { BinanceMarginLoanRepayment } from "../binance-api"
 import { BINANCE_WALLETS } from "../binance-settings"
@@ -11,13 +11,12 @@ export function parseLoan(
   connection: BinanceConnection
 ): ParserResult {
   const { platformId } = connection
-  const { asset, isolatedSymbol, principal, txId: id } = row
+  const { asset, isolatedSymbol, principal, txId: _txId } = row
   const wallet = isolatedSymbol ? BINANCE_WALLETS.isolatedMargin : BINANCE_WALLETS.crossMargin
   const timestamp = floorTimestamp(row.timestamp, "1S" as ResolutionString)
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${row.timestamp}`)
   }
-  const txId = `${connection.id}_${id}_binance`
   const importId = connection.id
   const importIndex = index
 
@@ -25,14 +24,17 @@ export function parseLoan(
 
   const incoming = principalBN.toFixed()
   const incomingAsset = `${platformId}:${asset}`
+  const operation = "Margin Loan"
+  const id = `${connection.id}_${hashString(`${incomingAsset}_${operation}_${incoming}`)}_${index}`
+
   const logs: AuditLog[] = [
     {
       assetId: incomingAsset,
       change: incoming as string,
       fileImportId: importId,
-      id: `${txId}_LOAN`,
+      id,
       importIndex,
-      operation: "Margin Loan",
+      operation,
       platformId,
       timestamp,
       wallet,
@@ -49,27 +51,28 @@ export function parseRepayment(
   connection: BinanceConnection
 ): ParserResult {
   const { platformId } = connection
-  const { amount, asset, isolatedSymbol, txId: id } = row
+  const { amount, asset, isolatedSymbol, txId: _txId } = row
   const wallet = isolatedSymbol ? BINANCE_WALLETS.isolatedMargin : BINANCE_WALLETS.crossMargin
   const timestamp = floorTimestamp(row.timestamp, "1S" as ResolutionString)
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${row.timestamp}`)
   }
-  const txId = `${connection.id}_${id}_binance`
+  const assetId = `${platformId}:${asset}`
   const importId = connection.id
   const importIndex = index
 
-  const amountBN = new Big(amount)
-  const outgoing = amountBN.toFixed()
-  const outgoingAsset = `${platformId}:${asset}`
+  const change = `-${amount}`
+  const operation = "Margin Repayment"
+  const id = `${connection.id}_${hashString(`${assetId}_${operation}_${change}`)}_${index}`
+
   const logs: AuditLog[] = [
     {
-      assetId: outgoingAsset,
-      change: `-${outgoing}` as string,
+      assetId,
+      change,
       fileImportId: importId,
-      id: `${txId}_Repayment`,
+      id,
       importIndex,
-      operation: "Margin Repayment",
+      operation,
       platformId,
       timestamp,
       wallet,

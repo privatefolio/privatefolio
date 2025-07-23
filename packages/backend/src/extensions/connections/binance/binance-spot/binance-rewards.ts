@@ -7,7 +7,7 @@ import {
   Transaction,
   TransactionType,
 } from "src/interfaces"
-import { floorTimestamp } from "src/utils/utils"
+import { floorTimestamp, hashString } from "src/utils/utils"
 
 import { BinanceReward } from "../binance-api"
 import { BINANCE_WALLETS } from "../binance-settings"
@@ -18,13 +18,12 @@ export function parseReward(
   connection: BinanceConnection
 ): ParserResult {
   const { platformId } = connection
-  const { amount, rewards, asset, positionId, projectId, time } = row
+  const { amount, rewards, asset, positionId: _positionId, projectId: _projectId, time } = row
   const wallet = BINANCE_WALLETS.spot
   const timestamp = floorTimestamp(time, "1S" as ResolutionString)
   if (isNaN(timestamp)) {
     throw new Error(`Invalid timestamp: ${time}`)
   }
-  const txId = `${connection.id}_${positionId || projectId}_binance`
   const type: TransactionType = "Reward"
   const importId = connection.id
   const importIndex = index
@@ -40,6 +39,11 @@ export function parseReward(
 
   const incoming = amountBN.toFixed()
   const incomingAsset = `${platformId}:${asset}`
+  const operation = "Reward"
+
+  const id = `${connection.id}_${hashString(`${incomingAsset}_${operation}_${incoming}`)}_${index}`
+  const txId = `${id}_TX`
+
   const logs: AuditLog[] = [
     {
       assetId: incomingAsset,
@@ -47,7 +51,7 @@ export function parseReward(
       fileImportId: importId,
       id: `${txId}_REWARD`,
       importIndex,
-      operation: "Reward",
+      operation,
       platformId,
       timestamp,
       txId,
