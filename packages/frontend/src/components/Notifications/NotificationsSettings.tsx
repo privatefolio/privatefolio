@@ -34,7 +34,7 @@ import { LearnMore } from "../LearnMore"
 import { LoadingButton } from "../LoadingButton"
 import { SectionTitle } from "../SectionTitle"
 
-export function NotificationsSettings(props) {
+export function NotificationsSettings() {
   const accountName = useStore($activeAccount)
   const connectionStatus = useStore($connectionStatus)
   const rpc = useStore($rpc)
