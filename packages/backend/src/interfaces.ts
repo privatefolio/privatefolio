@@ -1,3 +1,5 @@
+import type { PushSubscription } from "web-push"
+
 import type { BinancePair } from "./extensions/connections/binance/binance-api"
 import { BinanceWalletId } from "./extensions/connections/binance/binance-settings"
 import type {
@@ -793,6 +795,7 @@ export enum SubscriptionChannel {
   Tags = "tags",
   Trades = "trades",
   TradePnl = "trade-pnl",
+  Notifications = "notifications",
 }
 
 export type SubscriptionListener = (...args: unknown[]) => void
@@ -996,3 +999,26 @@ export interface ChatConversation {
 }
 
 export type BlockNumber = number
+
+export interface Notification {
+  createdAt: number
+  id: number
+  metadata?: Record<string, unknown>
+  /**
+   * 0 = unread, 1 = read, 2 = archived
+   */
+  status?: number
+  text: string
+  title: string
+}
+
+export type NewNotification = Omit<Notification, "id">
+
+export type PushSub = PushSubscription
+
+export interface PushDevice {
+  createdAt: number
+  deviceId: string
+  subscription: PushSub
+  userAgent?: string
+}

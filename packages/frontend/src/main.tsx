@@ -18,6 +18,7 @@ import { AnalyticsProvider } from "./AnalyticsProvider"
 import App from "./App"
 import { FileDownloadSnackbar } from "./components/FileDownloadSnackbar"
 import { ConfirmDialogProvider } from "./hooks/useConfirm"
+import { ServiceWorkerProvider } from "./ServiceWorkerProvider"
 import { ONE_DAY_CACHE } from "./settings"
 import { ThemeProvider } from "./ThemeProvider"
 import { isElectron } from "./utils/electron-utils"
@@ -47,39 +48,41 @@ const ReactQueryDevtools = lazy(() =>
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <Router future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
-    <PersistQueryClientProvider client={queryClient} persistOptions={{ maxAge, persister }}>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <ThemeProvider>
-          <ConfirmDialogProvider>
-            <KBarProvider
-              options={{
-                disableDocumentLock: true,
-                // enableHistory: true, does not do what I expected it to do
-                toggleShortcut: "/",
-              }}
-            >
-              <SnackbarProvider
-                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-                maxSnack={3}
-                // transitionDuration={{ enter: 225, exit: 195 }}
-                Components={{
-                  fileDownload: FileDownloadSnackbar,
+  <ServiceWorkerProvider>
+    <Router future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+      <PersistQueryClientProvider client={queryClient} persistOptions={{ maxAge, persister }}>
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <ThemeProvider>
+            <ConfirmDialogProvider>
+              <KBarProvider
+                options={{
+                  disableDocumentLock: true,
+                  // enableHistory: true, does not do what I expected it to do
+                  toggleShortcut: "/",
                 }}
-                action={(snackbarId) => (
-                  <IconButton onClick={() => closeSnackbar(snackbarId)} size="small">
-                    <CloseRounded fontSize="small" />
-                  </IconButton>
-                )}
               >
-                <App />
-              </SnackbarProvider>
-            </KBarProvider>
-            <AnalyticsProvider />
-          </ConfirmDialogProvider>
-        </ThemeProvider>
-      </LocalizationProvider>
-      {/* {isDevelopment && <ReactQueryDevtools />} */}
-    </PersistQueryClientProvider>
-  </Router>
+                <SnackbarProvider
+                  anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                  maxSnack={3}
+                  // transitionDuration={{ enter: 225, exit: 195 }}
+                  Components={{
+                    fileDownload: FileDownloadSnackbar,
+                  }}
+                  action={(snackbarId) => (
+                    <IconButton onClick={() => closeSnackbar(snackbarId)} size="small">
+                      <CloseRounded fontSize="small" />
+                    </IconButton>
+                  )}
+                >
+                  <App />
+                </SnackbarProvider>
+              </KBarProvider>
+              <AnalyticsProvider />
+            </ConfirmDialogProvider>
+          </ThemeProvider>
+        </LocalizationProvider>
+        {/* {isDevelopment && <ReactQueryDevtools />} */}
+      </PersistQueryClientProvider>
+    </Router>
+  </ServiceWorkerProvider>
 )

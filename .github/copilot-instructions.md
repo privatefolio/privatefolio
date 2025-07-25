@@ -1,1 +1,2 @@
+After making a change, don't bother to write tests, to compile or to build, unless explicitly asked.
 Make sure to read [AGENTS.md](/AGENTS.md) before making any changes.

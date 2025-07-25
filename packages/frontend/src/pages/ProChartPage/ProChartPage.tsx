@@ -1,4 +1,3 @@
-"use client"
 import { Box, Paper, Stack } from "@mui/material"
 import { animated, useSpring } from "@react-spring/web"
 import React, { useEffect, useState } from "react"
