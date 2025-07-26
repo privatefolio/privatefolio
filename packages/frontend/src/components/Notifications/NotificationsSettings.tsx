@@ -8,7 +8,6 @@ import {
   TabletMac,
 } from "@mui/icons-material"
 import {
-  Alert,
   Avatar,
   Box,
   IconButton,
@@ -44,7 +43,6 @@ export function NotificationsSettings(props) {
   const [isLoading, setIsLoading] = useState(true)
   const [isSendingTest, setIsSendingTest] = useState(false)
   const [isEnablingPush, setIsEnablingPush] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
@@ -53,10 +51,7 @@ export function NotificationsSettings(props) {
       rpc
         .getAllPushDevices(accountName)
         .then(setPushDevices)
-        .catch((err) => {
-          console.error("Failed to load push devices:", err)
-          setError("Failed to load devices")
-        })
+        .catch(console.error)
         .finally(() => setIsLoading(false))
     }
   }, [accountName, rpc, connectionStatus])
@@ -72,9 +67,8 @@ export function NotificationsSettings(props) {
         "This is a test notification from Privatefolio"
       )
       enqueueSnackbar("Test notification sent", { variant: "success" })
-    } catch (err) {
-      console.error("Failed to send test notification:", err)
-      setError("Failed to send test notification")
+    } catch (error) {
+      console.error("Failed to send test notification:", error)
       enqueueSnackbar("Failed to send test notification", { variant: "error" })
     } finally {
       setIsSendingTest(false)
@@ -121,11 +115,10 @@ export function NotificationsSettings(props) {
       setPushDevices(updatedDevices)
 
       enqueueSnackbar("Push notifications enabled", { variant: "success" })
-    } catch (err) {
-      console.error("Failed to enable push notifications:", err)
+    } catch (error) {
+      console.error("Failed to enable push notifications:", error)
       const errorMessage =
-        err instanceof Error ? err.message : "Failed to enable push notifications"
-      setError(errorMessage)
+        error instanceof Error ? error.message : "Failed to enable push notifications"
       enqueueSnackbar(`Error: ${errorMessage}`, { variant: "error" })
     } finally {
       setIsEnablingPush(false)
@@ -140,9 +133,8 @@ export function NotificationsSettings(props) {
         await rpc.removePushDevice(accountName, endpoint)
         setPushDevices((prev) => prev.filter((device) => device.subscription.endpoint !== endpoint))
         enqueueSnackbar("Push notifications disabled for device", { variant: "success" })
-      } catch (err) {
-        console.error("Failed to remove device:", err)
-        setError("Failed to remove device")
+      } catch (error) {
+        console.error("Failed to remove device:", error)
         enqueueSnackbar("Failed to remove device", { variant: "error" })
       }
     },
@@ -169,11 +161,6 @@ export function NotificationsSettings(props) {
   return (
     <>
       <Stack gap={1} alignItems="flex-start">
-        {error && (
-          <Alert severity="error" sx={{ marginBottom: 2 }} onClose={() => setError(null)}>
-            {error}
-          </Alert>
-        )}
         <Box sx={{ width: "100%" }}>
           <SectionTitle marginX={0.5} marginTop={0.5}>
             Devices
