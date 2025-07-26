@@ -27,7 +27,7 @@ import { getAccountWithAuditLogs } from "./audit-logs-api"
 import { getValue, setValue } from "./kv-api"
 import { enqueueTask } from "./server-tasks-api"
 
-const SCHEMA_VERSION = 2
+const SCHEMA_VERSION = 3
 
 export async function getAccountWithAssets(accountName: string) {
   const account = await getAccount(accountName)
@@ -46,7 +46,13 @@ export async function getAccountWithAssets(accountName: string) {
         favorite BOOLEAN
       );`)
   }
-  if (schemaVersion < 2) {
+  if (schemaVersion < 3) {
+    try {
+      await account.execute(sql`
+        ALTER TABLE assets ADD COLUMN favorite BOOLEAN;
+      `)
+    } catch {}
+
     await account.execute(sql`DROP VIEW IF EXISTS favorite_assets`)
     await account.execute(sql`
       CREATE VIEW favorite_assets AS
