@@ -31,3 +31,7 @@ pnpm-debug.log*
 # electron output
 out/
 resources/
+
+# expo
+.expo/
+expo-env.d.ts
