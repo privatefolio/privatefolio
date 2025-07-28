@@ -86,7 +86,7 @@ export async function upsertServerFiles(accountName: string, records: NewServerF
         id, name, description, scheduledAt, status, progress, startedAt, completedAt, deletedAt, metadata, createdBy
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       records.map((record) => [
-        record.id || null,
+        "id" in record ? record.id : null,
         record.name,
         record.description || null,
         record.scheduledAt,

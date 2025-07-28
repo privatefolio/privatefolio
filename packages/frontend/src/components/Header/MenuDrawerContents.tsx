@@ -26,43 +26,10 @@ import { LogoText } from "./LogoText"
 
 type MenuContentsProps = AppVerProps & PopoverToggleProps
 
-// interface BeforeInstallPromptEvent extends Event {
-//   prompt: () => Promise<void>
-//   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>
-// }
-
 export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
-  // const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null)
-  // // const isInstalled = useMediaQuery("(display-mode: standalone)")
-
-  // useEffect(() => {
-  //   const handleBeforeInstallPrompt = (e) => {
-  //     e.preventDefault()
-  //     setInstallPrompt(e as BeforeInstallPromptEvent)
-  //   }
-
-  //   window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
-
-  //   return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
-  // }, [])
-
-  // TODO8
-  // const promptInstall = () => {
-  //   if (installPrompt) {
-  //     installPrompt.prompt()
-  //     installPrompt.userChoice.then((choiceResult) => {
-  //       if (choiceResult.outcome === "accepted") {
-  //         console.log("User accepted the install prompt")
-  //       } else {
-  //         console.log("User dismissed the install prompt")
-  //       }
-  //       setInstallPrompt(null)
-  //     })
-  //   }
-  // }
-
   const activeAccountPath = useStore($activeAccountPath)
   const activeAccount = useStore($activeAccount)
+
   if (!activeAccount) return null
 
   return (
@@ -274,39 +241,6 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
           />
         </Stack>
         <Stack>
-          {/* <MenuItem
-            sx={{
-              "&:hover": {
-                color: "text.primary",
-              },
-              borderRadius: 0.5,
-              color: "text.secondary",
-              display: isInstalled ? "none" : "inline-flex",
-            }}
-            onClick={promptInstall}
-            aria-label="Install app"
-          >
-            <ListItemAvatar>
-              <DownloadRounded fontSize="small" />
-            </ListItemAvatar>
-            <ListItemText
-              primary={
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  Install app{" "}
-                  <Chip
-                    size="small"
-                    color="secondary"
-                    sx={{
-                      backgroundColor: "var(--mui-palette-secondary-main)",
-                      fontSize: "0.625rem",
-                      height: 18,
-                    }}
-                    label="Coming soon"
-                  />
-                </Stack>
-              }
-            />
-          </MenuItem> */}
           {/* <MenuItem
             onClick={() => {
               toggleOpen()

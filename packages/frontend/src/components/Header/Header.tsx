@@ -1,5 +1,3 @@
-"use client"
-
 import { AppBar, Container, Stack, Toolbar } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React from "react"
@@ -7,6 +5,7 @@ import { $activeAccount } from "src/stores/account-store"
 import { isLinux, isMac, isWindows } from "src/utils/electron-utils"
 
 import { CurrencySelector } from "../CurrencySelector"
+import { NotificationDropdown } from "../Notifications/NotificationDropdown"
 import { SearchBar } from "../SearchBar/SearchBar"
 import { TaskDropdown } from "../Tasks/TaskDropdown"
 import { NavigationMenu } from "./NavigationMenu"
@@ -55,6 +54,7 @@ export function Header() {
             <Stack direction="row" gap={1} alignItems="center" justifyContent="flex-end">
               <TaskDropdown />
               <CurrencySelector />
+              <NotificationDropdown />
               <SettingsButton />
             </Stack>
           </Stack>

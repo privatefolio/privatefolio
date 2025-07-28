@@ -21,7 +21,9 @@ import * as settings from "./account/settings-api"
 import * as tags from "./account/tags-api"
 import * as trades from "./account/trades-api"
 import * as transactions from "./account/transactions-api"
+//
 import * as accounts from "./accounts-api"
+import * as notifications from "./notifications-api"
 
 export const api = {
   ...analytics,
@@ -45,6 +47,7 @@ export const api = {
   ...tags,
   ...trades,
   ...settings,
+  ...notifications,
   ...platforms,
 } satisfies BackendApiShape
 

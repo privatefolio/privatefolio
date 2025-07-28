@@ -1,7 +1,12 @@
-import { GitHub, OpenInNew, Twitter } from "@mui/icons-material"
+import {
+  GitHub,
+  InstallDesktopRounded,
+  InstallMobileRounded,
+  OpenInNew,
+  Twitter,
+} from "@mui/icons-material"
 import {
   FormControlLabel,
-  Link as MuiLink,
   LinkProps,
   MenuItem,
   MenuItemProps,
@@ -10,14 +15,17 @@ import {
   Typography,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
+import { enqueueSnackbar } from "notistack"
 import React from "react"
 import { GIT_DATE } from "src/env"
+import { useInstallPwa } from "src/hooks/useInstallPwa"
 import { formatDate, formatHour } from "src/utils/formatting-utils"
 
 import { $debugMode, $telemetry, AppVerProps } from "../../stores/app-store"
 import { MonoFont } from "../../theme"
 import { AppLink } from "../AppLink"
 import { DiscordIcon } from "../DiscordIcon"
+import { LearnMore } from "../LearnMore"
 import { SectionTitle } from "../SectionTitle"
 import { ReducedMotion } from "./ReducedMotion"
 import { ThemeMode } from "./ThemeMode"
@@ -55,6 +63,8 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
   const debugMode = useStore($debugMode)
   const telemetry = useStore($telemetry)
 
+  const { isInstalled, promptInstall } = useInstallPwa()
+
   return (
     <Stack
       paddingX={2}
@@ -71,6 +81,65 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
       <div>
         <SectionTitle>Animations</SectionTitle>
         <ReducedMotion />
+      </div>
+      <div>
+        <SectionTitle>Apps</SectionTitle>
+        <LearnMore
+          title={
+            <>
+              Install the app as a progressive web app (PWA) for faster access and a native app-like
+              experience. It works offline and opens in its own window, just like a regular app.
+              <br />
+              <br />
+              If you wish the ability to create local accounts, you must download and install the
+              desktop app.
+              <br />
+              <br />
+              To install this PWA manually, on the right of the address bar, tap <b>More</b> and
+              then <b>Add to home screen</b>.
+            </>
+          }
+        >
+          <CustomLink
+            onClick={async () => {
+              if (isInstalled) {
+                enqueueSnackbar("App already installed", { variant: "info" })
+                return
+              }
+              try {
+                const success = await promptInstall()
+                if (success) {
+                  enqueueSnackbar("App installed", { variant: "success" })
+                }
+              } catch {
+                enqueueSnackbar("Failed to install app, try manual install", { variant: "error" })
+              }
+            }}
+          >
+            <InstallMobileRounded fontSize="small" />
+            <Typography variant="inherit" sx={{ fontSize: "1rem" }}>
+              Install as PWA
+            </Typography>
+          </CustomLink>
+        </LearnMore>
+        <LearnMore
+          title={
+            <>
+              Download and install the native desktop app if you wish to use the local accounts
+              feature.
+              <br />
+              <br />
+              Available on Windows, Mac and Linux.
+            </>
+          }
+        >
+          <CustomLink href="https://privatefolio.xyz/downloads">
+            <InstallDesktopRounded fontSize="small" />
+            <Typography variant="inherit" sx={{ fontSize: "1rem" }}>
+              Download the Desktop app
+            </Typography>
+          </CustomLink>
+        </LearnMore>
       </div>
       <div role="list" aria-labelledby="social-links">
         <SectionTitle id="social-links" role="listitem">
@@ -189,7 +258,7 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
         <MenuItem
           href="https://github.com/privatefolio/privatefolio/issues/new"
           role="listitem"
-          component={MuiLink}
+          component={AppLink}
           tabIndex={0}
           sx={{
             "&:hover": {

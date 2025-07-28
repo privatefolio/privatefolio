@@ -16,6 +16,8 @@ export const CACHE_LOCATION = `${DATA_LOCATION}/cache`
 export const SALT_FILE = `${AUTH_DATA_DIR}/.salt`
 export const HASH_FILE = `${AUTH_DATA_DIR}/.hash`
 export const JWT_SECRET_FILE = `${AUTH_DATA_DIR}/.jwtsecret`
+export const VAPID_PUBLIC_KEY_FILE = `${AUTH_DATA_DIR}/.vapid_public`
+export const VAPID_PRIVATE_KEY_FILE = `${AUTH_DATA_DIR}/.vapid_private`
 
 export const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",

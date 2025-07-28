@@ -12,7 +12,7 @@ const AppLink = forwardRef<HTMLAnchorElement, AppLinkProps>((props, ref) => {
 
   const isLocalLink = href && !(href.includes("http") || href.startsWith("mailto:"))
 
-  if (!href) return <Box ref={ref} {...rest} />
+  if (!href) return <Box ref={ref} onClick={onClick} {...rest} />
 
   if (isLocalLink) {
     return (

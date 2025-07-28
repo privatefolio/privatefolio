@@ -52,3 +52,33 @@ export function isInputFocused() {
 
   return false
 }
+
+export function formatUserAgent(ua?: string): string {
+  if (!ua) return "Unknown device"
+
+  // 1. Browser detection
+  const browserMatchers: [string, RegExp][] = [
+    ["Edge", /Edg(e|A|IOS)?\/\d+/i],
+    ["Opera", /OPR\/\d+/i],
+    ["Chrome", /Chrome\/\d+/i],
+    ["Safari", /Safari\/\d+/i],
+    ["Firefox", /Firefox\/\d+/i],
+    ["IE", /MSIE |Trident\//i],
+  ]
+  const rawBrowser = browserMatchers.find(([, re]) => re.test(ua))?.[0] || ua.split(" ")[0]
+
+  // 2. OS extraction
+  const osMatch = ua.match(/\(([^)]+)\)/)
+  let rawOs = osMatch ? osMatch[1].split(";")[0].trim() : "Unknown OS"
+
+  // 3. Simplify common OS strings
+  if (/Windows NT/i.test(rawOs)) rawOs = "Windows"
+  else if (/Mac OS X/i.test(rawOs)) rawOs = "macOS"
+  else if (/Android/i.test(rawOs)) rawOs = "Android"
+  else if (/iPhone|iPad|iPod/i.test(ua)) rawOs = "iOS"
+
+  // 4. Capitalize first letter, lowercase the rest
+  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()
+
+  return `${capitalize(rawBrowser)} on ${capitalize(rawOs)}`
+}

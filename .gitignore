@@ -31,3 +31,5 @@ pnpm-debug.log*
 # electron output
 out/
 resources/
+
+**/public/service-worker.js

@@ -7,7 +7,6 @@ import {
   DialogTitle,
   Stack,
   Tab,
-  tabsClasses,
   TextField,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
@@ -19,7 +18,7 @@ import { cloudEnabled, localServerEnabled } from "src/utils/environment-utils"
 import { $cloudRpc, $localRpc } from "src/workers/remotes"
 
 import { SectionTitle } from "../SectionTitle"
-import { Tabs } from "../Tabs"
+import { TabsAlt } from "../TabsAlt"
 
 interface AddAccountDialogProps {
   open: boolean
@@ -115,6 +114,7 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
     if (!cloudAvailable && accountType === "cloud") {
       return (
         <>
+          {/* TODO9 */}
           {/* <MuiLink component={Link} to="/cloud"> */}
           Login to PrivateCloud
           {/* </MuiLink>{" "} */} to start using the cloud.
@@ -132,43 +132,10 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
         </DialogTitle>
         <DialogContent sx={{ maxWidth: 360, minWidth: 360 }}>
           <Stack gap={2}>
-            <Tabs
-              variant="fullWidth"
-              // textColor="inherit"
-              value={accountType}
-              onChange={(event, newValue) => setAccountType(newValue)}
-              sx={(theme) => ({
-                background: "var(--mui-palette-background-default)",
-                borderRadius: 1,
-                margin: 0,
-                minHeight: "unset",
-                padding: 0.5,
-                [`& .${tabsClasses.indicator}`]: {
-                  background: "var(--mui-palette-background-paper)",
-                  backgroundImage: "var(--mui-overlays-2)",
-                  borderRadius: 0.5,
-                  height: "100%",
-                },
-                [`& .${tabsClasses.flexContainer}`]: {
-                  gap: 0.5,
-                },
-                [`& .${tabsClasses.flexContainer} > button`]: {
-                  borderRadius: 0.75,
-                  minHeight: 20,
-                  padding: 0.5,
-                  textTransform: "none !important",
-                  transition: theme.transitions.create("color"),
-                  willChange: "background",
-                  zIndex: 2,
-                },
-                [`& .${tabsClasses.flexContainer} > button:hover`]: {
-                  color: theme.palette.text.primary,
-                },
-              })}
-            >
+            <TabsAlt value={accountType} onChange={(event, newValue) => setAccountType(newValue)}>
               <Tab label="Local" value="local" />
               <Tab label="Cloud" value="cloud" />
-            </Tabs>
+            </TabsAlt>
             <div>
               <SectionTitle>Name</SectionTitle>
               <TextField

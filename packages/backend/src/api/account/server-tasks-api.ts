@@ -113,7 +113,7 @@ export async function upsertServerTasks(accountName: string, records: NewServerT
         id, name, description, priority, startedAt, completedAt, duration, errorMessage, trigger, status, createdAt, determinate, groupId
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       records.map((record) => [
-        record.id || null,
+        "id" in record ? record.id : null,
         record.name,
         record.description,
         record.priority,

@@ -1,11 +1,5 @@
 import Big from "big.js"
-import {
-  AuditLog,
-  BinanceConnection,
-  ParserResult,
-  ResolutionString,
-  TransactionType,
-} from "src/interfaces"
+import { AuditLog, BinanceConnection, ParserResult, ResolutionString } from "src/interfaces"
 import { floorTimestamp, hashString } from "src/utils/utils"
 
 import { BinanceTrade } from "../binance-api"
@@ -18,7 +12,7 @@ export function parseTrade(
 ): ParserResult {
   const { platformId } = connection
   const {
-    id: binanceId,
+    id: _binanceId,
     qty,
     commission,
     commissionAsset,
@@ -34,7 +28,7 @@ export function parseTrade(
     throw new Error(`Invalid timestamp: ${time}`)
   }
 
-  const type: TransactionType = "Swap"
+  // const type: TransactionType = "Swap"
   const importId = connection.id
   const importIndex = index
 

@@ -136,107 +136,111 @@ async function setupMetadataCronJob(accountName: string) {
 }
 
 async function setupSideEffects(accountName: string) {
-  console.log(getPrefix(accountName, true), `Migrating database tables.`)
-  await writeApi.migrateTables(accountName)
+  try {
+    console.log(getPrefix(accountName, true), `Migrating database tables.`)
+    await writeApi.migrateTables(accountName)
 
-  console.log(getPrefix(accountName, true), `Setting up side-effects.`)
+    console.log(getPrefix(accountName, true), `Setting up side-effects.`)
 
-  // Make sure the task queue is initialized
-  await writeApi.getServerTasks(accountName)
+    // Make sure the task queue is initialized
+    await writeApi.getServerTasks(accountName)
 
-  let nextTimestamp: Timestamp | undefined
+    let nextTimestamp: Timestamp | undefined
 
-  const handleAuditLogChange = async (
-    cause: EventCause,
-    oldestTimestamp?: Timestamp,
-    groupId?: string
-  ) => {
-    if (!nextTimestamp) nextTimestamp = oldestTimestamp
-    if (nextTimestamp > oldestTimestamp) nextTimestamp = oldestTimestamp
-    await handleAuditLogChangeDebounced(cause, nextTimestamp, groupId)
-    nextTimestamp = undefined
-  }
-
-  const handleAuditLogChangeDebounced = debounce(
-    async (cause, oldestTimestamp?: Timestamp, groupId?: string) => {
-      console.log(
-        getPrefix(accountName, true),
-        `Running side-effects (trigger by audit log changes).`
-      )
-      if (cause === EventCause.Updated) return
-
-      await writeApi.computeGenesis(accountName)
-      const lastTx = await writeApi.computeLastTx(accountName)
-
-      if (oldestTimestamp) {
-        let newCursor = floorTimestamp(oldestTimestamp, "1D" as ResolutionString) - ONE_DAY
-        if (lastTx === 0) newCursor = 0
-        await writeApi.invalidateBalances(accountName, newCursor)
-        await writeApi.invalidateNetworth(accountName, newCursor)
-        await writeApi.invalidateTrades(accountName, newCursor) // TESTME
-        await writeApi.invalidateTradePnl(accountName, newCursor) // TESTME
-      }
-
-      if (lastTx !== 0) {
-        if (cause === EventCause.Created) {
-          await writeApi.enqueueDetectSpamTransactions(accountName, "side-effect", groupId)
-          await writeApi.enqueueAutoMerge(accountName, "side-effect", groupId)
-        }
-
-        // when created or deleted
-        await writeApi.enqueueRefreshBalances(accountName, "side-effect", groupId)
-
-        if (cause === EventCause.Created) {
-          await writeApi.enqueueFetchPrices(accountName, "side-effect", groupId)
-        }
-        await writeApi.enqueueRefreshNetworth(accountName, "side-effect", groupId)
-        await writeApi.enqueueRefreshTrades(accountName, "side-effect", groupId)
-      }
-
-      const account = await getAccount(accountName)
-      account.eventEmitter.emit(SubscriptionChannel.Metadata)
-    },
-    SHORT_DEBOUNCE_DURATION,
-    {
-      leading: false,
-      maxWait: MAX_DEBOUNCE_DURATION,
-      trailing: true,
+    const handleAuditLogChange = async (
+      cause: EventCause,
+      oldestTimestamp?: Timestamp,
+      groupId?: string
+    ) => {
+      if (!nextTimestamp) nextTimestamp = oldestTimestamp
+      if (nextTimestamp > oldestTimestamp) nextTimestamp = oldestTimestamp
+      await handleAuditLogChangeDebounced(cause, nextTimestamp, groupId)
+      nextTimestamp = undefined
     }
-  )
-  const subId = await writeApi.subscribeToAuditLogs(accountName, proxy(handleAuditLogChange))
 
-  sideEffects[accountName] = subId
+    const handleAuditLogChangeDebounced = debounce(
+      async (cause, oldestTimestamp?: Timestamp, groupId?: string) => {
+        console.log(
+          getPrefix(accountName, true),
+          `Running side-effects (trigger by audit log changes).`
+        )
+        if (cause === EventCause.Updated) return
 
-  await setupNetworthCronJob(accountName)
-  await setupMetadataCronJob(accountName)
+        await writeApi.computeGenesis(accountName)
+        const lastTx = await writeApi.computeLastTx(accountName)
 
-  const networthIntervalSubId = await writeApi.subscribeToSettingsProperty(
-    accountName,
-    "networthRefreshInterval",
-    proxy(async () => {
-      console.log(
-        getPrefix(accountName, true),
-        `Networth refresh interval changed, refreshing cron job.`
-      )
-      await setupNetworthCronJob(accountName)
-    })
-  )
+        if (oldestTimestamp) {
+          let newCursor = floorTimestamp(oldestTimestamp, "1D" as ResolutionString) - ONE_DAY
+          if (lastTx === 0) newCursor = 0
+          await writeApi.invalidateBalances(accountName, newCursor)
+          await writeApi.invalidateNetworth(accountName, newCursor)
+          await writeApi.invalidateTrades(accountName, newCursor) // TESTME
+          await writeApi.invalidateTradePnl(accountName, newCursor) // TESTME
+        }
 
-  networthIntervalSubs[accountName] = networthIntervalSubId
+        if (lastTx !== 0) {
+          if (cause === EventCause.Created) {
+            await writeApi.enqueueDetectSpamTransactions(accountName, "side-effect", groupId)
+            await writeApi.enqueueAutoMerge(accountName, "side-effect", groupId)
+          }
 
-  const metadataIntervalSubId = await writeApi.subscribeToSettingsProperty(
-    accountName,
-    "metadataRefreshInterval",
-    proxy(async () => {
-      console.log(
-        getPrefix(accountName, true),
-        `Metadata refresh interval changed, refreshing cron job.`
-      )
-      await setupMetadataCronJob(accountName)
-    })
-  )
+          // when created or deleted
+          await writeApi.enqueueRefreshBalances(accountName, "side-effect", groupId)
 
-  metadataIntervalSubs[accountName] = metadataIntervalSubId
+          if (cause === EventCause.Created) {
+            await writeApi.enqueueFetchPrices(accountName, "side-effect", groupId)
+          }
+          await writeApi.enqueueRefreshNetworth(accountName, "side-effect", groupId)
+          await writeApi.enqueueRefreshTrades(accountName, "side-effect", groupId)
+        }
+
+        const account = await getAccount(accountName)
+        account.eventEmitter.emit(SubscriptionChannel.Metadata)
+      },
+      SHORT_DEBOUNCE_DURATION,
+      {
+        leading: false,
+        maxWait: MAX_DEBOUNCE_DURATION,
+        trailing: true,
+      }
+    )
+    const subId = await writeApi.subscribeToAuditLogs(accountName, proxy(handleAuditLogChange))
+
+    sideEffects[accountName] = subId
+
+    await setupNetworthCronJob(accountName)
+    await setupMetadataCronJob(accountName)
+
+    const networthIntervalSubId = await writeApi.subscribeToSettingsProperty(
+      accountName,
+      "networthRefreshInterval",
+      proxy(async () => {
+        console.log(
+          getPrefix(accountName, true),
+          `Networth refresh interval changed, refreshing cron job.`
+        )
+        await setupNetworthCronJob(accountName)
+      })
+    )
+
+    networthIntervalSubs[accountName] = networthIntervalSubId
+
+    const metadataIntervalSubId = await writeApi.subscribeToSettingsProperty(
+      accountName,
+      "metadataRefreshInterval",
+      proxy(async () => {
+        console.log(
+          getPrefix(accountName, true),
+          `Metadata refresh interval changed, refreshing cron job.`
+        )
+        await setupMetadataCronJob(accountName)
+      })
+    )
+
+    metadataIntervalSubs[accountName] = metadataIntervalSubId
+  } catch (error) {
+    console.error(getPrefix(accountName, true), `Error setting up side-effects:`, error)
+  }
 }
 
 await writeApi.subscribeToAccounts(

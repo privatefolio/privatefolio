@@ -25,7 +25,7 @@ const BASE_LOCAL_SERVER_URL =
     ? "localhost:5555"
     : isProduction
       ? `${window.location.hostname}:${window.location.port}` // self hosted
-      : "localhost:4001"
+      : `${window.location.hostname}:4001`
 const REMOTE_SERVER_URL = (cloudAccount: User) => `${cloudAccount.id}.privatefolio.app`
 
 function getWebSocketUrl(baseServerUrl: string, jwtKey: string): string {

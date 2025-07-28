@@ -8,7 +8,6 @@ import {
   InputAdornment,
   Stack,
   Tab,
-  tabsClasses,
   TextField,
 } from "@mui/material"
 import React, { FormEvent, useCallback, useState } from "react"
@@ -16,7 +15,7 @@ import { handleLogin, handleSignUp } from "src/stores/cloud-user-store"
 
 import { LogoText } from "../Header/LogoText"
 import { SectionTitle } from "../SectionTitle"
-import { Tabs } from "../Tabs"
+import { TabsAlt } from "../TabsAlt"
 
 export function CloudLoginForm() {
   const [form, setForm] = useState<"login" | "sign-up">("login")
@@ -100,43 +99,10 @@ export function CloudLoginForm() {
         </LogoText>
         <DialogContent sx={{ minWidth: 380 }}>
           <Stack gap={2}>
-            <Tabs
-              variant="fullWidth"
-              // textColor="inherit"
-              value={form}
-              onChange={(event, newValue) => setForm(newValue)}
-              sx={(theme) => ({
-                background: "var(--mui-palette-background-default)",
-                borderRadius: 1,
-                margin: 0,
-                minHeight: "unset",
-                padding: 0.5,
-                [`& .${tabsClasses.indicator}`]: {
-                  background: "var(--mui-palette-background-paper)",
-                  backgroundImage: "var(--mui-overlays-2)",
-                  borderRadius: 0.5,
-                  height: "100%",
-                },
-                [`& .${tabsClasses.flexContainer}`]: {
-                  gap: 0.5,
-                },
-                [`& .${tabsClasses.flexContainer} > button`]: {
-                  borderRadius: 0.75,
-                  minHeight: 20,
-                  padding: 0.5,
-                  textTransform: "none !important",
-                  transition: theme.transitions.create("color"),
-                  willChange: "background",
-                  zIndex: 2,
-                },
-                [`& .${tabsClasses.flexContainer} > button:hover`]: {
-                  color: theme.palette.text.primary,
-                },
-              })}
-            >
+            <TabsAlt value={form} onChange={(event, newValue) => setForm(newValue)}>
               <Tab label="Login" value="login" />
               <Tab label="Sign up" value="sign-up" />
-            </Tabs>
+            </TabsAlt>
             <div>
               <SectionTitle>Email</SectionTitle>
               <TextField

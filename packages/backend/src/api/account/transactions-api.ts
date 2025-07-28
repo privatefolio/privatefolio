@@ -39,10 +39,9 @@ export async function getAccountWithTransactions(accountName: string) {
   const account = await getAccount(accountName)
   if (!writesAllowed) return account
 
-  const schemaVersion = await getValue(accountName, `transactions_schema_version`, 0)
+  const schemaVersion = await getValue<number>(accountName, `transactions_schema_version`, 0)
 
-  if (schemaVersion < SCHEMA_VERSION) {
-    // Drop existing table to recreate with new schema
+  if (schemaVersion < 1) {
     await account.execute(sql`DROP TABLE IF EXISTS transactions`)
 
     await account.execute(sql`
@@ -76,7 +75,8 @@ export async function getAccountWithTransactions(accountName: string) {
         FOREIGN KEY (fileImportId) REFERENCES fileImports(id)
       );
     `)
-
+  }
+  if (schemaVersion !== SCHEMA_VERSION) {
     await setValue(accountName, `transactions_schema_version`, SCHEMA_VERSION)
   }
 

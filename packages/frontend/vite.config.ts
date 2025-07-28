@@ -14,9 +14,12 @@ export default defineConfig(({ mode }) => {
     console.warn("⚠️ Building for target:", env.VITE_TARGET)
   }
 
+  // const minify = true
+
   return {
     base: env.VITE_TARGET === "electron" ? "./" : "/",
     build: {
+      // minify,
       outDir: "build",
       rollupOptions: {
         output: {
@@ -25,6 +28,16 @@ export default defineConfig(({ mode }) => {
       },
       sourcemap: true,
     },
+    // TODO8
+    // Module "url" has been externalized for browser compatibility, imported by "/home/runner/work/privatefolio/privatefolio/node_modules/web-push/src/web-push-lib.js".
+    // define: {
+    //   // Define Node.js globals for browser compatibility
+    //   global: "globalThis",
+    // },
+    // optimizeDeps: {
+    //   // Exclude server-side dependencies from pre-bundling
+    //   exclude: ["web-push", "https-proxy-agent", "jws"],
+    // },
     plugins: [
       MillionLint.vite({
         enabled: false,

@@ -335,6 +335,18 @@ export const theme: CssVarsThemeOptions = {
         },
       },
     },
+    MuiBadge: {
+      variants: [
+        {
+          props: { color: "accent" },
+          style: {
+            "& .MuiBadge-badge": {
+              backgroundColor: "var(--mui-palette-accent-main)",
+            },
+          },
+        },
+      ],
+    },
     MuiButton: {
       styleOverrides: {
         // outlined: {
@@ -352,7 +364,7 @@ export const theme: CssVarsThemeOptions = {
           borderRadius: "32px",
           boxShadow: "unset !important",
           textTransform: "none",
-          transition: "none !important",
+          // transition: "none !important",
         },
         sizeSmall: {
           lineHeight: 1.2,
@@ -972,7 +984,7 @@ export const theme: CssVarsThemeOptions = {
   },
   typography: {
     caption: {
-      letterSpacing: "0.05rem",
+      fontWeight: 300,
     },
     fontFamily: MainFont,
   },
