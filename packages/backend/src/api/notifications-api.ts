@@ -19,7 +19,7 @@ import { AUTH_DATA_DIR, VAPID_PRIVATE_KEY_FILE, VAPID_PUBLIC_KEY_FILE } from "..
 import { getValue, setValue } from "./account/kv-api"
 import { getAccount } from "./accounts-api"
 
-type PayloadShape = {
+type WebPushPayloadShape = {
   options: NotificationOptions & {
     badge?: string
     data?: { url?: string }
@@ -33,6 +33,42 @@ type PayloadShape = {
 
 const APP_URL = "https://privatefolio.app"
 const SUBJECT = "https://privatefolio.app"
+
+const SCHEMA_VERSION = 3
+
+export async function getAccountWithNotifications(accountName: string) {
+  const account = await getAccount(accountName)
+  if (!writesAllowed) return account
+
+  await ensureVapidKeys()
+  await loadVapidKeys()
+
+  const schemaVersion = await getValue<number>(accountName, `notifications_schema_version`, 0)
+
+  if (schemaVersion < 3) {
+    await account.execute(sql`
+        CREATE TABLE IF NOT EXISTS notifications (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          title VARCHAR NOT NULL,
+          text TEXT NOT NULL,
+          createdAt INTEGER NOT NULL,
+          status INTEGER DEFAULT 0,
+          metadata JSON
+        );
+      `)
+
+    await account.execute(
+      sql`CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(createdAt DESC)`
+    )
+    await account.execute(
+      sql`CREATE INDEX IF NOT EXISTS idx_notifications_status ON notifications(status)`
+    )
+  }
+  if (schemaVersion !== SCHEMA_VERSION) {
+    await setValue(accountName, `notifications_schema_version`, SCHEMA_VERSION)
+  }
+  return account
+}
 
 async function storeVapidKeys(publicKey: string, privateKey: string) {
   try {
@@ -77,19 +113,24 @@ async function loadVapidKeys() {
   webpush.setVapidDetails(SUBJECT, vapidKeys.publicKey, vapidKeys.privateKey)
 }
 
-async function getPushDevices(accountName: string): Promise<PushDevice[]> {
+export async function getVapidPublicKey(): Promise<string | null> {
+  const keys = await ensureVapidKeys()
+  return keys.publicKey
+}
+
+export async function getPushDevices(accountName: string) {
   const pushDevicesJson = await getValue<string>(accountName, "push_devices", null)
   if (!pushDevicesJson) return []
 
   try {
-    return JSON.parse(pushDevicesJson)
+    return JSON.parse(pushDevicesJson) as PushDevice[]
   } catch (error) {
     console.error("Failed to parse push devices:", error)
     return []
   }
 }
 
-async function savePushDevices(accountName: string, devices: PushDevice[]): Promise<void> {
+async function savePushDevices(accountName: string, devices: PushDevice[]) {
   await setValue(accountName, "push_devices", JSON.stringify(devices))
 }
 
@@ -98,7 +139,7 @@ export async function addPushDevice(
   subscription: PushSub,
   deviceId: string,
   userAgent?: string
-): Promise<void> {
+) {
   await getAccountWithNotifications(accountName)
   const existingDevices = await getPushDevices(accountName)
 
@@ -117,7 +158,7 @@ export async function addPushDevice(
   await savePushDevices(accountName, updatedDevices)
 }
 
-export async function removePushDevice(accountName: string, endpoint: string): Promise<void> {
+export async function removePushDevice(accountName: string, endpoint: string) {
   await getAccountWithNotifications(accountName)
   const existingDevices = await getPushDevices(accountName)
 
@@ -128,40 +169,33 @@ export async function removePushDevice(accountName: string, endpoint: string): P
   await savePushDevices(accountName, filteredDevices)
 }
 
-/**
- * Send push notification to all devices
- */
-export async function sendPushNotification(
-  accountName: string,
-  notification: Notification
-): Promise<void> {
+async function pushNotification(accountName: string, notification: Notification): Promise<void> {
   await getAccountWithNotifications(accountName)
+
   const pushDevices = await getPushDevices(accountName)
   if (pushDevices.length === 0) {
     console.log("No push devices found")
     return
   }
 
-  const payload: PayloadShape = {
+  const payload: WebPushPayloadShape = {
     options: {
-      badge: "/icon-512x512.png",
+      badge: "/512x512.png",
       body: notification.text,
       data: { url: APP_URL },
-      icon: "/icon-512x512.png",
+      icon: "/512x512.png",
       tag: "General",
-      timestamp: notification.createdAt * 1000,
+      timestamp: notification.createdAt,
     },
     title: notification.title,
   }
 
   const payloadStr = JSON.stringify(payload)
 
-  // Send to all devices
   const sendPromises = pushDevices.map(({ subscription }) =>
     webpush.sendNotification(subscription, payloadStr).catch((error) => {
       console.error("Failed to send push notification:", error)
 
-      // If the subscription is invalid, remove it
       if (error.statusCode === 410 || error.statusCode === 404) {
         console.log(`Removing invalid subscription: ${subscription.endpoint}`)
         removePushDevice(accountName, subscription.endpoint).catch(console.error)
@@ -172,147 +206,22 @@ export async function sendPushNotification(
   await Promise.allSettled(sendPromises)
 }
 
-/**
- * Create and send a push notification
- */
-export async function createAndSendNotification(
+export async function createAndPushNotification(
   accountName: string,
   title: string,
   text: string,
   metadata?: Record<string, unknown>
-): Promise<void> {
+) {
   const newNotification: NewNotification = {
-    createdAt: Math.floor(Date.now() / 1000),
+    createdAt: Date.now(),
     metadata,
-    status: 0, // 0 = unread
+    status: 0,
     text,
     title,
   }
 
-  // Save to database first - this will return the notification with ID
-  const savedNotification = await upsertNewNotification(accountName, newNotification)
-
-  // Then send push notification
-  await sendPushNotification(accountName, savedNotification)
-}
-
-export async function getVapidPublicKey(): Promise<string | null> {
-  const keys = await ensureVapidKeys()
-  return keys.publicKey
-}
-
-/**
- * Checks if VAPID keys have been set up (both key files exist)
- */
-export async function isVapidSetupComplete(): Promise<boolean> {
-  try {
-    await Promise.all([access(VAPID_PUBLIC_KEY_FILE), access(VAPID_PRIVATE_KEY_FILE)])
-    return true
-  } catch {
-    return false
-  }
-}
-
-/**
- * Get all push devices (for management/debugging)
- */
-export async function getAllPushDevices(accountName: string): Promise<PushDevice[]> {
-  await getAccountWithNotifications(accountName)
-  return getPushDevices(accountName)
-}
-
-const SCHEMA_VERSION = 3
-
-export async function getAccountWithNotifications(accountName: string) {
-  const account = await getAccount(accountName)
-  if (!writesAllowed) return account
-
-  await ensureVapidKeys()
-  await loadVapidKeys()
-
-  const schemaVersion = await getValue(accountName, `notifications_schema_version`, 0)
-
-  if (schemaVersion < SCHEMA_VERSION) {
-    if (schemaVersion < 2) {
-      // Create notifications table (legacy schema)
-      await account.execute(sql`
-        CREATE TABLE IF NOT EXISTS notifications (
-          id VARCHAR PRIMARY KEY,
-          title VARCHAR NOT NULL,
-          text TEXT NOT NULL,
-          createdAt INTEGER NOT NULL,
-          isRead BOOLEAN DEFAULT FALSE,
-          metadata JSON
-        );
-      `)
-
-      await account.execute(
-        sql`CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(createdAt DESC)`
-      )
-      await account.execute(
-        sql`CREATE INDEX IF NOT EXISTS idx_notifications_read ON notifications(isRead)`
-      )
-    }
-
-    if (schemaVersion < 3) {
-      // Migrate to new schema with auto-increment ID and status field
-      await account.execute(sql`
-        CREATE TABLE IF NOT EXISTS notifications_new (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          title VARCHAR NOT NULL,
-          text TEXT NOT NULL,
-          createdAt INTEGER NOT NULL,
-          status INTEGER DEFAULT 0,
-          metadata JSON
-        );
-      `)
-
-      // Migrate existing data if notifications table exists
-      const tables = await account.execute(sql`
-        SELECT name FROM sqlite_master WHERE type='table' AND name='notifications';
-      `)
-
-      if (tables.length > 0) {
-        // Copy existing data, converting isRead to status
-        await account.execute(sql`
-          INSERT INTO notifications_new (title, text, createdAt, status, metadata)
-          SELECT title, text, createdAt, CASE WHEN isRead THEN 1 ELSE 0 END, metadata
-          FROM notifications
-          ORDER BY createdAt;
-        `)
-
-        // Drop old table
-        await account.execute(sql`DROP TABLE notifications;`)
-      }
-
-      // Rename new table
-      await account.execute(sql`ALTER TABLE notifications_new RENAME TO notifications;`)
-
-      await account.execute(
-        sql`CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(createdAt DESC)`
-      )
-      await account.execute(
-        sql`CREATE INDEX IF NOT EXISTS idx_notifications_status ON notifications(status)`
-      )
-    }
-
-    // Initialize default values if needed
-    const existingVapidKeys = await readVapidKeys()
-    if (!existingVapidKeys) {
-      // Could generate default VAPID keys here if desired
-      // const keys = await generateAndStoreVapidKeys()
-    }
-
-    const existingDevices = await getPushDevices(accountName)
-    if (existingDevices.length === 0) {
-      // Initialize with empty devices array
-      await savePushDevices(accountName, [])
-    }
-
-    await setValue(accountName, `notifications_schema_version`, SCHEMA_VERSION)
-  }
-
-  return account
+  const notification = await upsertNotification(accountName, newNotification)
+  await pushNotification(accountName, notification)
 }
 
 export async function getNotifications(
@@ -396,13 +305,6 @@ export async function upsertNotification(
   return results[0]
 }
 
-export async function upsertNewNotification(
-  accountName: string,
-  notification: NewNotification
-): Promise<Notification> {
-  return upsertNotification(accountName, notification)
-}
-
 export async function patchNotifications(
   accountName: string,
   ids: number[],
@@ -448,24 +350,6 @@ export async function countNotifications(
   }
 }
 
-/**
- * Mark all notifications as read
- */
-export async function markAllNotificationsAsRead(accountName: string): Promise<void> {
-  const account = await getAccountWithNotifications(accountName)
-  if (!writesAllowed) return
-
-  await account.execute(sql`UPDATE notifications SET status = 1 WHERE status = 0`)
-
-  // Trigger subscription for notifications updates
-  account.eventEmitter.emit(SubscriptionChannel.Notifications, EventCause.Updated, {
-    allRead: true,
-  })
-}
-
-/**
- * Subscribe to notification changes
- */
 export function subscribeToNotifications(accountName: string, callback: () => void) {
   return createSubscription(accountName, SubscriptionChannel.Notifications, callback)
 }

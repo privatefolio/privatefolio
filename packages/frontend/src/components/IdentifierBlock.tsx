@@ -1,5 +1,5 @@
 import { ArrowRightAltRounded, OpenInNew } from "@mui/icons-material"
-import { Box, Button, Chip, Link as MuiLink, Stack, Tooltip, Typography } from "@mui/material"
+import { Box, Button, Chip, Stack, Tooltip, Typography } from "@mui/material"
 import React, { ReactNode, useState } from "react"
 import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { MonoFont } from "src/theme"
@@ -136,12 +136,12 @@ export function IdentifierBlock(props: IdentifierBlockProps) {
           {mainElement}
         </Button>
       ) : href ? (
-        <MuiLink component={AppLink} href={href} underline="none">
+        <AppLink href={href} underline="none">
           <Stack direction="row" alignItems="center" gap={1}>
             {mainElement}
             {!isLocalLink ? <OpenInNew sx={{ height: "1rem !important" }} /> : <></>}
           </Stack>
-        </MuiLink>
+        </AppLink>
       ) : (
         <Box onClick={handleCopy} sx={{ cursor: "pointer" }}>
           {mainElement}

@@ -19,7 +19,7 @@ import {
   Tooltip,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import { useSnackbar } from "notistack"
+import { enqueueSnackbar } from "notistack"
 import React, { useCallback, useEffect, useState } from "react"
 import { type Notification, PushDevice, PushSub } from "src/interfaces"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
@@ -43,13 +43,12 @@ export function NotificationsSettings() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSendingTest, setIsSendingTest] = useState(false)
   const [isEnablingPush, setIsEnablingPush] = useState(false)
-  const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
     if (accountName && rpc) {
       setIsLoading(true)
       rpc
-        .getAllPushDevices(accountName)
+        .getPushDevices(accountName)
         .then(setPushDevices)
         .catch(console.error)
         .finally(() => setIsLoading(false))
@@ -61,7 +60,7 @@ export function NotificationsSettings() {
 
     setIsSendingTest(true)
     try {
-      await rpc.createAndSendNotification(
+      await rpc.createAndPushNotification(
         accountName,
         "Test Notification",
         "This is a test notification from Privatefolio"
@@ -73,7 +72,7 @@ export function NotificationsSettings() {
     } finally {
       setIsSendingTest(false)
     }
-  }, [accountName, rpc, enqueueSnackbar])
+  }, [accountName, rpc])
 
   const handleEnablePush = useCallback(async () => {
     if (!accountName || !rpc) return
@@ -110,8 +109,7 @@ export function NotificationsSettings() {
         navigator.userAgent
       )
 
-      // Refresh the devices List
-      const updatedDevices = await rpc.getAllPushDevices(accountName)
+      const updatedDevices = await rpc.getPushDevices(accountName)
       setPushDevices(updatedDevices)
 
       enqueueSnackbar("Push notifications enabled", { variant: "success" })
@@ -123,7 +121,7 @@ export function NotificationsSettings() {
     } finally {
       setIsEnablingPush(false)
     }
-  }, [accountName, rpc, deviceId, enqueueSnackbar])
+  }, [accountName, rpc, deviceId])
 
   const handleRemoveDevice = useCallback(
     async (endpoint: string) => {
@@ -138,7 +136,7 @@ export function NotificationsSettings() {
         enqueueSnackbar("Failed to remove device", { variant: "error" })
       }
     },
-    [accountName, rpc, enqueueSnackbar]
+    [accountName, rpc]
   )
 
   const getDeviceIcon = (userAgent?: string) => {
@@ -247,7 +245,7 @@ export function NotificationsSettings() {
             disabled={isSendingTest}
             loading={isSendingTest}
             loadingText="Sending test notification…"
-            startIcon={<BugReport />} // TODO9
+            startIcon={<BugReport />} // TODO8
           >
             Send test notification
           </LoadingButton>

@@ -325,7 +325,7 @@ export function NotificationsList(props: NotificationsListProps) {
                   >
                     <Typography variant="body1">{title}</Typography>
                     <Typography variant="caption" color="text.secondary" className="date">
-                      {formatDate(createdAt * 1000)}
+                      {formatDate(createdAt)}
                       <Badge
                         color="accent"
                         variant="dot"

@@ -1,6 +1,6 @@
 import { PropsWithChildren, useEffect } from "react"
 
-import { $pushSubscription, $serviceWorker } from "./stores/notifications-store"
+import { $serviceWorker } from "./stores/notifications-store"
 
 export function ServiceWorkerProvider({ children }: PropsWithChildren) {
   useEffect(() => {
@@ -11,11 +11,6 @@ export function ServiceWorkerProvider({ children }: PropsWithChildren) {
         .then((registration) => {
           console.log("ServiceWorker registered: ", !!registration)
           $serviceWorker.set(registration)
-          return registration.pushManager.getSubscription()
-        })
-        .then((subscription) => {
-          console.log("ServiceWorker subscription: ", !!subscription)
-          $pushSubscription.set(subscription)
         })
         .catch((registrationError) => {
           console.log("ServiceWorker registration failed")
