@@ -22,7 +22,7 @@ export function useInstallPwa() {
   }, [])
 
   const promptInstall = useCallback(async () => {
-    if (!installPrompt) return false
+    if (!installPrompt) throw new Error("Something went wrong")
 
     installPrompt.prompt()
     const choiceResult = await installPrompt.userChoice

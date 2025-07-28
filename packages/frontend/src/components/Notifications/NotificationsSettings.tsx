@@ -79,19 +79,16 @@ export function NotificationsSettings() {
 
     setIsEnablingPush(true)
     try {
-      // Request notification permission
       const permission = await Notification.requestPermission()
       if (permission !== "granted") {
         throw new Error("Notification permission denied")
       }
 
-      // Get VAPID public key
       const vapidPublicKey = await rpc.getVapidPublicKey()
       if (!vapidPublicKey) {
         throw new Error("VAPID public key not available")
       }
 
-      // Register service worker and get push subscription
       const serviceWorker = $serviceWorker.get()
       if (!serviceWorker) {
         throw new Error("Service worker not available")
@@ -109,9 +106,7 @@ export function NotificationsSettings() {
         navigator.userAgent
       )
 
-      const updatedDevices = await rpc.getPushDevices(accountName)
-      setPushDevices(updatedDevices)
-
+      await rpc.getPushDevices(accountName).then(setPushDevices)
       enqueueSnackbar("Push notifications enabled", { variant: "success" })
     } catch (error) {
       console.error("Failed to enable push notifications:", error)

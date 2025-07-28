@@ -102,9 +102,14 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
                 enqueueSnackbar("App already installed", { variant: "info" })
                 return
               }
-              const success = await promptInstall()
-              if (success) {
-                enqueueSnackbar("App installed", { variant: "success" })
+              try {
+                const success = await promptInstall()
+                if (success) {
+                  enqueueSnackbar("App installed", { variant: "success" })
+                }
+              } catch (error) {
+                console.error(error)
+                enqueueSnackbar("Failed to install app", { variant: "error" })
               }
             }}
           >
