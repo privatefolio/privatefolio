@@ -364,7 +364,7 @@ export const theme: CssVarsThemeOptions = {
           borderRadius: "32px",
           boxShadow: "unset !important",
           textTransform: "none",
-          transition: "none !important",
+          // transition: "none !important",
         },
         sizeSmall: {
           lineHeight: 1.2,
