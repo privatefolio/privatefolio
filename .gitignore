@@ -32,4 +32,8 @@ pnpm-debug.log*
 out/
 resources/
 
+# expo
+.expo/
+expo-env.d.ts
+
 **/public/service-worker.js

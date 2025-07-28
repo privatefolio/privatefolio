@@ -13,15 +13,17 @@
       "packages/*"
     ],
     "nohoist": [
-      "privatefolio-electron/**"
+      "privatefolio-electron/**",
+      "privatefolio-expo/**"
     ]
   },
   "packageManager": "yarn@1.22.22",
   "scripts": {
     "clean": "git clean -fxd",
     "build": "lerna run build",
-    "dev": "lerna run --parallel --stream dev --ignore=privatefolio-electron",
-    "dev:electron": "lerna run --parallel --stream dev",
+    "dev": "lerna run --parallel --stream dev --ignore=privatefolio-electron,privatefolio-expo",
+    "dev:electron": "lerna run --parallel --stream dev --ignore=privatefolio-expo",
+    "dev:expo": "lerna run --parallel --stream dev --ignore=privatefolio-electron",
     "test": "lerna run --parallel test",
     "test:ci": "lerna run --parallel test:ci",
     "check-types": "lerna run --parallel check-types",
