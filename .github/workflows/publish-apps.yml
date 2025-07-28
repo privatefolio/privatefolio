@@ -127,7 +127,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
           status: ${{ needs.build-and-publish.result == 'success' && 'Success' || 'Failure' }}
-          title: 'Publish Apps'
+          title: 'Publish Desktop Apps'
           description: |
             **Branch**: `${{ github.ref_name }}`
             **Commit**: `${{ github.sha }}`

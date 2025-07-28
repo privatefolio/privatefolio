@@ -12,6 +12,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "xyz.privatefolio.mobile",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon/foreground.png",
         "backgroundColor": "#ffffff"
