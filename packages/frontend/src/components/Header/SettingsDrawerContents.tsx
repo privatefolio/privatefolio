@@ -93,6 +93,10 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
               <br />
               If you wish the ability to create local accounts, you must download and install the
               desktop app.
+              <br />
+              <br />
+              To install this PWA manually, on the right of the address bar, tap <b>More</b> and
+              then <b>Add to home screen</b>.
             </>
           }
         >
@@ -107,9 +111,8 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
                 if (success) {
                   enqueueSnackbar("App installed", { variant: "success" })
                 }
-              } catch (error) {
-                console.error(error)
-                enqueueSnackbar("Failed to install app", { variant: "error" })
+              } catch {
+                enqueueSnackbar("Failed to install app, try manual install", { variant: "error" })
               }
             }}
           >

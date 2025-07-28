@@ -210,10 +210,8 @@ export function NotificationsSettings() {
           <LearnMore
             title={
               <>
-                Chrome users on Android may need to install the app before using this feature.
-                <br />
-                <br />
-                To install the app, go to TODO9 install button
+                Chrome users on Android may need to install the app before using this feature. Go to{" "}
+                <b>Device Settings</b> and click the <b>Install as PWA</b> button.
               </>
             }
           >

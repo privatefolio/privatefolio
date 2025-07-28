@@ -93,7 +93,6 @@ export function NotificationsList(props: NotificationsListProps) {
     threshold: 1,
   })
 
-  // Filter notifications based on the selected filter
   const filteredNotifications = useMemo(() => {
     return notifications.filter((notification) => {
       const status = notification.status ?? 0
