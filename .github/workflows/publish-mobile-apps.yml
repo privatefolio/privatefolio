@@ -1,0 +1,99 @@
+name: Publish Mobile Apps
+
+on:
+  push:
+    tags: ["*"]
+
+  workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
+
+permissions:
+  contents: write
+
+# Required secrets for mobile app publishing:
+# - EXPO_TOKEN: Expo authentication token for EAS CLI
+# - GOOGLE_SERVICE_ACCOUNT_KEY_PATH: Path to Google Service Account JSON key for Android
+# 
+# iOS publishing (commented out for now):
+# - APPLE_ID: Apple ID for iOS app submission
+# - ASC_APP_ID: App Store Connect app ID for iOS
+# - APPLE_TEAM_ID: Apple Developer Team ID
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build-and-publish-mobile:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://github.com/privatefolio/privatefolio/releases/tag/${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Cache yarn downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/yarn/v6
+          key: yarn-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
+          restore-keys: yarn-cache-${{ runner.os }}-
+
+      - name: Cache node_modules (root)
+        uses: actions/cache@v4
+        with:
+          path: ./node_modules
+          key: deps-root-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
+          restore-keys: deps-root-${{ runner.os }}-
+
+      - name: Cache node_modules (packages)
+        uses: actions/cache@v4
+        with:
+          path: ./packages/**/node_modules
+          key: deps-packages-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
+          restore-keys: deps-packages-${{ runner.os }}-
+
+      - name: Setup Expo CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build and Submit Mobile Apps
+        working-directory: packages/expo
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          # APPLE_ID: ${{ secrets.APPLE_ID }}
+          # ASC_APP_ID: ${{ secrets.ASC_APP_ID }}
+          # APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          GOOGLE_SERVICE_ACCOUNT_KEY_PATH: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY_PATH }}
+        # run: |
+        # echo "Building and submitting mobile apps..."
+        # yarn publish
+        run: |
+          echo "Building and submitting Android app..."
+          yarn build:android
+          yarn submit:android
+
+  notify:
+    needs: build-and-publish-mobile
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Discord
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
+          status: ${{ needs.build-and-publish-mobile.result == 'success' && 'Success' || 'Failure' }}
+          title: 'Publish Mobile Apps'
+          description: |
+            **Branch**: `${{ github.ref_name }}`
+            **Commit**: `${{ github.sha }}`
+            **Mobile Apps**: ${{ needs.build-and-publish-mobile.result }}
+          color: ${{ needs.build-and-publish-mobile.result == 'success' && '0x00FF00' || '0xFF0000' }} 
