@@ -4,6 +4,7 @@ import * as binance from "./binance"
 // import * as binanceSpot from "./binance-spot-history"
 import * as blockpit from "./blockpit"
 import * as coinmama from "./coinmama"
+import * as coinstats from "./coinstats"
 import * as etherscan from "./etherscan"
 import * as etherscanBlockRewards from "./etherscan-block-reward"
 import * as etherscanErc20 from "./etherscan-erc20"
@@ -27,6 +28,8 @@ export const HEADER_MATCHER: Record<string, string> = {
   [blockpit.HEADER]: blockpit.parserId,
   [etherscanBlockRewards.HEADER]: etherscanBlockRewards.parserId,
   [etherscanStakingWithdrawals.HEADER]: etherscanStakingWithdrawals.parserId,
+  [coinstats.HEADERS[0]]: coinstats.parserId,
+  [coinstats.HEADERS[1]]: coinstats.parserId,
 }
 
 export const PARSER_MATCHER: Record<string, CsvParser> = {
@@ -40,4 +43,5 @@ export const PARSER_MATCHER: Record<string, CsvParser> = {
   [blockpit.parserId]: blockpit,
   [etherscanBlockRewards.parserId]: etherscanBlockRewards,
   [etherscanStakingWithdrawals.parserId]: etherscanStakingWithdrawals,
+  [coinstats.parserId]: coinstats,
 }

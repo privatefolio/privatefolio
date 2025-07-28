@@ -469,6 +469,10 @@ export type BinanceConnection = Connection & {
   options: BinanceConnectionOptions
 }
 
+export type CoinstatsConnection = Connection & {
+  apiKey: string
+}
+
 export type ParserResult = { logs: AuditLog[]; txns?: Transaction[] }
 
 export type ParserRequirementType = "platform" | "asset" | "address" | "text"
