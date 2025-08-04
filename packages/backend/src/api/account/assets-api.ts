@@ -148,7 +148,7 @@ export async function getMyAssets(
         )
       }
       // search by symbol
-      if (!cachedAsset && ticker) {
+      if (!cachedAsset && ticker && !contract) {
         cachedAsset = cachedAssets.find((x) => getAssetTicker(x.id) === ticker)
       }
       return { ...cachedAsset, ...result }

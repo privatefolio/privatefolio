@@ -2,6 +2,8 @@ import { getAccount } from "src/api/accounts-api"
 import { allSubscriptions, appEventEmitter } from "src/api/internal"
 import { SubscriptionChannel, SubscriptionId, SubscriptionListener } from "src/interfaces"
 
+import { randomUUID } from "./utils"
+
 export async function createSubscription(
   accountName = "",
   channel: SubscriptionChannel,
@@ -13,7 +15,7 @@ export async function createSubscription(
   } else {
     appEventEmitter.on(channel, listener)
   }
-  const id = crypto.randomUUID() as SubscriptionId
+  const id = randomUUID() as SubscriptionId
   allSubscriptions.set(id, { accountName, channel, listener })
   // console.log("Created subscription", id, channel)
   return id

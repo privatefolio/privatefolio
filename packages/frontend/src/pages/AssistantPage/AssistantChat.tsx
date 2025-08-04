@@ -39,7 +39,7 @@ import { MenuItemWithTooltip } from "src/components/MenuItemWithTooltip"
 import { $activeAccount } from "src/stores/account-store"
 import { $assistantMode, $assistantModel } from "src/stores/device-settings-store"
 import { getFilterValueLabel } from "src/stores/metadata-store"
-import { extractRootUrl } from "src/utils/utils"
+import { extractRootUrl, randomUUID } from "src/utils/utils"
 import { $rest, $rpc } from "src/workers/remotes"
 
 import { ChatMessageToolbar } from "./ChatMessageToolbar"
@@ -124,7 +124,7 @@ export function AssistantChat() {
         if (existingConversationId) return existingConversationId
         searchParams.set("new", "true")
         setSearchParams(searchParams, { replace: true })
-        return window.crypto.randomUUID()
+        return randomUUID()
       })(),
     initialMessages,
   })

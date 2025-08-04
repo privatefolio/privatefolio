@@ -23,6 +23,8 @@ export const TRANSACTIONS_TYPES = [
   "Unwrap",
   "Wrap",
   "Approve",
+  "Stake",
+  "Unstake",
   "Gift",
   "Other",
 ] as const
@@ -122,6 +124,8 @@ export type AuditLogOperation =
   | "Unknown"
   | "Mint"
   | "Wrap"
+  | "Stake"
+  | "Unstake"
 
 export interface PlatformMetadata {
   extensionsIds?: string[]

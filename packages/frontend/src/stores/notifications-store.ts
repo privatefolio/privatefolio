@@ -1,4 +1,5 @@
 import { atom } from "nanostores"
+import { randomUUID } from "src/utils/utils"
 
 export const $serviceWorker = atom<ServiceWorkerRegistration | undefined>()
 
@@ -8,7 +9,7 @@ export function getDeviceId() {
   let deviceId = localStorage.getItem(DEVICE_ID_KEY)
 
   if (!deviceId) {
-    deviceId = crypto.randomUUID()
+    deviceId = randomUUID()
     localStorage.setItem(DEVICE_ID_KEY, deviceId)
   }
 

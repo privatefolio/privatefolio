@@ -6,7 +6,7 @@ import { ConfirmDialogContextType, useConfirm } from "src/hooks/useConfirm"
 import { ParserRequirement, ServerFile } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 import { handleRestoreRequest } from "src/utils/backup-utils"
-import { formatCamelCase } from "src/utils/utils"
+import { formatCamelCase, randomUUID } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 import { CircularSpinner } from "./CircularSpinner"
@@ -69,7 +69,7 @@ export function FileDrop(props: FileDropProps) {
 
   const handleFileImport = useCallback(
     async (fileRecord: ServerFile, parserContext: Record<string, unknown>) => {
-      const groupId = window.crypto.randomUUID()
+      const groupId = randomUUID()
       rpc.enqueueImportFile(activeAccount, "user", fileRecord.id, parserContext, groupId)
       onSuccess?.(groupId)
     },

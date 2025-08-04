@@ -48,7 +48,7 @@ export function parse(
   //
   const txId = `${fileImportId}_${validatorIndex}+${withdrawalIndex}_BEACON_${index}`
   const assetId = PLATFORMS_META[ETHEREUM_PLATFORM_ID].nativeAssetId as string as string
-  const operation: AuditLogOperation = "Deposit"
+  const operation: AuditLogOperation = "Unstake"
   const type: TransactionType = operation
 
   const incoming = amount

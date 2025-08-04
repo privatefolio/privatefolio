@@ -25,6 +25,7 @@ import { WalletInput } from "src/components/WalletInput"
 import { MANUAL_TX_TYPES, TransactionType } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 import { formatTicker, getAssetPlatform } from "src/utils/assets-utils"
+import { randomUUID } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 type AddTransactionDrawerProps = {
@@ -152,7 +153,7 @@ export function AddTransactionDrawer(props: AddTransactionDrawerProps) {
 
       setError(undefined)
       setLoading(true)
-      const groupId = window.crypto.randomUUID()
+      const groupId = randomUUID()
       rpc
         .addTransaction(tx, activeAccount, groupId)
         .then(() => {

@@ -33,7 +33,7 @@ export function parseStakingWithdrawal(
   const wallet = address
   const txId = `${connection.id}_${validatorIndex}+${withdrawalIndex}_BEACON_${index}`
   const assetId = PLATFORMS_META[platformId].nativeAssetId as string
-  const operation: AuditLogOperation = "Deposit"
+  const operation: AuditLogOperation = "Unstake"
   const type: TransactionType = operation
 
   const incoming = new Big(amountInGwei).div(1e9).toFixed()

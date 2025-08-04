@@ -13,6 +13,7 @@ import { writesAllowed } from "src/utils/environment-utils"
 import { saveFile } from "src/utils/file-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
+import { randomUUID } from "src/utils/utils"
 
 import { SubscriptionChannel } from "../../interfaces"
 import { getAccount } from "../accounts-api"
@@ -124,7 +125,7 @@ export async function upsertChatMessages(accountName: string, records: NewChatMe
         id, conversationId, role, message, timestamp, tokens, metadata, parts
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       records.map((record) => [
-        record.id || crypto.randomUUID(),
+        record.id || randomUUID(),
         record.conversationId,
         record.role,
         record.message,

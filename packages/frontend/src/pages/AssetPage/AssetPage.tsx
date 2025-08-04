@@ -9,7 +9,6 @@ import { AmountBlock } from "src/components/AmountBlock"
 import { BackButton } from "src/components/BackButton"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { NavTab } from "src/components/NavTab"
-import { PlatformBlock } from "src/components/PlatformBlock"
 import { QuoteAmountBlock } from "src/components/QuoteAmountBlock"
 import { QuoteCurrencyToggle } from "src/components/QuoteCurrencyToggle"
 import { SectionTitle } from "src/components/SectionTitle"
@@ -19,7 +18,7 @@ import { UserWalletIcon } from "src/components/UserWalletIcon"
 import { useAsset } from "src/hooks/useAsset"
 import { Balance } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
-import { getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
+import { getAssetTicker } from "src/utils/assets-utils"
 import { $rpc } from "src/workers/remotes"
 
 import { AssetAvatar } from "../../components/AssetAvatar"
@@ -154,12 +153,6 @@ export default function AssetPage() {
             "& > div": { minHeight: 51.45 },
           }}
         >
-          {getAssetPlatform(assetId) && getAssetPlatform(assetId) !== "coingecko" && (
-            <div>
-              <SectionTitle>Platform</SectionTitle>
-              <PlatformBlock id={getAssetPlatform(assetId)} />
-            </div>
-          )}
           {metadata && (
             <>
               <div>
@@ -257,7 +250,9 @@ export default function AssetPage() {
           {tab === "transactions" && <TransactionActions />}
           {tab === "audit-logs" && <AuditLogActions />}
         </Stack>
-        {tab === "details" && <AssetDetails metadata={metadata} isLoading={isLoading} />}
+        {tab === "details" && (
+          <AssetDetails assetId={assetId} metadata={metadata} isLoading={isLoading} />
+        )}
         {tab === "price-history" && <AssetPriceHistory asset={asset} />}
         {tab === "markets" && (
           <AssetMarketTable tickers={metadata?.tickers} isLoading={isLoading} />

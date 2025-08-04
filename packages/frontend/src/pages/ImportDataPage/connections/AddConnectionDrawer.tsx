@@ -33,7 +33,7 @@ import { $activeAccount } from "src/stores/account-store"
 import { $addressBook, addWalletToAddressBook } from "src/stores/metadata-store"
 import { MonoFont } from "src/theme"
 import { asUTC } from "src/utils/formatting-utils"
-import { resolveUrl } from "src/utils/utils"
+import { randomUUID, resolveUrl } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 import { SectionTitle } from "../../../components/SectionTitle"
@@ -193,7 +193,7 @@ export function AddConnectionDrawer(props: AddConnectionDrawerProps) {
       setLoading(true)
       try {
         const platformIds = platformId === "all" ? extension.platformIds! : [platformId]
-        const groupId = window.crypto.randomUUID()
+        const groupId = randomUUID()
 
         const connections = await rpc.upsertConnections(
           activeAccount,

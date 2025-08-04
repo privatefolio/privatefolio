@@ -330,153 +330,126 @@ describe("0x003dc file import", () => {
     expect(updates.join("\n")).toMatchInlineSnapshot(`
       "0,Fetching audit logs
       2.5,Processing 1025 audit logs
-      6,Found 45 asset groups (skipped 24 unlisted assets)
+      6,Found 33 asset groups (skipped 36 unlisted assets)
       6,Processed all trades for ETH
-      6,Processed all trades for INSP
       7,Processed all trades for DNT
       7,Processed all trades for MANA
-      8,Processed all trades for ANT
-      8,Processed all trades for GNT
-      8,Processed all trades for SWT
-      9,Processed all trades for INT
-      9,Processed all trades for BOOTY
-      10,Processed all trades for SAI
-      10,Processed all trades for WETH
-      11,Processed all trades for SAFE
-      11,Processed all trades for CETH
-      11,Processed all trades for DAI
-      12,Processed all trades for KICK
-      12,Processed all trades for CDAI
-      13,Processed all trades for TKN
-      13,Processed all trades for USDC
-      14,Processed all trades for FREE
-      14,Processed all trades for ADAI
-      14,Processed all trades for AUSDC
-      15,Processed all trades for REP
-      15,Processed all trades for MKR
-      16,Processed all trades for LRC
-      16,Processed all trades for GEN
-      16,Processed all trades for UNI
-      17,Processed all trades for YFI
-      17,Processed all trades for CRV
-      18,Processed all trades for CUNI
-      18,Processed all trades for AMKR
-      19,Processed all trades for COMP
-      19,Processed all trades for WBTC
-      19,Processed all trades for CWBTC
-      20,Processed all trades for PICKLE
-      20,Processed all trades for SLP
-      21,Processed all trades for MYST
-      21,Processed all trades for BADGER
-      22,Processed all trades for USDT
-      22,Processed all trades for 1INCH
+      8,Processed all trades for SAI
+      8,Processed all trades for WETH
+      9,Processed all trades for CETH
+      10,Processed all trades for DAI
+      10,Processed all trades for CDAI
+      11,Processed all trades for TKN
+      11,Processed all trades for USDC
+      12,Processed all trades for FREE
+      12,Processed all trades for ADAI
+      13,Processed all trades for AUSDC
+      14,Processed all trades for MKR
+      14,Processed all trades for LRC
+      15,Processed all trades for UNI
+      15,Processed all trades for YFI
+      16,Processed all trades for CRV
+      16,Processed all trades for CUNI
+      17,Processed all trades for AMKR
+      18,Processed all trades for COMP
+      18,Processed all trades for WBTC
+      19,Processed all trades for PICKLE
+      19,Processed all trades for MYST
+      20,Processed all trades for BADGER
+      20,Processed all trades for USDT
+      21,Processed all trades for 1INCH
       22,Processed all trades for SUSHI
-      23,Processed all trades for DIGG
+      22,Processed all trades for DIGG
       23,Processed all trades for 3CRV
-      24,Processed all trades for GTC
+      23,Processed all trades for GTC
       24,Processed all trades for GLM
       25,Processed all trades for YVYFI
       25,Setting trades cursor to Sep 20, 2022
-      25,Computed 97 trades
-      30,Computing PnL for 97 trades
+      25,Computed 82 trades
+      30,Computing PnL for 82 trades
       30,Processed trade #1 (Long 47.67419555637689 ETH)
-      31,Processed trade #2 (Long 777 INSP)
-      32,Processed trade #3 (Long 1910 DNT)
-      32,Processed trade #4 (Long 3067.671 MANA)
-      33,Processed trade #5 (Long 4005 ANT)
-      34,Processed trade #6 (Long 441 GNT)
-      34,Processed trade #7 (Long 98.2 SWT)
-      35,Processed trade #8 (Long 1156 INT)
-      36,Processed trade #9 (Long 1.104653023952661 BOOTY)
-      36,Processed trade #10 (Long 10.87060820937004 SAI)
-      37,Processed trade #11 (Long 1927.5 SAI)
-      38,Processed trade #12 (Long 9462.77 SAI)
-      38,Processed trade #13 (Long 8 WETH)
-      39,Processed trade #14 (Long 47 WETH)
-      40,Processed trade #15 (Long 2911 SAI)
-      40,Processed trade #16 (Long 47.60993124529113 WETH)
-      41,Processed trade #17 (Long 1 SAFE)
-      42,Processed trade #18 (Long 2250 SAI)
-      42,Processed trade #19 (Long 1300 SAI)
-      43,Processed trade #20 (Long 5144.247788224923 SAI)
-      44,Processed trade #21 (Long 2325 SAI)
-      44,Processed trade #22 (Long 1750 SAI)
-      45,Processed trade #23 (Long 675.84 SAI)
-      46,Processed trade #24 (Long 3075 SAI)
-      46,Processed trade #25 (Long 3760 SAI)
-      47,Processed trade #26 (Long 2098.99161694 CETH)
-      48,Processed trade #27 (Long 1000 SAI)
-      48,Processed trade #28 (Long 1000 SAI)
-      49,Processed trade #29 (Long 1000 SAI)
-      50,Processed trade #30 (Long 2750 SAI)
-      50,Processed trade #31 (Long 2520.9911048659155 DAI)
-      51,Processed trade #32 (Long 888888 KICK)
-      52,Processed trade #33 (Long 41035.42403614 CDAI)
-      52,Processed trade #34 (Long 995 SAI)
-      53,Processed trade #35 (Long 994.96892911 SAI)
-      54,Processed trade #36 (Long 994.96892911 DAI)
-      54,Processed trade #37 (Long 821.373092771901 DAI)
-      55,Processed trade #38 (Long 2000 DAI)
-      56,Processed trade #39 (Long 2839.5 DAI)
-      56,Processed trade #40 (Long 2145.86543802 TKN)
-      57,Processed trade #41 (Long 1571.469243 USDC)
-      58,Processed trade #42 (Long 10000 FREE)
-      58,Processed trade #43 (Long 6290.509641257626 ANT)
-      59,Processed trade #44 (Long 99.957818 USDC)
-      60,Processed trade #45 (Long 1680.3010012111763 ANT)
-      60,Processed trade #46 (Long 4430.2018948769455 ADAI)
-      61,Processed trade #47 (Long 4607.000118 AUSDC)
-      62,Processed trade #48 (Long 2497.72853867 CETH)
-      62,Processed trade #49 (Long 3906 DAI)
-      63,Processed trade #50 (Long 2146 DAI)
-      64,Processed trade #51 (Long 4436.296511716325 DAI)
-      64,Processed trade #52 (Long 4506.611832 USDC)
-      65,Processed trade #53 (Long 5794.773921 USDC)
-      66,Processed trade #54 (Long 5794.815104 USDC)
-      66,Processed trade #55 (Long 63.73917557521433 REP)
-      67,Processed trade #56 (Long 7.076083294896952 MKR)
-      68,Processed trade #57 (Long 5940.0227188854915 LRC)
-      68,Processed trade #58 (Long 1017.881923452677 DAI)
-      69,Processed trade #59 (Long 6676.20440269004 GEN)
-      70,Processed trade #60 (Long 400 UNI)
-      70,Processed trade #61 (Long 0.0970886 YFI)
-      71,Processed trade #62 (Long 0.046449260886212644 YFI)
-      72,Processed trade #63 (Long 2500 USDC)
-      72,Processed trade #64 (Long 500 CRV)
-      73,Processed trade #65 (Long 267.54314482231206 UNI)
-      74,Processed trade #66 (Long 2.150945835565699 MKR)
-      74,Processed trade #67 (Long 13322.70172601 CUNI)
-      75,Processed trade #68 (Long 2.150945835565699 AMKR)
-      76,Processed trade #69 (Long 6022.107825046159 DAI)
-      76,Processed trade #70 (Long 1.2853117351540768 COMP)
-      77,Processed trade #71 (Long 0.33333333 WBTC)
-      78,Processed trade #72 (Long 2511.22 USDC)
-      78,Processed trade #73 (Long 16.50923151 CWBTC)
-      79,Processed trade #74 (Long 17 PICKLE)
-      80,Processed trade #75 (Long 0.0508494402157599 YFI)
-      80,Processed trade #76 (Long 0.2127217809827348 SLP)
-      81,Processed trade #77 (Long 521.4366690830452 MYST)
-      82,Processed trade #78 (Long 42.85272155641802 BADGER)
-      82,Processed trade #79 (Long 0.25532646 WBTC)
-      83,Processed trade #80 (Long 1000 USDT)
-      84,Processed trade #81 (Long 746.7450104902583 1INCH)
-      84,Processed trade #82 (Long 0.2127217809827348 SLP)
-      85,Processed trade #83 (Long 21.374913152096518 SUSHI)
-      86,Processed trade #84 (Long 0.07052041880285556 YFI)
-      86,Processed trade #85 (Long 0.048925828 DIGG)
-      87,Processed trade #86 (Long 56.68907623690096 BADGER)
-      88,Processed trade #87 (Long 201.8817290386431 CRV)
-      88,Processed trade #88 (Long 136.0013233557136 3CRV)
-      89,Processed trade #89 (Long 2.15543784295425 MKR)
-      90,Processed trade #90 (Long 269.05019322329014 UNI)
-      90,Processed trade #91 (Long 0.0635 WBTC)
-      91,Processed trade #92 (Long 0.09370821 WBTC)
-      92,Processed trade #93 (Long 231.9853 GTC)
-      92,Processed trade #94 (Long 248.18304423451846 CRV)
-      93,Processed trade #95 (Long 17 PICKLE)
-      94,Processed trade #96 (Long 441 GLM)
-      95,Processed trade #97 (Long 0.001196905052533791 YVYFI)
-      95,Saving 97 records to disk
+      31,Processed trade #2 (Long 1910 DNT)
+      32,Processed trade #3 (Long 3067.671 MANA)
+      33,Processed trade #4 (Long 10.87060820937004 SAI)
+      33,Processed trade #5 (Long 1927.5 SAI)
+      34,Processed trade #6 (Long 9462.77 SAI)
+      35,Processed trade #7 (Long 8 WETH)
+      36,Processed trade #8 (Long 47 WETH)
+      37,Processed trade #9 (Long 2911 SAI)
+      37,Processed trade #10 (Long 47.60993124529113 WETH)
+      38,Processed trade #11 (Long 2250 SAI)
+      39,Processed trade #12 (Long 1300 SAI)
+      40,Processed trade #13 (Long 5144.247788224923 SAI)
+      41,Processed trade #14 (Long 2325 SAI)
+      41,Processed trade #15 (Long 1750 SAI)
+      42,Processed trade #16 (Long 675.84 SAI)
+      43,Processed trade #17 (Long 3075 SAI)
+      44,Processed trade #18 (Long 3760 SAI)
+      45,Processed trade #19 (Long 2098.99161694 CETH)
+      45,Processed trade #20 (Long 1000 SAI)
+      46,Processed trade #21 (Long 1000 SAI)
+      47,Processed trade #22 (Long 1000 SAI)
+      48,Processed trade #23 (Long 2750 SAI)
+      49,Processed trade #24 (Long 2520.9911048659155 DAI)
+      49,Processed trade #25 (Long 41035.42403614 CDAI)
+      50,Processed trade #26 (Long 995 SAI)
+      51,Processed trade #27 (Long 994.96892911 SAI)
+      52,Processed trade #28 (Long 994.96892911 DAI)
+      52,Processed trade #29 (Long 821.373092771901 DAI)
+      53,Processed trade #30 (Long 2000 DAI)
+      54,Processed trade #31 (Long 2839.5 DAI)
+      55,Processed trade #32 (Long 2145.86543802 TKN)
+      56,Processed trade #33 (Long 1571.469243 USDC)
+      56,Processed trade #34 (Long 10000 FREE)
+      57,Processed trade #35 (Long 99.957818 USDC)
+      58,Processed trade #36 (Long 4430.2018948769455 ADAI)
+      59,Processed trade #37 (Long 4607.000118 AUSDC)
+      60,Processed trade #38 (Long 2497.72853867 CETH)
+      60,Processed trade #39 (Long 3906 DAI)
+      61,Processed trade #40 (Long 2146 DAI)
+      62,Processed trade #41 (Long 4436.296511716325 DAI)
+      63,Processed trade #42 (Long 4506.611832 USDC)
+      64,Processed trade #43 (Long 5794.773921 USDC)
+      64,Processed trade #44 (Long 5794.815104 USDC)
+      65,Processed trade #45 (Long 7.076083294896952 MKR)
+      66,Processed trade #46 (Long 5940.0227188854915 LRC)
+      67,Processed trade #47 (Long 1017.881923452677 DAI)
+      68,Processed trade #48 (Long 400 UNI)
+      68,Processed trade #49 (Long 0.0970886 YFI)
+      69,Processed trade #50 (Long 0.046449260886212644 YFI)
+      70,Processed trade #51 (Long 2500 USDC)
+      71,Processed trade #52 (Long 500 CRV)
+      72,Processed trade #53 (Long 267.54314482231206 UNI)
+      72,Processed trade #54 (Long 2.150945835565699 MKR)
+      73,Processed trade #55 (Long 13322.70172601 CUNI)
+      74,Processed trade #56 (Long 2.150945835565699 AMKR)
+      75,Processed trade #57 (Long 6022.107825046159 DAI)
+      75,Processed trade #58 (Long 1.2853117351540768 COMP)
+      76,Processed trade #59 (Long 0.33333333 WBTC)
+      77,Processed trade #60 (Long 2511.22 USDC)
+      78,Processed trade #61 (Long 17 PICKLE)
+      79,Processed trade #62 (Long 0.0508494402157599 YFI)
+      79,Processed trade #63 (Long 521.4366690830452 MYST)
+      80,Processed trade #64 (Long 42.85272155641802 BADGER)
+      81,Processed trade #65 (Long 0.25532646 WBTC)
+      82,Processed trade #66 (Long 1000 USDT)
+      83,Processed trade #67 (Long 746.7450104902583 1INCH)
+      83,Processed trade #68 (Long 21.374913152096518 SUSHI)
+      84,Processed trade #69 (Long 0.07052041880285556 YFI)
+      85,Processed trade #70 (Long 0.048925828 DIGG)
+      86,Processed trade #71 (Long 56.68907623690096 BADGER)
+      87,Processed trade #72 (Long 201.8817290386431 CRV)
+      87,Processed trade #73 (Long 136.0013233557136 3CRV)
+      88,Processed trade #74 (Long 2.15543784295425 MKR)
+      89,Processed trade #75 (Long 269.05019322329014 UNI)
+      90,Processed trade #76 (Long 0.0635 WBTC)
+      91,Processed trade #77 (Long 0.09370821 WBTC)
+      91,Processed trade #78 (Long 231.9853 GTC)
+      92,Processed trade #79 (Long 248.18304423451846 CRV)
+      93,Processed trade #80 (Long 17 PICKLE)
+      94,Processed trade #81 (Long 441 GLM)
+      95,Processed trade #82 (Long 0.001196905052533791 YVYFI)
+      95,Saving 82 records to disk
       100,PnL computation completed"
     `)
   })
@@ -502,7 +475,7 @@ describe("0x003dc file import", () => {
         `../__snapshots__/0x003dc/balances-${i}.ts.snap`
       )
     }
-    expect(trades.length).toMatchInlineSnapshot(`97`)
+    expect(trades.length).toMatchInlineSnapshot(`82`)
     for (let i = 0; i < trades.length; i += 5) {
       await expect(trades.slice(i, i + 5)).toMatchFileSnapshot(
         `../__snapshots__/0x003dc/trades-${i}.ts.snap`

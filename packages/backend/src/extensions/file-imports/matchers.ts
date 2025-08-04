@@ -5,10 +5,10 @@ import * as binance from "./binance"
 import * as blockpit from "./blockpit"
 import * as coinmama from "./coinmama"
 import * as etherscan from "./etherscan"
-import * as etherscanBeaconWithdrawals from "./etherscan-beacon-withdrawals"
 import * as etherscanBlockRewards from "./etherscan-block-reward"
 import * as etherscanErc20 from "./etherscan-erc20"
 import * as etherscanInternal from "./etherscan-internal"
+import * as etherscanStakingWithdrawals from "./etherscan-staking-withdrawals"
 import * as mexc from "./mexc"
 import * as privatefolioTxns from "./privatefolio-transactions"
 
@@ -26,7 +26,7 @@ export const HEADER_MATCHER: Record<string, string> = {
   [etherscanErc20.HEADERS[1]]: etherscanErc20.parserId,
   [blockpit.HEADER]: blockpit.parserId,
   [etherscanBlockRewards.HEADER]: etherscanBlockRewards.parserId,
-  [etherscanBeaconWithdrawals.HEADER]: etherscanBeaconWithdrawals.parserId,
+  [etherscanStakingWithdrawals.HEADER]: etherscanStakingWithdrawals.parserId,
 }
 
 export const PARSER_MATCHER: Record<string, CsvParser> = {
@@ -39,5 +39,5 @@ export const PARSER_MATCHER: Record<string, CsvParser> = {
   [privatefolioTxns.parserId]: privatefolioTxns,
   [blockpit.parserId]: blockpit,
   [etherscanBlockRewards.parserId]: etherscanBlockRewards,
-  [etherscanBeaconWithdrawals.parserId]: etherscanBeaconWithdrawals,
+  [etherscanStakingWithdrawals.parserId]: etherscanStakingWithdrawals,
 }

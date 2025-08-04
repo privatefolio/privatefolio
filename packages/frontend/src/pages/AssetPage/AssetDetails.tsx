@@ -22,9 +22,11 @@ import { SectionTitle } from "src/components/SectionTitle"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { CoingeckoMetadataFull } from "src/interfaces"
 import { getBlockExplorerUrl, PlatformPrefix } from "src/settings"
+import { getAssetContract, getAssetPlatform } from "src/utils/assets-utils"
 import { formatWebsiteLink, noop } from "src/utils/utils"
 
 type AssetDetailsProps = {
+  assetId: string
   isLoading: boolean
   metadata?: CoingeckoMetadataFull
 }
@@ -32,7 +34,7 @@ type AssetDetailsProps = {
 const descriptionCharLimit = 500
 
 export function AssetDetails(props: AssetDetailsProps) {
-  const { metadata, isLoading } = props
+  const { metadata, isLoading, assetId } = props
 
   const isEmpty = !metadata
 
@@ -55,6 +57,18 @@ export function AssetDetails(props: AssetDetailsProps) {
       <Paper sx={{ paddingX: 2, paddingY: 1 }}>
         <Typography variant="body2" component="div">
           <Stack gap={2}>
+            {getAssetPlatform(assetId) && getAssetPlatform(assetId) !== "coingecko" && (
+              <div>
+                <SectionTitle>Platform</SectionTitle>
+                <PlatformBlock id={getAssetPlatform(assetId)} />
+              </div>
+            )}
+            {getAssetContract(assetId) && (
+              <div>
+                <SectionTitle>Contract Address</SectionTitle>
+                <IdentifierBlock id={getAssetContract(assetId)!} />
+              </div>
+            )}
             {metadata.links && (
               <div>
                 <SectionTitle>Links</SectionTitle>
