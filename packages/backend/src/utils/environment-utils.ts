@@ -3,7 +3,7 @@ const isNode = typeof process !== "undefined" && !!process.versions && !!process
 export const isWebWorker = isServer && !isNode
 export const isBunWorker = isNode && process.env.BUN_WORKER === "true"
 
-const runtime = !isServer
+export const runtime = !isServer
   ? "browser"
   : isWebWorker
     ? "web worker"

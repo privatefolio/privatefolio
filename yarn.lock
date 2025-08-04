@@ -11046,6 +11046,11 @@ posthog-js@^1.100.0:
     preact "^10.19.3"
     web-vitals "^4.2.4"
 
+posthog-node@^5.6.0:
+  version "5.6.0"
+  resolved "https://registry.yarnpkg.com/posthog-node/-/posthog-node-5.6.0.tgz#81c2848a553a03cc3ecf781ba67abda19390fc12"
+  integrity sha512-MVXxKmqAYp2cPBrN1YMhnhYsJYIu6yc6wumbHz1dbo67wZBf2WtMm67Uh+4VCrp07049qierWlxQqz1W5zGDeg==
+
 preact@^10.19.3:
   version "10.26.4"
   resolved "https://registry.yarnpkg.com/preact/-/preact-10.26.4.tgz#b514f4249453a4247c82ff6d1267d59b7d78f9f9"

@@ -15,6 +15,7 @@ import {
   Timestamp,
 } from "./interfaces"
 import { MAX_DEBOUNCE_DURATION, SHORT_DEBOUNCE_DURATION } from "./settings/settings"
+import { getServerId, Telemetry } from "./telemetry"
 import { ONE_DAY } from "./utils/formatting-utils"
 import { floorTimestamp, getCronExpression, getPrefix, isDevelopment } from "./utils/utils"
 
@@ -296,9 +297,13 @@ for (const accountName of accountNames) {
 await handleAccountsSideEffects()
 await startServer()
 
-process.on("SIGINT", () => {
+const serverId = await getServerId()
+const telemetry = new Telemetry(serverId)
+
+process.on("SIGINT", async () => {
   console.log("Shutting down server.")
   server.close()
   worker.terminate()
+  await telemetry.shutdown()
   process.exit()
 })
