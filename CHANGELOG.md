@@ -3,6 +3,12 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.37 - 2025/08/04
+
+### 🐛 Bug Fixes
+
+- Fix bug with `AppLink`
+
 ## v2.0.0-beta.36 - 2025/08/04
 
 ### 🐛 Bug Fixes
