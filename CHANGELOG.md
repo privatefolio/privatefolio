@@ -3,6 +3,18 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.36 - 2025/08/04
+
+### 🐛 Bug Fixes
+
+- Fix bug with `randomUUID()`
+
+## v2.0.0-beta.35 - 2025/07/28
+
+### 🐛 Bug Fixes
+
+- Fix bug in assets sql table
+
 ## v2.0.0-beta.34 - 2025/07/23
 
 ### 💡 Feature updates
