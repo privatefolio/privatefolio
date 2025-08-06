@@ -3,6 +3,7 @@
 import { expose } from "comlink"
 
 import { api } from "./api/api"
+import { logger } from "./logger"
 // import { api as rawApi } from "./api/api"
 
 // const api = new Proxy(rawApi, {
@@ -21,4 +22,4 @@ import { api } from "./api/api"
 // })
 
 expose(api)
-console.log("Bun worker initialized.")
+logger.info("Worker ready")

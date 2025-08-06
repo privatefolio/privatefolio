@@ -228,7 +228,7 @@ export function NotificationsList(props: NotificationsListProps) {
                   selected={filter === option.value}
                   onClick={() => handleFilterSelect(option.value)}
                 >
-                  <Stack direction="row" alignItems="center" spacing={1}>
+                  <Stack direction="row" alignItems="center" gap={1}>
                     <IconComponent fontSize="small" />
                     <Typography variant="body2">{option.label}</Typography>
                   </Stack>
@@ -260,7 +260,7 @@ export function NotificationsList(props: NotificationsListProps) {
               const IconComponent = action.icon
               return (
                 <MenuItem key={action.id} onClick={() => handleMoreActionSelect(action.id)}>
-                  <Stack direction="row" alignItems="center" spacing={1}>
+                  <Stack direction="row" alignItems="center" gap={1}>
                     <IconComponent fontSize="small" />
                     <Typography variant="body2">{action.label}</Typography>
                   </Stack>

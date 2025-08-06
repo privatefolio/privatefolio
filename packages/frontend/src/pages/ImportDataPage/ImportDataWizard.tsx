@@ -282,7 +282,10 @@ export function ImportDataWizard() {
                   },
                 })}
                 InputProps={{
-                  sx: { borderRadius: 3 },
+                  inputProps: {
+                    sx: { paddingTop: "0px !important" },
+                  },
+                  sx: { borderRadius: 3, paddingTop: "0px !important" },
                 }}
               />
               <Stack
@@ -355,7 +358,7 @@ export function ImportDataWizard() {
                           setSearchParams(searchParams)
                         }}
                       >
-                        <Stack direction="column" alignItems="center" spacing={1}>
+                        <Stack direction="column" alignItems="center" gap={1}>
                           <PlatformAvatar src={platform.image} alt={platform.name} size="medium" />
                           <Stack direction="row" alignItems="center" gap={0.5}>
                             <Typography
@@ -415,7 +418,7 @@ export function ImportDataWizard() {
                     setSearchParams(searchParams)
                   }}
                 >
-                  <Stack direction="column" alignItems="center" spacing={1}>
+                  <Stack direction="column" alignItems="center" gap={1}>
                     <ExtensionAvatar
                       src={extension.extensionLogoUrl}
                       alt={extension.extensionName}

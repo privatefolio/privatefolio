@@ -7,6 +7,7 @@ import {
   HomeRounded,
   ReceiptLong,
   SdStorageRounded,
+  Settings,
   TimelineRounded,
   Workspaces,
 } from "@mui/icons-material"
@@ -229,6 +230,15 @@ export const MenuDrawerContents = ({ toggleOpen }: MenuContentsProps) => {
             onClick={toggleOpen}
             shortcutKey="s"
             avatar={<CloudRounded />}
+          />
+          <NavMenuItem
+            value="settings"
+            to={`${activeAccountPath}/settings`}
+            label="Settings"
+            aria-label="Visit Settings"
+            onClick={toggleOpen}
+            shortcutKey="g"
+            avatar={<Settings />}
           />
           <NavMenuItem
             value="pro-chart"

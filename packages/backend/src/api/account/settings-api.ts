@@ -41,7 +41,7 @@ export async function subscribeToSettings(accountName: string, callback: () => v
 
 export async function subscribeToSettingsProperty(
   accountName: string,
-  property: string,
+  property: keyof Settings,
   callback: () => void
 ) {
   let currentPropertyValue = (await getSettings(accountName))[property]

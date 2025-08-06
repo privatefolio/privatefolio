@@ -48,23 +48,14 @@ function handleReadLogs(event: IpcMainEvent) {
   event.returnValue = logs
 }
 
-/**
- * Handles the get-backend-url event
- */
 function handleGetBackendUrl(event: IpcMainEvent) {
-  event.returnValue = `http://localhost:${backendManager.getPort()}`
+  event.returnValue = `localhost:${backendManager.getPort()}`
 }
 
-/**
- * Handles the is-backend-running event
- */
 function handleIsBackendRunning(event: IpcMainEvent) {
   event.returnValue = backendManager.isRunning()
 }
 
-/**
- * Handles the restart-backend event
- */
 async function handleRestartBackend() {
   console.log("Restarting backend server...")
 

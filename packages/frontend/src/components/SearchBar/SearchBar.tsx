@@ -547,9 +547,9 @@ export const SearchBar = () => {
       },
       {
         icon: <Bedtime fontSize="small" />,
-        id: "action-sleep-1s",
-        name: "Sleep 1s",
-        perform: () => rpc.enqueueSleep(activeAccount, 1, 0.1),
+        id: "action-sleep-5s",
+        name: "Sleep 5s",
+        perform: () => rpc.enqueueSleep(activeAccount, 5, 1, true),
         priority: 0,
         section: SECTIONS.actions,
       },

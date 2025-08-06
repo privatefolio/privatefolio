@@ -13,6 +13,7 @@ import {
   $localConnectionStatusText,
 } from "src/stores/account-store"
 import { $cloudRpcReady, $cloudServerInfo, $cloudUser } from "src/stores/cloud-user-store"
+import { backendUrl } from "src/utils/electron-utils"
 import { isProduction, isSecure, localServerEnabled } from "src/utils/environment-utils"
 
 import { $localAuth } from "../stores/auth-store"
@@ -22,7 +23,7 @@ const CLOUD_JWT_STORATE_KEY = "privatecloud_instance_jwt"
 
 const BASE_LOCAL_SERVER_URL =
   TARGET === "electron"
-    ? "localhost:5555"
+    ? backendUrl!
     : isProduction
       ? `${window.location.hostname}:${window.location.port}` // self hosted
       : `${window.location.hostname}:4001`

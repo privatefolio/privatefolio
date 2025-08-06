@@ -170,7 +170,14 @@ export function formatFileSize(bytes: number, longFormat = false) {
   })} ${sizes[i]}`
 }
 
+/**
+ * 1 day in seconds
+ */
 export const ONE_DAY_TIME = 24 * 60 * 60
+
+/**
+ * 1 day in milliseconds
+ */
 export const ONE_DAY = ONE_DAY_TIME * 1000
 
 /**

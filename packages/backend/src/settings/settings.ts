@@ -1,10 +1,8 @@
-import { isServer, isTestEnvironment } from "../utils/environment-utils"
+import { isServer } from "../utils/environment-utils"
 
 const DEFAULT_DATA_LOCATION = "./data"
-const DATA_LOCATION =
+export const DATA_LOCATION =
   isServer && process.env.DATA_LOCATION ? process.env.DATA_LOCATION : DEFAULT_DATA_LOCATION
-
-if (!isTestEnvironment) console.log(`Data location is "${DATA_LOCATION}"`)
 
 export const DATABASES_LOCATION = `${DATA_LOCATION}/databases`
 export const TASK_LOGS_LOCATION = `${DATA_LOCATION}/logs`
@@ -19,6 +17,7 @@ export const JWT_SECRET_FILE = `${AUTH_DATA_DIR}/.jwtsecret`
 export const VAPID_PUBLIC_KEY_FILE = `${AUTH_DATA_DIR}/.vapid_public`
 export const VAPID_PRIVATE_KEY_FILE = `${AUTH_DATA_DIR}/.vapid_private`
 export const SERVER_ID_FILE = `${AUTH_DATA_DIR}/.server-id`
+export const SERVER_DB_FILE = `${AUTH_DATA_DIR}/server.sqlite`
 
 export const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",

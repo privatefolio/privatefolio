@@ -1,7 +1,6 @@
 // import "./comlink-setup"
 
 import { Server, ServerWebSocket } from "bun"
-import chalk from "chalk"
 import { proxy } from "comlink"
 import { access } from "fs/promises"
 import { join } from "path"
@@ -23,6 +22,7 @@ import {
   FunctionInvocation,
   FunctionReference,
 } from "./backend-comms"
+import { logger } from "./logger"
 import { APP_VERSION } from "./server-env"
 import { corsHeaders } from "./settings/settings"
 import { extractJwt, verifyJwt } from "./utils/jwt-utils"
@@ -64,7 +64,7 @@ export class BackendServer<T extends BackendApiShape> {
     const authDisabled = this._authDisabled
     const kioskMode = this._kioskMode
     const writeApi = this.writeApi
-    console.log(`Server starting on port ${port}. Kiosk mode ${kioskMode ? "enabled" : "disabled"}`)
+    logger.info(`Starting server`, { kioskMode, port })
     this.server = Bun.serve({
       async fetch(request, server) {
         const { method } = request
@@ -110,13 +110,13 @@ export class BackendServer<T extends BackendApiShape> {
           if (payload) {
             isAuthenticated = true
           } else {
-            console.warn("Received invalid or expired authentication token.")
+            logger.warn("Received invalid or expired authentication token.")
           }
         }
 
         const protectedRoutes = ["/download", "/upload", "/assistant-chat"]
         if (!isAuthenticated && protectedRoutes.includes(pathname)) {
-          console.warn(`Blocked unauthenticated request to ${pathname}.`)
+          logger.warn(`Blocked unauthenticated request to ${pathname}.`)
           return new Response("Login or sign up to continue.", {
             headers: corsHeaders,
             status: 401,
@@ -158,7 +158,7 @@ export class BackendServer<T extends BackendApiShape> {
       port,
       websocket: {
         close() {
-          // console.log("Connection closed.")
+          // logger.info("Connection closed.")
         },
         message: async (
           socket: ServerWebSocket<{ isAuthenticated?: boolean; kioskMode?: boolean }>,
@@ -167,7 +167,7 @@ export class BackendServer<T extends BackendApiShape> {
           const { isAuthenticated, kioskMode } = socket.data
 
           if (!isAuthenticated && !kioskMode) {
-            console.warn("Connection denied: auth check failed.")
+            logger.warn("Connection denied: auth check failed.")
             socket.close(1008, "Unauthorized")
             return
           }
@@ -185,7 +185,7 @@ export class BackendServer<T extends BackendApiShape> {
 
           try {
             const { id, method, params, functionId } = request
-            // console.log("RPC: New request", request)
+            // logger.info("RPC: New request", request)
 
             const isReadMethod =
               method.startsWith("read") ||
@@ -230,29 +230,31 @@ export class BackendServer<T extends BackendApiShape> {
               try {
                 this.functionRegistry[functionId](...(params as unknown[]))
               } catch {
-                console.error(`Error invoking server function ${functionId}`)
+                logger.error(`Error invoking server function ${functionId}`)
               }
-              // console.log("Server function invocation result:", result)
+              // logger.info("Server function invocation result:", result)
               return
             }
 
             if (!this.readApi[method]) {
               response = { error: `API method not found: ${method}`, id, method }
             } else if (isReadMethod) {
-              // console.log(`Forwarding method ${method} to ${chalk.bold.blue("readApi")}`)
+              // logger.info(`Forwarding method ${method} to ${chalk.bold.blue("readApi")}`)
               const result = await this.readApi[method](...deserializedParams)
               response = { id, method, result }
             } else {
-              // console.log(`Forwarding method ${method} to ${chalk.bold.yellow("writeApi")}`)
+              // logger.info(`Forwarding method ${method} to ${chalk.bold.yellow("writeApi")}`)
               const result = await this.writeApi[method](...deserializedParams)
               response = { id, method, result }
             }
           } catch (error) {
-            console.warn(
-              `${chalk.yellow.bold("[warn]")} Failed to execute request "${request.method}" ${String(error)}`
-            )
+            logger.error(`Failed to execute request {requestMethod} {errorMessage}`, {
+              errorMessage: String(error),
+              requestMethod: request.method,
+              stackTrace: error.stack,
+            })
             if (error.message.includes("Worker has been terminated")) {
-              console.error("[error] Shutting down server due to invalid worker state")
+              logger.fatal("Shutting down server due to invalid worker state")
               this.server?.stop()
               this._requestShutdown?.()
               return
@@ -277,24 +279,15 @@ export class BackendServer<T extends BackendApiShape> {
             socket.close(1008, "Unauthorized")
             // return
           }
-          // console.log("Connection opened. ")
+          // logger.info("Connection opened. ")
         },
       },
     })
 
-    console.log(chalk.bold.green(`Server started on port ${this.server.port}.`))
-    console.log(
-      chalk.green("➜ "),
-      chalk.bold(`REST:`),
-      chalk.bold.blue(
-        `             http://localhost:${this.server.port}, http://localhost:${this.server.port}/info`
-      )
-    )
-    console.log(
-      chalk.green("➜ "),
-      chalk.bold(`WebSockets:`),
-      chalk.bold.blue(`         ws://localhost:${this.server.port}`)
-    )
+    logger.info(`Started server`, {
+      http: `http://localhost:${this.server.port}`,
+      ws: `ws://localhost:${this.server.port}`,
+    })
   }
 
   private writeApi?: T

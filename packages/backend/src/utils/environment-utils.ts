@@ -20,11 +20,4 @@ export const environment = isProduction ? "production" : isTestEnvironment ? "te
 
 export const useBunSqlite = isNode && process.env.BUN_SQL !== "false"
 
-if (!isTestEnvironment) {
-  console.log(`Backend runtime is ${runtime}`)
-  console.log(`Backend environment is ${environment}`)
-  console.log(`Sqlite implementation is ${useBunSqlite ? "bun" : "sqlite3"}`)
-  console.log(`Sqlite writes are ${writesAllowed ? "allowed" : "disallowed"}`)
-}
-
 export const isDebug = false

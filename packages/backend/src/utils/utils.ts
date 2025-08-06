@@ -1,4 +1,3 @@
-import chalk from "chalk"
 import {
   Blockchain,
   ChartData,
@@ -12,7 +11,6 @@ import {
 } from "src/interfaces"
 
 import { PlatformPrefix } from "../settings/platforms"
-import { isBunWorker } from "./environment-utils"
 import { formatDate } from "./formatting-utils"
 
 /**
@@ -142,18 +140,6 @@ export function parseProgressLog(logEntry: string): ProgressLog {
   const timestamp = new Date(isoDate).getTime()
   const progressUpdate = JSON.parse(logEntry.slice(25))
   return [timestamp, progressUpdate] satisfies ProgressLog
-}
-
-export function getPrefix(accountName: string, isCron = false): string {
-  if (isCron) return chalk.green(`[${accountName}]`)
-  if (isBunWorker) return `[${accountName}]`
-
-  return chalk.gray(`[${accountName}]`)
-  // return `${isBunWorker ? "[writeApi]" : "[readApi] "} [${accountName}]`
-  // return (
-  //   chalk.bold.magenta(`[${accountName}]`) +
-  //   (isBunWorker ? chalk.bold.yellow("[writeApi]") : chalk.bold.blue("[readApi]"))
-  // )
 }
 
 export const isExchange = (x: Platform): x is Exchange => x.id.startsWith(PlatformPrefix.Exchange)
