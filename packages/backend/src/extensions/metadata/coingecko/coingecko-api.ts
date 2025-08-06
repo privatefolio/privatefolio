@@ -37,7 +37,6 @@ export async function getFullMetadata(coingeckoId: string): Promise<CoingeckoMet
       // safely assume its a cors error due to rate limit
       throw new Error("429: Rate limited")
     }
-    // console.error(error)
     throw error
   }
 }
@@ -64,7 +63,6 @@ export async function getFullExchangeMetadata(
       // safely assume its a cors error due to rate limit
       throw new Error("429: Rate limited")
     }
-    // console.error(error)
     throw error
   }
 }

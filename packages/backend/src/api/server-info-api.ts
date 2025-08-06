@@ -1,4 +1,5 @@
 import { SystemInfo } from "src/interfaces"
+import { logAndReportError } from "src/utils/error-utils"
 import { createSystemInfo } from "src/utils/server-utils"
 
 import { getServerValue, setServerValue } from "./server-kv-api"
@@ -12,7 +13,7 @@ export async function getSystemInfo(): Promise<SystemInfo | null> {
   try {
     return JSON.parse(systemInfoJson) as SystemInfo
   } catch (error) {
-    console.error("Failed to parse system info:", error)
+    logAndReportError(error, "Failed to parse system info")
     return null
   }
 }

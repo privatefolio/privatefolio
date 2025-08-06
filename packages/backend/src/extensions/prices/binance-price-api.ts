@@ -118,7 +118,6 @@ export async function queryPrices(request: QueryRequest) {
       // safely assume its a cors error due to coin not found
       throw new Error(`Binance: UnknownError: ${String(error)}`)
     }
-    // console.error(error)
     throw error
   }
 }

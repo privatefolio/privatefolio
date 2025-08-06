@@ -3,6 +3,7 @@ import { binanceConnExtension } from "src/extensions/connections/binance/binance
 import { etherscanConnExtension } from "src/extensions/connections/etherscan/etherscan-settings"
 import { SqlParam, TaskCompletionCallback } from "src/interfaces"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { formatDate } from "src/utils/formatting-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
@@ -201,8 +202,11 @@ export async function upsertConnections(accountName: string, records: NewConnect
 export async function upsertConnection(accountName: string, record: NewConnection) {
   const results = await upsertConnections(accountName, [record])
   if (results.length === 0) {
-    console.error("Failed to upsert connection", record.platformId)
-    throw new Error("Failed to upsert connection")
+    const error = new Error("Failed to upsert connection")
+    logAndReportError(error, `Failed to upsert connection`, {
+      platformId: record.platformId,
+    })
+    throw error
   }
   return results[0]
 }

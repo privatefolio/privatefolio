@@ -6,6 +6,7 @@ import {
   isTestEnvironment,
   writesAllowed,
 } from "src/utils/environment-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { ensureActiveAccount, isReadQuery } from "src/utils/sql-utils"
 
 export type SQLiteCompatibleType = boolean | string | number | null | Uint8Array
@@ -63,7 +64,9 @@ export async function createQueryExecutor(
       }
       return rows
     } catch (error) {
-      if (!isTestEnvironment && writesAllowed) console.error(error, query)
+      if (!isTestEnvironment && writesAllowed) {
+        logAndReportError(error, "Failed to execute query", { query })
+      }
       throw new Error(`Failed to execute query: ${query}, error: ${error}`)
     }
   }

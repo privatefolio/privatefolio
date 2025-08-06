@@ -3,6 +3,7 @@ import path from "path"
 import { ServerLog, SubscriptionChannel } from "src/interfaces"
 import { SERVER_LOGS_LOCATION } from "src/settings/settings"
 import { stripAnsi } from "src/utils/ansi-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { createSubscription } from "src/utils/sub-utils"
 
 import { appEventEmitter } from "../internal"
@@ -105,7 +106,7 @@ export async function queryServerLogs(
       // If the specific day's log file doesn't exist, return empty results
       return [[], 0]
     }
-    console.error(`Failed to read server log from ${logFilePath}:`, error)
+    logAndReportError(error, `Failed to read server log`, { logFilePath })
     throw error
   }
 }

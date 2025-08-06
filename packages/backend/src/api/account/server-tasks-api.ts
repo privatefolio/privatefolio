@@ -189,7 +189,7 @@ function createProgressCallback(account: Account, taskId: number): ProgressCallb
       // emit event
       account.eventEmitter.emit(SubscriptionChannel.ServerTaskProgress, taskId, logEntry)
     } catch (error) {
-      // console.error("Failed to log progress update to file:", error)
+      logAndReportError(error, "Failed to log progress update")
     }
   }
 }

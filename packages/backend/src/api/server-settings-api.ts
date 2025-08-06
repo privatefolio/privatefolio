@@ -1,4 +1,5 @@
 import { SubscriptionChannel } from "src/interfaces"
+import { logAndReportError } from "src/utils/error-utils"
 import { ONE_DAY_MIN } from "src/utils/formatting-utils"
 
 import { appEventEmitter } from "./internal"
@@ -24,7 +25,7 @@ export async function getServerSettings(): Promise<ServerSettings> {
     const savedSettings = JSON.parse(settingsJson) as ServerSettings
     return Object.assign({}, DEFAULT_SERVER_SETTINGS, savedSettings)
   } catch (error) {
-    console.error("Failed to parse server settings:", error)
+    logAndReportError(error, "Failed to read server settings")
     return DEFAULT_SERVER_SETTINGS
   }
 }
