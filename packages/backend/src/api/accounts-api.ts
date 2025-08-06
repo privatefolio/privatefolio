@@ -14,6 +14,7 @@ import { logger } from "src/logger"
 import { DATABASES_LOCATION, FILES_LOCATION, TASK_LOGS_LOCATION } from "src/settings/settings"
 import { createSqliteDatabaseConnection } from "src/sqlite/sqlite"
 import { isTestEnvironment, writesAllowed } from "src/utils/environment-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { safeRemove } from "src/utils/file-utils"
 import { ensureActiveAccount, isMarkedForDeletion, sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
@@ -226,7 +227,7 @@ export async function deleteAccount(accountName: string, keepAccount = false) {
     await account.close()
     await deleteUserData(accountName)
   } catch (error) {
-    account.logger.error("Failed to delete user data", { error })
+    logAndReportError(error, "Failed to delete user data", {}, account.logger)
   }
 
   if (!isTestEnvironment) account.logger.info("Deleted account")

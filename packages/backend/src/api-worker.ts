@@ -1,5 +1,7 @@
 // import "./comlink-setup"
 
+import "./error-catcher"
+
 import { expose } from "comlink"
 
 import { api } from "./api/api"

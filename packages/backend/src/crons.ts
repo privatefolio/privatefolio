@@ -5,6 +5,7 @@ import { getAccount } from "./api/accounts-api"
 import { Api } from "./api/api"
 import { SubscriptionId } from "./interfaces"
 import { logger } from "./logger"
+import { logAndReportError } from "./utils/error-utils"
 import { getCronExpression, isProduction } from "./utils/utils"
 
 /**
@@ -69,7 +70,7 @@ export async function setupNetworthCronJob(accountName: string, writeApi: Api) {
     })
     networthCronJobs[accountName] = cronJob
   } catch (error) {
-    account.logger.error(`Error setting up networth cron job:`, { error })
+    logAndReportError(error, "Error creating cron-job for networth", {}, account.logger)
   }
 }
 
@@ -97,7 +98,7 @@ export async function setupMetadataCronJob(accountName: string, writeApi: Api) {
     })
     metadataCronJobs[accountName] = cronJob
   } catch (error) {
-    account.logger.error(`Error setting up metadata cron job:`, { error })
+    logAndReportError(error, "Error creating cron-job for metadata", {}, account.logger)
   }
 }
 
@@ -172,7 +173,7 @@ export async function setupServerHealthCronJob(writeApi: Api) {
       await writeApi.monitorServerHealth()
     })
   } catch (error) {
-    logger.error(`Error setting up server health cron job:`, { error })
+    logAndReportError(error, "Error creating cron-job for server health")
   }
 }
 
@@ -195,6 +196,6 @@ export async function setupSystemInfoCronJob(writeApi: Api) {
       await writeApi.refreshSystemInfo()
     })
   } catch (error) {
-    logger.error(`Error setting up system info cron job:`, { error })
+    logAndReportError(error, "Error creating cron-job for system info")
   }
 }

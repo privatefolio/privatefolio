@@ -10,7 +10,7 @@ import {
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { enqueueSnackbar } from "notistack"
-import { ONE_DAY_TIME } from "privatefolio-backend/src/utils/formatting-utils"
+import { ONE_DAY_MIN } from "privatefolio-backend/src/utils/formatting-utils"
 import React, { MouseEvent, useEffect, useState } from "react"
 import { DefaultErrorMessage } from "src/components/DefaultErrorMessage"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
@@ -37,9 +37,9 @@ const HEALTH_METRICS_INTERVALS = [
 
 // Predefined system info refresh interval options in minutes
 const SYSTEM_INFO_INTERVALS = [
-  { label: "1 day", value: ONE_DAY_TIME },
-  { label: "7 days", value: 7 * ONE_DAY_TIME },
-  { label: "30 days", value: 30 * ONE_DAY_TIME },
+  { label: "1 day", value: ONE_DAY_MIN },
+  { label: "7 days", value: 7 * ONE_DAY_MIN },
+  { label: "30 days", value: 30 * ONE_DAY_MIN },
 ]
 
 export function ServerSettings() {

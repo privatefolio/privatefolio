@@ -12,7 +12,7 @@ import {
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { enqueueSnackbar } from "notistack"
-import { ONE_DAY_TIME } from "privatefolio-backend/src/utils/formatting-utils"
+import { ONE_DAY_MIN } from "privatefolio-backend/src/utils/formatting-utils"
 import React, { MouseEvent, useEffect, useState } from "react"
 import { DefaultErrorMessage } from "src/components/DefaultErrorMessage"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
@@ -35,14 +35,14 @@ const REFRESH_INTERVALS = [
   { label: "5 min", value: 5 },
   { label: "1 hour", value: 60 },
   { label: "4 hours", value: 240 },
-  { label: "1 day", value: ONE_DAY_TIME },
+  { label: "1 day", value: ONE_DAY_MIN },
 ]
 
 // Predefined refresh interval options in minutes
 const METADATA_REFRESH_INTERVALS = [
-  { label: "1 day", value: ONE_DAY_TIME },
-  { label: "7 days", value: 7 * ONE_DAY_TIME },
-  { label: "30 days", value: 30 * ONE_DAY_TIME },
+  { label: "1 day", value: ONE_DAY_MIN },
+  { label: "7 days", value: 7 * ONE_DAY_MIN },
+  { label: "30 days", value: 30 * ONE_DAY_MIN },
 ]
 
 export function PortfolioSettings() {

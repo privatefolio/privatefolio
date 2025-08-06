@@ -1,5 +1,5 @@
 import { SubscriptionChannel } from "src/interfaces"
-import { ONE_DAY_TIME } from "src/utils/formatting-utils"
+import { ONE_DAY_MIN } from "src/utils/formatting-utils"
 
 import { appEventEmitter } from "./internal"
 import { getServerValue, setServerValue, subscribeToServerKV } from "./server-kv-api"
@@ -11,7 +11,7 @@ export interface ServerSettings {
 
 const DEFAULT_SERVER_SETTINGS: ServerSettings = {
   healthMetricsInterval: 5,
-  systemInfoInterval: 7 * ONE_DAY_TIME,
+  systemInfoInterval: 7 * ONE_DAY_MIN,
 }
 
 const SERVER_SETTINGS_KEY = "settings"

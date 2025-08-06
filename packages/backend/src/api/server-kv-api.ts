@@ -3,6 +3,7 @@ import { SqlParam, SubscriptionChannel } from "src/interfaces"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 
+import { appEventEmitter } from "./internal"
 import { getServerDatabase } from "./server-api"
 
 export async function getServerDatabaseWithKeyValue() {
@@ -31,6 +32,7 @@ export async function setServerValue(key: string, value: unknown) {
     key,
     value as SqlParam,
   ])
+  appEventEmitter.emit(SubscriptionChannel.ServerKeyValue, key, value)
 }
 
 export async function getServerValue<T>(

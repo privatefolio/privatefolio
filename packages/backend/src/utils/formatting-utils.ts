@@ -171,9 +171,14 @@ export function formatFileSize(bytes: number, longFormat = false) {
 }
 
 /**
+ * 1 day in minutes
+ */
+export const ONE_DAY_MIN = 24 * 60
+
+/**
  * 1 day in seconds
  */
-export const ONE_DAY_TIME = 24 * 60 * 60
+export const ONE_DAY_TIME = ONE_DAY_MIN * 60
 
 /**
  * 1 day in milliseconds

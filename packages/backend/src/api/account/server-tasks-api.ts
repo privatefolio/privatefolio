@@ -12,6 +12,7 @@ import {
 } from "src/interfaces"
 import { TASK_LOG_CHAR_LIMIT, TASK_LOG_LINE_LIMIT, TASK_LOGS_LOCATION } from "src/settings/settings"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { isTestEnvironment, sleep, writesAllowed } from "src/utils/utils"
@@ -246,8 +247,10 @@ async function processQueue(accountName: string) {
             })(),
           ])
         } catch (error) {
-          // account.logger.error("Error processing task", { accountName, error })
           errorMessage = String(error)
+          if (!task.abortController.signal.aborted) {
+            logAndReportError(error, "Error processing task")
+          }
         } finally {
           let status: TaskStatus = TaskStatus.Completed
           if (errorMessage) status = TaskStatus.Failed

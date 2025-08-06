@@ -1,3 +1,6 @@
+import "./error-catcher"
+import "./logger-cron"
+
 import { wrap } from "comlink"
 
 import { Api, api as readApi } from "./api/api"
@@ -5,7 +8,7 @@ import { BackendServer } from "./backend-server"
 import { setupServerCronJobs } from "./crons"
 import { logger } from "./logger"
 import { setupAllSideEffects } from "./side-effects"
-import { getServerId, Telemetry } from "./telemetry"
+import { telemetry } from "./telemetry"
 import { isProduction } from "./utils/utils"
 
 logger.info("Spawning worker thread")
@@ -31,9 +34,6 @@ async function getKioskMode() {
   }
   return kioskMode
 }
-
-const serverId = await getServerId()
-const telemetry = new Telemetry(serverId)
 
 let server: BackendServer<Api>
 

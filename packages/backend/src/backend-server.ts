@@ -25,6 +25,7 @@ import {
 import { logger } from "./logger"
 import { APP_VERSION } from "./server-env"
 import { corsHeaders } from "./settings/settings"
+import { logAndReportError } from "./utils/error-utils"
 import { extractJwt, verifyJwt } from "./utils/jwt-utils"
 
 // Disallow functions because of bun worker bug
@@ -230,7 +231,7 @@ export class BackendServer<T extends BackendApiShape> {
               try {
                 this.functionRegistry[functionId](...(params as unknown[]))
               } catch {
-                logger.error(`Error invoking server function ${functionId}`)
+                logger.warn(`Error invoking server function ${functionId}`)
               }
               // logger.info("Server function invocation result:", result)
               return
@@ -248,10 +249,8 @@ export class BackendServer<T extends BackendApiShape> {
               response = { id, method, result }
             }
           } catch (error) {
-            logger.error(`Failed to execute request {requestMethod} {errorMessage}`, {
-              errorMessage: String(error),
+            logAndReportError(error, "Failed to execute request {requestMethod} {errorMessage}", {
               requestMethod: request.method,
-              stackTrace: error.stack,
             })
             if (error.message.includes("Worker has been terminated")) {
               logger.fatal("Shutting down server due to invalid worker state")

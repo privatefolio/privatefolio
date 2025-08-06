@@ -1,11 +1,11 @@
 import { access, mkdir, readFile, writeFile } from "fs/promises"
 import { PostHog } from "posthog-node"
-import { environment, randomUUID, runtime } from "src/utils/utils"
+import { randomUUID } from "src/utils/utils"
 
 import { logger } from "./logger"
 import { AUTH_DATA_DIR, SERVER_ID_FILE } from "./settings/settings"
 
-export async function getServerId() {
+async function getServerId() {
   try {
     await access(AUTH_DATA_DIR)
   } catch {
@@ -23,18 +23,15 @@ export async function getServerId() {
   }
 }
 
-export class Telemetry extends PostHog {
-  constructor(serverId: string) {
+class Telemetry extends PostHog {
+  constructor() {
     super("phc_6vlr4ItLrmAGdVewHWNFEsL4P5mPuG9Z7ewgwrsOGef", {
       host: "https://eu.i.posthog.com",
     })
 
     logger.info("Telemetry enabled")
-    process.on("uncaughtException", (error) => {
-      this.captureException(error, serverId, {
-        environment,
-        runtime,
-      })
-    })
   }
 }
+
+export const serverId = await getServerId()
+export const telemetry = new Telemetry()
