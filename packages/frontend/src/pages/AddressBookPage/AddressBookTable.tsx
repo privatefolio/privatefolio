@@ -1,7 +1,7 @@
 import { Add, MenuBookRounded } from "@mui/icons-material"
 import { Button, Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React, { useCallback, useMemo } from "react"
+import React, { useCallback, useEffect, useMemo } from "react"
 import { AttentionBlock } from "src/components/AttentionBlock"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
 import { useConfirm } from "src/hooks/useConfirm"
@@ -19,10 +19,15 @@ import { AddressBookForm } from "./AddressBookForm"
 import { AddressBookTableRow } from "./AddressBookTableRow"
 
 export function AddressBookTable() {
+  const activeAccount = useStore($activeAccount)
+
+  useEffect(() => {
+    document.title = `Address book - ${activeAccount} - Privatefolio`
+  }, [activeAccount])
+
   const addressBook = useStore($addressBook)
   const inMemoryDataQueryTime = useStore($inMemoryDataQueryTime)
   const rpc = useStore($rpc)
-  const activeAccount = useStore($activeAccount)
 
   const rows: LabeledAddress[] = useMemo(
     () =>

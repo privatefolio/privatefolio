@@ -1,55 +1,68 @@
-import { Paper, Skeleton, Stack, Typography, TypographyProps } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React, { useEffect, useState } from "react"
-import { $activeAccount } from "src/stores/account-store"
+import { formatFileSize } from "privatefolio-backend/src/utils/formatting-utils"
+import React, { useCallback, useEffect, useState } from "react"
+import { InfoCard, InfoCardRow, InfoCards } from "src/components/InfoCard"
+import { SystemInfo } from "src/interfaces"
+import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 
-import { MonoFont } from "../../theme"
 import { formatNumber } from "../../utils/formatting-utils"
 import { $rpc } from "../../workers/remotes"
-import { DatabaseInfo } from "./DatabaseInfo"
-import { PortfolioInfo } from "./PortfolioInfo"
-
-function SectionTitle(props: TypographyProps) {
-  return <Typography variant="body2" {...props} />
-}
 
 export function ServerInfo() {
-  const [listenerCount, setListenerCount] = useState<number | null>(null)
+  const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null)
   const rpc = useStore($rpc)
   const activeAccount = useStore($activeAccount)
+  const connectionStatus = useStore($connectionStatus)
 
   useEffect(() => {
     document.title = `Server info - ${activeAccount} - Privatefolio`
   }, [activeAccount])
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      rpc.getListenerCount().then(setListenerCount)
-    }, 1000)
-
-    return () => clearInterval(interval)
+  const fetchSystemInfo = useCallback(async () => {
+    try {
+      const info = await rpc.getSystemInfo()
+      setSystemInfo(info)
+    } catch (error) {
+      console.error("Failed to fetch system info:", error)
+    }
   }, [rpc])
 
+  useEffect(() => {
+    fetchSystemInfo()
+  }, [fetchSystemInfo])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (connectionStatus === "connected") {
+        fetchSystemInfo()
+      }
+    }, 1_000)
+
+    return () => clearInterval(interval)
+  }, [connectionStatus, fetchSystemInfo])
+
   return (
-    <>
-      <Stack direction={{ md: "row" }} gap={1}>
-        <Paper sx={{ minWidth: 340 }}>
-          <Stack sx={{ paddingX: 2, paddingY: 1 }} gap={1}>
-            <Stack direction="row" justifyContent="space-between">
-              <SectionTitle>Active connections</SectionTitle>
-              {listenerCount === null ? (
-                <Skeleton height={20} width={80} />
-              ) : (
-                <Typography fontFamily={MonoFont} variant="body2">
-                  <span>{formatNumber(listenerCount)}</span>
-                </Typography>
-              )}
-            </Stack>
-          </Stack>
-        </Paper>
-        <DatabaseInfo />
-        <PortfolioInfo />
-      </Stack>
-    </>
+    <InfoCards>
+      <InfoCard>
+        <InfoCardRow title="CPU model" value={systemInfo === null ? null : systemInfo.cpuModel} />
+        <InfoCardRow
+          title="CPU threads"
+          value={systemInfo === null ? null : formatNumber(systemInfo.cpuCores)}
+        />
+        <InfoCardRow
+          title="Memory"
+          value={systemInfo === null ? null : formatFileSize(systemInfo.memory)}
+        />
+        <InfoCardRow title="Platform" value={systemInfo === null ? null : systemInfo.platform} />
+        <InfoCardRow
+          title="Node version"
+          value={systemInfo === null ? null : systemInfo.nodeVersion}
+        />
+        <InfoCardRow
+          title="Privatefolio version"
+          value={systemInfo === null ? null : systemInfo.version}
+        />
+      </InfoCard>
+    </InfoCards>
   )
 }

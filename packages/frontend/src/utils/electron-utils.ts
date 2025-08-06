@@ -8,6 +8,11 @@ declare global {
 }
 
 interface ElectronAPI {
+  backend: {
+    getUrl: () => string
+    isRunning: () => boolean
+    restart: () => void
+  }
   isProduction: boolean
   notifications: {
     send: (message: string) => void
@@ -22,12 +27,14 @@ interface ElectronAPI {
 
 export const setElectronMode = window.electron?.setMode
 export const openExternalLink = window.electron?.openExternalLink
+export const restartBackend = window.electron?.backend.restart
 export const isElectron = Boolean(window.electron)
 export const isWindows = window.electron && window.electron.platform === "win32"
 export const isLinux = window.electron && window.electron.platform === "linux"
 export const isMac = window.electron && window.electron.platform === "darwin"
 
 export const isProductionElectron = !!window.electron?.isProduction
+export const backendUrl = window.electron?.backend.getUrl()
 
 console.log(`Electron API ${isElectron ? "available" : "not available"}`)
 

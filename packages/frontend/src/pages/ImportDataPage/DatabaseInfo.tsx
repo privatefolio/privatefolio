@@ -1,16 +1,13 @@
 import { SdStorageRounded } from "@mui/icons-material"
-import { Paper, Skeleton, Stack, Tooltip, Typography, TypographyProps } from "@mui/material"
+import { Stack, Tooltip, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useState } from "react"
+import { InfoCard, InfoCardRow } from "src/components/InfoCard"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 
 import { MonoFont } from "../../theme"
 import { formatFileSize, formatNumber } from "../../utils/formatting-utils"
 import { $rpc } from "../../workers/remotes"
-
-function SectionTitle(props: TypographyProps) {
-  return <Typography variant="body2" {...props} />
-}
 
 export function DatabaseInfo() {
   const [storageUsage, setStorageUsage] = useState<number | null>(null)
@@ -62,17 +59,11 @@ export function DatabaseInfo() {
   }, [connectionStatus, rpc, activeAccount])
 
   return (
-    <Paper sx={{ minWidth: 340 }}>
-      <Stack sx={{ paddingX: 2, paddingY: 1 }} gap={1}>
-        <Stack direction="row" justifyContent="space-between">
-          <SectionTitle>Disk Usage</SectionTitle>
-          {storageUsage === null ? (
-            <Skeleton height={20} width={80} />
-          ) : storageUsage === 0 ? (
-            <Typography color="text.secondary" component="span" variant="body2">
-              Unknown
-            </Typography>
-          ) : (
+    <InfoCard>
+      <InfoCardRow
+        title="Disk Usage"
+        value={
+          storageUsage === null ? null : storageUsage === 0 ? undefined : (
             <Tooltip
               title={
                 <Stack>
@@ -90,29 +81,19 @@ export function DatabaseInfo() {
                 </Typography>
               </Stack>
             </Tooltip>
-          )}
-        </Stack>
-        <Stack direction="row" justifyContent="space-between">
-          <SectionTitle>Audit logs</SectionTitle>
-          {auditLogs === null ? (
-            <Skeleton height={20} width={80} />
-          ) : (
-            <Typography fontFamily={MonoFont} variant="body2">
-              <span>{formatNumber(auditLogs)}</span>
-            </Typography>
-          )}
-        </Stack>
-        <Stack direction="row" justifyContent="space-between">
-          <SectionTitle>Transactions</SectionTitle>
-          {transactions === null ? (
-            <Skeleton height={20} width={80} />
-          ) : (
-            <Typography fontFamily={MonoFont} variant="body2">
-              <span>{formatNumber(transactions)}</span>
-            </Typography>
-          )}
-        </Stack>
-      </Stack>
-    </Paper>
+          )
+        }
+      />
+
+      <InfoCardRow
+        title="Audit logs"
+        value={auditLogs === null ? auditLogs : <span>{formatNumber(auditLogs)}</span>}
+      />
+
+      <InfoCardRow
+        title="Transactions"
+        value={transactions === null ? transactions : <span>{formatNumber(transactions)}</span>}
+      />
+    </InfoCard>
   )
 }

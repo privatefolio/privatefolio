@@ -49,7 +49,8 @@ export type QueryTableData<T extends BaseType> = (
   rowsPerPage: number,
   page: number,
   order: Order,
-  signal: AbortSignal
+  signal: AbortSignal,
+  orderBy: keyof T
 ) => Promise<[T[], number | (() => Promise<number>)]>
 
 export interface RemoteTableProps<T extends BaseType> {
@@ -64,6 +65,7 @@ export interface RemoteTableProps<T extends BaseType> {
   headCells: HeadCell<T>[]
   initOrderBy: keyof T
   queryFn: QueryTableData<T>
+  showToolbarAlways?: boolean
 }
 
 function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
@@ -76,13 +78,13 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
     emptyContent = <NoDataButton />,
     addNewRow,
     extraRow,
+    showToolbarAlways = false,
   } = props
 
   const [queryTime, setQueryTime] = useState<number | null>(null)
   const [rowCount, setRowCount] = useState<number | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [rows, setRows] = useState<T[]>([])
-  const [orderBy, setOrderBy] = useState<keyof T>(initOrderBy)
   const [error, setError] = useState<Error>()
 
   const [searchParams, setSearchParams] = useSearchParams()
@@ -111,6 +113,17 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
   const setOrder = useCallback(
     (order: Order) => {
       searchParams.set("order", order)
+      setSearchParams(searchParams)
+    },
+    [searchParams, setSearchParams]
+  )
+
+  const orderBy = searchParams.get("orderBy")
+    ? (searchParams.get("orderBy") as keyof T)
+    : initOrderBy
+  const setOrderBy = useCallback(
+    (orderBy: keyof T) => {
+      searchParams.set("orderBy", String(orderBy))
       setSearchParams(searchParams)
     },
     [searchParams, setSearchParams]
@@ -182,7 +195,7 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
 
     setLoading(true)
     Promise.all([
-      queryFn(activeFilters, rowsPerPage, page, order, controller.signal),
+      queryFn(activeFilters, rowsPerPage, page, order, controller.signal, orderBy),
       sleep(10),
       //
     ])
@@ -198,7 +211,7 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
         }
       })
       .catch((error) => {
-        console.error(error)
+        // console.error(error)
         setError(error as Error)
       })
       .finally(() => {
@@ -208,7 +221,7 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
     return function cleanup() {
       controller.abort("Result no longer needed.")
     }
-  }, [queryFn, activeFilters, rowsPerPage, page, order])
+  }, [queryFn, activeFilters, rowsPerPage, page, order, orderBy])
 
   const inMemoryDataQueryTime = useStore($inMemoryDataQueryTime)
 
@@ -270,7 +283,7 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
                           sx={{
                             top: appBarHeight,
                             ...headCell.sx,
-                            ...(isFirstLoading || isEmpty
+                            ...((isFirstLoading || isEmpty) && !showToolbarAlways
                               ? {
                                   borderColor: "transparent",
                                   opacity: 0,

@@ -1,24 +1,17 @@
-import "./logger"
+import "./error-catcher"
+import "./logger-cron"
 
-import { proxy, wrap } from "comlink"
-import { Cron } from "croner"
-import { debounce } from "lodash-es"
+import { wrap } from "comlink"
 
-import { getAccount } from "./api/accounts-api"
 import { Api, api as readApi } from "./api/api"
 import { BackendServer } from "./backend-server"
-import {
-  EventCause,
-  ResolutionString,
-  SubscriptionChannel,
-  SubscriptionId,
-  Timestamp,
-} from "./interfaces"
-import { MAX_DEBOUNCE_DURATION, SHORT_DEBOUNCE_DURATION } from "./settings/settings"
-import { ONE_DAY } from "./utils/formatting-utils"
-import { floorTimestamp, getCronExpression, getPrefix, isDevelopment } from "./utils/utils"
+import { setupServerCronJobs } from "./crons"
+import { logger } from "./logger"
+import { setupAllSideEffects } from "./side-effects"
+import { telemetry } from "./telemetry"
+import { isProduction } from "./utils/utils"
 
-console.log("Starting worker...")
+logger.info("Spawning worker thread")
 const worker = new Worker(import.meta.resolve("./api-worker"), {
   env: {
     ALLOW_WRITES: "true",
@@ -26,9 +19,8 @@ const worker = new Worker(import.meta.resolve("./api-worker"), {
     ...process.env,
   },
 })
-const writeApi = wrap<Api>(worker)
-console.log("Started worker...")
 
+const writeApi = wrap<Api>(worker) as Api
 const accountNames = await writeApi.getAccountNames()
 
 async function getKioskMode() {
@@ -43,262 +35,32 @@ async function getKioskMode() {
   return kioskMode
 }
 
-const sideEffects: Record<string, SubscriptionId> = {}
-const networthCronJobs: Record<string, Cron> = {}
-const metadataCronJobs: Record<string, Cron> = {}
-const networthIntervalSubs: Record<string, SubscriptionId> = {}
-const metadataIntervalSubs: Record<string, SubscriptionId> = {}
 let server: BackendServer<Api>
 
 async function startServer() {
   const kioskMode = await getKioskMode()
   server?.close()
-  server = new BackendServer(readApi, writeApi as Api, false, kioskMode, function shutdown() {
-    console.log("Shutting down server.")
+  server = new BackendServer(readApi, writeApi, false, kioskMode, function shutdown() {
+    logger.fatal("Shutting down server - fatal error")
     worker.terminate()
-    if (!isDevelopment) process.exit()
+    telemetry.shutdown().finally()
+    if (isProduction) process.exit()
   })
 
   const port = Number(process.env.PORT)
   server.start(isNaN(port) ? 4001 : port)
 }
 
-async function handleAccountsSideEffects() {
-  const accounts = await writeApi.getAccountNames()
-  if (accounts.length === 0) return
+await writeApi.migrateServerDatabase()
+await setupAllSideEffects(writeApi, startServer)
+await setupServerCronJobs(writeApi)
 
-  for (const accountName of accounts) {
-    await writeApi.subscribeToSettingsProperty(
-      accountName,
-      "kioskMode",
-      proxy(async () => {
-        console.log("Kiosk mode changed, restarting server.")
-        await startServer()
-      })
-    )
-  }
-}
-
-async function setupNetworthCronJob(accountName: string) {
-  if (networthCronJobs[accountName]) {
-    console.log(getPrefix(accountName, true), `Stopping existing networth cron job.`)
-    networthCronJobs[accountName].stop()
-  }
-
-  const { networthRefreshInterval } = await writeApi.getSettings(accountName)
-
-  console.log(
-    getPrefix(accountName, true),
-    `Setting up networth cron job with interval: ${networthRefreshInterval} minutes.`
-  )
-  try {
-    const cronExpression = getCronExpression(networthRefreshInterval)
-    console.log(getPrefix(accountName, true), `Networth cron expression: ${cronExpression}`)
-
-    const cronJob = new Cron(cronExpression, async () => {
-      console.log(getPrefix(accountName, true), `Cron: Refreshing account.`)
-      await writeApi.enqueueRefreshBalances(accountName, "cron")
-      await writeApi.enqueueFetchPrices(accountName, "cron")
-      await writeApi.enqueueRefreshNetworth(accountName, "cron")
-      await writeApi.enqueueRefreshTrades(accountName, "cron")
-    })
-    networthCronJobs[accountName] = cronJob
-  } catch (error) {
-    console.error(getPrefix(accountName, true), `Error setting up networth cron job:`, error)
-  }
-}
-
-async function setupMetadataCronJob(accountName: string) {
-  if (metadataCronJobs[accountName]) {
-    console.log(getPrefix(accountName, true), `Stopping existing metadata cron job.`)
-    metadataCronJobs[accountName].stop()
-  }
-
-  const { metadataRefreshInterval } = await writeApi.getSettings(accountName)
-
-  console.log(
-    getPrefix(accountName, true),
-    `Setting up metadata cron job with interval: ${metadataRefreshInterval} minutes.`
-  )
-  try {
-    const cronExpression = getCronExpression(metadataRefreshInterval)
-    console.log(getPrefix(accountName, true), `Metadata cron expression: ${cronExpression}`)
-
-    const cronJob = new Cron(cronExpression, async () => {
-      console.log(getPrefix(accountName, true), `Cron: Refreshing metadata.`)
-      await writeApi.enqueueRefetchAssets(accountName, "cron")
-      await writeApi.enqueueRefetchPlatforms(accountName, "cron")
-    })
-    metadataCronJobs[accountName] = cronJob
-  } catch (error) {
-    console.error(getPrefix(accountName, true), `Error setting up metadata cron job:`, error)
-  }
-}
-
-async function setupSideEffects(accountName: string) {
-  try {
-    console.log(getPrefix(accountName, true), `Migrating database tables.`)
-    await writeApi.migrateTables(accountName)
-
-    console.log(getPrefix(accountName, true), `Setting up side-effects.`)
-
-    // Make sure the task queue is initialized
-    await writeApi.getServerTasks(accountName)
-
-    let nextTimestamp: Timestamp | undefined
-
-    const handleAuditLogChange = async (
-      cause: EventCause,
-      oldestTimestamp?: Timestamp,
-      groupId?: string
-    ) => {
-      if (!nextTimestamp) nextTimestamp = oldestTimestamp
-      if (nextTimestamp > oldestTimestamp) nextTimestamp = oldestTimestamp
-      await handleAuditLogChangeDebounced(cause, nextTimestamp, groupId)
-      nextTimestamp = undefined
-    }
-
-    const handleAuditLogChangeDebounced = debounce(
-      async (cause, oldestTimestamp?: Timestamp, groupId?: string) => {
-        console.log(
-          getPrefix(accountName, true),
-          `Running side-effects (trigger by audit log changes).`
-        )
-        if (cause === EventCause.Updated) return
-
-        await writeApi.computeGenesis(accountName)
-        const lastTx = await writeApi.computeLastTx(accountName)
-
-        if (oldestTimestamp) {
-          let newCursor = floorTimestamp(oldestTimestamp, "1D" as ResolutionString) - ONE_DAY
-          if (lastTx === 0) newCursor = 0
-          await writeApi.invalidateBalances(accountName, newCursor)
-          await writeApi.invalidateNetworth(accountName, newCursor)
-          await writeApi.invalidateTrades(accountName, newCursor) // TESTME
-          await writeApi.invalidateTradePnl(accountName, newCursor) // TESTME
-        }
-
-        if (lastTx !== 0) {
-          if (cause === EventCause.Created) {
-            await writeApi.enqueueDetectSpamTransactions(accountName, "side-effect", groupId)
-            await writeApi.enqueueAutoMerge(accountName, "side-effect", groupId)
-          }
-
-          // when created or deleted
-          await writeApi.enqueueRefreshBalances(accountName, "side-effect", groupId)
-
-          if (cause === EventCause.Created) {
-            await writeApi.enqueueFetchPrices(accountName, "side-effect", groupId)
-          }
-          await writeApi.enqueueRefreshNetworth(accountName, "side-effect", groupId)
-          await writeApi.enqueueRefreshTrades(accountName, "side-effect", groupId)
-        }
-
-        const account = await getAccount(accountName)
-        account.eventEmitter.emit(SubscriptionChannel.Metadata)
-      },
-      SHORT_DEBOUNCE_DURATION,
-      {
-        leading: false,
-        maxWait: MAX_DEBOUNCE_DURATION,
-        trailing: true,
-      }
-    )
-    const subId = await writeApi.subscribeToAuditLogs(accountName, proxy(handleAuditLogChange))
-
-    sideEffects[accountName] = subId
-
-    await setupNetworthCronJob(accountName)
-    await setupMetadataCronJob(accountName)
-
-    const networthIntervalSubId = await writeApi.subscribeToSettingsProperty(
-      accountName,
-      "networthRefreshInterval",
-      proxy(async () => {
-        console.log(
-          getPrefix(accountName, true),
-          `Networth refresh interval changed, refreshing cron job.`
-        )
-        await setupNetworthCronJob(accountName)
-      })
-    )
-
-    networthIntervalSubs[accountName] = networthIntervalSubId
-
-    const metadataIntervalSubId = await writeApi.subscribeToSettingsProperty(
-      accountName,
-      "metadataRefreshInterval",
-      proxy(async () => {
-        console.log(
-          getPrefix(accountName, true),
-          `Metadata refresh interval changed, refreshing cron job.`
-        )
-        await setupMetadataCronJob(accountName)
-      })
-    )
-
-    metadataIntervalSubs[accountName] = metadataIntervalSubId
-  } catch (error) {
-    console.error(getPrefix(accountName, true), `Error setting up side-effects:`, error)
-  }
-}
-
-await writeApi.subscribeToAccounts(
-  proxy(async (cause, accountName) => {
-    if (cause === EventCause.Deleted) {
-      console.log(getPrefix(accountName, true), `Tearing down side-effects.`)
-      const subId = sideEffects[accountName]
-      try {
-        await writeApi.unsubscribe(subId, false)
-
-        if (networthCronJobs[accountName]) {
-          networthCronJobs[accountName].stop()
-          delete networthCronJobs[accountName]
-        }
-
-        if (metadataCronJobs[accountName]) {
-          metadataCronJobs[accountName].stop()
-          delete metadataCronJobs[accountName]
-        }
-
-        if (networthIntervalSubs[accountName]) {
-          await writeApi.unsubscribe(networthIntervalSubs[accountName], false)
-          delete networthIntervalSubs[accountName]
-        }
-        if (metadataIntervalSubs[accountName]) {
-          await writeApi.unsubscribe(metadataIntervalSubs[accountName], false)
-          delete metadataIntervalSubs[accountName]
-        }
-      } catch {}
-      console.log(getPrefix(accountName, true), `Tore down side-effects.`)
-      await readApi.disconnectAccount(accountName)
-    }
-
-    if (cause === EventCause.Reset) {
-      try {
-        await readApi.reconnectAccount(accountName)
-        await setupSideEffects(accountName)
-        await handleAccountsSideEffects()
-      } catch {}
-    }
-
-    if (cause === EventCause.Created) {
-      await setupSideEffects(accountName)
-      await handleAccountsSideEffects()
-    }
-  })
-)
-
-for (const accountName of accountNames) {
-  await setupSideEffects(accountName)
-}
-
-await handleAccountsSideEffects()
 await startServer()
 
-process.on("SIGINT", () => {
-  console.log("Shutting down server.")
+process.on("SIGINT", async () => {
+  logger.info("Shutting down server - SIGINT received")
   server.close()
   worker.terminate()
+  await telemetry.shutdown()
   process.exit()
 })

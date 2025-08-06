@@ -78,11 +78,12 @@ export class StackedAreaSeriesRenderer<TData extends StackedAreaData>
 
     const options = this._options
     const bars: StackedAreaBarItem[] = this._data.bars.map((bar) => {
+      const values = options.stacked
+        ? cumulativeBuildUp(bar.originalData.values)
+        : bar.originalData.values
       return {
         x: bar.x,
-        ys: cumulativeBuildUp(bar.originalData.values).map(
-          (value) => priceToCoordinate(value) ?? 0
-        ),
+        ys: values.map((value) => priceToCoordinate(value) ?? 0),
       }
     })
     const zeroY = priceToCoordinate(0) ?? 0

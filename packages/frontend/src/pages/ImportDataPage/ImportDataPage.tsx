@@ -13,8 +13,10 @@ import { TagsTable } from "../TagsPage/TagsTable"
 import { ConnectionsTable } from "./connections/ConnectionsTable"
 import { FileImportsTable } from "./file-imports/FileImportsTable"
 import { ImportDataActions } from "./ImportDataActions"
+import { ImportDataInfo } from "./ImportDataInfo"
 import { ImportDataWizard } from "./ImportDataWizard"
 
+// TODO8 rename to DataPage
 export default function ImportDataPage({ show }: { show: boolean }) {
   const [searchParams] = useSearchParams()
   const tab = searchParams.get("tab") || "wizard"
@@ -44,6 +46,7 @@ export default function ImportDataPage({ show }: { show: boolean }) {
             <NavTab value="file-imports" to={"?tab=file-imports"} label="File imports" />
             <NavTab value="address-book" to={"?tab=address-book"} label="Address book" />
             <NavTab value="tags" to={"?tab=tags"} label="Tags" />
+            <NavTab value="info" to={"?tab=info"} label="Info" />
           </Tabs>
           <ImportDataActions currentTab={tab} />
         </Stack>
@@ -52,6 +55,7 @@ export default function ImportDataPage({ show }: { show: boolean }) {
         {tab === "connections" && <ConnectionsTable />}
         {tab === "address-book" && <AddressBookTable />}
         {tab === "tags" && <TagsTable />}
+        {tab === "info" && <ImportDataInfo />}
       </Stack>
     </StaggeredList>
   )

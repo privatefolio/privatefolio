@@ -43,7 +43,10 @@ import {
   StackedAreaSeriesOptions,
 } from "src/lightweight-charts/plugins/stacked-area-series/options"
 import { StackedAreaSeries } from "src/lightweight-charts/plugins/stacked-area-series/stacked-area-series"
-import { StackedTooltipPrimitive } from "src/lightweight-charts/plugins/stacked-tooltip/stacked-tooltip"
+import {
+  StackedTooltipPrimitive,
+  StackedTooltipPrimitiveOptions,
+} from "src/lightweight-charts/plugins/stacked-tooltip/stacked-tooltip"
 import { $preferredInterval } from "src/stores/device-settings-store"
 import { $inspectTime } from "src/stores/pages/balances-store"
 import { isInputFocused } from "src/utils/browser-utils"
@@ -52,7 +55,10 @@ import { noop } from "src/utils/utils"
 import { useBoolean } from "../hooks/useBoolean"
 import { ChartData, ResolutionString, StackedAreaData } from "../interfaces"
 import { CandleTooltipPrimitive } from "../lightweight-charts/plugins/candle-tooltip/candle-tooltip"
-import { DeltaTooltipPrimitive } from "../lightweight-charts/plugins/delta-tooltip/delta-tooltip"
+import {
+  DeltaTooltipPrimitive,
+  DeltaTooltipPrimitiveOptions,
+} from "../lightweight-charts/plugins/delta-tooltip/delta-tooltip"
 import {
   TooltipPrimitive,
   TooltipPrimitiveOptions,
@@ -85,7 +91,7 @@ export type QueryChartData = (
   interval: ResolutionString
 ) => Promise<ChartData[] | StackedAreaData[]>
 
-export type TooltipOpts = Partial<Omit<TooltipPrimitiveOptions, "priceExtractor">>
+export type TooltipOpts = Partial<TooltipPrimitiveOptions | StackedTooltipPrimitiveOptions>
 
 export type CursorMode = "move" | "inspect" | "measure"
 
@@ -97,15 +103,20 @@ export interface SingleSeriesChartProps extends Omit<Partial<ChartProps>, "chart
   allowedCursorModes?: CursorMode[]
   emptyContent?: ReactNode
   extraSettings?: ReactNode
+  hideToolbar?: boolean
   /**
    * @default "Candlestick"
    */
   initType?: SeriesType
+  isMultiArea?: boolean
   isStackedArea?: boolean
   onSeriesReady?: (chart: IChartApi, series: ISeriesApi<SeriesType>) => void
   queryFn: QueryChartData
   seriesOptions?: SeriesOpts
   showToolbarAlways?: boolean
+  /**
+   * @default "large"
+   */
   size?: "small" | "medium" | "large"
   tooltipOptions?: TooltipOpts
 }
@@ -157,7 +168,9 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
     tooltipOptions = {},
     emptyContent = <NoDataButton />,
     isStackedArea,
+    isMultiArea,
     onSeriesReady = noop,
+    hideToolbar = false,
     showToolbarAlways = false,
     extraSettings,
     ...rest
@@ -219,11 +232,15 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
 
       const opts = merge({}, defaultSeriesOptions, seriesOptions)
 
-      const isStackedData = "values" in data[0]
+      const hasMultipleValues = "values" in data[0]
 
-      if (isStackedData) {
+      if (hasMultipleValues) {
         const customSeriesView = new StackedAreaSeries<LcStackedAreaData>()
-        const customSeries = chartRef.current.addCustomSeries(customSeriesView, opts.StackedArea)
+        const customSeries = chartRef.current.addCustomSeries(customSeriesView, {
+          ...opts.StackedArea,
+          lastValueVisible: !isMultiArea,
+          stacked: isStackedArea,
+        })
 
         customSeries.setData(data as LcStackedAreaData[])
         seriesRef.current = customSeries
@@ -286,7 +303,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
           tooltip: extractTooltipColors(theme),
         },
         tooltipOptions
-      )
+      ) as Partial<TooltipPrimitiveOptions>
     )
     const candleTooltip = new CandleTooltipPrimitive(
       merge(
@@ -302,7 +319,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
           tooltip: extractTooltipColors(theme),
         },
         tooltipOptions
-      )
+      ) as Partial<DeltaTooltipPrimitiveOptions>
     )
     const stackedTooltip = new StackedTooltipPrimitive(
       merge(
@@ -310,10 +327,10 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
           tooltip: extractTooltipColors(theme),
         },
         tooltipOptions
-      )
+      ) as Partial<StackedTooltipPrimitiveOptions>
     )
     //
-    if (isStackedArea) {
+    if (isStackedArea || isMultiArea) {
       seriesRef.current.attachPrimitive(stackedTooltip)
     } else if (cursorMode === "measure") {
       seriesRef.current.attachPrimitive(deltaTooltip)
@@ -414,6 +431,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
     theme,
     allowedCursorModes,
     isStackedArea,
+    isMultiArea,
     activeType,
   ])
 
@@ -478,211 +496,212 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
               }),
         }}
       >
-        <Stack
-          sx={{
-            borderBottom: "1px solid var(--mui-palette-TableCell-border)",
-            marginLeft: -0.5,
-            minHeight: 43,
-            ...(isEmpty && !showToolbarAlways
-              ? {
-                  borderColor: "transparent",
-                  opacity: 0,
-                  pointerEvents: "none",
-                }
-              : {}),
-          }}
-          alignItems="center"
-          justifyContent="space-between"
-          paddingX={2}
-          direction="row"
-          flexWrap="wrap"
-          gap={0.5}
-          paddingY={0.5}
-        >
-          <Stack direction="row" gap={1} flexWrap="wrap">
-            <Stack direction="row">
-              <Tooltip
-                title={
-                  <>
-                    Switch to <b>Move</b> cursor
-                  </>
-                }
-              >
-                <span>
-                  <ChartIconButton
-                    active={cursorMode === "move"}
-                    onClick={() => setCursorMode("move")}
-                    disabled={!allowedCursorModes.includes("move")}
-                  >
-                    <ControlCamera fontSize="inherit" />
-                  </ChartIconButton>
-                </span>
-              </Tooltip>
-              <Tooltip
-                title={
-                  <>
-                    Switch to <b>Inspect</b> cursor
-                    <br />
-                    (or hold <i>Ctrl</i> for quick toggle)
-                  </>
-                }
-              >
-                <span>
-                  <ChartIconButton
-                    active={cursorMode === "inspect"}
-                    onClick={() => setCursorMode("inspect")}
-                    disabled={!allowedCursorModes.includes("inspect")}
-                  >
-                    <SvgIcon fontSize="inherit">
-                      {/* cc https://icon-sets.iconify.design/fluent/cursor-16-filled/ */}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 16 16"
-                      >
-                        <path
-                          fill="currentColor"
-                          d="M4.002 2.998a1 1 0 0 1 1.6-.8L13.6 8.2c.768.576.36 1.8-.6 1.8H9.053a1 1 0 0 0-.793.39l-2.466 3.215c-.581.758-1.793.347-1.793-.609z"
-                        />
-                      </svg>
-                    </SvgIcon>
-                  </ChartIconButton>
-                </span>
-              </Tooltip>
-              <Tooltip
-                title={
-                  <>
-                    <>
-                      Switch to <b>Measure</b> cursor
-                      <br />
-                      (or hold <i>Shift</i> for quick toggle)
-                    </>
-                  </>
-                }
-              >
-                <span>
-                  <ChartIconButton
-                    active={cursorMode === "measure"}
-                    onClick={() => setCursorMode("measure")}
-                    disabled={!allowedCursorModes.includes("measure")}
-                  >
-                    <StraightenSharp fontSize="inherit" />
-                  </ChartIconButton>
-                </span>
-              </Tooltip>
-            </Stack>
-            <Divider orientation="vertical" flexItem />
-            <Stack direction="row">
-              {favoriteIntervals.map((interval) => (
+        {!hideToolbar && (
+          <Stack
+            sx={{
+              borderBottom: "1px solid var(--mui-palette-TableCell-border)",
+              marginLeft: -0.5,
+              minHeight: 43,
+              ...(isEmpty && !showToolbarAlways
+                ? {
+                    borderColor: "transparent",
+                    opacity: 0,
+                    pointerEvents: "none",
+                  }
+                : {}),
+            }}
+            alignItems="center"
+            justifyContent="space-between"
+            paddingX={2}
+            direction="row"
+            flexWrap="wrap"
+            gap={0.5}
+            paddingY={0.5}
+          >
+            <Stack direction="row" gap={1} flexWrap="wrap">
+              <Stack direction="row">
                 <Tooltip
-                  key={interval}
                   title={
                     <>
-                      Switch interval to {INTERVAL_LABEL_MAP[interval]}
-                      {!supportedIntervals.includes(interval) && (
-                        <Chip
-                          size="small"
-                          color="primary"
-                          sx={{ fontSize: "0.625rem", height: 18, marginLeft: 1 }}
-                          label="Coming soon"
-                        />
-                      )}
+                      Switch to <b>Move</b> cursor
                     </>
                   }
                 >
                   <span>
-                    <Button
-                      size="small"
-                      sx={{ borderRadius: 0.5, paddingX: 1 }}
-                      disabled={!supportedIntervals.includes(interval)}
-                      // disabled={timeframes ? !timeframes.includes(interval as Timeframe) : false}
-                      // className={timeframe === interval ? "active" : undefined}
-                      title={interval}
-                      aria-label={`Switch interval to ${INTERVAL_LABEL_MAP[interval]}`}
-                      color={interval === activeInterval ? "accent" : "secondary"}
-                      onClick={() => {
-                        $preferredInterval.set(interval)
-                      }}
+                    <ChartIconButton
+                      active={cursorMode === "move"}
+                      onClick={() => setCursorMode("move")}
+                      disabled={!allowedCursorModes.includes("move")}
                     >
-                      {interval
-                        .replace("1d", "D")
-                        .replace("1w", "W")
-                        .replace("3d", "3D")
-                        .replace("1m", "M")}
-                    </Button>
+                      <ControlCamera fontSize="inherit" />
+                    </ChartIconButton>
                   </span>
                 </Tooltip>
-              ))}
-            </Stack>
-            <Divider orientation="vertical" flexItem />
-            <Stack direction="row">
-              <Tooltip title="Switch to Candlestick type">
-                <span>
-                  <ChartIconButton
-                    disabled={data.length > 0 && !("open" in data[0])}
-                    active={activeType === "Candlestick"}
-                    onClick={() => setPreferredType("Candlestick")}
-                    aria-label="Switch to Candlestick type"
+                <Tooltip
+                  title={
+                    <>
+                      Switch to <b>Inspect</b> cursor
+                      <br />
+                      (or hold <i>Ctrl</i> for quick toggle)
+                    </>
+                  }
+                >
+                  <span>
+                    <ChartIconButton
+                      active={cursorMode === "inspect"}
+                      onClick={() => setCursorMode("inspect")}
+                      disabled={!allowedCursorModes.includes("inspect")}
+                    >
+                      <SvgIcon fontSize="inherit">
+                        {/* cc https://icon-sets.iconify.design/fluent/cursor-16-filled/ */}
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                        >
+                          <path
+                            fill="currentColor"
+                            d="M4.002 2.998a1 1 0 0 1 1.6-.8L13.6 8.2c.768.576.36 1.8-.6 1.8H9.053a1 1 0 0 0-.793.39l-2.466 3.215c-.581.758-1.793.347-1.793-.609z"
+                          />
+                        </svg>
+                      </SvgIcon>
+                    </ChartIconButton>
+                  </span>
+                </Tooltip>
+                <Tooltip
+                  title={
+                    <>
+                      <>
+                        Switch to <b>Measure</b> cursor
+                        <br />
+                        (or hold <i>Shift</i> for quick toggle)
+                      </>
+                    </>
+                  }
+                >
+                  <span>
+                    <ChartIconButton
+                      active={cursorMode === "measure"}
+                      onClick={() => setCursorMode("measure")}
+                      disabled={!allowedCursorModes.includes("measure")}
+                    >
+                      <StraightenSharp fontSize="inherit" />
+                    </ChartIconButton>
+                  </span>
+                </Tooltip>
+              </Stack>
+              <Divider orientation="vertical" flexItem />
+              <Stack direction="row">
+                {favoriteIntervals.map((interval) => (
+                  <Tooltip
+                    key={interval}
+                    title={
+                      <>
+                        Switch interval to {INTERVAL_LABEL_MAP[interval]}
+                        {!supportedIntervals.includes(interval) && (
+                          <Chip
+                            size="small"
+                            color="primary"
+                            sx={{ fontSize: "0.625rem", height: 18, marginLeft: 1 }}
+                            label="Coming soon"
+                          />
+                        )}
+                      </>
+                    }
                   >
-                    <CandlestickChartSharp fontSize="inherit" />
-                  </ChartIconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title="Switch to Baseline type">
-                <span>
-                  <ChartIconButton
-                    active={activeType === "Baseline"}
-                    onClick={() => setPreferredType("Baseline")}
-                    aria-label="Switch to Baseline type"
-                    disabled={isStackedArea}
-                  >
-                    <Timeline fontSize="inherit" />
-                  </ChartIconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title="Switch to Area type">
-                <span>
-                  <ChartIconButton
-                    active={activeType === "Area"}
-                    onClick={() => setPreferredType("Area")}
-                    aria-label="Switch to Area type"
-                  >
-                    {/* <ShowChart fontSize="inherit" /> */}
-                    {/* cc https://icon-sets.iconify.design/material-symbols/area-chart/ */}
-                    <SvgIcon fontSize="inherit">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
+                    <span>
+                      <Button
+                        size="small"
+                        sx={{ borderRadius: 0.5, paddingX: 1 }}
+                        disabled={!supportedIntervals.includes(interval)}
+                        // disabled={timeframes ? !timeframes.includes(interval as Timeframe) : false}
+                        // className={timeframe === interval ? "active" : undefined}
+                        title={interval}
+                        aria-label={`Switch interval to ${INTERVAL_LABEL_MAP[interval]}`}
+                        color={interval === activeInterval ? "accent" : "secondary"}
+                        onClick={() => {
+                          $preferredInterval.set(interval)
+                        }}
                       >
-                        <path
-                          fill="currentColor"
-                          d="m21 16l-9.4-7.35l-3.975 5.475L3 10.5V7l4 3l5-7l5 4h4zM3 20v-7l5 4l4-5.5l9 7.025V20z"
-                        />
-                      </svg>
-                    </SvgIcon>
-                  </ChartIconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title="Switch to Histogram type">
-                <span>
-                  <ChartIconButton
-                    active={activeType === "Histogram"}
-                    onClick={() => setPreferredType("Histogram")}
-                    aria-label="Switch to Histogram type"
-                    disabled={isStackedArea}
-                  >
-                    <BarChartOutlined fontSize="inherit" />
-                  </ChartIconButton>
-                </span>
-              </Tooltip>
+                        {interval
+                          .replace("1d", "D")
+                          .replace("1w", "W")
+                          .replace("3d", "3D")
+                          .replace("1m", "M")}
+                      </Button>
+                    </span>
+                  </Tooltip>
+                ))}
+              </Stack>
+              <Divider orientation="vertical" flexItem />
+              <Stack direction="row">
+                <Tooltip title="Switch to Candlestick type">
+                  <span>
+                    <ChartIconButton
+                      disabled={data.length > 0 && !("open" in data[0])}
+                      active={activeType === "Candlestick"}
+                      onClick={() => setPreferredType("Candlestick")}
+                      aria-label="Switch to Candlestick type"
+                    >
+                      <CandlestickChartSharp fontSize="inherit" />
+                    </ChartIconButton>
+                  </span>
+                </Tooltip>
+                <Tooltip title="Switch to Baseline type">
+                  <span>
+                    <ChartIconButton
+                      active={activeType === "Baseline"}
+                      onClick={() => setPreferredType("Baseline")}
+                      aria-label="Switch to Baseline type"
+                      disabled={isStackedArea || isMultiArea}
+                    >
+                      <Timeline fontSize="inherit" />
+                    </ChartIconButton>
+                  </span>
+                </Tooltip>
+                <Tooltip title="Switch to Area type">
+                  <span>
+                    <ChartIconButton
+                      active={activeType === "Area"}
+                      onClick={() => setPreferredType("Area")}
+                      aria-label="Switch to Area type"
+                    >
+                      {/* <ShowChart fontSize="inherit" /> */}
+                      {/* cc https://icon-sets.iconify.design/material-symbols/area-chart/ */}
+                      <SvgIcon fontSize="inherit">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            fill="currentColor"
+                            d="m21 16l-9.4-7.35l-3.975 5.475L3 10.5V7l4 3l5-7l5 4h4zM3 20v-7l5 4l4-5.5l9 7.025V20z"
+                          />
+                        </svg>
+                      </SvgIcon>
+                    </ChartIconButton>
+                  </span>
+                </Tooltip>
+                <Tooltip title="Switch to Histogram type">
+                  <span>
+                    <ChartIconButton
+                      active={activeType === "Histogram"}
+                      onClick={() => setPreferredType("Histogram")}
+                      aria-label="Switch to Histogram type"
+                      disabled={isStackedArea || isMultiArea}
+                    >
+                      <BarChartOutlined fontSize="inherit" />
+                    </ChartIconButton>
+                  </span>
+                </Tooltip>
+              </Stack>
+              <Divider orientation="vertical" flexItem />
             </Stack>
-            <Divider orientation="vertical" flexItem />
-          </Stack>
-          {extraSettings}
-          {/* <Stack direction="row">
+            {extraSettings}
+            {/* <Stack direction="row">
             <IconButton
               size="small"
               // onClick={toggleFullscreen}
@@ -698,8 +717,9 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
               <MoreHoriz fontSize="inherit" />
             </IconButton>
           </Stack> */}
-        </Stack>
-        <Box sx={{ height: "calc(100% - 43px - 4px)" }}>
+          </Stack>
+        )}
+        <Box sx={{ height: `calc(100% - ${hideToolbar ? 0 : 43}px - 4px)` }}>
           {(isLoading || isEmpty || error) && (
             <Stack
               justifyContent="center"
@@ -709,7 +729,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
               {isEmpty && !isLoading && !error && emptyContent}
               {isLoading && <DefaultSpinner />}
               {error && (
-                <Stack spacing={1} alignItems="center">
+                <Stack gap={1} alignItems="center">
                   <Typography>Error loading data</Typography>
                   <Typography color="error" variant="body2" component="div">
                     <span>{error.message}</span>

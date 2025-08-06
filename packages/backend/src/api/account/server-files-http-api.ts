@@ -2,8 +2,8 @@ import { createWriteStream } from "fs"
 import { access, mkdir, open, readFile, stat } from "fs/promises"
 import mime from "mime-types"
 import { join } from "path"
+import { logger } from "src/logger"
 import { corsHeaders, FILES_LOCATION } from "src/settings/settings"
-import { getPrefix } from "src/utils/utils"
 import { promisify } from "util"
 
 import { Api } from "../api"
@@ -154,7 +154,7 @@ export async function handleUpload(request: Request, writeApi: Api): Promise<Res
     })
   }
 
-  console.log(getPrefix(accountName), `Uploading file: ${fileRecord.name}`)
+  logger.getChild(accountName).info("Uploading file", { fileName: fileRecord.name })
 
   await writeApi.patchServerFile(accountName, fileRecord.id, {
     startedAt: Date.now(),
@@ -186,10 +186,10 @@ export async function handleUpload(request: Request, writeApi: Api): Promise<Res
     // Read all chunks of data from the stream
     while (!(result = await reader.read()).done) {
       const chunk = result.value
-      console.log(
-        getPrefix(accountName),
-        `Received chunk of size ${chunk.byteLength} bytes of file ${fileRecord.name}`
-      )
+      logger.getChild(accountName).debug("Received chunk", {
+        chunkSize: chunk.byteLength,
+        fileName: fileRecord.name,
+      })
       // Write each chunk directly to the file
       writeStream.write(Buffer.from(chunk))
     }
@@ -216,7 +216,7 @@ export async function handleUpload(request: Request, writeApi: Api): Promise<Res
     })
   }
 
-  console.log(getPrefix(accountName), `File uploaded: ${fileRecord.name}`)
+  logger.getChild(accountName).info("File uploaded", { fileName: fileRecord.name })
 
   return new Response("File uploaded.", { headers: corsHeaders, status: 200 })
 }

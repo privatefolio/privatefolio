@@ -81,6 +81,7 @@ export async function fetchInMemoryData(rpc: RPC, accountName: string) {
     family: ["openai", "perplexity", "anthropic"],
     feeAsset: assetIds,
     incomingAsset: assetIds,
+    level: ["error", "warn", "info", "debug", "fatal"],
     operation,
     outgoingAsset: assetIds,
     platformId: platformIds,
@@ -113,6 +114,7 @@ export const FILTER_LABEL_MAP: Record<FilterKey | DirectFilterKey, string> = {
   groupId: "Group Id",
   id: "Id",
   incomingAsset: "Incoming asset",
+  level: "Level",
   operation: "Operation",
   outgoingAsset: "Outgoing asset",
   platformId: "Platform",
@@ -175,6 +177,11 @@ export function getFilterValueLabel(value: string | number | undefined) {
   if (value === "open") return "Open"
   if (value === "closed") return "Closed"
   if (value === "manual-import") return "Manual import"
+  if (value === "error") return "Error"
+  if (value === "warn") return "Warn"
+  if (value === "info") return "Info"
+  if (value === "debug") return "Debug"
+  if (value === "fatal") return "Fatal"
 
   if (value in $addressBook.get()) {
     return $addressBook.get()[value]

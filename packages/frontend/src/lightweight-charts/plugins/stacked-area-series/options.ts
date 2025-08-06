@@ -8,6 +8,7 @@ export interface StackedAreaColor {
 export interface StackedAreaSeriesOptions extends CustomSeriesOptions {
   colors: readonly StackedAreaColor[]
   lineWidth: number
+  stacked?: boolean
 }
 
 export const defaultOptions: StackedAreaSeriesOptions = {

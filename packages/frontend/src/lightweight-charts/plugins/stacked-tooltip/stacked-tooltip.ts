@@ -70,7 +70,7 @@ interface TooltipCrosshairLineData {
   topMargin: number
 }
 
-const defaultOptions: TooltipPrimitiveOptions = {
+const defaultOptions: StackedTooltipPrimitiveOptions = {
   currencySymbol: "",
   priceExtractor: (data: StackedAreaData, significantDigits?: number) => {
     const d = data as StackedAreaData
@@ -99,7 +99,7 @@ const defaultOptions: TooltipPrimitiveOptions = {
   },
 }
 
-export interface TooltipPrimitiveOptions {
+export interface StackedTooltipPrimitiveOptions {
   tooltip?: Partial<TooltipOptions>
   priceExtractor: (
     dataPoint: StackedAreaData,
@@ -113,7 +113,7 @@ export interface TooltipPrimitiveOptions {
 }
 
 export class StackedTooltipPrimitive implements ISeriesPrimitive<Time> {
-  private _options: TooltipPrimitiveOptions
+  private _options: StackedTooltipPrimitiveOptions
   private _tooltip: TooltipElement | undefined = undefined
   _paneViews: MultiTouchCrosshairPaneView[]
   _data: TooltipCrosshairLineData = {
@@ -125,7 +125,7 @@ export class StackedTooltipPrimitive implements ISeriesPrimitive<Time> {
 
   _attachedParams: SeriesAttachedParameter<Time> | undefined
 
-  constructor(options: Partial<TooltipPrimitiveOptions> = {}) {
+  constructor(options: Partial<StackedTooltipPrimitiveOptions> = {}) {
     this._options = {
       ...defaultOptions,
       ...options,
@@ -176,7 +176,7 @@ export class StackedTooltipPrimitive implements ISeriesPrimitive<Time> {
     return this._attachedParams?.series
   }
 
-  applyOptions(options: Partial<TooltipPrimitiveOptions>) {
+  applyOptions(options: Partial<StackedTooltipPrimitiveOptions>) {
     this._options = {
       ...this._options,
       ...options,

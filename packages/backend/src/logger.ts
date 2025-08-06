@@ -1,80 +1,67 @@
-import { BunFile, FileSink } from "bun"
+import { getFileSink } from "@logtape/file"
+import { configure, getConsoleSink, getJsonLinesFormatter, getLogger } from "@logtape/logtape"
+import { getPrettyFormatter } from "@logtape/pretty"
 import { existsSync, mkdirSync } from "fs"
 import { join } from "path"
 
-import { SERVER_LOGS_LOCATION } from "./settings/settings"
+import { DATA_LOCATION, SERVER_LOGS_LOCATION } from "./settings/settings"
+import {
+  environment,
+  isBunWorker,
+  isTestEnvironment,
+  runtime,
+  useBunSqlite,
+  writesAllowed,
+} from "./utils/environment-utils"
 
 if (!existsSync(SERVER_LOGS_LOCATION)) mkdirSync(SERVER_LOGS_LOCATION, { recursive: true })
 
-let fileSink: FileSink
-
-// Rotate log file at midnight and every 24h thereafter
-function openLogFile() {
+export const getLogFilePath = () => {
   const date = new Date().toISOString().slice(0, 10)
-  fileSink?.end()
-
-  const bunFile: BunFile = Bun.file(join(SERVER_LOGS_LOCATION, `${date}.log`))
-  fileSink = bunFile.writer()
-}
-openLogFile()
-
-const msUntilMidnight = () => {
-  const now = new Date()
-  const next = new Date(now)
-  next.setDate(now.getDate() + 1)
-  next.setHours(0, 0, 0, 0)
-  return next.getTime() - now.getTime()
+  return join(SERVER_LOGS_LOCATION, `${date}.log`)
 }
 
-setTimeout(() => {
-  openLogFile()
-  setInterval(openLogFile, 24 * 60 * 60 * 1000)
-}, msUntilMidnight())
-
-const originalConsole = <Record<string, (...args: unknown[]) => void>>{}
-const levels = ["log", "info", "warn", "error", "debug"] as const
-levels.forEach((level) => {
-  if (typeof console[level] === "function") {
-    originalConsole[level] = console[level].bind(console)
-  }
-})
-
-function callOriginal(level: (typeof levels)[number], ...args: unknown[]) {
-  const fn = originalConsole[level] || originalConsole.log
-  fn(...args)
+export async function setupLogger(logFilePath: string) {
+  await configure({
+    loggers: [
+      {
+        category: [],
+        lowestLevel: "debug",
+        // lowestLevel: "trace",
+        sinks: ["console", "file"],
+      },
+      {
+        category: ["logtape", "meta"],
+        lowestLevel: "warning",
+        sinks: ["console", "file"],
+      },
+    ],
+    sinks: {
+      console: getConsoleSink({
+        formatter: getPrettyFormatter({
+          categoryWidth: 14,
+          properties: true,
+        }),
+      }),
+      file: getFileSink(logFilePath, {
+        flushInterval: 100,
+        formatter: getJsonLinesFormatter(),
+        nonBlocking: true,
+      }),
+    },
+  })
 }
 
-levels.forEach((level) => {
-  if (!originalConsole[level]) return
+await setupLogger(getLogFilePath())
 
-  console[level] = (...args: unknown[]) => {
-    const timestamp = new Date().toISOString()
-    const msg = args
-      .map((a) =>
-        typeof a === "string"
-          ? a
-          : a instanceof Error
-            ? a.stack || a.message
-            : JSON.stringify(a, null, 2)
-      )
-      .join(" ")
+export const logger = getLogger(isBunWorker ? ["worker"] : ["main"])
 
-    const entry = `${timestamp} [${level.toUpperCase()}] ${msg}\n`
-    fileSink.write(entry)
-    fileSink.flush()
-
-    callOriginal(level, ...args)
-  }
-})
-
-// Global error handlers
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled Rejection:", promise, "reason:", reason)
-})
-
-process.on("uncaughtException", (err) => {
-  console.error("Uncaught Exception:", err)
-})
-
-// Indicate readiness
-console.log("Logger initialized.")
+if (!isTestEnvironment) {
+  logger.info("Initialize backend", {
+    dataLocation: DATA_LOCATION,
+    environment,
+    runtime,
+    sqliteImpl: useBunSqlite ? "bun" : "sqlite3",
+    sqliteWrites: writesAllowed ? "allowed" : "disallowed",
+  })
+}

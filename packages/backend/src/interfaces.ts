@@ -764,6 +764,7 @@ export type FilterOptionsMap = {
   family: ModelFamily[]
   feeAsset: string[]
   incomingAsset: string[]
+  level: string[]
   operation: AuditLogOperation[]
   outgoingAsset: string[]
   platformId: string[]
@@ -785,6 +786,10 @@ export enum SubscriptionChannel {
   ServerTasks = "server-tasks",
   ServerTaskProgress = "server-task-progress",
   ServerFiles = "server-files",
+  ServerKeyValue = "server-key-value",
+  ServerSettings = "server-settings",
+  ServerLogs = "server-logs",
+  ServerHealth = "server-health",
   KeyValue = "key-value",
   AuditLogs = "audit-logs",
   ChatHistory = "chat-history",
@@ -795,7 +800,6 @@ export enum SubscriptionChannel {
   Metadata = "metadata",
   Balances = "balances",
   Transactions = "transactions",
-  ServerLog = "server-logs",
   Tags = "tags",
   Trades = "trades",
   TradePnl = "trade-pnl",
@@ -1025,4 +1029,46 @@ export interface PushDevice {
   deviceId: string
   subscription: PushSub
   userAgent?: string
+}
+
+export interface SystemInfo {
+  cpuCores: number
+  cpuModel: string
+  memory: number
+  nodeVersion: string
+  platform: string
+  version: string
+}
+
+export interface ServerHealthMetric {
+  cpuUsage: number
+  diskTotal?: number
+  diskUsage?: number
+  diskUsed?: number
+  id?: number
+  memoryTotal: number
+  memoryUsage: number
+  memoryUsed: number
+  processCount?: number
+  timestamp: number
+  uptime: number
+}
+
+export interface ServerLog {
+  categories: string[]
+  id: string
+  level: "fatal" | "error" | "warn" | "info" | "debug" | "trace"
+  message: string
+  properties: Record<string, unknown>
+  timestamp: number
+}
+
+export interface HealthStats {
+  avgCpuUsage: number
+  avgMemoryUsage: number
+  count: number
+  maxCpuUsage: number
+  maxMemoryUsage: number
+  minCpuUsage: number
+  minMemoryUsage: number
 }

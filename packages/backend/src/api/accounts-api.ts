@@ -1,3 +1,4 @@
+import { Logger } from "@logtape/logtape"
 import EventEmitter from "events"
 import { access, mkdir, readdir, stat, writeFile } from "fs/promises"
 import { join } from "path"
@@ -9,13 +10,15 @@ import {
   TaskPriority,
   TaskStatus,
 } from "src/interfaces"
+import { logger } from "src/logger"
 import { DATABASES_LOCATION, FILES_LOCATION, TASK_LOGS_LOCATION } from "src/settings/settings"
 import { createSqliteDatabaseConnection } from "src/sqlite/sqlite"
-import { isDevelopment, isTestEnvironment, writesAllowed } from "src/utils/environment-utils"
+import { isTestEnvironment, writesAllowed } from "src/utils/environment-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { safeRemove } from "src/utils/file-utils"
 import { ensureActiveAccount, isMarkedForDeletion, sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
-import { getPrefix, sleep, wasteCpuCycles } from "src/utils/utils"
+import { sleep, wasteCpuCycles } from "src/utils/utils"
 
 import { enqueueRefetchAssets, getAccountWithAssets } from "./account/assets-api"
 import { getAccountWithChatHistory } from "./account/assistant-api"
@@ -47,7 +50,11 @@ if (typeof window !== "undefined") {
 
 const IN_MEMORY_DB = ":memory:"
 
-async function createDatabaseConnection(accountName: string, createIfNeeded = false) {
+async function createDatabaseConnection(
+  accountName: string,
+  createIfNeeded = false,
+  logger: Logger
+) {
   const databaseFilePath = isTestEnvironment
     ? IN_MEMORY_DB
     : join(DATABASES_LOCATION, `${accountName}.sqlite`)
@@ -57,21 +64,27 @@ async function createDatabaseConnection(accountName: string, createIfNeeded = fa
     try {
       await ensureActiveAccount(accountName)
       await access(databaseFilePath)
-      console.log(getPrefix(accountName), "Connecting to existing database", databaseFilePath)
+
+      // logger.debug("Connecting to existing database", {
+      //   dbPath: databaseFilePath,
+      // })
     } catch {
       if (!createIfNeeded) throw new Error(`Account "${accountName}" does not exist`)
-      console.log(getPrefix(accountName), "Creating database file", databaseFilePath)
+      logger.info("Creating database file", { dbPath: databaseFilePath })
       // ensure databases dir exists
       await mkdir(DATABASES_LOCATION, { recursive: true })
       await writeFile(databaseFilePath, "")
     }
   }
 
-  const db = await createSqliteDatabaseConnection(databaseFilePath, accountName)
+  const db = await createSqliteDatabaseConnection(databaseFilePath, accountName, logger)
 
-  const journalMode = await db.execute(`PRAGMA journal_mode`)
-  if (isDevelopment) {
-    console.log(getPrefix(accountName), "SQLite journal mode:", journalMode[0][0])
+  if (!isTestEnvironment) {
+    const journalMode = await db.execute(`PRAGMA journal_mode`)
+    logger.info("Connected to database", {
+      dbPath: databaseFilePath,
+      journalMode: journalMode[0][0],
+    })
   }
 
   return db
@@ -81,6 +94,7 @@ export type DatabaseConnection = Awaited<ReturnType<typeof createDatabaseConnect
 
 export type BaseAccount = DatabaseConnection & {
   eventEmitter: EventEmitter
+  logger: Logger
   name: string
 }
 
@@ -123,8 +137,13 @@ export async function getAccount(accountName: string, createIfNeeded = false): P
 
   if (!accounts[accountName]) {
     accounts[accountName] = (async () => {
-      const db: DatabaseConnection = await createDatabaseConnection(accountName, createIfNeeded)
-      const initialized = await initializeDatabaseIfNeeded(db, accountName)
+      const childLogger = logger.getChild(accountName)
+      const db: DatabaseConnection = await createDatabaseConnection(
+        accountName,
+        createIfNeeded,
+        childLogger
+      )
+      const initialized = await initializeDatabaseIfNeeded(db, childLogger)
       if (initialized) {
         appEventEmitter.emit(SubscriptionChannel.Accounts, EventCause.Created, accountName)
         populateFirstServerTask(accountName)
@@ -132,6 +151,7 @@ export async function getAccount(accountName: string, createIfNeeded = false): P
       const account: BaseAccount = {
         ...db,
         eventEmitter: new EventEmitter(),
+        logger: childLogger,
         name: accountName,
       }
 
@@ -190,9 +210,9 @@ async function deleteUserData(accountName: string) {
 }
 
 export async function deleteAccount(accountName: string, keepAccount = false) {
-  if (!isTestEnvironment) console.log(getPrefix(accountName), "Deleting account.")
-
   const account = await getAccount(accountName)
+
+  if (!isTestEnvironment) account.logger.info("Deleting account")
   if (!isTestEnvironment) {
     await writeFile(
       join(DATABASES_LOCATION, `${accountName}.deleting`),
@@ -207,10 +227,10 @@ export async function deleteAccount(accountName: string, keepAccount = false) {
     await account.close()
     await deleteUserData(accountName)
   } catch (error) {
-    console.error(getPrefix(accountName), "Failed to delete user data:", error)
+    logAndReportError(error, "Failed to delete user data", {}, account.logger)
   }
 
-  if (!isTestEnvironment) console.log(getPrefix(accountName), "Deleted account.")
+  if (!isTestEnvironment) account.logger.info("Deleted account")
 }
 
 /**
@@ -235,8 +255,8 @@ export async function resetAccount(accountName: string) {
   await deleteAccount(accountName, true)
 
   // recreate db
-  const db: DatabaseConnection = await createDatabaseConnection(accountName, true)
-  await initializeDatabaseIfNeeded(db, accountName)
+  const db: DatabaseConnection = await createDatabaseConnection(accountName, true, account.logger)
+  await initializeDatabaseIfNeeded(db, account.logger)
   populateFirstServerTask(accountName)
 
   Object.assign(account, db)
@@ -249,7 +269,7 @@ export async function resetAccount(accountName: string) {
 
 async function initializeDatabaseIfNeeded(
   account: DatabaseConnection,
-  accountName: string
+  logger: Logger
 ): Promise<boolean> {
   const tablesCount = (
     await account.execute(sql`
@@ -263,23 +283,16 @@ async function initializeDatabaseIfNeeded(
   }
 
   if (tablesCount > 0) {
-    console.log(getPrefix(accountName), "Skipping database initialization.")
+    logger.trace("Skipping database initialization")
     return false
   }
 
-  if (!isTestEnvironment) console.log(getPrefix(accountName), "Initializing database.")
+  if (!isTestEnvironment) logger.info("Initializing database")
   try {
     await account.execute(`PRAGMA journal_mode = WAL;`)
   } catch {
-    console.log(getPrefix(accountName), "Failed to set journal mode to WAL")
+    logger.warn("Failed to set journal mode to WAL")
   }
-
-  await account.execute(sql`
-CREATE TABLE key_value (
-  key VARCHAR PRIMARY KEY,
-  value JSON
-);
-`)
 
   return true
 }
@@ -325,7 +338,7 @@ export async function subscribeToAccounts(
   return createSubscription(undefined, SubscriptionChannel.Accounts, callback)
 }
 
-export async function getListenerCount() {
+export async function computeActiveConnections() {
   return appEventEmitter.listenerCount(SubscriptionChannel.Accounts)
 }
 
@@ -344,7 +357,7 @@ export async function getAccountNames() {
     validFiles.map(async (file) => {
       const accountName = file.replace(".sqlite", "")
       if (await isMarkedForDeletion(accountName)) {
-        console.log(getPrefix(accountName), "Account marked for deletion, removing user data")
+        logger.getChild(accountName).info("Account marked for deletion, removing user data")
         try {
           await deleteUserData(accountName)
         } catch {}
@@ -411,6 +424,8 @@ export async function unsubscribe(subscriptionId: SubscriptionId, throwOnError =
 }
 
 export async function migrateTables(accountName: string) {
+  const account = await getAccount(accountName)
+  account.logger.info("Migrating database tables")
   await getAccountWithAssets(accountName)
   await getAccountWithAuditLogs(accountName)
   await getAccountWithBalances(accountName)

@@ -1,22 +1,22 @@
 import {
   Button,
-  FormControlLabel,
   FormHelperText,
   InputAdornment,
   Paper,
   Stack,
-  Switch,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { enqueueSnackbar } from "notistack"
+import { ONE_DAY_MIN } from "privatefolio-backend/src/utils/formatting-utils"
 import React, { MouseEvent, useEffect, useState } from "react"
+import { DefaultErrorMessage } from "src/components/DefaultErrorMessage"
+import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { LearnMore } from "src/components/LearnMore"
 import { SectionTitle } from "src/components/SectionTitle"
 
-import { DEFAULT_SETTINGS } from "../../settings"
 import { $activeAccount } from "../../stores/account-store"
 import { $rpc } from "../../workers/remotes"
 
@@ -27,19 +27,19 @@ const isValidInterval = (minutes: number): boolean => {
   return minutes < 60 || minutes % 60 === 0
 }
 
-// Predefined refresh interval options in minutes
-const REFRESH_INTERVALS = [
-  { label: "5min", value: 5 },
-  { label: "1h", value: 60 },
-  { label: "4h", value: 240 },
-  { label: "24h", value: 1440 },
+// Predefined server health cron interval options in minutes
+const HEALTH_METRICS_INTERVALS = [
+  { label: "1 min", value: 1 },
+  { label: "5 min", value: 5 },
+  { label: "1 hour", value: 60 },
+  { label: "4 hours", value: 240 },
 ]
 
-// Predefined refresh interval options in minutes
-const METADATA_REFRESH_INTERVALS = [
-  { label: "1 day", value: 1440 },
-  { label: "7 days", value: 10080 },
-  { label: "30 days", value: 43200 },
+// Predefined system info refresh interval options in minutes
+const SYSTEM_INFO_INTERVALS = [
+  { label: "1 day", value: ONE_DAY_MIN },
+  { label: "7 days", value: 7 * ONE_DAY_MIN },
+  { label: "30 days", value: 30 * ONE_DAY_MIN },
 ]
 
 export function ServerSettings() {
@@ -51,20 +51,14 @@ export function ServerSettings() {
   }, [activeAccount])
 
   const [isLoading, setIsLoading] = useState(true)
-  const [networthRefreshInterval, setNetworthCronInterval] = useState(
-    DEFAULT_SETTINGS.networthRefreshInterval
-  )
-  const [isCustomMode, setIsCustomMode] = useState(false)
-  const [isNetworthIntervalValid, setIsNetworthIntervalValid] = useState(true)
-  const [kioskMode, setKioskMode] = useState(false)
-
-  const [metadataRefreshInterval, setMetadataCronInterval] = useState(
-    DEFAULT_SETTINGS.metadataRefreshInterval
-  )
-  const [isMetadataCustomMode, setIsMetadataCustomMode] = useState(false)
-  const [isMetadataIntervalValid, setIsMetadataIntervalValid] = useState(true)
-
+  const [healthMetricsInterval, setHealthMetricsInterval] = useState(5)
+  const [isHealthCustomMode, setIsHealthCustomMode] = useState(false)
+  const [isHealthIntervalValid, setIsHealthIntervalValid] = useState(true)
+  const [systemInfoInterval, setSystemInfoInterval] = useState(1440)
+  const [isSystemInfoCustomMode, setIsSystemInfoCustomMode] = useState(false)
+  const [isSystemInfoIntervalValid, setIsSystemInfoIntervalValid] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
     if (!activeAccount) return
@@ -72,32 +66,28 @@ export function ServerSettings() {
     const loadSettings = async () => {
       setIsLoading(true)
       try {
-        const savedSettings = await rpc.getSettings(activeAccount)
-        const settings = Object.assign({}, DEFAULT_SETTINGS, savedSettings)
+        const serverSettings = await rpc.getServerSettings()
+        setHealthMetricsInterval(serverSettings.healthMetricsInterval)
+        setSystemInfoInterval(serverSettings.systemInfoInterval)
 
-        setNetworthCronInterval(settings.networthRefreshInterval)
-        setMetadataCronInterval(settings.metadataRefreshInterval)
-        setKioskMode(settings.kioskMode ?? false)
-
-        // Check if the loaded value matches any predefined interval
-        const isNetworthCustom = !REFRESH_INTERVALS.some(
-          (option) => option.value === settings.networthRefreshInterval
+        const isHealthCustom = !HEALTH_METRICS_INTERVALS.some(
+          (option) => option.value === serverSettings.healthMetricsInterval
         )
-        setIsCustomMode(isNetworthCustom)
-        setIsNetworthIntervalValid(
-          isNetworthCustom ? isValidInterval(settings.networthRefreshInterval) : true
+        setIsHealthCustomMode(isHealthCustom)
+        setIsHealthIntervalValid(
+          isHealthCustom ? isValidInterval(serverSettings.healthMetricsInterval) : true
         )
 
-        const isMetadataCustom = !METADATA_REFRESH_INTERVALS.some(
-          (option) => option.value === settings.metadataRefreshInterval
+        const isSystemInfoCustom = !SYSTEM_INFO_INTERVALS.some(
+          (option) => option.value === serverSettings.systemInfoInterval
         )
-        setIsMetadataCustomMode(isMetadataCustom)
-        setIsMetadataIntervalValid(
-          isMetadataCustom ? isValidInterval(settings.metadataRefreshInterval) : true
+        setIsSystemInfoCustomMode(isSystemInfoCustom)
+        setIsSystemInfoIntervalValid(
+          isSystemInfoCustom ? isValidInterval(serverSettings.systemInfoInterval) : true
         )
       } catch (error) {
         console.error("Failed to load settings:", error)
-        enqueueSnackbar("Failed to load settings", { variant: "error" })
+        setError(error as Error)
       } finally {
         setIsLoading(false)
       }
@@ -112,112 +102,111 @@ export function ServerSettings() {
     setIsSaving(true)
 
     try {
-      await rpc.updateSettings(activeAccount, {
-        kioskMode,
-        metadataRefreshInterval,
-        networthRefreshInterval,
+      await rpc.updateServerSettings({
+        healthMetricsInterval,
+        systemInfoInterval,
       })
-      enqueueSnackbar("Settings saved", { variant: "success" })
+      enqueueSnackbar("Server settings saved", { variant: "success" })
     } catch (error) {
-      console.error("Failed to save settings:", error)
-      enqueueSnackbar("Failed to save settings", { variant: "error" })
+      console.error("Failed to save server settings:", error)
+      enqueueSnackbar("Failed to save server settings", { variant: "error" })
     } finally {
       setIsSaving(false)
     }
   }
 
-  const handleNetworthIntervalChange = (
+  const handleHealthIntervalChange = (
     _: MouseEvent<HTMLElement>,
     value: number | "custom" | null
   ) => {
     if (value !== null) {
       if (value === "custom") {
-        setIsCustomMode(true)
-        setIsNetworthIntervalValid(isValidInterval(networthRefreshInterval))
+        setIsHealthCustomMode(true)
+        setIsHealthIntervalValid(isValidInterval(healthMetricsInterval))
       } else {
-        setIsCustomMode(false)
-        setNetworthCronInterval(value)
-        setIsNetworthIntervalValid(true) // Predefined are always valid
+        setIsHealthCustomMode(false)
+        setHealthMetricsInterval(value)
+        setIsHealthIntervalValid(true) // Predefined are always valid
       }
     }
   }
 
-  const handleNetworthCustomIntervalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleHealthCustomIntervalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.includes(".")) {
-      setNetworthCronInterval(parseFloat(e.target.value))
-      setIsNetworthIntervalValid(false)
+      setHealthMetricsInterval(parseFloat(e.target.value))
+      setIsHealthIntervalValid(false)
       return
     }
 
     const value = parseInt(e.target.value, 10)
     if (!isNaN(value) && value > 0) {
-      setNetworthCronInterval(value)
-      setIsNetworthIntervalValid(isValidInterval(value))
+      setHealthMetricsInterval(value)
+      setIsHealthIntervalValid(isValidInterval(value))
     } else {
-      setNetworthCronInterval(value || 0)
-      setIsNetworthIntervalValid(false)
+      setHealthMetricsInterval(value || 0)
+      setIsHealthIntervalValid(false)
     }
   }
 
-  const handleMetadataIntervalChange = (
+  const handleSystemInfoIntervalChange = (
     _: MouseEvent<HTMLElement>,
     value: number | "custom" | null
   ) => {
     if (value !== null) {
       if (value === "custom") {
-        setIsMetadataCustomMode(true)
-        setIsMetadataIntervalValid(isValidInterval(metadataRefreshInterval))
+        setIsSystemInfoCustomMode(true)
+        setIsSystemInfoIntervalValid(isValidInterval(systemInfoInterval))
       } else {
-        setIsMetadataCustomMode(false)
-        setMetadataCronInterval(value)
-        setIsMetadataIntervalValid(true) // Predefined are always valid
+        setIsSystemInfoCustomMode(false)
+        setSystemInfoInterval(value)
+        setIsSystemInfoIntervalValid(true) // Predefined are always valid
       }
     }
   }
 
-  const handleMetadataCustomIntervalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSystemInfoCustomIntervalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.includes(".")) {
-      setMetadataCronInterval(parseFloat(e.target.value) * 1440)
-      setIsMetadataIntervalValid(false)
+      setSystemInfoInterval(parseFloat(e.target.value) * 1440)
+      setIsSystemInfoIntervalValid(false)
       return
     }
 
     const valueInDays = parseInt(e.target.value, 10)
     if (!isNaN(valueInDays) && valueInDays > 0) {
       const valueInMinutes = valueInDays * 1440
-      setMetadataCronInterval(valueInMinutes)
-      setIsMetadataIntervalValid(isValidInterval(valueInMinutes))
+      setSystemInfoInterval(valueInMinutes)
+      setIsSystemInfoIntervalValid(isValidInterval(valueInMinutes))
 
       // If the custom value matches a predefined option, switch back to the toggle button
-      if (METADATA_REFRESH_INTERVALS.some((option) => option.value === valueInMinutes)) {
-        setIsMetadataCustomMode(false)
+      if (SYSTEM_INFO_INTERVALS.some((option) => option.value === valueInMinutes)) {
+        setIsSystemInfoCustomMode(false)
       }
     } else {
-      setMetadataCronInterval(0) // invalid
-      setIsMetadataIntervalValid(false)
+      setSystemInfoInterval(0) // invalid
+      setIsSystemInfoIntervalValid(false)
     }
   }
 
   // Determine which value to show in the toggle group
-  const networthToggleValue = isCustomMode ? "custom" : networthRefreshInterval
-  const metadataToggleValue = isMetadataCustomMode ? "custom" : metadataRefreshInterval
+  const healthToggleValue = isHealthCustomMode ? "custom" : healthMetricsInterval
+  const systemInfoToggleValue = isSystemInfoCustomMode ? "custom" : systemInfoInterval
+
+  if (isLoading) return <DefaultSpinner wrapper />
+  if (error) return <DefaultErrorMessage error={error} />
 
   return (
     <Paper sx={{ paddingX: 2, paddingY: 1 }}>
       <Stack gap={2}>
         <Stack gap={1}>
-          <LearnMore
-            title={`How often the server will automatically refresh balances, prices, and networth.
-                    Default is ${DEFAULT_SETTINGS.networthRefreshInterval} minutes.`}
-          >
-            <SectionTitle>Networth Refresh Interval</SectionTitle>
+          <LearnMore title={`How often to collect and store system health metrics.`}>
+            <SectionTitle>Health Metrics Interval</SectionTitle>
           </LearnMore>
           <ToggleButtonGroup
-            value={networthToggleValue}
+            value={healthToggleValue}
             exclusive
-            onChange={handleNetworthIntervalChange}
+            onChange={handleHealthIntervalChange}
             disabled={isLoading}
-            aria-label="refresh interval"
+            aria-label="health metrics refresh interval"
             color="primary"
             sx={{
               "& .MuiButtonBase-root": {
@@ -228,7 +217,7 @@ export function ServerSettings() {
               },
             }}
           >
-            {REFRESH_INTERVALS.map((option) => (
+            {HEALTH_METRICS_INTERVALS.map((option) => (
               <ToggleButton key={option.label} value={option.value}>
                 {option.label}
               </ToggleButton>
@@ -236,14 +225,14 @@ export function ServerSettings() {
             <ToggleButton value={"custom" as const}>Custom</ToggleButton>
           </ToggleButtonGroup>
 
-          {isCustomMode && (
+          {isHealthCustomMode && (
             <Stack direction="row" gap={2} alignItems="center" flexWrap="wrap">
               <SectionTitle>Custom interval:</SectionTitle>
               <TextField
-                error={!isNetworthIntervalValid}
+                error={!isHealthIntervalValid}
                 disabled={isLoading}
-                value={networthRefreshInterval || ""}
-                onChange={handleNetworthCustomIntervalChange}
+                value={healthMetricsInterval || ""}
+                onChange={handleHealthCustomIntervalChange}
                 type="number"
                 InputProps={{
                   endAdornment: <InputAdornment position="end">minutes</InputAdornment>,
@@ -252,7 +241,7 @@ export function ServerSettings() {
                 sx={{ width: 160 }}
                 size="small"
               />
-              {!isNetworthIntervalValid && (
+              {!isHealthIntervalValid && (
                 <FormHelperText error>Must be &lt; 60, or a whole number of hours.</FormHelperText>
               )}
             </Stack>
@@ -261,16 +250,16 @@ export function ServerSettings() {
 
         <Stack gap={1}>
           <LearnMore
-            title={`How often the server will automatically refetch assets and platforms metadata.`}
+            title={`How often to refresh and update static system information (CPU, memory, platform details).`}
           >
-            <SectionTitle>Metadata Refresh Interval</SectionTitle>
+            <SectionTitle>System Info Interval</SectionTitle>
           </LearnMore>
           <ToggleButtonGroup
-            value={metadataToggleValue}
+            value={systemInfoToggleValue}
             exclusive
-            onChange={handleMetadataIntervalChange}
+            onChange={handleSystemInfoIntervalChange}
             disabled={isLoading}
-            aria-label="metadata refresh interval"
+            aria-label="system info refresh interval"
             color="primary"
             sx={{
               "& .MuiButtonBase-root": {
@@ -281,7 +270,7 @@ export function ServerSettings() {
               },
             }}
           >
-            {METADATA_REFRESH_INTERVALS.map((option) => (
+            {SYSTEM_INFO_INTERVALS.map((option) => (
               <ToggleButton key={option.label} value={option.value}>
                 {option.label}
               </ToggleButton>
@@ -289,14 +278,14 @@ export function ServerSettings() {
             <ToggleButton value={"custom" as const}>Custom</ToggleButton>
           </ToggleButtonGroup>
 
-          {isMetadataCustomMode && (
+          {isSystemInfoCustomMode && (
             <Stack direction="row" gap={2} alignItems="center" flexWrap="wrap">
               <SectionTitle>Custom interval:</SectionTitle>
               <TextField
-                error={!isMetadataIntervalValid}
+                error={!isSystemInfoIntervalValid}
                 disabled={isLoading}
-                value={metadataRefreshInterval > 0 ? metadataRefreshInterval / 1440 : ""}
-                onChange={handleMetadataCustomIntervalChange}
+                value={systemInfoInterval > 0 ? systemInfoInterval / 1440 : ""}
+                onChange={handleSystemInfoCustomIntervalChange}
                 type="number"
                 InputProps={{
                   endAdornment: <InputAdornment position="end">days</InputAdornment>,
@@ -305,37 +294,11 @@ export function ServerSettings() {
                 sx={{ width: 160 }}
                 size="small"
               />
-              {!isMetadataIntervalValid && (
+              {!isSystemInfoIntervalValid && (
                 <FormHelperText error>Must be a whole number of days.</FormHelperText>
               )}
             </Stack>
           )}
-        </Stack>
-        <Stack gap={1}>
-          <LearnMore
-            title={`When enabled, read operations are available to anyone without authentication. Write operations still require authentication.`}
-          >
-            <SectionTitle>Kiosk Mode</SectionTitle>
-          </LearnMore>
-          <FormControlLabel
-            sx={{
-              "&:not(:hover)": {
-                color: "var(--mui-palette-secondary-main)",
-              },
-              gap: 1,
-              marginLeft: 0,
-            }}
-            control={
-              <Switch
-                checked={kioskMode}
-                onChange={(e) => setKioskMode(e.target.checked)}
-                disabled={isLoading}
-                color="secondary"
-                size="small"
-              />
-            }
-            label="Make portfolio public"
-          />
         </Stack>
 
         <div>
@@ -345,8 +308,8 @@ export function ServerSettings() {
             disabled={
               isLoading ||
               isSaving ||
-              (isCustomMode && !isNetworthIntervalValid) ||
-              (isMetadataCustomMode && !isMetadataIntervalValid)
+              (isHealthCustomMode && !isHealthIntervalValid) ||
+              (isSystemInfoCustomMode && !isSystemInfoIntervalValid)
             }
           >
             Save

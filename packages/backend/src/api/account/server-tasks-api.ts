@@ -12,9 +12,10 @@ import {
 } from "src/interfaces"
 import { TASK_LOG_CHAR_LIMIT, TASK_LOG_LINE_LIMIT, TASK_LOGS_LOCATION } from "src/settings/settings"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
-import { getPrefix, isTestEnvironment, sleep, writesAllowed } from "src/utils/utils"
+import { isTestEnvironment, sleep, writesAllowed } from "src/utils/utils"
 
 import { Account, getAccount } from "../accounts-api"
 import { getValue, setValue } from "./kv-api"
@@ -188,7 +189,7 @@ function createProgressCallback(account: Account, taskId: number): ProgressCallb
       // emit event
       account.eventEmitter.emit(SubscriptionChannel.ServerTaskProgress, taskId, logEntry)
     } catch (error) {
-      // console.error("Failed to log progress update to file:", error)
+      logAndReportError(error, "Failed to log progress update")
     }
   }
 }
@@ -246,8 +247,10 @@ async function processQueue(accountName: string) {
             })(),
           ])
         } catch (error) {
-          // console.error(getPrefix(accountName), "Error processing task:", error)
           errorMessage = String(error)
+          if (!task.abortController.signal.aborted) {
+            logAndReportError(error, "Error processing task")
+          }
         } finally {
           let status: TaskStatus = TaskStatus.Completed
           if (errorMessage) status = TaskStatus.Failed
@@ -292,7 +295,7 @@ export async function getAccountWithTaskQueue(accountName: string) {
     account.taskQueue = []
     account.pendingTask = undefined
 
-    console.log(getPrefix(accountName), "Checking if there are any pending tasks in the database")
+    account.logger.info("Checking if there are any pending tasks in the database")
     const tasks = await getServerTasks(
       accountName,
       "SELECT * FROM server_tasks WHERE status = 'queued' or status = 'running'"
@@ -336,7 +339,7 @@ export async function cancelTask(accountName: string, taskId: number) {
   const account = await getAccountWithTaskQueue(accountName)
 
   if (account.pendingTask?.id === taskId) {
-    console.log(getPrefix(accountName), `Aborting task with id: ${account.pendingTask.id}`)
+    account.logger.info("Aborting task", { taskId: account.pendingTask.id })
     account.pendingTask.abortController?.abort("Task aborted by user.")
   } else if (account.taskQueue.some((x) => x.id === taskId)) {
     account.taskQueue = account.taskQueue.filter((x) => x.id !== taskId)
@@ -365,8 +368,7 @@ export async function getServerTaskLog(accountName: string, taskId: number) {
       return lines
     }
   } catch (error) {
-    console.error(`Failed to read ${logFilePath}`, error)
-    throw error
+    throw new Error(`Failed to open log file ${logFilePath} ${error.code}`)
   }
 }
 

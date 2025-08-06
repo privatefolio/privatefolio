@@ -20,6 +20,7 @@ import {
   TaskTrigger,
 } from "src/interfaces"
 import { DATABASES_LOCATION, FILES_LOCATION, TASK_LOGS_LOCATION } from "src/settings/settings"
+import { logAndReportError } from "src/utils/error-utils"
 import { saveFile } from "src/utils/file-utils"
 import { noop, parseProgressLog } from "src/utils/utils"
 
@@ -512,9 +513,9 @@ export async function enqueueRestore(accountName: string, trigger: TaskTrigger, 
           const logFilePath = join(logDir, `server_task_${savedTask.id}.log`)
           await writeFile(logFilePath, savedLogs.join(""))
         } catch (error) {
-          console.error(
-            `Failed to save restore task record/logs for account ${accountName}:`,
-            error
+          logAndReportError(
+            error,
+            `Failed to save restore task record/logs for account ${accountName}.`
           )
         }
       }
