@@ -11,7 +11,7 @@ import { closeSubscription } from "src/utils/browser-utils"
 import { $colorArray, stringToNumber } from "src/utils/color-utils"
 import { $rpc } from "src/workers/remotes"
 
-export function MemoryUsageChart() {
+export function DiskUsageChart() {
   const rpc = useStore($rpc)
   const connectionStatus = useStore($connectionStatus)
   const [refresh, setRefresh] = useState<number>(0)
@@ -36,9 +36,9 @@ export function MemoryUsageChart() {
     return metrics
       .map(
         (metric): StackedAreaData => ({
-          assets: ["Memory usage", "Memory total"],
+          assets: ["Disk usage", "Disk total"],
           time: (metric.timestamp / 1000) as Time,
-          values: [metric.memoryUsed || 0, metric.memoryTotal || 0],
+          values: [metric.diskUsed || 0, metric.diskTotal || 0],
         })
       )
       .filter((x) => !!x.values[0]) // Ensure no null values are returned

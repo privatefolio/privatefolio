@@ -71,6 +71,8 @@ export async function getDiskUsage(): Promise<{
   try {
     const currentDir = process.cwd()
 
+    // logger.debug("Getting disk usage for current directory:", { currentDir })
+
     if (os.platform() === "linux" || os.platform() === "darwin") {
       // Use df command to get disk usage information
       const { stdout } = await execAsync(`df -k "${currentDir}"`)

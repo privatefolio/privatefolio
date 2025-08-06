@@ -1,30 +1,26 @@
 import { LinearProgress, Paper, Skeleton, Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { formatDistance } from "date-fns"
+import { throttle } from "lodash-es"
 import React, { useCallback, useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { InfoCard, InfoCardRow, InfoCards } from "src/components/InfoCard"
 import { NavTab } from "src/components/NavTab"
 import { Tabs } from "src/components/Tabs"
-import { ServerHealthMetric } from "src/interfaces"
+import { WorkInProgressCallout } from "src/components/WorkInProgressCallout"
+import { HealthStats, ServerHealthMetric } from "src/interfaces"
+import { SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { MonoFont } from "src/theme"
+import { closeSubscription } from "src/utils/browser-utils"
 import { formatNumber } from "src/utils/formatting-utils"
 import { $rpc } from "src/workers/remotes"
 
 import { CpuUsageChart } from "./health/CpuUsageChart"
+import { DiskUsageChart } from "./health/DiskUsageChart"
 import { MemoryUsageChart } from "./health/MemoryUsageChart"
-
-interface HealthStats {
-  avgCpuUsage: number
-  avgMemoryUsage: number
-  count: number
-  maxCpuUsage: number
-  maxMemoryUsage: number
-  minCpuUsage: number
-  minMemoryUsage: number
-}
+import { ServerHealthActions } from "./health/ServerHealthActions"
 
 export function ServerHealth() {
   const activeAccount = useStore($activeAccount)
@@ -62,21 +58,15 @@ export function ServerHealth() {
   }, [fetchHealthData])
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (connectionStatus === "connected") {
-        fetchHealthData()
-      }
-    }, 5_000) // Update every 5 seconds
+    const subscription = rpc.subscribeToServerHealth(
+      throttle(fetchHealthData, SHORT_THROTTLE_DURATION)
+    )
 
-    return () => clearInterval(interval)
-  }, [connectionStatus, fetchHealthData, activeAccount])
+    return closeSubscription(subscription, rpc)
+  }, [rpc, connectionStatus, fetchHealthData])
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      rpc.computeListenerCount().then(setListenerCount)
-    }, 1_000)
-
-    return () => clearInterval(interval)
+    rpc.computeActiveConnections().then(setListenerCount)
   }, [rpc])
 
   if (isLoading) {
@@ -196,14 +186,20 @@ export function ServerHealth() {
 
         {healthStats && (
           <InfoCard>
-            <InfoCardRow title="Avg CPU usage" value={`${healthStats.avgCpuUsage.toFixed(1)}%`} />
-            <InfoCardRow title="Max CPU usage" value={`${healthStats.maxCpuUsage.toFixed(1)}%`} />
             <InfoCardRow
-              title="Avg memory usage"
+              title="Avg 24h CPU usage"
+              value={`${healthStats.avgCpuUsage.toFixed(1)}%`}
+            />
+            <InfoCardRow
+              title="Max 24h CPU usage"
+              value={`${healthStats.maxCpuUsage.toFixed(1)}%`}
+            />
+            <InfoCardRow
+              title="Avg 24h memory usage"
               value={`${healthStats.avgMemoryUsage.toFixed(1)}%`}
             />
             <InfoCardRow
-              title="Max memory usage"
+              title="Max 24h memory usage"
               value={`${healthStats.maxMemoryUsage.toFixed(1)}%`}
             />
           </InfoCard>
@@ -211,13 +207,20 @@ export function ServerHealth() {
       </InfoCards>
 
       <div>
-        <Tabs value={subTab} defaultValue={subTab}>
-          <NavTab value="cpu" to={`?tab=health&subtab=cpu`} label="CPU usage" />
-          <NavTab value="memory" to={`?tab=health&subtab=memory`} label="Memory usage" />
-        </Tabs>
+        <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+          <Tabs value={subTab} defaultValue={subTab}>
+            <NavTab value="cpu" to={`?tab=health&subtab=cpu`} label="CPU usage" />
+            <NavTab value="memory" to={`?tab=health&subtab=memory`} label="Memory usage" />
+            <NavTab value="disk" to={`?tab=health&subtab=disk`} label="Disk usage" />
+          </Tabs>
+          <ServerHealthActions />
+        </Stack>
         {subTab === "cpu" && <CpuUsageChart />}
         {subTab === "memory" && <MemoryUsageChart />}
+        {subTab === "disk" && <DiskUsageChart />}
       </div>
+
+      <WorkInProgressCallout />
     </Stack>
   )
 }

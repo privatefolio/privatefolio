@@ -1,8 +1,11 @@
-import { ServerHealthMetric, SqlParam } from "src/interfaces"
+import { ServerHealthMetric, SqlParam, SubscriptionChannel } from "src/interfaces"
 import { transformNullsToUndefined } from "src/utils/db-utils"
+import { isBunWorker } from "src/utils/environment-utils"
 import { getSystemMetrics } from "src/utils/server-utils"
 import { sql } from "src/utils/sql-utils"
+import { createSubscription } from "src/utils/sub-utils"
 
+import { appEventEmitter } from "./internal"
 import { getServerDatabase } from "./server-api"
 import { ensureSystemInfo } from "./server-info-api"
 import { getServerValue, setServerValue } from "./server-kv-api"
@@ -220,4 +223,28 @@ export async function monitorServerHealth() {
   await cleanupOldServerHealthMetrics(thirtyDaysAgo)
 
   return metrics
+}
+
+let latestRowId = 0
+
+// TODO7 should we unsub?
+// Every second check the log file for changes and emit an event
+if (isBunWorker) {
+  const _interval = setInterval(async () => {
+    const listeners = appEventEmitter.listenerCount(SubscriptionChannel.ServerHealth)
+    if (listeners === 0) return
+
+    const rows = await getServerHealth(
+      "SELECT * FROM health_metrics ORDER BY timestamp DESC LIMIT 1"
+    )
+    const latestRow = rows[0]
+    if (latestRow && latestRow.id !== latestRowId) {
+      appEventEmitter.emit(SubscriptionChannel.ServerHealth)
+      latestRowId = latestRow.id
+    }
+  }, 1_000)
+}
+
+export async function subscribeToServerHealth(callback: () => void) {
+  return createSubscription(undefined, SubscriptionChannel.ServerHealth, callback)
 }

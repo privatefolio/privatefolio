@@ -338,7 +338,7 @@ export async function subscribeToAccounts(
   return createSubscription(undefined, SubscriptionChannel.Accounts, callback)
 }
 
-export async function computeListenerCount() {
+export async function computeActiveConnections() {
   return appEventEmitter.listenerCount(SubscriptionChannel.Accounts)
 }
 

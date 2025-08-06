@@ -72,6 +72,18 @@ export function ServerActions() {
         <MenuItem
           dense
           onClick={() => {
+            rpc.monitorServerHealth()
+            handleClose()
+          }}
+        >
+          <ListItemAvatar>
+            <Refresh fontSize="small" />
+          </ListItemAvatar>
+          <ListItemText>Refresh health metrics</ListItemText>
+        </MenuItem>
+        <MenuItem
+          dense
+          onClick={() => {
             rpc.refreshSystemInfo()
             handleClose()
           }}

@@ -3,6 +3,7 @@ import path from "path"
 import { ServerLog, SubscriptionChannel } from "src/interfaces"
 import { SERVER_LOGS_LOCATION } from "src/settings/settings"
 import { stripAnsi } from "src/utils/ansi-utils"
+import { isBunWorker } from "src/utils/environment-utils"
 import { logAndReportError } from "src/utils/error-utils"
 import { createSubscription } from "src/utils/sub-utils"
 
@@ -111,17 +112,23 @@ export async function queryServerLogs(
   }
 }
 
-let latestRow = ""
+let latestRowId = ""
 
+// TODO7 should we unsub?
 // Every second check the log file for changes and emit an event
-const interval = setInterval(async () => {
-  const [logs] = await queryServerLogs({}, 1, 1, "desc", "timestamp")
-  const latestLog = logs[0]
-  if (latestLog && latestLog.id !== latestRow) {
-    appEventEmitter.emit(SubscriptionChannel.ServerLogs, "update")
-    latestRow = latestLog.id
-  }
-}, 1_000)
+if (isBunWorker) {
+  const _interval = setInterval(async () => {
+    const listeners = appEventEmitter.listenerCount(SubscriptionChannel.ServerLogs)
+    if (listeners === 0) return
+
+    const [logs] = await queryServerLogs({}, 1, 1, "desc", "timestamp")
+    const latestRow = logs[0]
+    if (latestRow && latestRow.id !== latestRowId) {
+      appEventEmitter.emit(SubscriptionChannel.ServerLogs)
+      latestRowId = latestRow.id
+    }
+  }, 1_000)
+}
 
 export async function subscribeToServerLog(callback: () => void) {
   return createSubscription(undefined, SubscriptionChannel.ServerLogs, callback)

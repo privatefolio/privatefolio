@@ -789,6 +789,7 @@ export enum SubscriptionChannel {
   ServerKeyValue = "server-key-value",
   ServerSettings = "server-settings",
   ServerLogs = "server-logs",
+  ServerHealth = "server-health",
   KeyValue = "key-value",
   AuditLogs = "audit-logs",
   ChatHistory = "chat-history",
@@ -799,7 +800,6 @@ export enum SubscriptionChannel {
   Metadata = "metadata",
   Balances = "balances",
   Transactions = "transactions",
-  ServerLog = "server-logs",
   Tags = "tags",
   Trades = "trades",
   TradePnl = "trade-pnl",
@@ -1061,4 +1061,14 @@ export interface ServerLog {
   message: string
   properties: Record<string, unknown>
   timestamp: number
+}
+
+export interface HealthStats {
+  avgCpuUsage: number
+  avgMemoryUsage: number
+  count: number
+  maxCpuUsage: number
+  maxMemoryUsage: number
+  minCpuUsage: number
+  minMemoryUsage: number
 }

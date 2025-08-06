@@ -43,7 +43,10 @@ import {
   StackedAreaSeriesOptions,
 } from "src/lightweight-charts/plugins/stacked-area-series/options"
 import { StackedAreaSeries } from "src/lightweight-charts/plugins/stacked-area-series/stacked-area-series"
-import { StackedTooltipPrimitive } from "src/lightweight-charts/plugins/stacked-tooltip/stacked-tooltip"
+import {
+  StackedTooltipPrimitive,
+  StackedTooltipPrimitiveOptions,
+} from "src/lightweight-charts/plugins/stacked-tooltip/stacked-tooltip"
 import { $preferredInterval } from "src/stores/device-settings-store"
 import { $inspectTime } from "src/stores/pages/balances-store"
 import { isInputFocused } from "src/utils/browser-utils"
@@ -52,7 +55,10 @@ import { noop } from "src/utils/utils"
 import { useBoolean } from "../hooks/useBoolean"
 import { ChartData, ResolutionString, StackedAreaData } from "../interfaces"
 import { CandleTooltipPrimitive } from "../lightweight-charts/plugins/candle-tooltip/candle-tooltip"
-import { DeltaTooltipPrimitive } from "../lightweight-charts/plugins/delta-tooltip/delta-tooltip"
+import {
+  DeltaTooltipPrimitive,
+  DeltaTooltipPrimitiveOptions,
+} from "../lightweight-charts/plugins/delta-tooltip/delta-tooltip"
 import {
   TooltipPrimitive,
   TooltipPrimitiveOptions,
@@ -85,7 +91,7 @@ export type QueryChartData = (
   interval: ResolutionString
 ) => Promise<ChartData[] | StackedAreaData[]>
 
-export type TooltipOpts = Partial<Omit<TooltipPrimitiveOptions, "priceExtractor">>
+export type TooltipOpts = Partial<TooltipPrimitiveOptions | StackedTooltipPrimitiveOptions>
 
 export type CursorMode = "move" | "inspect" | "measure"
 
@@ -102,6 +108,7 @@ export interface SingleSeriesChartProps extends Omit<Partial<ChartProps>, "chart
    * @default "Candlestick"
    */
   initType?: SeriesType
+  isMultiArea?: boolean
   isStackedArea?: boolean
   onSeriesReady?: (chart: IChartApi, series: ISeriesApi<SeriesType>) => void
   queryFn: QueryChartData
@@ -161,6 +168,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
     tooltipOptions = {},
     emptyContent = <NoDataButton />,
     isStackedArea,
+    isMultiArea,
     onSeriesReady = noop,
     hideToolbar = false,
     showToolbarAlways = false,
@@ -224,11 +232,15 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
 
       const opts = merge({}, defaultSeriesOptions, seriesOptions)
 
-      const isStackedData = "values" in data[0]
+      const hasMultipleValues = "values" in data[0]
 
-      if (isStackedData) {
+      if (hasMultipleValues) {
         const customSeriesView = new StackedAreaSeries<LcStackedAreaData>()
-        const customSeries = chartRef.current.addCustomSeries(customSeriesView, opts.StackedArea)
+        const customSeries = chartRef.current.addCustomSeries(customSeriesView, {
+          ...opts.StackedArea,
+          lastValueVisible: !isMultiArea,
+          stacked: isStackedArea,
+        })
 
         customSeries.setData(data as LcStackedAreaData[])
         seriesRef.current = customSeries
@@ -291,7 +303,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
           tooltip: extractTooltipColors(theme),
         },
         tooltipOptions
-      )
+      ) as Partial<TooltipPrimitiveOptions>
     )
     const candleTooltip = new CandleTooltipPrimitive(
       merge(
@@ -307,7 +319,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
           tooltip: extractTooltipColors(theme),
         },
         tooltipOptions
-      )
+      ) as Partial<DeltaTooltipPrimitiveOptions>
     )
     const stackedTooltip = new StackedTooltipPrimitive(
       merge(
@@ -315,10 +327,10 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
           tooltip: extractTooltipColors(theme),
         },
         tooltipOptions
-      )
+      ) as Partial<StackedTooltipPrimitiveOptions>
     )
     //
-    if (isStackedArea) {
+    if (isStackedArea || isMultiArea) {
       seriesRef.current.attachPrimitive(stackedTooltip)
     } else if (cursorMode === "measure") {
       seriesRef.current.attachPrimitive(deltaTooltip)
@@ -419,6 +431,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
     theme,
     allowedCursorModes,
     isStackedArea,
+    isMultiArea,
     activeType,
   ])
 
@@ -641,7 +654,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
                       active={activeType === "Baseline"}
                       onClick={() => setPreferredType("Baseline")}
                       aria-label="Switch to Baseline type"
-                      disabled={isStackedArea}
+                      disabled={isStackedArea || isMultiArea}
                     >
                       <Timeline fontSize="inherit" />
                     </ChartIconButton>
@@ -678,7 +691,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
                       active={activeType === "Histogram"}
                       onClick={() => setPreferredType("Histogram")}
                       aria-label="Switch to Histogram type"
-                      disabled={isStackedArea}
+                      disabled={isStackedArea || isMultiArea}
                     >
                       <BarChartOutlined fontSize="inherit" />
                     </ChartIconButton>
