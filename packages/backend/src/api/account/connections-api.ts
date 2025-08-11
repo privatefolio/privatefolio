@@ -328,6 +328,8 @@ export async function syncConnection(
       until,
       signal
     )
+    // } else if (connection.extensionId === "coinstats-connection") {
+    //   result = await syncCoinstats(progress, connection as CoinstatsConnection, since, until, signal)
   } else {
     throw new Error(`Unsupported extension: ${connection.extensionId}`)
   }

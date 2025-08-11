@@ -13,6 +13,7 @@ import {
 } from "../../extensions/metadata/coingecko/coingecko-interfaces"
 import {
   Blockchain,
+  DataPlatform,
   Exchange,
   FindPlatformsResult,
   Platform,
@@ -63,6 +64,10 @@ export async function getExchanges(): Promise<Exchange[]> {
   } catch {
     return customExchanges
   }
+}
+
+export async function getDataPlatforms(): Promise<DataPlatform[]> {
+  return customDataPlatforms
 }
 
 export async function getBlockchains(): Promise<Blockchain[]> {
@@ -241,9 +246,11 @@ export async function getPlatform(id: string): Promise<Platform | undefined> {
 export async function getPlatformsByIds(ids: string[]): Promise<Platform[]> {
   const blockchains = await getBlockchains()
   const exchanges = await getExchanges()
+  const dataPlatforms = await getDataPlatforms()
   return [
     ...blockchains.filter((blockchain) => ids.includes(blockchain.id)),
     ...exchanges.filter((exchange) => ids.includes(exchange.id)),
+    ...dataPlatforms.filter((platform) => ids.includes(platform.id)),
   ]
 }
 

@@ -7,7 +7,6 @@ import {
   binanceConnExtension,
 } from "privatefolio-backend/src/extensions/connections/binance/binance-settings"
 import React, { useState } from "react"
-import { AmountBlock } from "src/components/AmountBlock"
 import { DrawerHeader } from "src/components/DrawerHeader"
 import { ExtensionBlock } from "src/components/ExtensionBlock"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
@@ -20,6 +19,7 @@ import { BinanceConnectionOptions, Connection } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 import { $debugMode, PopoverToggleProps } from "src/stores/app-store"
 import { getAddressBookEntry } from "src/stores/metadata-store"
+import { formatNumber } from "src/utils/formatting-utils"
 import { $rpc } from "src/workers/remotes"
 
 type ConnectionDrawerProps = DrawerProps &
@@ -59,7 +59,10 @@ export function ConnectionDrawer(props: ConnectionDrawerProps) {
           <SectionTitle>Extension</SectionTitle>
           <ExtensionBlock id={extensionId} />
         </div>
-
+        <div>
+          <SectionTitle>Platform</SectionTitle>
+          <PlatformBlock id={platformId} />
+        </div>
         {extensionId === binanceConnExtension ? (
           <div>
             <SectionTitle>API Key</SectionTitle>
@@ -75,34 +78,9 @@ export function ConnectionDrawer(props: ConnectionDrawerProps) {
             </Stack>
           </div>
         )}
-
         <div>
           <SectionTitle>Created</SectionTitle>
           <TimestampBlock timestamp={timestamp} relative={relativeTime} />
-        </div>
-        <div>
-          <SectionTitle>Platform</SectionTitle>
-          <PlatformBlock id={platformId} />
-        </div>
-        <div>
-          <SectionTitle>Audit logs</SectionTitle>
-          {!meta ? (
-            <Typography component="span" variant="inherit">
-              0
-            </Typography>
-          ) : (
-            <AmountBlock amount={meta.logs} />
-          )}
-        </div>
-        <div>
-          <SectionTitle>Transactions</SectionTitle>
-          {!meta ? (
-            <Typography component="span" variant="inherit">
-              0
-            </Typography>
-          ) : (
-            <AmountBlock amount={meta.transactions} />
-          )}
         </div>
         <div>
           <SectionTitle>Synced at</SectionTitle>
@@ -112,6 +90,26 @@ export function ConnectionDrawer(props: ConnectionDrawerProps) {
             <Typography component="span" variant="inherit">
               Not synced
             </Typography>
+          )}
+        </div>
+        <div>
+          <SectionTitle>Audit logs</SectionTitle>
+          {!meta ? (
+            <Typography component="span" variant="inherit">
+              0
+            </Typography>
+          ) : (
+            formatNumber(meta.logs)
+          )}
+        </div>
+        <div>
+          <SectionTitle>Transactions</SectionTitle>
+          {!meta ? (
+            <Typography component="span" variant="inherit">
+              0
+            </Typography>
+          ) : (
+            formatNumber(meta.transactions)
           )}
         </div>
         {extensionId === binanceConnExtension && (

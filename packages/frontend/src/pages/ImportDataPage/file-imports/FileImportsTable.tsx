@@ -79,7 +79,7 @@ export function FileImportsTable() {
         label: "Audit logs",
         numeric: true,
         sortable: true,
-        sx: { maxWidth: 180, minWidth: 180, width: 180 },
+        sx: { maxWidth: 128, minWidth: 128, width: 128 },
         valueSelector: (row) => row.meta?.logs,
       },
       {
@@ -87,7 +87,7 @@ export function FileImportsTable() {
         label: "Transactions",
         numeric: true,
         sortable: true,
-        sx: { maxWidth: 180, minWidth: 180, width: 180 },
+        sx: { maxWidth: 120, minWidth: 120, width: 120 },
         valueSelector: (row) => row.meta?.transactions,
       },
       {

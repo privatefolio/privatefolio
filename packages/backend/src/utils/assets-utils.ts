@@ -36,6 +36,12 @@ export const getAssetPlatform = memoize(function getAssetPlatform(assetId: strin
   } catch {}
 })
 
+export const getPlatformPrefix = memoize(function getPlatformPrefix(platformId: string) {
+  try {
+    return platformId.split(".")[0] + "."
+  } catch {}
+})
+
 export const removePlatformPrefix = memoize(function removePlatformPrefix(platformId: string) {
   try {
     return platformId.split(".")[1]
