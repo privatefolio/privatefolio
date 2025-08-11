@@ -23,7 +23,7 @@ const steps = [
         <ExternalLink href="https://privatefolio.app/c/0/transactions">Transactions</ExternalLink>.
         <br />
         <br />
-        <AppLink href={resolveUrl("$STATIC_ASSETS/help/privatefolio/Step1.png")}>
+        <AppLink external href={resolveUrl("$STATIC_ASSETS/help/privatefolio/Step1.png")}>
           <img
             height={201}
             width={433}
@@ -42,7 +42,7 @@ const steps = [
         the transactions from this account.
         <br />
         <br />
-        <AppLink href={resolveUrl("$STATIC_ASSETS/help/privatefolio/Step2.png")}>
+        <AppLink external href={resolveUrl("$STATIC_ASSETS/help/privatefolio/Step2.png")}>
           <img
             height={201}
             width={433}

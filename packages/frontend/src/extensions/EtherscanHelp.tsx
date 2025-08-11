@@ -20,7 +20,7 @@ const steps = [
         <ExternalLink href="https://etherscan.io/exportData">CSV Export</ExternalLink>.
         <br />
         <br />
-        <AppLink href={resolveUrl("$STATIC_ASSETS/help/etherscan/step1.png")}>
+        <AppLink external href={resolveUrl("$STATIC_ASSETS/help/etherscan/step1.png")}>
           <img
             height={217}
             width={433}
@@ -39,7 +39,7 @@ const steps = [
         .
         <br />
         <br />
-        <AppLink href={resolveUrl("$STATIC_ASSETS/help/etherscan/step2.png")}>
+        <AppLink external href={resolveUrl("$STATIC_ASSETS/help/etherscan/step2.png")}>
           <img
             height={249}
             width={433}
@@ -59,7 +59,7 @@ const steps = [
         .
         <br />
         <br />
-        <AppLink href={resolveUrl("$STATIC_ASSETS/help/etherscan/step3.png")}>
+        <AppLink external href={resolveUrl("$STATIC_ASSETS/help/etherscan/step3.png")}>
           <img
             height={249}
             width={433}
@@ -79,7 +79,7 @@ const steps = [
         .
         <br />
         <br />
-        <AppLink href={resolveUrl("$STATIC_ASSETS/help/etherscan/step4.png")}>
+        <AppLink external href={resolveUrl("$STATIC_ASSETS/help/etherscan/step4.png")}>
           <img
             height={249}
             width={433}

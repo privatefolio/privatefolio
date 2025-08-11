@@ -4,13 +4,14 @@ import { Link as RouterLink } from "react-router-dom"
 import { isElectron, openExternalLink } from "src/utils/electron-utils"
 
 export type AppLinkProps = BoxProps & {
+  external?: boolean
   href?: string
 } & MuiLinkProps
 
 const AppLink = forwardRef<HTMLAnchorElement, AppLinkProps>((props, ref) => {
-  const { href, onClick, sx, ...rest } = props
+  const { href, onClick, sx, external, ...rest } = props
 
-  const isLocalLink = href && !(href.includes("http") || href.startsWith("mailto:"))
+  const isLocalLink = href && !external && !(href.includes("http") || href.startsWith("mailto:"))
 
   if (!href) return <Box ref={ref} onClick={onClick} {...rest} />
 
