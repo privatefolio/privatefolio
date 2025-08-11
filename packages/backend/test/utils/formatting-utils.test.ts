@@ -85,14 +85,20 @@ it("getAutoFormatDigits should work", () => {
   `)
   expect(getAutoFormatDigits(1)).toMatchInlineSnapshot(`
     {
-      "maximumFractionDigits": undefined,
-      "minimumFractionDigits": undefined,
+      "maximumFractionDigits": 0,
+      "minimumFractionDigits": 0,
+    }
+  `)
+  expect(getAutoFormatDigits(42)).toMatchInlineSnapshot(`
+    {
+      "maximumFractionDigits": 0,
+      "minimumFractionDigits": 0,
     }
   `)
   expect(getAutoFormatDigits(1000)).toMatchInlineSnapshot(`
     {
-      "maximumFractionDigits": 2,
-      "minimumFractionDigits": 2,
+      "maximumFractionDigits": 0,
+      "minimumFractionDigits": 0,
     }
   `)
   expect(getAutoFormatDigits(10000)).toMatchInlineSnapshot(`
