@@ -13,6 +13,10 @@ import {
   extensionId as coinmamaFileImportId,
   platformId as coinmamaFileImportPlatform,
 } from "src/extensions/file-imports/coinmama"
+import {
+  extensionId as coinstatsFileImportId,
+  platformId as coinstatsFileImportPlatform,
+} from "src/extensions/file-imports/coinstats"
 import { extensionId as etherscanFileImportId } from "src/extensions/file-imports/etherscan"
 import {
   extensionId as mexcFileImportId,
@@ -185,7 +189,7 @@ export const extensions: Extension[] = [
   },
   {
     authorGithub: "kernelwhisperer",
-    description: "Import Privatefolio transaction exports.",
+    description: "Import transactions from Privatefolio.",
     extensionLogoUrl: "$STATIC_ASSETS/extensions/privatefolio.svg",
     extensionName: "Privatefolio",
     extensionType: "file-import",
@@ -251,35 +255,36 @@ export const extensions: Extension[] = [
     ],
     updatedAt: new Date("2025-06-01").getTime(),
   },
+  // TODO9
+  // {
+  //   authorGithub: "kernelwhisperer",
+  //   description: "Connect to your CoinStats portfolio to automatically sync your transactions.",
+  //   extensionLogoUrl: "$STATIC_ASSETS/extensions/coinstats.svg",
+  //   extensionName: "CoinStats",
+  //   extensionType: "connection",
+  //   extensionVersion: "1.0.0",
+  //   githubUrl: "https://github.com/privatefolio/privatefolio",
+  //   id: "coinstats-connection",
+  //   platformIds: [],
+  //   publishedAt: new Date("2025-07-28").getTime(),
+  //   sources: [
+  //     {
+  //       tags: ["root"],
+  //       url: "https://github.com/privatefolio/privatefolio/tree/main/packages/backend/src/extensions/connections/coinstats",
+  //     },
+  //   ],
+  //   updatedAt: new Date("2025-07-28").getTime(),
+  // },
   {
     authorGithub: "kernelwhisperer",
-    description: "Connect to your CoinStats portfolio to automatically sync your transactions.",
-    extensionLogoUrl: "$STATIC_ASSETS/extensions/coinstats.svg",
-    extensionName: "CoinStats",
-    extensionType: "connection",
-    extensionVersion: "1.0.0",
-    githubUrl: "https://github.com/privatefolio/privatefolio",
-    id: "coinstats-connection",
-    platformIds: [],
-    publishedAt: new Date("2025-07-28").getTime(),
-    sources: [
-      {
-        tags: ["root"],
-        url: "https://github.com/privatefolio/privatefolio/tree/main/packages/backend/src/extensions/connections/coinstats",
-      },
-    ],
-    updatedAt: new Date("2025-07-28").getTime(),
-  },
-  {
-    authorGithub: "kernelwhisperer",
-    description: "Import your CoinStats transactions.",
+    description: "Import transactions from CoinStats.",
     extensionLogoUrl: "$STATIC_ASSETS/extensions/coinstats.svg",
     extensionName: "CoinStats",
     extensionType: "file-import",
     extensionVersion: "1.0.0",
     githubUrl: "https://github.com/privatefolio/privatefolio",
-    id: "coinstats-file-import",
-    platformIds: [],
+    id: coinstatsFileImportId,
+    platformIds: [coinstatsFileImportPlatform],
     publishedAt: new Date("2025-07-28").getTime(),
     sources: [
       {

@@ -24,13 +24,19 @@ import { Platform } from "src/interfaces"
 import { PlatformPrefix } from "src/settings"
 import { $activeAccount } from "src/stores/account-store"
 import { MonoFont, SerifFont } from "src/theme"
-import { removePlatformPrefix } from "src/utils/assets-utils"
+import { getPlatformPrefix, removePlatformPrefix } from "src/utils/assets-utils"
 import { extractRootUrl, formatWebsiteLink, noop } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 import FourZeroFourPage from "../404"
 import { AssetMarketTable } from "../AssetPage/AssetMarketTable"
 import { PlatformAssets } from "./PlatformAssets"
+
+const PLATFORM_TYPE: Record<PlatformPrefix, string> = {
+  [PlatformPrefix.Chain]: "Blockchain",
+  [PlatformPrefix.Exchange]: "Exchange",
+  [PlatformPrefix.App]: "Data Platform",
+}
 
 export default function PlatformPage() {
   const { platformId } = useParams<{ platformId: string }>()
@@ -131,7 +137,7 @@ export default function PlatformPage() {
           )}
           <div>
             <SectionTitle>Type</SectionTitle>
-            <ActionBlock action={isExchange(platform) ? "Exchange" : "Blockchain"} size="small" />
+            <ActionBlock action={PLATFORM_TYPE[getPlatformPrefix(platform.id)!]} size="small" />
           </div>
         </Stack>
       </Stack>

@@ -1,5 +1,11 @@
 import Big from "big.js"
-import { AuditLog, AuditLogOperation, ParserResult, Transaction } from "src/interfaces"
+import {
+  AuditLog,
+  AuditLogOperation,
+  ParserResult,
+  Transaction,
+  TransactionType,
+} from "src/interfaces"
 import { PlatformPrefix } from "src/settings/settings"
 import { asUTC } from "src/utils/formatting-utils"
 import { hashString } from "src/utils/utils"
@@ -19,57 +25,35 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
   const portfolio = columns[0]
   const coinName = columns[1]
   const coinSymbol = columns[2]
-  const exchange = columns[3]
-  const pair = columns[4]
-  const type = columns[5]
+  // const exchange = columns[3]
+  // const pair = columns[4]
+  const type = columns[5].replace("Sent", "Withdraw").replace("Received", "Deposit")
   const amount = new Big(columns[6])
-  const price = columns[7] ? new Big(columns[7]) : new Big(0)
-  const priceUsd = columns[8] ? new Big(columns[8]) : new Big(0)
-  const feePercent = columns[9]
-  const feeAmount = columns[10] ? new Big(columns[10]) : new Big(0)
-  const feeCurrency = columns[11]
+  // const price = columns[7] ? new Big(columns[7]) : new Big(0)
+  // const priceUsd = columns[8] ? new Big(columns[8]) : new Big(0)
+  // const feePercent = columns[9]
+  // const feeAmount = columns[10] ? new Big(columns[10]) : new Big(0)
+  // const feeCurrency = columns[11]
   const date = columns[12]
   const notes = columns[13]
 
-  // Handle duplicate transactions
   if (notes.toLowerCase().includes("duplicate")) {
     return { logs: [] }
   }
 
-  // Skip fake transactions created to fill balance
   if (notes.includes("fake transaction created to fill your balance")) {
     return { logs: [] }
   }
 
-  // Map CoinStats types to our operation types
-  let operation: AuditLogOperation
-  switch (type.toLowerCase()) {
-    case "buy":
-      operation = "Buy"
-      break
-    case "sell":
-      operation = "Sell"
-      break
-    case "fill":
-      // For fills, determine buy/sell based on amount sign
-      operation = amount.gt(0) ? "Buy" : "Sell"
-      break
-    default:
-      // For other types, try to map based on common patterns
-      if (type.toLowerCase().includes("deposit")) {
-        operation = "Deposit"
-      } else if (type.toLowerCase().includes("withdraw")) {
-        operation = "Withdraw"
-      } else {
-        operation = "Buy" // Default fallback
-      }
+  if (coinName.includes("ERC721") || type === "Fill") {
+    return { logs: [] }
   }
 
-  // Adjust operation based on amount sign if needed
-  if (operation === "Buy" && amount.lt(0)) {
-    operation = "Sell"
-  } else if (operation === "Sell" && amount.gt(0)) {
-    operation = "Buy"
+  const operation = type as AuditLogOperation
+  let change = amount.toFixed()
+
+  if (operation === "Withdraw") {
+    change = `-${change}`
   }
 
   const assetId = `${platformId}:${coinSymbol}`
@@ -80,7 +64,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
 
   const log: AuditLog = {
     assetId,
-    change: amount.toFixed(),
+    change,
     fileImportId,
     id,
     importIndex: index,
@@ -90,107 +74,29 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
     wallet,
   }
 
-  let txns: Transaction[] = []
+  const incoming = operation === "Buy" || operation === "Deposit" ? change : undefined
+  const incomingAsset = operation === "Buy" || operation === "Deposit" ? assetId : undefined
+  const outgoing = operation === "Sell" || operation === "Withdraw" ? change : undefined
+  const outgoingAsset = operation === "Sell" || operation === "Withdraw" ? assetId : undefined
 
-  if (operation === "Buy") {
-    txns = [
-      {
-        fileImportId,
-        id: txId,
-        importIndex: index,
-        incoming: amount.toFixed(),
-        incomingAsset: assetId,
-        metadata: {
-          coinName,
-          exchange,
-          feeAmount: feeAmount.toString(),
-          feeCurrency,
-          pair,
-          price: price.toString(),
-          priceUsd: priceUsd.toString(),
-        },
-        platformId,
-        timestamp,
-        type: "Buy",
-        wallet,
-      },
-    ]
-    log.txId = txId
-  }
+  const txns: Transaction[] = [
+    {
+      fileImportId,
+      id: txId,
+      importIndex: index,
+      incoming,
+      incomingAsset,
+      metadata: {},
+      outgoing,
+      outgoingAsset,
+      platformId,
+      timestamp,
+      type: operation as TransactionType,
+      wallet,
+    },
+  ]
 
-  if (operation === "Sell") {
-    txns = [
-      {
-        fileImportId,
-        id: txId,
-        importIndex: index,
-        metadata: {
-          coinName,
-          exchange,
-          feeAmount: feeAmount.toString(),
-          feeCurrency,
-          pair,
-          price: price.toString(),
-          priceUsd: priceUsd.toString(),
-        },
-        outgoing: amount.abs().toFixed(),
-        outgoingAsset: assetId,
-        platformId,
-        timestamp,
-        type: "Sell",
-        wallet,
-      },
-    ]
-    log.txId = txId
-  }
-
-  if (operation === "Deposit") {
-    txns = [
-      {
-        fileImportId,
-        id: txId,
-        importIndex: index,
-        incoming: amount.toFixed(),
-        incomingAsset: assetId,
-        metadata: {
-          coinName,
-          exchange,
-          pair,
-          price: price.toString(),
-          priceUsd: priceUsd.toString(),
-        },
-        platformId,
-        timestamp,
-        type: "Deposit",
-        wallet,
-      },
-    ]
-    log.txId = txId
-  }
-
-  if (operation === "Withdraw") {
-    txns = [
-      {
-        fileImportId,
-        id: txId,
-        importIndex: index,
-        metadata: {
-          coinName,
-          exchange,
-          pair,
-          price: price.toString(),
-          priceUsd: priceUsd.toString(),
-        },
-        outgoing: amount.abs().toFixed(),
-        outgoingAsset: assetId,
-        platformId,
-        timestamp,
-        type: "Withdraw",
-        wallet,
-      },
-    ]
-    log.txId = txId
-  }
+  log.txId = txId
 
   return { logs: [log], txns }
 }

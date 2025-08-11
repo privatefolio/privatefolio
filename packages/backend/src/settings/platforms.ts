@@ -471,6 +471,14 @@ export const customDataPlatforms: DataPlatform[] = [
     supported: true,
     url: "https://privatefolio.xyz",
   },
+  {
+    extensionsIds: ["coinstats-file-import"],
+    id: `${PlatformPrefix.App}coinstats`,
+    image: "$STATIC_ASSETS/extensions/coinstats.svg",
+    name: "CoinStats",
+    supported: true,
+    url: "https://coinstats.app",
+  },
 ]
 
 export const customExchanges: Exchange[] = [

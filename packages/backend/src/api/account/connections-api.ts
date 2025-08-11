@@ -9,12 +9,10 @@ import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 
 import { syncBinance } from "../../extensions/connections/binance/binance-connector"
-import { syncCoinstats } from "../../extensions/connections/coinstats/coinstats-connector"
 import { syncEtherscan } from "../../extensions/connections/etherscan/etherscan-connector"
 import {
   AuditLogOperation,
   BinanceConnection,
-  CoinstatsConnection,
   Connection,
   EtherscanConnection,
   EventCause,
@@ -330,8 +328,8 @@ export async function syncConnection(
       until,
       signal
     )
-  } else if (connection.extensionId === "coinstats-connection") {
-    result = await syncCoinstats(progress, connection as CoinstatsConnection, since, until, signal)
+    // } else if (connection.extensionId === "coinstats-connection") {
+    //   result = await syncCoinstats(progress, connection as CoinstatsConnection, since, until, signal)
   } else {
     throw new Error(`Unsupported extension: ${connection.extensionId}`)
   }
