@@ -81,6 +81,14 @@ export function FileImportDrawer(props: FileImportDrawerProps) {
           <IdentifierBlock id={id} />
         </div>
         <div>
+          <SectionTitle>Extension</SectionTitle>
+          {!extensionId ? <Skeleton height={20} width={80} /> : <ExtensionBlock id={extensionId} />}
+        </div>
+        <div>
+          <SectionTitle>Platform</SectionTitle>
+          {!meta ? <Skeleton height={20} width={80} /> : <PlatformBlock id={meta.platformId} />}
+        </div>
+        <div>
           <SectionTitle>File</SectionTitle>
           <Stack gap={0.5} alignItems="flex-start">
             <IdentifierBlock id={name} />
@@ -98,14 +106,6 @@ export function FileImportDrawer(props: FileImportDrawerProps) {
           ) : (
             <IdentifierBlock id={parserId} size="small" />
           )}
-        </div>
-        <div>
-          <SectionTitle>Extension</SectionTitle>
-          {!extensionId ? <Skeleton height={20} width={80} /> : <ExtensionBlock id={extensionId} />}
-        </div>
-        <div>
-          <SectionTitle>Platform</SectionTitle>
-          {!meta ? <Skeleton height={20} width={80} /> : <PlatformBlock id={meta.platformId} />}
         </div>
         <div>
           <SectionTitle>Imported</SectionTitle>

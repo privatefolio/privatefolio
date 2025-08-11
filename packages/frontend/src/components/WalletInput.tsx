@@ -4,7 +4,7 @@ import InputAdornment from "@mui/material/InputAdornment"
 import TextField, { TextFieldProps } from "@mui/material/TextField"
 import { useStore } from "@nanostores/react"
 import { getAddress, isAddress } from "ethers"
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { $addressBook, $filterOptionsMap } from "src/stores/metadata-store"
 import { formatHex } from "src/utils/utils"
 
@@ -64,6 +64,12 @@ export function WalletInput(props: WalletInputProps) {
 
     onChange(newValue)
   }
+
+  useEffect(() => {
+    if (!value && error) {
+      setError(null)
+    }
+  }, [value, error])
 
   const endAdornment = success ? (
     <InputAdornment position="end">

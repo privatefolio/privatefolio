@@ -169,7 +169,10 @@ export function FileDrop(props: FileDropProps) {
         color="text.secondary"
         variant="body2"
         component="div"
-        sx={{ minHeight: 22, width: "100%" }}
+        sx={{
+          // minHeight: 22,
+          width: "100%",
+        }}
       >
         {cloning ? (
           <Stack>
@@ -185,18 +188,18 @@ export function FileDrop(props: FileDropProps) {
         ) : (
           children || (
             <Stack
-              alignItems={size === "large" ? "center" : "flex-start"}
+              alignItems={size === "large" ? "center" : "center"}
               direction={size === "large" ? "column" : "row"}
             >
               {size === "large" ? (
                 <FolderOutlined sx={{ height: 64, width: 64 }} />
               ) : (
-                <Add sx={{ height: 20, marginRight: 1, width: 20 }} />
+                <Add sx={{ height: 16, marginLeft: 0.5, marginRight: 1, width: 16 }} />
               )}
 
               <span>
                 Click to <u>browse files</u> from your computer or <u>drag and drop</u> your{" "}
-                <code>.csv</code> files here.
+                <b>.csv</b> files here.
               </span>
             </Stack>
           )

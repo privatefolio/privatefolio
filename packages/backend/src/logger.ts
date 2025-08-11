@@ -21,6 +21,8 @@ export const getLogFilePath = () => {
   return join(SERVER_LOGS_LOCATION, `${date}.log`)
 }
 
+const sinks = isTestEnvironment ? [] : ["console", "file"]
+
 export async function setupLogger(logFilePath: string) {
   await configure({
     loggers: [
@@ -28,12 +30,12 @@ export async function setupLogger(logFilePath: string) {
         category: [],
         lowestLevel: "debug",
         // lowestLevel: "trace",
-        sinks: ["console", "file"],
+        sinks,
       },
       {
         category: ["logtape", "meta"],
         lowestLevel: "warning",
-        sinks: ["console", "file"],
+        sinks,
       },
     ],
     sinks: {
