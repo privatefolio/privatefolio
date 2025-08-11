@@ -17,13 +17,18 @@ import { $rpc } from "src/workers/remotes"
 import { TagsTableRow } from "./TagsTableRow"
 
 export function TagsTable() {
+  const activeAccount = useStore($activeAccount)
+
+  useEffect(() => {
+    document.title = `Tags - ${activeAccount} - Privatefolio`
+  }, [activeAccount])
+
   const [tags, setTags] = useState<Tag[]>([])
   const [queryTime, setQueryTime] = useState<number | null>(null)
   const [refresh, setRefresh] = useState(0)
   const accountName = useStore($activeAccount)
   const connectionStatus = useStore($connectionStatus)
   const rpc = useStore($rpc)
-  const activeAccount = useStore($activeAccount)
 
   const fetchTags = useCallback(async () => {
     const start = Date.now()

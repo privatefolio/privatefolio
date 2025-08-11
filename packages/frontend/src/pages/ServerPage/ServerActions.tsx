@@ -1,8 +1,9 @@
 import {
   BackupRounded,
   Bedtime,
-  CalculateOutlined,
+  BugReport,
   MoreHoriz,
+  Refresh,
   RestoreRounded,
 } from "@mui/icons-material"
 import {
@@ -71,27 +72,27 @@ export function ServerActions() {
         <MenuItem
           dense
           onClick={() => {
-            rpc.enqueueRecomputeBalances(activeAccount, "user")
+            rpc.monitorServerHealth()
             handleClose()
           }}
         >
           <ListItemAvatar>
-            <CalculateOutlined fontSize="small" />
+            <Refresh fontSize="small" />
           </ListItemAvatar>
-          <ListItemText>Recompute balances</ListItemText>
+          <ListItemText>Refresh health metrics</ListItemText>
         </MenuItem>
         <MenuItem
           dense
           onClick={() => {
-            rpc.enqueueRecomputeNetworth(activeAccount, "user")
+            rpc.refreshSystemInfo()
             handleClose()
           }}
         >
           <ListItemAvatar>
-            <CalculateOutlined fontSize="small" />
+            <Refresh fontSize="small" />
           </ListItemAvatar>
-          <ListItemText>Recompute networth</ListItemText>
-        </MenuItem>{" "}
+          <ListItemText>Refresh system info</ListItemText>
+        </MenuItem>
         {debugMode && (
           <>
             <Divider textAlign="center">
@@ -102,14 +103,14 @@ export function ServerActions() {
             <MenuItem
               dense
               onClick={() => {
-                rpc.enqueueSleep(activeAccount, 1, 0.1)
+                rpc.enqueueSleep(activeAccount, 5, 1, true)
                 handleClose()
               }}
             >
               <ListItemAvatar>
                 <Bedtime fontSize="small" />
               </ListItemAvatar>
-              <ListItemText>Sleep 1s</ListItemText>
+              <ListItemText>Sleep 5s</ListItemText>
             </MenuItem>
             <MenuItem
               dense
@@ -122,6 +123,18 @@ export function ServerActions() {
                 <Bedtime fontSize="small" />
               </ListItemAvatar>
               <ListItemText>Sleep 50s</ListItemText>
+            </MenuItem>
+            <MenuItem
+              dense
+              onClick={() => {
+                rpc.throwTestError()
+                handleClose()
+              }}
+            >
+              <ListItemAvatar>
+                <BugReport fontSize="small" />
+              </ListItemAvatar>
+              <ListItemText>Trigger error</ListItemText>
             </MenuItem>
           </>
         )}

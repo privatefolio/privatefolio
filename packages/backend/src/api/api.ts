@@ -24,6 +24,11 @@ import * as transactions from "./account/transactions-api"
 //
 import * as accounts from "./accounts-api"
 import * as notifications from "./notifications-api"
+import * as server from "./server-api"
+import * as serverHealth from "./server-health-api"
+import * as serverInfo from "./server-info-api"
+import * as serverKv from "./server-kv-api"
+import * as serverSettings from "./server-settings-api"
 
 export const api = {
   ...analytics,
@@ -42,7 +47,12 @@ export const api = {
   ...assets,
   ...serverTasks,
   ...serverFiles,
+  ...serverHealth,
+  ...serverInfo,
   ...serverLogs,
+  ...serverSettings,
+  ...serverKv,
+  ...server,
   ...backup,
   ...tags,
   ...trades,

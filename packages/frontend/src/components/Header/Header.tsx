@@ -54,6 +54,11 @@ export function Header() {
             <Stack direction="row" gap={1} alignItems="center" justifyContent="flex-end">
               <TaskDropdown />
               <CurrencySelector />
+              {/* <Tooltip title="Server status">
+                <IconButton size="small">
+                  <Dns />
+                </IconButton>
+              </Tooltip> */}
               <NotificationDropdown />
               <SettingsButton />
             </Stack>

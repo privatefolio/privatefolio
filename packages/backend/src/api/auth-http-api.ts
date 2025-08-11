@@ -1,6 +1,7 @@
 import { randomBytes, scrypt, timingSafeEqual } from "crypto"
 import { access, mkdir, readFile, writeFile } from "fs/promises"
 import { isTestEnvironment } from "src/utils/environment-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { promisify } from "util"
 
 import {
@@ -86,7 +87,7 @@ export async function readSecrets(): Promise<AuthSecrets | null> {
     if (error instanceof Error && "code" in error && error.code === "ENOENT") {
       return null
     }
-    console.error("Error reading secrets:", error)
+    logAndReportError(error, "Failed to read authentication secrets")
     throw error
   }
 }
@@ -145,8 +146,8 @@ export async function handleSetupRequest(request: Request): Promise<Response> {
       status: 201,
     })
   } catch (error) {
-    console.error("Setup error:", error)
-    return new Response(JSON.stringify({ error: "Failed to complete setup." }), {
+    logAndReportError(error, "Failed to complete setup")
+    return new Response(JSON.stringify({ error: "Failed to complete setup" }), {
       headers: { "Content-Type": "application/json", ...corsHeaders },
       status: 500,
     })
@@ -192,8 +193,8 @@ export async function handleLoginRequest(request: Request): Promise<Response> {
       })
     }
   } catch (error) {
-    console.error("Login error:", error)
-    return new Response(JSON.stringify({ error: "Login failed." }), {
+    logAndReportError(error, "Login request failed")
+    return new Response(JSON.stringify({ error: "Login failed" }), {
       headers: { "Content-Type": "application/json", ...corsHeaders },
       status: 500,
     })
@@ -256,9 +257,9 @@ export async function handleVerifyAuthRequest(request: Request): Promise<Respons
       )
     }
   } catch (error) {
-    console.error("Auth verification error:", error)
+    logAndReportError(error, "Authentication verification failed")
     return new Response(
-      JSON.stringify({ error: "Authentication verification failed.", valid: false }),
+      JSON.stringify({ error: "Authentication verification failed", valid: false }),
       {
         headers: { "Content-Type": "application/json", ...corsHeaders },
         status: 500,

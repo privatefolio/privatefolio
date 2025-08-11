@@ -3,7 +3,7 @@ const isNode = typeof process !== "undefined" && !!process.versions && !!process
 export const isWebWorker = isServer && !isNode
 export const isBunWorker = isNode && process.env.BUN_WORKER === "true"
 
-const runtime = !isServer
+export const runtime = !isServer
   ? "browser"
   : isWebWorker
     ? "web worker"
@@ -19,12 +19,5 @@ export const writesAllowed = (isNode && process.env.ALLOW_WRITES === "true") || 
 export const environment = isProduction ? "production" : isTestEnvironment ? "test" : "development"
 
 export const useBunSqlite = isNode && process.env.BUN_SQL !== "false"
-
-if (!isTestEnvironment) {
-  console.log(`Backend runtime is ${runtime}`)
-  console.log(`Backend environment is ${environment}`)
-  console.log(`Sqlite implementation is ${useBunSqlite ? "bun" : "sqlite3"}`)
-  console.log(`Sqlite writes are ${writesAllowed ? "allowed" : "disallowed"}`)
-}
 
 export const isDebug = false

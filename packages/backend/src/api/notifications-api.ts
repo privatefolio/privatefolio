@@ -1,6 +1,7 @@
 import { access, mkdir, readFile, writeFile } from "fs/promises"
 import { transformNullsToUndefined } from "src/utils/db-utils"
 import { isTestEnvironment } from "src/utils/environment-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 import { writesAllowed } from "src/utils/utils"
@@ -101,8 +102,7 @@ async function readVapidKeys() {
     if (error instanceof Error && "code" in error && error.code === "ENOENT") {
       return null
     }
-    console.error("Error reading VAPID keys:", error)
-    throw error
+    logAndReportError(error, "Failed to read VAPID keys")
   }
 }
 
@@ -125,7 +125,7 @@ export async function getPushDevices(accountName: string) {
   try {
     return JSON.parse(pushDevicesJson) as PushDevice[]
   } catch (error) {
-    console.error("Failed to parse push devices:", error)
+    logAndReportError(error, "Failed to parse push devices")
     return []
   }
 }
@@ -194,11 +194,13 @@ async function pushNotification(accountName: string, notification: Notification)
 
   const sendPromises = pushDevices.map(({ subscription }) =>
     webpush.sendNotification(subscription, payloadStr).catch((error) => {
-      console.error("Failed to send push notification:", error)
+      logAndReportError(error, "Failed to send push notification")
 
       if (error.statusCode === 410 || error.statusCode === 404) {
         console.log(`Removing invalid subscription: ${subscription.endpoint}`)
-        removePushDevice(accountName, subscription.endpoint).catch(console.error)
+        removePushDevice(accountName, subscription.endpoint).catch((error) => {
+          logAndReportError(error, "Failed to remove invalid push device")
+        })
       }
     })
   )

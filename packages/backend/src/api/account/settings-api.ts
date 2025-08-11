@@ -1,3 +1,5 @@
+import { logAndReportError } from "src/utils/error-utils"
+
 import { DEFAULT_SETTINGS, Settings } from "../../settings/settings"
 import { getValue, setValue, subscribeToKV } from "./kv-api"
 
@@ -15,7 +17,7 @@ export async function getSettings(accountName: string): Promise<Settings> {
     const savedSettings = JSON.parse(settingsJson) as Settings
     return Object.assign({}, DEFAULT_SETTINGS, savedSettings)
   } catch (error) {
-    console.error("Failed to parse settings:", error)
+    logAndReportError(error, "Failed to read settings")
     return DEFAULT_SETTINGS
   }
 }
@@ -41,7 +43,7 @@ export async function subscribeToSettings(accountName: string, callback: () => v
 
 export async function subscribeToSettingsProperty(
   accountName: string,
-  property: string,
+  property: keyof Settings,
   callback: () => void
 ) {
   let currentPropertyValue = (await getSettings(accountName))[property]

@@ -5,6 +5,7 @@ import { JSONValue, LanguageModelV1, Message, StepResult, streamText, Tool } fro
 import { ChatMessage } from "src/interfaces"
 import { getAssistantSystemPrompt, getAssistantTools, MAX_STEPS } from "src/settings/assistant"
 import { AssistantModel, AVAILABLE_MODELS, ModelFamily } from "src/settings/assistant-models"
+import { logAndReportError } from "src/utils/error-utils"
 import { decryptValue } from "src/utils/jwt-utils"
 
 import { corsHeaders } from "../../settings/settings"
@@ -13,11 +14,12 @@ import { AuthSecrets, readSecrets } from "../auth-http-api"
 import { getValue } from "./kv-api"
 
 function errorHandler(error: unknown) {
-  console.error(error)
-  if (error == null) return "unknown error"
-  if (typeof error === "string") return error
-  if (error instanceof Error) return error.message
-  return JSON.stringify(error)
+  let newError: Error
+  if (error == null) newError = new Error("Unknown Error")
+  if (typeof error === "string") newError = new Error(error)
+  if (error instanceof Error) newError = error
+  logAndReportError(newError, "Error in assistant chat handler")
+  return JSON.stringify(newError.message)
 }
 
 type ChatResult = Omit<StepResult<Record<string, Tool>>, "stepType" | "isContinued"> & {

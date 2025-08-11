@@ -18,6 +18,7 @@ import React, { FormEvent, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { LogoText } from "src/components/Header/LogoText"
 import { SectionTitle } from "src/components/SectionTitle"
+import { isElectron, restartBackend } from "src/utils/electron-utils"
 import { $localRest } from "src/workers/remotes"
 
 import { $localAuth, setPassword, unlockApp } from "../../stores/auth-store"
@@ -105,6 +106,11 @@ export default function LocalAuthPage() {
         <CardContent component={Stack} gap={2} alignItems="center">
           <WifiOffRounded sx={{ fontSize: 100 }} />
           <Alert severity="error">{errorMessage}</Alert>
+          {isElectron && (
+            <Button variant="contained" onClick={restartBackend}>
+              Restart backend
+            </Button>
+          )}
         </CardContent>
       </Container>
     )

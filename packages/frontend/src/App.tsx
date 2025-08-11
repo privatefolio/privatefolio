@@ -57,8 +57,12 @@ const ServerPage = lazy(() => import("./pages/ServerPage/ServerPage"))
 const TradePage = lazy(() => import("./pages/TradePage/TradePage"))
 const TradesPage = lazy(() => import("./pages/TradesPage/TradesPage"))
 const TransactionsPage = lazy(() => import("./pages/TransactionsPage/TransactionsPage"))
+const SettingsPage = lazy(() => import("./pages/SettingsPage/SettingsPage"))
 
 export default function App() {
+  /**
+   * Local RPC
+   */
   const localAuth = useStore($localAuth)
   const localConnectionStatus = useStore($localConnectionStatus)
   const localRest = useStore($localRest)
@@ -84,6 +88,9 @@ export default function App() {
     return closeSubscription(subscription, localRpc)
   }, [localConnectionStatus, localAuth, localRpc])
 
+  /**
+   * Cloud RPC
+   */
   const cloudRpcReady = useStore($cloudRpcReady)
   const cloudConnectionStatus = useStore($cloudConnectionStatus)
   const cloudAvailable = useStore($cloudAvailable)
@@ -126,6 +133,9 @@ export default function App() {
     }, 0)
   }, [cloudUser])
 
+  /**
+   * Selected account
+   */
   const activeAccount = useStore($activeAccount)
   const connectionStatus = useStore($connectionStatus)
   const auth = useStore($auth)
@@ -149,6 +159,9 @@ export default function App() {
     return closeSubscription(subscription, rpc)
   }, [activeAccount, connectionStatus, auth, rpc])
 
+  /**
+   * Loading
+   */
   if (localServerEnabled && !localAuth.checked) {
     return (
       <Box
@@ -159,6 +172,9 @@ export default function App() {
     )
   }
 
+  /**
+   * Local auth
+   */
   if (
     localServerEnabled &&
     (!localAuth.isAuthenticated || localAuth.needsSetup) &&
@@ -270,6 +286,7 @@ export default function App() {
                   <Route path="import-data" element={<ImportDataPage show />} />
                   <Route path="assistant" element={<AssistantPage show />} />
                   <Route path="server" element={<ServerPage show />} />
+                  <Route path="settings" element={<SettingsPage show />} />
                   <Route path="extensions" element={<ExtensionsPage show />} />
                   <Route path="extension/:extensionId" element={<ExtensionPage />} />
                   <Route path="platforms" element={<PlatformsPage show />} />

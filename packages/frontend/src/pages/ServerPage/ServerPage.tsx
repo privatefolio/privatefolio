@@ -8,6 +8,7 @@ import { Tabs } from "src/components/Tabs"
 
 import { ServerFilesTable } from "./files/ServerFilesTable"
 import { ServerActions } from "./ServerActions"
+import { ServerHealth } from "./ServerHealth"
 import { ServerInfo } from "./ServerInfo"
 import { ServerLogs } from "./ServerLogs"
 import { ServerSettings } from "./ServerSettings"
@@ -25,6 +26,7 @@ export default function ServerPage({ show }: { show: boolean }) {
             <NavTab value="tasks" to={"?tab=tasks"} label="Tasks" />
             <NavTab value="files" to={"?tab=files"} label="Files" />
             <NavTab value="logs" to={"?tab=logs"} label="Logs" />
+            <NavTab value="health" to={"?tab=health"} label="Health" />
             <NavTab value="info" to={"?tab=info"} label="Info" />
             <NavTab value="settings" to={"?tab=settings"} label={<Settings fontSize="small" />} />
           </Tabs>
@@ -33,6 +35,7 @@ export default function ServerPage({ show }: { show: boolean }) {
         {tab === "tasks" && <ServerTasksTable />}
         {tab === "files" && <ServerFilesTable />}
         {tab === "logs" && <ServerLogs />}
+        {tab === "health" && <ServerHealth />}
         {tab === "info" && <ServerInfo />}
         {tab === "settings" && <ServerSettings />}
       </Stack>

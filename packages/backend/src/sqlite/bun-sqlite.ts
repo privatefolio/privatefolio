@@ -1,3 +1,4 @@
+import { Logger } from "@logtape/logtape"
 import { Database } from "bun:sqlite"
 import {
   isDebug,
@@ -5,8 +6,8 @@ import {
   isTestEnvironment,
   writesAllowed,
 } from "src/utils/environment-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { ensureActiveAccount, isReadQuery } from "src/utils/sql-utils"
-import { getPrefix } from "src/utils/utils"
 
 export type SQLiteCompatibleType = boolean | string | number | null | Uint8Array
 
@@ -18,7 +19,8 @@ export type QueryExecutor = {
 
 export async function createQueryExecutor(
   databaseFilePath: string,
-  accountName: string
+  accountName: string,
+  logger?: Logger
 ): Promise<QueryExecutor> {
   await ensureActiveAccount(accountName)
 
@@ -29,10 +31,10 @@ export async function createQueryExecutor(
   })
 
   const close = async () => {
-    if (!isTestEnvironment) console.log(getPrefix(accountName), "Closing database connection.")
+    logger?.info("Closing database connection")
     db.exec("PRAGMA wal_checkpoint(FULL);")
     db.close(true)
-    if (!isTestEnvironment) console.log(getPrefix(accountName), "Closed database connection.")
+    logger?.info("Closed database connection")
   }
 
   async function executeFn(
@@ -56,15 +58,15 @@ export async function createQueryExecutor(
       const durationMs = Number(end - start) / 1_000_000 // Convert nanoseconds to milliseconds
 
       if (isDevelopment && isDebug) {
-        console.log(
-          getPrefix(accountName),
-          `Query took ${durationMs.toFixed(3)}ms`,
-          query.slice(0, 80).replace(/\n/g, "").trim()
-        )
+        logger?.debug(`Query took ${durationMs.toFixed(3)}ms`, {
+          query: query.slice(0, 80).replace(/\n/g, "").trim(),
+        })
       }
       return rows
     } catch (error) {
-      if (!isTestEnvironment && writesAllowed) console.error(error, query)
+      if (!isTestEnvironment && writesAllowed) {
+        logAndReportError(error, "Failed to execute query", { query })
+      }
       throw new Error(`Failed to execute query: ${query}, error: ${error}`)
     }
   }
