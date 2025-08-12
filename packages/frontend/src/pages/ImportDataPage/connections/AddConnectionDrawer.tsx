@@ -394,41 +394,41 @@ export function AddConnectionDrawer(props: AddConnectionDrawerProps) {
                   ) : null}
                 </Stack>
               </FormControl>
+              <div>
+                <SectionTitle optional>Import range</SectionTitle>
+                <Stack gap={1.5} marginTop={1.5}>
+                  <DatePicker
+                    name="sinceLimit"
+                    label="Start date"
+                    slotProps={{
+                      openPickerButton: {
+                        color: "secondary",
+                        size: "small",
+                      },
+                      textField: {
+                        fullWidth: true,
+                        size: "small",
+                      },
+                    }}
+                  />
+                  <DatePicker
+                    name="untilLimit"
+                    label="End date"
+                    slotProps={{
+                      openPickerButton: {
+                        color: "secondary",
+                        size: "small",
+                      },
+                      textField: {
+                        fullWidth: true,
+                        size: "small",
+                      },
+                    }}
+                  />
+                </Stack>
+              </div>
             </>
           )}
-          <div>
-            <SectionTitle optional>Import range</SectionTitle>
-            <Stack gap={1.5} marginTop={1.5}>
-              <DatePicker
-                name="sinceLimit"
-                label="Start date"
-                slotProps={{
-                  openPickerButton: {
-                    color: "secondary",
-                    size: "small",
-                  },
-                  textField: {
-                    fullWidth: true,
-                    size: "small",
-                  },
-                }}
-              />
-              <DatePicker
-                name="untilLimit"
-                label="End date"
-                slotProps={{
-                  openPickerButton: {
-                    color: "secondary",
-                    size: "small",
-                  },
-                  textField: {
-                    fullWidth: true,
-                    size: "small",
-                  },
-                }}
-              />
-            </Stack>
-          </div>
           {error && <FormHelperText error>{error}</FormHelperText>}
           <div>
             <LoadingButton

@@ -42,7 +42,7 @@ export async function createQueryExecutor(
     params: SQLiteCompatibleType[] = []
   ): Promise<SQLiteCompatibleType[][]> {
     await ensureActiveAccount(accountName, close)
-    if (!writesAllowed && !isReadQuery(query)) throw new Error("Illegal write query")
+    if (!writesAllowed && !isReadQuery(query)) throw new Error(`Illegal write query: ${query}`)
     try {
       const start = process.hrtime.bigint() // Start time in nanoseconds
 
