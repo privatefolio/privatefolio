@@ -9139,9 +9139,9 @@ jws@^4.0.0:
     safe-buffer "^5.0.1"
 
 kbar@^0.1.0-beta.45:
-  version "0.1.0-beta.45"
-  resolved "https://registry.npmjs.org/kbar/-/kbar-0.1.0-beta.45.tgz"
-  integrity sha512-kXvjthqPLoWZXlxLJPrFKioskNdQv1O3Ukg5mqq2ExK3Ix1qvYT3W/ACDRIv/e/CHxPWZoTriB4oFbQ6UCSX5g==
+  version "0.1.0-beta.48"
+  resolved "https://registry.yarnpkg.com/kbar/-/kbar-0.1.0-beta.48.tgz#2db254cb2943f14200c5a5f47064135737527983"
+  integrity sha512-HD5A1dqfK6XGeoH4fRWTmRt4y76sDbtGxY4Dh2xNa5MYtvtKsqfz+nRZ0tKgcrjjGYN4rf5TLXMJuiE7Pb8rXg==
   dependencies:
     "@radix-ui/react-portal" "^1.0.1"
     fast-equals "^2.0.3"
