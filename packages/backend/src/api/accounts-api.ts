@@ -79,13 +79,11 @@ async function createDatabaseConnection(
 
   const db = await createSqliteDatabaseConnection(databaseFilePath, accountName, logger)
 
-  if (!isTestEnvironment) {
-    const journalMode = await db.execute(`PRAGMA journal_mode`)
-    logger.info("Connected to database", {
-      dbPath: databaseFilePath,
-      journalMode: journalMode[0][0],
-    })
-  }
+  const journalMode = await db.execute(`PRAGMA journal_mode`)
+  logger.info("Connected to database", {
+    dbPath: databaseFilePath,
+    journalMode: journalMode[0][0],
+  })
 
   return db
 }
@@ -211,8 +209,8 @@ async function deleteUserData(accountName: string) {
 
 export async function deleteAccount(accountName: string, keepAccount = false) {
   const account = await getAccount(accountName)
+  account.logger.info("Deleting account")
 
-  if (!isTestEnvironment) account.logger.info("Deleting account")
   if (!isTestEnvironment) {
     await writeFile(
       join(DATABASES_LOCATION, `${accountName}.deleting`),
@@ -230,7 +228,7 @@ export async function deleteAccount(accountName: string, keepAccount = false) {
     logAndReportError(error, "Failed to delete user data", {}, account.logger)
   }
 
-  if (!isTestEnvironment) account.logger.info("Deleted account")
+  account.logger.info("Deleted account")
 }
 
 /**
@@ -287,7 +285,7 @@ async function initializeDatabaseIfNeeded(
     return false
   }
 
-  if (!isTestEnvironment) logger.info("Initializing database")
+  logger.info("Initializing database")
   try {
     await account.execute(`PRAGMA journal_mode = WAL;`)
   } catch {

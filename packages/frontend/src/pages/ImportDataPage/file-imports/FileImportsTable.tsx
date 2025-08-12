@@ -5,6 +5,7 @@ import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
 import { FileDrop } from "src/components/FileDrop"
 import { FileImport } from "src/interfaces"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
+import { TIMESTAMP_HEADER_SX } from "src/theme"
 import { closeSubscription } from "src/utils/browser-utils"
 import { HeadCell } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
@@ -46,7 +47,7 @@ export function FileImportsTable() {
         key: "timestamp",
         label: "Imported",
         sortable: true,
-        sx: { maxWidth: 200, minWidth: 200, width: 200 },
+        sx: TIMESTAMP_HEADER_SX,
         valueSelector: (row) => row.timestamp || Infinity,
       },
       {
@@ -72,7 +73,7 @@ export function FileImportsTable() {
         key: "lastModified",
         label: "Last modified",
         sortable: true,
-        sx: { maxWidth: 200, minWidth: 200, width: 200 },
+        sx: TIMESTAMP_HEADER_SX,
       },
       {
         key: "logs" as keyof FileImport,

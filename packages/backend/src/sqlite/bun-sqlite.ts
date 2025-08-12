@@ -1,11 +1,6 @@
 import { Logger } from "@logtape/logtape"
 import { Database } from "bun:sqlite"
-import {
-  isDebug,
-  isDevelopment,
-  isTestEnvironment,
-  writesAllowed,
-} from "src/utils/environment-utils"
+import { isDebug, isDevelopment, writesAllowed } from "src/utils/environment-utils"
 import { logAndReportError } from "src/utils/error-utils"
 import { ensureActiveAccount, isReadQuery } from "src/utils/sql-utils"
 
@@ -64,9 +59,7 @@ export async function createQueryExecutor(
       }
       return rows
     } catch (error) {
-      if (!isTestEnvironment && writesAllowed) {
-        logAndReportError(error, "Failed to execute query", { query })
-      }
+      if (writesAllowed) logAndReportError(error, "Failed to execute query", { query })
       throw new Error(`Failed to execute query: ${query}, error: ${error}`)
     }
   }

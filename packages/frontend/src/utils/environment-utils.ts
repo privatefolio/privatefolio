@@ -5,10 +5,6 @@ import { isProductionElectron } from "./electron-utils"
 // https://vite.dev/guide/env-and-mode.html#built-in-constants
 const isProductionBuild = !!import.meta.env.PROD
 export const isSecure = window.location.protocol === "https:"
-// const isServer = typeof window === "undefined"
-// const isNode = typeof process !== "undefined" && process.versions && process.versions.node
-// const isWebWorker = isServer && !isNode
-// const isTestEnvironment = typeof process !== "undefined" && process.env.NODE_ENV === "test"
 
 export const isProduction = TARGET === "electron" ? isProductionElectron : isProductionBuild
 const environment = isProduction ? "production" : "development"

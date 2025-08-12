@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/member-ordering */
+import { Logger } from "@logtape/logtape"
 import { app, BrowserWindow, dialog, shell } from "electron"
-import type { Logger } from "electron-log"
 import { autoUpdater, UpdateDownloadedEvent, UpdateInfo } from "electron-updater"
 
+import { logger } from "./logger"
 import { isProduction } from "./utils"
 
 const CHECK_FOR_UPDATES_INTERVAL = 24 * 60 * 60 * 1000 // 24 hours
@@ -27,31 +28,31 @@ export class AutoUpdater {
 
   private setupEventHandlers() {
     autoUpdater.on("checking-for-update", () => {
-      console.log("Checking for update...")
+      logger.info("Checking for update...")
     })
 
     autoUpdater.on("update-available", (info) => {
-      console.log("Update available:", info.version)
+      logger.info(`Update available: ${info.version}`)
       this.showUpdateDialog(info)
     })
 
     autoUpdater.on("update-not-available", (info) => {
-      console.log("Update not available:", info.version)
+      logger.info(`Update not available: ${info.version}`)
     })
 
-    autoUpdater.on("error", (err) => {
-      console.error("Error in auto-updater:", err)
+    autoUpdater.on("error", (error) => {
+      logger.error("Error in auto-updater", { error })
     })
 
     autoUpdater.on("download-progress", (progressObj) => {
       let logMessage = "Download speed: " + progressObj.bytesPerSecond
       logMessage = logMessage + " - Downloaded " + progressObj.percent + "%"
       logMessage = logMessage + " (" + progressObj.transferred + "/" + progressObj.total + ")"
-      console.log(logMessage)
+      logger.info(logMessage)
     })
 
     autoUpdater.on("update-downloaded", (info) => {
-      console.log("Update downloaded:", info.version)
+      logger.info(`Update downloaded: ${info.version}`)
       this.showRestartDialog(info)
     })
   }
@@ -98,11 +99,11 @@ export class AutoUpdater {
 
   async checkForUpdates(informUser = false) {
     if (!isProduction) {
-      console.log("Skipping update check in development mode")
+      logger.info("Skipping update check in development mode")
       return
     }
 
-    console.log("Checking for updates...")
+    logger.info("Checking for updates...")
     const result = await autoUpdater.checkForUpdates()
     if (!informUser) return
     if (result?.isUpdateAvailable) {
@@ -125,7 +126,7 @@ export class AutoUpdater {
 
   startPeriodicCheck() {
     if (!isProduction) {
-      console.log("Skipping periodic update checks in development mode")
+      logger.trace("Skipping periodic update checks in development mode")
       return
     }
 

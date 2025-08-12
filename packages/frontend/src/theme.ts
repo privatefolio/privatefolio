@@ -11,6 +11,8 @@ export const MonoFont = "'IBM Plex Mono', monospace"
 export const bgColor = "rgb(242, 243, 245)"
 export const appBarHeight = 52
 
+export const TIMESTAMP_HEADER_SX = { maxWidth: 180, minWidth: 180, width: 180 }
+
 export const chipBgOpacity = 0.075
 
 // const cutCorners =

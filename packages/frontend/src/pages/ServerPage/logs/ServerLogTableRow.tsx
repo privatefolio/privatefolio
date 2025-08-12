@@ -1,5 +1,5 @@
 import { DataObject, Visibility } from "@mui/icons-material"
-import { IconButton, TableCell, TableRow, Tooltip, Typography } from "@mui/material"
+import { Chip, IconButton, Stack, TableCell, TableRow, Tooltip, Typography } from "@mui/material"
 import React, { memo } from "react"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { useBoolean } from "src/hooks/useBoolean"
@@ -69,28 +69,35 @@ function ServerLogTableRowBase(props: TableRowComponentProps<ServerLog>) {
           </Typography>
         </TableCell>
         <TableCell variant="actionList" sx={{ position: "relative" }} align="right">
-          {hasProperties && (
-            <IconButton
-              size="small"
-              color="secondary"
-              sx={{
-                ".MuiTableRow-root:hover & ": {
-                  visibility: "hidden !important",
-                },
-                position: "absolute",
-                right: 16,
-                top: 8,
-                visibility: "visible !important",
-              }}
-            >
-              <DataObject fontSize="inherit" />
-            </IconButton>
-          )}
-          <Tooltip title="Inspect">
-            <IconButton size="small" color="secondary" onClick={toggleOpen}>
-              <Visibility fontSize="inherit" />
-            </IconButton>
-          </Tooltip>
+          <Stack direction="row" justifyContent="flex-end" gap={1}>
+            <Stack direction="row" gap={0.5} flexWrap="wrap">
+              {row.categories.map((x) => (
+                <Chip key={x} label={x} size="small" sx={{ borderRadius: 2 }} />
+              ))}
+            </Stack>
+            {hasProperties && (
+              <IconButton
+                size="small"
+                color="secondary"
+                sx={{
+                  ".MuiTableRow-root:hover & ": {
+                    visibility: "hidden !important",
+                  },
+                  position: "absolute",
+                  right: 16,
+                  top: 8,
+                  visibility: "visible !important",
+                }}
+              >
+                <DataObject fontSize="inherit" />
+              </IconButton>
+            )}
+            <Tooltip title="Inspect">
+              <IconButton size="small" color="secondary" onClick={toggleOpen}>
+                <Visibility fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
+          </Stack>
         </TableCell>
       </TableRow>
       <ServerLogDrawer

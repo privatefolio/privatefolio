@@ -9,6 +9,7 @@ import { setupServerCronJobs } from "./crons"
 import { logger } from "./logger"
 import { setupAllSideEffects } from "./side-effects"
 import { telemetry } from "./telemetry"
+import { logAndReportError } from "./utils/error-utils"
 import { isProduction } from "./utils/utils"
 
 logger.info("Spawning worker thread")
@@ -48,7 +49,11 @@ async function startServer() {
   })
 
   const port = Number(process.env.PORT)
-  server.start(isNaN(port) ? 4001 : port)
+  try {
+    server.start(isNaN(port) ? 4001 : port)
+  } catch (error) {
+    logAndReportError(error, "Failed to start server")
+  }
 }
 
 await writeApi.migrateServerDatabase()

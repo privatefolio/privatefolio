@@ -1,5 +1,4 @@
 import { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, shell, Tray } from "electron"
-import Logger from "electron-log/main"
 import Store from "electron-store"
 import path from "path"
 
@@ -8,15 +7,9 @@ import { getAutoLaunchEnabled, toggleAutoLaunch } from "./auto-launch"
 import { AutoUpdater } from "./auto-updater"
 import * as backendManager from "./backend-manager"
 import { configureIpcMain } from "./ipc-main"
-import {
-  appEnvironment,
-  getLatestLogFilepath,
-  getLogsPath,
-  hasDevFlag,
-  isMac,
-  isProduction,
-  isWindows,
-} from "./utils"
+import { FLUSH_INTERVAL, getLogFilePath, logger } from "./logger"
+import { DATA_LOCATION, SERVER_LOGS_LOCATION, SERVER_PORT } from "./settings"
+import { environment, hasDevFlag, isMac, isProduction, isWindows } from "./utils"
 
 interface WindowState {
   height: number
@@ -52,29 +45,20 @@ function toggleAutoUpdate(): boolean {
 
 const startMinimized = process.argv.includes("--hidden")
 
-Logger.transports.file.resolvePathFn = getLatestLogFilepath
-Logger.initialize({ spyRendererConsole: false })
-Logger.errorHandler.startCatching()
-Logger.eventLogger.startLogging()
-Object.assign(console, Logger.scope("Main"))
-
-console.log("Starting app...")
-console.log("Logging to", getLatestLogFilepath())
-console.log("Dev flag", hasDevFlag)
-
-// Logs: C:\Users\daniel\AppData\Local\SquirrelTemp
-const squirrel = require("electron-squirrel-startup")
-
-console.log("Squirrel startup", squirrel)
-if (squirrel) app.quit()
-
-console.log("Production", isProduction)
+logger.info("Initialize electron", {
+  dataLocation: DATA_LOCATION,
+  environment,
+  hasDevFlag,
+  os: process.platform,
+  platform: "electron",
+  serverPort: SERVER_PORT,
+})
 
 const appIconPath = isWindows
   ? path.join(__dirname, "images/icon.ico")
   : path.join(__dirname, "images/icon.png")
 
-console.log("App icon path", appIconPath)
+logger.trace(`App icon path ${appIconPath}`)
 
 Menu.setApplicationMenu(
   !isMac
@@ -112,10 +96,10 @@ Menu.setApplicationMenu(
 let isQuitting = false
 let tray: Tray | null = null
 
-const appUpdater = new AutoUpdater(Logger)
+const appUpdater = new AutoUpdater(logger)
 
 function createWindow() {
-  console.log("Creating main window")
+  logger.trace("Creating main window")
   // Get saved window state
   const windowState = store.get("windowState", {
     height: 900,
@@ -134,7 +118,7 @@ function createWindow() {
     titleBarOverlay: TITLE_BAR_OPTS.light,
     titleBarStyle: "hidden",
     webPreferences: {
-      additionalArguments: [`--${appEnvironment}`],
+      additionalArguments: [`--${environment}`],
       preload: path.join(__dirname, "./preload.js"),
     },
     width: windowState.width,
@@ -191,23 +175,14 @@ function createWindow() {
 
   mainWindow.on("close", async (event) => {
     if (!isQuitting) {
-      console.log("Minimizing window to Tray")
+      logger.trace("Minimizing window to Tray")
       event.preventDefault()
       mainWindow.hide()
       updateTrayMenu(mainWindow)
       return false
     } else {
-      console.log("Closing app...")
-      // Give a small delay to ensure logs are written
-      await new Promise((resolve) => setTimeout(resolve, 100))
-      // disable logging to avoid EPIPE errors
-      Logger.errorHandler.stopCatching()
-      Logger.eventLogger.stopLogging()
-      Logger.transports.file.level = false
-      Logger.transports.console.level = false
-      // Clear any pending console operations
-      process.stdout.destroy()
-      process.stderr.destroy()
+      logger.trace("Closing app...")
+      await new Promise((resolve) => setTimeout(resolve, FLUSH_INTERVAL + 100))
     }
   })
   return mainWindow
@@ -221,13 +196,7 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
   const isAutoUpdateEnabled = getAutoUpdateEnabled()
   const isDevToolsOpened = mainWindow.webContents.isDevToolsOpened()
 
-  console.log(
-    "Updating tray menu for",
-    isVisible ? "visible" : "hidden",
-    "window",
-    "with dev tools",
-    isDevToolsOpened ? "opened" : "closed"
-  )
+  logger.trace(`Updating tray menu`, { isDevToolsOpened, isWindowVisible: isVisible })
 
   const contextMenu = Menu.buildFromTemplate([
     isVisible
@@ -251,10 +220,9 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
       checked: isAutoLaunchEnabled,
       click: async function () {
         const newEnabled = await toggleAutoLaunch()
-        console.log(
-          newEnabled ? "App added to startup" : "App removed from startup",
-          app.getPath("exe")
-        )
+        logger.trace(newEnabled ? "App added to startup" : "App removed from startup", {
+          exe: app.getPath("exe"),
+        })
         updateTrayMenu(mainWindow)
       },
       label: "Auto-start on login",
@@ -264,7 +232,7 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
       checked: isAutoUpdateEnabled,
       click: async function () {
         const newEnabled = toggleAutoUpdate()
-        console.log("Auto-update", newEnabled ? "enabled" : "disabled")
+        logger.trace(`Auto-update ${newEnabled ? "enabled" : "disabled"}`)
         updateTrayMenu(mainWindow)
       },
       label: "Auto-update",
@@ -286,7 +254,7 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
         {
           checked: isDevToolsOpened,
           click: function () {
-            // console.log(`Dev tools ${isDevToolsOpened ? "closing" : "opening"}`)
+            // logger.trace(`Dev tools ${isDevToolsOpened ? "closing" : "opening"}`)
             if (isDevToolsOpened) {
               mainWindow.webContents.closeDevTools()
             } else {
@@ -313,13 +281,13 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
         },
         {
           click: function () {
-            shell.openPath(getLatestLogFilepath())
+            shell.openPath(getLogFilePath())
           },
           label: "Open latest log file",
         },
         {
           click: function () {
-            shell.openPath(getLogsPath())
+            shell.openPath(SERVER_LOGS_LOCATION)
           },
           label: "Open logs directory",
         },
@@ -358,7 +326,7 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
                 app.relaunch()
                 app.exit(0)
               } catch (error) {
-                console.error("Failed to remove data:", error)
+                logger.error("Failed to remove data", { error })
                 dialog.showErrorBox(
                   "Error",
                   "Failed to remove data. Please try to manually delete the data located at:\n" +
@@ -386,10 +354,10 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
   }
 }
 
-console.log("Getting single instance lock")
+logger.trace("Getting single instance lock")
 const gotTheLock = app.requestSingleInstanceLock()
 if (!gotTheLock) {
-  console.log("Couldn't get lock, quitting")
+  logger.trace("Couldn't get lock, quitting")
   app.quit()
 } else {
   let mainWindow: BrowserWindow | null = null
@@ -397,31 +365,30 @@ if (!gotTheLock) {
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   app.whenReady().then(async () => {
-    console.log("App is ready!")
+    logger.trace("App is ready!")
 
     // Start the backend server
-    console.log("Backend server should start:", isProduction)
     if (isProduction) {
       try {
         await backendManager.start()
-        console.log("Backend started successfully")
+        logger.trace("Backend started successfully")
       } catch (error) {
-        console.error("Failed to start backend:", error)
+        logger.error("Failed to start backend", { error })
       }
     }
 
     mainWindow = createWindow()
-    console.log("Configuring IPC")
+    logger.trace("Configuring IPC")
     configureIpcMain(ipcMain, mainWindow)
 
-    console.log("Initializing auto-updater")
+    logger.trace("Initializing auto-updater")
     appUpdater.setMainWindow(mainWindow)
     if (getAutoUpdateEnabled()) appUpdater.startPeriodicCheck()
 
-    console.log("Creating tray")
+    logger.trace("Creating tray")
     const trayIcon = nativeImage.createFromPath(appIconPath)
     if (trayIcon.isEmpty()) {
-      console.error("Failed to load tray icon from path:", appIconPath)
+      logger.error("Failed to load tray icon from path", { appIconPath })
     }
     tray = new Tray(trayIcon)
     tray.setToolTip("Privatefolio")
@@ -443,17 +410,17 @@ if (!gotTheLock) {
       updateTrayMenu(mainWindow)
     }
     if (!startMinimized) {
-      console.log("Showing main window")
+      logger.trace("Showing main window")
       mainWindow.show()
       // force focus
       setTimeout(() => mainWindow.focus(), 100)
     } else {
-      console.log("Starting minimized")
+      logger.trace("Starting minimized")
     }
   })
 
   app.on("second-instance", () => {
-    console.log("Second instance opened", !!mainWindow)
+    logger.trace("Second instance opened", { mainWindow: !!mainWindow })
     // Someone tried to run a second instance, we should focus our window.
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore()
@@ -469,7 +436,7 @@ if (!gotTheLock) {
 
   // Handle app quit
   app.on("before-quit", async (event) => {
-    console.log("Before quit event")
+    logger.trace("Before quit event")
     isQuitting = true
     appUpdater.stopPeriodicCheck()
 
@@ -479,17 +446,9 @@ if (!gotTheLock) {
       try {
         await backendManager.stop()
         // Give a small delay to ensure logs are written
-        await new Promise((resolve) => setTimeout(resolve, 100))
-        // Disable logging
-        Logger.errorHandler.stopCatching()
-        Logger.eventLogger.stopLogging()
-        Logger.transports.file.level = false
-        Logger.transports.console.level = false
-        // Clear any pending console operations
-        process.stdout.destroy()
-        process.stderr.destroy()
+        await new Promise((resolve) => setTimeout(resolve, FLUSH_INTERVAL + 100))
       } catch (error) {
-        console.error("Error during shutdown:", error)
+        logger.error("Error during shutdown", { error })
       }
       app.quit()
     }
@@ -497,7 +456,7 @@ if (!gotTheLock) {
 
   // Handle window-all-closed event
   app.on("window-all-closed", () => {
-    console.log("All windows closed")
+    logger.trace("All windows closed")
     if (process.platform !== "darwin" && isQuitting) {
       app.quit()
     }

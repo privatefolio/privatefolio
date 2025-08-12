@@ -1,6 +1,6 @@
 import { access, mkdir, readFile, writeFile } from "fs/promises"
+import { logger } from "src/logger"
 import { transformNullsToUndefined } from "src/utils/db-utils"
-import { isTestEnvironment } from "src/utils/environment-utils"
 import { logAndReportError } from "src/utils/error-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
@@ -79,7 +79,7 @@ async function storeVapidKeys(publicKey: string, privateKey: string) {
   }
   await writeFile(VAPID_PUBLIC_KEY_FILE, publicKey, "utf8")
   await writeFile(VAPID_PRIVATE_KEY_FILE, privateKey, "utf8")
-  if (!isTestEnvironment) console.log("⚠️ Stored VAPID keys.")
+  logger.info("Stored VAPID keys.")
 }
 
 async function ensureVapidKeys() {

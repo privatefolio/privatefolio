@@ -32,6 +32,7 @@ contextBridge.exposeInMainWorld("electron", {
   },
   platform: process.platform,
   readLogs() {
+    // TODO9
     return ipcRenderer.sendSync("read-logs")
   },
   setMode(mode: PaletteMode) {

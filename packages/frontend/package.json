@@ -42,7 +42,6 @@
     "big.js": "^6.2.1",
     "comlink": "^4.4.1",
     "date-fns": "^2.30.0",
-    "electron-log": "^5.1.5",
     "ethers": "^6.9.0",
     "events": "^3.3.0",
     "exponential-backoff": "^3.1.1",

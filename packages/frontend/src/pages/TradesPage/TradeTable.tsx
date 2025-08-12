@@ -4,6 +4,7 @@ import React, { MutableRefObject, useCallback, useEffect, useMemo, useState } fr
 import { SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { $inspectTime } from "src/stores/pages/balances-store"
+import { TIMESTAMP_HEADER_SX } from "src/theme"
 import { closeSubscription } from "src/utils/browser-utils"
 
 import {
@@ -144,7 +145,7 @@ export function TradeTable(props: TradesTableProps) {
         key: "createdAt",
         label: "Created At",
         sortable: true,
-        sx: { maxWidth: 180, minWidth: 180, width: 180 },
+        sx: TIMESTAMP_HEADER_SX,
         timestamp: true,
       },
     ],

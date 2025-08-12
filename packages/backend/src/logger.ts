@@ -58,12 +58,10 @@ await setupLogger(getLogFilePath())
 
 export const logger = getLogger(isBunWorker ? ["worker"] : ["main"])
 
-if (!isTestEnvironment) {
-  logger.info("Initialize backend", {
-    dataLocation: DATA_LOCATION,
-    environment,
-    runtime,
-    sqliteImpl: useBunSqlite ? "bun" : "sqlite3",
-    sqliteWrites: writesAllowed ? "allowed" : "disallowed",
-  })
-}
+logger.info("Initialize backend", {
+  dataLocation: DATA_LOCATION,
+  environment,
+  runtime,
+  sqliteImpl: useBunSqlite ? "bun" : "sqlite3",
+  sqliteWrites: writesAllowed ? "allowed" : "disallowed",
+})
