@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "build",
+    "declaration": true,
+    "declarationMap": true, // important for 'Go to Source' to work
+    "sourceMap": true,
+    "noEmit": false,
+    "composite": true,
+
+    /* Custom */
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["./src/*"]
+    }
+  },
+  "include": ["src"]
+}

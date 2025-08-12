@@ -1,12 +1,5 @@
-import { getFileSink } from "@logtape/file"
-import {
-  configure,
-  getConsoleSink,
-  getJsonLinesFormatter,
-  getLogger,
-  Logger,
-} from "@logtape/logtape"
-import { getPrettyFormatter } from "@logtape/pretty"
+import { getLogger, Logger } from "@logtape/logtape"
+import { setupLogger } from "@privatefolio/node-common/src/logger"
 import { existsSync, mkdirSync } from "fs"
 import { join } from "path"
 
@@ -14,44 +7,9 @@ import { SERVER_LOGS_LOCATION } from "./settings"
 
 if (!existsSync(SERVER_LOGS_LOCATION)) mkdirSync(SERVER_LOGS_LOCATION, { recursive: true })
 
-export const FLUSH_INTERVAL = 100
-
 export const getLogFilePath = () => {
   const date = new Date().toISOString().slice(0, 10)
   return join(SERVER_LOGS_LOCATION, `${date}.log`)
-}
-
-const sinks = ["console", "file"]
-
-export async function setupLogger(logFilePath: string) {
-  await configure({
-    loggers: [
-      {
-        category: [],
-        lowestLevel: "debug",
-        // lowestLevel: "trace",
-        sinks,
-      },
-      {
-        category: ["logtape", "meta"],
-        lowestLevel: "warning",
-        sinks,
-      },
-    ],
-    sinks: {
-      console: getConsoleSink({
-        formatter: getPrettyFormatter({
-          categoryWidth: 14,
-          properties: true,
-        }),
-      }),
-      file: getFileSink(logFilePath, {
-        flushInterval: FLUSH_INTERVAL,
-        formatter: getJsonLinesFormatter(),
-        nonBlocking: true,
-      }),
-    },
-  })
 }
 
 // --- Buffered logger to avoid losing logs before async setup completes ---
