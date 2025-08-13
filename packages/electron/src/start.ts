@@ -1,4 +1,4 @@
-import { FLUSH_INTERVAL } from "@privatefolio/node-common/src/logger"
+import { FLUSH_INTERVAL, getLatestLogFilename } from "@privatefolio/node-commons/src/logger"
 import { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, shell, Tray } from "electron"
 import Store from "electron-store"
 import path from "path"
@@ -8,7 +8,7 @@ import { getAutoLaunchEnabled, toggleAutoLaunch } from "./auto-launch"
 import { AutoUpdater } from "./auto-updater"
 import * as backendManager from "./backend-manager"
 import { configureIpcMain } from "./ipc-main"
-import { getLogFilePath, logger } from "./logger"
+import { logger } from "./logger"
 import { DATA_LOCATION, SERVER_LOGS_LOCATION, SERVER_PORT } from "./settings"
 import { environment, hasDevFlag, isMac, isProduction, isWindows } from "./utils"
 
@@ -282,7 +282,7 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
         },
         {
           click: function () {
-            shell.openPath(getLogFilePath())
+            shell.openPath(path.join(SERVER_LOGS_LOCATION, getLatestLogFilename()))
           },
           label: "Open latest log file",
         },

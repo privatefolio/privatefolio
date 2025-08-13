@@ -1,7 +1,8 @@
-import { getLogger } from "@logtape/logtape"
-import { setupLogger } from "@privatefolio/node-common/src/logger"
-import { ensureDirectory } from "@privatefolio/node-common/src/utils"
-import { join } from "path"
+import {
+  configureLogger,
+  getLatestLogFilename,
+  getLogger,
+} from "@privatefolio/node-commons/src/logger"
 
 import { DATA_LOCATION, SERVER_LOGS_LOCATION } from "./settings/settings"
 import {
@@ -12,16 +13,7 @@ import {
   writesAllowed,
 } from "./utils/environment-utils"
 
-export { setupLogger }
-
-ensureDirectory(SERVER_LOGS_LOCATION)
-
-export const getLogFilePath = () => {
-  const date = new Date().toISOString().slice(0, 10)
-  return join(SERVER_LOGS_LOCATION, `${date}.log`)
-}
-
-await setupLogger(getLogFilePath())
+await configureLogger(SERVER_LOGS_LOCATION, getLatestLogFilename())
 
 export const logger = getLogger(isBunWorker ? ["worker"] : ["main"])
 

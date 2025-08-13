@@ -2,7 +2,7 @@ import { BrowserWindow, IpcMainEvent, Notification, shell } from "electron"
 
 import { TITLE_BAR_OPTS } from "./api"
 import * as backendManager from "./backend-manager"
-import { getLogFilePath, logger } from "./logger"
+import { logger } from "./logger"
 import { PaletteMode } from "./preload"
 import { SERVER_LOGS_LOCATION } from "./settings"
 import { isMac, isProduction } from "./utils"
@@ -43,9 +43,9 @@ function handleOpenLogsDir(event: IpcMainEvent) {
 }
 
 function handleReadLogs(event: IpcMainEvent) {
-  const logsPath = getLogFilePath()
-  const logs = require("fs").readFileSync(logsPath).toString()
-  event.returnValue = logs
+  // const logsPath = getLogFilePath()
+  // const logs = require("fs").readFileSync(logsPath).toString()
+  event.returnValue = []
 }
 
 function handleGetBackendUrl(event: IpcMainEvent) {

@@ -34,7 +34,7 @@
     "@logtape/logtape": "^1.0.4",
     "@logtape/pretty": "^1.1.0-dev.324",
     "@logtape/redaction": "^1.0.4",
-    "@privatefolio/node-common": "2.0.0",
+    "@privatefolio/node-commons": "^2.0.0-beta.38",
     "ai": "^4.3.16",
     "big.js": "^6.2.1",
     "comlink": "^4.4.2",

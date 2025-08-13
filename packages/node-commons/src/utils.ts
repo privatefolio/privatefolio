@@ -1,6 +1,26 @@
 import { existsSync, mkdirSync } from "fs"
 
 /**
+ * 1 day in minutes
+ */
+export const ONE_DAY_MIN = 24 * 60
+
+/**
+ * 1 day in seconds
+ */
+export const ONE_DAY_TIME = ONE_DAY_MIN * 60
+
+/**
+ * 1 day in milliseconds
+ */
+export const ONE_DAY = ONE_DAY_TIME * 1000
+
+/**
+ * 1 hour in milliseconds
+ */
+export const ONE_HOUR = 60 * 60 * 1000
+
+/**
  * Generates a UUID v4 string with fallback for environments where crypto.randomUUID is not available
  * @returns {string} A UUID v4 string
  */

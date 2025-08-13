@@ -1,5 +1,9 @@
 {
-  "name": "@privatefolio/node-common",
+  "author": {
+    "email": "hello@danielconstantin.net",
+    "name": "Daniel Constantin"
+  },
+  "name": "@privatefolio/node-commons",
   "type": "module",
   "dependencies": {
     "@logtape/file": "^1.0.4",
@@ -7,6 +11,8 @@
     "@logtape/pretty": "^1.1.0-dev.324",
     "@logtape/redaction": "^1.0.4"
   },
+  "description": "Common libraries for node projects.",
+  "homepage": "https://privatefolio.xyz",
   "devDependencies": {
     "@types/bun": "latest",
     "@types/node": "^22.5.4",
@@ -29,9 +35,14 @@
   "peerDependencies": {
     "typescript": "^5"
   },
-  "version": "2.0.0",
+  "keywords": [
+    "privatefolio",
+    "node",
+    "commons"
+  ],
+  "license": "AGPL-3.0",
+  "version": "2.0.0-beta.38",
   "scripts": {
-    "build": "tsc",
     "lint": "eslint .",
     "lint:fix": "yarn lint --fix",
     "check-types": "tsc --noEmit"

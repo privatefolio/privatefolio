@@ -13,9 +13,15 @@
   ],
   "ignorePatterns": [
     "build/**/*",
+    "dist/**/*",
     "out/**/*",
-    "package-lock.json"
+    "package-lock.json",
+    "yarn.lock"
   ],
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module"
+  },
   "plugins": [
     "prettier",
     "@typescript-eslint",
@@ -40,7 +46,10 @@
     "simple-import-sort/imports": "warn",
     "simple-import-sort/exports": "warn",
     "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-extra-semi": "off",
     "unused-imports/no-unused-imports": "warn",
+    "no-non-null-assertion": "off",
     "unused-imports/no-unused-vars": [
       "warn",
       {

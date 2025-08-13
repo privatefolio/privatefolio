@@ -1,6 +1,6 @@
 // https://www.npmjs.com/package/@tsconfig/bun
 {
-  "extends": "@privatefolio/node-common/tsconfig.base.json",
+  "extends": "@privatefolio/node-commons/tsconfig.base.json",
   "compilerOptions": {
     "strict": false, // TODO9
     "noUncheckedIndexedAccess": false // TODO9
