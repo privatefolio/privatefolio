@@ -1,6 +1,6 @@
+import { environment } from "./environment-utils"
 import { logger as defaultLogger } from "./logger"
 import { appId, telemetry } from "./telemetry"
-import { environment } from "./environment-utils"
 
 export function logAndReportError(
   error: Error,

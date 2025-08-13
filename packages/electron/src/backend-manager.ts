@@ -1,10 +1,10 @@
 import { ChildProcess, exec, spawn } from "child_process"
 import path from "path"
 
+import { environment, isWindows } from "./environment-utils"
 import { logAndReportError } from "./error-utils"
 import { logger } from "./logger"
 import { DATA_LOCATION, SERVER_PORT as port } from "./settings"
-import { environment, isWindows } from "./environment-utils"
 
 let backendProcess: ChildProcess | null = null
 let isStarted = false
