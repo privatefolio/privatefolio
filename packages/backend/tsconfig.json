@@ -1,10 +1,8 @@
 {
   "extends": "@privatefolio/commons/tsconfig.base.json",
   "compilerOptions": {
-    "strict": false, // TODO9
-    "noUncheckedIndexedAccess": false,  // TODO9
-
-    /* Custom */
+    "strict": false, // TODO8
+    "noUncheckedIndexedAccess": false,  // TODO8
     "outDir": "build", // even if noEmit is true, this is needed for correct intellisense
     "baseUrl": ".",
     "paths": {

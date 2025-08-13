@@ -1,8 +1,7 @@
+import { randomUUID } from "@privatefolio/commons/utils"
 import { getAccount } from "src/api/accounts-api"
 import { allSubscriptions, appEventEmitter } from "src/api/internal"
 import { SubscriptionChannel, SubscriptionId, SubscriptionListener } from "src/interfaces"
-
-import { randomUUID } from "./utils"
 
 export async function createSubscription(
   accountName = "",

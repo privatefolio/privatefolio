@@ -4,13 +4,15 @@
     "name": "Daniel Constantin"
   },
   "name": "@privatefolio/commons",
+  "sideEffects": false,
   "exports": {
     "./*": {
       "import": "./src/*.ts",
       "require": "./build/cjs/*.js"
     },
     "./package.json": "./package.json",
-    "./tsconfig.base.json": "./tsconfig.base.json"
+    "./tsconfig.base.json": "./tsconfig.base.json",
+    "./tsconfig.cjs.json": "./tsconfig.cjs.json"
   },
   "typesVersions": {
     "*": {
@@ -19,7 +21,6 @@
       ]
     }
   },
-  "sideEffects": false,
   "dependencies": {
     "@logtape/file": "^1.0.4",
     "@logtape/logtape": "^1.0.4",

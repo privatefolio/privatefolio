@@ -16,7 +16,7 @@ export const HASH_FILE = `${AUTH_DATA_DIR}/.hash`
 export const JWT_SECRET_FILE = `${AUTH_DATA_DIR}/.jwtsecret`
 export const VAPID_PUBLIC_KEY_FILE = `${AUTH_DATA_DIR}/.vapid_public`
 export const VAPID_PRIVATE_KEY_FILE = `${AUTH_DATA_DIR}/.vapid_private`
-export const SERVER_ID_FILE = `${AUTH_DATA_DIR}/.server-id`
+export const SERVER_ID_FILENAME = ".server-id"
 export const SERVER_DB_FILE = `${AUTH_DATA_DIR}/server.sqlite`
 
 export const corsHeaders = {

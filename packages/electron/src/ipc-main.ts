@@ -5,7 +5,7 @@ import * as backendManager from "./backend-manager"
 import { logger } from "./logger"
 import { PaletteMode } from "./preload"
 import { SERVER_LOGS_LOCATION } from "./settings"
-import { isMac, isProduction } from "./utils"
+import { isMac, isProduction } from "./environment-utils"
 
 export function configureIpcMain(ipcMain: Electron.IpcMain, window: BrowserWindow) {
   ipcMain.on("notify", (_, message: string) => {

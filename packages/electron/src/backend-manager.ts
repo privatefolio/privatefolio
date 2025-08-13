@@ -1,9 +1,10 @@
 import { ChildProcess, exec, spawn } from "child_process"
 import path from "path"
 
+import { logAndReportError } from "./error-utils"
 import { logger } from "./logger"
 import { DATA_LOCATION, SERVER_PORT as port } from "./settings"
-import { environment, isWindows } from "./utils"
+import { environment, isWindows } from "./environment-utils"
 
 let backendProcess: ChildProcess | null = null
 let isStarted = false
@@ -77,7 +78,7 @@ export async function start(): Promise<void> {
     })
 
     backendProcess.on("error", (error) => {
-      logger.error(`BackendManager: Process error: ${error.message}`)
+      logAndReportError(error, `BackendManager: process error`)
       isStarted = false
     })
 
@@ -91,7 +92,7 @@ export async function start(): Promise<void> {
     isStarted = true
     logger.info(`BackendManager: Started on port ${port}`)
   } catch (error) {
-    logger.error(`BackendManager: Failed to start: ${error}`)
+    logAndReportError(error as Error, `BackendManager: failed to start`)
     throw error
   }
 }
@@ -147,7 +148,7 @@ async function killProcessOnPort(): Promise<void> {
 
       exec(killCommand, (killError) => {
         if (killError) {
-          logger.error(`Failed to kill process on port ${port}: ${killError}`)
+          logAndReportError(killError, `Failed to kill process on port ${port}`)
         } else {
           logger.info(`BackendManager: Killed process on port ${port}`)
         }

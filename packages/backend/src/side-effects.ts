@@ -13,6 +13,7 @@ import {
 } from "./interfaces"
 import { logger } from "./logger"
 import { MAX_DEBOUNCE_DURATION, SHORT_DEBOUNCE_DURATION } from "./settings/settings"
+import { logAndReportError } from "./utils/error-utils"
 import { ONE_DAY } from "./utils/formatting-utils"
 import { floorTimestamp } from "./utils/utils"
 
@@ -90,7 +91,7 @@ async function setupSideEffects(accountName: string, writeApi: Api) {
 
     await setupCronJobs(accountName, writeApi as Api)
   } catch (error) {
-    accountLogger.error(`Error setting up side-effects:`, { error })
+    logAndReportError(error as Error, `Error setting up side-effects:`, {}, accountLogger)
   }
 }
 

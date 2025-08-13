@@ -1,12 +1,7 @@
 {
-  "extends": "@privatefolio/commons/tsconfig.base.json",
+  "extends": "@privatefolio/commons/tsconfig.cjs.json",
   "compilerOptions": {
     "outDir": "build/cjs",
-    "module": "CommonJS",
-    "moduleResolution": "Node",
-    "declaration": true,
-    "declarationMap": true, // important for 'Go to Source' to work
-    "sourceMap": true
   },
   "include": ["src"]
 }

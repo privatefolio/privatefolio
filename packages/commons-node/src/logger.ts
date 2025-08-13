@@ -21,7 +21,7 @@ export async function configureLogger(
   logFileName: string,
   lowestLevel: LogLevel = "debug"
 ) {
-  ensureDirectory(logsDirectory)
+  await ensureDirectory(logsDirectory)
   const logFilePath = join(logsDirectory, logFileName)
 
   await configure({

@@ -3,7 +3,7 @@ import {
   getLatestLogFilename,
   getOldLogs,
   msUntilMidnight,
-} from "@privatefolio/commons-node/src/logger"
+} from "@privatefolio/commons-node/logger"
 
 import { logger } from "./logger"
 import { SERVER_LOGS_LOCATION } from "./settings/settings"

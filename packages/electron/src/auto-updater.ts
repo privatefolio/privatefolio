@@ -3,8 +3,9 @@ import { Logger } from "@logtape/logtape"
 import { app, BrowserWindow, dialog, shell } from "electron"
 import { autoUpdater, UpdateDownloadedEvent, UpdateInfo } from "electron-updater"
 
+import { logAndReportError } from "./error-utils"
 import { logger } from "./logger"
-import { isProduction } from "./utils"
+import { isProduction } from "./environment-utils"
 
 const CHECK_FOR_UPDATES_INTERVAL = 24 * 60 * 60 * 1000 // 24 hours
 const CHECK_FOR_UPDATES_START_DELAY = 60 * 1000 // 60 seconds
@@ -41,7 +42,7 @@ export class AutoUpdater {
     })
 
     autoUpdater.on("error", (error) => {
-      logger.error("Error in auto-updater", { error })
+      logAndReportError(error, "Error in auto-updater")
     })
 
     autoUpdater.on("download-progress", (progressObj) => {

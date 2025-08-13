@@ -1,8 +1,4 @@
-import {
-  configureLogger,
-  getLatestLogFilename,
-  getLogger,
-} from "@privatefolio/commons-node/src/logger"
+import { configureLogger, getLatestLogFilename, getLogger } from "@privatefolio/commons-node/logger"
 
 import { DATA_LOCATION, SERVER_LOGS_LOCATION } from "./settings/settings"
 import {

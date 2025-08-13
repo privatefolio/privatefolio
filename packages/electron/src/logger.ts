@@ -1,9 +1,6 @@
 import { getLogger } from "@logtape/logtape"
-import { configureLogger, getLatestLogFilename } from "@privatefolio/commons-node/build/cjs/logger"
-import {
-  configureMemoryLogger,
-  getInMemoryRecords,
-} from "@privatefolio/commons-node/build/cjs/logger-memory"
+import { configureLogger, getLatestLogFilename } from "@privatefolio/commons-node/logger"
+import { configureMemoryLogger, getInMemoryRecords } from "@privatefolio/commons-node/logger-memory"
 
 import { SERVER_LOGS_LOCATION } from "./settings"
 

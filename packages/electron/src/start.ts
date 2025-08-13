@@ -1,4 +1,6 @@
-import { FLUSH_INTERVAL, getLatestLogFilename } from "@privatefolio/commons-node/build/cjs/logger"
+import "./error-catcher"
+
+import { FLUSH_INTERVAL, getLatestLogFilename } from "@privatefolio/commons-node/logger"
 import { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, shell, Tray } from "electron"
 import Store from "electron-store"
 import path from "path"
@@ -7,10 +9,11 @@ import { TITLE_BAR_OPTS } from "./api"
 import { getAutoLaunchEnabled, toggleAutoLaunch } from "./auto-launch"
 import { AutoUpdater } from "./auto-updater"
 import * as backendManager from "./backend-manager"
+import { environment, hasDevFlag, isMac, isProduction, isWindows } from "./environment-utils"
+import { logAndReportError } from "./error-utils"
 import { configureIpcMain } from "./ipc-main"
 import { logger } from "./logger"
 import { DATA_LOCATION, SERVER_LOGS_LOCATION, SERVER_PORT } from "./settings"
-import { environment, hasDevFlag, isMac, isProduction, isWindows } from "./utils"
 
 interface WindowState {
   height: number
@@ -327,7 +330,7 @@ async function updateTrayMenu(mainWindow: BrowserWindow | null) {
                 app.relaunch()
                 app.exit(0)
               } catch (error) {
-                logger.error("Failed to remove data", { error })
+                logAndReportError(error as Error, "Failed to remove data")
                 dialog.showErrorBox(
                   "Error",
                   "Failed to remove data. Please try to manually delete the data located at:\n" +
@@ -374,7 +377,7 @@ if (!gotTheLock) {
         await backendManager.start()
         logger.trace("Backend started successfully")
       } catch (error) {
-        logger.error("Failed to start backend", { error })
+        logAndReportError(error as Error, "Failed to start backend")
       }
     }
 
@@ -389,7 +392,7 @@ if (!gotTheLock) {
     logger.trace("Creating tray")
     const trayIcon = nativeImage.createFromPath(appIconPath)
     if (trayIcon.isEmpty()) {
-      logger.error("Failed to load tray icon from path", { appIconPath })
+      logAndReportError(new Error("Tray icon empty"), "Failed to load tray icon from path")
     }
     tray = new Tray(trayIcon)
     tray.setToolTip("Privatefolio")
@@ -449,7 +452,7 @@ if (!gotTheLock) {
         // Give a small delay to ensure logs are written
         await new Promise((resolve) => setTimeout(resolve, FLUSH_INTERVAL + 100))
       } catch (error) {
-        logger.error("Error during shutdown", { error })
+        logAndReportError(error as Error, "Error during shutdown")
       }
       app.quit()
     }
