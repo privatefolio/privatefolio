@@ -44,5 +44,5 @@
   //   "**/*.ts",
   //   "**/*.tsx",
   // ],
-  "exclude": ["node_modules", "service-worker"]
+  "exclude": ["node_modules", "service-worker", "vite.config.ts"]
 }

@@ -66,12 +66,12 @@ export async function start(): Promise<void> {
       stdio: "pipe", // Redirect stdout and stderr
     })
 
-    backendProcess.stdout.on("data", (data) => {
+    backendProcess.stdout!.on("data", (data) => {
       const str = data.toString()
       logger.info(`BackendManager: stdout: ${str.endsWith("\n") ? str.slice(0, -1) : str}`)
     })
 
-    backendProcess.stderr.on("data", (data) => {
+    backendProcess.stderr!.on("data", (data) => {
       const str = data.toString()
       logger.error(`BackendManager: stderr: ${str.endsWith("\n") ? str.slice(0, -1) : str}`)
     })

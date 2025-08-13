@@ -1,5 +1,5 @@
 {
-  "extends": "@privatefolio/node-commons/tsconfig.base.json",
+  "extends": "@privatefolio/commons/tsconfig.base.json",
   "compilerOptions": {
     "strict": false, // TODO9
     "noUncheckedIndexedAccess": false,  // TODO9

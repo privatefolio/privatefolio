@@ -1,12 +1,10 @@
 {
-  "extends": "./tsconfig.base.json",
-  "compilerOptions": {
-    // "outDir": "build",
-    // "declaration": true,
-    // "declarationMap": true, // important for 'Go to Source' to work
-    // "sourceMap": true,
-    // "noEmit": false,
-    // "composite": true,
-  },
+  "extends": "@privatefolio/commons/tsconfig.base.json",
+  // "compilerOptions": {
+  //   "outDir": "build/esm",
+  //   "declaration": true,
+  //   "declarationMap": true, // important for 'Go to Source' to work
+  //   "sourceMap": true,
+  // },
   "include": ["src"]
 }

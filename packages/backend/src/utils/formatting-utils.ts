@@ -2,7 +2,7 @@ import { Timestamp } from "src/interfaces"
 
 const locale = typeof window !== "undefined" ? window.navigator.language : "en-US"
 
-export * from "@privatefolio/node-commons/src/utils"
+export * from "@privatefolio/commons/utils"
 
 /**
  * Calculates the number of decimal places required to precisely represent the given number.

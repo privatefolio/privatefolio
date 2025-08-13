@@ -13,13 +13,13 @@
     // "allowImportingTsExtensions": true,
     // "resolveJsonModule": true,
     // "verbatimModuleSyntax": true,
-    "noEmit": true,
+    // "noEmit": true,
 
     /* Linting */
     "skipLibCheck": true,
     "strict": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
+    "noUncheckedIndexedAccess": true
     // "noUnusedLocals": true,
     // "noUnusedParameters": true,
     // "noPropertyAccessFromIndexSignature": true,

@@ -1,11 +1,12 @@
 import { getFileSink } from "@logtape/file"
 import { configure, getConsoleSink, getJsonLinesFormatter, LogLevel } from "@logtape/logtape"
 import { getPrettyFormatter } from "@logtape/pretty"
+import { ONE_DAY } from "@privatefolio/commons/utils"
 import { readdir } from "fs/promises"
 import { join } from "path"
 
 import { isTestEnvironment } from "./environment-utils"
-import { ensureDirectory, ONE_DAY } from "./utils"
+import { ensureDirectory } from "./utils"
 
 const sinks = isTestEnvironment ? [] : ["console", "file"]
 

@@ -1,4 +1,4 @@
-import { FLUSH_INTERVAL, getLatestLogFilename } from "@privatefolio/node-commons/src/logger"
+import { FLUSH_INTERVAL, getLatestLogFilename } from "@privatefolio/node-commons/build/cjs/logger"
 import { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, shell, Tray } from "electron"
 import Store from "electron-store"
 import path from "path"
@@ -402,7 +402,7 @@ if (!gotTheLock) {
         mainWindow.show()
       }
 
-      setTimeout(() => mainWindow.focus(), 100)
+      setTimeout(() => mainWindow?.focus(), 100)
       updateTrayMenu(mainWindow)
     }
     tray.on("click", handleClick)
@@ -414,7 +414,7 @@ if (!gotTheLock) {
       logger.trace("Showing main window")
       mainWindow.show()
       // force focus
-      setTimeout(() => mainWindow.focus(), 100)
+      setTimeout(() => mainWindow?.focus(), 100)
     } else {
       logger.trace("Starting minimized")
     }
@@ -428,10 +428,10 @@ if (!gotTheLock) {
       if (!mainWindow.isVisible()) {
         mainWindow.show()
         // force focus
-        setTimeout(() => mainWindow.focus(), 100)
+        setTimeout(() => mainWindow?.focus(), 100)
       }
       // force focus
-      setTimeout(() => mainWindow.focus(), 100)
+      setTimeout(() => mainWindow?.focus(), 100)
     }
   })
 

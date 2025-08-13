@@ -47,8 +47,8 @@ export default defineConfig(({ mode }) => {
         // brotliSize: true,
         filename: "build/bundle-analysis.html",
         gzipSize: true,
-        // open: true,
-        template: "sunburst",
+        open: true,
+        template: "treemap",
       }),
     ],
     resolve: {

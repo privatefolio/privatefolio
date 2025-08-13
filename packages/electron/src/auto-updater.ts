@@ -109,7 +109,7 @@ export class AutoUpdater {
     if (result?.isUpdateAvailable) {
       this.showUpdateDialog(result.updateInfo)
     } else {
-      const { response } = await dialog.showMessageBox(this.mainWindow, {
+      const { response } = await dialog.showMessageBox(this.mainWindow!, {
         buttons: ["OK", "Show all releases"],
         cancelId: 0,
         defaultId: 0,
