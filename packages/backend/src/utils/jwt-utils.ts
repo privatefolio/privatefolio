@@ -1,5 +1,6 @@
 import { createCipheriv, createDecipheriv, randomBytes } from "crypto"
 import * as jose from "jose"
+import { logger } from "src/logger"
 import { TextEncoder } from "util" // Node.js util for encoding secret
 
 import { isTestEnvironment } from "./environment-utils"
@@ -68,15 +69,15 @@ export async function verifyJwt(
     if (isTestEnvironment) return null
     // Log specific JOSE errors if needed
     if (error instanceof jose.errors.JWTExpired) {
-      console.warn("JWT Verification failed: Token expired")
+      logger.warn("JWT Verification failed: Token expired")
     } else if (error instanceof jose.errors.JWTClaimValidationFailed) {
-      console.warn(
+      logger.warn(
         `JWT Verification failed: Claim validation failed (${error.claim} = ${error.reason})`
       )
     } else if (error instanceof jose.errors.JOSEError) {
-      console.warn(`JWT Verification failed: ${error.code || error.message}`)
+      logger.warn(`JWT Verification failed: ${error.code || error.message}`)
     } else {
-      console.warn("JWT Verification failed:", error)
+      logger.warn("JWT Verification failed", { error })
     }
     return null
   }
@@ -163,9 +164,7 @@ export async function decryptValue(
 
     return decrypted
   } catch (error) {
-    if (!isTestEnvironment) {
-      console.warn("Decryption failed:", error)
-    }
+    logger.warn("Decryption failed", { error })
     return null
   }
 }

@@ -122,7 +122,7 @@ Privatefolio is a free, open-source cryptocurrency portfolio manager built as a 
   - Optimized for Bun runtime with fallbacks for Node.js compatibility
 
 - **Electron:**
-  - Windows builds with Squirrel installer, Linux with DEB packages, macOS with DMG
+  - Windows builds with Nsis installer, Linux with DEB packages, macOS with DMG
   - Automated deployment process via GitHub Actions triggered by version changes (`yarn new-version`)
   - Binaries published to GitHub releases for user distribution
 
@@ -573,7 +573,8 @@ yarn build-bin:mac
 ```
 
 The build process creates platform-specific installers:
-- Windows: Squirrel installer (.exe)
+
+- Windows: Nsis installer (.exe)
 - macOS: ZIP archive
 - Linux: DEB and RPM packages
 

@@ -274,7 +274,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
         setSeriesReady(true)
       }, 0)
     },
-    [defaultSeriesOptions, seriesOptions, onSeriesReady, activeType]
+    [defaultSeriesOptions, seriesOptions, onSeriesReady, isMultiArea, isStackedArea, activeType]
   )
 
   useEffect(() => {

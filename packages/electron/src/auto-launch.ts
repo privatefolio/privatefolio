@@ -5,7 +5,7 @@ import {
   enableAutoLaunchLinux,
   isAutoLaunchEnabledLinux,
 } from "./auto-launch-linux"
-import { isLinux } from "./utils"
+import { isLinux } from "./environment-utils"
 
 export async function toggleAutoLaunch() {
   if (isLinux) {

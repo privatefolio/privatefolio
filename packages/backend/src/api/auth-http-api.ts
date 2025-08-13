@@ -1,6 +1,6 @@
 import { randomBytes, scrypt, timingSafeEqual } from "crypto"
 import { access, mkdir, readFile, writeFile } from "fs/promises"
-import { isTestEnvironment } from "src/utils/environment-utils"
+import { logger } from "src/logger"
 import { logAndReportError } from "src/utils/error-utils"
 import { promisify } from "util"
 
@@ -68,7 +68,7 @@ export async function storeSecrets(salt: Buffer, hash: Buffer, jwtSecret: Buffer
   await writeFile(SALT_FILE, salt)
   await writeFile(HASH_FILE, hash)
   await writeFile(JWT_SECRET_FILE, jwtSecret)
-  if (!isTestEnvironment) console.log("⚠️ Stored salt, hash, and JWT secret.")
+  logger.info("Stored salt, hash, and JWT secret.")
 }
 
 /**

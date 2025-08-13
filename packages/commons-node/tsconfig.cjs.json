@@ -1,0 +1,7 @@
+{
+  "extends": "@privatefolio/commons/tsconfig.cjs.json",
+  "compilerOptions": {
+    "outDir": "build/cjs",
+  },
+  "include": ["src"]
+}

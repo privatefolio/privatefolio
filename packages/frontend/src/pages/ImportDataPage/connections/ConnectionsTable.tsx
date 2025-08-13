@@ -9,6 +9,7 @@ import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
 import { Connection } from "src/interfaces"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { $hideInactiveConnections } from "src/stores/device-settings-store"
+import { TIMESTAMP_HEADER_SX } from "src/theme"
 import { closeSubscription } from "src/utils/browser-utils"
 import { HeadCell } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
@@ -74,7 +75,7 @@ export function ConnectionsTable() {
         key: "syncedAt",
         label: "Synced at",
         sortable: true,
-        sx: { maxWidth: 180, minWidth: 180, width: 180 },
+        sx: TIMESTAMP_HEADER_SX,
         timestamp: true,
       },
       {

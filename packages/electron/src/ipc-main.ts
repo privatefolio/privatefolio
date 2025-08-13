@@ -1,14 +1,14 @@
-import { app, BrowserWindow, IpcMainEvent, Notification, shell } from "electron"
-import path from "path"
+import { BrowserWindow, IpcMainEvent, Notification, shell } from "electron"
 
 import { TITLE_BAR_OPTS } from "./api"
 import * as backendManager from "./backend-manager"
+import { isMac, isProduction } from "./environment-utils"
+import { logger } from "./logger"
 import { PaletteMode } from "./preload"
-import { getLatestLogFilepath, isMac, isProduction } from "./utils"
+import { SERVER_LOGS_LOCATION } from "./settings"
 
 export function configureIpcMain(ipcMain: Electron.IpcMain, window: BrowserWindow) {
   ipcMain.on("notify", (_, message: string) => {
-    // console.log("📜 LOG > ipcMain.on notify > message")
     new Notification({ body: message, title: "Notification" }).show()
   })
   ipcMain.on("set-mode", createSetModeHandler(window))
@@ -28,7 +28,7 @@ export function configureIpcMain(ipcMain: Electron.IpcMain, window: BrowserWindo
 
 function createSetModeHandler(window: BrowserWindow) {
   return function handleSetMode(event: IpcMainEvent, mode: PaletteMode) {
-    console.log("Setting theme mode", mode)
+    logger.trace(`Setting theme mode ${mode}`)
     try {
       if (!isMac) window.setTitleBarOverlay(TITLE_BAR_OPTS[mode])
     } catch {}
@@ -37,15 +37,15 @@ function createSetModeHandler(window: BrowserWindow) {
 }
 
 function handleOpenLogsDir(event: IpcMainEvent) {
-  const dirPath = path.join(app.getPath("userData"), "logs")
+  const dirPath = SERVER_LOGS_LOCATION
   shell.openPath(dirPath)
   event.returnValue = dirPath
 }
 
 function handleReadLogs(event: IpcMainEvent) {
-  const logsPath = getLatestLogFilepath()
-  const logs = require("fs").readFileSync(logsPath).toString()
-  event.returnValue = logs
+  // const logsPath = getLogFilePath()
+  // const logs = require("fs").readFileSync(logsPath).toString()
+  event.returnValue = []
 }
 
 function handleGetBackendUrl(event: IpcMainEvent) {
@@ -57,11 +57,11 @@ function handleIsBackendRunning(event: IpcMainEvent) {
 }
 
 async function handleRestartBackend() {
-  console.log("Restarting backend server...")
+  logger.info("Restarting backend server...")
 
   // In development mode, we don't manage the backend process
   if (!isProduction) {
-    console.log("Cannot restart backend in development mode - managed by lerna")
+    logger.info("Cannot restart backend in development mode - managed by lerna")
     return false
   }
 

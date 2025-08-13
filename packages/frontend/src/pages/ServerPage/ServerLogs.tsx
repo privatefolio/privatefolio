@@ -7,6 +7,7 @@ import { QueryTableData, RemoteTable } from "src/components/EnhancedTable/Remote
 import { ServerLog } from "src/interfaces"
 import { SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
+import { TIMESTAMP_HEADER_SX } from "src/theme"
 import { closeSubscription } from "src/utils/browser-utils"
 import { HeadCell } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
@@ -62,7 +63,7 @@ export function ServerLogs() {
         key: "timestamp",
         label: "Created",
         sortable: true,
-        sx: { maxWidth: 200, minWidth: 200, width: 200 },
+        sx: TIMESTAMP_HEADER_SX,
       },
       {
         filterable: true,

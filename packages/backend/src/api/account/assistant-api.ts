@@ -1,3 +1,4 @@
+import { randomUUID } from "@privatefolio/commons/utils"
 import {
   ChatConversation,
   ChatMessage,
@@ -13,7 +14,6 @@ import { writesAllowed } from "src/utils/environment-utils"
 import { saveFile } from "src/utils/file-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
-import { randomUUID } from "src/utils/utils"
 
 import { SubscriptionChannel } from "../../interfaces"
 import { getAccount } from "../accounts-api"

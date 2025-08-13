@@ -2,6 +2,8 @@ import { Timestamp } from "src/interfaces"
 
 const locale = typeof window !== "undefined" ? window.navigator.language : "en-US"
 
+export * from "@privatefolio/commons/utils"
+
 /**
  * Calculates the number of decimal places required to precisely represent the given number.
  *
@@ -169,21 +171,6 @@ export function formatFileSize(bytes: number, longFormat = false) {
     maximumFractionDigits: longFormat ? undefined : 2,
   })} ${sizes[i]}`
 }
-
-/**
- * 1 day in minutes
- */
-export const ONE_DAY_MIN = 24 * 60
-
-/**
- * 1 day in seconds
- */
-export const ONE_DAY_TIME = ONE_DAY_MIN * 60
-
-/**
- * 1 day in milliseconds
- */
-export const ONE_DAY = ONE_DAY_TIME * 1000
 
 /**
  * Calculates appropriate minimumFractionDigits and maximumFractionDigits for formatting a number.

@@ -49,6 +49,8 @@ export default defineConfig({
         "net",
         "tls",
         "assert",
+        "sqlite3",
+        "sqlite",
       ],
       output: {
         // chunkFileNames: "chunks/[name]/[name].js",

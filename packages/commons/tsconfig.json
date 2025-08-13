@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    // this disabled @types/node
+    "types": []
+    // for esm we use src directly
+    // "outDir": "build/esm",
+    // "declaration": true,
+    // "declarationMap": true, // important for 'Go to Source' to work
+    // "sourceMap": true,
+  },
+  "include": ["src"]
+}

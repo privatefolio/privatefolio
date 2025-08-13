@@ -9,6 +9,7 @@ import { SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { $hideSpam } from "src/stores/device-settings-store"
 import { $inspectTime } from "src/stores/pages/balances-store"
+import { TIMESTAMP_HEADER_SX } from "src/theme"
 import { closeSubscription } from "src/utils/browser-utils"
 import { ONE_DAY } from "src/utils/formatting-utils"
 
@@ -149,7 +150,7 @@ export function TransactionTable(props: TransactionsTableProps) {
         key: "timestamp",
         label: "Timestamp",
         sortable: true,
-        sx: { maxWidth: 200, minWidth: 200, width: 200 },
+        sx: TIMESTAMP_HEADER_SX,
       },
       {
         filterable: true,

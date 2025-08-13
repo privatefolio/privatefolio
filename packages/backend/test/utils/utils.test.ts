@@ -1,4 +1,4 @@
-import { randomUUID } from "src/utils/utils"
+import { randomUUID } from "@privatefolio/commons/utils"
 import { expect, it } from "vitest"
 
 it("randomUUID should work", () => {

@@ -1,0 +1,48 @@
+{
+  "author": {
+    "email": "hello@danielconstantin.net",
+    "name": "Daniel Constantin"
+  },
+  "name": "@privatefolio/commons-node",
+  "sideEffects": false,
+  "exports": {
+    "./*": {
+      "import": "./src/*.ts",
+      "require": "./build/cjs/*.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "src/*"
+      ]
+    }
+  },
+  "dependencies": {
+    "@logtape/file": "^1.0.4",
+    "@logtape/logtape": "^1.0.4",
+    "@logtape/pretty": "^1.1.0-dev.324",
+    "@logtape/redaction": "^1.0.4",
+    "@privatefolio/commons": "^2.0.0-beta.38",
+    "posthog-node": "^5.6.0"
+  },
+  "description": "Common libraries for node projects.",
+  "homepage": "https://privatefolio.xyz",
+  "keywords": [
+    "privatefolio",
+    "node",
+    "commons"
+  ],
+  "license": "AGPL-3.0",
+  "version": "2.0.0-beta.38",
+  "scripts": {
+    "prebuild": "rm -rf build",
+    "build": "tsc --project tsconfig.cjs.json",
+    "build:watch": "tsc --project tsconfig.cjs.json --watch --preserveWatchOutput",
+    "dev": "yarn build:watch",
+    "lint": "eslint .",
+    "lint:fix": "yarn lint --fix",
+    "check-types": "tsc --noEmit"
+  }
+}

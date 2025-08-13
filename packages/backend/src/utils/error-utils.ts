@@ -1,10 +1,10 @@
 import { logger as defaultLogger } from "src/logger"
 import { serverId, telemetry } from "src/telemetry"
-import { environment, runtime } from "src/utils/utils"
+import { environment, isTestEnvironment, runtime } from "src/utils/utils"
 
 export function logAndReportError(
   error: Error,
-  extraMessage?: string,
+  extraMessage: string,
   extraProperties = {},
   logger = defaultLogger
 ): void {
@@ -13,6 +13,7 @@ export function logAndReportError(
     stackTrace: error.stack,
     ...extraProperties,
   })
+  if (isTestEnvironment) return
   try {
     telemetry.captureException(error, serverId, {
       environment,

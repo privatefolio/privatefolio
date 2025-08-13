@@ -6,6 +6,7 @@ import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { MemoryTable } from "src/components/EnhancedTable/MemoryTable"
 import { NoDataAvailable } from "src/components/NoDataAvailable"
 import { CoingeckoTickerData } from "src/interfaces"
+import { TIMESTAMP_HEADER_SX } from "src/theme"
 import { HeadCell } from "src/utils/table-utils"
 
 import { AssetMarketTableRow, TickerData } from "./AssetMarketTableRow"
@@ -96,7 +97,7 @@ export function AssetMarketTable({ tickers, isLoading }: AssetMarketsProps) {
         label: "Last Updated",
         numeric: true,
         sortable: true,
-        sx: { maxWidth: 200, minWidth: 200, width: 200 },
+        sx: TIMESTAMP_HEADER_SX,
       },
     ],
     []

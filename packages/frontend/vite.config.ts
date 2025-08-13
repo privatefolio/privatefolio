@@ -48,7 +48,7 @@ export default defineConfig(({ mode }) => {
         filename: "build/bundle-analysis.html",
         gzipSize: true,
         // open: true,
-        template: "sunburst",
+        template: "treemap",
       }),
     ],
     resolve: {

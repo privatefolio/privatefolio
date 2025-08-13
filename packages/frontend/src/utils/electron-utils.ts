@@ -1,5 +1,4 @@
 import { PaletteMode } from "@mui/material"
-import Logger from "electron-log/renderer"
 
 declare global {
   interface Window {
@@ -41,17 +40,18 @@ console.log(`Electron API ${isElectron ? "available" : "not available"}`)
 export const { openLogsDir, readLogs, openDevTools } = window.electron || {}
 
 // Initialize logger
-;(() => {
-  if (isElectron && isProductionElectron) {
-    const originalConsole = console
-    Object.assign(console, Logger.scope("Renderer"))
-    Logger.errorHandler.startCatching()
-    // if the window is closing, stop catching
-    window.addEventListener("beforeunload", () => {
-      try {
-        Logger.errorHandler.stopCatching()
-        Object.assign(console, originalConsole)
-      } catch {}
-    })
-  }
-})()
+// TODO9
+// ;(() => {
+//   if (isElectron && isProductionElectron) {
+//     const originalConsole = console
+//     Object.assign(console, Logger.scope("Renderer"))
+//     Logger.errorHandler.startCatching()
+//     // if the window is closing, stop catching
+//     window.addEventListener("beforeunload", () => {
+//       try {
+//         Logger.errorHandler.stopCatching()
+//         Object.assign(console, originalConsole)
+//       } catch {}
+//     })
+//   }
+// })()

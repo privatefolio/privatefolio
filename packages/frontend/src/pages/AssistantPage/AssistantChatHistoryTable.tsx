@@ -5,6 +5,7 @@ import { QueryTableData, RemoteTable } from "src/components/EnhancedTable/Remote
 import { ChatConversation } from "src/interfaces"
 import { SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
+import { TIMESTAMP_HEADER_SX } from "src/theme"
 import { closeSubscription } from "src/utils/browser-utils"
 import { HeadCell } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
@@ -69,7 +70,7 @@ export function AssistantChatHistoryTable() {
         key: "startTime",
         label: "Started",
         sortable: true,
-        sx: { maxWidth: 180, minWidth: 180, width: 180 },
+        sx: TIMESTAMP_HEADER_SX,
         timestamp: true,
       },
       {

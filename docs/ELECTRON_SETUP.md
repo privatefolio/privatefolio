@@ -100,7 +100,8 @@ yarn build-bin:mac
 ```
 
 The build process creates platform-specific installers:
-- Windows: Squirrel installer (.exe)
+
+- Windows: Nsis installer (.exe)
 - macOS: ZIP archive
 - Linux: DEB and RPM packages
 

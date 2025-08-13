@@ -3,7 +3,7 @@ import type { Api } from "privatefolio-backend/build/src/api/api"
 import type { IBackendRelayer } from "privatefolio-backend/build/src/backend-relayer"
 import { createBackendRelayer } from "privatefolio-backend/build/src/backend-relayer"
 import { User } from "src/api/privatecloud-api"
-import { TARGET } from "src/env"
+import { SERVER_PORT, TARGET } from "src/env"
 import { ConnectionStatusCallback } from "src/interfaces"
 import {
   $activeAccountType,
@@ -26,7 +26,7 @@ const BASE_LOCAL_SERVER_URL =
     ? backendUrl!
     : isProduction
       ? `${window.location.hostname}:${window.location.port}` // self hosted
-      : `${window.location.hostname}:4001`
+      : `${window.location.hostname}:${SERVER_PORT}`
 const REMOTE_SERVER_URL = (cloudAccount: User) => `${cloudAccount.id}.privatefolio.app`
 
 function getWebSocketUrl(baseServerUrl: string, jwtKey: string): string {
