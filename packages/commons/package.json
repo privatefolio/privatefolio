@@ -55,7 +55,7 @@
   "scripts": {
     "prebuild": "rm -rf build",
     "build": "tsc --project tsconfig.cjs.json",
-    "build:watch": "yarn build --watch --preserveWatchOutput",
+    "build:watch": "tsc --project tsconfig.cjs.json --watch --preserveWatchOutput",
     "dev": "yarn build:watch",
     "lint": "eslint .",
     "lint:fix": "yarn lint --fix",

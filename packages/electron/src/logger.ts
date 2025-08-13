@@ -14,6 +14,6 @@ export const logger = getLogger(["electron"])
 configureLogger(SERVER_LOGS_LOCATION, getLatestLogFilename()).then(() => {
   // flush memory logger to file
   for (const record of getInMemoryRecords()) {
-    logger[record.level](record.message as TemplateStringsArray, record.properties)
+    logger[record.level](record.rawMessage as string, record.properties)
   }
 })
