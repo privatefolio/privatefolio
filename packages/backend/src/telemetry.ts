@@ -1,37 +1,15 @@
-import { access, mkdir, readFile, writeFile } from "fs/promises"
-import { PostHog } from "posthog-node"
-import { randomUUID } from "src/utils/utils"
+import { randomUUID } from "@privatefolio/commons/utils"
+import { Telemetry } from "@privatefolio/commons-node/telemetry"
+import { getOrInitialize } from "@privatefolio/commons-node/utils"
 
 import { logger } from "./logger"
-import { AUTH_DATA_DIR, SERVER_ID_FILE } from "./settings/settings"
+import { AUTH_DATA_DIR, SERVER_ID_FILENAME } from "./settings/settings"
 
 async function getServerId() {
-  try {
-    await access(AUTH_DATA_DIR)
-  } catch {
-    await mkdir(AUTH_DATA_DIR, { recursive: true })
-  }
-
-  try {
-    await access(SERVER_ID_FILE)
-    const serverId = await readFile(SERVER_ID_FILE, "utf8")
-    return serverId
-  } catch {
-    const serverId = randomUUID()
-    await writeFile(SERVER_ID_FILE, serverId, "utf8")
-    return serverId
-  }
-}
-
-class Telemetry extends PostHog {
-  constructor() {
-    super("phc_6vlr4ItLrmAGdVewHWNFEsL4P5mPuG9Z7ewgwrsOGef", {
-      host: "https://eu.i.posthog.com",
-    })
-
-    logger.info("Telemetry enabled")
-  }
+  return getOrInitialize(AUTH_DATA_DIR, SERVER_ID_FILENAME, () => `server.${randomUUID()}`)
 }
 
 export const serverId = await getServerId()
 export const telemetry = new Telemetry()
+
+logger.info("Telemetry enabled", { serverId })

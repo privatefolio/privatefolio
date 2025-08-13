@@ -3,7 +3,7 @@
     "email": "hello@danielconstantin.net",
     "name": "Daniel Constantin"
   },
-  "name": "@privatefolio/node-commons",
+  "name": "@privatefolio/commons-node",
   "sideEffects": false,
   "dependencies": {
     "@logtape/file": "^1.0.4",

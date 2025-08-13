@@ -14,7 +14,7 @@ export async function syncCoinstats(
   connection: CoinstatsConnection,
   since: number,
   until: number,
-  signal?: AbortSignal
+  _signal?: AbortSignal
 ): Promise<SyncResult> {
   await progress([0, `Fetching portfolio data`])
 

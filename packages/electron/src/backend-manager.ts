@@ -68,12 +68,12 @@ export async function start(): Promise<void> {
 
     backendProcess.stdout!.on("data", (data) => {
       const str = data.toString()
-      logger.info(`BackendManager: stdout: ${str.endsWith("\n") ? str.slice(0, -1) : str}`)
+      console.log(`BackendManager: stdout: ${str.endsWith("\n") ? str.slice(0, -1) : str}`)
     })
 
     backendProcess.stderr!.on("data", (data) => {
       const str = data.toString()
-      logger.error(`BackendManager: stderr: ${str.endsWith("\n") ? str.slice(0, -1) : str}`)
+      console.error(`BackendManager: stderr: ${str.endsWith("\n") ? str.slice(0, -1) : str}`)
     })
 
     backendProcess.on("error", (error) => {

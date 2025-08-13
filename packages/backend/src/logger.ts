@@ -2,7 +2,7 @@ import {
   configureLogger,
   getLatestLogFilename,
   getLogger,
-} from "@privatefolio/node-commons/src/logger"
+} from "@privatefolio/commons-node/src/logger"
 
 import { DATA_LOCATION, SERVER_LOGS_LOCATION } from "./settings/settings"
 import {

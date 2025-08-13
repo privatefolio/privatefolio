@@ -1,4 +1,4 @@
-import { FLUSH_INTERVAL, getLatestLogFilename } from "@privatefolio/node-commons/build/cjs/logger"
+import { FLUSH_INTERVAL, getLatestLogFilename } from "@privatefolio/commons-node/build/cjs/logger"
 import { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, shell, Tray } from "electron"
 import Store from "electron-store"
 import path from "path"
