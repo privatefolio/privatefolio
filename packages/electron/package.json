@@ -5,13 +5,13 @@
   },
   "dependencies": {
     "@privatefolio/commons-node": "^2.0.0-beta.38",
-    "electron-store": "^8.2.0",
+    "electron-store": "^10.1.0",
     "electron-updater": "^6.6.2"
   },
   "description": "Desktop version of Privatefolio.",
   "homepage": "https://privatefolio.xyz",
   "devDependencies": {
-    "@types/node": "^22.0.0",
+    "@types/node": "^24.2.1",
     "concurrently": "^9.2.0",
     "electron": "^37.1.0",
     "electron-builder": "26.0.12",
