@@ -82,7 +82,9 @@ export default function App() {
     localRpc.getAccountNames().then($localAccounts.set)
 
     const subscription = localRpc.subscribeToAccounts(() => {
-      localRpc.getAccountNames().then($localAccounts.set)
+      setTimeout(() => {
+        localRpc.getAccountNames().then($localAccounts.set)
+      }, 300)
     })
 
     return closeSubscription(subscription, localRpc)
@@ -112,7 +114,9 @@ export default function App() {
     cloudRpc.getAccountNames().then($cloudAccounts.set)
 
     const subscription = cloudRpc.subscribeToAccounts(() => {
-      cloudRpc.getAccountNames().then($cloudAccounts.set)
+      setTimeout(() => {
+        cloudRpc.getAccountNames().then($cloudAccounts.set)
+      }, 300)
     })
 
     return closeSubscription(subscription, cloudRpc)
