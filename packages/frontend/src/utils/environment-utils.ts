@@ -7,7 +7,8 @@ const isProductionBuild = !!import.meta.env.PROD
 export const isSecure = window.location.protocol === "https:"
 
 export const isProduction = TARGET === "electron" ? isProductionElectron : isProductionBuild
-const environment = isProduction ? "production" : "development"
+export const isDevelopment = !isProduction
+export const environment = isProduction ? "production" : "development"
 
 console.log(`Frontend environment is ${environment}`)
 
@@ -19,8 +20,7 @@ const isWebDeployment = isProduction && TARGET !== "electron" && isOfficialUrl
 export const cloudEnabled = !isSelfHosted
 export const localServerEnabled = isSelfHosted || !isWebDeployment
 
-const mode = isSelfHosted ? "self-hosted" : isWebDeployment ? "web" : "electron"
-export const isDevelopment = !isProduction
+export const mode = isSelfHosted ? "self-hosted" : isWebDeployment ? "web" : "electron"
 
 console.log(`App mode is ${mode}`)
 console.log(`Local server ${localServerEnabled ? "enabled" : "disabled"}`)

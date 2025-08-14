@@ -1,5 +1,6 @@
 import { atom, computed, WritableAtom } from "nanostores"
 import { logAtoms } from "src/utils/browser-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { sleep } from "src/utils/utils"
 import { RestConfig } from "src/workers/remotes"
 
@@ -98,7 +99,7 @@ export async function checkAuthentication(atom: WritableAtom<AuthState>, api: Re
       })
     }
   } catch (error) {
-    console.error("⚠️ Authentication check failed:", error)
+    logAndReportError(error, "Authentication check failed")
     atom.set({
       ...atom.get(),
       checked: true,
@@ -112,12 +113,7 @@ export async function checkAuthentication(atom: WritableAtom<AuthState>, api: Re
 export function lockApp(atom: WritableAtom<AuthState>, api: RestConfig | null) {
   if (!api) return
   const { jwtKey } = api
-
-  try {
-    localStorage.removeItem(jwtKey)
-  } catch (error) {
-    console.error("Failed to remove JWT from localStorage:", error)
-  }
+  localStorage.removeItem(jwtKey)
   // Reset auth state, keeping setup status known
   atom.set({
     ...atom.get(),
@@ -162,8 +158,7 @@ export async function setPassword(
       atom.set({ ...atom.get(), errorMessage, loading: false })
     }
   } catch (error) {
-    console.error("⚠️ Authentication setup failed:", error)
-
+    logAndReportError(error, "Authentication setup failed")
     atom.set({
       ...atom.get(),
       errorMessage: `Cannot connect to server at ${baseUrl}.`,
@@ -211,7 +206,7 @@ export async function unlockApp(
       throw new Error(errorMessage)
     }
   } catch (error) {
-    console.error("Login request failed:", error)
+    logAndReportError(error, "Login request failed")
 
     await sleep(1_000)
     atom.set({

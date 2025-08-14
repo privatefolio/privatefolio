@@ -50,6 +50,7 @@ import {
 import { $preferredInterval } from "src/stores/device-settings-store"
 import { $inspectTime } from "src/stores/pages/balances-store"
 import { isInputFocused } from "src/utils/browser-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { noop } from "src/utils/utils"
 
 import { useBoolean } from "../hooks/useBoolean"
@@ -263,7 +264,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
 
           seriesRef.current.setData(seriesData as never)
         } catch (error) {
-          console.error(error)
+          logAndReportError(error, "SingleSeriesChart plotSeries failed")
           setError(error as Error)
         }
       }
@@ -465,7 +466,7 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
         setIsFirstLoad(false)
       })
       .catch((error) => {
-        console.error(error)
+        logAndReportError(error, "SingleSeriesChart queryFn failed")
         setError(error as Error)
         setLoading(false)
         setQueryTime(Date.now() - start)

@@ -18,6 +18,7 @@ import { DefaultErrorMessage } from "src/components/DefaultErrorMessage"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { LearnMore } from "src/components/LearnMore"
 import { SectionTitle } from "src/components/SectionTitle"
+import { logAndReportError } from "src/utils/error-utils"
 
 import { DEFAULT_SETTINGS } from "../../settings"
 import { $activeAccount } from "../../stores/account-store"
@@ -100,7 +101,7 @@ export function PortfolioSettings() {
           isMetadataCustom ? isValidInterval(settings.metadataRefreshInterval) : true
         )
       } catch (error) {
-        console.error("Failed to load portfolio settings:", error)
+        logAndReportError(error, "Failed to load portfolio settings")
         setError(error as Error)
       } finally {
         setIsLoading(false)
@@ -123,7 +124,7 @@ export function PortfolioSettings() {
       })
       enqueueSnackbar("Portfolio settings saved", { variant: "success" })
     } catch (error) {
-      console.error("Failed to save portfolio settings:", error)
+      logAndReportError(error, "Failed to save portfolio settings")
       enqueueSnackbar("Failed to save portfolio settings", { variant: "error" })
     } finally {
       setIsSaving(false)

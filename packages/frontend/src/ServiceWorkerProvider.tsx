@@ -1,23 +1,25 @@
 import { PropsWithChildren, useEffect } from "react"
 
 import { $serviceWorker } from "./stores/notifications-store"
+import { logAndReportError } from "./utils/error-utils"
 
 export function ServiceWorkerProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if ("serviceWorker" in navigator) {
-      console.log("ServiceWorker start")
       navigator.serviceWorker
         .register("/service-worker.js")
         .then((registration) => {
-          console.log("ServiceWorker registered: ", !!registration)
+          console.log("ServiceWorker registered.")
           $serviceWorker.set(registration)
         })
         .catch((registrationError) => {
-          console.log("ServiceWorker registration failed")
-          console.error(registrationError)
+          logAndReportError(registrationError, "ServiceWorker registration failed")
         })
     } else {
-      console.warn("ServiceWorker skipped")
+      logAndReportError(
+        new Error("serverWorker not supported"),
+        "ServiceWorker registration failed"
+      )
     }
   }, [])
 

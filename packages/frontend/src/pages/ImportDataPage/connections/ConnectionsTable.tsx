@@ -11,6 +11,7 @@ import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { $hideInactiveConnections } from "src/stores/device-settings-store"
 import { TIMESTAMP_HEADER_SX } from "src/theme"
 import { closeSubscription } from "src/utils/browser-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { HeadCell } from "src/utils/table-utils"
 import { $rpc } from "src/workers/remotes"
 
@@ -42,7 +43,7 @@ export function ConnectionsTable() {
         const data = await rpc.getConnections(activeAccount)
         setConnections(data)
       } catch (error) {
-        console.error(error)
+        logAndReportError(error, "Failed to get connections")
         setError(error as Error)
       } finally {
         setQueryTime(Date.now() - start)

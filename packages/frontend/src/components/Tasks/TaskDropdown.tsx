@@ -19,6 +19,7 @@ import { ServerTask, TaskStatus } from "src/interfaces"
 import { SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $activeAccountPath, $connectionStatus } from "src/stores/account-store"
 import { closeSubscription } from "src/utils/browser-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { $rpc } from "src/workers/remotes"
 
 import { MonoFont } from "../../theme"
@@ -64,7 +65,9 @@ export function TaskDropdown() {
         `SELECT * FROM server_tasks ORDER BY id DESC LIMIT ${CHECK_LIMIT}`
       )
       .then(setLatestTasks)
-      .catch(console.error)
+      .catch((error) => {
+        logAndReportError(error, "Failed to fetch server tasks")
+      })
   }, [rpc, refresh, accountName, connectionStatus])
 
   useEffect(() => {

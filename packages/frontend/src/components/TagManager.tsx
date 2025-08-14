@@ -6,6 +6,7 @@ import { SectionTitle } from "src/components/SectionTitle"
 import { useConfirm } from "src/hooks/useConfirm"
 import { Tag } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
+import { logAndReportError } from "src/utils/error-utils"
 import { $rpc } from "src/workers/remotes"
 
 interface TagManagerProps {
@@ -56,7 +57,7 @@ export function TagManager({ tags, setTags, itemId, itemType }: TagManagerProps)
           setTags(updatedTags)
         }
       } catch (error) {
-        console.error("Failed to add tag:", error)
+        logAndReportError(error, "Failed to add tag")
       }
     }
   }
@@ -77,7 +78,7 @@ export function TagManager({ tags, setTags, itemId, itemType }: TagManagerProps)
         setTags(updatedTags)
       }
     } catch (error) {
-      console.error("Failed to remove tag:", error)
+      logAndReportError(error, "Failed to remove tag")
     }
   }
 

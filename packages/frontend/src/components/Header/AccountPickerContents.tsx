@@ -12,6 +12,7 @@ import {
   $localAccounts,
 } from "src/stores/account-store"
 import { $localAuth, lockApp } from "src/stores/auth-store"
+import { logAndReportError } from "src/utils/error-utils"
 import { $localRest, $rpc } from "src/workers/remotes"
 
 import { AccountAvatar } from "../AccountAvatar"
@@ -124,7 +125,7 @@ export function AccountPickerContents(props: AccountPickerContentsProps) {
                 enqueueSnackbar("Account reset", { variant: "success" })
               })
               .catch((error) => {
-                console.error(error)
+                logAndReportError(error, "Failed to reset account")
                 setResetting(false)
                 enqueueSnackbar(error.message, { variant: "error" })
               })
@@ -163,7 +164,7 @@ export function AccountPickerContents(props: AccountPickerContentsProps) {
                 enqueueSnackbar("Account deleted", { variant: "success" })
               })
               .catch((error) => {
-                console.error(error)
+                logAndReportError(error, "Failed to delete account")
                 setDeleting(false)
                 enqueueSnackbar(error.message, { variant: "error" })
               })

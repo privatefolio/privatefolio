@@ -6,6 +6,7 @@ import { SqlParam, Trade, TradePnL } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 import { $quoteCurrency } from "src/stores/device-settings-store"
 import { $inspectTime } from "src/stores/pages/balances-store"
+import { logAndReportError } from "src/utils/error-utils"
 import { $rpc } from "src/workers/remotes"
 
 export function useTradeBreakdown(trade: Trade) {
@@ -82,7 +83,7 @@ export function useTradeBreakdown(trade: Trade) {
         }
       })
       .catch((error) => {
-        console.error(error)
+        logAndReportError(error, "Failed to get trade PnL")
         setTradePnl(null)
       })
   }, [activeAccount, rpc, trade.id, inspectTime])

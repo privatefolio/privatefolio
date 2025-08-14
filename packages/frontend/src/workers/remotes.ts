@@ -32,13 +32,7 @@ const REMOTE_SERVER_URL = (cloudAccount: User) => `${cloudAccount.id}.privatefol
 function getWebSocketUrl(baseServerUrl: string, jwtKey: string): string {
   const protocol = isSecure ? "wss" : "ws"
   let url = `${protocol}://${baseServerUrl}`
-  let jwt: string | null = null
-
-  try {
-    jwt = localStorage.getItem(jwtKey)
-  } catch (error) {
-    console.error("Failed to get JWT from localStorage:", error)
-  }
+  const jwt = localStorage.getItem(jwtKey)
   if (jwt) {
     url += `?jwt=${encodeURIComponent(jwt)}`
   }

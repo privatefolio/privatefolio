@@ -14,12 +14,12 @@ import { lazy } from "react"
 import * as ReactDOM from "react-dom/client"
 import { BrowserRouter, HashRouter } from "react-router-dom"
 
-import { AnalyticsProvider } from "./AnalyticsProvider"
 import App from "./App"
 import { FileDownloadSnackbar } from "./components/FileDownloadSnackbar"
 import { ConfirmDialogProvider } from "./hooks/useConfirm"
 import { ServiceWorkerProvider } from "./ServiceWorkerProvider"
 import { ONE_DAY_CACHE } from "./settings"
+import { TelemetryProvider } from "./TelemetryProvider"
 import { ThemeProvider } from "./ThemeProvider"
 import { isElectron } from "./utils/electron-utils"
 import { ONE_DAY } from "./utils/formatting-utils"
@@ -77,7 +77,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                   <App />
                 </SnackbarProvider>
               </KBarProvider>
-              <AnalyticsProvider />
+              <TelemetryProvider />
             </ConfirmDialogProvider>
           </ThemeProvider>
         </LocalizationProvider>

@@ -25,6 +25,7 @@ import { type Notification, PushDevice, PushSub } from "src/interfaces"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { $serviceWorker, getDeviceId } from "src/stores/notifications-store"
 import { formatUserAgent } from "src/utils/browser-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { $rpc } from "src/workers/remotes"
 
 import { CaptionText } from "../CaptionText"
@@ -50,7 +51,9 @@ export function NotificationsSettings() {
       rpc
         .getPushDevices(accountName)
         .then(setPushDevices)
-        .catch(console.error)
+        .catch((error) => {
+          logAndReportError(error, "Failed to fetch push devices")
+        })
         .finally(() => setIsLoading(false))
     }
   }, [accountName, rpc, connectionStatus])
@@ -67,7 +70,7 @@ export function NotificationsSettings() {
       )
       enqueueSnackbar("Test notification sent", { variant: "success" })
     } catch (error) {
-      console.error("Failed to send test notification:", error)
+      logAndReportError(error, "Failed to send test notification")
       enqueueSnackbar("Failed to send test notification", { variant: "error" })
     } finally {
       setIsSendingTest(false)
@@ -109,7 +112,7 @@ export function NotificationsSettings() {
       await rpc.getPushDevices(accountName).then(setPushDevices)
       enqueueSnackbar("Push notifications enabled", { variant: "success" })
     } catch (error) {
-      console.error("Failed to enable push notifications:", error)
+      logAndReportError(error, "Failed to enable push notifications")
       const errorMessage =
         error instanceof Error ? error.message : "Failed to enable push notifications"
       enqueueSnackbar(`Error: ${errorMessage}`, { variant: "error" })
@@ -127,7 +130,7 @@ export function NotificationsSettings() {
         setPushDevices((prev) => prev.filter((device) => device.subscription.endpoint !== endpoint))
         enqueueSnackbar("Push notifications disabled for device", { variant: "success" })
       } catch (error) {
-        console.error("Failed to remove device:", error)
+        logAndReportError(error, "Failed to remove device")
         enqueueSnackbar("Failed to remove device", { variant: "error" })
       }
     },

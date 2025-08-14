@@ -13,7 +13,6 @@ export function configureIpcMain(ipcMain: Electron.IpcMain, window: BrowserWindo
   })
   ipcMain.on("set-mode", createSetModeHandler(window))
   ipcMain.on("open-logs-dir", handleOpenLogsDir)
-  ipcMain.on("read-logs", handleReadLogs)
   ipcMain.on("open-dev-tools", (event) => {
     setTimeout(() => {
       window.webContents.openDevTools()
@@ -40,12 +39,6 @@ function handleOpenLogsDir(event: IpcMainEvent) {
   const dirPath = SERVER_LOGS_LOCATION
   shell.openPath(dirPath)
   event.returnValue = dirPath
-}
-
-function handleReadLogs(event: IpcMainEvent) {
-  // const logsPath = getLogFilePath()
-  // const logs = require("fs").readFileSync(logsPath).toString()
-  event.returnValue = []
 }
 
 function handleGetBackendUrl(event: IpcMainEvent) {

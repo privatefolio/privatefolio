@@ -1,5 +1,6 @@
 import { Paper } from "@mui/material"
 import React, { Component, createRef, ReactNode } from "react"
+import { logAndReportError } from "src/utils/error-utils"
 
 import { BackButton } from "./BackButton"
 import { StaggeredList } from "./StaggeredList"
@@ -15,7 +16,9 @@ interface State {
 
 export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("ErrorBoundary did catch", error, errorInfo)
+    logAndReportError(error, "ErrorBoundary did catch", {
+      errorInfo,
+    })
   }
 
   componentDidUpdate(_: Props, prevState: State) {

@@ -7,6 +7,7 @@ import { isBunWorker } from "src/utils/environment-utils"
 import { logAndReportError } from "src/utils/error-utils"
 import { createSubscription } from "src/utils/sub-utils"
 
+import { getAccount } from "../accounts-api"
 import { appEventEmitter } from "../internal"
 
 const LEVEL_SEVERITY = {
@@ -136,4 +137,13 @@ export async function subscribeToServerLog(callback: () => void) {
 
 export async function throwTestError() {
   throw new Error("This is a test error")
+}
+
+export async function logUiError(
+  accountName: string,
+  message: string,
+  properties: Record<string, unknown>
+) {
+  const account = await getAccount(accountName)
+  account.logger.getChild("ui").error(message, properties)
 }

@@ -17,6 +17,7 @@ import {
 } from "src/api/privatecloud-api"
 import { logAtoms } from "src/utils/browser-utils"
 import { cloudEnabled, isProduction } from "src/utils/environment-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { sleep } from "src/utils/utils"
 import { $cloudRest } from "src/workers/remotes"
 
@@ -75,7 +76,7 @@ export async function checkSubscription() {
       $cloudSubscription.set(sub)
     })
     .catch((err) => {
-      console.error("Error fetching cloud subscription:", err)
+      logAndReportError(err as Error, "Error fetching cloud subscription")
       $cloudSubscription.set(null)
       enqueueSnackbar(`Cloud server: ${(err as Error).message}`, { variant: "error" })
     })
@@ -86,7 +87,7 @@ export async function checkCloudInstance() {
   return getCloudInstance()
     .then($cloudInstance.set)
     .catch((err) => {
-      console.error("Error fetching cloud server info:", err)
+      logAndReportError(err as Error, "Error fetching cloud server info")
       $cloudInstance.set(null)
       enqueueSnackbar(`Cloud server: ${(err as Error).message}`, { variant: "error" })
     })
@@ -109,7 +110,7 @@ export async function checkCloudServerInfo() {
       $cloudServerInfo.set(info)
     })
     .catch((err: Error) => {
-      console.error("Error fetching cloud server info:", err)
+      console.warn("Error fetching cloud server info:", err)
       if ($cloudServerInfo.get() === undefined) $cloudServerInfo.set(null)
       // enqueueSnackbar(`Cloud server: ${(err as Error).message}`, { variant: "error" })
     })
@@ -176,7 +177,7 @@ export async function handleUnpauseServer() {
     $cloudServerMutating.set(true)
     const serverId = $cloudInstance.get()?.id
     if (!serverId) {
-      console.error("No server ID found")
+      logAndReportError(new Error("No server ID found"), "handleUnpauseServer")
       return
     }
     const cloudInstance = await patchCloudInstance(serverId, { action: "unpause" })
@@ -194,7 +195,7 @@ export async function handleUpdateServer() {
     $cloudServerMutating.set(true)
     const serverId = $cloudInstance.get()?.id
     if (!serverId) {
-      console.error("No server ID found")
+      logAndReportError(new Error("No server ID found"), "handleUpdateServer")
       return
     }
     const cloudInstance = await patchCloudInstance(serverId, { action: "update" })
@@ -234,7 +235,7 @@ export async function handlePauseServer() {
     $cloudServerMutating.set(true)
     const serverId = $cloudInstance.get()?.id
     if (!serverId) {
-      console.error("No server ID found")
+      logAndReportError(new Error("No server ID found"), "handleRestartServer")
       return
     }
     const cloudInstance = await patchCloudInstance(serverId, { action: "pause" })
@@ -252,7 +253,7 @@ export async function handleRestartServer() {
     $cloudServerMutating.set(true)
     const serverId = $cloudInstance.get()?.id
     if (!serverId) {
-      console.error("No server ID found")
+      logAndReportError(new Error("No server ID found"), "handleRestartServer")
       return
     }
     const cloudInstance = await patchCloudInstance(serverId, { action: "restart" })
@@ -270,7 +271,7 @@ export async function handleRemoveServer(removeVolume: boolean) {
     $cloudServerMutating.set(true)
     const serverId = $cloudInstance.get()?.id
     if (!serverId) {
-      console.error("No server ID found")
+      logAndReportError(new Error("No server ID found"), "handleRemoveServer")
       return
     }
     await removeCloudInstance(serverId, { removeVolume })

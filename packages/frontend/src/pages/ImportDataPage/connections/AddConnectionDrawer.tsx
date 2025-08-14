@@ -32,6 +32,7 @@ import { PAYMENT_PLANS } from "src/settings"
 import { $activeAccount } from "src/stores/account-store"
 import { $addressBook, addWalletToAddressBook } from "src/stores/metadata-store"
 import { MonoFont } from "src/theme"
+import { logAndReportError } from "src/utils/error-utils"
 import { asUTC } from "src/utils/formatting-utils"
 import { randomUUID, resolveUrl } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
@@ -223,7 +224,7 @@ export function AddConnectionDrawer(props: AddConnectionDrawerProps) {
           { variant: "success" }
         )
       } catch (error) {
-        console.error(error)
+        logAndReportError(error, "Failed to add connection")
         setError(String(error))
         setLoading(false)
       }

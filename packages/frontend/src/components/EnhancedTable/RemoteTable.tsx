@@ -21,6 +21,7 @@ import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { $debugMode } from "src/stores/app-store"
 import { $showRelativeTime } from "src/stores/device-settings-store"
 import { appBarHeight } from "src/theme"
+import { logAndReportError } from "src/utils/error-utils"
 import { sleep } from "src/utils/utils"
 
 import {
@@ -211,7 +212,7 @@ function RemoteTableBase<T extends BaseType>(props: RemoteTableProps<T>) {
         }
       })
       .catch((error) => {
-        // console.error(error)
+        logAndReportError(error, "RemoteTableBase queryFn failed")
         setError(error as Error)
       })
       .finally(() => {

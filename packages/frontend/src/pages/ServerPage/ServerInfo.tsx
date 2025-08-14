@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from "react"
 import { InfoCard, InfoCardRow, InfoCards } from "src/components/InfoCard"
 import { SystemInfo } from "src/interfaces"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
+import { logAndReportError } from "src/utils/error-utils"
 
 import { formatNumber } from "../../utils/formatting-utils"
 import { $rpc } from "../../workers/remotes"
@@ -23,7 +24,7 @@ export function ServerInfo() {
       const info = await rpc.getSystemInfo()
       setSystemInfo(info)
     } catch (error) {
-      console.error("Failed to fetch system info:", error)
+      logAndReportError(error, "Failed to fetch system info")
     }
   }, [rpc])
 

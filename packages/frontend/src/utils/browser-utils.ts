@@ -26,7 +26,7 @@ export function closeSubscription(sub: Promise<SubscriptionId>, rpc: RPC) {
           // console.log("Subscription closed", subscriptionId)
         })
         .catch(() => {
-          // console.error("Error closing subscription", subscriptionId, error)
+          // console.warn("Error closing subscription", subscriptionId, error)
         })
     })
   }

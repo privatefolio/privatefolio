@@ -29,6 +29,7 @@ import { useStore } from "@nanostores/react"
 import React, { useCallback, useMemo, useState } from "react"
 import { Notification } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
+import { logAndReportError } from "src/utils/error-utils"
 import { formatDate } from "src/utils/formatting-utils"
 import { $rpc } from "src/workers/remotes"
 
@@ -74,8 +75,8 @@ export function NotificationsList(props: NotificationsListProps) {
 
       try {
         await rpc.patchNotification(accountName, notificationId, { status })
-      } catch (err) {
-        console.error("Failed to update notification status:", err)
+      } catch (error) {
+        logAndReportError(error, "Failed to update notification status")
       }
     },
     [accountName, rpc]
@@ -137,8 +138,8 @@ export function NotificationsList(props: NotificationsListProps) {
             status: targetStatus,
           }
         )
-      } catch (err) {
-        console.error("Failed to execute bulk action:", err)
+      } catch (error) {
+        logAndReportError(error, "Failed to execute bulk action")
       }
     },
     [accountName, rpc, filteredNotifications]

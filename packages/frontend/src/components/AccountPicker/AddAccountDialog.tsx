@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom"
 import { $cloudAccounts, $localAccounts } from "src/stores/account-store"
 import { $cloudAvailable } from "src/stores/cloud-user-store"
 import { cloudEnabled, localServerEnabled } from "src/utils/environment-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { $cloudRpc, $localRpc } from "src/workers/remotes"
 
 import { SectionTitle } from "../SectionTitle"
@@ -86,7 +87,7 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
         setError("")
         setName("")
       } catch (error) {
-        console.error(error)
+        logAndReportError(error, "AddAccountDialog.handleSubmit failed")
         setError(String(error))
         setLoading(false)
       }

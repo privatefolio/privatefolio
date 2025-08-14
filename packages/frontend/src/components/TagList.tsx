@@ -7,6 +7,7 @@ import { Tag } from "src/interfaces"
 import { SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { closeSubscription } from "src/utils/browser-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { $rpc } from "src/workers/remotes"
 
 interface TagListProps {
@@ -57,7 +58,7 @@ export function TagList({ itemId, itemType }: TagListProps) {
           setTags(fetchedTags)
         }
       } catch (error) {
-        console.error(`Failed to fetch tags for ${itemType} ${itemId}:`, error)
+        logAndReportError(error, `Failed to fetch tags for ${itemType} ${itemId}`)
       }
     }
 

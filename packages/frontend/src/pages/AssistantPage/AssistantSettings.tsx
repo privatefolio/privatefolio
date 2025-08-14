@@ -15,6 +15,7 @@ import { AssistantModelSelect } from "src/components/AssistantModelSelect"
 import { LearnMore } from "src/components/LearnMore"
 import { SectionTitle } from "src/components/SectionTitle"
 import { $assistantModel } from "src/stores/device-settings-store"
+import { logAndReportError } from "src/utils/error-utils"
 
 import { DEFAULT_SETTINGS } from "../../settings"
 import { $activeAccount } from "../../stores/account-store"
@@ -64,7 +65,7 @@ export function AssistantSettings() {
         setPerplexityApiKey(perplexityKeyEncrypted ? "encrypted" : "")
         setAnthropicApiKey(anthropicKeyEncrypted ? "encrypted" : "")
       } catch (error) {
-        console.error("Failed to load assistant settings:", error)
+        logAndReportError(error, "Failed to load assistant settings")
         enqueueSnackbar("Failed to load assistant settings", { variant: "error" })
       } finally {
         setIsLoading(false)
@@ -96,7 +97,7 @@ export function AssistantSettings() {
 
       enqueueSnackbar("Assistant settings saved", { variant: "success" })
     } catch (error) {
-      console.error("Failed to save assistant settings:", error)
+      logAndReportError(error, "Failed to save assistant settings")
       enqueueSnackbar("Failed to save assistant settings", { variant: "error" })
     } finally {
       setIsSaving(false)

@@ -12,6 +12,7 @@ import {
 } from "@mui/material"
 import React, { FormEvent, useCallback, useState } from "react"
 import { handleLogin, handleSignUp } from "src/stores/cloud-user-store"
+import { logAndReportError } from "src/utils/error-utils"
 
 import { LogoText } from "../Header/LogoText"
 import { SectionTitle } from "../SectionTitle"
@@ -57,10 +58,10 @@ export function CloudLoginForm() {
         }
         setLoading(false)
       } catch (error) {
-        console.error(error)
         if (String(error).includes("UNIQUE constraint failed")) {
           setApiError("Email already in use.")
         } else {
+          logAndReportError(error, `${form === "sign-up" ? "Sign up" : "Login"} failed`)
           setApiError(String(error))
         }
         setLoading(false)

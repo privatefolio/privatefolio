@@ -21,7 +21,7 @@ import { GIT_DATE } from "src/env"
 import { useInstallPwa } from "src/hooks/useInstallPwa"
 import { formatDate, formatHour } from "src/utils/formatting-utils"
 
-import { $debugMode, $telemetry, AppVerProps } from "../../stores/app-store"
+import { $debugMode, $telemetryEnabled, AppVerProps } from "../../stores/app-store"
 import { MonoFont } from "../../theme"
 import { AppLink } from "../AppLink"
 import { DiscordIcon } from "../DiscordIcon"
@@ -61,7 +61,7 @@ type MenuContentsProps = AppVerProps
 
 export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) => {
   const debugMode = useStore($debugMode)
-  const telemetry = useStore($telemetry)
+  const telemetry = useStore($telemetryEnabled)
 
   const { isInstalled, promptInstall } = useInstallPwa()
 
@@ -248,7 +248,7 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
                   "privatefolio-no-telemetry",
                   event.target.checked ? "false" : "true"
                 )
-                $telemetry.set(event.target.checked)
+                $telemetryEnabled.set(event.target.checked)
               }}
             />
           }

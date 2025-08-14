@@ -126,7 +126,7 @@ export default function CloudUserPage({ show }: { show: boolean }) {
           $cloudPortalLink.set(link.url)
         })
         .catch(() => {
-          // console.error("Error fetching portal link:", error)
+          // console.warn("Error fetching portal link:", error)
           $cloudPortalLink.set(null)
         })
     }

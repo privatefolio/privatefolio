@@ -31,10 +31,6 @@ contextBridge.exposeInMainWorld("electron", {
     return ipcRenderer.sendSync("open-logs-dir")
   },
   platform: process.platform,
-  readLogs() {
-    // TODO9
-    return ipcRenderer.sendSync("read-logs")
-  },
   setMode(mode: PaletteMode) {
     return ipcRenderer.sendSync("set-mode", mode)
   },

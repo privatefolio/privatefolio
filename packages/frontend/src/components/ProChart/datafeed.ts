@@ -7,6 +7,7 @@ import {
 } from "privatefolio-backend/src/settings/price-apis"
 import { ChartData } from "src/interfaces"
 import { aggregateCandles } from "src/utils/chart-utils"
+import { logAndReportError } from "src/utils/error-utils"
 
 import { $activeAccount } from "../../stores/account-store"
 import { $rpc } from "../../workers/remotes"
@@ -83,7 +84,7 @@ export const datafeed: IBasicDataFeed = {
       const bars = data.map(mapChartDataToBars)
       onResult(bars, { noData: bars.length === 0 })
     } catch (error: unknown) {
-      console.error(error)
+      logAndReportError(error, "getBars failed")
       onError(error instanceof Error ? error.message : String(error))
     }
   },

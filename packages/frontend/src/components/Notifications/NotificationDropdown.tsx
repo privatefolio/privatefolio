@@ -6,6 +6,7 @@ import { useBoolean } from "src/hooks/useBoolean"
 import { type Notification } from "src/interfaces"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { closeSubscription, isInputFocused } from "src/utils/browser-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { $rpc } from "src/workers/remotes"
 
 import { Key } from "../SearchBar/Key"
@@ -43,7 +44,9 @@ export function NotificationDropdown() {
           setNotifications(notificationList)
           setUnreadCount(count)
         })
-        .catch(console.error)
+        .catch((error) => {
+          logAndReportError(error, "Failed to fetch notifications")
+        })
         .finally(() => setIsLoading(false))
     }
 

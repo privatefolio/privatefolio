@@ -2,6 +2,7 @@ import { Box, useTheme } from "@mui/material"
 import { enqueueSnackbar } from "notistack"
 import React, { useEffect, useRef } from "react"
 import { PUBLIC_DIR_LOCATION } from "src/env"
+import { logAndReportError } from "src/utils/error-utils"
 
 import { candleStickOptions } from "../../utils/chart-utils"
 import {
@@ -149,7 +150,7 @@ export default function ProChart() {
               saveChartData(chartData)
               enqueueSnackbar("Chart saved", { variant: "success" })
             } catch (error) {
-              console.error("Failed to save chart:", error)
+              logAndReportError(error, "Failed to save chart")
               enqueueSnackbar("Failed to save chart", { variant: "error" })
             }
           })
@@ -167,7 +168,7 @@ export default function ProChart() {
             widgetRef.current?.load(savedData)
             enqueueSnackbar("Chart loaded", { variant: "success" })
           } catch (error) {
-            console.error("Failed to load chart:", error)
+            logAndReportError(error, "Failed to load chart")
             enqueueSnackbar("Could not load chart. Resetting.", { variant: "error" })
             removeChartData()
             resetWidget(widgetRef.current, defaultSymbol)

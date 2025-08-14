@@ -14,6 +14,7 @@ import { SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $connectionStatus } from "src/stores/account-store"
 import { MonoFont } from "src/theme"
 import { closeSubscription } from "src/utils/browser-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { formatNumber } from "src/utils/formatting-utils"
 import { $rpc } from "src/workers/remotes"
 
@@ -47,7 +48,7 @@ export function ServerHealth() {
       setCurrentMetrics(current)
       setHealthStats(stats)
     } catch (error) {
-      console.error("Failed to fetch health data:", error)
+      logAndReportError(error, "Failed to fetch health data")
     } finally {
       setIsLoading(false)
     }

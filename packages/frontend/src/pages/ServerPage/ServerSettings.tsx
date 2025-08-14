@@ -16,6 +16,7 @@ import { DefaultErrorMessage } from "src/components/DefaultErrorMessage"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { LearnMore } from "src/components/LearnMore"
 import { SectionTitle } from "src/components/SectionTitle"
+import { logAndReportError } from "src/utils/error-utils"
 
 import { $activeAccount } from "../../stores/account-store"
 import { $rpc } from "../../workers/remotes"
@@ -86,7 +87,7 @@ export function ServerSettings() {
           isSystemInfoCustom ? isValidInterval(serverSettings.systemInfoInterval) : true
         )
       } catch (error) {
-        console.error("Failed to load settings:", error)
+        logAndReportError(error, "Failed to load settings")
         setError(error as Error)
       } finally {
         setIsLoading(false)
@@ -108,7 +109,7 @@ export function ServerSettings() {
       })
       enqueueSnackbar("Server settings saved", { variant: "success" })
     } catch (error) {
-      console.error("Failed to save server settings:", error)
+      logAndReportError(error, "Failed to save server settings")
       enqueueSnackbar("Failed to save server settings", { variant: "error" })
     } finally {
       setIsSaving(false)

@@ -20,7 +20,6 @@ interface ElectronAPI {
   openExternalLink: (url: string) => void
   openLogsDir: () => string
   platform: NodeJS.Platform
-  readLogs: () => string
   setMode: (mode: PaletteMode) => boolean
 }
 
@@ -37,21 +36,4 @@ export const backendUrl = window.electron?.backend.getUrl()
 
 console.log(`Electron API ${isElectron ? "available" : "not available"}`)
 
-export const { openLogsDir, readLogs, openDevTools } = window.electron || {}
-
-// Initialize logger
-// TODO9
-// ;(() => {
-//   if (isElectron && isProductionElectron) {
-//     const originalConsole = console
-//     Object.assign(console, Logger.scope("Renderer"))
-//     Logger.errorHandler.startCatching()
-//     // if the window is closing, stop catching
-//     window.addEventListener("beforeunload", () => {
-//       try {
-//         Logger.errorHandler.stopCatching()
-//         Object.assign(console, originalConsole)
-//       } catch {}
-//     })
-//   }
-// })()
+export const { openLogsDir, openDevTools } = window.electron || {}

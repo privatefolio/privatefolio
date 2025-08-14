@@ -25,6 +25,7 @@ import { WalletInput } from "src/components/WalletInput"
 import { MANUAL_TX_TYPES, TransactionType } from "src/interfaces"
 import { $activeAccount } from "src/stores/account-store"
 import { formatTicker, getAssetPlatform } from "src/utils/assets-utils"
+import { logAndReportError } from "src/utils/error-utils"
 import { randomUUID } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
@@ -162,7 +163,7 @@ export function AddTransactionDrawer(props: AddTransactionDrawerProps) {
           onSuccess?.(groupId)
         })
         .catch((error) => {
-          console.error(error)
+          logAndReportError(error, "AddTransactionDrawer.handleSubmit failed")
           setError(String(error))
           setLoading(false)
         })

@@ -39,6 +39,7 @@ import { MenuItemWithTooltip } from "src/components/MenuItemWithTooltip"
 import { $activeAccount } from "src/stores/account-store"
 import { $assistantMode, $assistantModel } from "src/stores/device-settings-store"
 import { getFilterValueLabel } from "src/stores/metadata-store"
+import { logAndReportError } from "src/utils/error-utils"
 import { extractRootUrl, randomUUID } from "src/utils/utils"
 import { $rest, $rpc } from "src/workers/remotes"
 
@@ -104,7 +105,7 @@ export function AssistantChat() {
 
         setInitialMessages(messages)
       } catch (error) {
-        console.error("Failed to load conversation history:", error)
+        logAndReportError(error, "Failed to load conversation history")
       } finally {
         setIsLoadingHistory(false)
       }

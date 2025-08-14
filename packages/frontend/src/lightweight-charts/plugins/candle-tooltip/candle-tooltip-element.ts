@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { IChartApi } from "lightweight-charts"
+import { logAndReportError } from "src/utils/error-utils"
 
 import { MainFont, MonoFont } from "../../../theme"
 import { CommonTooltipOptions } from "../../../utils/chart-utils"
@@ -176,12 +177,18 @@ export class CandleTooltipElement {
 
     const chartElementParent = chartElement.parentElement
     if (!chartElementParent) {
-      console.error("Chart Element is not attached to the page.")
+      logAndReportError(
+        new Error("Chart Element is not attached to the page."),
+        "CandleTooltipElement"
+      )
       return
     }
     const position = getComputedStyle(chartElementParent).position
     if (position !== "relative" && position !== "absolute") {
-      console.error("Chart Element position is expected be `relative` or `absolute`.")
+      logAndReportError(
+        new Error("Chart Element position is expected be `relative` or `absolute`."),
+        "CandleTooltipElement"
+      )
     }
   }
 

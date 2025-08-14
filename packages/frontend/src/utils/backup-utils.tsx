@@ -1,6 +1,7 @@
 import { closeSnackbar, enqueueSnackbar } from "notistack"
 import { $rest, RPC } from "src/workers/remotes"
 
+import { logAndReportError } from "./error-utils"
 import { requestFile } from "./utils"
 
 export async function handleBackupRequest(rpc: RPC, accountName: string) {
@@ -98,7 +99,7 @@ export async function handleRestoreRequest(rpc: RPC, accountName: string, file: 
     console.log("File uploaded")
   } else {
     const errorText = await response.text()
-    console.error("Error uploading file:", errorText)
+    logAndReportError(new Error(errorText), "Error uploading file")
   }
 
   return fileRecord
