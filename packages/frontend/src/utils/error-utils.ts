@@ -1,4 +1,3 @@
-import { $activeAccount } from "src/stores/account-store"
 import { $telemetry } from "src/stores/app-store"
 import { $rpc } from "src/workers/remotes"
 
@@ -10,7 +9,7 @@ export function logAndReportError(
   extraProperties = {}
 ): void {
   console.error(extraMessage, error, extraProperties)
-  $rpc.get().logUiError($activeAccount.get(), extraMessage, {
+  $rpc.get().logUiError(extraMessage, {
     errorMessage: String(error),
     stackTrace: error instanceof Error ? error.stack : undefined,
     ...extraProperties,

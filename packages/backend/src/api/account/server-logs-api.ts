@@ -1,13 +1,13 @@
 import { access, readFile } from "fs/promises"
 import path from "path"
 import { ServerLog, SubscriptionChannel } from "src/interfaces"
+import { logger } from "src/logger"
 import { SERVER_LOGS_LOCATION } from "src/settings/settings"
 import { stripAnsi } from "src/utils/ansi-utils"
 import { isBunWorker } from "src/utils/environment-utils"
 import { logAndReportError } from "src/utils/error-utils"
 import { createSubscription } from "src/utils/sub-utils"
 
-import { getAccount } from "../accounts-api"
 import { appEventEmitter } from "../internal"
 
 const LEVEL_SEVERITY = {
@@ -139,11 +139,6 @@ export async function throwTestError() {
   throw new Error("This is a test error")
 }
 
-export async function logUiError(
-  accountName: string,
-  message: string,
-  properties: Record<string, unknown>
-) {
-  const account = await getAccount(accountName)
-  account.logger.getChild("ui").error(message, properties)
+export async function logUiError(message: string, properties: Record<string, unknown>) {
+  logger.getChild("ui").error(message, properties)
 }
