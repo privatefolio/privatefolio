@@ -3,6 +3,29 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.41 - 2025/08/14
+
+### 🐛 Bug Fixes
+
+- Fix bug with service worker registration (push notifications)
+
+## v2.0.0-beta.40 - 2025/08/14
+
+### 💡 Feature updates
+
+- Add coinstats extensions
+- Improve `Server logs` page
+- Add `Server health` page
+
+### Other updates
+
+- Track and report errors through telemetry
+- Improve error logging
+- Improve backend bundle
+- Fix bug in help sections
+- Improve number formatting
+- Extract common logic in the `commons` and `commons-node` libraries (packages)
+
 ## v2.0.0-beta.37 - 2025/08/04
 
 ### 🐛 Bug Fixes
