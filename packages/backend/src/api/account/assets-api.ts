@@ -48,9 +48,13 @@ export async function getAccountWithAssets(accountName: string) {
   }
   if (schemaVersion < 3) {
     try {
-      await account.execute(sql`
+      const columns = await account.execute(`PRAGMA table_info(assets);`)
+      const hasFavorite = Array.isArray(columns) && columns.some((row) => row[1] === "favorite")
+      if (!hasFavorite) {
+        await account.execute(sql`
         ALTER TABLE assets ADD COLUMN favorite BOOLEAN;
       `)
+      }
     } catch {}
 
     await account.execute(sql`DROP VIEW IF EXISTS favorite_assets`)
