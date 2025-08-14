@@ -105,24 +105,26 @@ export class AutoUpdater {
     }
 
     logger.info("Checking for updates...")
-    const result = await autoUpdater.checkForUpdates()
-    if (!informUser) return
-    if (result?.isUpdateAvailable) {
-      this.showUpdateDialog(result.updateInfo)
-    } else {
-      const { response } = await dialog.showMessageBox(this.mainWindow!, {
-        buttons: ["OK", "Show all releases"],
-        cancelId: 0,
-        defaultId: 0,
-        message: "Privatefolio is up to date.",
-        title: "Up to date",
-        type: "info",
-      })
+    try {
+      const result = await autoUpdater.checkForUpdates()
+      if (!informUser) return
+      if (result?.isUpdateAvailable) {
+        this.showUpdateDialog(result.updateInfo)
+      } else {
+        const { response } = await dialog.showMessageBox(this.mainWindow!, {
+          buttons: ["OK", "Show all releases"],
+          cancelId: 0,
+          defaultId: 0,
+          message: "Privatefolio is up to date.",
+          title: "Up to date",
+          type: "info",
+        })
 
-      if (response === 1) {
-        shell.openExternal(DOWNLOADS_URL)
+        if (response === 1) {
+          shell.openExternal(DOWNLOADS_URL)
+        }
       }
-    }
+    } catch {}
   }
 
   startPeriodicCheck() {
