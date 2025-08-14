@@ -17,7 +17,7 @@ import AccountsPage from "./pages/AccountsPage/AccountsPage"
 import LocalAuthPage from "./pages/AccountsPage/LocalAuthPage"
 import CloudUserPage from "./pages/CloudUserPage/CloudUserPage"
 import HomePage from "./pages/HomePage/HomePage"
-import { SHORT_THROTTLE_DURATION } from "./settings"
+import { INPUT_DEBOUNCE_DURATION, SHORT_THROTTLE_DURATION } from "./settings"
 import {
   $activeAccount,
   $cloudAccounts,
@@ -84,7 +84,7 @@ export default function App() {
     const subscription = localRpc.subscribeToAccounts(() => {
       setTimeout(() => {
         localRpc.getAccountNames().then($localAccounts.set)
-      }, 300)
+      }, INPUT_DEBOUNCE_DURATION)
     })
 
     return closeSubscription(subscription, localRpc)
@@ -116,7 +116,7 @@ export default function App() {
     const subscription = cloudRpc.subscribeToAccounts(() => {
       setTimeout(() => {
         cloudRpc.getAccountNames().then($cloudAccounts.set)
-      }, 300)
+      }, INPUT_DEBOUNCE_DURATION)
     })
 
     return closeSubscription(subscription, cloudRpc)

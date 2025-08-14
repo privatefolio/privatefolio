@@ -11,7 +11,8 @@ import {
 
 await configureLogger(SERVER_LOGS_LOCATION, getLatestLogFilename())
 
-export const logger = getLogger(isBunWorker ? ["worker"] : ["main"])
+export const logger = getLogger(isBunWorker ? "worker" : "main")
+export const uiLogger = getLogger("ui")
 
 logger.info("Initialize backend", {
   dataLocation: DATA_LOCATION,

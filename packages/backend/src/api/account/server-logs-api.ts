@@ -1,7 +1,7 @@
 import { access, readFile } from "fs/promises"
 import path from "path"
 import { ServerLog, SubscriptionChannel } from "src/interfaces"
-import { logger } from "src/logger"
+import { uiLogger } from "src/logger"
 import { SERVER_LOGS_LOCATION } from "src/settings/settings"
 import { stripAnsi } from "src/utils/ansi-utils"
 import { isBunWorker } from "src/utils/environment-utils"
@@ -140,5 +140,5 @@ export async function throwTestError() {
 }
 
 export async function logUiError(message: string, properties: Record<string, unknown>) {
-  logger.getChild("ui").error(message, properties)
+  uiLogger.error(message, properties)
 }

@@ -12,10 +12,12 @@ import {
 import { useStore } from "@nanostores/react"
 import React, { FormEvent, useCallback, useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { INPUT_DEBOUNCE_DURATION } from "src/settings"
 import { $cloudAccounts, $localAccounts } from "src/stores/account-store"
 import { $cloudAvailable } from "src/stores/cloud-user-store"
 import { cloudEnabled, localServerEnabled } from "src/utils/environment-utils"
 import { logAndReportError } from "src/utils/error-utils"
+import { sleep } from "src/utils/utils"
 import { $cloudRpc, $localRpc } from "src/workers/remotes"
 
 import { SectionTitle } from "../SectionTitle"
@@ -73,12 +75,14 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
           const localRpc = $localRpc.get()
           if (!localRpc) throw new Error("RPC is not defined")
           await localRpc.createAccount(newAcc)
+          await sleep(INPUT_DEBOUNCE_DURATION)
           await localRpc.getAccountNames().then($localAccounts.set)
           navigate(`/l/${localAccounts?.length ?? 0}/import-data`)
         } else {
           const cloudRpc = $cloudRpc.get()
           if (!cloudRpc) throw new Error("RPC is not defined")
           await cloudRpc.createAccount(newAcc)
+          await sleep(INPUT_DEBOUNCE_DURATION)
           await cloudRpc.getAccountNames().then($cloudAccounts.set)
           navigate(`/c/${cloudAccounts?.length ?? 0}/import-data`)
         }
