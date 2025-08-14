@@ -7,28 +7,29 @@ import { BASE_URL, BinanceRewardType } from "./binance-settings"
 async function generateSignature(data: Uint8Array, secret: Uint8Array) {
   if (isTestEnvironment) {
     const crypto = await import("crypto")
-    return crypto.createHmac("sha256", secret).update(data).digest("hex")
+    return crypto.createHmac("sha256", Buffer.from(secret)).update(Buffer.from(data)).digest("hex")
   }
+
+  // Ensure proper ArrayBuffer
+  const secretBuffer =
+    secret.buffer instanceof ArrayBuffer ? secret.buffer : new Uint8Array(secret).buffer
+
+  const dataBuffer = data.buffer instanceof ArrayBuffer ? data.buffer : new Uint8Array(data).buffer
 
   // eslint-disable-next-line no-restricted-globals
   const cryptoKey = await self.crypto.subtle.importKey(
     "raw",
-    secret,
+    secretBuffer,
     { hash: "SHA-256", name: "HMAC" },
     false,
     ["sign"]
   )
-  // eslint-disable-next-line no-restricted-globals
-  const signature = await self.crypto.subtle.sign("HMAC", cryptoKey, data)
-  const byteArray = new Uint8Array(signature)
-  const hexParts: string[] = []
-  byteArray.forEach((byte) => {
-    const hex = byte.toString(16).padStart(2, "0")
-    hexParts.push(hex)
-  })
 
-  const finalSignature = hexParts.join("")
-  return finalSignature
+  // eslint-disable-next-line no-restricted-globals
+  const signature = await self.crypto.subtle.sign("HMAC", cryptoKey, dataBuffer)
+  const byteArray = new Uint8Array(signature)
+
+  return Array.from(byteArray, (b) => b.toString(16).padStart(2, "0")).join("")
 }
 
 export interface BinanceDeposit {

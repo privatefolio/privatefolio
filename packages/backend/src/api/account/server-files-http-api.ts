@@ -86,7 +86,7 @@ export async function handleDownload(request: Request, writeApi: Api): Promise<R
 
   await access(filePath)
   const fileBuffer = await readFile(filePath)
-  return new Response(fileBuffer, {
+  return new Response(new Uint8Array(fileBuffer), {
     headers: {
       // "Cache-Control": "no-cache",
       "Cache-Control": "public, max-age=31536000, immutable", // 1 year in seconds, cache forever
