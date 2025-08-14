@@ -8,6 +8,8 @@ RUN apk add --no-cache nodejs npm \
 WORKDIR /app
 COPY package.json yarn.lock lerna.json ./
 COPY packages/backend/package.json ./packages/backend/
+COPY packages/commons/package.json ./packages/commons/
+COPY packages/commons-node/package.json ./packages/commons-node/
 
 # Install dependencies using Yarn
 RUN yarn install --production --frozen-lockfile
@@ -26,6 +28,8 @@ WORKDIR /app
 COPY package.json yarn.lock lerna.json ./
 COPY packages/backend/package.json ./packages/backend/
 COPY packages/frontend/package.json ./packages/frontend/
+COPY packages/commons/package.json ./packages/commons/
+COPY packages/commons-node/package.json ./packages/commons-node/
 
 # Install dependencies using Yarn
 RUN yarn install --frozen-lockfile
@@ -46,8 +50,11 @@ FROM oven/bun:1-alpine AS runtime
 
 WORKDIR /app
 
+# TODO6 image size jumped from 190MB to 240MB because of commons and commons-node (dev deps?)
 COPY --from=backend-builder /app/node_modules ./node_modules
 COPY --from=backend-builder /app/packages/backend ./packages/backend
+COPY --from=backend-builder /app/packages/commons ./packages/commons
+COPY --from=backend-builder /app/packages/commons-node ./packages/commons-node
 COPY --from=frontend-builder /app/packages/frontend/build ./packages/frontend/build
 
 RUN mkdir -p /app/data/{databases,logs,files}
