@@ -633,7 +633,10 @@ export default function CloudUserPage({ show }: { show: boolean }) {
 
             <Stack>
               <SectionTitle>Help</SectionTitle>
-              <AppLink variant="body2" href="mailto:hello@danielconstantin.net">
+              <AppLink
+                variant="body2"
+                href="mailto:hello@danielconstantin.net?subject=PrivateCloud%20-%20Support%20Request"
+              >
                 Contact support
               </AppLink>
 

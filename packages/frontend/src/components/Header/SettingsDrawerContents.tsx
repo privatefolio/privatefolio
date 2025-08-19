@@ -2,22 +2,25 @@ import {
   GitHub,
   InstallDesktopRounded,
   InstallMobileRounded,
-  OpenInNew,
+  MailOutlineRounded,
   Twitter,
 } from "@mui/icons-material"
 import {
   FormControlLabel,
+  IconButton,
   LinkProps,
   MenuItem,
   MenuItemProps,
   Stack,
   Switch,
+  Tooltip,
   Typography,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { enqueueSnackbar } from "notistack"
 import React from "react"
 import { GIT_DATE } from "src/env"
+import { useHelpLinks } from "src/hooks/useHelpLinks"
 import { useInstallPwa } from "src/hooks/useInstallPwa"
 import { formatDate, formatHour } from "src/utils/formatting-utils"
 
@@ -57,6 +60,36 @@ const CustomLink = ({ children, ...rest }: MenuItemProps & LinkProps) => (
   </MenuItem>
 )
 
+const CustomHelpLink = ({
+  children,
+  extraButton,
+  ...rest
+}: MenuItemProps & LinkProps & { extraButton: React.ReactNode }) => (
+  <Stack direction="row" gap={1} alignItems="center">
+    <MenuItem
+      role="listitem"
+      component={AppLink}
+      tabIndex={0}
+      sx={{
+        "&:hover": {
+          color: "text.primary",
+        },
+        borderRadius: 0.5,
+        color: "text.secondary",
+        display: "flex",
+        gap: 1,
+        marginX: -1,
+        paddingX: 1,
+        width: "100%",
+      }}
+      {...rest}
+    >
+      <Typography variant="body2">{children}</Typography>
+    </MenuItem>
+    {extraButton}
+  </Stack>
+)
+
 type MenuContentsProps = AppVerProps
 
 export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) => {
@@ -64,6 +97,15 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
   const telemetry = useStore($telemetryEnabled)
 
   const { isInstalled, promptInstall } = useInstallPwa()
+
+  const {
+    bugGitHubUrl,
+    bugEmailUrl,
+    featureGitHubUrl,
+    featureEmailUrl,
+    questionDiscordUrl,
+    questionEmailUrl,
+  } = useHelpLinks()
 
   return (
     <Stack
@@ -255,26 +297,47 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
           label="Telemetry"
           labelPlacement="start"
         />
-        <MenuItem
-          href="https://github.com/privatefolio/privatefolio/issues/new"
-          role="listitem"
-          component={AppLink}
-          tabIndex={0}
-          sx={{
-            "&:hover": {
-              color: "text.primary",
-            },
-            borderRadius: 0.5,
-            color: "text.secondary",
-            display: "flex",
-            gap: 1,
-            marginX: -1,
-            paddingX: 1,
-          }}
+      </div>
+      <div>
+        <SectionTitle id="help" role="listitem">
+          Help
+        </SectionTitle>
+        <CustomHelpLink
+          href={bugGitHubUrl}
+          extraButton={
+            <Tooltip title="Report an issue via email">
+              <IconButton href={bugEmailUrl} component={AppLink} tabIndex={0} size="small">
+                <MailOutlineRounded fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
+          }
         >
-          <Typography variant="body2">Report an issue</Typography>
-          <OpenInNew fontSize="inherit" />
-        </MenuItem>
+          Report an issue
+        </CustomHelpLink>
+        <CustomHelpLink
+          href={featureGitHubUrl}
+          extraButton={
+            <Tooltip title="Request a feature via email">
+              <IconButton href={featureEmailUrl} component={AppLink} tabIndex={0} size="small">
+                <MailOutlineRounded fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
+          }
+        >
+          Request a feature
+        </CustomHelpLink>
+        <CustomHelpLink
+          href={questionDiscordUrl}
+          extraButton={
+            <Tooltip title="Ask a question via email">
+              <IconButton href={questionEmailUrl} component={AppLink} tabIndex={0} size="small">
+                <MailOutlineRounded fontSize="inherit" />
+              </IconButton>
+            </Tooltip>
+          }
+        >
+          Ask a question
+        </CustomHelpLink>
       </div>
     </Stack>
   )
