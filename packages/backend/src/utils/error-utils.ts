@@ -1,6 +1,6 @@
 import { logger as defaultLogger } from "src/logger"
 import { serverId, telemetry } from "src/telemetry"
-import { environment, isTestEnvironment, runtime } from "src/utils/utils"
+import { environment, isNode, isTestEnvironment, runtime } from "src/utils/utils"
 
 export function logAndReportError(
   error: Error,
@@ -16,8 +16,10 @@ export function logAndReportError(
   if (isTestEnvironment) return
   try {
     telemetry.captureException(error, serverId, {
+      arch: isNode ? process.arch : undefined,
       environment,
       extraMessage,
+      os: isNode ? process.platform : undefined,
       runtime,
       ...extraProperties,
     })

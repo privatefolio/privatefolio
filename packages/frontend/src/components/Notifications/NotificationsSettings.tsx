@@ -214,7 +214,7 @@ export function NotificationsSettings() {
             title={
               <>
                 Chrome users on Android may need to install the app before using this feature. Go to{" "}
-                <b>Device Settings</b> and click the <b>Install as PWA</b> button.
+                <b>Device settings</b> and click the <b>Install as PWA</b> button.
               </>
             }
           >

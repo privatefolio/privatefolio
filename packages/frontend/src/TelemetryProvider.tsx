@@ -3,7 +3,7 @@ import React, { PropsWithChildren, useEffect, useRef } from "react"
 
 import { APP_VERSION, PLATFORM, POSTHOG_KEY } from "./env"
 import { $telemetry, $telemetryEnabled } from "./stores/app-store"
-import { $cloudUser } from "./stores/cloud-user-store"
+import { $cloudUser } from "./stores/cloud-server-store"
 import { logAndReportError } from "./utils/error-utils"
 import { isProduction } from "./utils/utils"
 

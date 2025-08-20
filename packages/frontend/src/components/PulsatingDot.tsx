@@ -1,7 +1,7 @@
 import { Box, BoxProps } from "@mui/material"
 import React from "react"
 
-export function LiveIcon(props: BoxProps) {
+export function PulsatingDot({ size = 20, ...rest }: BoxProps & { size?: number }) {
   return (
     <Box
       sx={{
@@ -10,10 +10,10 @@ export function LiveIcon(props: BoxProps) {
           backgroundColor: "var(--mui-palette-success-main)",
           borderRadius: "50%",
           content: '""',
-          height: "13px",
+          height: size - 6,
           left: 0,
           position: "absolute",
-          width: "13px",
+          width: size - 6,
         },
         "@keyframes pulse": {
           "0%": {
@@ -27,12 +27,12 @@ export function LiveIcon(props: BoxProps) {
         },
         backgroundColor: "var(--mui-palette-success-main)",
         borderRadius: "50%",
-        height: "13px",
+        height: size - 6,
         margin: "2px",
         position: "relative",
-        width: "13px",
+        width: size - 6,
       }}
-      {...props}
+      {...rest}
     />
   )
 }

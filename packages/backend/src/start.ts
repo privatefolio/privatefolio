@@ -51,6 +51,9 @@ async function startServer() {
   const port = Number(process.env.PORT)
   try {
     server.start(isNaN(port) ? 4001 : port)
+    setTimeout(async () => {
+      await writeApi.refreshSystemInfo()
+    }, 500)
   } catch (error) {
     logAndReportError(error, "Failed to start server")
   }

@@ -11,7 +11,7 @@ import {
   TextField,
 } from "@mui/material"
 import React, { FormEvent, useCallback, useState } from "react"
-import { handleLogin, handleSignUp } from "src/stores/cloud-user-store"
+import { handleLogin, handleSignUp } from "src/stores/cloud-server-store"
 import { logAndReportError } from "src/utils/error-utils"
 
 import { LogoText } from "../Header/LogoText"

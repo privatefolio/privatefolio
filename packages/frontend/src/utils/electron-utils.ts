@@ -8,6 +8,7 @@ declare global {
 
 interface ElectronAPI {
   backend: {
+    getErrorMessage: () => string | null
     getUrl: () => string
     isRunning: () => boolean
     restart: () => void

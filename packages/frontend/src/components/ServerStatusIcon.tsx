@@ -2,23 +2,30 @@ import { BuildCircle, Error, Lock, PauseCircle, StopCircle } from "@mui/icons-ma
 import { Stack } from "@mui/material"
 import React from "react"
 import { CloudInstanceStatus } from "src/api/privatecloud-api"
-import { LiveIcon } from "src/components/LiveIcon"
+import { PulsatingDot } from "src/components/PulsatingDot"
+import { ConnectionStatus, LocalServerStatus } from "src/interfaces"
 
-export function ServerStatusIcon({ status }: { status?: CloudInstanceStatus }) {
-  if (status === "running") {
-    return <LiveIcon />
+export function ServerStatusIcon({
+  size = 20,
+  status,
+}: {
+  size?: number
+  status?: CloudInstanceStatus | ConnectionStatus | LocalServerStatus
+}) {
+  if (status === "running" || status === "connected") {
+    return <PulsatingDot size={size} />
   }
 
   if (status === "paused") {
-    return <PauseCircle sx={{ height: 20, width: 20 }} color="warning" />
+    return <PauseCircle sx={{ height: size, width: size }} color="warning" />
   }
 
-  if (status === "errored") {
-    return <Error sx={{ height: 20, width: 20 }} color="error" />
+  if (status === "errored" || status === "closed") {
+    return <Error sx={{ height: size, width: size }} color="error" />
   }
 
   if (status === "unknown") {
-    return <Error sx={{ height: 20, width: 20 }} color="warning" />
+    return <Error sx={{ height: size, width: size }} color="warning" />
   }
 
   if (status === "restarting" || status === "creating" || status === "pending") {
@@ -27,11 +34,11 @@ export function ServerStatusIcon({ status }: { status?: CloudInstanceStatus }) {
   }
 
   if (status === "stopped") {
-    return <StopCircle sx={{ height: 20, width: 20 }} color="error" />
+    return <StopCircle sx={{ height: size, width: size }} color="error" />
   }
 
   if (status === "needs setup") {
-    return <BuildCircle sx={{ height: 20, width: 20 }} color="warning" />
+    return <BuildCircle sx={{ height: size, width: size }} color="warning" />
   }
 
   if (status === "needs login") {
@@ -48,9 +55,9 @@ export function ServerStatusIcon({ status }: { status?: CloudInstanceStatus }) {
         <Lock
           sx={{
             color: "var(--mui-palette-background-paper)",
-            height: 14,
+            height: size - 6,
             margin: "2px",
-            width: 14,
+            width: size - 6,
           }}
         />
       </Stack>

@@ -1,11 +1,11 @@
 import { StopCircle } from "@mui/icons-material"
 import React from "react"
-import { LiveIcon } from "src/components/LiveIcon"
+import { PulsatingDot } from "src/components/PulsatingDot"
 import { TradeStatus } from "src/interfaces"
 
 export function TradeStatusIcon({ status }: { status?: TradeStatus }) {
   if (status === "open") {
-    return <LiveIcon />
+    return <PulsatingDot />
   }
 
   if (status === "closed") {

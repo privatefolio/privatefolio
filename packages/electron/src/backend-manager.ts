@@ -8,6 +8,7 @@ import { DATA_LOCATION, SERVER_PORT as port } from "./settings"
 
 let backendProcess: ChildProcess | null = null
 let isStarted = false
+let errorMessage: string | null = null
 
 /**
  * Starts the backend server
@@ -78,6 +79,7 @@ export async function start(): Promise<void> {
     })
 
     backendProcess.on("error", (error) => {
+      errorMessage = String(error)
       logAndReportError(error, `BackendManager: process error`)
       isStarted = false
     })
@@ -92,6 +94,7 @@ export async function start(): Promise<void> {
     isStarted = true
     logger.info(`BackendManager: Started on port ${port}`)
   } catch (error) {
+    errorMessage = String(error)
     logAndReportError(error as Error, `BackendManager: failed to start`)
     throw error
   }
@@ -170,4 +173,11 @@ export function isRunning(): boolean {
  */
 export function getPort(): number {
   return port
+}
+
+/**
+ * Get the error message from the backend
+ */
+export function getErrorMessage(): string | null {
+  return errorMessage
 }

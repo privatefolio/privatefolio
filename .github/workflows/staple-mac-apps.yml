@@ -4,7 +4,7 @@ on:
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
 
   schedule:
-    - cron: "0 * * * *" # Run every 1 hour
+    - cron: "0 0 * * *" # Run every day at midnight
 
   workflow_run:
     workflows: ["Publish Apps"]

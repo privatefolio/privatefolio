@@ -306,7 +306,13 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
           href={bugGitHubUrl}
           extraButton={
             <Tooltip title="Report an issue via email">
-              <IconButton href={bugEmailUrl} component={AppLink} tabIndex={0} size="small">
+              <IconButton
+                href={bugEmailUrl}
+                component={AppLink}
+                tabIndex={0}
+                size="small"
+                color="secondary"
+              >
                 <MailOutlineRounded fontSize="inherit" />
               </IconButton>
             </Tooltip>
@@ -318,7 +324,13 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
           href={featureGitHubUrl}
           extraButton={
             <Tooltip title="Request a feature via email">
-              <IconButton href={featureEmailUrl} component={AppLink} tabIndex={0} size="small">
+              <IconButton
+                href={featureEmailUrl}
+                component={AppLink}
+                tabIndex={0}
+                size="small"
+                color="secondary"
+              >
                 <MailOutlineRounded fontSize="inherit" />
               </IconButton>
             </Tooltip>
@@ -330,7 +342,13 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
           href={questionDiscordUrl}
           extraButton={
             <Tooltip title="Ask a question via email">
-              <IconButton href={questionEmailUrl} component={AppLink} tabIndex={0} size="small">
+              <IconButton
+                href={questionEmailUrl}
+                component={AppLink}
+                tabIndex={0}
+                size="small"
+                color="secondary"
+              >
                 <MailOutlineRounded fontSize="inherit" />
               </IconButton>
             </Tooltip>

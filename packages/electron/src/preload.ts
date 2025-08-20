@@ -5,6 +5,9 @@ const isProduction = process.argv.includes("--production")
 
 contextBridge.exposeInMainWorld("electron", {
   backend: {
+    getErrorMessage() {
+      return ipcRenderer.sendSync("get-backend-error-message")
+    },
     getUrl() {
       return ipcRenderer.sendSync("get-backend-url")
     },

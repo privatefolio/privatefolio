@@ -7,9 +7,6 @@ set -e  # Exit immediately if a command exits with a non-zero status
 BUN_LOCATION="resources/bun-sh"
 mkdir -p "$BUN_LOCATION"
 
-# Download Bun binary based on platform
-PLATFORM=$(uname -s)
-ARCH=$(uname -m)
 
 GITHUB="https://github.com"
 GITHUB_REPO="$GITHUB/oven-sh/bun"
@@ -23,13 +20,13 @@ if [[ "$1" == "win" || "$npm_lifecycle_event" == *":win" ]]; then
   rm "$BUN_LOCATION/bun-win.zip"
   mv "./$BUN_LOCATION/bun-$target/bun.exe" "$BUN_LOCATION/privatefolio.exe"
   rm -rf "$BUN_LOCATION/bun-$target"
-elif [[ "$1" == "mac" || "$npm_lifecycle_event" == *":mac" ]]; then
-  echo "Downloading Bun for macOS..."
-  if [[ "$ARCH" == "arm64" ]]; then
-    target="darwin-aarch64"
-  else
+elif [[ "$1" == "mac" || "$1" == mac* || "$npm_lifecycle_event" == *"mac"* ]]; then
+  if [[ "$npm_lifecycle_event" == *"x64"* || "$npm_lifecycle_event" == *"amd64"* || "$1" == *"x64"* || "$1" == *"amd64"* ]]; then
     target="darwin-x64"
+  else
+    target="darwin-aarch64"
   fi
+  echo "Downloading Bun for macOS ($target)..."
   curl -fsSL "$GITHUB_REPO/releases/latest/download/bun-$target.zip" -o "$BUN_LOCATION/bun-darwin.zip"
   unzip -o "$BUN_LOCATION/bun-darwin.zip" -d "$BUN_LOCATION"
   rm "$BUN_LOCATION/bun-darwin.zip"

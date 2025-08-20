@@ -5,7 +5,6 @@ import {
   Card,
   CardActions,
   CardContent,
-  CardHeader,
   Container,
   IconButton,
   InputAdornment,
@@ -16,20 +15,22 @@ import {
 import { useStore } from "@nanostores/react"
 import React, { FormEvent, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { LogoText } from "src/components/Header/LogoText"
 import { SectionTitle } from "src/components/SectionTitle"
+import { useHelpLinks } from "src/hooks/useHelpLinks"
 import { isElectron, restartBackend } from "src/utils/electron-utils"
 import { $localRest } from "src/workers/remotes"
 
 import { $localAuth, setPassword, unlockApp } from "../../stores/auth-store"
+import { AppLink } from "../AppLink"
 
-export default function LocalAuthPage() {
+export default function LocalLoginForm() {
   const { isAuthenticated, errorMessage, loading, checked, needsSetup } = useStore($localAuth)
   const [password, setPasswordValue] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [validationError, setValidationError] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
+  const { bugGitHubUrl, featureGitHubUrl, questionDiscordUrl } = useHelpLinks()
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -108,19 +109,30 @@ export default function LocalAuthPage() {
           <Alert severity="error">{errorMessage}</Alert>
           {isElectron && (
             <Button variant="contained" onClick={restartBackend}>
-              Restart backend
+              Restart local server
             </Button>
           )}
+          <Stack alignSelf="flex-start">
+            <SectionTitle>Help</SectionTitle>
+            <AppLink variant="body2" href={bugGitHubUrl}>
+              Report an issue
+            </AppLink>
+            <AppLink variant="body2" href={featureGitHubUrl}>
+              Request a feature
+            </AppLink>
+            <AppLink variant="body2" href={questionDiscordUrl}>
+              Ask a question
+            </AppLink>
+          </Stack>
         </CardContent>
       </Container>
     )
   }
 
   return (
-    <Container maxWidth="xs" sx={{ marginTop: 8 }} disableGutters>
+    <Container maxWidth="xs" disableGutters>
       <form onSubmit={needsSetup ? handleSetup : handleUnlock}>
         <Card variant="outlined">
-          <CardHeader title={<LogoText color="primary" />} />
           {needsSetup ? (
             <>
               <CardContent component={Stack} gap={2}>
@@ -182,7 +194,7 @@ export default function LocalAuthPage() {
             <>
               <CardContent component={Stack} gap={2}>
                 <Typography variant="body2" color="text.secondary">
-                  Please enter your password to access Privatefolio.
+                  Please enter your password to access your local data.
                 </Typography>
                 <div>
                   <SectionTitle>Password</SectionTitle>

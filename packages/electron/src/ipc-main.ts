@@ -20,6 +20,7 @@ export function configureIpcMain(ipcMain: Electron.IpcMain, window: BrowserWindo
     event.returnValue = true
   })
   ipcMain.on("get-backend-url", handleGetBackendUrl)
+  ipcMain.on("get-backend-error-message", handleGetBackendErrorMessage)
   ipcMain.on("is-backend-running", handleIsBackendRunning)
   ipcMain.handle("restart-backend", handleRestartBackend)
   ipcMain.on("open-external-link", handleOpenExternalLink)
@@ -49,12 +50,16 @@ function handleIsBackendRunning(event: IpcMainEvent) {
   event.returnValue = backendManager.isRunning()
 }
 
+function handleGetBackendErrorMessage(event: IpcMainEvent) {
+  event.returnValue = backendManager.getErrorMessage()
+}
+
 async function handleRestartBackend() {
-  logger.info("Restarting backend server...")
+  logger.info("Restarting local server...")
 
   // In development mode, we don't manage the backend process
   if (!isProduction) {
-    logger.info("Cannot restart backend in development mode - managed by lerna")
+    logger.info("Cannot restart local server in development mode - managed by lerna")
     return false
   }
 

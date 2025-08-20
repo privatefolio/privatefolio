@@ -1076,3 +1076,7 @@ export interface HealthStats {
   minCpuUsage: number
   minMemoryUsage: number
 }
+
+export type ConnectionStatus = "connected" | "closed"
+
+export type LocalServerStatus = "needs setup" | "needs login" | "running"
