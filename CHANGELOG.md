@@ -3,6 +3,16 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.42 - 2025/08/20
+
+### 💡 Feature updates
+
+- Improve server status visibility
+
+### 🐛 Bug Fixes
+
+- Fix issue in the Mac app for x64 architecture
+
 ## v2.0.0-beta.41 - 2025/08/14
 
 ### 🐛 Bug Fixes
