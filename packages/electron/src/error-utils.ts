@@ -15,6 +15,7 @@ export function logAndReportError(
   })
   try {
     telemetry.captureException(error, appId, {
+      arch: process.arch,
       environment,
       extraMessage,
       os: process.platform,

@@ -86,7 +86,7 @@ jobs:
 
       - name: Build and Publish Binary (macOS)
         if: matrix.os == 'macos-latest'
-        run: yarn build-bin:mac
+        run: yarn build-bin:mac && yarn build-bin:mac-x64
         env:
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}

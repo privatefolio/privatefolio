@@ -2,7 +2,8 @@
  * Runtime detection
  */
 export const isServer = typeof window === "undefined"
-const isNode = typeof process !== "undefined" && !!process.versions && !!process.versions.node
+export const isNode =
+  typeof process !== "undefined" && !!process.versions && !!process.versions.node
 export const isWebWorker = isServer && !isNode
 export const isBunWorker = isNode && process.env.BUN_WORKER === "true"
 export const runtime = !isServer
