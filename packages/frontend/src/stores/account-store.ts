@@ -1,4 +1,5 @@
 import { atom, computed } from "nanostores"
+import { ConnectionStatus } from "src/interfaces"
 import { logAtoms } from "src/utils/browser-utils"
 
 export const $localAccounts = atom<string[] | undefined>()
@@ -24,10 +25,10 @@ export const $activeAccountPath = computed(
   }
 )
 
-export const $localConnectionStatus = atom<"closed" | "connected" | undefined>(undefined)
+export const $localConnectionStatus = atom<ConnectionStatus | undefined>(undefined)
 export const $localConnectionStatusText = atom<string | undefined>()
 
-export const $cloudConnectionStatus = atom<"closed" | "connected" | undefined>(undefined)
+export const $cloudConnectionStatus = atom<ConnectionStatus | undefined>(undefined)
 export const $cloudConnectionStatusText = atom<string | undefined>()
 
 export const $connectionStatus = computed(

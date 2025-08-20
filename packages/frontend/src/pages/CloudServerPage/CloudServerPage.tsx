@@ -55,7 +55,7 @@ import { isElectron, openExternalLink } from "src/utils/electron-utils"
 import { formatDate } from "src/utils/formatting-utils"
 import { $cloudRest } from "src/workers/remotes"
 
-import { ServerStatusIcon } from "./ServerStatusIcon"
+import { ServerStatusIcon } from "../../components/ServerStatusIcon"
 
 export default function CloudServerPage({ show }: { show: boolean }) {
   useNonAccountRoute()
@@ -72,6 +72,8 @@ export default function CloudServerPage({ show }: { show: boolean }) {
     cloudInstance,
     serverMutating,
     portalLink,
+    serverLoading,
+    serverChanging,
   } = useCloudServer()
 
   const confirm = useConfirm()
@@ -209,10 +211,7 @@ export default function CloudServerPage({ show }: { show: boolean }) {
                   <Avatar>
                     <Cloud color="primary" fontSize="small" />
                   </Avatar>
-                  {(cloudInstance === undefined ||
-                    serverStatus === "pending" ||
-                    serverStatus === "creating" ||
-                    serverStatus === "restarting") && (
+                  {(serverLoading || serverChanging) && (
                     <CircularSpinner
                       size={40}
                       rootSx={{
@@ -226,7 +225,7 @@ export default function CloudServerPage({ show }: { show: boolean }) {
                 </Badge>
 
                 <Stack>
-                  {cloudInstance === undefined ? (
+                  {serverLoading ? (
                     <Stack>
                       <Skeleton height={18} width={80} />
                       <Skeleton height={18} width={100} />

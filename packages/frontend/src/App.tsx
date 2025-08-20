@@ -29,7 +29,7 @@ import { $auth, $cloudAuth, $localAuth, checkAuthentication } from "./stores/aut
 import { $cloudRpcReady } from "./stores/cloud-server-store"
 import { fetchInMemoryData } from "./stores/metadata-store"
 import { closeSubscription } from "./utils/browser-utils"
-import { localServerEnabled, noop } from "./utils/utils"
+import { noop } from "./utils/utils"
 import { $cloudRest, $cloudRpc, $localRest, $localRpc, $rpc } from "./workers/remotes"
 
 const AssetPage = lazy(() => import("./pages/AssetPage/AssetPage"))
@@ -63,9 +63,12 @@ export default function App() {
   }, [localRest])
 
   useEffect(() => {
-    if (!localAuth.checked || localAuth.needsSetup || !localAuth.isAuthenticated || !localRpc) {
-      return
+    const apiNotReady =
+      !localAuth.checked || localAuth.needsSetup || !localAuth.isAuthenticated || !localRpc
+    if (apiNotReady && $localAccounts.get() !== undefined) {
+      $localAccounts.set(undefined)
     }
+    if (apiNotReady) return
 
     localRpc.getAccountNames().then($localAccounts.set)
 
@@ -92,10 +95,11 @@ export default function App() {
   }, [cloudRest])
 
   useEffect(() => {
-    if ((!cloudRpcReady || !cloudRpc) && $cloudAccounts.get() !== undefined) {
+    const apiReady = cloudRpcReady && cloudRpc
+    if (!apiReady && $cloudAccounts.get() !== undefined) {
       $cloudAccounts.set(undefined)
     }
-    if (!cloudRpcReady || !cloudRpc) return
+    if (!apiReady) return
 
     cloudRpc.getAccountNames().then($cloudAccounts.set)
 
@@ -133,19 +137,6 @@ export default function App() {
 
     return closeSubscription(subscription, rpc)
   }, [activeAccount, connectionStatus, auth, rpc])
-
-  /**
-   * Loading
-   */
-  if (localServerEnabled && !localAuth.checked) {
-    return (
-      <Box
-        sx={{ alignItems: "center", display: "flex", height: "100vh", justifyContent: "center" }}
-      >
-        <DefaultSpinner />
-      </Box>
-    )
-  }
 
   return (
     <Stack direction="row">

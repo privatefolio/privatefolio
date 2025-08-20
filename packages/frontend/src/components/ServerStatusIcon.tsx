@@ -3,15 +3,16 @@ import { Stack } from "@mui/material"
 import React from "react"
 import { CloudInstanceStatus } from "src/api/privatecloud-api"
 import { PulsatingDot } from "src/components/PulsatingDot"
+import { ConnectionStatus, LocalServerStatus } from "src/interfaces"
 
 export function ServerStatusIcon({
   size = 20,
   status,
 }: {
   size?: number
-  status?: CloudInstanceStatus
+  status?: CloudInstanceStatus | ConnectionStatus | LocalServerStatus
 }) {
-  if (status === "running") {
+  if (status === "running" || status === "connected") {
     return <PulsatingDot size={size} />
   }
 
@@ -19,7 +20,7 @@ export function ServerStatusIcon({
     return <PauseCircle sx={{ height: size, width: size }} color="warning" />
   }
 
-  if (status === "errored") {
+  if (status === "errored" || status === "closed") {
     return <Error sx={{ height: size, width: size }} color="error" />
   }
 
@@ -54,9 +55,9 @@ export function ServerStatusIcon({
         <Lock
           sx={{
             color: "var(--mui-palette-background-paper)",
-            height: 14,
+            height: size - 6,
             margin: "2px",
-            width: 14,
+            width: size - 6,
           }}
         />
       </Stack>

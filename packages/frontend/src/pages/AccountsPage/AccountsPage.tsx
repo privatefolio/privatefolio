@@ -10,11 +10,13 @@ import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { StaggeredList } from "src/components/StaggeredList"
 import { useBoolean } from "src/hooks/useBoolean"
 import { useBreakpoints } from "src/hooks/useBreakpoints"
+import { useLocalServer } from "src/hooks/useLocalServer"
 import { useNonAccountRoute } from "src/hooks/useNonAccountRoute"
 import { $cloudAccounts, $localAccounts } from "src/stores/account-store"
 import { $cloudRpcReady, $cloudUser } from "src/stores/cloud-server-store"
 import { SerifFont } from "src/theme"
-import { localServerEnabled, SPRING_CONFIGS } from "src/utils/utils"
+import { isElectron } from "src/utils/electron-utils"
+import { SPRING_CONFIGS } from "src/utils/utils"
 
 export default function AccountsPage() {
   useNonAccountRoute()
@@ -45,8 +47,13 @@ export default function AccountsPage() {
 
   const { isDesktop } = useBreakpoints()
 
-  const showWelcomeMessage = !localServerEnabled && cloudUser === null
-  const showConfigureMessage = !localServerEnabled && cloudUser && cloudRpcReady === false
+  const { localAvailable, loading: localLoading, auth } = useLocalServer()
+
+  const showWelcomeMessage = !localLoading && !localAvailable && cloudUser === null
+  const showConfigureMessage =
+    !localLoading && !localAvailable && cloudUser && cloudRpcReady === false
+  const showUnlockMessage =
+    !localLoading && localAvailable && !auth.isAuthenticated && cloudUser === null
 
   const allAccounts = useMemo<
     {
@@ -105,18 +112,20 @@ export default function AccountsPage() {
               >
                 Login to PrivateCloud
               </Button>{" "}
-              <Button
-                size="large"
-                variant="contained"
-                href="https://privatefolio.xyz/downloads"
-                component={AppLink}
-                endIcon={<OpenInNewRounded sx={{ fontSize: "1rem !important" }} />}
-                sx={{
-                  paddingY: 0.25,
-                }}
-              >
-                Download the Desktop app
-              </Button>{" "}
+              {!isElectron && (
+                <Button
+                  size="large"
+                  variant="contained"
+                  href="https://privatefolio.xyz/downloads"
+                  component={AppLink}
+                  endIcon={<OpenInNewRounded sx={{ fontSize: "1rem !important" }} />}
+                  sx={{
+                    paddingY: 0.25,
+                  }}
+                >
+                  Download the Desktop app
+                </Button>
+              )}
             </Stack>
           </Fade>
         ) : showConfigureMessage ? (
@@ -135,6 +144,23 @@ export default function AccountsPage() {
               }}
             >
               Configure your cloud instance
+            </Button>
+          </Stack>
+        ) : showUnlockMessage ? (
+          <Stack gap={2} alignItems="center">
+            <Typography variant="h5" textAlign="center" fontWeight={700}>
+              Your local data is locked.
+            </Typography>
+            <Button
+              size="large"
+              variant="contained"
+              component={Link}
+              to="/local"
+              sx={{
+                paddingY: 0.25,
+              }}
+            >
+              Unlock app
             </Button>
           </Stack>
         ) : !localAccounts && !cloudAccounts ? (

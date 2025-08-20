@@ -20,6 +20,7 @@ export function configureIpcMain(ipcMain: Electron.IpcMain, window: BrowserWindo
     event.returnValue = true
   })
   ipcMain.on("get-backend-url", handleGetBackendUrl)
+  ipcMain.on("get-backend-error-message", handleGetBackendErrorMessage)
   ipcMain.on("is-backend-running", handleIsBackendRunning)
   ipcMain.handle("restart-backend", handleRestartBackend)
   ipcMain.on("open-external-link", handleOpenExternalLink)
@@ -47,6 +48,10 @@ function handleGetBackendUrl(event: IpcMainEvent) {
 
 function handleIsBackendRunning(event: IpcMainEvent) {
   event.returnValue = backendManager.isRunning()
+}
+
+function handleGetBackendErrorMessage(event: IpcMainEvent) {
+  event.returnValue = backendManager.getErrorMessage()
 }
 
 async function handleRestartBackend() {

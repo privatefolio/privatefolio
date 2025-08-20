@@ -5,16 +5,18 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Link as MuiLink,
   Stack,
   Tab,
   TextField,
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { FormEvent, useCallback, useEffect, useMemo, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { INPUT_DEBOUNCE_DURATION } from "src/settings"
 import { $cloudAccounts, $localAccounts } from "src/stores/account-store"
 import { $cloudAvailable } from "src/stores/cloud-server-store"
+import { $localAvailable } from "src/stores/local-server-store"
 import { cloudEnabled, localServerEnabled } from "src/utils/environment-utils"
 import { logAndReportError } from "src/utils/error-utils"
 import { sleep } from "src/utils/utils"
@@ -39,8 +41,10 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
 
   const [loading, setLoading] = useState(false)
 
+  const localAvailable = useStore($localAvailable)
+
   const [accountType, setAccountType] = useState<"local" | "cloud">(
-    localServerEnabled ? "local" : "cloud"
+    localAvailable ? "local" : "cloud"
   )
 
   useEffect(() => {
@@ -102,13 +106,26 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
   const cloudAvailable = useStore($cloudAvailable)
 
   const errorComponent = useMemo(() => {
+    if (localServerEnabled && !localAvailable && accountType === "local") {
+      return (
+        <>
+          There is an issue connecting to your local server.{" "}
+          <MuiLink component={Link} to="/local">
+            Learn more
+          </MuiLink>
+          .
+        </>
+      )
+    }
     if (!localServerEnabled && accountType === "local") {
       return (
         <>
           Local accounts are not available in the browser. Download our desktop app for Windows,
-          Mac, and Linux or {/* <MuiLink component={Link} to={"/cloud"}> */}
-          login to PrivateCloud
-          {/* </MuiLink> */}.
+          Mac, and Linux or{" "}
+          <MuiLink component={Link} to={"/cloud"}>
+            login to PrivateCloud™
+          </MuiLink>
+          .
         </>
       )
     }
@@ -119,15 +136,15 @@ export function AddAccountDialog(props: AddAccountDialogProps) {
     if (!cloudAvailable && accountType === "cloud") {
       return (
         <>
-          {/* TODO9 */}
-          {/* <MuiLink component={Link} to="/cloud"> */}
-          Login to PrivateCloud
-          {/* </MuiLink>{" "} */} to start using the cloud.
+          <MuiLink component={Link} to="/cloud">
+            Login to PrivateCloud™
+          </MuiLink>{" "}
+          to get started.
         </>
       )
     }
     return null
-  }, [accountType, cloudAvailable])
+  }, [accountType, cloudAvailable, localAvailable])
 
   return (
     <Dialog open={open} onClose={toggleOpen}>

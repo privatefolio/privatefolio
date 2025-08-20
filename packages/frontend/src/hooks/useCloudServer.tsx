@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react"
 import { getPortalLink } from "src/api/privatecloud-api"
 import { APP_VERSION } from "src/env"
 import { ONE_HOUR_CACHE } from "src/settings"
+import { $cloudConnectionStatus, $cloudConnectionStatusText } from "src/stores/account-store"
 import { getLatestAppVersion } from "src/stores/app-store"
 import { $cloudAuth } from "src/stores/auth-store"
 import {
@@ -41,6 +42,7 @@ export function useCloudServer() {
       return "needs login"
     }
     if (serverMutating) return "pending"
+    if (cloudInstance === undefined) return
     return cloudInstance?.status || "unknown"
   }, [auth, cloudInstance, serverMutating])
 
@@ -111,6 +113,8 @@ export function useCloudServer() {
   }, [subscription])
 
   const cloudAvailable = useStore($cloudAvailable)
+  const connectionStatus = useStore($cloudConnectionStatus)
+  const connectionStatusText = useStore($cloudConnectionStatusText)
 
   useEffect(() => {
     checkCloudUser()
@@ -125,16 +129,32 @@ export function useCloudServer() {
     }, 0)
   }, [cloudUser])
 
+  const serverChanging =
+    serverStatus === "pending" ||
+    serverStatus === "creating" ||
+    serverStatus === "restarting" ||
+    serverMutating
+
+  const serverLoading = cloudInstance === undefined
+  const connectionLoading = connectionStatus === undefined
+  const loading = !!cloudUser && (serverLoading || serverChanging || connectionLoading)
+
   return {
     auth,
     cloudAvailable,
     cloudEnabled,
     cloudInstance,
     cloudUser,
+    connectionLoading,
+    connectionStatus,
+    connectionStatusText,
     latestVersion,
+    loading,
     paymentPlan,
     portalLink,
+    serverChanging,
     serverInfo,
+    serverLoading,
     serverMutating,
     serverStatus,
     subscription,
