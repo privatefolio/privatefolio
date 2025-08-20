@@ -14,7 +14,7 @@ import React, { FormEvent, useCallback, useEffect, useMemo, useState } from "rea
 import { useNavigate } from "react-router-dom"
 import { INPUT_DEBOUNCE_DURATION } from "src/settings"
 import { $cloudAccounts, $localAccounts } from "src/stores/account-store"
-import { $cloudAvailable } from "src/stores/cloud-user-store"
+import { $cloudAvailable } from "src/stores/cloud-server-store"
 import { cloudEnabled, localServerEnabled } from "src/utils/environment-utils"
 import { logAndReportError } from "src/utils/error-utils"
 import { sleep } from "src/utils/utils"

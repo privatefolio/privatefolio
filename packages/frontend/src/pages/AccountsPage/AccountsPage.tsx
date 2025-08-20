@@ -1,45 +1,29 @@
 import { Add, Cloud, OpenInNewRounded } from "@mui/icons-material"
-import {
-  AppBar,
-  Avatar,
-  Box,
-  Button,
-  Container,
-  Fade,
-  Stack,
-  Toolbar,
-  Tooltip,
-  Typography,
-} from "@mui/material"
+import { Avatar, Box, Button, Fade, Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useMemo } from "react"
 import { Link } from "react-router-dom"
 import { AccountAvatar, SIZE_MAP } from "src/components/AccountAvatar"
 import { AddAccountDialog } from "src/components/AccountPicker/AddAccountDialog"
 import { AppLink } from "src/components/AppLink"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
-import { Gravatar } from "src/components/Gravatar"
-import { LogoText } from "src/components/Header/LogoText"
-import { SettingsButton } from "src/components/Header/SettingsButton"
-import { Logo } from "src/components/Logo"
 import { StaggeredList } from "src/components/StaggeredList"
-import { Truncate } from "src/components/Truncate"
 import { useBoolean } from "src/hooks/useBoolean"
 import { useBreakpoints } from "src/hooks/useBreakpoints"
-import { $activeAccount, $cloudAccounts, $localAccounts } from "src/stores/account-store"
-import { $cloudRpcReady, $cloudUser } from "src/stores/cloud-user-store"
+import { useNonAccountRoute } from "src/hooks/useNonAccountRoute"
+import { $cloudAccounts, $localAccounts } from "src/stores/account-store"
+import { $cloudRpcReady, $cloudUser } from "src/stores/cloud-server-store"
 import { SerifFont } from "src/theme"
-import { isLinux, isMac, isWindows } from "src/utils/electron-utils"
-import { cloudEnabled, localServerEnabled, SPRING_CONFIGS } from "src/utils/utils"
+import { localServerEnabled, SPRING_CONFIGS } from "src/utils/utils"
 
 export default function AccountsPage() {
+  useNonAccountRoute()
   useEffect(() => {
     document.title = `Accounts - Privatefolio`
   }, [])
 
   const localAccounts = useStore($localAccounts)
   const cloudAccounts = useStore($cloudAccounts)
-  const activeAccount = useStore($activeAccount)
 
   const { value: addAccountOpen, toggle: toggleAddAccount } = useBoolean(false)
 
@@ -47,19 +31,8 @@ export default function AccountsPage() {
   const cloudRpcReady = useStore($cloudRpcReady)
 
   useEffect(() => {
-    if (activeAccount) {
-      $activeAccount.set("")
-    }
-  }, [activeAccount])
-
-  const [showAppBar, setShowAppBar] = useState(false)
-  useEffect(() => {
     const firstAccount = document.getElementById("account-0")
     firstAccount?.focus()
-    const timeout = setTimeout(() => {
-      setShowAppBar(true)
-    }, 250)
-    return () => clearTimeout(timeout)
   }, [])
 
   useEffect(() => {
@@ -99,112 +72,6 @@ export default function AccountsPage() {
 
   return (
     <>
-      <AppBar
-        position="fixed"
-        elevation={0}
-        sx={{
-          "& button, & .MuiInputBase-root, & a": {
-            WebkitAppRegion: "no-drag",
-          },
-          WebkitAppRegion: "drag",
-          backdropFilter: "none !important",
-          background: "none !important",
-          border: "none",
-          color: "var(--mui-palette-primary-main) !important",
-          zIndex: 1001,
-        }}
-      >
-        <Fade in={showAppBar} timeout={400}>
-          <Toolbar disableGutters>
-            <Container
-              disableGutters
-              maxWidth="md"
-              sx={{ marginTop: -0.5, paddingX: { xs: 2 }, paddingY: 0, position: "relative" }}
-            >
-              <Stack
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                gap={1}
-                sx={(theme) => ({
-                  [theme.breakpoints.down("xxl")]: {
-                    marginLeft: isMac ? 10 : 0,
-                    marginRight: isWindows ? 15 : isLinux ? 9 : 0,
-                  },
-                })}
-              >
-                <Button
-                  size="small"
-                  color="secondary"
-                  variant="text"
-                  href="https://privatefolio.xyz"
-                  component={AppLink}
-                  sx={{ marginX: -2, paddingX: 2 }}
-                >
-                  <LogoText
-                    sx={{
-                      display: {
-                        sm: "inline-flex",
-                        xs: "none",
-                      },
-                    }}
-                  />
-                  <Logo
-                    width={24}
-                    height={24}
-                    sx={{
-                      display: {
-                        sm: "none",
-                        xs: "inline-flex",
-                      },
-                    }}
-                  />
-                </Button>
-                <Stack direction="row" gap={1} alignItems="center">
-                  {cloudUser !== undefined && !cloudUser && cloudEnabled && (
-                    <Button
-                      color="secondary"
-                      size="small"
-                      endIcon={<Cloud />}
-                      variant="outlined"
-                      component={Link}
-                      to="/cloud"
-                      sx={{
-                        display: showWelcomeMessage ? "none" : "inline-flex",
-                      }}
-                    >
-                      Login to PrivateCloud
-                    </Button>
-                  )}
-                  {cloudUser !== undefined && cloudUser && cloudEnabled && (
-                    <Tooltip title="View PrivateCloud account">
-                      <Button
-                        color="secondary"
-                        size="small"
-                        endIcon={
-                          cloudUser.email ? (
-                            <Gravatar email={cloudUser.email} sx={{ height: 18, width: 18 }} />
-                          ) : (
-                            <Cloud />
-                          )
-                        }
-                        variant="outlined"
-                        component={Link}
-                        to="/cloud"
-                      >
-                        <Truncate sx={{ maxWidth: { sm: "unset", xs: "15vw" } }}>
-                          {cloudUser.email}
-                        </Truncate>
-                      </Button>
-                    </Tooltip>
-                  )}
-                  <SettingsButton size="small" />
-                </Stack>
-              </Stack>
-            </Container>
-          </Toolbar>
-        </Fade>
-      </AppBar>
       <Stack
         sx={{
           background: "var(--mui-palette-background-default)",

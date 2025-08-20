@@ -12,7 +12,7 @@ import {
   $localConnectionStatus,
   $localConnectionStatusText,
 } from "src/stores/account-store"
-import { $cloudRpcReady, $cloudServerInfo, $cloudUser } from "src/stores/cloud-user-store"
+import { $cloudRpcReady, $cloudServerInfo, $cloudUser } from "src/stores/cloud-server-store"
 import { backendUrl } from "src/utils/electron-utils"
 import { isProduction, isSecure, localServerEnabled } from "src/utils/environment-utils"
 

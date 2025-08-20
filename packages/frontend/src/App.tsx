@@ -8,36 +8,25 @@ import { Navigate, Route, Routes } from "react-router-dom"
 import { AccountRouteGuard } from "./AccountRouteGuard"
 import { DefaultSpinner } from "./components/DefaultSpinner"
 import { ErrorBoundary } from "./components/ErrorBoundary"
-import { ConnectionBanner } from "./components/Header/ConnectionBanner"
 import { Header } from "./components/Header/Header"
 import { MenuDrawerContents } from "./components/Header/MenuDrawerContents"
 import { APP_VERSION, GIT_HASH } from "./env"
 import FourZeroFourPage from "./pages/404"
 import AccountsPage from "./pages/AccountsPage/AccountsPage"
-import LocalAuthPage from "./pages/AccountsPage/LocalAuthPage"
-import CloudUserPage from "./pages/CloudUserPage/CloudUserPage"
+import CloudUserPage from "./pages/CloudServerPage/CloudServerPage"
 import HomePage from "./pages/HomePage/HomePage"
+import LocalServerPage from "./pages/LocalServerPage/LocalServerPage"
 import { INPUT_DEBOUNCE_DURATION, SHORT_THROTTLE_DURATION } from "./settings"
 import {
   $activeAccount,
   $cloudAccounts,
   $cloudConnectionStatus,
-  $cloudConnectionStatusText,
   $connectionStatus,
   $localAccounts,
   $localConnectionStatus,
-  $localConnectionStatusText,
 } from "./stores/account-store"
 import { $auth, $cloudAuth, $localAuth, checkAuthentication } from "./stores/auth-store"
-import {
-  $cloudAvailable,
-  $cloudRpcReady,
-  $cloudUser,
-  checkCloudInstance,
-  checkCloudServerInfo,
-  checkCloudUser,
-  checkSubscription,
-} from "./stores/cloud-user-store"
+import { $cloudRpcReady } from "./stores/cloud-server-store"
 import { fetchInMemoryData } from "./stores/metadata-store"
 import { closeSubscription } from "./utils/browser-utils"
 import { localServerEnabled, noop } from "./utils/utils"
@@ -70,7 +59,6 @@ export default function App() {
 
   useEffect(() => {
     if (!localRest) return
-
     checkAuthentication($localAuth, localRest)
   }, [localRest])
 
@@ -95,13 +83,11 @@ export default function App() {
    */
   const cloudRpcReady = useStore($cloudRpcReady)
   const cloudConnectionStatus = useStore($cloudConnectionStatus)
-  const cloudAvailable = useStore($cloudAvailable)
   const cloudRest = useStore($cloudRest)
   const cloudRpc = useStore($cloudRpc)
 
   useEffect(() => {
     if (!cloudRest) return
-
     checkAuthentication($cloudAuth, cloudRest)
   }, [cloudRest])
 
@@ -121,21 +107,6 @@ export default function App() {
 
     return closeSubscription(subscription, cloudRpc)
   }, [cloudConnectionStatus, cloudRpcReady, cloudRpc])
-
-  useEffect(() => {
-    checkCloudUser()
-  }, [])
-
-  const cloudUser = useStore($cloudUser)
-
-  useEffect(() => {
-    if (!cloudUser) return
-
-    setTimeout(async () => {
-      await Promise.all([checkSubscription(), checkCloudInstance()])
-      await checkCloudServerInfo()
-    }, 0)
-  }, [cloudUser])
 
   /**
    * Selected account
@@ -174,17 +145,6 @@ export default function App() {
         <DefaultSpinner />
       </Box>
     )
-  }
-
-  /**
-   * Local auth
-   */
-  if (
-    localServerEnabled &&
-    (!localAuth.isAuthenticated || localAuth.needsSetup) &&
-    !localAuth.kioskMode
-  ) {
-    return <LocalAuthPage />
   }
 
   return (
@@ -236,18 +196,25 @@ export default function App() {
         </>
       )}
       <Box
-        sx={(theme) => ({
-          [theme.breakpoints.between("md", "xl")]: {
-            flexBasis: "calc(100% - 96px)",
-            width: "calc(100% - 96px)",
-          },
-          [theme.breakpoints.up("xl")]: {
-            flexBasis: "calc(100% - 300px)",
-            width: "calc(100% - 300px)",
-          },
-          flexBasis: "100%",
-          width: "100%",
-        })}
+        sx={(theme) =>
+          activeAccount !== ""
+            ? {
+                [theme.breakpoints.between("md", "xl")]: {
+                  flexBasis: "calc(100% - 96px)",
+                  width: "calc(100% - 96px)",
+                },
+                [theme.breakpoints.up("xl")]: {
+                  flexBasis: "calc(100% - 300px)",
+                  width: "calc(100% - 300px)",
+                },
+                flexBasis: "100%",
+                width: "100%",
+              }
+            : {
+                flexBasis: "100%",
+                width: "100%",
+              }
+        }
       >
         {/* TODO0 */}
         {/* <Box
@@ -278,6 +245,7 @@ export default function App() {
             <Suspense fallback={<DefaultSpinner wrapper />}>
               <Routes>
                 <Route index element={<AccountsPage />} />
+                <Route path="/local" element={<LocalServerPage show />} />
                 <Route path="/cloud" element={<CloudUserPage show />} />
                 <Route path="/:accountType/:accountIndex" element={<AccountRouteGuard />}>
                   <Route index element={<HomePage />} />
@@ -302,32 +270,6 @@ export default function App() {
               </Routes>
             </Suspense>
           </ErrorBoundary>
-          <Stack
-            sx={{
-              bottom: 0,
-              left: 0,
-              position: "fixed",
-              width: "100%",
-              zIndex: "var(--mui-zIndex-tooltip)",
-            }}
-          >
-            {localServerEnabled && (
-              <ConnectionBanner
-                key="local"
-                statusAtom={$localConnectionStatus}
-                statusTextAtom={$localConnectionStatusText}
-                prefix="Local connection"
-              />
-            )}
-            {cloudAvailable && (
-              <ConnectionBanner
-                key="cloud"
-                statusAtom={$cloudConnectionStatus}
-                statusTextAtom={$cloudConnectionStatusText}
-                prefix="Cloud connection"
-              />
-            )}
-          </Stack>
         </Container>
       </Box>
     </Stack>

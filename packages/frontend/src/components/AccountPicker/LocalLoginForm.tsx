@@ -5,7 +5,6 @@ import {
   Card,
   CardActions,
   CardContent,
-  CardHeader,
   Container,
   IconButton,
   InputAdornment,
@@ -16,14 +15,13 @@ import {
 import { useStore } from "@nanostores/react"
 import React, { FormEvent, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { LogoText } from "src/components/Header/LogoText"
 import { SectionTitle } from "src/components/SectionTitle"
 import { isElectron, restartBackend } from "src/utils/electron-utils"
 import { $localRest } from "src/workers/remotes"
 
 import { $localAuth, setPassword, unlockApp } from "../../stores/auth-store"
 
-export default function LocalAuthPage() {
+export default function LocalLoginForm() {
   const { isAuthenticated, errorMessage, loading, checked, needsSetup } = useStore($localAuth)
   const [password, setPasswordValue] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -108,7 +106,7 @@ export default function LocalAuthPage() {
           <Alert severity="error">{errorMessage}</Alert>
           {isElectron && (
             <Button variant="contained" onClick={restartBackend}>
-              Restart backend
+              Restart local server
             </Button>
           )}
         </CardContent>
@@ -117,10 +115,9 @@ export default function LocalAuthPage() {
   }
 
   return (
-    <Container maxWidth="xs" sx={{ marginTop: 8 }} disableGutters>
+    <Container maxWidth="xs" disableGutters>
       <form onSubmit={needsSetup ? handleSetup : handleUnlock}>
         <Card variant="outlined">
-          <CardHeader title={<LogoText color="primary" />} />
           {needsSetup ? (
             <>
               <CardContent component={Stack} gap={2}>
@@ -182,7 +179,7 @@ export default function LocalAuthPage() {
             <>
               <CardContent component={Stack} gap={2}>
                 <Typography variant="body2" color="text.secondary">
-                  Please enter your password to access Privatefolio.
+                  Please enter your password to access your local data.
                 </Typography>
                 <div>
                   <SectionTitle>Password</SectionTitle>

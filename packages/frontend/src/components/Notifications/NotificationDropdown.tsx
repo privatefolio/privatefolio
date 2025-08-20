@@ -85,12 +85,7 @@ export function NotificationDropdown() {
           </>
         }
       >
-        <IconButton
-          color="secondary"
-          ref={setAnchorEl}
-          onClick={toggleOpen}
-          sx={{ marginRight: -1 }}
-        >
+        <IconButton color="secondary" ref={setAnchorEl} onClick={toggleOpen}>
           <Badge
             badgeContent={unreadCount}
             color="accent"

@@ -33,7 +33,7 @@ export function SettingsButton(props: { size?: "small" | "medium" }) {
       <Tooltip
         title={
           <>
-            Device Settings <Key variant="tooltip">{SHORTCUT_KEY}</Key>
+            Device settings <Key variant="tooltip">{SHORTCUT_KEY}</Key>
           </>
         }
       >

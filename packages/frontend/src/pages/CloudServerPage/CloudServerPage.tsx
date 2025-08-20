@@ -26,36 +26,22 @@ import {
   TextField,
   Typography,
 } from "@mui/material"
-import { useStore } from "@nanostores/react"
-import { useQuery } from "@tanstack/react-query"
 import { enqueueSnackbar } from "notistack"
-import React, { useEffect, useMemo } from "react"
-import { CloudInstanceStatus, getCheckoutLink, getPortalLink } from "src/api/privatecloud-api"
+import React, { useEffect } from "react"
+import { CloudInstanceStatus, getCheckoutLink } from "src/api/privatecloud-api"
 import { CloudLoginForm } from "src/components/AccountPicker/CloudLoginForm"
 import { AppLink } from "src/components/AppLink"
-import { BackButton } from "src/components/BackButton"
 import { CircularSpinner } from "src/components/CircularSpinner"
 import { Gravatar } from "src/components/Gravatar"
 import { LogoText } from "src/components/Header/LogoText"
 import { PaymentPlanChip } from "src/components/PaymentPlanChip"
 import { SectionTitle } from "src/components/SectionTitle"
 import { StaggeredList } from "src/components/StaggeredList"
-import { APP_VERSION } from "src/env"
+import { useCloudServer } from "src/hooks/useCloudServer"
 import { useConfirm } from "src/hooks/useConfirm"
-import { ONE_HOUR_CACHE } from "src/settings"
-import { $activeAccount } from "src/stores/account-store"
-import { getLatestAppVersion } from "src/stores/app-store"
+import { useNonAccountRoute } from "src/hooks/useNonAccountRoute"
 import { $cloudAuth, unlockApp } from "src/stores/auth-store"
 import {
-  $cloudInstance,
-  $cloudPortalLink,
-  $cloudServerInfo,
-  $cloudServerMutating,
-  $cloudSubscription,
-  $cloudUser,
-  checkCloudInstance,
-  checkCloudServerInfo,
-  checkSubscription,
   handleCreateServer,
   handleLogout,
   handlePauseServer,
@@ -64,122 +50,36 @@ import {
   handleSetupServer,
   handleUnpauseServer,
   handleUpdateServer,
-} from "src/stores/cloud-user-store"
+} from "src/stores/cloud-server-store"
 import { isElectron, openExternalLink } from "src/utils/electron-utils"
 import { formatDate } from "src/utils/formatting-utils"
 import { $cloudRest } from "src/workers/remotes"
 
 import { ServerStatusIcon } from "./ServerStatusIcon"
 
-export default function CloudUserPage({ show }: { show: boolean }) {
-  const activeAccount = useStore($activeAccount)
+export default function CloudServerPage({ show }: { show: boolean }) {
+  useNonAccountRoute()
   useEffect(() => {
-    if (activeAccount) {
-      $activeAccount.set("")
-    }
-  }, [activeAccount])
-
-  useEffect(() => {
-    document.title = "PrivateCloud"
+    document.title = "Cloud server - Privatefolio"
   }, [])
 
-  const account = useStore($cloudUser)
-  const sub = useStore($cloudSubscription)
-  const cloudInstance = useStore($cloudInstance)
-  const serverMutating = useStore($cloudServerMutating)
-  const serverInfo = useStore($cloudServerInfo)
-  const auth = useStore($cloudAuth)
-
-  const { data: latestVersion = APP_VERSION } = useQuery({
-    queryFn: getLatestAppVersion,
-    queryKey: ["latest-app-version"],
-    ...ONE_HOUR_CACHE,
-  })
-
-  const serverStatus = useMemo(() => {
-    if (auth.needsSetup) return "needs setup"
-    if (auth.checked && !auth.needsSetup && !auth.isAuthenticated && !auth.errorMessage) {
-      return "needs login"
-    }
-    if (serverMutating) return "pending"
-    return cloudInstance?.status || "unknown"
-  }, [auth, cloudInstance, serverMutating])
-
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      if (!$cloudUser.get()) return
-      await Promise.all([checkSubscription(), checkCloudInstance()])
-      await checkCloudServerInfo()
-    }, 5_000)
-
-    return () => {
-      clearInterval(interval)
-    }
-  }, [])
-
-  const portalLink = useStore($cloudPortalLink)
-
-  useEffect(() => {
-    if (account) {
-      getPortalLink()
-        .then((link) => {
-          $cloudPortalLink.set(link.url)
-        })
-        .catch(() => {
-          // console.warn("Error fetching portal link:", error)
-          $cloudPortalLink.set(null)
-        })
-    }
-  }, [account])
-
-  const paymentPlan = useMemo<{
-    cancelAt?: Date
-    isPremium: boolean
-    loading?: boolean
-    name: string
-    priceText?: string
-    renewal?: Date
-  }>(() => {
-    if (sub === undefined) {
-      return { isPremium: false, loading: true, name: "Loading…" }
-    }
-    if (sub === null) {
-      return { isPremium: false, name: "Free" }
-    }
-
-    const item = sub.items.data[0]
-    if (!item) {
-      return { isPremium: false, name: "Free" }
-    }
-
-    const { plan } = item
-    const amount = plan.amount / 100
-    const currency = plan.currency.toUpperCase().replace("USD", "$")
-    const interval = plan.interval
-
-    const name = plan.nickname || "Premium"
-
-    const renewal = new Date(sub.billing_cycle_anchor * 1000)
-    renewal.setMonth(new Date(renewal).getMonth() + plan.interval_count)
-
-    return {
-      cancelAt: sub.cancel_at ? new Date(sub.cancel_at * 1000) : undefined,
-      isPremium: true,
-      name,
-      priceText: `${currency}${amount.toFixed(2)} per ${interval}`,
-      renewal,
-    }
-  }, [sub])
+  const {
+    cloudUser,
+    serverStatus,
+    serverInfo,
+    latestVersion,
+    paymentPlan,
+    cloudInstance,
+    serverMutating,
+    portalLink,
+  } = useCloudServer()
 
   const confirm = useConfirm()
 
-  if (!account) {
+  if (!cloudUser) {
     return (
       <Container maxWidth="xs" sx={{ marginTop: 8 }} disableGutters>
         <StaggeredList component="main" gap={1} show={show} tertiary>
-          <BackButton sx={{ marginLeft: 2 }} fallback="/">
-            Back
-          </BackButton>
           <Card variant="outlined">
             <CloudLoginForm />
           </Card>
@@ -191,9 +91,6 @@ export default function CloudUserPage({ show }: { show: boolean }) {
   return (
     <Container maxWidth="xs" sx={{ marginTop: 8 }} disableGutters>
       <StaggeredList component="main" gap={1} show={show} tertiary>
-        <BackButton sx={{ marginLeft: 2 }} fallback="/">
-          Back
-        </BackButton>
         <Card variant="outlined">
           <LogoText color="primary" sx={{ paddingTop: 2, paddingX: 3 }}>
             PrivateCloud™
@@ -202,7 +99,7 @@ export default function CloudUserPage({ show }: { show: boolean }) {
             <div>
               <SectionTitle>Account</SectionTitle>
               <Stack direction="row" alignItems="flex-start" gap={2} sx={{ overflowX: "auto" }}>
-                <Gravatar email={account?.email} />
+                <Gravatar email={cloudUser?.email} />
                 <Stack>
                   <Typography variant="caption" component="div">
                     <Stack direction="row" gap={1}>
@@ -210,14 +107,14 @@ export default function CloudUserPage({ show }: { show: boolean }) {
                         Email
                       </Typography>
                       <Typography variant="inherit">
-                        {account ? account.email : "Unknown"}
+                        {cloudUser ? cloudUser.email : "Unknown"}
                       </Typography>
                     </Stack>
                     <Stack direction="row" gap={1}>
                       <Typography variant="inherit" color="text.secondary">
                         User ID
                       </Typography>{" "}
-                      <Typography variant="inherit">#{account.id}</Typography>
+                      <Typography variant="inherit">#{cloudUser.id}</Typography>
                     </Stack>
                     <Stack direction="row" gap={1}>
                       <Typography variant="inherit" color="text.secondary">

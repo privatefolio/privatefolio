@@ -23,7 +23,7 @@ import { $cloudRest } from "src/workers/remotes"
 
 import { $cloudAuth, setPassword, unlockApp } from "./auth-store"
 
-export type CloudServerInfo = {
+export type ServerInfo = {
   buildDate: string
   commit: string
   digest: string
@@ -36,7 +36,7 @@ export const $cloudUser = atom<User | null | undefined>()
 export const $cloudSubscription = atom<Subscription | null | undefined>()
 export const $cloudPortalLink = atom<string | null | undefined>()
 export const $cloudInstance = atom<CloudInstance | null | undefined>()
-export const $cloudServerInfo = atom<CloudServerInfo | null | undefined>()
+export const $cloudServerInfo = atom<ServerInfo | null | undefined>()
 export const $cloudServerMutating = atom<boolean>(false)
 
 export const $cloudAvailable = computed([$cloudUser, $cloudInstance], (user, instance) => {
