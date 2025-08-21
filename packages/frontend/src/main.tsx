@@ -1,4 +1,5 @@
 import "./workers/remotes"
+import "./error-catcher"
 
 import { CloseRounded } from "@mui/icons-material"
 import { IconButton } from "@mui/material"

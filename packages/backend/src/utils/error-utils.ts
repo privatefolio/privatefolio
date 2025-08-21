@@ -7,14 +7,14 @@ export function logAndReportError(
   extraMessage: string,
   extraProperties = {},
   logger = defaultLogger
-): void {
-  logger.error(extraMessage, {
-    errorMessage: String(error),
-    stackTrace: error.stack,
-    ...extraProperties,
-  })
-  if (isTestEnvironment) return
+) {
   try {
+    logger.error(extraMessage, {
+      errorMessage: String(error),
+      stackTrace: error.stack,
+      ...extraProperties,
+    })
+    if (isTestEnvironment) return
     telemetry.captureException(error, serverId, {
       arch: isNode ? process.arch : undefined,
       environment,

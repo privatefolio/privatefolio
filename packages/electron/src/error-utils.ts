@@ -7,13 +7,13 @@ export function logAndReportError(
   extraMessage: string,
   extraProperties = {},
   logger = defaultLogger
-): void {
-  logger.error(extraMessage, {
-    errorMessage: String(error),
-    stackTrace: error.stack,
-    ...extraProperties,
-  })
+) {
   try {
+    logger.error(extraMessage, {
+      errorMessage: String(error),
+      stackTrace: error.stack,
+      ...extraProperties,
+    })
     telemetry.captureException(error, appId, {
       arch: process.arch,
       environment,
