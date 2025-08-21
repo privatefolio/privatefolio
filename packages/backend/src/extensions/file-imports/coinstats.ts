@@ -74,9 +74,11 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
     wallet,
   }
 
-  const incoming = operation === "Buy" || operation === "Deposit" ? change : undefined
+  const incoming =
+    operation === "Buy" || operation === "Deposit" ? change.replace("-", "") : undefined
   const incomingAsset = operation === "Buy" || operation === "Deposit" ? assetId : undefined
-  const outgoing = operation === "Sell" || operation === "Withdraw" ? change : undefined
+  const outgoing =
+    operation === "Sell" || operation === "Withdraw" ? change.replace("-", "") : undefined
   const outgoingAsset = operation === "Sell" || operation === "Withdraw" ? assetId : undefined
 
   const txns: Transaction[] = [
