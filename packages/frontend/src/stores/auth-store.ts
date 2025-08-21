@@ -78,7 +78,7 @@ export async function checkAuthentication(atom: WritableAtom<AuthState>, api: Re
     }
 
     if (!jwt) {
-      setIfChanged(atom, { ...DEFAULT_AUTH_STATE, checked: true })
+      patchIfChanged(atom, { checked: true, isAuthenticated: false })
       return
     }
 
