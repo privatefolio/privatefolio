@@ -52,7 +52,7 @@ export function parse(csvRow: string, index: number, fileImportId: string): Pars
   const operation = type as AuditLogOperation
   let change = amount.toFixed()
 
-  if (operation === "Withdraw") {
+  if (operation === "Withdraw" && !change.includes("-")) {
     change = `-${change}`
   }
 
