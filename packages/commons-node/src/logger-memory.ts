@@ -1,13 +1,13 @@
-import { configureSync, LogRecord } from "@logtape/logtape"
+import { configureSync, LogLevel, LogRecord } from "@logtape/logtape"
 
 const inMemoryRecords: LogRecord[] = []
 
-export function configureMemoryLogger() {
+export function configureMemoryLogger(lowestLevel: LogLevel = "debug") {
   configureSync({
     loggers: [
       {
         category: [],
-        lowestLevel: "debug",
+        lowestLevel,
         sinks: ["inMemory"],
       },
       {

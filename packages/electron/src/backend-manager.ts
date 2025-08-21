@@ -149,9 +149,11 @@ async function killProcessOnPort(): Promise<void> {
         ? `for /f "tokens=5" %a in ('netstat -ano ^| findstr :${port} ^| findstr LISTENING') do taskkill /F /PID %a`
         : `lsof -i :${port} -t | xargs kill -9`
 
-      exec(killCommand, (killError) => {
-        if (killError) {
-          logAndReportError(killError, `Failed to kill process on port ${port}`)
+      exec(killCommand, (error) => {
+        if (String(error).includes("not found")) {
+          return
+        } else if (error) {
+          logAndReportError(error, `Failed to kill process on port ${port}`)
         } else {
           logger.info(`BackendManager: Killed process on port ${port}`)
         }
