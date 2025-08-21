@@ -3,6 +3,17 @@
 Changes to this project will be documented in this file.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.43 - 2025/08/21
+
+### 🐛 Bug Fixes
+
+- Fix bug in coinstats file import
+- Fix UI bug with the app header
+
+### Other updates
+
+- Improve error handling on the frontend
+
 ## v2.0.0-beta.42 - 2025/08/20
 
 ### 💡 Feature updates
