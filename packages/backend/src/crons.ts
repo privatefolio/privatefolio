@@ -62,7 +62,7 @@ export async function setupNetworthCronJob(accountName: string, writeApi: Api) {
     account.logger.info(`Networth cron expression: ${cronExpression}`)
 
     const cronJob = new Cron(cronExpression, async () => {
-      account.logger.info(`Cron: re-creating account.`)
+      account.logger.info(`Cron: Refreshing portfolio (balances, prices, networth, trades).`)
       await writeApi.enqueueRefreshBalances(accountName, "cron")
       await writeApi.enqueueFetchPrices(accountName, "cron")
       await writeApi.enqueueRefreshNetworth(accountName, "cron")
@@ -92,7 +92,7 @@ export async function setupMetadataCronJob(accountName: string, writeApi: Api) {
     account.logger.info(`Metadata cron expression: ${cronExpression}`)
 
     const cronJob = new Cron(cronExpression, async () => {
-      account.logger.info(`Cron: re-creating metadata.`)
+      account.logger.info(`Cron: Refreshing metadata (assets and platforms).`)
       await writeApi.enqueueRefetchAssets(accountName, "cron")
       await writeApi.enqueueRefetchPlatforms(accountName, "cron")
     })
@@ -192,7 +192,7 @@ export async function setupSystemInfoCronJob(writeApi: Api) {
     logger.info(`System info cron expression: ${cronExpression}`)
 
     systemInfoCronJob = new Cron(cronExpression, async () => {
-      logger.info(`Cron: re-creating system info.`)
+      logger.info(`Cron: Refreshing system info.`)
       await writeApi.refreshSystemInfo()
     })
   } catch (error) {

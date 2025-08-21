@@ -11,7 +11,7 @@ export interface ServerSettings {
 }
 
 const DEFAULT_SERVER_SETTINGS: ServerSettings = {
-  healthMetricsInterval: 5,
+  healthMetricsInterval: 60,
   systemInfoInterval: 7 * ONE_DAY_MIN,
 }
 
