@@ -136,11 +136,14 @@ export async function getMyAssets(
         cachedAsset = cachedAssets.find((x) => getAssetTicker(x.id) === ticker)
       }
       // search by coingeckoId (native assets)
-      if (!cachedAsset && contract === ZERO_ADDRESS) {
-        cachedAsset = cachedAssets.find((x) => x.coingeckoId === coingeckoId)
-      }
       if (!cachedAsset && contract === ZERO_ADDRESS && ticker === "ETH") {
         cachedAsset = cachedAssets.find((x) => x.coingeckoId === "ethereum")
+      }
+      if (!cachedAsset && contract === ZERO_ADDRESS && ticker === "MATIC") {
+        cachedAsset = cachedAssets.find((x) => x.coingeckoId === "polygon")
+      }
+      if (!cachedAsset && contract === ZERO_ADDRESS) {
+        cachedAsset = cachedAssets.find((x) => x.coingeckoId === coingeckoId)
       }
       // search by contract
       if (!cachedAsset && contract && coingeckoId) {

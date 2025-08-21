@@ -55,7 +55,6 @@ export default function NetworthPage() {
   const headCells = useMemo<HeadCell<Balance>[]>(
     () => [
       {
-        filterable: true,
         key: "assetId",
         label: "Asset",
         sortable: true,

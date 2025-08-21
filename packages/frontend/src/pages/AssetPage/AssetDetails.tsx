@@ -16,7 +16,6 @@ import { CoinGeckoIcon } from "src/components/CoinGeckoIcon"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { DiscordIcon } from "src/components/DiscordIcon"
 import { IdentifierBlock } from "src/components/IdentifierBlock"
-import { NoDataAvailable } from "src/components/NoDataAvailable"
 import { PlatformBlock } from "src/components/PlatformBlock"
 import { SectionTitle } from "src/components/SectionTitle"
 import { TimestampBlock } from "src/components/TimestampBlock"
@@ -36,21 +35,10 @@ const descriptionCharLimit = 500
 export function AssetDetails(props: AssetDetailsProps) {
   const { metadata, isLoading, assetId } = props
 
-  const isEmpty = !metadata
-
   const [showAllCategories, setShowAllCategories] = React.useState(false)
   const [showFullDescription, setShowFullDescription] = React.useState(false)
 
   if (isLoading) return <DefaultSpinner wrapper />
-  if (isEmpty) {
-    return (
-      <Paper>
-        <Stack justifyContent="center" alignItems="center" sx={{ height: 300 }}>
-          {isEmpty && <NoDataAvailable />}
-        </Stack>
-      </Paper>
-    )
-  }
 
   return (
     <Stack gap={2}>
@@ -66,164 +54,177 @@ export function AssetDetails(props: AssetDetailsProps) {
             {getAssetContract(assetId) && (
               <div>
                 <SectionTitle>Contract Address</SectionTitle>
-                <IdentifierBlock id={getAssetContract(assetId)!} />
-              </div>
-            )}
-            {metadata.links && (
-              <div>
-                <SectionTitle>Links</SectionTitle>
-                <Stack direction="row" gap={1} flexWrap="wrap">
-                  <Chip
-                    href={`https://coingecko.com/en/coins/${metadata.id}`}
-                    component={AppLink}
-                    sx={{ borderRadius: 12 }}
-                    onClick={() => {
-                      //
-                    }}
-                    label={metadata.id}
-                    icon={<CoinGeckoIcon height="1rem" width="1.5rem" />}
-                  />
-                  {metadata.links.homepage && metadata.links.homepage[0] && (
-                    <Chip
-                      href={metadata.links.homepage[0]}
-                      component={AppLink}
-                      sx={{ borderRadius: 12 }}
-                      onClick={noop}
-                      label={formatWebsiteLink(metadata.links.homepage[0])}
-                      icon={<Language sx={{ height: "1rem !important" }} />}
-                    />
+                <IdentifierBlock
+                  id={getAssetContract(assetId)!}
+                  href={getBlockExplorerUrl(
+                    getAssetPlatform(assetId)!,
+                    getAssetContract(assetId)!,
+                    "address"
                   )}
-                  {metadata.links.twitter_screen_name && (
-                    <Chip
-                      href={`https://twitter.com/${metadata.links.twitter_screen_name}`}
-                      component={AppLink}
-                      sx={{ borderRadius: 12 }}
-                      onClick={noop}
-                      label={metadata.links.twitter_screen_name}
-                      icon={<Twitter sx={{ height: "1rem !important" }} />}
-                    />
-                  )}
-                  {metadata.links.subreddit_url && (
-                    <Chip
-                      href={metadata.links.subreddit_url}
-                      component={AppLink}
-                      sx={{ borderRadius: 12 }}
-                      onClick={noop}
-                      label={formatWebsiteLink(
-                        metadata.links.subreddit_url.replace("reddit.com/", "")
-                      )}
-                      icon={<Reddit sx={{ height: "1rem !important" }} />}
-                    />
-                  )}
-                  {metadata.links.telegram_channel_identifier && (
-                    <Chip
-                      href={`https://t.me/${metadata.links.telegram_channel_identifier}`}
-                      component={AppLink}
-                      sx={{ borderRadius: 12 }}
-                      onClick={noop}
-                      label={metadata.links.telegram_channel_identifier}
-                      icon={<Telegram sx={{ height: "1rem !important" }} />}
-                    />
-                  )}
-                  {metadata.links.chat_url && metadata.links.chat_url[0] && (
-                    <Chip
-                      href={metadata.links.chat_url[0]}
-                      component={AppLink}
-                      sx={{ borderRadius: 12 }}
-                      onClick={noop}
-                      label={formatWebsiteLink(metadata.links.chat_url[0])}
-                      icon={<DiscordIcon height="1rem" />}
-                    />
-                  )}
-                  {metadata.links.repos_url.github && metadata.links.repos_url.github[0] && (
-                    <Chip
-                      href={metadata.links.repos_url.github[0]}
-                      component={AppLink}
-                      sx={{ borderRadius: 12 }}
-                      onClick={noop}
-                      label={formatWebsiteLink(
-                        metadata.links.repos_url.github[0].replace("github.com/", "")
-                      )}
-                      icon={<GitHub sx={{ height: "1rem !important" }} />}
-                    />
-                  )}
-                </Stack>
-              </div>
-            )}
-            <div>
-              <SectionTitle>Description</SectionTitle>
-              {!metadata.description.en ? (
-                <span>No description available.</span>
-              ) : (
-                <span>
-                  {showFullDescription
-                    ? metadata.description.en
-                    : metadata.description.en.substring(0, descriptionCharLimit) + "…"}{" "}
-                  {metadata.description.en.length > descriptionCharLimit && (
-                    <Typography
-                      variant="inherit"
-                      color="text.secondary"
-                      component="span"
-                      onClick={() => setShowFullDescription(!showFullDescription)}
-                      sx={{
-                        cursor: "pointer",
-                        textDecoration: "underline",
-                      }}
-                    >
-                      {showFullDescription ? "Show less" : "Show more"}
-                    </Typography>
-                  )}
-                </span>
-              )}
-            </div>
-            {metadata.categories && metadata.categories.length > 0 && (
-              <div>
-                <SectionTitle>Categories</SectionTitle>
-                <Stack direction="row" gap={1} flexWrap={"wrap"}>
-                  {metadata.categories
-                    .slice(0, !showAllCategories ? 3 : metadata.categories.length)
-                    .map((category) => (
-                      <Chip key={category} label={category} size="small" />
-                    ))}
-                  {!showAllCategories && metadata.categories.length > 3 && (
-                    <Chip
-                      label={`+${metadata.categories.length - 3} more`}
-                      size="small"
-                      onClick={() => setShowAllCategories(true)}
-                    />
-                  )}
-                  {showAllCategories && metadata.categories.length > 3 && (
-                    <Chip
-                      label={"Show less"}
-                      size="small"
-                      onClick={() => setShowAllCategories(false)}
-                    />
-                  )}
-                </Stack>
-              </div>
-            )}
-            {/* Genesis Date */}
-            {metadata.genesis_date && (
-              <div>
-                <SectionTitle>Genesis Date</SectionTitle>
-                <TimestampBlock
-                  timestamp={new Date(metadata.genesis_date).getTime()}
-                  variant="simple"
+                  linkText={`See on block explorer`}
+                  size="small"
                 />
               </div>
             )}
-            {/* last_updated */}
-            {/* watchlist_portfolio_users */}
-            {/* market data */}
-            {/* community data */}
-            {/* dev data? */}
-            {/* tickers */}
-            {/* platforms */}
-            {/* markets */}
+            {!!metadata && (
+              <>
+                {metadata.links && (
+                  <div>
+                    <SectionTitle>Links</SectionTitle>
+                    <Stack direction="row" gap={1} flexWrap="wrap">
+                      <Chip
+                        href={`https://coingecko.com/en/coins/${metadata.id}`}
+                        component={AppLink}
+                        sx={{ borderRadius: 12 }}
+                        onClick={() => {
+                          //
+                        }}
+                        label={metadata.id}
+                        icon={<CoinGeckoIcon height="1rem" width="1.5rem" />}
+                      />
+                      {metadata.links.homepage && metadata.links.homepage[0] && (
+                        <Chip
+                          href={metadata.links.homepage[0]}
+                          component={AppLink}
+                          sx={{ borderRadius: 12 }}
+                          onClick={noop}
+                          label={formatWebsiteLink(metadata.links.homepage[0])}
+                          icon={<Language sx={{ height: "1rem !important" }} />}
+                        />
+                      )}
+                      {metadata.links.twitter_screen_name && (
+                        <Chip
+                          href={`https://twitter.com/${metadata.links.twitter_screen_name}`}
+                          component={AppLink}
+                          sx={{ borderRadius: 12 }}
+                          onClick={noop}
+                          label={metadata.links.twitter_screen_name}
+                          icon={<Twitter sx={{ height: "1rem !important" }} />}
+                        />
+                      )}
+                      {metadata.links.subreddit_url && (
+                        <Chip
+                          href={metadata.links.subreddit_url}
+                          component={AppLink}
+                          sx={{ borderRadius: 12 }}
+                          onClick={noop}
+                          label={formatWebsiteLink(
+                            metadata.links.subreddit_url.replace("reddit.com/", "")
+                          )}
+                          icon={<Reddit sx={{ height: "1rem !important" }} />}
+                        />
+                      )}
+                      {metadata.links.telegram_channel_identifier && (
+                        <Chip
+                          href={`https://t.me/${metadata.links.telegram_channel_identifier}`}
+                          component={AppLink}
+                          sx={{ borderRadius: 12 }}
+                          onClick={noop}
+                          label={metadata.links.telegram_channel_identifier}
+                          icon={<Telegram sx={{ height: "1rem !important" }} />}
+                        />
+                      )}
+                      {metadata.links.chat_url && metadata.links.chat_url[0] && (
+                        <Chip
+                          href={metadata.links.chat_url[0]}
+                          component={AppLink}
+                          sx={{ borderRadius: 12 }}
+                          onClick={noop}
+                          label={formatWebsiteLink(metadata.links.chat_url[0])}
+                          icon={<DiscordIcon height="1rem" />}
+                        />
+                      )}
+                      {metadata.links.repos_url.github && metadata.links.repos_url.github[0] && (
+                        <Chip
+                          href={metadata.links.repos_url.github[0]}
+                          component={AppLink}
+                          sx={{ borderRadius: 12 }}
+                          onClick={noop}
+                          label={formatWebsiteLink(
+                            metadata.links.repos_url.github[0].replace("github.com/", "")
+                          )}
+                          icon={<GitHub sx={{ height: "1rem !important" }} />}
+                        />
+                      )}
+                    </Stack>
+                  </div>
+                )}
+                <div>
+                  <SectionTitle>Description</SectionTitle>
+                  {!metadata.description.en ? (
+                    <span>No description available.</span>
+                  ) : (
+                    <span>
+                      {showFullDescription
+                        ? metadata.description.en
+                        : metadata.description.en.substring(0, descriptionCharLimit) + "…"}{" "}
+                      {metadata.description.en.length > descriptionCharLimit && (
+                        <Typography
+                          variant="inherit"
+                          color="text.secondary"
+                          component="span"
+                          onClick={() => setShowFullDescription(!showFullDescription)}
+                          sx={{
+                            cursor: "pointer",
+                            textDecoration: "underline",
+                          }}
+                        >
+                          {showFullDescription ? "Show less" : "Show more"}
+                        </Typography>
+                      )}
+                    </span>
+                  )}
+                </div>
+                {metadata.categories && metadata.categories.length > 0 && (
+                  <div>
+                    <SectionTitle>Categories</SectionTitle>
+                    <Stack direction="row" gap={1} flexWrap={"wrap"}>
+                      {metadata.categories
+                        .slice(0, !showAllCategories ? 3 : metadata.categories.length)
+                        .map((category) => (
+                          <Chip key={category} label={category} size="small" />
+                        ))}
+                      {!showAllCategories && metadata.categories.length > 3 && (
+                        <Chip
+                          label={`+${metadata.categories.length - 3} more`}
+                          size="small"
+                          onClick={() => setShowAllCategories(true)}
+                        />
+                      )}
+                      {showAllCategories && metadata.categories.length > 3 && (
+                        <Chip
+                          label={"Show less"}
+                          size="small"
+                          onClick={() => setShowAllCategories(false)}
+                        />
+                      )}
+                    </Stack>
+                  </div>
+                )}
+                {/* Genesis Date */}
+                {metadata.genesis_date && (
+                  <div>
+                    <SectionTitle>Genesis Date</SectionTitle>
+                    <TimestampBlock
+                      timestamp={new Date(metadata.genesis_date).getTime()}
+                      variant="simple"
+                    />
+                  </div>
+                )}
+                {/* last_updated */}
+                {/* watchlist_portfolio_users */}
+                {/* market data */}
+                {/* community data */}
+                {/* dev data? */}
+                {/* tickers */}
+                {/* platforms */}
+                {/* markets */}
+              </>
+            )}
           </Stack>
         </Typography>
       </Paper>
-      {metadata.detail_platforms && Object.entries(metadata.detail_platforms).length > 0 && (
+      {metadata?.detail_platforms && Object.entries(metadata.detail_platforms).length > 0 && (
         <Paper sx={{ alignSelf: "flex-start", paddingY: 0.5 }}>
           <Table sx={{ width: "fit-content" }} size="small">
             <TableHead>

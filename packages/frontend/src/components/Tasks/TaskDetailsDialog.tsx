@@ -56,6 +56,9 @@ export function TaskDetailsDialog({ task, ...props }: DialogProps & { task: Serv
           .filter((x) => x !== null)
       })
       .then(setProgressLogs)
+      .catch(() => {
+        setProgressLogs([[Date.now(), [undefined, "Error: Failed to load server task logs"]]])
+      })
   }, [rpc, task, activeAccount])
 
   const connectionStatus = useStore($connectionStatus)
