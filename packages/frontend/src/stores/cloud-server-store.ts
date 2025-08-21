@@ -1,4 +1,3 @@
-import { isEqual } from "lodash-es"
 import { atom, computed } from "nanostores"
 import { enqueueSnackbar } from "notistack"
 import {
@@ -18,10 +17,12 @@ import {
 import { logAtoms } from "src/utils/browser-utils"
 import { cloudEnabled, isProduction } from "src/utils/environment-utils"
 import { logAndReportError } from "src/utils/error-utils"
+import { setIfChanged } from "src/utils/store-utils"
 import { sleep } from "src/utils/utils"
 import { $cloudRest } from "src/workers/remotes"
 
-import { $cloudAuth, setPassword, unlockApp } from "./auth-store"
+import { $cloudConnectionStatus } from "./account-store"
+import { $cloudAuth, checkAuthentication, setPassword, unlockApp } from "./auth-store"
 
 export type ServerInfo = {
   buildDate: string
@@ -48,6 +49,13 @@ export const $cloudRpcReady = computed([$cloudAuth], (auth) => {
   return auth.checked && auth.isAuthenticated && !auth.needsSetup
 })
 
+$cloudConnectionStatus.listen((status) => {
+  if (status === "closed") {
+    checkCloudServerInfo()
+    checkAuthentication($cloudAuth, $cloudRest.get())
+  }
+})
+
 logAtoms({
   $cloudAvailable,
   $cloudInstance,
@@ -72,8 +80,7 @@ export async function checkSubscription() {
   if (!isProduction) console.log("PrivateCloud -", "checking service subscription")
   return getSubscription()
     .then((sub) => {
-      if (isEqual(sub, $cloudSubscription.get())) return
-      $cloudSubscription.set(sub)
+      setIfChanged($cloudSubscription, sub)
     })
     .catch((err) => {
       logAndReportError(err as Error, "Error fetching cloud subscription")
@@ -106,8 +113,7 @@ export async function checkCloudServerInfo() {
   return fetch(`https://${user.id}.privatefolio.app/info`)
     .then((res) => res.json())
     .then((info) => {
-      if (isEqual(info, $cloudServerInfo.get())) return
-      $cloudServerInfo.set(info)
+      setIfChanged($cloudServerInfo, info)
     })
     .catch((err: Error) => {
       console.warn("Error fetching cloud server info:", err)

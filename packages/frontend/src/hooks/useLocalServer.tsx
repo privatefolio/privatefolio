@@ -2,7 +2,7 @@ import { useStore } from "@nanostores/react"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { LocalServerStatus, SystemInfo } from "src/interfaces"
 import { $localConnectionStatus, $localConnectionStatusText } from "src/stores/account-store"
-import { $localAuth } from "src/stores/auth-store"
+import { $localAuth, checkAuthentication } from "src/stores/auth-store"
 import {
   $localAvailable,
   $localServerInfo,
@@ -10,17 +10,20 @@ import {
 } from "src/stores/local-server-store"
 import { localServerEnabled } from "src/utils/environment-utils"
 import { logAndReportError } from "src/utils/error-utils"
-import { $localRpc } from "src/workers/remotes"
+import { $localRest, $localRpc } from "src/workers/remotes"
 
 export function useLocalServer() {
   const auth = useStore($localAuth)
   const rpc = useStore($localRpc)
   const serverInfo = useStore($localServerInfo)
 
-  const serverStatus = useMemo<LocalServerStatus>(() => {
+  const serverStatus = useMemo<LocalServerStatus | undefined>(() => {
     if (auth.needsSetup) return "needs setup"
     if (auth.checked && !auth.needsSetup && !auth.isAuthenticated && !auth.errorMessage) {
       return "needs login"
+    }
+    if (auth.checked && auth.needsSetup) {
+      return "needs setup"
     }
     return "running"
   }, [auth])
@@ -28,6 +31,7 @@ export function useLocalServer() {
   useEffect(() => {
     const interval = setInterval(async () => {
       await checkLocalServerInfo()
+      await checkAuthentication($localAuth, $localRest.get())
     }, 5_000)
 
     return () => {
@@ -56,7 +60,7 @@ export function useLocalServer() {
     checkLocalServerInfo()
   }, [])
 
-  const loading = !auth.checked
+  const loading = !auth.checked && !serverInfo
   const localAvailable = useStore($localAvailable)
 
   return {

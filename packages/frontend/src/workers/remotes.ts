@@ -95,7 +95,12 @@ export const $localRpc = computed([$localAuth], () => {
   if (!localServerEnabled) return null
 
   const newAddress = getWebSocketUrl(BASE_LOCAL_SERVER_URL, LOCAL_JWT_STORATE_KEY)
-  if (latestLocalRpc && latestLocalRpc.address === newAddress) return latestLocalRpc
+  if (
+    latestLocalRpc &&
+    latestLocalRpc.address === newAddress &&
+    $localConnectionStatus.get() === "connected"
+  )
+    return latestLocalRpc
 
   if (latestLocalRpc) latestLocalRpc.closeConnection()
 
@@ -139,7 +144,12 @@ export const $cloudRpc = computed([$cloudUser, $cloudRpcReady], (cloudUser, clou
   if (!cloudRpcReady) return null
 
   const newAddress = getWebSocketUrl(REMOTE_SERVER_URL(cloudUser), CLOUD_JWT_STORATE_KEY)
-  if (latestCloudRpc && latestCloudRpc.address === newAddress) return latestCloudRpc
+  if (
+    latestCloudRpc &&
+    latestCloudRpc.address === newAddress &&
+    $cloudConnectionStatus.get() === "connected"
+  )
+    return latestCloudRpc
 
   if (latestCloudRpc) latestCloudRpc.closeConnection()
 

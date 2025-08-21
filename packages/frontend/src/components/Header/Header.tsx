@@ -34,14 +34,9 @@ export function Header() {
         position="fixed"
         elevation={0}
         sx={{
-          "& button, & .MuiInputBase-root, & a": {
-            WebkitAppRegion: "no-drag",
-          },
-          WebkitAppRegion: "drag",
           backdropFilter: "none !important",
           backgroundColor: "var(--mui-palette-background-default)",
           border: "none",
-          // zIndex: 1001,
         }}
       >
         <Fade in={showAppBar} timeout={400}>
@@ -108,10 +103,6 @@ export function Header() {
       position="sticky"
       elevation={0}
       sx={{
-        "& button, & .MuiInputBase-root": {
-          WebkitAppRegion: "no-drag",
-        },
-        WebkitAppRegion: "drag",
         backdropFilter: "none !important",
         backgroundColor: "var(--mui-palette-background-default)",
         border: "none",
@@ -143,11 +134,6 @@ export function Header() {
             <Stack direction="row" gap={1} alignItems="center" justifyContent="flex-end">
               <TaskDropdown />
               <CurrencySelector />
-              {/* <Tooltip title="Server status">
-                <IconButton size="small">
-                  <Dns />
-                </IconButton>
-              </Tooltip> */}
               <Stack direction="row" alignItems="center">
                 <NotificationDropdown />
                 {activeAccountType === "cloud" && <CloudServerButton />}

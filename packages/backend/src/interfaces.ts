@@ -1079,4 +1079,4 @@ export interface HealthStats {
 
 export type ConnectionStatus = "connected" | "closed"
 
-export type LocalServerStatus = "needs setup" | "needs login" | "running"
+export type LocalServerStatus = "needs setup" | "needs login" | "running" | "errored"

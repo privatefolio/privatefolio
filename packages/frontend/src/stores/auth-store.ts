@@ -1,6 +1,7 @@
 import { atom, computed, WritableAtom } from "nanostores"
 import { logAtoms } from "src/utils/browser-utils"
 import { logAndReportError } from "src/utils/error-utils"
+import { patchIfChanged, setIfChanged } from "src/utils/store-utils"
 import { sleep } from "src/utils/utils"
 import { RestConfig } from "src/workers/remotes"
 
@@ -11,27 +12,21 @@ export interface AuthState {
   errorMessage?: string
   isAuthenticated: boolean
   kioskMode: boolean
-  loading: boolean
+  mutating: boolean
   needsSetup: boolean
 }
 
-export const $localAuth = atom<AuthState>({
+export const DEFAULT_AUTH_STATE: AuthState = {
   checked: false,
   errorMessage: undefined,
   isAuthenticated: false,
   kioskMode: false,
-  loading: false,
+  mutating: false,
   needsSetup: false,
-})
+}
 
-export const $cloudAuth = atom<AuthState>({
-  checked: false,
-  errorMessage: undefined,
-  isAuthenticated: false,
-  kioskMode: false,
-  loading: false,
-  needsSetup: false,
-})
+export const $localAuth = atom<AuthState>(DEFAULT_AUTH_STATE)
+export const $cloudAuth = atom<AuthState>(DEFAULT_AUTH_STATE)
 
 export const $auth = computed(
   [$activeAccountType, $localAuth, $cloudAuth],
@@ -47,34 +42,43 @@ export async function checkAuthentication(atom: WritableAtom<AuthState>, api: Re
   const { baseUrl, jwtKey } = api
 
   try {
-    const jwt = localStorage.getItem(jwtKey)
+    /**
+     * Check if the server is set up
+     */
     const statusRes = await fetch(`${baseUrl}/api/setup-status`)
     if (!statusRes.ok) {
-      atom.set({ ...atom.get(), errorMessage: "Failed to check setup status." })
-    } else {
-      const { needsSetup, kioskMode } = (await statusRes.json()) as {
-        kioskMode: boolean
-        needsSetup: boolean
-      }
-      if (needsSetup) {
-        atom.set({ ...atom.get(), checked: true, kioskMode, loading: false, needsSetup })
-        return
-      }
-      if (kioskMode && !jwt) {
-        atom.set({
-          ...atom.get(),
-          checked: true,
-          isAuthenticated: true,
-          kioskMode,
-          loading: false,
-          needsSetup: false,
-        })
-        return
-      }
+      setIfChanged(atom, {
+        ...DEFAULT_AUTH_STATE,
+        checked: true,
+        errorMessage: "Failed to check setup status.",
+      })
+      return
+    }
+
+    const { needsSetup, kioskMode } = (await statusRes.json()) as {
+      kioskMode: boolean
+      needsSetup: boolean
+    }
+
+    if (needsSetup) {
+      setIfChanged(atom, { ...DEFAULT_AUTH_STATE, checked: true, kioskMode, needsSetup })
+      return
+    }
+
+    const jwt = localStorage.getItem(jwtKey)
+
+    if (kioskMode && !jwt) {
+      setIfChanged(atom, {
+        ...DEFAULT_AUTH_STATE,
+        checked: true,
+        isAuthenticated: true,
+        kioskMode,
+      })
+      return
     }
 
     if (!jwt) {
-      atom.set({ ...atom.get(), checked: true })
+      setIfChanged(atom, { ...DEFAULT_AUTH_STATE, checked: true })
       return
     }
 
@@ -82,30 +86,35 @@ export async function checkAuthentication(atom: WritableAtom<AuthState>, api: Re
       headers: { Authorization: `Bearer ${jwt}` },
     })
 
-    const data = await verifyRes.json()
-    if (data.valid) {
-      atom.set({ ...atom.get(), checked: true, isAuthenticated: true, kioskMode: data.kioskMode })
-    } else {
-      let errorMessage = data.error
+    const { valid, error } = (await verifyRes.json()) as {
+      error?: string
+      valid: boolean
+    }
+
+    if (!valid) {
+      let errorMessage = error!
       if (errorMessage.includes("expired")) {
         errorMessage = "Session expired. Please login again."
       }
-
-      atom.set({
-        ...atom.get(),
+      setIfChanged(atom, {
+        ...DEFAULT_AUTH_STATE,
         checked: true,
         errorMessage,
-        isAuthenticated: false,
       })
+      return
     }
+
+    setIfChanged(atom, {
+      ...DEFAULT_AUTH_STATE,
+      checked: true,
+      isAuthenticated: true,
+    })
   } catch (error) {
     logAndReportError(error, "Authentication check failed")
-    atom.set({
-      ...atom.get(),
+    setIfChanged(atom, {
+      ...DEFAULT_AUTH_STATE,
       checked: true,
       errorMessage: `Cannot connect to server at ${baseUrl}.`,
-      isAuthenticated: false,
-      loading: false,
     })
   }
 }
@@ -114,13 +123,7 @@ export function lockApp(atom: WritableAtom<AuthState>, api: RestConfig | null) {
   if (!api) return
   const { jwtKey } = api
   localStorage.removeItem(jwtKey)
-  // Reset auth state, keeping setup status known
-  atom.set({
-    ...atom.get(),
-    errorMessage: undefined,
-    isAuthenticated: false,
-    loading: false,
-  })
+  setIfChanged(atom, { ...DEFAULT_AUTH_STATE, checked: true, isAuthenticated: false })
 }
 
 /**
@@ -134,7 +137,7 @@ export async function setPassword(
 ) {
   if (!api) return
   const { baseUrl } = api
-  atom.set({ ...atom.get(), loading: true })
+  patchIfChanged(atom, { mutating: true })
 
   try {
     const response = await fetch(`${baseUrl}/api/setup`, {
@@ -144,25 +147,19 @@ export async function setPassword(
     })
 
     if (response.status === 201) {
-      atom.set({
-        ...atom.get(),
-        errorMessage: undefined,
-        loading: false,
-        needsSetup: false,
-      })
+      patchIfChanged(atom, { errorMessage: undefined, mutating: false, needsSetup: false })
     } else {
       const errorData = await response
         .json()
         .catch(() => ({ error: "Failed to parse error response" }))
       const errorMessage = errorData?.error || `HTTP error! status: ${response.status}`
-      atom.set({ ...atom.get(), errorMessage, loading: false })
+      patchIfChanged(atom, { errorMessage, mutating: false })
     }
   } catch (error) {
     logAndReportError(error, "Authentication setup failed")
-    atom.set({
-      ...atom.get(),
+    patchIfChanged(atom, {
       errorMessage: `Cannot connect to server at ${baseUrl}.`,
-      loading: false,
+      mutating: false,
     })
   }
 }
@@ -179,7 +176,7 @@ export async function unlockApp(
   if (!api) return
   const { baseUrl, jwtKey } = api
 
-  atom.set({ ...atom.get(), loading: true })
+  patchIfChanged(atom, { mutating: true })
   try {
     const response = await fetch(`${baseUrl}/api/login`, {
       body: JSON.stringify({ password }),
@@ -192,12 +189,7 @@ export async function unlockApp(
       if (!data.token) throw new Error("No token received from login endpoint.")
 
       localStorage.setItem(jwtKey, data.token)
-      atom.set({
-        ...atom.get(),
-        errorMessage: undefined,
-        isAuthenticated: true,
-        loading: false,
-      })
+      patchIfChanged(atom, { errorMessage: undefined, isAuthenticated: true, mutating: false })
     } else {
       const errorData = await response
         .json()
@@ -209,10 +201,9 @@ export async function unlockApp(
     logAndReportError(error, "Login request failed")
 
     await sleep(1_000)
-    atom.set({
-      ...atom.get(),
+    patchIfChanged(atom, {
       errorMessage: error instanceof Error ? error.message : String(error),
-      loading: false,
+      mutating: false,
     })
 
     throw error

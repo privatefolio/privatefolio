@@ -297,6 +297,16 @@ export const theme: CssVarsThemeOptions = {
         },
       },
     },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          "& button, & .MuiInputBase-root, & a": {
+            WebkitAppRegion: "no-drag",
+          },
+          WebkitAppRegion: "drag",
+        },
+      },
+    },
     MuiAutocomplete: {
       defaultProps: {
         slotProps: {
@@ -509,6 +519,7 @@ export const theme: CssVarsThemeOptions = {
           borderRight: "none",
           borderTop: isWindows || isLinux ? undefined : "none",
           borderTopLeftRadius: isWindows || isLinux ? "16px !important" : 0,
+          maxHeight: isWindows || isLinux ? `calc(100% - ${appBarHeight}px)` : undefined,
           top: isWindows || isLinux ? appBarHeight : 0,
         },
       },

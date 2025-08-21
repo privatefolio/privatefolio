@@ -29,6 +29,7 @@ import { $auth, $cloudAuth, $localAuth, checkAuthentication } from "./stores/aut
 import { $cloudRpcReady } from "./stores/cloud-server-store"
 import { fetchInMemoryData } from "./stores/metadata-store"
 import { closeSubscription } from "./utils/browser-utils"
+import { setIfChanged } from "./utils/store-utils"
 import { noop } from "./utils/utils"
 import { $cloudRest, $cloudRpc, $localRest, $localRpc, $rpc } from "./workers/remotes"
 
@@ -65,16 +66,14 @@ export default function App() {
   useEffect(() => {
     const apiNotReady =
       !localAuth.checked || localAuth.needsSetup || !localAuth.isAuthenticated || !localRpc
-    if (apiNotReady && $localAccounts.get() !== undefined) {
-      $localAccounts.set(undefined)
-    }
+    if (apiNotReady) setIfChanged($localAccounts, undefined)
     if (apiNotReady) return
 
-    localRpc.getAccountNames().then($localAccounts.set)
+    localRpc.getAccountNames().then((x) => setIfChanged($localAccounts, x))
 
     const subscription = localRpc.subscribeToAccounts(() => {
       setTimeout(() => {
-        localRpc.getAccountNames().then($localAccounts.set)
+        localRpc.getAccountNames().then((x) => setIfChanged($localAccounts, x))
       }, INPUT_DEBOUNCE_DURATION)
     })
 
@@ -96,16 +95,14 @@ export default function App() {
 
   useEffect(() => {
     const apiReady = cloudRpcReady && cloudRpc
-    if (!apiReady && $cloudAccounts.get() !== undefined) {
-      $cloudAccounts.set(undefined)
-    }
+    if (!apiReady) setIfChanged($cloudAccounts, undefined)
     if (!apiReady) return
 
-    cloudRpc.getAccountNames().then($cloudAccounts.set)
+    cloudRpc.getAccountNames().then((x) => setIfChanged($cloudAccounts, x))
 
     const subscription = cloudRpc.subscribeToAccounts(() => {
       setTimeout(() => {
-        cloudRpc.getAccountNames().then($cloudAccounts.set)
+        cloudRpc.getAccountNames().then((x) => setIfChanged($cloudAccounts, x))
       }, INPUT_DEBOUNCE_DURATION)
     })
 

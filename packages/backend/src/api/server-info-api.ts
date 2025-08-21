@@ -1,4 +1,5 @@
 import { SystemInfo } from "src/interfaces"
+import { logger } from "src/logger"
 import { logAndReportError } from "src/utils/error-utils"
 import { createSystemInfo } from "src/utils/server-utils"
 
@@ -36,6 +37,6 @@ export async function ensureSystemInfo(): Promise<SystemInfo> {
 export async function refreshSystemInfo(): Promise<SystemInfo> {
   const systemInfo = createSystemInfo()
   await setSystemInfo(systemInfo)
-  console.log("🔄 Refreshed system info:", systemInfo)
+  logger.info("Refreshed system info")
   return systemInfo
 }

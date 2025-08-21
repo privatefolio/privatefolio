@@ -24,7 +24,7 @@ import { $localAuth, setPassword, unlockApp } from "../../stores/auth-store"
 import { AppLink } from "../AppLink"
 
 export default function LocalLoginForm() {
-  const { isAuthenticated, errorMessage, loading, checked, needsSetup } = useStore($localAuth)
+  const { isAuthenticated, errorMessage, mutating, checked, needsSetup } = useStore($localAuth)
   const [password, setPasswordValue] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [validationError, setValidationError] = useState<string | null>(null)
@@ -153,7 +153,7 @@ export default function LocalLoginForm() {
                     value={password}
                     onChange={handlePasswordChange}
                     error={!!validationError || !!errorMessage}
-                    disabled={loading}
+                    disabled={mutating}
                     InputProps={{
                       endAdornment: passwordAdornment,
                     }}
@@ -171,7 +171,7 @@ export default function LocalLoginForm() {
                     value={confirmPassword}
                     onChange={handleConfirmPasswordChange}
                     error={!!validationError || !!errorMessage}
-                    disabled={loading}
+                    disabled={mutating}
                     InputProps={{
                       endAdornment: passwordAdornment,
                     }}
@@ -184,9 +184,9 @@ export default function LocalLoginForm() {
                 <Button
                   type="submit"
                   variant="contained"
-                  disabled={loading || !password || !confirmPassword}
+                  disabled={mutating || !password || !confirmPassword}
                 >
-                  {loading ? "Setting password…" : "Set password"}
+                  {mutating ? "Setting password…" : "Set password"}
                 </Button>
               </CardActions>
             </>
@@ -209,7 +209,7 @@ export default function LocalLoginForm() {
                     value={password}
                     onChange={handlePasswordChange}
                     error={!!errorMessage}
-                    disabled={loading}
+                    disabled={mutating}
                     InputProps={{
                       endAdornment: passwordAdornment,
                     }}
@@ -218,8 +218,8 @@ export default function LocalLoginForm() {
                 {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
               </CardContent>
               <CardActions sx={{ paddingX: 3 }}>
-                <Button type="submit" variant="contained" disabled={loading}>
-                  {loading ? "Unlocking…" : "Unlock"}
+                <Button type="submit" variant="contained" disabled={mutating}>
+                  {mutating ? "Unlocking…" : "Unlock"}
                 </Button>
               </CardActions>
             </>
