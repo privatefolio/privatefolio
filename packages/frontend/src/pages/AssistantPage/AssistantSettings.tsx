@@ -67,17 +67,13 @@ export function AssistantSettings() {
           "assistant_custom_api_key",
           ""
         )
-        const localApiUrlEncrypted = await rpc.getValue(
-          activeAccount,
-          "assistant_custom_api_url",
-          ""
-        )
+        const localApiUrl = await rpc.getValue(activeAccount, "assistant_custom_api_url", "")
 
         setOpenaiApiKey(openaiKeyEncrypted ? "encrypted" : "")
         setPerplexityApiKey(perplexityKeyEncrypted ? "encrypted" : "")
         setAnthropicApiKey(anthropicKeyEncrypted ? "encrypted" : "")
         setCustomApiKey(localApiKeyEncrypted ? "encrypted" : "")
-        setCustomApiUrl(localApiUrlEncrypted ? "encrypted" : "")
+        setCustomApiUrl(localApiUrl)
       } catch (error) {
         logAndReportError(error, "Failed to load assistant settings")
         enqueueSnackbar("Failed to load assistant settings", { variant: "error" })
@@ -111,9 +107,7 @@ export function AssistantSettings() {
       if (customApiKey !== "encrypted") {
         await rpc.setEncryptedValue(activeAccount, "assistant_custom_api_key", customApiKey)
       }
-      if (customApiUrl !== "encrypted") {
-        await rpc.setEncryptedValue(activeAccount, "assistant_custom_api_url", customApiUrl)
-      }
+      await rpc.setValue(activeAccount, "assistant_custom_api_url", customApiUrl)
 
       enqueueSnackbar("Assistant settings saved", { variant: "success" })
     } catch (error) {
@@ -253,7 +247,7 @@ export function AssistantSettings() {
                 endpoint.
                 <br />
                 <br />
-                Example: http://localhost:12434/engines/v1
+                Example: http://localhost:12434/engines/v1 (Docker model runner)
               </>
             }
           >

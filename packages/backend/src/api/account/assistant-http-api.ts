@@ -4,6 +4,7 @@ import { createOpenAICompatible } from "@ai-sdk/openai-compatible"
 import { createPerplexity } from "@ai-sdk/perplexity"
 import { JSONValue, LanguageModelV1, Message, StepResult, streamText, Tool } from "ai"
 import { ChatMessage } from "src/interfaces"
+import { PRIVATE_CLOUD_URL } from "src/server-env"
 import { getAssistantSystemPrompt, getAssistantTools, MAX_STEPS } from "src/settings/assistant"
 import { AssistantModel, AVAILABLE_MODELS, ModelFamily } from "src/settings/assistant-models"
 import { logAndReportError } from "src/utils/error-utils"
@@ -113,7 +114,7 @@ async function getApiKey(accountName: string, provider: ModelFamily): Promise<st
       if (!apiKeyEncrypted) {
         return "" // No API key configured - some custom servers don't need one
       }
-      const apiKey = await decryptValue(apiKeyEncrypted, secrets.jwtSecret)
+      const apiKey = await decryptValue(apiKeyEncrypted, jwtSecret)
       return apiKey || ""
     }
     default:
@@ -121,7 +122,7 @@ async function getApiKey(accountName: string, provider: ModelFamily): Promise<st
   }
 
   if (!apiKeyEncrypted) {
-    throw new Error(`${provider} API key not configured`)
+    return ""
   }
 
   const apiKey = await decryptValue(apiKeyEncrypted, jwtSecret)
@@ -131,18 +132,6 @@ async function getApiKey(accountName: string, provider: ModelFamily): Promise<st
   }
 
   return apiKey
-}
-
-async function getCustomApiUrl(accountName: string): Promise<string> {
-  const secrets = (await readSecrets()) as AuthSecrets
-  const apiUrlEncrypted = await getValue(accountName, "assistant_custom_api_url")
-
-  if (!apiUrlEncrypted) {
-    return "http://localhost:12434/engines/v1" // Default fallback URL
-  }
-
-  const apiUrl = await decryptValue(apiUrlEncrypted, secrets.jwtSecret)
-  return apiUrl || "http://localhost:12434/engines/v1"
 }
 
 type AssistantChatRequest = {
@@ -196,8 +185,13 @@ export async function handleAssistantChat(request: Request, writeApi: Api): Prom
     let providerOptions: Record<string, Record<string, JSONValue>>
 
     switch (model.family) {
-      case "openai":
-        llmModel = createOpenAI({ apiKey, compatibility: "strict" }).responses(model.id)
+      case "openai": {
+        const openai = createOpenAI({
+          apiKey,
+          baseURL: !apiKey ? `${PRIVATE_CLOUD_URL}/ai-proxy/v1` : undefined,
+          compatibility: !apiKey ? "strict" : "compatible",
+        })
+        llmModel = openai.responses(model.id)
         providerOptions = {
           openai: {
             reasoningEffort: "medium",
@@ -208,10 +202,7 @@ export async function handleAssistantChat(request: Request, writeApi: Api): Prom
           tools = {
             // https://ai-sdk.dev/cookbook/node/web-search-agent#using-native-web-search
             webSearch: {
-              ...createOpenAI({
-                apiKey,
-                compatibility: "strict",
-              }).tools.webSearchPreview(),
+              ...openai.tools.webSearchPreview(),
               description:
                 "Search the web/internet for current market information, news, and external data",
             },
@@ -219,11 +210,13 @@ export async function handleAssistantChat(request: Request, writeApi: Api): Prom
           }
         }
         break
-      case "perplexity":
+      }
+      case "perplexity": {
         llmModel = createPerplexity({ apiKey }).languageModel(model.id)
         tools = {}
         break
-      case "anthropic":
+      }
+      case "anthropic": {
         llmModel = createAnthropic({ apiKey }).languageModel(model.id)
         if (model.capabilities?.includes("reasoning")) {
           providerOptions = {
@@ -239,10 +232,14 @@ export async function handleAssistantChat(request: Request, writeApi: Api): Prom
           // https://github.com/vercel/ai/issues/6666#issuecomment-3005289250
         }
         break
+      }
       case "custom": {
-        const customApiUrl = await getCustomApiUrl(accountName)
+        const customApiUrl = await getValue<string>(accountName, "assistant_custom_api_url")
+        if (!customApiUrl) {
+          throw new Error("Custom API URL not configured")
+        }
         llmModel = createOpenAICompatible({
-          apiKey: apiKey || undefined,
+          apiKey,
           baseURL: customApiUrl,
           name: "custom",
         }).languageModel(model.id)
