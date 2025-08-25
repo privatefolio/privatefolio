@@ -59,7 +59,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 options={{
                   disableDocumentLock: true,
                   // enableHistory: true, does not do what I expected it to do
-                  toggleShortcut: "/",
+                  toggleShortcut: "dqwuydgyquwd",
                 }}
               >
                 <SnackbarProvider
