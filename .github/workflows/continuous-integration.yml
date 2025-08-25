@@ -63,6 +63,8 @@ jobs:
       - name: Test
         if: always()
         run: yarn test:ci
+        env:
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
 
       - name: Notify Discord on success
         if: success()
