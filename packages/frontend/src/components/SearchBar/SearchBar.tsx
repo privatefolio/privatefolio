@@ -59,6 +59,7 @@ import {
   handleExportTransactionsRequest,
   onRestoreRequest,
 } from "src/utils/backup-utils"
+import { isInputFocused } from "src/utils/browser-utils"
 import { isElectron } from "src/utils/electron-utils"
 import { formatDateRelative, formatPrivatefolioTxId } from "src/utils/formatting-utils"
 import { normalizeTxHash } from "src/utils/parsing-utils"
@@ -611,12 +612,30 @@ export const SearchBar = () => {
 
   useRegisterActions(actions, [actions])
 
+  const handleClick = useCallback(() => {
+    // onClick={() => kb.setVisualState(VisualState.animatingIn)}
+    kb.setVisualState(VisualState.showing)
+  }, [kb])
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (isInputFocused()) return
+      if (event.key === "/") {
+        handleClick()
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown)
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [handleClick])
+
   return (
     <>
       <Tooltip title={SEARCH_PLACEHOLDER}>
         <Button
-          // onClick={() => kb.setVisualState(VisualState.animatingIn)}
-          onClick={() => kb.setVisualState(VisualState.showing)}
+          onClick={handleClick}
           variant="outlined"
           color="secondary"
           sx={{ gap: 2, paddingY: 0.5 }}

@@ -1,8 +1,10 @@
 import { AnthropicProviderOptions, createAnthropic } from "@ai-sdk/anthropic"
 import { createOpenAI, OpenAIResponsesProviderOptions } from "@ai-sdk/openai"
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible"
 import { createPerplexity } from "@ai-sdk/perplexity"
 import { JSONValue, LanguageModelV1, Message, StepResult, streamText, Tool } from "ai"
 import { ChatMessage } from "src/interfaces"
+import { PRIVATE_CLOUD_URL } from "src/server-env"
 import { getAssistantSystemPrompt, getAssistantTools, MAX_STEPS } from "src/settings/assistant"
 import { AssistantModel, AVAILABLE_MODELS, ModelFamily } from "src/settings/assistant-models"
 import { logAndReportError } from "src/utils/error-utils"
@@ -106,12 +108,21 @@ async function getApiKey(accountName: string, provider: ModelFamily): Promise<st
       apiKeyEncrypted = await getValue(accountName, "assistant_anthropic_key")
       keyPrefix = "sk-ant-"
       break
+    case "custom": {
+      // Custom models may need API keys depending on the server
+      apiKeyEncrypted = await getValue(accountName, "assistant_custom_api_key")
+      if (!apiKeyEncrypted) {
+        return "" // No API key configured - some custom servers don't need one
+      }
+      const apiKey = await decryptValue(apiKeyEncrypted, jwtSecret)
+      return apiKey || ""
+    }
     default:
       throw new Error(`Unsupported provider: ${provider}`)
   }
 
   if (!apiKeyEncrypted) {
-    throw new Error(`${provider} API key not configured`)
+    return ""
   }
 
   const apiKey = await decryptValue(apiKeyEncrypted, jwtSecret)
@@ -174,8 +185,13 @@ export async function handleAssistantChat(request: Request, writeApi: Api): Prom
     let providerOptions: Record<string, Record<string, JSONValue>>
 
     switch (model.family) {
-      case "openai":
-        llmModel = createOpenAI({ apiKey, compatibility: "strict" }).responses(model.id)
+      case "openai": {
+        const openai = createOpenAI({
+          apiKey,
+          baseURL: !apiKey ? `${PRIVATE_CLOUD_URL}/ai-proxy/v1` : undefined,
+          compatibility: !apiKey ? "strict" : "compatible",
+        })
+        llmModel = openai.responses(model.id)
         providerOptions = {
           openai: {
             reasoningEffort: "medium",
@@ -186,10 +202,7 @@ export async function handleAssistantChat(request: Request, writeApi: Api): Prom
           tools = {
             // https://ai-sdk.dev/cookbook/node/web-search-agent#using-native-web-search
             webSearch: {
-              ...createOpenAI({
-                apiKey,
-                compatibility: "strict",
-              }).tools.webSearchPreview(),
+              ...openai.tools.webSearchPreview(),
               description:
                 "Search the web/internet for current market information, news, and external data",
             },
@@ -197,11 +210,13 @@ export async function handleAssistantChat(request: Request, writeApi: Api): Prom
           }
         }
         break
-      case "perplexity":
+      }
+      case "perplexity": {
         llmModel = createPerplexity({ apiKey }).languageModel(model.id)
         tools = {}
         break
-      case "anthropic":
+      }
+      case "anthropic": {
         llmModel = createAnthropic({ apiKey }).languageModel(model.id)
         if (model.capabilities?.includes("reasoning")) {
           providerOptions = {
@@ -217,6 +232,21 @@ export async function handleAssistantChat(request: Request, writeApi: Api): Prom
           // https://github.com/vercel/ai/issues/6666#issuecomment-3005289250
         }
         break
+      }
+      case "custom": {
+        const customApiUrl = await getValue<string>(accountName, "assistant_custom_api_url")
+        if (!customApiUrl) {
+          throw new Error("Custom API URL not configured")
+        }
+        llmModel = createOpenAICompatible({
+          apiKey,
+          baseURL: customApiUrl,
+          name: "custom",
+        }).languageModel(model.id)
+        providerOptions = {}
+        tools = {}
+        break
+      }
       default:
         throw new Error(`Unsupported model: ${model.id}`)
     }

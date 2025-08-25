@@ -35,6 +35,8 @@ export function AssistantSettings() {
   const [openaiApiKey, setOpenaiApiKey] = useState("")
   const [perplexityApiKey, setPerplexityApiKey] = useState("")
   const [anthropicApiKey, setAnthropicApiKey] = useState("")
+  const [customApiKey, setCustomApiKey] = useState("")
+  const [customApiUrl, setCustomApiUrl] = useState("")
   const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
@@ -60,10 +62,18 @@ export function AssistantSettings() {
           "assistant_anthropic_key",
           ""
         )
+        const localApiKeyEncrypted = await rpc.getValue(
+          activeAccount,
+          "assistant_custom_api_key",
+          ""
+        )
+        const localApiUrl = await rpc.getValue(activeAccount, "assistant_custom_api_url", "")
 
         setOpenaiApiKey(openaiKeyEncrypted ? "encrypted" : "")
         setPerplexityApiKey(perplexityKeyEncrypted ? "encrypted" : "")
         setAnthropicApiKey(anthropicKeyEncrypted ? "encrypted" : "")
+        setCustomApiKey(localApiKeyEncrypted ? "encrypted" : "")
+        setCustomApiUrl(localApiUrl)
       } catch (error) {
         logAndReportError(error, "Failed to load assistant settings")
         enqueueSnackbar("Failed to load assistant settings", { variant: "error" })
@@ -94,6 +104,10 @@ export function AssistantSettings() {
       if (anthropicApiKey !== "encrypted") {
         await rpc.setEncryptedValue(activeAccount, "assistant_anthropic_key", anthropicApiKey)
       }
+      if (customApiKey !== "encrypted") {
+        await rpc.setEncryptedValue(activeAccount, "assistant_custom_api_key", customApiKey)
+      }
+      await rpc.setValue(activeAccount, "assistant_custom_api_url", customApiUrl)
 
       enqueueSnackbar("Assistant settings saved", { variant: "success" })
     } catch (error) {
@@ -106,6 +120,7 @@ export function AssistantSettings() {
 
   const [showPasswords, setShowPasswords] = useState({
     anthropic: false,
+    custom: false,
     openai: false,
     perplexity: false,
   })
@@ -221,6 +236,57 @@ export function AssistantSettings() {
             placeholder="sk-ant-..."
             InputProps={{
               endAdornment: createPasswordAdornment("anthropic"),
+            }}
+          />
+        </div>
+        <div>
+          <LearnMore
+            title={
+              <>
+                The base URL for your custom API server. This should be an OpenAI-compatible
+                endpoint.
+                <br />
+                <br />
+                Example: http://localhost:12434/engines/v1 (Docker model runner)
+              </>
+            }
+          >
+            <SectionTitle>Custom API URL</SectionTitle>
+          </LearnMore>
+          <TextField
+            type="text"
+            size="small"
+            value={customApiUrl}
+            onChange={(e) => setCustomApiUrl(e.target.value)}
+            disabled={isLoading}
+            sx={{ minWidth: 320 }}
+            placeholder="http://localhost:12434/engines/v1"
+          />
+        </div>
+        <div>
+          <LearnMore
+            title={
+              <>
+                The API key for your custom API server (if required). Leave empty if no
+                authentication is needed.
+                <br />
+                <br />
+                The key is stored securely (with encryption) and only used for API calls.
+              </>
+            }
+          >
+            <SectionTitle>Custom API Key</SectionTitle>
+          </LearnMore>
+          <TextField
+            type={showPasswords.custom ? "text" : "password"}
+            size="small"
+            value={customApiKey}
+            onChange={(e) => setCustomApiKey(e.target.value)}
+            disabled={isLoading}
+            sx={{ minWidth: 320 }}
+            placeholder="optional..."
+            InputProps={{
+              endAdornment: createPasswordAdornment("custom"),
             }}
           />
         </div>
