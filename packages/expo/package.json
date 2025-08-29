@@ -8,18 +8,16 @@
   "license": "AGPL-3.0",
   "name": "privatefolio-expo",
   "main": "expo-router/entry",
-  "version": "1.0.0",
+  "version": "2.0.0-beta.44",
   "scripts": {
     "dev": "expo start --tunnel",
     "dev:android": "expo start --android",
     "dev:ios": "expo start --ios",
     "dev:web": "expo start --web",
-    "build:android": "eas build --platform android --profile production",
-    "build:ios": "eas build --platform ios --profile production",
-    "build:all": "eas build --platform all --profile production",
-    "submit:android": "eas submit --platform android --profile production",
-    "submit:ios": "eas submit --platform ios --profile production",
-    "submit:all": "eas submit --platform all --profile production",
+    "build-bin:android": "eas build --platform android --profile production",
+    "build-bin:ios": "eas build --platform ios --profile production",
+    "submit-bin:android": "eas submit --platform android --profile production",
+    "submit-bin:ios": "eas submit --platform ios --profile production",
     "publish": "eas build --platform all --profile production && eas submit --platform all --profile production"
   },
   "dependencies": {
