@@ -30,8 +30,8 @@
     "expo-splash-screen": "~0.30.10",
     "expo-status-bar": "~2.2.3",
     "expo-system-ui": "~5.0.10",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
     "react-native": "0.79.5",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
-    "@types/react": "~19.0.10",
+    "@types/react": "~19.1.12",
     "eas-cli": "^16.17.3",
     "typescript": "~5.8.3"
   },
