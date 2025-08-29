@@ -1,0 +1,67 @@
+name: Publish Libraries
+
+on:
+  push:
+    tags: ["*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish-libs:
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          registry-url: https://registry.npmjs.org
+
+      - name: Cache yarn downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/yarn/v6
+          key: yarn-cache-${{ runner.os }}-${{ hashFiles('./yarn.lock') }}
+          restore-keys: yarn-cache-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build @privatefolio/commons
+        run: yarn workspace @privatefolio/commons build
+
+      - name: Build @privatefolio/commons-node
+        run: yarn workspace @privatefolio/commons-node build
+
+      - name: Verify npm auth
+        run: npm whoami
+
+      - name: Publish @privatefolio/commons
+        working-directory: packages/commons
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          NAME=$(node -p "require('./package.json').name")
+          echo "Preparing to publish $NAME@$VERSION"
+          if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
+            echo "$NAME@$VERSION already exists on npm, skipping."
+          else
+            npm publish --access public
+          fi
+
+      - name: Publish @privatefolio/commons-node
+        working-directory: packages/commons-node
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          NAME=$(node -p "require('./package.json').name")
+          echo "Preparing to publish $NAME@$VERSION"
+          if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
+            echo "$NAME@$VERSION already exists on npm, skipping."
+          else
+            npm publish --access public
+          fi

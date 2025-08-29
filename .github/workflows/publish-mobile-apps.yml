@@ -1,4 +1,4 @@
-name: Publish Mobile Apps
+name: Publish mobile apps
 
 on:
   push:
@@ -91,7 +91,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
           status: ${{ needs.build-and-publish-mobile.result == 'success' && 'Success' || 'Failure' }}
-          title: 'Publish Mobile Apps'
+          title: 'Publish mobile apps'
           description: |
             **Branch**: `${{ github.ref_name }}`
             **Commit**: `${{ github.sha }}`
