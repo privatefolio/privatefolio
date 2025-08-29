@@ -82,9 +82,9 @@ yarn test test/tags/tags-api.test.ts
 ## Build for production
 
 ```sh
-yarn build-bin:win
-yarn build-bin:linux
-yarn build-bin:mac
+yarn bundle:win
+yarn bundle:linux
+yarn bundle:mac
 ```
 
 Run `./packages/electron/out/Privatefolio\ Setup\ 2.0.0-beta.38.exe`.

@@ -14,8 +14,8 @@
     "dev:android": "expo start --android",
     "dev:ios": "expo start --ios",
     "dev:web": "expo start --web",
-    "build-bin:android": "eas build --platform android --profile production",
-    "build-bin:ios": "eas build --platform ios --profile production",
+    "bundle:android": "eas build --platform android --profile production",
+    "bundle:ios": "eas build --platform ios --profile production",
     "submit-bin:android": "eas submit --platform android --profile production",
     "submit-bin:ios": "eas submit --platform ios --profile production",
     "publish": "eas build --platform all --profile production && eas submit --platform all --profile production"

@@ -34,7 +34,7 @@ Privatefolio is a free, open-source cryptocurrency portfolio manager built as a 
 
 ## Workflow & Integration
 - **Development:** `yarn dev` runs parallel development servers for frontend and backend, `yarn dev:electron` includes Electron.
-- **Building:** `yarn build` for all packages, platform-specific binaries with `yarn build-bin:[win|linux|mac]`.
+- **Building:** `yarn build` for all packages, platform-specific binaries with `yarn bundle:[win|linux|mac]`.
 - **Testing:** Comprehensive test suite with `yarn test` and `yarn test:bun` for Bun-specific tests, continuous integration with `yarn test:ci`.
 - **Integration:** Packages share common TypeScript interfaces and utilities, with backend exposing APIs consumed by frontend.
 
