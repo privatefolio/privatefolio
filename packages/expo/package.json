@@ -1,0 +1,48 @@
+{
+  "author": {
+    "email": "hello@danielconstantin.net",
+    "name": "Daniel Constantin"
+  },
+  "description": "Mobile version of Privatefolio.",
+  "homepage": "https://privatefolio.xyz",
+  "license": "AGPL-3.0",
+  "name": "privatefolio-expo",
+  "main": "expo-router/entry",
+  "version": "2.0.0-beta.44",
+  "scripts": {
+    "dev": "expo start --tunnel",
+    "dev:android": "expo start --android",
+    "dev:ios": "expo start --ios",
+    "dev:web": "expo start --web",
+    "bundle:android": "eas build --platform android --profile production",
+    "bundle:ios": "eas build --platform ios --profile production",
+    "submit-bin:android": "eas submit --platform android --profile production",
+    "submit-bin:ios": "eas submit --platform ios --profile production",
+    "publish": "eas build --platform all --profile production && eas submit --platform all --profile production"
+  },
+  "dependencies": {
+    "@react-navigation/native": "^7.1.6",
+    "expo": "~53.0.20",
+    "expo-constants": "~17.1.7",
+    "expo-font": "~13.3.2",
+    "expo-linking": "~7.1.7",
+    "expo-router": "~5.1.4",
+    "expo-splash-screen": "~0.30.10",
+    "expo-status-bar": "~2.2.3",
+    "expo-system-ui": "~5.0.10",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-native": "0.79.5",
+    "react-native-safe-area-context": "5.4.0",
+    "react-native-screens": "~4.11.1",
+    "react-native-web": "~0.20.0",
+    "react-native-webview": "13.13.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@types/react": "~19.0.10",
+    "eas-cli": "^16.17.3",
+    "typescript": "~5.8.3"
+  },
+  "private": true
+}

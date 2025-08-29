@@ -27,7 +27,7 @@
     "@logtape/pretty": "^1.1.0-dev.324",
     "@logtape/redaction": "^1.0.4"
   },
-  "description": "Common libraries for privatefolio projects.",
+  "description": "Common libraries to build privatefolio extensions.",
   "homepage": "https://privatefolio.xyz",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.62.0",
@@ -49,7 +49,9 @@
   },
   "keywords": [
     "privatefolio",
-    "commons"
+    "commons",
+    "extension",
+    "extensions"
   ],
   "license": "AGPL-3.0",
   "version": "2.0.0-beta.44",

@@ -108,7 +108,7 @@ Privatefolio is a free, open-source cryptocurrency portfolio manager built as a 
 
 ## Workflow & Integration
 - **Development:** `yarn dev` runs parallel development servers for frontend and backend, `yarn dev:electron` includes Electron.
-- **Building:** `yarn build` for all packages, platform-specific binaries with `yarn build-bin:[win|linux|mac]`.
+- **Building:** `yarn build` for all packages, platform-specific binaries with `yarn bundle:[win|linux|mac]`.
 - **Testing:** Comprehensive test suite with `yarn test` and `yarn test:bun` for Bun-specific tests, continuous integration with `yarn test:ci`.
 - **Integration:** Packages share common TypeScript interfaces and utilities, with backend exposing APIs consumed by frontend.
 
@@ -543,7 +543,7 @@ The application uses Electron Forge for packaging and distribution:
 1. TypeScript is compiled to JavaScript (`yarn build`)
 2. Icons are generated from source images (`yarn gen-icons`)
 3. The app is packaged with Electron Forge (`yarn package`)
-4. Platform-specific installers are created (`yarn build-bin:win`, `yarn build-bin:linux`, `yarn build-bin:mac`)
+4. Platform-specific installers are created (`yarn bundle:win`, `yarn bundle:linux`, `yarn bundle:mac`)
 
 ## Development
 
@@ -567,9 +567,9 @@ To create production builds:
 yarn build
 
 # Create production installers
-yarn build-bin:win
-yarn build-bin:linux
-yarn build-bin:mac
+yarn bundle:win
+yarn bundle:linux
+yarn bundle:mac
 ```
 
 The build process creates platform-specific installers:
@@ -696,7 +696,7 @@ await window.electron.backend.restart();
 
 ## Deployment
 - Static Site: serve `packages/frontend/build` on any web host or Vercel.
-- Electron: packaged into desktop app via `yarn build-bin` in root (see ELECTRON_SETUP.md).
+- Electron: packaged into desktop app via `yarn bundle` in root (see ELECTRON_SETUP.md).
 
 ## Contributing
 - Please read [`CONTRIBUTING.md`](../CONTRIBUTING.md) and [`ARCHITECTURE.md`](./ARCHITECTURE.md) for guidelines on code style, testing, and workflow.
@@ -901,4 +901,3 @@ Tests are a critical gate for accepting pull requests and merging code into the 
 
 
 ---
-

@@ -70,7 +70,7 @@ The application uses Electron Forge for packaging and distribution:
 1. TypeScript is compiled to JavaScript (`yarn build`)
 2. Icons are generated from source images (`yarn gen-icons`)
 3. The app is packaged with Electron Forge (`yarn package`)
-4. Platform-specific installers are created (`yarn build-bin:win`, `yarn build-bin:linux`, `yarn build-bin:mac`)
+4. Platform-specific installers are created (`yarn bundle:win`, `yarn bundle:linux`, `yarn bundle:mac`)
 
 ## Development
 
@@ -94,9 +94,9 @@ To create production builds:
 yarn build
 
 # Create production installers
-yarn build-bin:win
-yarn build-bin:linux
-yarn build-bin:mac
+yarn bundle:win
+yarn bundle:linux
+yarn bundle:mac
 ```
 
 The build process creates platform-specific installers:

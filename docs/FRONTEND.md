@@ -62,7 +62,7 @@
 
 ## Deployment
 - Static Site: serve `packages/frontend/build` on any web host or Vercel.
-- Electron: packaged into desktop app via `yarn build-bin` in root (see ELECTRON_SETUP.md).
+- Electron: packaged into desktop app via `yarn bundle` in root (see ELECTRON_SETUP.md).
 
 ## Contributing
 - Please read [`CONTRIBUTING.md`](../CONTRIBUTING.md) and [`ARCHITECTURE.md`](./ARCHITECTURE.md) for guidelines on code style, testing, and workflow.
