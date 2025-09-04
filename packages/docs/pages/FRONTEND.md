@@ -61,8 +61,9 @@
 - CI: included in `yarn test:ci` via root Lerna workflow
 
 ## Deployment
-- Static Site: serve `packages/frontend/build` on any web host or Vercel.
-- Electron: packaged into desktop app via `yarn bundle` in root (see ELECTRON_SETUP.md).
+- **Web Deployment**: Automatic deployment to Cloudflare Pages via GitHub Actions (see [web-deployment.md](./web-deployment.md)).
+- **Static Site**: Serve `packages/frontend/build` on any web host or Vercel.
+- **Electron**: Packaged into desktop app via `yarn bundle` in root (see ELECTRON_SETUP.md).
 
 ## Contributing
-- Please read [`CONTRIBUTING.md`](../../../CONTRIBUTING.md) and [`ARCHITECTURE.md`](./ARCHITECTURE.md) for guidelines on code style, testing, and workflow.
+- Please read [`CONTRIBUTING.md`](./CONTRIBUTING.md) and [`ARCHITECTURE.md`](./ARCHITECTURE.md) for guidelines on code style, testing, and workflow.
