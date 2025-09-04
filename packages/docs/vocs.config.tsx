@@ -52,10 +52,7 @@ export default defineConfig({
       </>
     )
   },
-  iconUrl: {
-    light: "/favicon-dark.png",
-    dark: "/favicon.png",
-  },
+  iconUrl: "/privatefolio.png",
   socials: [
     {
       icon: "discord",
@@ -97,7 +94,6 @@ export default defineConfig({
         // { text: "Home", link: "/home-page" },
         { text: "Readme", link: "/" },
         { text: "Changelog", link: "/changelog" },
-        { text: "Contributing", link: "/contributing" },
         // { text: "Vision", link: "/vision" },
         // { text: "Roadmap", link: "/roadmap" },
         // {
@@ -120,8 +116,9 @@ export default defineConfig({
     // },
     {
       collapsed: false,
-      text: "Developer docs",
+      text: "Developers",
       items: [
+        { text: "Getting started", link: "/getting-started" },
         { text: "Architecture", link: "/ARCHITECTURE" },
         { text: "Backend", link: "/BACKEND" },
         { text: "Frontend", link: "/FRONTEND" },
@@ -131,6 +128,7 @@ export default defineConfig({
         { text: "Docker Deploy", link: "/DOCKER_DEPLOY" },
         { text: "Desktop apps", link: "/ELECTRON_SETUP" },
         { text: "Web deployment", link: "/web-deployment" },
+        { text: "Guidelines for AI agents and LLMs", link: "/agents-guidelines" },
       ],
     },
   ],

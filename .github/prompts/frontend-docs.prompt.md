@@ -35,6 +35,3 @@ Find the frontend project inside the monorepo at `./packages/frontend` and read 
 
 ## Deployment
 - Instructions for building and deploying the frontend (static site or Electron packaging, Vercel config).
-
-## Contributing
-- Reference `CONTRIBUTING.md` and `ARCHITECTURE.md` for guidelines on code style, testing, and project conventions.

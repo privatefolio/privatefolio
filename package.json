@@ -43,7 +43,6 @@
     "docker:build": "yarn workspace privatefolio-backend docker:build",
     "docker:run": "yarn workspace privatefolio-backend docker:run",
     "docker:remove": "yarn workspace privatefolio-backend docker:remove",
-    "generate-llms-txt": "node scripts/generate-llms-txt.js",
     "preview-docs": "yarn workspace @privatefolio/docs preview"
   },
   "devDependencies": {

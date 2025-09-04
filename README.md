@@ -4,9 +4,9 @@
 
 <h1 align="center">Privatefolio</h1>
 
-<div align="center">
-  The Free* and Open-source Portfolio Manager - All your crypto assets in one place
-</div>
+<p align="center">
+  The AI Wealth Manager - A free* and open-source toolkit for financial empowerment
+</p>
 
 <div align="center">
 
@@ -15,7 +15,7 @@
 
 </div>
 
-<div align="center" class="heyboo">
+<div align="center">
 
 [![Github downloads](https://img.shields.io/github/downloads/privatefolio/privatefolio/total.svg?style=flat)](https://GitHub.com/privatefolio/privatefolio/releases/)
 ![Visitors](https://api.visitorbadge.io/api/visitors?path=privatefolio%2Fprivatefolio%20&style=flat)

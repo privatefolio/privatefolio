@@ -89,6 +89,3 @@ yarn docker:run
 yarn docker:remove
 ```
 In Electron, backend is started automatically on app launch.
-
-## Contributing
-See [CONTRIBUTING.md](../../../CONTRIBUTING.md) and [ARCHITECTURE.md](ARCHITECTURE.md) for guidelines on code style, testing, and pull request workflow.

@@ -1,49 +1,67 @@
-# Contributing
-
-Before jumping in consider getting familiar with the `ARCHITECTURE.md` docs. TODO
+# Getting started [How to build Privatefolio from source]
 
 ## Prerequisites
 
+To build & run the project, you need to have the following build dependencies installed:
+
 ```sh
-npm -v
-# 11.3.0
 node -v
 # v22.15.0
+npm -v
+# 11.3.0
 yarn -v
 # 1.22.22
-python --version
-# 3.13.3
 bun -v
 # 1.2.12
 ```
 
-It's recommended to install Node.js through NVM (Node Version Manager), and to install Yarn through NPM.
+### Node.js
 
-```sh
-npm install -g npm # Upgrade NPM
-npm install -g yarn # Install Yarn
-```
+It's recommended to install Node.js through NVM (Node Version Manager), and to install Yarn through NPM.
 
 On Windows, get it from [coreybutler/nvm-windows](https://github.com/coreybutler/nvm-windows).
 On Linux, get it from [nvm-sh/nvm](https://github.com/nvm-sh/nvm).
+
+Afterwards, upgrade NPM and install Yarn:
+
+```sh
+npm install -g npm
+npm install -g yarn
+```
 
 ### Windows
 
 Install the latest version of [Python](https://www.python.org/downloads/) and add it to your PATH.
 
 ```ps
-powershell -c "irm bun.sh/install.ps1|iex" # Install Bun
+python --version
+# 3.13.3
+```
+
+Afterwards, install Bun:
+
+```ps
+powershell -c "irm bun.sh/install.ps1|iex"
 ```
 
 ### Ubuntu
 
+Ensure these development dependencies are installed:
+
 ```sh
 sudo apt update && sudo apt -y upgrade
 sudo apt install libnss3-dev libatk1.0-0 libatk-bridge2.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 -y
-curl -fsSL https://bun.sh/install | bash # Install Bun
+```
+
+Afterwards, install Bun:
+
+```sh
+curl -fsSL https://bun.sh/install | bash
 ```
 
 ## Install
+
+Before we can build the project from source, we also need to install the project dependencies:
 
 ```sh
 yarn
@@ -59,11 +77,45 @@ sudo chmod 4755 packages/electron/node_modules/electron/dist/chrome-sandbox
 
 ## Development
 
+Run the project in development mode, to see your code changes in real-time.
+
 ```sh
 yarn dev
 ```
 
+## Build native apps
+
+To build the native apps, run any of the following commands:
+
+```sh
+# desktop apps
+yarn bundle:win
+yarn bundle:linux
+yarn bundle:mac
+yarn bundle:mac-x64
+# mobile apps
+yarn bundle:android
+yarn bundle:ios
+```
+
+Now you can run the artifacts from these paths:
+
+* Windows `./packages/electron/out/Privatefolio\ Setup\ 2.0.0-beta.44.exe`
+* Linux `sudo dpkg -i ./packages/electron/out/privatefolio-electron_2.0.0-beta.44_amd64.deb`
+* MacOS Arm64 `./packages/electron/out/Privatefolio-2.0.0-beta.44-arm64.dmg`
+* MacOS Intel `./packages/electron/out/Privatefolio-2.0.0-beta.44.dmg`
+* iOS `./packages/expo/out/ios/Privatefolio.ipa`
+* Android `./packages/expo/out/android/app-release.apk`
+
+## Build docker image
+
+```sh
+yarn docker:build
+```
+
 ## Testing
+
+After making changes to the code, you can run the tests to see if anything broke.
 
 ```sh
 yarn test
@@ -79,17 +131,6 @@ yarn test <test-file>
 yarn test test/tags/tags-api.test.ts
 ```
 
-## Build for production
-
-```sh
-yarn bundle:win
-yarn bundle:linux
-yarn bundle:mac
-```
-
-Run `./packages/electron/out/Privatefolio\ Setup\ 2.0.0-beta.38.exe`.
-Run `sudo dpkg -i ./packages/electron/out/privatefolio-electron_2.0.0-beta.38_amd64.deb`.
-
 ## Create a release
 
 ```sh
@@ -98,11 +139,11 @@ yarn new-version <major|minor|patch>
 
 Note: this will trigger the `publish-*.yml` workflows, which will:
 
-- publish the frontend to Cloudflare Pages.
-- publish the backend to Docker Hub.
-- build the binaries and attach them to the GitHub release.
+* publish the frontend to Cloudflare Pages.
+* publish the backend to Docker Hub.
+* build the native apps and attach them to the GitHub release.
 
-## Development utils
+## Tips & Know-how
 
 ### Add a package as a dependency to another
 

@@ -64,6 +64,3 @@
 - **Web Deployment**: Automatic deployment to Cloudflare Pages via GitHub Actions (see [web-deployment.mdx](./web-deployment.mdx)).
 - **Static Site**: Serve `packages/frontend/build` on any web host or Vercel.
 - **Electron**: Packaged into desktop app via `yarn bundle` in root (see ELECTRON_SETUP.md).
-
-## Contributing
-- Please read [`CONTRIBUTING.md`](./CONTRIBUTING.md) and [`ARCHITECTURE.md`](./ARCHITECTURE.md) for guidelines on code style, testing, and workflow.

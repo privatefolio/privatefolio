@@ -1,9 +1,16 @@
 # Architecture
 
 ## Overview
-Privatefolio is a free, open-source cryptocurrency portfolio manager built as a monorepo using Lerna for package management. It enables users to track all their crypto assets in one place with a focus on privacy and data ownership. The application is structured as a desktop app with a React frontend and a Node.js/Bun backend, packaged with Electron for cross-platform compatibility.
 
-## Structure
+The application has two main components: `@privatefolio/backend` and `@privatefolio/frontend`.
+These two components are bundled together as a Docker image, or as a desktop app using Electron.
+
+The frontend is a React application, and the backend is a Node.js/Bun server that uses REST and WebSocket APIs to communicate with the frontend.
+
+## Project structure
+
+Privatefolio is structured as a monorepo, using Lerna for orchestration and Yarn for package management.
+
 - **Root Config:** Yarn workspaces (v1.22.22) with nohoist, AGPL-3.0 license, Lerna (v8.1.3) for monorepo management, and TypeScript for type safety across all packages.
 
 ## Packages Summary
@@ -33,12 +40,14 @@ Privatefolio is a free, open-source cryptocurrency portfolio manager built as a 
     - Inter-process communication between frontend and backend
 
 ## Workflow & Integration
+
 - **Development:** `yarn dev` runs parallel development servers for frontend and backend, `yarn dev:electron` includes Electron.
 - **Building:** `yarn build` for all packages, platform-specific binaries with `yarn bundle:[win|linux|mac]`.
 - **Testing:** Comprehensive test suite with `yarn test` and `yarn test:bun` for Bun-specific tests, continuous integration with `yarn test:ci`.
 - **Integration:** Packages share common TypeScript interfaces and utilities, with backend exposing APIs consumed by frontend.
 
 ## Deployment
+
 - **Frontend:**
   - Compiled with Vite for optimal bundle size and performance
   - Can be deployed as a static site or packaged within Electron
