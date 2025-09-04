@@ -8,13 +8,13 @@
     "email": "hello@danielconstantin.net"
   },
   "scripts": {
-    "dev": "vocs dev --port 6600",
+    "dev": "vocs dev --port 6600 --clearScreen=false",
     "build": "vocs build",
     "preview": "vocs preview"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "18.2.0"
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
     "vocs": "^1.0.13"

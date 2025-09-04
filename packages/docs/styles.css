@@ -9,3 +9,7 @@
 .vocs_Heading {
   font-family: 'Roboto Serif', serif;
 }
+
+.vocs_Sidebar {
+  border-right: 1px solid var(--vocs-color_border);
+}
