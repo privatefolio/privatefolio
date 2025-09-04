@@ -1,4 +1,4 @@
-# Privatefolio AI Usage Guide
+# AI setup
 
 ## Overview
 - Leverages Vercel AI SDK for an interactive portfolio analysis assistant in both frontend and backend.

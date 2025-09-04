@@ -1,4 +1,4 @@
-# Privatefolio Testing Guide
+# Testing Guide
 
 ## Testing Philosophy
 

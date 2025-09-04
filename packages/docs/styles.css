@@ -1,0 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400;500;600;700&family=IBM+Plex+Sans:wght@200;300;400;500;600;700&family=Roboto+Serif:opsz,wght@8..144,300;8..144,500&display=block');
+
+.vocs_NavLogo_title {
+  font-family: 'Roboto Serif', serif;
+  font-weight: 600;
+  letter-spacing: 0.03125rem;
+}
+
+.vocs_Heading {
+  font-family: 'Roboto Serif', serif;
+}

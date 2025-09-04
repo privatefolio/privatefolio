@@ -1,4 +1,4 @@
-# Privatefolio Backend
+# Backend
 
 ## Overview
 Privatefolio Backend is a Node.js/Bun service that aggregates multi-chain cryptocurrency data, provides a REST and WebSocket API, and persists data in a local SQLite database. It powers the desktop app and frontend with real-time account balances, transactions, and price history.
@@ -91,4 +91,4 @@ yarn docker:remove
 In Electron, backend is started automatically on app launch.
 
 ## Contributing
-See [CONTRIBUTING.md](../CONTRIBUTING.md) and [ARCHITECTURE.md](ARCHITECTURE.md) for guidelines on code style, testing, and pull request workflow.
+See [CONTRIBUTING.md](../../../CONTRIBUTING.md) and [ARCHITECTURE.md](ARCHITECTURE.md) for guidelines on code style, testing, and pull request workflow.
