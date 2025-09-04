@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "vocs dev --port 6600 --clearScreen=false",
-    "build": "vocs build",
+    "build": "NODE_ENV=production vocs build",
     "preview": "vocs preview"
   },
   "dependencies": {
