@@ -1,5 +1,6 @@
 import * as React from "react"
 import { defineConfig, Theme } from "vocs"
+
 import { version } from "./package.json"
 
 const theme: Partial<Theme> = {
@@ -15,9 +16,9 @@ const theme: Partial<Theme> = {
     },
     color: {
       backgroundDark: {
-        light: "rgb(249, 250, 252)",
         // , dark: "rgb(30, 30, 30)"
         dark: "rgb(14, 13, 15)",
+        light: "rgb(249, 250, 252)",
       },
     },
     content: {
@@ -30,13 +31,10 @@ const theme: Partial<Theme> = {
   },
 }
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === "production"
 
 export default defineConfig({
-  title: "Privatefolio Docs",
-  rootDir: ".",
   description: "Documentation for users & developers.",
-  theme,
   head() {
     return (
       <>
@@ -62,47 +60,14 @@ export default defineConfig({
     )
   },
   iconUrl: "/privatefolio.png",
-  socials: [
-    {
-      icon: "discord",
-      link: "https://discord.gg/YHHu9nK8VD",
-    },
-    {
-      icon: "github",
-      link: "https://github.com/privatefolio/privatefolio",
-    },
-    {
-      icon: "x",
-      link: "https://twitter.com/PrivatefolioApp",
-    },
-  ],
-  topNav: [
-    { text: "Website", link: "https://privatefolio.xyz" },
-    { text: "Blog", link: "https://paragraph.com/@privatefolio" },
-    { text: "llms.txt", link: "https://docs.privatefolio.app/llms-full.txt" },
-    // {
-    //   text: version,
-    //   element: <p>v{version}</p>,
-    //   // items: [
-    //   //   {
-    //   //     text: 'Changelog',
-    //   //     link: 'https://github.com/privatefolio/privatefolio/blob/main/CHANGELOG.md',
-    //   //   },
-    //   //   {
-    //   //     text: 'Contributing',
-    //   //     link: 'https://github.com/privatefolio/privatefolio/blob/main/CONTRIBUTING.md',
-    //   //   },
-    //   // ],
-    // },
-  ],
+  rootDir: ".",
   sidebar: [
     {
-      text: "About",
       collapsed: false,
       items: [
         // { text: "Home", link: "/home-page" },
-        { text: "Readme", link: "/" },
-        { text: "Changelog", link: "/changelog" },
+        { link: "/", text: "Readme" },
+        { link: "/changelog", text: "Changelog" },
         // { text: "Vision", link: "/vision" },
         // { text: "Roadmap", link: "/roadmap" },
         // {
@@ -110,6 +75,7 @@ export default defineConfig({
         //   link: "/comparisons",
         // },
       ],
+      text: "About",
     },
     // {
     //   text: "User guide",
@@ -125,20 +91,62 @@ export default defineConfig({
     // },
     {
       collapsed: false,
-      text: "Developers",
       items: [
-        { text: "Getting started", link: "/getting-started" },
-        { text: "Architecture", link: "/ARCHITECTURE" },
-        { text: "Backend", link: "/BACKEND" },
-        { text: "Frontend", link: "/FRONTEND" },
-        { text: "AI setup", link: "/AI" },
-        { text: "Testing", link: "/TESTING" },
-        { text: "Docker Build", link: "/DOCKER_BUILD" },
-        { text: "Docker Deploy", link: "/DOCKER_DEPLOY" },
-        { text: "Desktop apps", link: "/ELECTRON_SETUP" },
-        { text: "Web deployment", link: "/web-deployment" },
-        { text: "Guidelines for AI agents and LLMs", link: "/agents-guidelines" },
+        { link: "/getting-started", text: "Getting started" },
+        { link: "/ARCHITECTURE", text: "Architecture" },
+        { link: "/BACKEND", text: "Backend" },
+        { link: "/FRONTEND", text: "Frontend" },
+        { link: "/AI", text: "AI setup" },
+        { link: "/TESTING", text: "Testing" },
+        { link: "/DOCKER_BUILD", text: "Docker Build" },
+        { link: "/DOCKER_DEPLOY", text: "Docker Deploy" },
+        { link: "/ELECTRON_SETUP", text: "Desktop apps" },
+        { link: "/agents-guidelines", text: "Guidelines for AI agents and LLMs" },
       ],
+      text: "Developers",
     },
+    {
+      collapsed: false,
+      items: [
+        { link: "/create-release", text: "Create release" },
+        { link: "/web-deployment", text: "Web deployment" },
+      ],
+      text: "Maintainers",
+    },
+  ],
+  socials: [
+    {
+      icon: "discord",
+      link: "https://discord.gg/YHHu9nK8VD",
+    },
+    {
+      icon: "github",
+      link: "https://github.com/privatefolio/privatefolio",
+    },
+    {
+      icon: "x",
+      link: "https://twitter.com/PrivatefolioApp",
+    },
+  ],
+  theme,
+  title: "Privatefolio Docs",
+  topNav: [
+    { link: "https://privatefolio.xyz", text: "Website" },
+    { link: "https://paragraph.com/@privatefolio", text: "Blog" },
+    { link: "https://docs.privatefolio.app/llms-full.txt", text: "llms.txt" },
+    // {
+    //   text: version,
+    //   element: <p>v{version}</p>,
+    //   // items: [
+    //   //   {
+    //   //     text: 'Changelog',
+    //   //     link: 'https://github.com/privatefolio/privatefolio/blob/main/CHANGELOG.md',
+    //   //   },
+    //   //   {
+    //   //     text: 'Contributing',
+    //   //     link: 'https://github.com/privatefolio/privatefolio/blob/main/CONTRIBUTING.md',
+    //   //   },
+    //   // ],
+    // },
   ],
 })

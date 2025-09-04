@@ -10,13 +10,16 @@
   "scripts": {
     "dev": "vocs dev --port 6600 --clearScreen=false",
     "build": "NODE_ENV=production vocs build",
-    "preview": "vocs preview"
+    "preview": "vocs preview",
+    "lint": "eslint .",
+    "lint:fix": "yarn lint --fix"
   },
   "dependencies": {
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },
   "devDependencies": {
-    "vocs": "^1.0.13"
+    "vocs": "^1.0.13",
+    "@privatefolio/commons": "^2.0.0-beta.44"
   }
 }
