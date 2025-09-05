@@ -1,0 +1,55 @@
+import { Callout } from 'vocs/components'
+
+# Web deployment
+
+Deploying Privatefolio on the web involves hosting the build output of the `@privatefolio/frontend` package.
+
+<Callout type="info">
+  Just like Privatefolio v1, in the future, you will be able to run the `@privatefolio/backend` package inside the browser using web workers. Web deployments will then encompass both. Help us make it a reality with 
+  [#27](https://github.com/privatefolio/privatefolio/issues/27).
+</Callout>
+
+## Build
+
+Once you setup the project and [its prerequisites](./getting-started.md), you can build the frontend.
+
+```bash
+yarn build
+# output dir: packages/frontend/build
+
+```
+
+## Deploy
+
+### with `serve`
+
+```bash
+npx serve -p 8080 -C packages/frontend/build
+```
+
+### with Cloudflare Pages
+
+```bash
+yarn wrangler pages deploy packages/frontend/build --project-name=privatefolio
+```
+
+## Official deployment
+
+We are currently deploying to Cloudflare Pages through a GitHub Actions workflow.
+This deployment system provides continuous deployment for all branches and pull requests, with Discord notifications for deployment status updates.
+
+
+Production deployment URL: [`https://privatefolio.app`](https://privatefolio.app) <br/>
+Preview deployments URLs: `https://<deployment-id>.privatefolio-com.pages.dev` <br/>
+See latest deployments at:
+[github.com/privatefolio/privatefolio/deployments](https://github.com/privatefolio/privatefolio/deployments)
+
+<Callout type="note">
+  Unlike other production deployments, the latest web deployment corresponds to the latest commit on the `main` branch, not the latest tagged release.
+</Callout>
+
+## Workflow file
+
+```yaml [.github/workflows/publish-frontend.yml]
+// [!include ~/../../.github/workflows/publish-frontend.yml] 
+``` 

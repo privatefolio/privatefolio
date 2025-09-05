@@ -51,6 +51,12 @@ FROM oven/bun:1-alpine AS runtime
 WORKDIR /app
 
 # TODO6 image size jumped from 190MB to 240MB because of commons and commons-node (dev deps?)
+
+LABEL org.opencontainers.image.title="Privatefolio"
+LABEL org.opencontainers.image.description="The AI Wealth Manager - A free* and open-source toolkit for financial empowerment"
+LABEL org.opencontainers.image.source="https://github.com/privatefolio/privatefolio"
+LABEL org.opencontainers.image.licenses="AGPL-3.0"
+
 COPY --from=backend-builder /app/node_modules ./node_modules
 COPY --from=backend-builder /app/packages/backend ./packages/backend
 COPY --from=backend-builder /app/packages/commons ./packages/commons

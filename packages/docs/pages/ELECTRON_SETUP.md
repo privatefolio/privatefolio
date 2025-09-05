@@ -1,4 +1,4 @@
-# Electron Setup
+# Desktop Apps
 
 This document describes the Electron setup for the Privatefolio desktop application.
 

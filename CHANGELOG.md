@@ -1,6 +1,6 @@
 # Changelog
 
-Changes to this project will be documented in this file.
+This file documents project changes that are of interest to users and developers.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## v2.0.0-beta.43 - 2025/08/21

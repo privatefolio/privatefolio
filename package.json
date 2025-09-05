@@ -19,9 +19,9 @@
   },
   "packageManager": "yarn@1.22.22",
   "scripts": {
-    "clean": "git clean -fxd",
+    "clean": "git clean -fxd -e data",
     "build": "lerna run build",
-    "dev": "lerna run --parallel --stream dev --ignore=privatefolio-electron,privatefolio-expo",
+    "dev": "lerna run --parallel --stream dev --ignore=privatefolio-electron --ignore=privatefolio-expo",
     "dev:electron": "lerna run --parallel --stream dev --ignore=privatefolio-expo",
     "dev:expo": "lerna run --parallel --stream dev --ignore=privatefolio-electron",
     "test": "lerna run --parallel test",
@@ -43,7 +43,7 @@
     "docker:build": "yarn workspace privatefolio-backend docker:build",
     "docker:run": "yarn workspace privatefolio-backend docker:run",
     "docker:remove": "yarn workspace privatefolio-backend docker:remove",
-    "generate-llms-txt": "node scripts/generate-llms-txt.js"
+    "preview-docs": "yarn workspace @privatefolio/docs preview"
   },
   "devDependencies": {
     "wrangler": "^3.90.0",

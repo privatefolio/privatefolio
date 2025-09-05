@@ -1,0 +1,131 @@
+import ArchitectureDiagram from '../components/ArchitectureDiagram'
+
+# Architecture
+
+## Overview
+
+The application has two main components: `@privatefolio/backend` and `@privatefolio/frontend`.
+These two components are bundled together as a Docker image, or as a desktop app using Electron.
+
+The frontend is a React application, and the backend is a Node.js/Bun server that uses REST and WebSocket APIs to communicate with the frontend.
+
+<ArchitectureDiagram />
+
+## Project structure
+
+Privatefolio is structured as a monorepo, using Lerna for orchestration and Yarn for package management.
+
+- **Root Config:** Yarn workspaces (v1.22.22) with nohoist, AGPL-3.0 license, Lerna (v8.1.3) for monorepo management, and TypeScript for type safety across all packages.
+
+### Directory Structure
+
+```text
+privatefolio/
+├── packages/
+│   ├── backend/            # Node.js/Bun server with REST & WebSocket APIs
+│   │   ├── src/
+│   │   │   ├── api/            # HTTP & WebSocket API definitions
+│   │   │   ├── config/         # Environment and settings loaders
+│   │   │   ├── sqlite/         # Schema and migration logic
+│   │   │   ├── utils/          # Helper functions
+│   │   │   ├── backend-server.ts  # HTTP/WebSocket server implementation
+│   │   │   ├── backend-relayer.ts # Task scheduler and data aggregator
+│   │   │   └── start.ts        # Entry point wiring server + relayer
+│   │   ├── data/               # Runtime database and log files
+│   │   ├── build/              # Compiled outputs for production
+│   │   ├── test/               # Vitest test suites organized by feature
+│   │   └── package.json        # Scripts, dependencies, and build setup
+│   ├── frontend/           # React-based UI with Vite and TypeScript
+│   │   ├── src/
+│   │   │   ├── components/     # Reusable UI elements (charts, tables, forms)
+│   │   │   ├── pages/          # Page components (Portfolio, Transactions, Settings)
+│   │   │   ├── stores/         # Nanostores state and persistence logic
+│   │   │   ├── api/            # REST/WebSocket client setup and hooks
+│   │   │   ├── hooks/          # Custom React hooks (data fetching, IPC)
+│   │   │   ├── utils/          # Utility functions and helpers
+│   │   │   ├── workers/        # WebWorker-based SQLite integration
+│   │   │   ├── App.tsx         # App shell and routing
+│   │   │   └── main.tsx        # Entry point
+│   │   ├── public/             # Static assets and PWA manifest
+│   │   ├── build/              # Compiled bundles and assets
+│   │   ├── vite.config.ts      # Vite build configuration
+│   │   └── package.json        # Frontend dependencies and scripts
+│   ├── electron/           # Desktop application wrapper
+│   │   ├── src/
+│   │   │   ├── backend-manager.ts  # Backend process manager
+│   │   │   ├── ipc-main.ts     # IPC communication setup
+│   │   │   ├── preload.ts      # Preload script for renderer
+│   │   │   ├── start.ts        # Main entry point
+│   │   │   └── auto-updater.ts # Auto-update functionality
+│   │   ├── out/                # Packaged app output
+│   │   └── package.json        # Electron configuration and scripts
+│   ├── expo/               # Mobile app (React Native with Expo)
+│   │   ├── app/                # App entry point and screens
+│   │   ├── assets/             # Mobile app assets
+│   │   ├── app.json            # Expo configuration
+│   │   ├── eas.json            # EAS build/submit profiles
+│   │   └── package.json        # Mobile app dependencies
+│   ├── commons/            # Shared utilities and interfaces
+│   │   ├── src/
+│   │   │   └── utils.ts        # Common utility functions
+│   │   └── package.json        # Shared dependencies
+│   ├── commons-node/       # Node.js-specific shared utilities
+│   └── docs/               # Documentation site (Vocs)
+│       ├── pages/              # Documentation pages
+│       ├── components/         # Doc-specific components
+│       └── package.json        # Documentation dependencies
+├── .github/
+│   ├── workflows/          # GitHub Actions CI/CD
+│   └── prompts/            # AI agent prompts and guidelines
+├── lerna.json              # Lerna monorepo configuration
+├── package.json            # Root workspace configuration
+└── yarn.lock               # Dependency lock file
+```
+
+## Packages Summary
+
+- **`packages/frontend`**
+  - **Description & Key Tech:** React-based UI that provides the user interface using Material-UI, Vite, and TypeScript.
+  - **Core Features & Tools:**
+    - Interactive portfolio visualization with lightweight-charts
+    - Command palette (`kbar`) and comprehensive search functionality
+    - WebWorker-based SQLite integration for client-side data processing
+    - State management with nanostores for reactive updates
+
+- **`packages/backend`**
+  - **Description & Key Tech:** Node.js/Bun server providing data processing, API integration, and SQLite database management.
+  - **Core Features & Tools:**
+    - Multi-chain cryptocurrency data aggregation and processing
+    - SQLite database for persistent storage with cross-platform compatibility
+    - Scheduled tasks with Croner for periodic data updates
+    - Support for both Bun and Node.js SQLite implementations
+
+- **`packages/electron`**
+  - **Description & Key Tech:** Desktop application wrapper using Electron with platform-specific optimizations.
+  - **Core Features & Tools:**
+    - Cross-platform desktop integration (Windows, Linux, macOS)
+    - Local file system access for database and configuration
+    - Auto-launch capabilities and system tray integration
+    - Inter-process communication between frontend and backend
+
+## Workflow & Integration
+
+- **Development:** `yarn dev` runs parallel development servers for frontend and backend, `yarn dev:electron` includes Electron.
+- **Building:** `yarn build` for all packages, platform-specific binaries with `yarn bundle:[win|linux|mac]`.
+- **Testing:** Comprehensive test suite with `yarn test` and `yarn test:bun` for Bun-specific tests, continuous integration with `yarn test:ci`.
+- **Integration:** Packages share common TypeScript interfaces and utilities, with backend exposing APIs consumed by frontend.
+
+## Deployment
+
+- **Frontend:**
+  - Compiled with Vite for optimal bundle size and performance
+  - Can be deployed as a static site or packaged within Electron
+
+- **Backend:**
+  - Runs as a local service within the Electron app
+  - Optimized for Bun runtime with fallbacks for Node.js compatibility
+
+- **Electron:**
+  - Windows builds with Nsis installer, Linux with DEB packages, macOS with DMG
+  - Automated deployment process via GitHub Actions triggered by version changes (`yarn new-version`)
+  - Binaries published to GitHub releases for user distribution

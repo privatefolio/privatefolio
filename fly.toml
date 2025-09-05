@@ -11,7 +11,7 @@ app = 'privatefolio'
   PORT = '5555'
 
 [[mounts]]
-  source = 'privatefolio_data'
+  source = 'privatefolio-data'
   destination = '/app/data'
 
 [http_service]

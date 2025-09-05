@@ -1,4 +1,4 @@
-# Privatefolio Frontend
+# Frontend
 
 ## Overview
 - The Privatefolio Frontend is a React and Vite powered TypeScript application that delivers a responsive and interactive UI for tracking multi-chain cryptocurrency portfolios. It leverages Material‑UI for design, nanostores for state management, and Comlink/WebWorker‑backed SQLite for client‑side data persistence, with seamless integration into Electron.
@@ -61,8 +61,6 @@
 - CI: included in `yarn test:ci` via root Lerna workflow
 
 ## Deployment
-- Static Site: serve `packages/frontend/build` on any web host or Vercel.
-- Electron: packaged into desktop app via `yarn bundle` in root (see ELECTRON_SETUP.md).
-
-## Contributing
-- Please read [`CONTRIBUTING.md`](../CONTRIBUTING.md) and [`ARCHITECTURE.md`](./ARCHITECTURE.md) for guidelines on code style, testing, and workflow.
+- **Web Deployment**: Automatic deployment to Cloudflare Pages via GitHub Actions (see [web-deployment.mdx](./web-deployment.mdx)).
+- **Static Site**: Serve `packages/frontend/build` on any web host or Vercel.
+- **Electron**: Packaged into desktop app via `yarn bundle` in root (see ELECTRON_SETUP.md).
