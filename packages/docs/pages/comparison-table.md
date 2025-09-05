@@ -1,5 +1,6 @@
 ---
 title: Comparison table
+description: Compare Privatefolio with other portfolio tracking and wealth management solutions
 ---
 
 ## Comparison table

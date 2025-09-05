@@ -1,3 +1,7 @@
+---
+description: Node.js/Bun backend service with REST API, WebSocket support, and SQLite database
+---
+
 # Backend
 
 ## Overview

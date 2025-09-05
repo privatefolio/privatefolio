@@ -1,3 +1,7 @@
+---
+description: How to create a new release of Privatefolio using the new-version command
+---
+
 # Create a release
 
 ```sh

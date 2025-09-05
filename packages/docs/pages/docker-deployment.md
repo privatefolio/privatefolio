@@ -1,3 +1,7 @@
+---
+description: Build and deploy Privatefolio using Docker
+---
+
 # Docker deployment
 
 Deploying Privatefolio via Docker requires us to build a Docker image that packages both `@privatefolio/backend` and `@privatefolio/frontend` alongside their dependencies.
