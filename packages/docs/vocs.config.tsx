@@ -67,15 +67,20 @@ export default defineConfig({
       items: [
         // { text: "Home", link: "/home-page" },
         { link: "/", text: "Read me" },
+        { link: "/vision", text: "Vision" },
+        {
+          link: "/comparison-table",
+          text: "Comparison table",
+        },
         { link: "/faq", text: "FAQ" },
         { link: "/changelog", text: "Changelog" },
-        // { link: "/mission", text: "Mission" },
-        // { text: "Vision", link: "/vision" },
-        // { text: "Roadmap", link: "/roadmap" },
-        // {
-        //   text: "Comparisons",
-        //   link: "/comparisons",
-        // },
+        //
+        {
+          link: "https://eu.posthog.com/shared/v1v6JkLETgvBpgebo5pR7eXpqqFUgA",
+          text: "Adoption metrics",
+        },
+        { link: "https://github.com/orgs/privatefolio/projects/1/", text: "Roadmap" },
+        { link: "https://paragraph.com/@privatefolio", text: "Blog" },
       ],
       text: "About",
     },
@@ -140,7 +145,6 @@ export default defineConfig({
   title: "Privatefolio Docs",
   topNav: [
     { link: "https://privatefolio.xyz", text: "Website" },
-    { link: "https://paragraph.com/@privatefolio", text: "Blog" },
     { link: "https://docs.privatefolio.app/llms-full.txt", text: "llms.txt" },
     // {
     //   text: version,
