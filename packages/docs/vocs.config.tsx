@@ -60,14 +60,12 @@ export default defineConfig({
     )
   },
   iconUrl: "/privatefolio.png",
-  ogImageUrl:
-    "https://vocs.dev/api/og?logo=/privatefolio.png&title=%title&description=%description",
+  ogImageUrl: "https://vocs.dev/api/og?title=%title&description=%description",
   rootDir: ".",
   sidebar: [
     {
       collapsed: false,
       items: [
-        // { text: "Home", link: "/home-page" },
         { link: "/", text: "Read me" },
         { link: "/vision", text: "Vision" },
         {
@@ -97,7 +95,6 @@ export default defineConfig({
         { link: "/installation", text: "Installation" },
         { link: "/self-hosting-with-docker", text: "Self-hosting with Docker" },
         { link: "/self-hosting-with-fly-io", text: "Self-hosting with Fly.io" },
-        // { link: "/faq", text: "FAQ" },
       ],
       text: "Users",
     },

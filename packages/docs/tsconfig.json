@@ -1,0 +1,4 @@
+{
+  "extends": "@privatefolio/commons/tsconfig.base.json",
+  "include": ["pages", "components"]
+}
