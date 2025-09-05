@@ -4,9 +4,11 @@
 
 <h1 align="center">Privatefolio</h1>
 
-<p align="center">
-  The AI Wealth Manager - A free* and open-source toolkit for financial empowerment
-</p>
+<div align="center">
+
+The AI Wealth Manager - A free* and open-source toolkit for financial empowerment
+
+</div>
 
 <div align="center">
 
@@ -29,11 +31,15 @@
 
 ## Installation
 
-Go to [GitHub releases](https://github.com/privatefolio/privatefolio/releases) and download the latest version for your platform. Each release contains the binaries for Windows, Linux and macOS under the Assets dropdown.
+To install the Privatefolio desktop app, you can either download the apps from [privatefolio.xyz/downloads](https://privatefolio.xyz/downloads) or from [GitHub releases](https://github.com/privatefolio/privatefolio/releases).
+
+Each release contains the binaries for Windows, Linux and Mac.
 
 On Windows, you can run the `Privatefolio-<version>.Setup.exe` executable directly.
 
 On Linux, you can run `sudo dpkg -i privatefolio_<version>_amd64.deb` to install the package.
+
+On Mac, download the dmg for your platform and run the installer.
 
 ## Features
 
@@ -58,16 +64,16 @@ On Linux, you can run `sudo dpkg -i privatefolio_<version>_amd64.deb` to install
 
 ## License
 
-This project is licensed under the **AGPL-3.0** (GNU Affero General Public License v3.0).
+Privatefolio is licensed under **GNU AGPL-3.0**, a copyleft license.
 
-### Key Points of the GNU AGPL-3.0 License
+In summary, this license gives you the following freedoms:
 
 - **Freedom to Use**: You can use the software for any purpose, including commercial use.
 - **Freedom to Study and Modify**: You can study how the program works and modify it to suit your needs, including for commercial purposes.
 - **Freedom to Distribute Copies**: You can redistribute copies of the original program.
 - **Freedom to Distribute Modified Versions**: You are allowed to distribute your modified versions, including for profit. However, if you run a modified version of the software on a server and allow others to interact with it, you must provide the source code of the modified version to those users.
 
-See the [LICENSE](LICENSE) file for more details.
+See the [LICENSE](https://github.com/privatefolio/privatefolio/blob/main/LICENSE) file for more details.
 
 ## For Developers
 
@@ -77,9 +83,9 @@ See the [LICENSE](LICENSE) file for more details.
 [![Lerna](https://img.shields.io/badge/Lerna-blueviolet?style=flat&logo=lerna&logoColor=white)](https://lerna.js.org/)
 [![Prettier](https://img.shields.io/badge/Prettier-1A2C34?style=flat&logo=prettier&logoColor=F7BA3E)](https://prettier.io/)
 
-Privatefolio is built with modern technologies like TypeScript, React, Bun, and Electron. Contributions are welcome to improve the project further.
+Privatefolio is built with modern technologies like TypeScript, React, Bun (Node.js) and SQLite, making it familiar for open-source developers to contribute to the project.
 
-For detailed setup instructions, including prerequisites, installation, and testing, please refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+For detailed setup instructions, architecture blueprints and more, please refer to [docs.privatefolio.app](https://docs.privatefolio.app).
 
 ### How to Contribute
 
@@ -92,13 +98,14 @@ For detailed setup instructions, including prerequisites, installation, and test
 
 For a complete example of adding a new feature, check out [PR #46](https://github.com/privatefolio/privatefolio/pull/46) which demonstrates how to add a new price API extension.
 
-For Docker setup and deployment, see the [Docker documentation](docs/DOCKER_DEPLOY.md).
+For deployment steps, please refer to [docs.privatefolio.app](https://docs.privatefolio.app).
 
 ### Key Technologies
 
 - **Frontend:** React, Vite, Material-UI
 - **Backend:** Node.js, Bun runtime, SQLite
-- **Desktop App:** Electron
+- **Desktop apps:** Electron
+- **Mobile apps:** Expo (React Native)
 - **Deployment:** Docker
 
 Feel free to open issues for bugs or feature requests!

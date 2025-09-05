@@ -13,3 +13,11 @@
 .vocs_Sidebar {
   border-right: 1px solid var(--vocs-color_border);
 }
+
+.vocs_Anchor > img {
+  display: inline-block;
+}
+
+img[alt="Visitors"] {
+  display: inline-block;
+}
