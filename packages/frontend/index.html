@@ -18,24 +18,28 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://privatefolio.app/">
   <meta property="og:title" content="Privatefolio">
-  <meta property="og:description" content="The AI Wealth Manager - A free* and open-source toolkit for financial empowerment">
+  <meta property="og:description"
+    content="The AI Wealth Manager - A free* and open-source toolkit for financial empowerment">
   <meta property="og:image" content="https://privatefolio.xyz/og-image.png">
   <meta property="og:site_name" content="Privatefolio">
   <meta property="og:locale" content="en_US">
   <meta property="og:image:width" content="1809">
   <meta property="og:image:height" content="1017">
+  <meta property="og:logo" content="https://privatefolio.app/privatefolio.svg" />
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
   <meta property="twitter:url" content="https://privatefolio.app/">
   <meta property="twitter:title" content="Privatefolio">
-  <meta property="twitter:description" content="The AI Wealth Manager - A free* and open-source toolkit for financial empowerment">
+  <meta property="twitter:description"
+    content="The AI Wealth Manager - A free* and open-source toolkit for financial empowerment">
   <meta property="twitter:image" content="https://privatefolio.xyz/og-image.png">
 
   <!-- Discord -->
   <meta property="discord:card" content="summary_large_image">
   <meta property="discord:title" content="Privatefolio">
-  <meta property="discord:description" content="The AI Wealth Manager - A free* and open-source toolkit for financial empowerment">
+  <meta property="discord:description"
+    content="The AI Wealth Manager - A free* and open-source toolkit for financial empowerment">
   <meta property="discord:image" content="https://privatefolio.xyz/og-image.png">
 
   <!-- Additional SEO -->
@@ -75,20 +79,12 @@
     },
     "description": "The AI Wealth Manager - A free* and open-source toolkit for financial empowerment"
   }
-  </script> 
+  </script>
 </head>
 
 <body>
   <div id="root"></div>
-  <script type="module" src="/src/main.tsx">
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/service-worker.js").then((swReg) => {
-        console.log("Service worker Registered")
-      })
-    } else {
-      console.warn("Service workers aren't supported in this browser.")
-    }
-  </script>
+  <script type="module" src="/src/main.tsx"></script>
 </body>
 
 </html>

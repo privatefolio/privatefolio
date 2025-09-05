@@ -62,7 +62,7 @@ export default defineConfig({
     )
   },
   iconUrl: "/privatefolio.png",
-  ogImageUrl: `https://vocs.dev/api/og?logo=${encodeURIComponent("https://docs.privatefolio.app/privatefolio.png")}&title=%title&description=%description`,
+  ogImageUrl: `https://vocs.dev/api/og?logo=${encodeURIComponent("https://docs.privatefolio.app/favicon.png")}&title=%title&description=%description`,
   rootDir: ".",
   sidebar: [
     {
