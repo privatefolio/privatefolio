@@ -2,7 +2,7 @@
 
 Deploying Privatefolio via Docker requires us to build a Docker image that packages both `@privatefolio/backend` and `@privatefolio/frontend` alongside their dependencies.
 
-Are you looking to self-host Privatefolio using the official Docker image? Go to [Self-hosting](./self-host-using-docker.md).
+Are you looking to self-host Privatefolio using the official Docker image? Go to [Self-hosting](./self-hosting-with-docker.md).
 
 ## Prerequisites
 
