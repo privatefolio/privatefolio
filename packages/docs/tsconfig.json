@@ -1,4 +1,0 @@
-{
-  "extends": "@privatefolio/commons/tsconfig.base.json",
-  "include": ["src"]
-}

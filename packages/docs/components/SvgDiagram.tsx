@@ -237,11 +237,10 @@ export default function SvgDiagram(props: SvgDiagramProps) {
       }}
     >
       <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}>
-        {/* Render edges first (behind nodes) */}
-        {edges.map(renderEdge)}
-
         {/* Render nodes */}
         {nodes.map(renderNode)}
+        {/* Render edges first (behind nodes) */}
+        {edges.map(renderEdge)}
       </svg>
     </div>
   )

@@ -67,7 +67,10 @@ export default defineConfig({
       items: [
         // { text: "Home", link: "/home-page" },
         { link: "/", text: "Readme" },
+        { link: "/license", text: "License" },
         { link: "/changelog", text: "Changelog" },
+        { link: "/mission", text: "Mission" },
+        { link: "/faq", text: "FAQ" },
         // { text: "Vision", link: "/vision" },
         // { text: "Roadmap", link: "/roadmap" },
         // {
@@ -77,18 +80,19 @@ export default defineConfig({
       ],
       text: "About",
     },
-    // {
-    //   text: "User guide",
-    //   collapsed: false,
-    //   items: [
-    //     { text: "Getting started", link: "/getting-started" },
-    //     { text: "Portfolio", link: "/portfolio" },
-    //     { text: "Transactions", link: "/transactions" },
-    //     { text: "Settings", link: "/settings" },
-    //     { text: "Backup & Restore", link: "/backup-and-restore" },
-    //     { text: "FAQ", link: "/faq" },
-    //   ],
-    // },
+    {
+      collapsed: false,
+      items: [
+        // { link: "/getting-started", text: "Getting started" },
+        // { link: "/portfolio", text: "Portfolio" },
+        // { link: "/transactions", text: "Transactions" },
+        // { link: "/settings", text: "Settings" },
+        // { link: "/backup-and-restore", text: "Backup & Restore" },
+        { link: "/DOCKER_DEPLOY", text: "Installation" },
+        // { link: "/faq", text: "FAQ" },
+      ],
+      text: "Users",
+    },
     {
       collapsed: false,
       items: [
@@ -98,19 +102,18 @@ export default defineConfig({
         { link: "/FRONTEND", text: "Frontend" },
         { link: "/AI", text: "AI setup" },
         { link: "/TESTING", text: "Testing" },
-        { link: "/DOCKER_BUILD", text: "Docker Build" },
-        { link: "/DOCKER_DEPLOY", text: "Docker Deploy" },
         { link: "/ELECTRON_SETUP", text: "Desktop apps" },
+        { link: "/web-deployment", text: "Web deployment" },
+        { link: "/docker-deployment", text: "Docker deployment" },
+        { link: "/self-hosting-with-docker", text: "Self-hosting with Docker" },
+        { link: "/self-hosting-with-fly-io", text: "Self-hosting with Fly.io" },
         { link: "/agents-guidelines", text: "Guidelines for AI agents and LLMs" },
       ],
       text: "Developers",
     },
     {
       collapsed: false,
-      items: [
-        { link: "/create-release", text: "Create release" },
-        { link: "/web-deployment", text: "Web deployment" },
-      ],
+      items: [{ link: "/create-release", text: "Create release" }],
       text: "Maintainers",
     },
   ],
