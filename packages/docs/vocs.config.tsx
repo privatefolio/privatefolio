@@ -38,6 +38,8 @@ export default defineConfig({
   head() {
     return (
       <>
+        <meta property="og:url" content="https://docs.privatefolio.app" />
+        <meta property="og:logo" content="https://docs.privatefolio.app/privatefolio.png" />
         <script
           dangerouslySetInnerHTML={{
             __html: `console.log("Environment is ${isProduction ? "production" : "development"}")`,
@@ -60,7 +62,7 @@ export default defineConfig({
     )
   },
   iconUrl: "/privatefolio.png",
-  ogImageUrl: "https://vocs.dev/api/og?title=%title&description=%description",
+  ogImageUrl: `https://vocs.dev/api/og?logo=${encodeURIComponent("https://docs.privatefolio.app/privatefolio.png")}&title=%title&description=%description`,
   rootDir: ".",
   sidebar: [
     {
