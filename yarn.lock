@@ -3994,9 +3994,9 @@
   integrity sha512-YvNVrXIxVpnY528zoiEjX8PqTfr0UCtKXyssvaWL8AE+OByFTCooKuKMdPlm6g65YUI9fPXrHn4UnogSskABnA==
 
 "@logtape/pretty@^1.1.0-dev.324":
-  version "1.1.0-dev.324"
-  resolved "https://registry.yarnpkg.com/@logtape/pretty/-/pretty-1.1.0-dev.324.tgz#8b9047b69e9521e297752b5f29d88e6d7065ca14"
-  integrity sha512-gjPA5BFYgpezKJZdod8bpkyqW4CZVAwjLggW4GOQYulUA8DNy72Y8vrmwRdEUywt0NCb2nvDrGEd0rkcHNnDvQ==
+  version "1.1.0-dev.333"
+  resolved "https://registry.yarnpkg.com/@logtape/pretty/-/pretty-1.1.0-dev.333.tgz#745d94210a7d7d538c8e02bc7e3ed0302a85862c"
+  integrity sha512-D7U5/zPaJ5EjZ9l/7tPtSAEpWNEnQ7+03+SpFSZcU8RiPTP+bvteAPv1lgeSszZFFdw2fFh0YtOQbR91v9OiRQ==
 
 "@logtape/redaction@^1.0.4":
   version "1.0.4"
