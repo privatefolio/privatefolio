@@ -72,7 +72,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_BUILDS_WEBHOOK }}
           status: "Success"
-          title: "Build"
+          title: "Continuous integration"
           description: |
             **Branch**: `${{ github.ref_name }}`
             **Commit**: `${{ github.sha }}`
@@ -84,7 +84,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_BUILDS_WEBHOOK }}
           status: "Failure"
-          title: "Build"
+          title: "Continuous integration"
           description: |
             **Branch**: `${{ github.ref_name }}`
             **Commit**: `${{ github.sha }}`

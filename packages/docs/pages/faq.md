@@ -16,7 +16,7 @@ Absolutely! Open-source and collaboration are at the core of our mission. You ca
 
 Extensions can range from support for new csv formats, new price providers, advanced analytics, AI features (like voice, or deep research agents) and much more.
 
-You can provide suggestions on how we can improve the app, or help with documentation. Check out our [developer quickstart on Github](https://github.com/privatefolio/privatefolio?tab=readme-ov-file#for-developers) and make sure to join our [Discord server](https://discord.gg/YHHu9nK8VD).
+You can provide suggestions on how we can improve the app, or help with documentation. Check out our [developer quickstart on GitHub](https://github.com/privatefolio/privatefolio?tab=readme-ov-file#for-developers) and make sure to join our [Discord server](https://discord.gg/YHHu9nK8VD).
 
 ## Is there a premium plan?
 

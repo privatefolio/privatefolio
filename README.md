@@ -19,7 +19,7 @@ The AI Wealth Manager - A free* and open-source toolkit for financial empowermen
 
 <div align="center">
 
-[![Github downloads](https://img.shields.io/github/downloads/privatefolio/privatefolio/total.svg?style=flat)](https://GitHub.com/privatefolio/privatefolio/releases/)
+[![GitHub downloads](https://img.shields.io/github/downloads/privatefolio/privatefolio/total.svg?style=flat)](https://GitHub.com/privatefolio/privatefolio/releases/)
 ![Visitors](https://api.visitorbadge.io/api/visitors?path=privatefolio%2Fprivatefolio%20&style=flat)
 [![GitHub last commit](https://img.shields.io/github/last-commit/privatefolio/privatefolio?style=flat)](https://github.com/privatefolio/privatefolio/commits/main)
 [![GitHub commits](https://img.shields.io/github/commit-activity/t/privatefolio/privatefolio)](https://GitHub.com/privatefolio/privatefolio/commit/)
