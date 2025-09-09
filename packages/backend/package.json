@@ -1,6 +1,6 @@
 {
   "name": "privatefolio-backend",
-  "version": "2.0.0-beta.46",
+  "version": "2.0.0-beta.47",
   "private": false,
   "license": "AGPL-3.0",
   "author": {
@@ -31,7 +31,7 @@
     "@ai-sdk/openai": "^1.3.22",
     "@ai-sdk/openai-compatible": "^0.2.16",
     "@ai-sdk/perplexity": "^1.1.9",
-    "@privatefolio/commons-node": "^2.0.0-beta.46",
+    "@privatefolio/commons-node": "^2.0.0-beta.47",
     "ai": "^4.3.16",
     "big.js": "^6.2.1",
     "comlink": "^4.4.2",
