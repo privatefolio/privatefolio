@@ -7,6 +7,23 @@ description: Release history and version changes for Privatefolio
 This file documents project changes that are of interest to users and developers.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.45 - 2025/09/09
+
+### 💡 Feature updates
+
+- Add a [new docs website](https://docs.privatefolio.app) for users & developers
+- Deploy first version of the Android app
+
+## v2.0.0-beta.44 - 2025/08/25
+
+### 💡 Feature updates
+
+- Add support for PrivateCloud™ AI Gateway
+
+### 🐛 Bug Fixes
+
+- Fix bug in coinstats file import
+
 ## v2.0.0-beta.43 - 2025/08/21
 
 ### 🐛 Bug Fixes
@@ -336,4 +353,4 @@ This release concludes the alpha phase of the v2.0.0 release cycle, marking a si
 ### 🐛 Bug Fixes
 
 - Fix `TaskDetailsDialog` to show the previous progress percentage for updates that have the format
-`[undefined, string]`, indicating that the progress remained the same, but a new.
+  `[undefined, string]`, indicating that the progress remained the same, but a new.
