@@ -1,0 +1,9 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "readme": "none",
+  "entryPoints": [
+    "./src/api/api.ts",
+    "./src/interfaces.ts"
+    // utils TODO
+  ]
+}

@@ -62,6 +62,9 @@ export default defineConfig({
     )
   },
   iconUrl: "/privatefolio.png",
+  // llm: {
+  //   ignore: ["api/**"],
+  // },
   ogImageUrl: `https://vocs.dev/api/og?logo=${encodeURIComponent("https://docs.privatefolio.app/favicon.png")}&title=%title&description=%description`,
   rootDir: ".",
   sidebar: [
@@ -114,6 +117,7 @@ export default defineConfig({
         { link: "/self-hosting-with-docker", text: "Self-hosting with Docker" },
         { link: "/self-hosting-with-fly-io", text: "Self-hosting with Fly.io" },
         { link: "/agents-guidelines", text: "Guidelines for AI agents and LLMs" },
+        // { link: "/api", text: "API Reference" },
       ],
       text: "Developers",
     },
@@ -121,8 +125,8 @@ export default defineConfig({
       collapsed: true,
       items: [
         { link: "/create-release", text: "Create release" },
-        { link: "/web-deployment", text: "Web deployment" },
-        { link: "/docker-deployment", text: "Docker deployment" },
+        // { link: "/web-deployment", text: "Web deployment" },
+        // { link: "/docker-deployment", text: "Docker deployment" },
         { link: "/TESTING", text: "Testing" },
       ],
       text: "Maintainers",
@@ -145,6 +149,7 @@ export default defineConfig({
   theme,
   title: "Privatefolio Docs",
   topNav: [
+    // { link: "/api", text: "API Reference" },
     { link: "https://privatefolio.xyz", text: "Website" },
     { link: "https://docs.privatefolio.app/llms-full.txt", text: "llms.txt" },
     // {

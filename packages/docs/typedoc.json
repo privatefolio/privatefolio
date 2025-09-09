@@ -1,0 +1,26 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "API Reference",
+  "entryPoints": [
+    "../commons",
+    "../commons-node",
+    "../backend"
+  ],
+  "out": "./pages/api",
+  "plugin": ["typedoc-plugin-markdown"],
+  "publicPath": "/api/",
+  "readme": "none",
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeInternal": true,
+  "hideGenerator": true,
+  "entryPointStrategy": "packages",
+  "sort": ["source-order"],
+  "categorizeByGroup": false,
+  "defaultCategory": "Other",
+  "hidePageHeader": true,
+  "githubPages": false,
+  "disableSources": false,
+  "sourceLinkTemplate": "https://github.com/privatefolio/privatefolio/blob/main/{path}#L{line}"
+}

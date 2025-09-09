@@ -26,6 +26,9 @@ pnpm-debug.log*
 # typescript
 *.tsbuildinfo
 
+# typedoc generated files
+packages/docs/pages/api/
+
 .million/
 
 # electron output
