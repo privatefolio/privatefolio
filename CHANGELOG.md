@@ -7,6 +7,13 @@ description: Release history and version changes for Privatefolio
 This file documents project changes that are of interest to users and developers.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.0.0-beta.46 - 2025/09/09
+
+### 🐛 Bug Fixes
+
+- Fix bug in desktop app deployment workflow
+- Fix bug in mobile app deployment workflow
+
 ## v2.0.0-beta.45 - 2025/09/09
 
 ### 💡 Feature updates

@@ -78,7 +78,7 @@ jobs:
         # yarn publish
         run: |
           echo "Building and submitting Android app..."
-          yarn build:android
+          yarn bundle:android
           yarn submit:android
 
   notify:

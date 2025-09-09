@@ -93,8 +93,8 @@ npx eas login
 Build commands (run from repo root or `packages/expo`):
 
 ```bash
-yarn workspace privatefolio-expo build:android
-yarn workspace privatefolio-expo build:ios
+yarn workspace privatefolio-expo bundle:android
+yarn workspace privatefolio-expo bundle:ios
 ```
 
 Artifacts are created on EAS servers; the CLI will provide download/install links.
