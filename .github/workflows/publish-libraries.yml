@@ -3,10 +3,12 @@ name: Publish Libraries
 on:
   push:
     tags: ["*"]
-  workflow_dispatch:
+
+  workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   publish-libraries:
@@ -51,7 +53,7 @@ jobs:
           if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
             echo "$NAME@$VERSION already exists on npm, skipping."
           else
-            npm publish --access public
+            npm publish --provenance --access public
           fi
 
       - name: Publish @privatefolio/commons-node
@@ -63,5 +65,5 @@ jobs:
           if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
             echo "$NAME@$VERSION already exists on npm, skipping."
           else
-            npm publish --access public
+            npm publish --provenance --access public
           fi

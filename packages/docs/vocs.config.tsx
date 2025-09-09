@@ -118,6 +118,7 @@ export default defineConfig({
         // { link: "/self-hosting-with-fly-io", text: "Self-hosting with Fly.io" },
         { link: "/agents-guidelines", text: "Guidelines for AI agents and LLMs" },
         // { link: "/api", text: "API Reference" },
+        // { link: "/software-provenance", text: "Software Provenance" },
       ],
       text: "Developers",
     },
