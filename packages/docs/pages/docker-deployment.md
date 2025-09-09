@@ -120,6 +120,6 @@ Learn more on [self-hosting with Docker](./self-hosting-with-docker.md).
 
 ## Workflow file
 
-```yaml [.github/workflows/publish-backend.yml]
-// [!include ~/../../.github/workflows/publish-backend.yml]
+```yaml [.github/workflows/publish-docker-image.yml]
+// [!include ~/../../.github/workflows/publish-docker-image.yml]
 ```

@@ -9,20 +9,11 @@ on:
 permissions:
   contents: write
 
-# Required secrets for mobile app publishing:
-# - EXPO_TOKEN: Expo authentication token for EAS CLI
-# - GOOGLE_SERVICE_ACCOUNT_KEY_PATH: Path to Google Service Account JSON key for Android
-# 
-# iOS publishing (commented out for now):
-# - APPLE_ID: Apple ID for iOS app submission
-# - ASC_APP_ID: App Store Connect app ID for iOS
-# - APPLE_TEAM_ID: Apple Developer Team ID
-
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  build-and-publish-mobile:
+  build-and-publish:
     runs-on: ubuntu-latest
     environment:
       name: production
@@ -65,24 +56,23 @@ jobs:
       - name: Install Dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Build and Submit Mobile Apps
+      - name: Build
+        working-directory: packages/expo
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: yarn bundle:android
+
+      - name: Submit
         working-directory: packages/expo
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           # APPLE_ID: ${{ secrets.APPLE_ID }}
           # ASC_APP_ID: ${{ secrets.ASC_APP_ID }}
           # APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          GOOGLE_SERVICE_ACCOUNT_KEY_PATH: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY_PATH }}
-        # run: |
-        # echo "Building and submitting mobile apps..."
-        # yarn publish
-        run: |
-          echo "Building and submitting Android app..."
-          yarn bundle:android
-          yarn workspace privatefolio-expo submit:android
+        run: yarn submit:android
 
   notify:
-    needs: build-and-publish-mobile
+    needs: build-and-publish
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -90,10 +80,10 @@ jobs:
         uses: sarisia/actions-status-discord@v1
         with:
           webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
-          status: ${{ needs.build-and-publish-mobile.result == 'success' && 'Success' || 'Failure' }}
-          title: 'Publish mobile apps'
+          status: ${{ needs.build-and-publish.result == 'success' && 'Success' || 'Failure' }}
+          title: "Publish mobile apps"
           description: |
             **Branch**: `${{ github.ref_name }}`
             **Commit**: `${{ github.sha }}`
-            **Mobile Apps**: ${{ needs.build-and-publish-mobile.result }}
-          color: ${{ needs.build-and-publish-mobile.result == 'success' && '0x00FF00' || '0xFF0000' }} 
+            **Mobile apps**: ${{ needs.build-and-publish.result }}
+          color: ${{ needs.build-and-publish.result == 'success' && '0x00FF00' || '0xFF0000' }}

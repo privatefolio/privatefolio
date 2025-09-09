@@ -114,7 +114,7 @@ Loaded 1 attestation from GitHub API
 
 sha256:abcd1234... was attested by:
 REPO        PREDICATE_TYPE                 WORKFLOW
-privatefolio/privatefolio  https://slsa.dev/provenance/v1  .github/workflows/publish-backend.yml@refs/tags/v2.0.0-beta.45
+privatefolio/privatefolio  https://slsa.dev/provenance/v1  .github/workflows/publish-docker-image.yml@refs/tags/v2.0.0-beta.45
 ```
 
 This tells you:

@@ -1,4 +1,4 @@
-name: Staple Mac Apps
+name: Staple Mac apps
 
 on:
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
@@ -7,7 +7,7 @@ on:
     - cron: "0 0 * * *" # Run every day at midnight
 
   workflow_run:
-    workflows: ["Publish Apps"]
+    workflows: ["Publish desktop apps"]
     types: [completed]
 
 permissions:
@@ -134,7 +134,7 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
           status: ${{ needs.check-and-staple.result == 'success' && 'Success' || 'Failure' }}
-          title: "Staple Mac Apps"
+          title: "Staple Mac apps"
           description: |
             **Checked versions:** `${{ needs.check-and-staple.outputs.checked_tags }}`
             **Stapled versions:** `${{ needs.check-and-staple.outputs.stapled_tags }}`

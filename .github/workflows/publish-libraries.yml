@@ -1,4 +1,4 @@
-name: Publish Libraries
+name: Publish libraries
 
 on:
   push:
@@ -67,3 +67,27 @@ jobs:
           else
             npm publish --provenance --access public
           fi
+
+      - name: Notify Discord on success
+        if: success()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
+          status: "Success"
+          title: "Publish libraries"
+          description: |
+            **Branch**: `${{ github.ref_name }}`
+            **Commit**: `${{ github.sha }}`
+          color: 0x00FF00
+
+      - name: Notify Discord on failure
+        if: failure()
+        uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_DEPLOYMENTS_WEBHOOK }}
+          status: "Failure"
+          title: "Publish libraries"
+          description: |
+            **Branch**: `${{ github.ref_name }}`
+            **Commit**: `${{ github.sha }}`
+          color: 0xFF0000
