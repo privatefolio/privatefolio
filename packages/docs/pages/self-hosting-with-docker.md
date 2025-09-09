@@ -25,6 +25,17 @@ docker pull ghcr.io/privatefolio/privatefolio:latest
 
 This fetches the latest official release from GHCR.
 
+:::tip
+To install an older version, replace the `latest` tag with a version tag or git commit hash.
+
+```sh
+docker pull ghcr.io/privatefolio/privatefolio:v2.0.0-beta.40
+docker pull ghcr.io/privatefolio/privatefolio:4a678c3
+```
+
+See all versions at [ghcr.io/privatefolio/privatefolio](https://github.com/privatefolio/privatefolio/pkgs/container/privatefolio).
+:::
+
 ## 2. Run the Container
 
 ```sh

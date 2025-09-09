@@ -107,8 +107,8 @@ See all versions at [ghcr.io/privatefolio/privatefolio](https://github.com/priva
 Available image tags:
 
 - `latest`: Latest tagged release
-- `v*.*.*`: Tagged releases (e.g., v2.0.0-alpha.5)
-- `******`: Git commit (e.g. 4a678c3)
+- `v*.*.*`: Tagged releases (e.g., v2.0.0-beta.40)
+- `******`: Git commit (e.g. 1da1a8f)
 
 To run the official image:
 
