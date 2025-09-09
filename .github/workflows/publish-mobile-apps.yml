@@ -79,7 +79,7 @@ jobs:
         run: |
           echo "Building and submitting Android app..."
           yarn bundle:android
-          yarn submit:android
+          yarn workspace privatefolio-expo submit:android
 
   notify:
     needs: build-and-publish-mobile
