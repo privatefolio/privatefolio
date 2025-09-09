@@ -1,4 +1,4 @@
-name: Publish Mobile Apps
+name: Publish mobile apps
 
 on:
   push:

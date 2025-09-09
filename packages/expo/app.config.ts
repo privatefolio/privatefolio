@@ -17,7 +17,7 @@ const config: ExpoConfig = {
     package: "xyz.privatefolio.mobile",
     adaptiveIcon: {
       foregroundImage: "./assets/images/adaptive-icon/foreground.png",
-      backgroundColor: "#ffffff",
+      backgroundColor: "#000000",
     },
     edgeToEdgeEnabled: true,
   },
@@ -34,7 +34,7 @@ const config: ExpoConfig = {
         image: "./assets/images/splash.png",
         imageWidth: 200,
         resizeMode: "contain",
-        backgroundColor: "#ffffff",
+        backgroundColor: "#000000",
       },
     ],
   ],
