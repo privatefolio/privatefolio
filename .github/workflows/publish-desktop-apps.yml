@@ -1,4 +1,4 @@
-name: Publish desktop apps
+name: Publish Desktop Apps
 
 on:
   push:
