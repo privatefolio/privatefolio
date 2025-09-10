@@ -69,7 +69,7 @@ jobs:
           # APPLE_ID: ${{ secrets.APPLE_ID }}
           # ASC_APP_ID: ${{ secrets.ASC_APP_ID }}
           # APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: yarn submit:android
+        run: eas submit --platform android --profile production --latest --non-interactive
 
   notify:
     needs: build-and-publish
