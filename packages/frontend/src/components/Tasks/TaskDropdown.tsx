@@ -15,7 +15,6 @@ import { useStore } from "@nanostores/react"
 import { throttle } from "lodash-es"
 import React, { useEffect, useMemo, useRef, useState } from "react"
 import { Link } from "react-router-dom"
-import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { ServerTask, TaskStatus } from "src/interfaces"
 import { SHORT_THROTTLE_DURATION } from "src/settings"
 import { $activeAccount, $activeAccountPath, $connectionStatus } from "src/stores/account-store"
@@ -100,8 +99,6 @@ export function TaskDropdown() {
     return list
   }, [latestTasks, pendingTask])
 
-  const { isMobile } = useBreakpoints()
-
   return (
     <>
       <Tooltip title="Server tasks">
@@ -109,22 +106,22 @@ export function TaskDropdown() {
           size="small"
           variant="outlined"
           color={"secondary"}
-          sx={{ gap: 1, paddingX: 1.5, paddingY: 1 }}
+          sx={{ paddingX: 1.5, paddingY: 1 }}
           onClick={handleClick}
+          startIcon={
+            pendingTask ? (
+              <CircularProgressConnected
+                task={pendingTask}
+                key={pendingTask.id} // important
+              />
+            ) : (
+              <DoneAllRounded sx={{ height: 16, width: 16 }} />
+            )
+          }
         >
-          {pendingTask ? (
-            <CircularProgressConnected
-              task={pendingTask}
-              key={pendingTask.id} // important
-            />
-          ) : (
-            <DoneAllRounded sx={{ height: 16, width: 16 }} />
-          )}
-          {!isMobile && (
-            <Truncate sx={{ maxWidth: { sm: 260, xs: 120 } }}>
-              {pendingTask ? pendingTask.name : "Up to date"}
-            </Truncate>
-          )}
+          <Truncate sx={{ maxWidth: { sm: 260, xs: 120 } }}>
+            {pendingTask ? `${pendingTask.name}` : "Up to date"}
+          </Truncate>
         </Button>
       </Tooltip>
       <Menu

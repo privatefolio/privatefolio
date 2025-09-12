@@ -23,18 +23,6 @@ html {
   overflow-y: scroll; 
 }
 
-/* Safe area support */
-html, body, #root {
-  height: 100%;
-}
-
-body {
-  padding-top: env(safe-area-inset-top);
-  padding-right: env(safe-area-inset-right);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-}
-
 /* Scrollbar */
 @media (hover: hover) and (pointer: fine) {
   ::-webkit-scrollbar-corner {
@@ -142,7 +130,7 @@ input[type=number]::-webkit-outer-spin-button {
 /* Notistack Customizations */
 .notistack-SnackbarContainer {
   z-index: var(--mui-zIndex-snackbar) !important;
-  bottom: calc(48px + env(safe-area-inset-bottom)) !important;
+  bottom: 48px !important;
   gap: 4px !important;
 }
 
