@@ -1,4 +1,4 @@
-import { Drawer, SwipeableDrawer, Typography } from "@mui/material"
+import { Box, Drawer, SwipeableDrawer, Typography } from "@mui/material"
 import React from "react"
 import { APP_VERSION, GIT_HASH } from "src/env"
 import { useBreakpoints } from "src/hooks/useBreakpoints"
@@ -34,11 +34,13 @@ export function SettingsDrawer(props: PopoverToggleProps) {
             variant="subtitle1"
             letterSpacing="0.025rem"
             align="center"
-            sx={{ marginTop: 2 }}
+            sx={{ marginBottom: 1, marginTop: 2 }}
           >
             Settings
           </Typography>
-          <SettingsDrawerContents appVer={APP_VERSION} gitHash={GIT_HASH} />
+          <Box sx={{ overflowY: "auto" }}>
+            <SettingsDrawerContents appVer={APP_VERSION} gitHash={GIT_HASH} />
+          </Box>
         </SwipeableDrawer>
       </>
     )

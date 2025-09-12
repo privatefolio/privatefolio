@@ -6,6 +6,7 @@ import {
   CachedRounded,
   CalculateOutlined,
   CallMergeRounded,
+  Close,
   CloudSyncRounded,
   DeleteForever,
   DownloadRounded,
@@ -18,6 +19,7 @@ import {
   Button,
   Dialog,
   Divider,
+  IconButton,
   ListItemAvatar,
   ListItemText,
   MenuItem,
@@ -612,30 +614,48 @@ export const SearchBar = () => {
 
   useRegisterActions(actions, [actions])
 
-  const handleClick = useCallback(() => {
+  const handleOpen = useCallback(() => {
     // onClick={() => kb.setVisualState(VisualState.animatingIn)}
     kb.setVisualState(VisualState.showing)
   }, [kb])
 
+  const handleClose = useCallback(() => {
+    // kb.setVisualState(VisualState.animatingOut)
+    kb.setVisualState(VisualState.hidden)
+  }, [kb])
+
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleEvent = (event: KeyboardEvent) => {
       if (isInputFocused()) return
       if (event.key === "/") {
-        handleClick()
+        handleOpen()
       }
     }
 
-    document.addEventListener("keydown", handleKeyDown)
+    document.addEventListener("keydown", handleEvent)
     return () => {
-      document.removeEventListener("keydown", handleKeyDown)
+      document.removeEventListener("keydown", handleEvent)
     }
-  }, [handleClick])
+  }, [handleOpen])
+
+  // useEffect(() => {
+  //   const handleEvent = () => {
+  //     if (showing) {
+  //       handleClose()
+  //     }
+  //   }
+
+  //   document.addEventListener("popstate", handleEvent)
+  //   return () => {
+  //     document.removeEventListener("popstate", handleEvent)
+  //   }
+  // }, [handleClose, showing])
 
   return (
     <>
       <Tooltip title={SEARCH_PLACEHOLDER}>
         <Button
-          onClick={handleClick}
+          onClick={handleOpen}
           variant="outlined"
           color="secondary"
           sx={{ gap: 2, paddingY: 0.5 }}
@@ -644,19 +664,18 @@ export const SearchBar = () => {
           <Key>/</Key>
         </Button>
       </Tooltip>
-      <Dialog
-        open={showing}
-        onClose={() => {
-          // kb.setVisualState(VisualState.animatingOut)
-          kb.setVisualState(VisualState.hidden)
-        }}
-      >
+      <Dialog open={showing} onClose={handleClose}>
         <>
           <Stack gap={1} padding={0.5} marginTop={0.5}>
-            <SearchInput
-              defaultPlaceholder={SEARCH_PLACEHOLDER}
-              loading={txnsLoading || platformsLoading || assetsLoading || extensionsLoading}
-            />
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <SearchInput
+                defaultPlaceholder={SEARCH_PLACEHOLDER}
+                loading={txnsLoading || platformsLoading || assetsLoading || extensionsLoading}
+              />
+              <IconButton onClick={handleClose} size="small" color="secondary">
+                <Close />
+              </IconButton>
+            </Stack>
             <Divider />
             <RenderResults
               loading={txnsLoading || platformsLoading || assetsLoading || extensionsLoading}

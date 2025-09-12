@@ -1,5 +1,6 @@
 import { Typography, TypographyProps } from "@mui/material"
 import React, { FC } from "react"
+import { useBreakpoints } from "src/hooks/useBreakpoints"
 import { MonoFont } from "src/theme"
 
 interface KeyProps extends Omit<TypographyProps, "variant"> {
@@ -19,6 +20,10 @@ const keyVariantStyles = {
 
 export const Key: FC<KeyProps> = ({ children, variant = "default", sx, ...props }) => {
   const variantStyles = keyVariantStyles[variant]
+
+  const { isMobile } = useBreakpoints()
+
+  if (isMobile) return null
 
   return (
     <Typography
