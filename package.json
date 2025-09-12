@@ -46,8 +46,8 @@
     "preview-docs": "yarn workspace @privatefolio/docs preview"
   },
   "devDependencies": {
-    "wrangler": "^3.90.0",
-    "cross-env": "7.0.3",
+    "wrangler": "^4.36.0",
+    "cross-env": "10.0.0",
     "lerna": "^8.1.3"
   }
 }
