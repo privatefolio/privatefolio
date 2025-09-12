@@ -641,7 +641,7 @@ export const SearchBar = () => {
           sx={{ gap: 2, paddingY: 0.5 }}
         >
           <span>Search</span>
-          <Key>/</Key>
+          <Key sx={{ display: { md: "inline-flex", xs: "none" } }}>/</Key>
         </Button>
       </Tooltip>
       <Dialog
