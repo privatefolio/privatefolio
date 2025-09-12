@@ -62,7 +62,7 @@ export function SearchInput(props: SearchInputProps) {
           [`& .${inputBaseClasses.root} fieldset`]: {
             border: "none",
           },
-          [theme.breakpoints.up("md")]: { minWidth: 520 },
+          [theme.breakpoints.up("md")]: { minWidth: 486 },
           height: "100%",
         })}
         ref={query.inputRefSetter}

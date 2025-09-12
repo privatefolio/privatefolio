@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "vocs dev --port 4003 --clearScreen=false",
     "prebuildTODO": "yarn build:api-ref",
-    "build": "NODE_ENV=production vocs build",
+    "build": "cross-env NODE_ENV=production vocs build",
     "build:api-ref": "typedoc",
     "build:api-ref:watch": "typedoc --watch",
     "preview": "vocs preview",

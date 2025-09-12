@@ -515,11 +515,10 @@ export function SingleSeriesChart(props: SingleSeriesChartProps) {
             justifyContent="space-between"
             paddingX={2}
             direction="row"
-            flexWrap="wrap"
             gap={0.5}
             paddingY={0.5}
           >
-            <Stack direction="row" gap={1} flexWrap="wrap">
+            <Stack direction="row" gap={1} overflow="auto">
               <Stack direction="row">
                 <Tooltip
                   title={

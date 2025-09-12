@@ -42,7 +42,7 @@ export function AccountPicker(props: AccountPickerProps) {
         >
           Accounts
         </Typography>
-        <MenuList sx={{ paddingX: 2, paddingY: 1 }}>
+        <MenuList sx={{ overflowY: "auto", paddingX: 2, paddingY: 1 }}>
           <AccountPickerContents
             toggleAddAccount={toggleAddAccount}
             onClose={() => handleClose(true)}
