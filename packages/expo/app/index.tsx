@@ -1,31 +1,33 @@
 import React from "react"
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
 import { WebView } from "react-native-webview"
 
 export default function App() {
   // return <Text>asd wwqwdqwasdasd</Text>
   return (
-    <SafeAreaView style={styles.container}>
-      <WebView
-        source={{ uri: "https://privatefolio.app" }}
-        style={styles.webview}
-        startInLoadingState={true}
-        renderLoading={() => (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#007AFF" />
-          </View>
-        )}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
-        mixedContentMode="compatibility"
-        geolocationEnabled={true}
-        allowFileAccess={true}
-        thirdPartyCookiesEnabled={true}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-      />
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+        <WebView
+          source={{ uri: "https://privatefolio.app" }}
+          style={styles.webview}
+          startInLoadingState={true}
+          renderLoading={() => (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#007AFF" />
+            </View>
+          )}
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+          mixedContentMode="compatibility"
+          geolocationEnabled={true}
+          allowFileAccess={true}
+          thirdPartyCookiesEnabled={true}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+        />
+      </SafeAreaView>
+    </SafeAreaProvider>
   )
 }
 
