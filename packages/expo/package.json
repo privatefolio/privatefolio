@@ -14,11 +14,8 @@
     "dev:android": "expo start --android",
     "dev:ios": "expo start --ios",
     "dev:web": "expo start --web",
-    "bundle:android": "eas build --platform android --profile production",
-    "bundle:ios": "eas build --platform ios --profile production",
-    "submit:android": "eas submit --platform android --profile production --latest --non-interactive",
-    "submit:ios": "eas submit --platform ios --profile production",
-    "publish": "eas build --platform all --profile production && eas submit --platform all --profile production"
+    "bundle:android": "eas build --platform android --profile production --auto-submit",
+    "bundle:ios": "eas build --platform ios --profile production --auto-submit"
   },
   "dependencies": {
     "@react-navigation/native": "^7.1.6",

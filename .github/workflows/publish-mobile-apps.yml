@@ -56,20 +56,11 @@ jobs:
       - name: Install Dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Build
+      - name: Build & submit
         working-directory: packages/expo
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: yarn bundle:android
-
-      - name: Submit
-        working-directory: packages/expo
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          # APPLE_ID: ${{ secrets.APPLE_ID }}
-          # ASC_APP_ID: ${{ secrets.ASC_APP_ID }}
-          # APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        run: eas submit --platform android --profile production --latest --non-interactive
 
   notify:
     needs: build-and-publish
