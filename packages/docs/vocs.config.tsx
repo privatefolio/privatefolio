@@ -85,7 +85,7 @@ export default defineConfig({
           text: "Adoption metrics",
         },
         { link: "https://github.com/orgs/privatefolio/projects/1/", text: "Roadmap" },
-        { link: "https://paragraph.com/@privatefolio", text: "Blog" },
+        // { link: "https://paragraph.com/@privatefolio", text: "Blog" },
       ],
       text: "About",
     },
@@ -151,6 +151,7 @@ export default defineConfig({
   title: "Privatefolio Docs",
   topNav: [
     // { link: "/api", text: "API Reference" },
+    { link: "/blog", text: "Blog" },
     { link: "https://privatefolio.xyz", text: "Website" },
     { link: "https://docs.privatefolio.app/llms-full.txt", text: "llms.txt" },
     // {
