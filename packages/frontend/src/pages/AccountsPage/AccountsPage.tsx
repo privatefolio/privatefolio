@@ -1,4 +1,4 @@
-import { Add, Cloud, OpenInNewRounded } from "@mui/icons-material"
+import { Add, ArrowOutwardRounded, Cloud } from "@mui/icons-material"
 import { Avatar, Box, Button, Fade, Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo } from "react"
@@ -96,35 +96,47 @@ export default function AccountsPage() {
       >
         {showWelcomeMessage ? (
           <Fade in timeout={400}>
-            <Stack gap={2} alignItems="center">
-              <Typography variant="h5" textAlign="center" fontWeight={700}>
-                Welcome to Privatefolio!
-              </Typography>
-              <Button
-                size="large"
-                variant="contained"
-                component={Link}
-                to="/cloud"
-                endIcon={<Cloud />}
-                sx={{
-                  paddingY: 0.25,
-                }}
-              >
-                Login to PrivateCloud
-              </Button>{" "}
-              {!isElectron && (
+            <Stack gap={3} alignItems="center">
+              <Stack gap={0.5} alignItems="center">
+                <Typography variant="h5" textAlign="center" fontWeight={700}>
+                  Welcome to Privatefolio!
+                </Typography>
+                <Typography variant="caption" textAlign="center" gutterBottom>
+                  This web app is powered by the cloud.
+                </Typography>
                 <Button
                   size="large"
                   variant="contained"
-                  href="https://privatefolio.xyz/apps"
-                  component={AppLink}
-                  endIcon={<OpenInNewRounded sx={{ fontSize: "1rem !important" }} />}
+                  component={Link}
+                  to="/cloud"
+                  endIcon={<Cloud />}
                   sx={{
                     paddingY: 0.25,
                   }}
                 >
-                  Download the Desktop app
+                  Login to PrivateCloud™
                 </Button>
+              </Stack>
+              {!isElectron && (
+                <Stack gap={0.5} alignItems="center">
+                  <Typography variant="caption" textAlign="center" gutterBottom>
+                    If you wish to self-host,
+                    <br />
+                    you can use the desktop app or deploy via Docker.
+                  </Typography>
+                  <Button
+                    size="large"
+                    variant="outlined"
+                    href="https://privatefolio.xyz/apps"
+                    component={AppLink}
+                    endIcon={<ArrowOutwardRounded sx={{ fontSize: "1rem !important" }} />}
+                    sx={{
+                      paddingY: 0.25,
+                    }}
+                  >
+                    Download the Desktop app
+                  </Button>
+                </Stack>
               )}
             </Stack>
           </Fade>

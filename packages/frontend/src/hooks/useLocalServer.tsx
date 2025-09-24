@@ -60,8 +60,8 @@ export function useLocalServer() {
     checkLocalServerInfo()
   }, [])
 
-  const loading = !auth.checked || !serverInfo
   const localAvailable = useStore($localAvailable)
+  const loading = !localAvailable || !localServerEnabled ? false : !auth.checked || !serverInfo
 
   return {
     auth,
