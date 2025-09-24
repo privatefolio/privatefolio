@@ -1,4 +1,4 @@
-import { Add, ArrowOutwardRounded, Cloud } from "@mui/icons-material"
+import { Add, ArrowOutwardRounded, BuildCircle, Cloud, LockOpenRounded } from "@mui/icons-material"
 import { Avatar, Box, Button, Fade, Stack, Typography } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React, { useEffect, useMemo } from "react"
@@ -49,10 +49,12 @@ export default function AccountsPage() {
 
   const { localAvailable, loading: localLoading, auth } = useLocalServer()
 
-  const showWelcomeMessage = !localLoading && !localAvailable && cloudUser === null
-  const showConfigureMessage =
+  const showCloudWelcomeMessage = !localLoading && !localAvailable && cloudUser === null
+  const showCloudConfigureMessage =
     !localLoading && !localAvailable && cloudUser && cloudRpcReady === false
-  const showUnlockMessage =
+  const showLocalConfigureMessage =
+    !localLoading && localAvailable && auth.needsSetup && cloudUser === null
+  const showLocalUnlockMessage =
     !localLoading && localAvailable && !auth.isAuthenticated && cloudUser === null
 
   const allAccounts = useMemo<
@@ -94,7 +96,7 @@ export default function AccountsPage() {
         alignItems="center"
         justifyContent="center"
       >
-        {showWelcomeMessage ? (
+        {showCloudWelcomeMessage ? (
           <Fade in timeout={400}>
             <Stack gap={3} alignItems="center">
               <Stack gap={0.5} alignItems="center">
@@ -140,7 +142,7 @@ export default function AccountsPage() {
               )}
             </Stack>
           </Fade>
-        ) : showConfigureMessage ? (
+        ) : showCloudConfigureMessage ? (
           <Stack gap={2} alignItems="center">
             <Typography variant="h5" textAlign="center" fontWeight={700}>
               Your cloud instance is not yet set up.
@@ -158,16 +160,41 @@ export default function AccountsPage() {
               Configure your cloud instance
             </Button>
           </Stack>
-        ) : showUnlockMessage ? (
-          <Stack gap={2} alignItems="center">
+        ) : showLocalConfigureMessage ? (
+          <Stack gap={0.5} alignItems="center">
             <Typography variant="h5" textAlign="center" fontWeight={700}>
-              Your local data is locked.
+              Welcome to Privatefolio!
+            </Typography>
+            <Typography variant="caption" textAlign="center" gutterBottom>
+              Before you get started, secure the application.
             </Typography>
             <Button
               size="large"
               variant="contained"
               component={Link}
               to="/local"
+              sx={{
+                paddingY: 0.25,
+              }}
+              endIcon={<BuildCircle fontSize="small" />}
+            >
+              Set a password
+            </Button>
+          </Stack>
+        ) : showLocalUnlockMessage ? (
+          <Stack gap={0.5} alignItems="center">
+            <Typography variant="h5" textAlign="center" fontWeight={700}>
+              Your local data is locked.
+            </Typography>
+            <Typography variant="caption" textAlign="center" gutterBottom>
+              Enter your password to continue.
+            </Typography>
+            <Button
+              size="large"
+              variant="contained"
+              component={Link}
+              to="/local"
+              endIcon={<LockOpenRounded fontSize="small" />}
               sx={{
                 paddingY: 0.25,
               }}
