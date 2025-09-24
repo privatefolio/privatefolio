@@ -116,7 +116,7 @@ export default function AccountsPage() {
                 <Button
                   size="large"
                   variant="contained"
-                  href="https://privatefolio.xyz/downloads"
+                  href="https://privatefolio.xyz/apps"
                   component={AppLink}
                   endIcon={<OpenInNewRounded sx={{ fontSize: "1rem !important" }} />}
                   sx={{

@@ -10,7 +10,7 @@ import { logger } from "./logger"
 const CHECK_FOR_UPDATES_INTERVAL = 24 * 60 * 60 * 1000 // 24 hours
 const CHECK_FOR_UPDATES_START_DELAY = 60 * 1000 // 60 seconds
 const GITHUB_REPO_URL = "https://github.com/privatefolio/privatefolio"
-const DOWNLOADS_URL = "https://privatefolio.xyz/downloads"
+const DOWNLOADS_URL = "https://privatefolio.xyz/apps"
 
 export class AutoUpdater {
   private mainWindow: BrowserWindow | null = null

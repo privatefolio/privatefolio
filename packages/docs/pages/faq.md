@@ -8,7 +8,7 @@ However, since Privatefolio is extensible, just like in App Store or Google Play
 
 ## Can I self-host Privatefolio?
 
-Yes! The easiest way to self-host is to either install any of the [desktop apps](https://privatefolio.xyz/downloads) on your computer, or to [run the Docker image](./self-hosting-with-docker) on your server.
+Yes! The easiest way to self-host is to either install any of the [desktop apps](https://privatefolio.xyz/apps) on your computer, or to [run the Docker image](./self-hosting-with-docker) on your server.
 
 ## Can I contribute to the project?
 

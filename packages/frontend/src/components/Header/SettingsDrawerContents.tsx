@@ -175,7 +175,7 @@ export const SettingsDrawerContents = ({ appVer, gitHash }: MenuContentsProps) =
             </>
           }
         >
-          <CustomLink href="https://privatefolio.xyz/downloads">
+          <CustomLink href="https://privatefolio.xyz/apps">
             <InstallDesktopRounded fontSize="small" />
             <Typography variant="inherit" sx={{ fontSize: "1rem" }}>
               Download the Desktop app

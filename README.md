@@ -31,7 +31,7 @@ The AI Wealth Manager - A free* and open-source toolkit for financial empowermen
 
 ## Installation
 
-To install the Privatefolio desktop app, you can either download the apps from [privatefolio.xyz/downloads](https://privatefolio.xyz/downloads) or from [GitHub releases](https://github.com/privatefolio/privatefolio/releases).
+To install the Privatefolio desktop app, you can either download the apps from [privatefolio.xyz/apps](https://privatefolio.xyz/apps) or from [GitHub releases](https://github.com/privatefolio/privatefolio/releases).
 
 Each release contains the binaries for Windows, Linux and Mac.
 
