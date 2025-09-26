@@ -2,7 +2,7 @@ import { SdCardRounded } from "@mui/icons-material"
 import { MenuItem, Select, SelectChangeEvent, Stack, Tooltip } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import { throttle } from "lodash-es"
-import { getLivePricesForAsset } from "privatefolio-backend/build/src/extensions/prices/providers"
+import { getLivePricesForAsset } from "privatefolio-backend/src/extensions/prices/providers"
 import { allPriceApiIds } from "privatefolio-backend/src/settings/price-apis"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useSearchParams } from "react-router-dom"
@@ -68,9 +68,14 @@ export function AssetPriceHistory(props: AssetPriceHistoryProps) {
 
       const useDatabaseCache = priceApiId === null && !!asset.priceApiId
 
+      const actualPriceApiId = priceApiId || defaultPriceApiId
+      const priceApi = PRICE_APIS_META[actualPriceApiId]
+
       const prices = useDatabaseCache
         ? await rpc.getPricesForAsset(activeAccount, asset.id)
-        : await getLivePricesForAsset(asset.id, priceApiId || defaultPriceApiId)
+        : priceApi.needsTunnel
+          ? await rpc.getLivePricesForAsset(asset.id, actualPriceApiId)
+          : await getLivePricesForAsset(asset.id, actualPriceApiId)
 
       return aggregateCandles(prices, interval)
     },

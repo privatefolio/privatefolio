@@ -405,4 +405,23 @@ export const extensions: Extension[] = [
     ],
     updatedAt: new Date("2025-06-11").getTime(),
   },
+  {
+    authorGithub: "privatefolio",
+    description: "Get real-time and historical price data from Yahoo Finance.",
+    extensionLogoUrl: "$STATIC_ASSETS/extensions/yahoo.svg",
+    extensionName: "Yahoo!",
+    extensionType: "price-api",
+    extensionVersion: "1.0.0",
+    githubUrl: "https://github.com/privatefolio/privatefolio",
+    id: "yahoo-price-api",
+    platformIds: [],
+    publishedAt: new Date("2025-09-26").getTime(),
+    sources: [
+      {
+        tags: ["root"],
+        url: "https://github.com/privatefolio/privatefolio/tree/main/packages/backend/src/extensions/prices/yahoo-price-api.ts",
+      },
+    ],
+    updatedAt: new Date("2025-09-26").getTime(),
+  },
 ]
