@@ -1,4 +1,5 @@
 import { BackendApiShape } from "src/backend-server"
+import { getLivePricesForAsset } from "src/extensions/prices/providers"
 
 import * as analytics from "./account/analytics-api"
 import * as assets from "./account/assets-api"
@@ -59,6 +60,7 @@ export const api = {
   ...settings,
   ...notifications,
   ...platforms,
+  getLivePricesForAsset,
 } satisfies BackendApiShape
 
 export type Api = typeof api

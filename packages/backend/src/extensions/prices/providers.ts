@@ -5,6 +5,7 @@ import * as alchemy from "./alchemy-price-api"
 import * as binance from "./binance-price-api"
 import * as coinbase from "./coinbase-price-api"
 import * as llama from "./llama-price-api"
+import * as yahoo from "./yahoo-price-api"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PriceMapper = (data: any) => ChartData
@@ -24,6 +25,7 @@ export const PRICE_API_MATCHER: Record<PriceApiId, PriceApiExtension> = {
   binance,
   coinbase,
   "defi-llama": llama,
+  yahoo,
 }
 
 export async function getLivePricesForAsset(

@@ -2,7 +2,7 @@ import { ResolutionString } from "src/interfaces"
 
 import { isTestEnvironment } from "../utils/environment-utils"
 
-const PRICE_API_IDS = ["coinbase", "binance", "defi-llama", "alchemy"] as const
+const PRICE_API_IDS = ["coinbase", "binance", "defi-llama", "alchemy", "yahoo"] as const
 export type PriceApiId = (typeof PRICE_API_IDS)[number]
 
 export const SUPPORTED_RESOLUTIONS = [
@@ -24,6 +24,7 @@ export type PriceApiMeta = {
   hasCandles: boolean
   logoUrl: string
   name: string
+  needsTunnel?: boolean
   priority: number
   supportedResolutions: ResolutionString[]
   url: string
@@ -72,6 +73,25 @@ export const PRICE_APIS_META: Record<PriceApiId, PriceApiMeta> = {
       "1W",
     ] as ResolutionString[],
     url: "https://defillama.com",
+  },
+  yahoo: {
+    hasCandles: true,
+    logoUrl: "$STATIC_ASSETS/extensions/yahoo.svg",
+    name: "Yahoo!",
+    needsTunnel: true,
+    priority: 5,
+    supportedResolutions: [
+      "1",
+      "5",
+      "15",
+      "60",
+      "120",
+      "240",
+      "1D",
+      "1W",
+      "1M",
+    ] as ResolutionString[],
+    url: "https://finance.yahoo.com",
   },
 }
 
