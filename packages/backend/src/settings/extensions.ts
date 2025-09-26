@@ -26,12 +26,13 @@ import {
   extensionId as privatefolioFileImportId,
   platformId as privatefolioFileImportPlatform,
 } from "src/extensions/file-imports/privatefolio-transactions"
+import { US_SEC_META_EXTENSION } from "src/extensions/metadata/us-sec-api"
 import { BINANCE_PLATFORM_ID } from "src/extensions/utils/binance-utils"
 import { Extension } from "src/interfaces"
 
 export const extensions: Extension[] = [
   {
-    authorGithub: "kernelwhisperer",
+    authorGithub: "privatefolio",
     description: "Get assets, exchanges and blockchain data from CoinGecko.",
     extensionLogoUrl: "$STATIC_ASSETS/extensions/coingecko.svg",
     extensionName: "CoinGecko",
@@ -57,6 +58,7 @@ export const extensions: Extension[] = [
     ],
     updatedAt: new Date("2025-06-01").getTime(),
   },
+  US_SEC_META_EXTENSION,
   {
     authorGithub: "kernelwhisperer",
     description: "Import your Binance account statement.",
@@ -188,7 +190,7 @@ export const extensions: Extension[] = [
     updatedAt: new Date("2025-06-01").getTime(),
   },
   {
-    authorGithub: "kernelwhisperer",
+    authorGithub: "privatefolio",
     description: "Import transactions from Privatefolio.",
     extensionLogoUrl: "$STATIC_ASSETS/extensions/privatefolio.svg",
     extensionName: "Privatefolio",

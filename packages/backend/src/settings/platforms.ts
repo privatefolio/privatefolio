@@ -1,14 +1,6 @@
+import { US_SEC_PLATFORM } from "../extensions/metadata/us-sec-api"
 import { BlockchainMeta, DataPlatform, Exchange } from "../interfaces"
-
-/**
- * This is used to avoid conflicts with other platforms.
- * E.g. "sonic" is both a chain and an exchange on Coingecko.
- */
-export enum PlatformPrefix {
-  Chain = "chain.",
-  Exchange = "ex.",
-  App = "app.",
-}
+import { PlatformPrefix } from "./settings"
 
 export const ETHEREUM_PLATFORM_ID = `${PlatformPrefix.Chain}ethereum`
 export const BINANCE_PLATFORM_ID = `${PlatformPrefix.Exchange}binance`
@@ -479,6 +471,7 @@ export const customDataPlatforms: DataPlatform[] = [
     supported: true,
     url: "https://coinstats.app",
   },
+  US_SEC_PLATFORM,
 ]
 
 export const customExchanges: Exchange[] = [

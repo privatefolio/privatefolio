@@ -60,6 +60,7 @@ export default function LocalLoginForm() {
   const handleUnlock = async (event: FormEvent) => {
     event.preventDefault()
     await unlockApp(password, $localAuth, $localRest.get())
+    navigate("/")
   }
 
   const handleSetup = async (event: FormEvent) => {

@@ -8,7 +8,7 @@ import {
 } from "../../interfaces"
 import { PriceApiId } from "../../settings/settings"
 import {
-  getAssetContract,
+  getAssetInternalId,
   getAssetPlatform,
   getAssetTicker,
   isNativeAsset,
@@ -25,7 +25,7 @@ import {
 export const Identifier: PriceApiId = "alchemy"
 
 export function getPair(assetId: string) {
-  const contract = getAssetContract(assetId)
+  const contract = getAssetInternalId(assetId)
   const platformId = getAssetPlatform(assetId)
   const coingeckoId = removePlatformPrefix(platformId)
   const ticker = getAssetTicker(assetId)

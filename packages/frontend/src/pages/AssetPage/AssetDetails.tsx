@@ -21,7 +21,7 @@ import { SectionTitle } from "src/components/SectionTitle"
 import { TimestampBlock } from "src/components/TimestampBlock"
 import { CoingeckoMetadataFull } from "src/interfaces"
 import { getBlockExplorerUrl, PlatformPrefix } from "src/settings"
-import { getAssetContract, getAssetPlatform } from "src/utils/assets-utils"
+import { getAssetInternalId, getAssetPlatform, getPlatformPrefix } from "src/utils/assets-utils"
 import { formatWebsiteLink, noop } from "src/utils/utils"
 
 type AssetDetailsProps = {
@@ -51,14 +51,18 @@ export function AssetDetails(props: AssetDetailsProps) {
                 <PlatformBlock id={getAssetPlatform(assetId)} />
               </div>
             )}
-            {getAssetContract(assetId) && (
+            {getAssetInternalId(assetId) && (
               <div>
-                <SectionTitle>Contract Address</SectionTitle>
+                <SectionTitle>
+                  {getPlatformPrefix(assetId) === PlatformPrefix.Chain
+                    ? "Contract Address"
+                    : "Identifier"}
+                </SectionTitle>
                 <IdentifierBlock
-                  id={getAssetContract(assetId)!}
+                  id={getAssetInternalId(assetId)!}
                   href={getBlockExplorerUrl(
                     getAssetPlatform(assetId)!,
-                    getAssetContract(assetId)!,
+                    getAssetInternalId(assetId)!,
                     "address"
                   )}
                   linkText={`See on block explorer`}

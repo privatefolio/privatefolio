@@ -3,6 +3,8 @@ import { CoingeckoCoin } from "src/extensions/metadata/coingecko/coingecko-inter
 import {
   Asset,
   MyAsset,
+  ProgressCallback,
+  SecTicker,
   SqlParam,
   SubscriptionChannel,
   TaskPriority,
@@ -10,7 +12,7 @@ import {
 } from "src/interfaces"
 import { CACHE_LOCATION } from "src/settings/settings"
 import {
-  getAssetContract,
+  getAssetInternalId,
   getAssetPlatform,
   getAssetTicker,
   removePlatformPrefix,
@@ -22,6 +24,7 @@ import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
 
 import { getCoingeckoCoins } from "../../extensions/metadata/coingecko/coingecko-asset-cache"
+import { getSecTickers, US_SEC_PLATFORM } from "../../extensions/metadata/us-sec-api"
 import { getAccount } from "../accounts-api"
 import { getAccountWithAuditLogs } from "./audit-logs-api"
 import { getValue, setValue } from "./kv-api"
@@ -127,7 +130,7 @@ export async function getMyAssets(
 
     return results.map((result) => {
       let cachedAsset = cachedAssets.find((x) => x.id === result.id)
-      const contract = getAssetContract(result.id)
+      const contract = getAssetInternalId(result.id)
       const platform = getAssetPlatform(result.id)
       const coingeckoId = removePlatformPrefix(platform)
       const ticker = getAssetTicker(result.id)
@@ -177,33 +180,78 @@ const customAssets: Asset[] = [
 
 let assets: Asset[] = []
 
+async function getCoinsFromCache() {
+  try {
+    await access(`${CACHE_LOCATION}/coins/all.json`)
+    const data = await readFile(`${CACHE_LOCATION}/coins/all.json`, "utf8")
+    const parsed = JSON.parse(data) as CoingeckoCoin[]
+    const list: Asset[] = parsed.map(
+      ({ id, image: logoUrl, market_cap_rank: marketCapRank, name, platforms, symbol }) =>
+        ({
+          coingeckoId: id,
+          id: `coingecko:${id}:${symbol}`,
+          logoUrl,
+          marketCapRank,
+          name,
+          platforms,
+          symbol,
+        }) satisfies Asset
+    )
+
+    return list
+  } catch {
+    return []
+  }
+}
+
+async function getStocksFromCache() {
+  try {
+    await access(`${CACHE_LOCATION}/stocks/all.json`)
+    const data = await readFile(`${CACHE_LOCATION}/stocks/all.json`, "utf8")
+    const parsed = JSON.parse(data) as Record<string, SecTicker>
+
+    const list: Asset[] = Object.entries(parsed).map(
+      ([key, { cik_str: secId, ticker: symbol, title: name }]) =>
+        ({
+          id: `${US_SEC_PLATFORM.id}:${secId}:${symbol}`,
+          logoUrl: `https://github.com/nvstly/icons/raw/main/ticker_icons/${symbol}.png`,
+          // logoUrl: `https://github.com/davidepalazzo/ticker-logos/raw/main/ticker_icons/${symbol}.png`,
+          marketCapRank: Number(key) + 1,
+          name,
+          symbol,
+        }) satisfies Asset
+    )
+
+    return list
+  } catch {
+    return []
+  }
+}
+
 export async function getAssets(): Promise<Asset[]> {
   if (assets.length > 0) {
     return assets
   }
 
-  try {
-    await access(`${CACHE_LOCATION}/coins/all.json`)
-    const data = await readFile(`${CACHE_LOCATION}/coins/all.json`, "utf8")
+  const coinAssets = await getCoinsFromCache()
+  const stockAssets = await getStocksFromCache()
 
-    const list: MyAsset[] = JSON.parse(data).map(
-      (asset: CoingeckoCoin) =>
-        ({
-          coingeckoId: asset.id,
-          id: `coingecko:${asset.id}:${asset.symbol}`,
-          logoUrl: asset.image,
-          marketCapRank: asset.market_cap_rank,
-          name: asset.name,
-          platforms: asset.platforms,
-          symbol: asset.symbol,
-        }) as Asset
-    )
-    assets = [...list, ...customAssets]
-    list.sort((a, b) => (a.marketCapRank ?? Infinity) - (b.marketCapRank ?? Infinity))
-    return list
-  } catch {
-    return []
-  }
+  const list: Asset[] = [...coinAssets, ...stockAssets, ...customAssets]
+
+  list.sort((a, b) => {
+    // Primary sort: market cap rank ascending (nulls/undefined last)
+    const aRank = a.marketCapRank ?? Infinity
+    const bRank = b.marketCapRank ?? Infinity
+    if (aRank !== bRank) return aRank - bRank
+
+    // Secondary sort: name or symbol ascending
+    const aName = a.name ?? a.symbol
+    const bName = b.name ?? b.symbol
+    return aName.localeCompare(bName)
+  })
+
+  assets = list
+  return assets
 }
 
 export async function getAssetsByPlatform(platformId: string): Promise<Asset[]> {
@@ -215,7 +263,7 @@ export async function getAssetsByPlatform(platformId: string): Promise<Asset[]> 
 export async function getAsset(accountName: string, id: string): Promise<MyAsset | undefined> {
   const records = await getMyAssets(accountName, getQuery(true), [id, id])
   if (records.length === 0) {
-    const contract = getAssetContract(id)
+    const contract = getAssetInternalId(id)
     const platform = getAssetPlatform(id)
     const coingeckoId = removePlatformPrefix(platform)
 
@@ -277,11 +325,11 @@ export async function findAssets(
   query: string,
   limit = 5,
   strict = false,
-  searchSet: "coingecko" | "my-assets" = "coingecko"
+  searchSet: "all-assets" | "my-assets" = "all-assets"
 ): Promise<Asset[]> {
   const normalizedQuery = query.toLowerCase().trim()
 
-  const assets = searchSet === "coingecko" ? await getAssets() : await getMyAssets(accountName)
+  const assets = searchSet === "all-assets" ? await getAssets() : await getMyAssets(accountName)
 
   if (!normalizedQuery) {
     return assets.slice(0, limit)
@@ -319,23 +367,39 @@ export async function findAssets(
   return matchingAssets
 }
 
-async function refetchAssets() {
-  const data = await getCoingeckoCoins()
-  console.log(`Coingecko assets fetched.`)
+async function refetchCoins() {
+  const coins = await getCoingeckoCoins()
   await mkdir(`${CACHE_LOCATION}/coins`, { recursive: true })
-  await writeFile(`${CACHE_LOCATION}/coins/all.json`, JSON.stringify(data, null, 2))
+  await writeFile(`${CACHE_LOCATION}/coins/all.json`, JSON.stringify(coins, null, 2))
+  return coins
+}
+
+async function refetchStocks() {
+  const stocks = await getSecTickers()
+  await mkdir(`${CACHE_LOCATION}/stocks`, { recursive: true })
+  await writeFile(`${CACHE_LOCATION}/stocks/all.json`, JSON.stringify(stocks, null, 2))
+  return stocks
+}
+
+async function refetchAssets(progress?: ProgressCallback) {
+  await progress?.([undefined, `Downloading metadata for coins`])
+  const coins = await refetchCoins()
+  await progress?.([50, `Downloaded metadata for ${coins.length} coins`])
+  await progress?.([undefined, `Downloading metadata for stocks`])
+  const stocks = await refetchStocks()
+  await progress?.([100, `Downloaded metadata for ${Object.keys(stocks).length} stocks`])
   assets = []
   return await getAssets()
 }
 
 export async function refetchAssetsIfNeeded() {
-  console.log(`Coingecko assets checking...`)
+  console.log(`Assets checking...`)
   const assets = await getAssets()
   if (assets.length === 0) {
-    console.log(`Coingecko assets fetching...`)
+    console.log(`Assets fetching...`)
     return await refetchAssets()
   }
-  console.log(`Coingecko assets already exist: ${assets.length} records.`)
+  console.log(`Assets already exist: ${assets.length} records.`)
   return assets
 }
 
@@ -349,13 +413,13 @@ export function enqueueRefetchAssets(
     function: async (progress) => {
       const assets = await getAssets()
       if (assets.length !== 0 && onlyIfNeeded) {
-        await progress([undefined, `Coingecko assets already exist: ${assets.length} records.`])
+        await progress([undefined, `Assets already exist: ${assets.length} records.`])
         return
       }
-      const data = await refetchAssets()
+      const data = await refetchAssets(progress)
       const account = await getAccountWithAssets(accountName)
       account.eventEmitter.emit(SubscriptionChannel.Metadata)
-      await progress([undefined, `Refetched ${data.length} assets from coingecko.com.`])
+      await progress([undefined, `Downloaded metadata for ${data.length} assets.`])
     },
     name: "Refetch assets",
     priority: TaskPriority.High,

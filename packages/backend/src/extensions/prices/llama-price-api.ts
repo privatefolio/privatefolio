@@ -1,7 +1,7 @@
 import { ChartData, LlamaPrice, QueryRequest, ResolutionString, Time } from "src/interfaces"
 import { PriceApiId } from "src/settings/settings"
 import {
-  getAssetContract,
+  getAssetInternalId,
   getAssetPlatform,
   getAssetTicker,
   removePlatformPrefix,
@@ -14,7 +14,7 @@ export const Identifier: PriceApiId = "defi-llama"
 export function getPair(assetId: string) {
   const platformId = getAssetPlatform(assetId)
   const coingeckoId = removePlatformPrefix(platformId)
-  return `${coingeckoId}:${getAssetContract(assetId)}`
+  return `${coingeckoId}:${getAssetInternalId(assetId)}`
 }
 
 export function getPairDescription(assetId: string) {

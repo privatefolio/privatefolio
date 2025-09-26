@@ -36,6 +36,7 @@ const PLATFORM_TYPE: Record<PlatformPrefix, string> = {
   [PlatformPrefix.Chain]: "Blockchain",
   [PlatformPrefix.Exchange]: "Exchange",
   [PlatformPrefix.App]: "Data Platform",
+  [PlatformPrefix.Gov]: "Government",
 }
 
 export default function PlatformPage() {
