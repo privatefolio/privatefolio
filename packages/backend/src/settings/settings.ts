@@ -1,4 +1,5 @@
 import { isServer } from "../utils/environment-utils"
+export { PlatformPrefix } from "./config"
 
 const DEFAULT_DATA_LOCATION = "./data"
 export const DATA_LOCATION =
@@ -66,8 +67,6 @@ export const DEFAULT_SETTINGS: Settings = {
 
 export const TASK_LOG_CHAR_LIMIT = 50_000
 export const TASK_LOG_LINE_LIMIT = 1000
-
-export { PlatformPrefix } from "./platforms"
 
 export const PAYMENT_PLANS_IDS = ["premium", "free"] as const
 

@@ -236,6 +236,7 @@ async function processQueue(accountName: string) {
 
         try {
           const progressCallback = createProgressCallback(account, task.id)
+          await progressCallback([undefined, "Starting task"])
           await Promise.race([
             task.function(progressCallback, task.abortController.signal),
             // Give the task a 5 second grace period to finish up, otherwise abort it
