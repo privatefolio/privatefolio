@@ -395,7 +395,7 @@ async function refetchAssets(progress?: ProgressCallback) {
 export async function refetchAssetsIfNeeded() {
   console.log(`Assets checking...`)
   const assets = await getAssets()
-  if (assets.length === 0) {
+  if (assets.length === customAssets.length) {
     console.log(`Assets fetching...`)
     return await refetchAssets()
   }
@@ -412,7 +412,7 @@ export function enqueueRefetchAssets(
     description: "Refetching assets.",
     function: async (progress) => {
       const assets = await getAssets()
-      if (assets.length !== 0 && onlyIfNeeded) {
+      if (assets.length > customAssets.length && onlyIfNeeded) {
         await progress([undefined, `Assets already exist: ${assets.length} records.`])
         return
       }
