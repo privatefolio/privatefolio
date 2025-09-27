@@ -145,7 +145,7 @@ export const SearchBar = () => {
         try {
           setAssetsLoading(true)
           const [assets, myAssets] = await Promise.all([
-            rpc.findAssets(activeAccount, query, 5, false, "coingecko"),
+            rpc.findAssets(activeAccount, query, 5, false, "all-assets"),
             rpc.findAssets(activeAccount, query, 5, false, "my-assets"),
           ])
 

@@ -82,7 +82,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             </ConfirmDialogProvider>
           </ThemeProvider>
         </LocalizationProvider>
-        {/* {isDevelopment && <ReactQueryDevtools />} */}
+        {/* <ReactQueryDevtools /> */}
       </PersistQueryClientProvider>
     </Router>
   </ServiceWorkerProvider>

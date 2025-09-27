@@ -1,5 +1,5 @@
 import { AuditLog, EtherscanTransaction, Transaction } from "src/interfaces"
-import { PlatformPrefix } from "src/settings/platforms"
+import { PlatformPrefix } from "src/settings/settings"
 
 function trimTxId(fullId: string, platformId: string): string {
   const parts = fullId.split("_")

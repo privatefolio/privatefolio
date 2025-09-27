@@ -7,7 +7,7 @@ import {
   TransactionType,
 } from "src/interfaces"
 import { PLATFORMS_META, WETH_ASSET_ID } from "src/settings/settings"
-import { formatAddress, getAssetContract } from "src/utils/assets-utils"
+import { formatAddress, getAssetInternalId } from "src/utils/assets-utils"
 import { asUTC } from "src/utils/formatting-utils"
 
 import { ETHEREUM_PLATFORM_ID } from "../utils/evm-utils"
@@ -92,7 +92,7 @@ export function parse(
 
     // TESTME TODO9: on other networks
     // Fix for WETH: unwrapping does not appear in the erc20 export
-    if (from === getAssetContract(WETH_ASSET_ID)) {
+    if (from === getAssetInternalId(WETH_ASSET_ID)) {
       logs.push({
         assetId: WETH_ASSET_ID,
         change: `-${valueIn}`,

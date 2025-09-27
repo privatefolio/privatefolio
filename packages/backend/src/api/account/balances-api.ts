@@ -2,7 +2,7 @@ import Big from "big.js"
 import { getErc20Balance, getNativeBalance } from "src/extensions/utils/evm-utils"
 import { EventCause, ResolutionString, SqlParam } from "src/interfaces"
 import { PLATFORMS_META } from "src/settings/platforms"
-import { getAssetContract, getAssetPlatform, isEvmPlatform } from "src/utils/assets-utils"
+import { getAssetInternalId, getAssetPlatform, isEvmPlatform } from "src/utils/assets-utils"
 import { formatDate, ONE_DAY } from "src/utils/formatting-utils"
 import { sql } from "src/utils/sql-utils"
 import { floorTimestamp, noop, writesAllowed } from "src/utils/utils"
@@ -449,7 +449,7 @@ export async function verifyBalances(
       const platformId = getAssetPlatform(assetId)
       const platform = await getPlatform(platformId)
       const meta = PLATFORMS_META[platformId]
-      const contract = getAssetContract(assetId)
+      const contract = getAssetInternalId(assetId)
       let onChain: string | undefined
 
       try {

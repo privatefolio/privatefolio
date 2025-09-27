@@ -40,8 +40,8 @@ export function AssetInput(props: AssetInputProps) {
     debounce(
       async (query: string, signal: AbortSignal) => {
         setLoading(true)
-        const [coingecko, myAssets] = await Promise.all([
-          rpc.findAssets(activeAccount, query, 5, true, "coingecko"),
+        const [allAssets, myAssets] = await Promise.all([
+          rpc.findAssets(activeAccount, query, 5, true, "all-assets"),
           rpc.findAssets(activeAccount, query, 5, true, "my-assets"),
         ])
 
@@ -49,7 +49,7 @@ export function AssetInput(props: AssetInputProps) {
         if (signal.aborted) return
 
         const assetMap = new Map<string, Asset>()
-        coingecko.forEach((asset) => {
+        allAssets.forEach((asset) => {
           assetMap.set(asset.id, asset)
         })
         myAssets.forEach((asset) => {

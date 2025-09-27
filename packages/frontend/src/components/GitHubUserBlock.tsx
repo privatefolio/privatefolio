@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
-import { fetchGitHubUser } from "src/utils/github-utils"
+import { fetchGitHubUser, GitHubUser } from "src/utils/github-utils"
 
 import { AssetAvatar, AssetAvatarProps } from "./AssetAvatar"
 import { IdentifierBlock } from "./IdentifierBlock"
@@ -11,7 +11,13 @@ interface GitHubUserBlockProps extends Omit<AssetAvatarProps, "alt"> {
 
 export function GitHubUserBlock({ username, size, ...props }: GitHubUserBlockProps) {
   const { data: user } = useQuery({
-    queryFn: () => fetchGitHubUser(username),
+    queryFn: () =>
+      username === "privatefolio"
+        ? ({
+            avatar_url: "$STATIC_ASSETS/extensions/privatefolio.svg",
+            name: "Privatefolio",
+          } as GitHubUser)
+        : fetchGitHubUser(username),
     queryKey: ["github-user", username],
   })
 

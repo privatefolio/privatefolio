@@ -341,19 +341,20 @@ export const AVAILABLE_MODELS: AssistantModel[] = [
     id: "claude-3-haiku-20240307",
     label: "Claude 3 Haiku",
   },
+  // TODO9
   // Custom Models
-  {
-    capabilities: [],
-    contextWindow: 8192,
-    costPer1kTokens: {
-      input: 0,
-      output: 0,
-    },
-    description: "Local SmolLM2 model",
-    family: "custom",
-    id: "ai/smollm2",
-    label: "SmolLM2",
-  },
+  // {
+  //   capabilities: [],
+  //   contextWindow: 8192,
+  //   costPer1kTokens: {
+  //     input: 0,
+  //     output: 0,
+  //   },
+  //   description: "Local SmolLM2 model",
+  //   family: "custom",
+  //   id: "ai/smollm2",
+  //   label: "SmolLM2",
+  // },
 ]
 
 type ModeId = "read" | "write" | "deep-research"

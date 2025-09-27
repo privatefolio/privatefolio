@@ -10,7 +10,7 @@ import {
   Timestamp,
 } from "src/interfaces"
 
-import { PlatformPrefix } from "../settings/platforms"
+import { PlatformPrefix } from "../settings/settings"
 import { formatDate } from "./formatting-utils"
 
 /**

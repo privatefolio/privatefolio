@@ -57,7 +57,7 @@ export function TaskDetailsDialog({ task, ...props }: DialogProps & { task: Serv
       })
       .then(setProgressLogs)
       .catch(() => {
-        setProgressLogs([[Date.now(), [undefined, "Error: Failed to load server task logs"]]])
+        setProgressLogs([[Date.now(), [undefined, "Warning: Failed to load server task logs"]]])
       })
   }, [rpc, task, activeAccount])
 
@@ -225,12 +225,6 @@ export function TaskDetailsDialog({ task, ...props }: DialogProps & { task: Serv
               }}
             >
               <Typography variant="caption" component="div">
-                {"startedAt" in task && (
-                  <div>
-                    <TimeLabel timestamp={task.startedAt as number} debugMode={debugMode} />{" "}
-                    Starting task...
-                  </div>
-                )}
                 {/* Only show updates that contain a message */}
                 {progressLogs?.map((log, index) =>
                   !log[1][1] ? null : (

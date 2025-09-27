@@ -145,11 +145,11 @@ export function enqueueRefetchPlatforms(
       await Promise.all([
         (async function first() {
           const data = await refetchBlockchains()
-          await progress([undefined, `Refetched ${data.length} blockchains`])
+          await progress([undefined, `Downloaded metadata for ${data.length} blockchains`])
         })(),
         (async function second() {
           const data = await refetchExchanges()
-          await progress([undefined, `Refetched ${data.length} exchanges`])
+          await progress([undefined, `Downloaded metadata for ${data.length} exchanges`])
         })(),
       ])
     },

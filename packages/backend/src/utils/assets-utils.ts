@@ -48,8 +48,7 @@ export const removePlatformPrefix = memoize(function removePlatformPrefix(platfo
   } catch {}
 })
 
-// TODO rename to getAssetInternalId
-export const getAssetContract = memoize(function getAssetContract(assetId: string) {
+export const getAssetInternalId = memoize(function getAssetInternalId(assetId: string) {
   try {
     const parts = assetId.split(":")
     if (parts.length < 3) return

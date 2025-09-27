@@ -7,7 +7,7 @@ import {
   TransactionType,
 } from "src/interfaces"
 import { PLATFORMS_META, WETH_ASSET_ID } from "src/settings/settings"
-import { formatAddress, getAssetContract } from "src/utils/assets-utils"
+import { formatAddress, getAssetInternalId } from "src/utils/assets-utils"
 import { extractColumnsFromRow } from "src/utils/csv-utils"
 import { asUTC } from "src/utils/formatting-utils"
 
@@ -92,7 +92,7 @@ export function parse(
 
       // TESTME TODO9: on other networks
       // Fix for WETH: wrapping does not appear
-      if (operation === "Withdraw" && to === getAssetContract(WETH_ASSET_ID)) {
+      if (operation === "Withdraw" && to === getAssetInternalId(WETH_ASSET_ID)) {
         logs[logs.length - 1].operation = "Wrap"
         logs.push({
           assetId: WETH_ASSET_ID,

@@ -1,6 +1,6 @@
 import { GITHUB_CACHE_URL } from "src/settings/settings"
 import {
-  getAssetContract,
+  getAssetInternalId,
   getAssetPlatform,
   getAssetTicker,
   isEvmPlatform,
@@ -14,7 +14,7 @@ export async function getCachedCoingeckoId(assetId: string): Promise<string> {
 
     const platform = getAssetPlatform(assetId)
     if (isEvmPlatform(platform)) {
-      const contract = getAssetContract(assetId)
+      const contract = getAssetInternalId(assetId)
       url = `${GITHUB_CACHE_URL}/coin-id/a/${platform}/${contract.toLowerCase()}`
     } else {
       const ticker = getAssetTicker(assetId)

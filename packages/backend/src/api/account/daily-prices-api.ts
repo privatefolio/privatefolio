@@ -1,3 +1,4 @@
+import { US_SEC_PLATFORM_ID } from "src/extensions/metadata/us-sec-api"
 import { PRICE_API_MATCHER } from "src/extensions/prices/providers"
 import {
   ChartData,
@@ -14,8 +15,8 @@ import {
 } from "src/interfaces"
 import { BINANCE_PLATFORM_ID } from "src/settings/platforms"
 import { allPriceApiIds, PriceApiId } from "src/settings/price-apis"
-import { PRICE_API_PAGINATION, PRICE_APIS_META } from "src/settings/settings"
-import { getAssetPlatform, getAssetTicker } from "src/utils/assets-utils"
+import { PlatformPrefix, PRICE_API_PAGINATION, PRICE_APIS_META } from "src/settings/settings"
+import { getAssetPlatform, getAssetTicker, getPlatformPrefix } from "src/utils/assets-utils"
 import { formatDate, ONE_DAY } from "src/utils/formatting-utils"
 import { sql } from "src/utils/sql-utils"
 import { createSubscription } from "src/utils/sub-utils"
@@ -231,8 +232,9 @@ export async function fetchDailyPrices(
     promises.push(async () => {
       const asset = assets[i - 1]
       const platform = getAssetPlatform(asset.id)
+      const platformPrefix = getPlatformPrefix(platform)
 
-      if (!asset.coingeckoId && platform !== BINANCE_PLATFORM_ID) {
+      if (platformPrefix === PlatformPrefix.Chain && !asset.coingeckoId) {
         await progress([undefined, `Skipped ${getAssetTicker(asset.id)}: No coingeckoId`])
         return
       }
@@ -245,6 +247,11 @@ export async function fetchDailyPrices(
       if (!preferredPriceApiId && platform === BINANCE_PLATFORM_ID) {
         // priceApiIds.sort((a) => (a === "binance" ? -1 : 1))
         priceApiIds = ["binance"]
+      }
+
+      if (!preferredPriceApiId && platform === US_SEC_PLATFORM_ID) {
+        // priceApiIds.sort((a) => (a === "binance" ? -1 : 1))
+        priceApiIds = ["yahoo"]
       }
 
       let since: Timestamp | undefined = await getPriceCursor(accountName, asset.id)
