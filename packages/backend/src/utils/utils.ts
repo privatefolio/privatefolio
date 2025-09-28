@@ -165,32 +165,78 @@ export function roundTimestamp(timestamp: Timestamp, timeInterval: ResolutionStr
   return timestamp - remainder
 }
 
+/**
+ * Ensures that the prices are in valid buckets, fills gaps between data points
+ */
 export function ensureValidBuckets(
   prices: ChartData[],
-  timeInterval: ResolutionString
+  timeInterval: ResolutionString,
+  untilTime?: Time
 ): ChartData[] {
   const bucketSize = getBucketSize(timeInterval)
   const patched: ChartData[] = []
+
+  const isCandleData = prices[0]?.close !== undefined
+  const hasVolume = prices[0]?.volume !== undefined
 
   let prevRecord: ChartData | undefined
   for (let i = 0; i < prices.length; i++) {
     const record = prices[i]
 
     const intervalsDiff = prevRecord ? (record.time - (prevRecord.time as number)) / bucketSize : 0
-
     if (intervalsDiff > 1) {
       // fill the gaps between data points
       for (let i = 1; i < intervalsDiff; i++) {
         const gapTime = ((prevRecord as ChartData).time as number) + i * bucketSize
-        patched.push({
-          time: gapTime as Time,
-          value: (prevRecord as ChartData).value,
-        })
+
+        patched.push(
+          isCandleData
+            ? {
+                close: prevRecord.value,
+                high: prevRecord.value,
+                low: prevRecord.value,
+                open: prevRecord.value,
+                time: gapTime as Time,
+                value: prevRecord.value,
+                volume: hasVolume ? 0 : undefined,
+              }
+            : {
+                time: gapTime as Time,
+                value: prevRecord.value,
+                volume: hasVolume ? 0 : undefined,
+              }
+        )
       }
     }
 
     patched.push(record)
     prevRecord = record
+  }
+
+  // fill the gaps until the until timestamp
+  const lastRecord = patched[patched.length - 1]
+  if (untilTime && lastRecord && lastRecord.time < untilTime) {
+    const gapLength = Math.floor((untilTime - lastRecord.time) / bucketSize)
+    for (let i = 1; i < gapLength; i++) {
+      const gapTime = lastRecord.time + i * bucketSize
+      patched.push(
+        isCandleData
+          ? {
+              close: lastRecord.value,
+              high: lastRecord.value,
+              low: lastRecord.value,
+              open: lastRecord.value,
+              time: gapTime as Time,
+              value: lastRecord.value,
+              volume: hasVolume ? 0 : undefined,
+            }
+          : {
+              time: gapTime as Time,
+              value: lastRecord.value,
+              volume: hasVolume ? 0 : undefined,
+            }
+      )
+    }
   }
 
   return patched

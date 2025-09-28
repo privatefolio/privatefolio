@@ -1,21 +1,22 @@
 import { mapToChartData, queryPrices } from "src/extensions/prices/coinbase-price-api"
 import { ResolutionString, Timestamp } from "src/interfaces"
 import { PRICE_API_PAGINATION } from "src/settings/settings"
-import { ONE_DAY } from "src/utils/formatting-utils"
+import { formatDateWithHour, ONE_DAY } from "src/utils/formatting-utils"
 import { assertTimeConsistency } from "src/utils/test-utils"
 import { expect, it } from "vitest"
 
 it("should fetch BTC prices within a range", async () => {
   // act
-  const result = await queryPrices({
+  let result = await queryPrices({
     limit: 3,
     pair: "BTC-USD",
-    since: 1502928000000,
+    since: Date.UTC(2017, 7, 17, 0, 0, 0, 0),
     timeInterval: "1d" as ResolutionString,
-    until: 1503100800000,
+    until: Date.UTC(2017, 7, 19, 0, 0, 0, 0),
   })
   // assert
-  expect(result.map(mapToChartData)).toMatchInlineSnapshot(`
+  result = result.map(mapToChartData)
+  expect(result).toMatchInlineSnapshot(`
     [
       {
         "close": 4280.01,
@@ -46,6 +47,12 @@ it("should fetch BTC prices within a range", async () => {
       },
     ]
   `)
+  expect(formatDateWithHour(result[0].time * 1000)).toMatchInlineSnapshot(
+    `"August 17, 2017 at 03:00"`
+  )
+  expect(formatDateWithHour(result[result.length - 1].time * 1000)).toMatchInlineSnapshot(
+    `"August 19, 2017 at 03:00"`
+  )
 })
 
 it("should fetch BTC prices in correct order", async () => {

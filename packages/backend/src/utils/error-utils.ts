@@ -1,6 +1,6 @@
 import { logger as defaultLogger } from "src/logger"
 import { serverId, telemetry } from "src/telemetry"
-import { environment, isNode, isTestEnvironment, runtime } from "src/utils/utils"
+import { environment, isNode, isProduction, runtime } from "src/utils/utils"
 
 export function logAndReportError(
   error: Error,
@@ -14,7 +14,7 @@ export function logAndReportError(
       stackTrace: error.stack,
       ...extraProperties,
     })
-    if (isTestEnvironment) return
+    if (!isProduction) return
     telemetry.captureException(error, serverId, {
       arch: isNode ? process.arch : undefined,
       environment,

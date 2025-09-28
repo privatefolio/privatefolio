@@ -1,5 +1,8 @@
-import { AuditLog, EtherscanTransaction, Transaction } from "src/interfaces"
+import { TimeConsistencyError } from "src/errors"
+import { AuditLog, EtherscanTransaction, Time, Transaction } from "src/interfaces"
 import { PlatformPrefix } from "src/settings/settings"
+
+import { ONE_DAY_TIME } from "./formatting-utils"
 
 function trimTxId(fullId: string, platformId: string): string {
   const parts = fullId.split("_")
@@ -71,12 +74,18 @@ export function sanitizeTransaction(transaction: Transaction) {
   }
 }
 
-export function assertTimeConsistency(records: { time: number }[]) {
+/**
+ * Asserts that the records are in ascending order by time, no gaps, and no duplicates
+ */
+export function assertTimeConsistency(records: { time: Time }[], interval = ONE_DAY_TIME) {
   let prevRecord
-  for (const record of records) {
-    if (prevRecord && Number(record.time) !== Number(prevRecord.time) + 86400) {
+  for (let i = 0; i < records.length; i++) {
+    const record = records[i]
+    if (prevRecord && record.time !== prevRecord.time + interval) {
       console.log(prevRecord, record)
-      throw new Error("Inconsistency error")
+      throw new TimeConsistencyError(
+        `Data must be asc, index ${i}, time ${record.time}, prevTime ${prevRecord.time}`
+      )
     }
     prevRecord = record
   }

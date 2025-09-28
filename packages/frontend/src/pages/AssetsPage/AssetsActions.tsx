@@ -18,7 +18,8 @@ import {
 } from "@mui/material"
 import { useStore } from "@nanostores/react"
 import React from "react"
-import { ActionId, APP_ACTIONS } from "src/AppActions"
+import { ActionId } from "src/AppActions"
+import { ActionMenuItem } from "src/components/ActionMenuItem"
 import { $activeAccount } from "src/stores/account-store"
 import { $debugMode } from "src/stores/app-store"
 import { $hideUnlisted } from "src/stores/device-settings-store"
@@ -98,26 +99,8 @@ export function AssetsActions() {
                 DEBUG
               </Typography>
             </Divider>
-            <MenuItem
-              dense
-              onClick={async () => {
-                await APP_ACTIONS[ActionId.DELETE_ASSET_PRICES].perform()
-                handleClose()
-              }}
-            >
-              <ListItemAvatar>{APP_ACTIONS[ActionId.DELETE_ASSET_PRICES].icon}</ListItemAvatar>
-              <ListItemText>{APP_ACTIONS[ActionId.DELETE_ASSET_PRICES].name}</ListItemText>
-            </MenuItem>
-            <MenuItem
-              dense
-              onClick={async () => {
-                await APP_ACTIONS[ActionId.DELETE_ASSET_PREFERENCES].perform()
-                handleClose()
-              }}
-            >
-              <ListItemAvatar>{APP_ACTIONS[ActionId.DELETE_ASSET_PREFERENCES].icon}</ListItemAvatar>
-              <ListItemText>{APP_ACTIONS[ActionId.DELETE_ASSET_PREFERENCES].name}</ListItemText>
-            </MenuItem>
+            <ActionMenuItem dense id={ActionId.DELETE_ASSET_PRICES} onFinish={handleClose} />
+            <ActionMenuItem dense id={ActionId.DELETE_ASSET_PREFERENCES} onFinish={handleClose} />
           </>
         )}
       </Menu>

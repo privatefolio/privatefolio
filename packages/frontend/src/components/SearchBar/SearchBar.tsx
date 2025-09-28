@@ -1,20 +1,4 @@
-import {
-  AccountBalanceRounded,
-  AttachMoneyRounded,
-  BackupRounded,
-  Bedtime,
-  CachedRounded,
-  CalculateOutlined,
-  CallMergeRounded,
-  Close,
-  CloudSyncRounded,
-  DeleteForever,
-  DownloadRounded,
-  PhishingRounded,
-  RestoreRounded,
-  StarRounded,
-  Workspaces,
-} from "@mui/icons-material"
+import { Close, StarRounded } from "@mui/icons-material"
 import {
   Button,
   Dialog,
@@ -52,20 +36,12 @@ import {
 } from "src/interfaces"
 import { INPUT_DEBOUNCE_DURATION, INPUT_MAX_DEBOUNCE_DURATION } from "src/settings"
 import { $activeAccount, $activeAccountPath } from "src/stores/account-store"
-import { $debugMode } from "src/stores/app-store"
 import { appBarHeight } from "src/theme"
 import { getAssetPlatform } from "src/utils/assets-utils"
-import {
-  handleBackupRequest,
-  handleExportAuditLogsRequest,
-  handleExportTransactionsRequest,
-  onRestoreRequest,
-} from "src/utils/backup-utils"
 import { isInputFocused } from "src/utils/browser-utils"
 import { isElectron } from "src/utils/electron-utils"
 import { formatDateRelative, formatPrivatefolioTxId } from "src/utils/formatting-utils"
 import { normalizeTxHash } from "src/utils/parsing-utils"
-import { noop } from "src/utils/utils"
 import { $rpc } from "src/workers/remotes"
 
 import { $assetMap, $platformMap, getFilterValueLabel } from "../../stores/metadata-store"
@@ -415,170 +391,10 @@ export const SearchBar = () => {
   }, [extensionsFound, navigate, activeAccountPath])
 
   const appActions = useMemo<Action[]>(() => {
-    const actions: Action[] = [
-      {
-        icon: <CachedRounded fontSize="small" />,
-        id: "action-refresh-all",
-        name: "Refresh all",
-        perform: () => {
-          rpc.enqueueFetchPrices(activeAccount, "user")
-          rpc.enqueueRefreshBalances(activeAccount, "user")
-          rpc.enqueueRefreshNetworth(activeAccount, "user")
-          rpc.enqueueRefreshTrades(activeAccount, "user")
-        },
-        priority: 11,
-        section: SECTIONS.actions,
-        shortcut: ["$mod+a"],
-        subtitle: "Refresh prices, networth, trades and more.",
-      },
-      {
-        icon: <AttachMoneyRounded fontSize="small" />,
-        id: "action-fetch-asset-prices",
-        name: "Fetch asset prices",
-        perform: () => rpc.enqueueFetchPrices(activeAccount, "user"),
-        priority: 3,
-        section: SECTIONS.actions,
-      },
-      {
-        icon: <CloudSyncRounded fontSize="small" />,
-        id: "action-sync-all-connections",
-        name: "Sync all connections",
-        perform: () => rpc.enqueueSyncAllConnections(activeAccount, "user", $debugMode.get()),
-        priority: 10,
-        section: SECTIONS.actions,
-      },
-      {
-        icon: <CloudSyncRounded fontSize="small" />,
-        id: "action-reset-all-connections",
-        name: "Reset all connections",
-        perform: () => rpc.enqueueResetAllConnections(activeAccount, "user"),
-        priority: 10,
-        section: SECTIONS.actions,
-      },
-      {
-        icon: <PhishingRounded fontSize="small" />,
-        id: "action-detect-spam-transactions",
-        name: "Detect spam transactions",
-        perform: () => rpc.enqueueDetectSpamTransactions(activeAccount, "user"),
-        priority: 1,
-        section: SECTIONS.actions,
-      },
-      {
-        icon: <CallMergeRounded fontSize="small" />,
-        id: "action-auto-merge-txns",
-        name: "Auto-merge transactions",
-        perform: () => rpc.enqueueAutoMerge(activeAccount, "user"),
-        priority: 1,
-        section: SECTIONS.actions,
-      },
-      {
-        icon: <BackupRounded fontSize="small" />,
-        id: "action-backup-account",
-        keywords: "backup account restore",
-        name: "Backup account",
-        perform: () => handleBackupRequest(rpc, activeAccount),
-        priority: 9,
-        section: SECTIONS.actions,
-      },
-      {
-        icon: <RestoreRounded fontSize="small" />,
-        id: "action-restore-account",
-        keywords: "restore account backup",
-        name: "Restore account",
-        perform: () => onRestoreRequest(rpc, activeAccount, noop),
-        priority: 9,
-        section: SECTIONS.actions,
-      },
-      {
-        icon: <DownloadRounded fontSize="small" />,
-        id: "action-export-transactions",
-        keywords: "export transactions",
-        name: "Export transactions",
-        perform: () => handleExportTransactionsRequest(rpc, activeAccount),
-        priority: 5,
-        section: SECTIONS.actions,
-      },
-      {
-        icon: <DownloadRounded fontSize="small" />,
-        id: "action-export-audit-logs",
-        keywords: "export audit logs",
-        name: "Export audit logs",
-        perform: () => handleExportAuditLogsRequest(rpc, activeAccount),
-        priority: 5,
-        section: SECTIONS.actions,
-      },
-      {
-        icon: <AccountBalanceRounded fontSize="small" />,
-        id: "action-refetch-platforms",
-        name: "Refetch asset platforms",
-        perform: () => rpc.enqueueRefetchPlatforms(activeAccount, "user"),
-        priority: 2,
-        section: SECTIONS.actions,
-      },
-      {
-        icon: <CalculateOutlined fontSize="small" />,
-        id: "action-recompute-trades",
-        name: "Recompute trades",
-        perform: () => rpc.enqueueRecomputeTrades(activeAccount, "user"),
-        priority: 3,
-        section: SECTIONS.actions,
-        // shortcut: ["$mod+x"],
-      },
-      {
-        icon: <CalculateOutlined fontSize="small" />,
-        id: "action-recompute-balances",
-        name: "Recompute balances",
-        perform: () => rpc.enqueueRecomputeBalances(activeAccount, "user"),
-        priority: 3,
-        section: SECTIONS.actions,
-      },
-      {
-        icon: <CalculateOutlined fontSize="small" />,
-        id: "action-recompute-networth",
-        name: "Recompute networth",
-        perform: () => rpc.enqueueRecomputeNetworth(activeAccount, "user"),
-        priority: 3,
-        section: SECTIONS.actions,
-      },
-      {
-        icon: <DeleteForever fontSize="small" />,
-        id: "action-delete-balances",
-        name: "Delete balances",
-        perform: () => rpc.enqueueDeleteBalances(activeAccount, "user"),
-        priority: 0,
-        section: SECTIONS.actions,
-      },
-      {
-        icon: <Bedtime fontSize="small" />,
-        id: "action-sleep-5s",
-        name: "Sleep 5s",
-        perform: () => rpc.enqueueSleep(activeAccount, 5, 1, true),
-        priority: 0,
-        section: SECTIONS.actions,
-      },
-      {
-        icon: <Bedtime fontSize="small" />,
-        id: "action-sleep-50s",
-        name: "Sleep 50s",
-        perform: () => rpc.enqueueSleep(activeAccount, 50, 10, true),
-        priority: 0,
-        section: SECTIONS.actions,
-      },
-      {
-        icon: <Workspaces fontSize="small" />,
-        id: "action-refetch-all-assets",
-        name: "Refetch all assets",
-        perform: () => rpc.enqueueRefetchAssets(activeAccount, "user"),
-        priority: 2,
-        section: SECTIONS.actions,
-      },
-      ...Object.values(APP_ACTIONS),
-    ]
-
+    const actions = Object.values(APP_ACTIONS)
     actions.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""))
-
     return actions
-  }, [activeAccount, rpc])
+  }, [])
 
   const actions = useMemo<Action[]>(() => {
     const all = [

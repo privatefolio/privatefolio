@@ -1,4 +1,4 @@
-import { CalculateOutlined, DeleteForever, DownloadRounded, MoreHoriz } from "@mui/icons-material"
+import { DownloadRounded, MoreHoriz } from "@mui/icons-material"
 import {
   Divider,
   IconButton,
@@ -13,6 +13,8 @@ import {
 import { useStore } from "@nanostores/react"
 import { transformAuditLogsToCsv } from "privatefolio-backend/build/src/utils/csv-export-utils"
 import React, { MutableRefObject, useState } from "react"
+import { ActionId } from "src/AppActions"
+import { ActionMenuItem } from "src/components/ActionMenuItem"
 import { HideSpamToggle } from "src/components/HideSpamToggle"
 import { QuoteCurrencyToggle } from "src/components/QuoteCurrencyToggle"
 import { AuditLog } from "src/interfaces"
@@ -84,18 +86,7 @@ export function AuditLogActions(props: AuditLogsActionsProps) {
           </ListItemAvatar>
           <ListItemText>Export all audit logs</ListItemText>
         </MenuItem>
-        <MenuItem
-          dense
-          onClick={() => {
-            rpc.enqueueRecomputeBalances(activeAccount, "user")
-            handleClose()
-          }}
-        >
-          <ListItemAvatar>
-            <CalculateOutlined fontSize="small" />
-          </ListItemAvatar>
-          <ListItemText>Recompute balances</ListItemText>
-        </MenuItem>
+        <ActionMenuItem dense id={ActionId.RECOMPUTE_BALANCES} onFinish={handleClose} />
         {debugMode && (
           <div>
             <Divider textAlign="center">
@@ -103,18 +94,7 @@ export function AuditLogActions(props: AuditLogsActionsProps) {
                 DEBUG
               </Typography>
             </Divider>
-            <MenuItem
-              dense
-              onClick={() => {
-                rpc.enqueueDeleteBalances(activeAccount, "user")
-                handleClose()
-              }}
-            >
-              <ListItemAvatar>
-                <DeleteForever fontSize="small" />
-              </ListItemAvatar>
-              <ListItemText>Delete balances</ListItemText>
-            </MenuItem>
+            <ActionMenuItem dense id={ActionId.DELETE_BALANCES} onFinish={handleClose} />
           </div>
         )}
       </Menu>

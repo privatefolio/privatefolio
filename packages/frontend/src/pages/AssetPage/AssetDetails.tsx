@@ -45,7 +45,7 @@ export function AssetDetails(props: AssetDetailsProps) {
       <Paper sx={{ paddingX: 2, paddingY: 1 }}>
         <Typography variant="body2" component="div">
           <Stack gap={2}>
-            {getAssetPlatform(assetId) && getAssetPlatform(assetId) !== "coingecko" && (
+            {getAssetPlatform(assetId) && (
               <div>
                 <SectionTitle>Platform</SectionTitle>
                 <PlatformBlock id={getAssetPlatform(assetId)} />
