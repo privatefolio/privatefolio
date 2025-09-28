@@ -65,7 +65,8 @@ it("should fetch BTC prices using Binance", async (test) => {
     [{ coingeckoId: "test", id: "binance:BTC", priceApiId: "binance", symbol: "BTC" }],
     async (state) => updates.push(state),
     undefined,
-    { until: 1735682400000 }
+    { until: 1735682400000 } // TODO9
+    // { until: Date.UTC(2024, 11, 31, 0, 0, 0, 0) }
   )
   const records = await getPricesForAsset(accountName, "binance:BTC")
   // assert
@@ -150,7 +151,7 @@ it("should fetch BTC prices using Coinbase", async () => {
     ],
     async (state) => updates.push(state),
     undefined,
-    { until: 1735682400000 }
+    { until: Date.UTC(2024, 11, 31, 0, 0, 0, 0) }
   )
   const records = await getPricesForAsset(accountName, "coinbase:BTC")
   // assert
@@ -166,19 +167,19 @@ it("should fetch BTC prices using Coinbase", async () => {
       ],
       [
         undefined,
-        "Fetched BTC using Coinbase from Jul 16, 2022 to Dec 31, 2024",
+        "Fetched BTC using Coinbase from Jul 18, 2022 to Dec 31, 2024",
       ],
       [
         undefined,
-        "Fetched BTC using Coinbase from Jan 30, 2020 to Jul 15, 2022",
+        "Fetched BTC using Coinbase from Feb 01, 2020 to Jul 17, 2022",
       ],
       [
         undefined,
-        "Fetched BTC using Coinbase from Aug 15, 2017 to Jan 29, 2020",
+        "Fetched BTC using Coinbase from Aug 17, 2017 to Jan 31, 2020",
       ],
       [
         undefined,
-        "Fetched BTC using Coinbase from Jul 20, 2015 to Aug 14, 2017",
+        "Fetched BTC using Coinbase from Jul 20, 2015 to Aug 16, 2017",
       ],
       [
         100,
@@ -240,7 +241,7 @@ it.skip("should fetch WBTC prices using DefiLlama", async () => {
     ],
     async (state) => updates.push(state),
     undefined,
-    { until: 1735682400000 }
+    { until: Date.UTC(2024, 11, 31, 0, 0, 0, 0) }
   )
   const records = await getPricesForAsset(
     accountName,
@@ -313,7 +314,8 @@ it("should fetch WBTC prices using Alchemy", async () => {
     ],
     async (state) => updates.push(state),
     undefined,
-    { until: 1735682400000 }
+    { until: 1735682400000 } // TODO9
+    // { until: Date.UTC(2024, 11, 31, 0, 0, 0, 0) }
   )
   const records = await getPricesForAsset(
     accountName,

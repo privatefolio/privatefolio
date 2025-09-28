@@ -211,14 +211,14 @@ async function getStocksFromCache() {
     const parsed = JSON.parse(data) as Record<string, SecTicker>
 
     const list: Asset[] = Object.entries(parsed).map(
-      ([key, { cik_str: secId, ticker: symbol, title: name }]) =>
+      ([key, { cik_str: secId, ticker, title: name }]) =>
         ({
-          id: `${US_SEC_PLATFORM.id}:${secId}:${symbol}`,
-          logoUrl: `https://github.com/nvstly/icons/raw/main/ticker_icons/${symbol}.png`,
+          id: `${US_SEC_PLATFORM.id}:${secId}:${ticker.toLowerCase()}`,
+          logoUrl: `https://github.com/nvstly/icons/raw/main/ticker_icons/${ticker}.png`,
           // logoUrl: `https://github.com/davidepalazzo/ticker-logos/raw/main/ticker_icons/${symbol}.png`,
           marketCapRank: Number(key) + 1,
           name,
-          symbol,
+          symbol: ticker.toLowerCase(),
         }) satisfies Asset
     )
 

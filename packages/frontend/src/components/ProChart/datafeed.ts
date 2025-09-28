@@ -72,14 +72,21 @@ export const datafeed: IBasicDataFeed = {
         // const useDatabaseCache = false // asset.priceApiId === null && !!asset.priceApiId
       }
 
-      const data = await getLivePricesForAsset(
+      const priceApiId = exchange as PriceApiId
+      const priceApi = PRICE_APIS_META[priceApiId]
+
+      const params: Parameters<typeof getLivePricesForAsset> = [
         id,
-        exchange as PriceApiId,
+        priceApiId,
         limit,
         resolution,
         start * 1000,
-        end * 1000
-      )
+        end * 1000,
+      ]
+
+      const data = priceApi.needsTunnel
+        ? await rpc.getLivePricesForAsset(...params)
+        : await getLivePricesForAsset(...params)
 
       const bars = data.map(mapChartDataToBars)
       onResult(bars, { noData: bars.length === 0 })

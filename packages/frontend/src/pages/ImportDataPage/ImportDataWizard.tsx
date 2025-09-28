@@ -283,13 +283,14 @@ export function ImportDataWizard() {
                 })}
                 InputProps={{
                   inputProps: {
-                    sx: { paddingTop: "0px !important" },
+                    // sx: { paddingY: "4px !important" },
                   },
-                  sx: { borderRadius: 3, paddingTop: "0px !important" },
+                  sx: { borderRadius: 3 },
                 }}
               />
               <Stack
                 direction="row"
+                flexWrap="wrap"
                 gap={1}
                 sx={{
                   "& .MuiButton-colorPrimary": {

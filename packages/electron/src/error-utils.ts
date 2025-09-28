@@ -1,4 +1,4 @@
-import { environment } from "./environment-utils"
+import { environment, isProduction } from "./environment-utils"
 import { logger as defaultLogger } from "./logger"
 import { appId, telemetry } from "./telemetry"
 
@@ -14,6 +14,7 @@ export function logAndReportError(
       stackTrace: error.stack,
       ...extraProperties,
     })
+    if (!isProduction) return
     telemetry.captureException(error, appId, {
       arch: process.arch,
       environment,

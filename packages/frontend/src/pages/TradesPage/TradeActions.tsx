@@ -1,18 +1,9 @@
-import { CalculateOutlined, MoreHoriz } from "@mui/icons-material"
-import {
-  IconButton,
-  ListItemAvatar,
-  ListItemText,
-  Menu,
-  MenuItem,
-  Stack,
-  Tooltip,
-} from "@mui/material"
-import { useStore } from "@nanostores/react"
+import { MoreHoriz } from "@mui/icons-material"
+import { IconButton, Menu, Stack, Tooltip } from "@mui/material"
 import React from "react"
+import { ActionId } from "src/AppActions"
+import { ActionMenuItem } from "src/components/ActionMenuItem"
 import { QuoteCurrencyToggle } from "src/components/QuoteCurrencyToggle"
-import { $activeAccount } from "src/stores/account-store"
-import { $rpc } from "src/workers/remotes"
 
 export function TradeActions() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
@@ -23,9 +14,6 @@ export function TradeActions() {
   const handleClose = () => {
     setAnchorEl(null)
   }
-
-  const rpc = useStore($rpc)
-  const activeAccount = useStore($activeAccount)
 
   return (
     <Stack direction="row">
@@ -42,18 +30,7 @@ export function TradeActions() {
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
       >
-        <MenuItem
-          dense
-          onClick={() => {
-            rpc.enqueueRecomputeTrades(activeAccount, "user")
-            handleClose()
-          }}
-        >
-          <ListItemAvatar>
-            <CalculateOutlined fontSize="small" />
-          </ListItemAvatar>
-          <ListItemText>Recompute trades</ListItemText>
-        </MenuItem>
+        <ActionMenuItem dense id={ActionId.RECOMPUTE_TRADES} onFinish={handleClose} />
       </Menu>
     </Stack>
   )

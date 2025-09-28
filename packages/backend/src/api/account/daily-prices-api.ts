@@ -303,11 +303,11 @@ export async function fetchDailyPrices(
               throw new Error(`${PRICE_APIS_META[priceApiId].name}: EmptyResponse`)
             }
 
-            const documents = results.map((result) => {
+            const records: NewDailyPrice[] = results.map((result: unknown) => {
               const price = priceApi.mapToChartData(result)
               const timestamp = (price.time as number) * 1000
 
-              const doc: NewDailyPrice = {
+              const record: NewDailyPrice = {
                 assetId: asset.id,
                 pair,
                 price,
@@ -315,10 +315,10 @@ export async function fetchDailyPrices(
                 timestamp,
               }
 
-              return doc
+              return record
             })
 
-            await upsertDailyPrices(accountName, documents)
+            await upsertDailyPrices(accountName, records)
 
             const start = (priceApi.mapToChartData(results[0]).time as number) * 1000
             const end = (priceApi.mapToChartData(results[results.length - 1]).time as number) * 1000
