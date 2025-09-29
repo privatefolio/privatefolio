@@ -47,12 +47,12 @@ it("should fetch BTC prices within a range", async () => {
       },
     ]
   `)
-  expect(formatDateWithHour(result[0].time * 1000)).toMatchInlineSnapshot(
-    `"August 17, 2017 at 03:00"`
+  expect(formatDateWithHour(result[0].time * 1000, { timeZone: "UTC" })).toMatchInlineSnapshot(
+    `"August 17, 2017 at 00:00"`
   )
-  expect(formatDateWithHour(result[result.length - 1].time * 1000)).toMatchInlineSnapshot(
-    `"August 19, 2017 at 03:00"`
-  )
+  expect(
+    formatDateWithHour(result[result.length - 1].time * 1000, { timeZone: "UTC" })
+  ).toMatchInlineSnapshot(`"August 19, 2017 at 00:00"`)
 })
 
 it("should fetch BTC prices in correct order", async () => {
