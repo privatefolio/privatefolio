@@ -4,7 +4,7 @@
     "name": "Daniel Constantin"
   },
   "dependencies": {
-    "@privatefolio/commons-node": "^2.0.0-beta.47",
+    "@privatefolio/commons-node": "^2.0.0-beta.48",
     "electron-store": "^8.2.0",
     "electron-updater": "^6.6.2"
   },
@@ -47,5 +47,5 @@
     "package:mac": "yarn bundle:mac --dir",
     "package:win": "yarn bundle:win --dir"
   },
-  "version": "2.0.0-beta.47"
+  "version": "2.0.0-beta.48"
 }
