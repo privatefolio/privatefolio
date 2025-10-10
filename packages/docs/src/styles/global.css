@@ -99,7 +99,8 @@ p, li {
   font-weight: var(--sl-font-weight-light);
 }
 
-#starlight__on-this-page {
+/* on this page */
+#starlight__on-this-page, .right-sidebar-panel h2 {
   font-family: var(--sl-font);
   font-size: var(--sl-text-xs);
   margin-left: 0.5rem;

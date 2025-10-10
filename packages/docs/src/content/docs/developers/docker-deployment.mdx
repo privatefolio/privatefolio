@@ -57,7 +57,7 @@ The Docker image uses a multi-stage build process. It builds the frontend bundle
 The final image utilizes Bun to serve the compiled JavaScript build of the backend and the pre-built frontend bundle.
 
 import { Code } from '@astrojs/starlight/components';
-import dockerFile from '../backend/Dockerfile?raw';
+import dockerFile from './Dockerfile?raw';
 
 <Code code={dockerFile} lang="docker" title="packages/backend/Dockerfile" />
 
@@ -120,7 +120,7 @@ Learn more on [self-hosting with Docker](/users/self-hosting-with-docker).
 
 ## Workflow file
 
-import workflowFile from '../../.github/workflows/publish-docker-image.yml?raw';
+import workflowFile from './publish-docker-image.yml?raw';
 
 <Code code={workflowFile} lang="yaml" title=".github/workflows/publish-docker-image.yml" mark={[
   { range: "32-37" },
