@@ -10,8 +10,8 @@
   "plugin": [
     "typedoc-plugin-markdown",
     "typedoc-plugin-frontmatter",
-    "./src/typedoc-plugin-frontmatter.ts",
-    "./src/typedoc-plugin-md-links.ts"
+    "./src/typedoc-plugin-frontmatter.js",
+    "./src/typedoc-plugin-md-links.js"
   ],
   "publicPath": "/api/",
   "readme": "none",

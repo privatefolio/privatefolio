@@ -3,8 +3,6 @@ title: Self-hosting with Fly.io
 description: Deploy Privatefolio to the edge using Fly.io cloud platform
 ---
 
-# Self-hosting with Fly.io
-
 Deploying to Fly.io to self-host Privatefolio on the edge using the official Docker image from GitHub Container Registry (GHCR). Privatefolio includes a `fly.toml` configuration file for easy deployment on this cloud provider.
 
 ## Prerequisites

@@ -3,8 +3,6 @@ title: Guidelines for AI agents and LLMs
 description: A structured checklist for AI agents and LLMs
 ---
 
-# Guidelines for AI agents and LLMs
-
 You are an AI agent helping developers troubleshoot and make changes to Privatefolio.
 
 ## General Guidelines
@@ -23,3 +21,5 @@ When helping developers with Privatefolio:
 - **DO NOT** ever run the `start` or `dev` scripts because these are long-lived processes that should already be running in the background
 - **ALWAYS** use the `test` or `build` scripts when you want to test that something works
 - **ALWAYS** place interfaces (that span multiple files) in `src/interfaces.ts`
+- **ALWAYS** read [llms-small.txt](/packages/docs/dist/llms-small.txt) before making any changes.
+- **DO NOT** bother to write tests, to compile or to build, unless explicitly asked.

@@ -3,8 +3,6 @@ title: Frontend
 description: React and Vite powered frontend with Material-UI
 ---
 
-# Frontend
-
 ## Overview
 
 - The Privatefolio Frontend is a React and Vite powered TypeScript application that delivers a responsive and interactive UI for tracking multi-chain cryptocurrency portfolios. It leverages Material‑UI for design, nanostores for state management, and Comlink/WebWorker‑backed SQLite for client‑side data persistence, with seamless integration into Electron.

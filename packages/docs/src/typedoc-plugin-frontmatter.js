@@ -1,8 +1,10 @@
-import { Application } from "typedoc"
-import { MarkdownPageEvent } from "typedoc-plugin-markdown"
+const { MarkdownPageEvent } = require("typedoc-plugin-markdown")
 
-export function load(app: Application) {
-  app.renderer.on(MarkdownPageEvent.BEGIN, (event: any) => {
+/**
+ * @param {import('typedoc-plugin-markdown').MarkdownApplication} app
+ */
+function load(app) {
+  app.renderer.on(MarkdownPageEvent.BEGIN, (event) => {
     let title = event.model?.name || event.project?.name || "Untitled"
     title = title.replace("API Reference", "API Reference Overview")
 
@@ -10,14 +12,17 @@ export function load(app: Application) {
       ...(event.frontmatter || {}),
       editUrl: false,
       next: false,
+      pagefind: false,
       prev: false,
       title,
     }
   })
 
-  app.renderer.on(MarkdownPageEvent.END, (event: any) => {
+  app.renderer.on(MarkdownPageEvent.END, (event) => {
     if (!event.contents) return
     // Remove all H1 headings
     event.contents = event.contents.replace(/^[ \t]*#[ \t]+.*$/gm, "").trim()
   })
 }
+
+module.exports = { load }

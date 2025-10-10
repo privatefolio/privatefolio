@@ -3,8 +3,6 @@ title: AI setup
 description: Configure AI assistants with OpenAI, Anthropic, and Perplexity providers in Privatefolio
 ---
 
-# AI setup
-
 ## Overview
 
 - Leverages Vercel AI SDK for an interactive portfolio analysis assistant in both frontend and backend.
