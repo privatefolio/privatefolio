@@ -1,3 +1,11 @@
+---
+title: Start here
+description: The AI Wealth Manager - A free* and open-source toolkit for financial empowerment
+head:
+  - tag: title
+    content: Privatefolio Docs
+---
+
 <p align="center">
   <img src="https://github.com/privatefolio/privatefolio/blob/main/packages/electron/src/app-icon.png?raw=true" alt="Privatefolio Logo" width="100">
 </p>
@@ -6,7 +14,7 @@
 
 <div align="center">
 
-The AI Wealth Manager - A free* and open-source toolkit for financial empowerment
+The AI Wealth Manager - A free\* and open-source toolkit for financial empowerment
 
 </div>
 
@@ -41,16 +49,21 @@ On Linux, you can run `sudo dpkg -i privatefolio_<version>_amd64.deb` to install
 
 On Mac, download the dmg for your platform and run the installer.
 
+## What is it?
+
+**Privatefolio is a tool you own**. It allows you to collect, analyze and visualize your financial data.
+
+You can use it in conjunction with LLMs and AI agents to gain a deeper understanding of where you are at, and to plan for the future.
+
+Privatefolio is for: 1) Investment portfolios, 2) Accounting, 3) Tax reporting & planning, 4) Financial intelligence, 5) Privacy, 6) AI workflows, 7) Expense tracking, 8) Budgeting, 9) Cashflow predictions, 10) Retirement planning, 11) FIRE, 12) Volatility simulations, 13) Risk management and much more.
+
 ## Features
 
-<table>
-<tr>
-<td width="250">
-<div style="width: 250px; height: 450px; overflow: hidden;">
+<div style="display:flex; gap:16px; align-items:flex-start">
+<div style="min-width: 250px; height: 450px; overflow: hidden;">
 <img src="https://github.com/privatefolio/privatefolio/blob/main/packages/frontend/public/landing/mobile-demo.png?raw=true" alt="Privatefolio screenshot" style="width: 250px; height: 450px; object-fit: cover; object-position: top; mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 65%, rgba(0,0,0,0) 90%);">
 </div>
-</td>
-<td>
+<div style="margin-top: 60px;">
 
 - Time travel through trades to surface the strengths and weaknesses of your portfolio
 - Inspect and compare your historical net worth with no limitations
@@ -58,9 +71,8 @@ On Mac, download the dmg for your platform and run the installer.
 - Prepare your tax report or feed data into your AI assistant
 - Extend the project under the AGPL-3.0 license
 
-</td>
-</tr>
-</table>
+</div>
+</div>
 
 ## License
 

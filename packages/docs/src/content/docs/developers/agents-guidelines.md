@@ -1,4 +1,5 @@
 ---
+title: Guidelines for AI agents and LLMs
 description: A structured checklist for AI agents and LLMs
 ---
 

@@ -1,0 +1,156 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@200;300;400;500;600;700&family=IBM+Plex+Sans:wght@200;300;400;500;600;700&family=Roboto+Serif:opsz,wght@8..144,300;8..144,500&display=block');
+
+/* html {
+  scroll-padding-top: 160px !important;
+} */
+
+:root {
+  --sl-color-accent: rgb(30, 136, 229); /* blue[600] - matches app's accent color */
+  --sl-color-accent-high: rgb(66, 165, 245); /* blue[400] */
+  --sl-color-accent-low: rgb(25, 118, 210); /* blue[700] */
+  --background-main: rgb(29, 30, 31);
+  --sl-color-bg: rgb(25,25, 25);
+  --divider: rgba(255, 255, 255, 0.08);
+  --sl-color-black: var(--sl-color-bg);
+  --sl-color-gray-5: var(--divider);
+  --sl-color-gray-6: #2f3031;
+  /* --sl-color-accent-high: hsl(258, 79%, 72%);
+  --sl-color-accent: hsl(258, 61%, 66%);
+  --sl-color-accent-low: hsl(258, 55%, 57%); */
+  --sl-font: 'IBM Plex Sans', serif;
+  --sl-content-width: 52rem;
+  --sl-color-text: rgba(255, 255, 255, .8);
+
+  /* Defaults */
+  /* --sl-text-2xs: 0.75rem;
+  --sl-text-xs: 0.8125rem;
+  --sl-text-sm: 0.875rem;
+  --sl-text-base: 1rem;
+  --sl-text-lg: 1.125rem;
+  --sl-text-xl: 1.25rem;
+  --sl-text-2xl: 1.5rem;
+  --sl-text-3xl: 1.8125rem;
+  --sl-text-4xl: 2.1875rem;
+  --sl-text-5xl: 2.625rem;
+  --sl-text-6xl: 4rem; */
+  --sl-text-h1: 2rem;
+  --sl-text-h2: 1.5rem;
+  --sl-text-h3: 1.25rem;
+  --sl-text-h4: 1.125rem;
+  --sl-text-h5: 1.125rem;
+  --sl-text-h6: 1rem;
+  
+ 
+  --sl-font-weight-light: 300;
+  --sl-font-weight-normal: 400;
+  --sl-font-weight-semibold: 500;
+  --sl-font-weight-bold: 600;
+  --sl-color-blue-low: #008ff519;
+  --sl-color-blue: #009eff2a;
+  --sl-color-blue-high: #70b8ff;
+}
+
+:root[data-theme='light'] {
+  --background-main: #fff;
+  --sl-color-bg: rgb(249, 250, 252);
+  --divider: rgba(0, 0, 0, 0.08);
+  --sl-color-gray-6: #ebebeb;
+  /* --sl-color-accent-high: hsl(257, 49%, 42%);
+  --sl-color-accent: hsl(257, 54%, 59%);
+  --sl-color-accent-low: hsl(257, 52%, 75%); */
+  --sl-color-text: rgb(76 76 76);
+  --sl-color-blue-low: #f4faff;
+  --sl-color-blue: #009eff2a;
+  --sl-color-blue-high: #0588f0;
+}
+
+.main-frame {
+  background: var(--background-main);
+  border-left: 1px solid var(--divider);
+}
+
+
+.starlight-aside--note {
+  --sl-aside-accent: var(--accent);
+}
+
+/* Custom logo styling */
+.sl-nav [aria-label="Logo"] {
+  font-family: 'Roboto Serif', serif;
+  font-weight: 600;
+  letter-spacing: 0.03125rem;
+}
+
+/* Custom heading styling */
+h1, h2, h3, h4, h5, h6, .site-title {
+  font-family: 'Roboto Serif', serif;
+}
+
+summary * {
+  font-weight: var(--sl-font-weight-semibold);
+  color: var(--sl-color-text);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--sl-font-weight-semibold);
+}
+
+p, li {
+  font-weight: var(--sl-font-weight-light);
+}
+
+#starlight__on-this-page {
+  font-family: var(--sl-font);
+  font-size: var(--sl-text-xs);
+  margin-left: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+code {
+  /* font-size: var(--sl-text-code-base); */
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.site-title {
+  font-weight: var(--sl-font-weight-bold);
+  color: var(--sl-color-white);
+}
+
+.social-icons > a {
+  color: var(--sl-color-text);
+}
+
+aside p {
+  font-size: var(--sl-text-sm);
+}
+
+.starlight-aside {
+  border: 1px solid var(--sl-color-asides-border);
+}
+
+.starlight-aside--note {
+
+}
+
+/* Image styling */
+img {
+  display: inline-block;
+}
+
+/* Visitors image specific styling */
+img[alt="Visitors"] {
+  display: inline-block;
+}
+
+
+/* 
+
+.vocs_Anchor > img {
+  display: inline-block;
+}
+
+img[alt="Visitors"] {
+  display: inline-block;
+} 
+  
+*/

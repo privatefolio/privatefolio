@@ -1,8 +1,7 @@
 ---
+title: Testing guide
 description: Comprehensive testing approach using Vitest, Bun tests, and CI/CD integration
 ---
-
-# Testing Guide
 
 ## Testing Philosophy
 

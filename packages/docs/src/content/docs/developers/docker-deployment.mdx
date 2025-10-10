@@ -1,12 +1,11 @@
 ---
+title: Docker deployment
 description: Build and deploy Privatefolio using Docker
 ---
 
-# Docker deployment
-
 Deploying Privatefolio via Docker requires us to build a Docker image that packages both `@privatefolio/backend` and `@privatefolio/frontend` alongside their dependencies.
 
-Are you looking to self-host Privatefolio using the official Docker image? Go to [Self-hosting](./self-hosting-with-docker.md).
+Are you looking to self-host Privatefolio using the official Docker image? Go to [Self-hosting](/users/self-hosting-with-docker).
 
 ## Prerequisites
 
@@ -57,9 +56,10 @@ Visit [`http://localhost:5555`](http://localhost:5555) in your browser.
 The Docker image uses a multi-stage build process. It builds the frontend bundle and installs backend production dependencies.
 The final image utilizes Bun to serve the compiled JavaScript build of the backend and the pre-built frontend bundle.
 
-```yaml [packages/backend/Dockerfile]
-// [!include ~/../../packages/backend/Dockerfile]
-```
+import { Code } from '@astrojs/starlight/components';
+import dockerFile from '../backend/Dockerfile?raw';
+
+<Code code={dockerFile} lang="docker" title="packages/backend/Dockerfile" />
 
 ## Configuration
 
@@ -116,10 +116,15 @@ To run the official image:
 docker run -d -p ${PORT:-5555}:${PORT:-5555} -v privatefolio-data:/app/data --name privatefolio ghcr.io/privatefolio/privatefolio:latest
 ```
 
-Learn more on [self-hosting with Docker](./self-hosting-with-docker.md).
+Learn more on [self-hosting with Docker](/users/self-hosting-with-docker).
 
 ## Workflow file
 
-```yaml [.github/workflows/publish-docker-image.yml]
-// [!include ~/../../.github/workflows/publish-docker-image.yml]
-```
+import workflowFile from '../../.github/workflows/publish-docker-image.yml?raw';
+
+<Code code={workflowFile} lang="yaml" title=".github/workflows/publish-docker-image.yml" mark={[
+  { range: "32-37" },
+  { range: "39-51" },
+  { range: "53-54" },
+  { range: "56-69" },
+]} />

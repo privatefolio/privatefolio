@@ -3,8 +3,6 @@ title: Comparison table
 description: Compare Privatefolio with other portfolio tracking and wealth management solutions
 ---
 
-## Comparison table
-
 | Feature          | Privatefolio          | Rotki                      | Ghostfolio                           | Midday                       | DeBank                 | CoinStats                   | Delta                        |
 | ---------------- | --------------------- | -------------------------- | ------------------------------------ | ---------------------------- | ---------------------- | --------------------------- | ---------------------------- |
 | **Type**         | AI Wealth Manager     | Open-source crypto tracker | Open-source wealth manager           | Open-source business finance | DeFi portfolio tracker | Freemium crypto tracker     | Investment tracker           |

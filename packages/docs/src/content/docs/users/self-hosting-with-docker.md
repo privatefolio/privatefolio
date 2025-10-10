@@ -1,8 +1,7 @@
 ---
+title: Self-hosting with Docker
 description: Deploy Privatefolio on your own server using the official Docker image
 ---
-
-# Self-hosting with Docker
 
 Deploying with Docker using the official deployment of Privatefolio which is available on GitHub Container Registry (GHCR).
 

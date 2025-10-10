@@ -1,4 +1,5 @@
 ---
+title: Self-hosting with Fly.io
 description: Deploy Privatefolio to the edge using Fly.io cloud platform
 ---
 

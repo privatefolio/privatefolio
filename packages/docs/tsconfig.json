@@ -1,7 +1,12 @@
 {
   "extends": "@privatefolio/commons/tsconfig.base.json",
   "compilerOptions": {
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": ["pages", "components"]
+  "include": ["src"]
 }

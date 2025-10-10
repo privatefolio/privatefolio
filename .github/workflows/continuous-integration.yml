@@ -52,10 +52,6 @@ jobs:
         if: always()
         run: yarn build
 
-      - name: Lint
-        if: always()
-        run: yarn lint
-
       - name: Check types
         if: always()
         run: yarn check-types
@@ -65,6 +61,10 @@ jobs:
         run: yarn test:ci
         env:
           ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+
+      - name: Lint
+        if: always()
+        run: yarn lint
 
       - name: Notify Discord on success
         if: success()

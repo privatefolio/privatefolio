@@ -41,3 +41,6 @@ dist/
 expo-env.d.ts
 
 **/public/service-worker.js
+
+.astro/
+**/docs/api/

@@ -1,4 +1,5 @@
 ---
+title: AI setup
 description: Configure AI assistants with OpenAI, Anthropic, and Perplexity providers in Privatefolio
 ---
 

@@ -1,26 +1,22 @@
 ---
+title: Web deployment
 description: Deploy Privatefolio frontend to web hosting platforms like Cloudflare Pages
 ---
 
-import { Callout } from 'vocs/components'
-
-# Web deployment
-
 Deploying Privatefolio on the web involves hosting the build output of the `@privatefolio/frontend` package.
 
-<Callout type="info">
+:::note
   Just like Privatefolio v1, in the future, you will be able to run the `@privatefolio/backend` package inside the browser using web workers. Web deployments will then encompass both. Help us make it a reality with 
   [#27](https://github.com/privatefolio/privatefolio/issues/27).
-</Callout>
+:::
 
 ## Build
 
-Once you setup the project and [its prerequisites](./getting-started.md), you can build the frontend.
+Once you setup the project and [its prerequisites](/developers/getting-started), you can build the frontend.
 
-```bash
-yarn build
+```bash title=""
+yarn build 
 # output dir: packages/frontend/build
-
 ```
 
 ## Deploy
@@ -48,12 +44,16 @@ Preview deployments URLs: `https://<deployment-id>.privatefolio-com.pages.dev` <
 See latest deployments at:
 [github.com/privatefolio/privatefolio/deployments](https://github.com/privatefolio/privatefolio/deployments)
 
-<Callout type="note">
+:::note
   Unlike other production deployments, the latest web deployment corresponds to the latest commit on the `main` branch, not the latest tagged release.
-</Callout>
+:::
 
 ## Workflow file
 
-```yaml [.github/workflows/publish-web-app.yml]
-// [!include ~/../../.github/workflows/publish-web-app.yml] 
-``` 
+import { Code } from '@astrojs/starlight/components';
+import workflowFile from '../../.github/workflows/publish-web-app.yml?raw';
+
+<Code code={workflowFile} lang="yaml" title=".github/workflows/publish-web-app.yml" mark={[
+  { range: "56-57" },
+  { range: "59-66" },
+]} />

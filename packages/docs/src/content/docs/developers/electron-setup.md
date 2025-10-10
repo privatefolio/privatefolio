@@ -1,8 +1,7 @@
 ---
+title: Desktop apps
 description: Electron desktop application setup, build process, and platform-specific packaging
 ---
-
-# Desktop Apps
 
 This document describes the Electron setup for the Privatefolio desktop application.
 

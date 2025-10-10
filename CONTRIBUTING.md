@@ -1,9 +1,9 @@
 ---
 title: Getting started
-description: How to build Privatefolio from source - prerequisites, installation, and development setup
+description: Learn how to build Privatefolio from source - prerequisites, installation, and development setup
 ---
 
-# Getting started [How to build Privatefolio from source]
+Learn how to build Privatefolio from source.
 
 ## Prerequisites
 

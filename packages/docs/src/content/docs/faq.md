@@ -1,4 +1,7 @@
-# Frequently Asked Questions
+---
+title: FAQ
+description: Frequently Asked Questions about Privatefolio
+---
 
 ## Is Privatefolio really free?
 

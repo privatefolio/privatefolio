@@ -2,8 +2,7 @@
 FROM oven/bun:1-alpine AS backend-builder
 
 # Install Node.js & Yarn so you can use yarn install
-RUN apk add --no-cache nodejs npm \
- && npm install -g yarn
+RUN apk add --no-cache nodejs npm && npm install -g yarn
 
 WORKDIR /app
 COPY package.json yarn.lock lerna.json ./
@@ -21,8 +20,7 @@ COPY . .
 FROM oven/bun:1-alpine AS frontend-builder
 
 # Install Node.js & Yarn so you can use yarn install
-RUN apk add --no-cache nodejs npm \
- && npm install -g yarn
+RUN apk add --no-cache nodejs npm && npm install -g yarn
 
 WORKDIR /app
 COPY package.json yarn.lock lerna.json ./

@@ -6,8 +6,13 @@
     "../commons-node",
     "../backend"
   ],
-  "out": "./pages/api",
-  "plugin": ["typedoc-plugin-markdown"],
+  "out": "./src/content/docs/api",
+  "plugin": [
+    "typedoc-plugin-markdown",
+    "typedoc-plugin-frontmatter",
+    "./src/typedoc-plugin-frontmatter.ts",
+    "./src/typedoc-plugin-md-links.ts"
+  ],
   "publicPath": "/api/",
   "readme": "none",
   "excludeExternals": true,
@@ -16,6 +21,7 @@
   "excludeInternal": true,
   "hideGenerator": true,
   "entryPointStrategy": "packages",
+  "entryFileName": "index",
   "sort": ["source-order"],
   "categorizeByGroup": false,
   "defaultCategory": "Other",

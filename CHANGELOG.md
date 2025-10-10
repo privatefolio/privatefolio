@@ -1,8 +1,7 @@
 ---
+title: Changelog
 description: Release history and version changes for Privatefolio
 ---
-
-# Changelog
 
 This file documents project changes that are of interest to users and developers.
 Versioning is based on [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
