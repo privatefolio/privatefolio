@@ -5,11 +5,14 @@
 } */
 
 :root {
-  --sl-color-accent: rgb(30, 136, 229); /* blue[600] - matches app's accent color */
-  --sl-color-accent-high: rgb(66, 165, 245); /* blue[400] */
-  --sl-color-accent-low: rgb(25, 118, 210); /* blue[700] */
+  --sl-color-accent: rgb(30, 136, 229);
+  /* blue[600] - matches app's accent color */
+  --sl-color-accent-high: rgb(66, 165, 245);
+  /* blue[400] */
+  --sl-color-accent-low: rgb(25, 118, 210);
+  /* blue[700] */
   --background-main: rgb(29, 30, 31);
-  --sl-color-bg: rgb(25,25, 25);
+  --sl-color-bg: rgb(25, 25, 25);
   --divider: rgba(255, 255, 255, 0.08);
   --sl-color-black: var(--sl-color-bg);
   --sl-color-gray-5: var(--divider);
@@ -20,6 +23,16 @@
   --sl-font: 'IBM Plex Sans', serif;
   --sl-content-width: 52rem;
   --sl-color-text: rgba(255, 255, 255, .8);
+  --sl-color-text-secondary: rgba(255, 255, 255, .5);
+
+  /* Table column width variables */
+  --table-col-first: 200px;
+
+  --table-col-xs: 120px;
+  --table-col-small: 140px;
+  --table-col-medium: 180px;
+  --table-col-large: 200px;
+  --table-col-xlarge: 240px;
 
   /* Defaults */
   /* --sl-text-2xs: 0.75rem;
@@ -39,8 +52,8 @@
   --sl-text-h4: 1.125rem;
   --sl-text-h5: 1.125rem;
   --sl-text-h6: 1rem;
-  
- 
+
+
   --sl-font-weight-light: 300;
   --sl-font-weight-normal: 400;
   --sl-font-weight-semibold: 500;
@@ -62,6 +75,7 @@
   --sl-color-blue-low: #f4faff;
   --sl-color-blue: #009eff2a;
   --sl-color-blue-high: #0588f0;
+  --sl-color-text-secondary: rgba(0, 0, 0, .5);
 }
 
 .main-frame {
@@ -82,7 +96,13 @@
 }
 
 /* Custom heading styling */
-h1, h2, h3, h4, h5, h6, .site-title {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.site-title {
   font-family: 'Roboto Serif', serif;
 }
 
@@ -91,16 +111,23 @@ summary * {
   color: var(--sl-color-text);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: var(--sl-font-weight-semibold);
 }
 
-p, li {
+p,
+li {
   font-weight: var(--sl-font-weight-light);
 }
 
 /* on this page */
-#starlight__on-this-page, .right-sidebar-panel h2 {
+#starlight__on-this-page,
+.right-sidebar-panel h2 {
   font-family: var(--sl-font);
   font-size: var(--sl-text-xs);
   margin-left: 0.5rem;
@@ -117,7 +144,7 @@ code {
   color: var(--sl-color-white);
 }
 
-.social-icons > a {
+.social-icons>a {
   color: var(--sl-color-text);
 }
 
@@ -129,9 +156,6 @@ aside p {
   border: 1px solid var(--sl-color-asides-border);
 }
 
-.starlight-aside--note {
-
-}
 
 /* Image styling */
 img {
@@ -143,15 +167,209 @@ img[alt="Visitors"] {
   display: inline-block;
 }
 
-
-/* 
-
-.vocs_Anchor > img {
-  display: inline-block;
+/* Table styling with sticky first column for comparison table only */
+.comparison-table-wrapper table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
 }
 
-img[alt="Visitors"] {
-  display: inline-block;
-} 
-  
-*/
+.comparison-table-wrapper table th {
+  font-weight: var(--sl-font-weight-normal);
+}
+
+.comparison-table-wrapper table th,
+.comparison-table-wrapper table td {
+  min-width: var(--table-col-medium);
+  padding: 0.5rem;
+  vertical-align: middle;
+  border-right: 1px solid var(--divider);
+  /* border-bottom: 1px solid var(--divider); */
+}
+
+.comparison-table-wrapper table tbody tr:last-child th,
+.comparison-table-wrapper table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.comparison-table-wrapper table th.product-column,
+.comparison-table-wrapper table td.product-cell {
+  position: sticky;
+  left: 0;
+  background: var(--background-main);
+  border-right: 2px solid var(--divider);
+  border-bottom: none;
+  z-index: 1;
+  min-width: var(--table-col-first);
+  max-width: 280px;
+  padding: 0.5rem;
+}
+
+.comparison-table-wrapper table th.product-column {
+  background: var(--background-main);
+  font-weight: var(--sl-font-weight-semibold);
+}
+
+.comparison-table-wrapper table td.product-cell {
+  font-weight: var(--sl-font-weight-medium);
+}
+
+/* Category headers styling */
+.comparison-table-wrapper table thead tr:first-child th {
+  font-weight: var(--sl-font-weight-semibold);
+  font-size: var(--sl-text-sm);
+  letter-spacing: 0.05em;
+  border-right: 1px solid var(--divider);
+}
+
+.comparison-table-wrapper table thead tr:first-child th:last-child {
+  border-right: none;
+}
+
+.comparison-table-wrapper table .category th:nth-child(2),
+.comparison-table-wrapper table .feature th:nth-child(1),
+.comparison-table-wrapper table .feature th:nth-child(2),
+.comparison-table-wrapper table .feature th:nth-child(3),
+.comparison-table-wrapper table td:nth-child(2),
+.comparison-table-wrapper table td:nth-child(3),
+.comparison-table-wrapper table td:nth-child(4) {
+  background: rgb(237 209 250 / 32%) !important;
+}
+
+.comparison-table-wrapper table .category th:nth-child(3),
+.comparison-table-wrapper table .feature th:nth-child(4),
+.comparison-table-wrapper table .feature th:nth-child(5),
+.comparison-table-wrapper table .feature th:nth-child(6),
+.comparison-table-wrapper table .feature th:nth-child(7),
+.comparison-table-wrapper table td:nth-child(5),
+.comparison-table-wrapper table td:nth-child(6),
+.comparison-table-wrapper table td:nth-child(7),
+.comparison-table-wrapper table td:nth-child(8) {
+  background: var(--sl-color-blue-low);
+}
+
+.comparison-table-wrapper table .category th:nth-child(4),
+.comparison-table-wrapper table .feature th:nth-child(8),
+.comparison-table-wrapper table td:nth-child(9) {
+  background: rgb(250 237 209 / 32%);
+}
+
+.comparison-table-wrapper table .category th:nth-child(5),
+.comparison-table-wrapper table .feature th:nth-child(9),
+.comparison-table-wrapper table .feature th:nth-child(10),
+.comparison-table-wrapper table td:nth-child(10),
+.comparison-table-wrapper table td:nth-child(11) {
+  background: rgb(250 209 209 / 32%);
+}
+
+.comparison-table-wrapper table .category th:nth-child(6),
+.comparison-table-wrapper table .feature th:nth-child(11),
+.comparison-table-wrapper table .feature th:nth-child(12),
+.comparison-table-wrapper table td:nth-child(12),
+.comparison-table-wrapper table td:nth-child(13) {
+  background: rgb(218 250 209 / 32%);
+}
+
+.comparison-table-wrapper table .category th:nth-child(7),
+.comparison-table-wrapper table .feature th:nth-child(13),
+.comparison-table-wrapper table .feature th:nth-child(14),
+.comparison-table-wrapper table td:nth-child(14),
+.comparison-table-wrapper table td:nth-child(15) {
+  background: rgb(209 224 250 / 32%);
+}
+
+.comparison-table-wrapper table .category th:nth-child(8),
+.comparison-table-wrapper table .feature th:nth-child(15),
+.comparison-table-wrapper table td:nth-child(16) {
+  background: rgb(250 248 209 / 32%);
+}
+
+.comparison-table-wrapper table .category th:nth-child(9),
+.comparison-table-wrapper table .feature th:nth-child(16),
+.comparison-table-wrapper table td:nth-child(17) {
+  background: rgb(209 250 237 / 32%);
+}
+
+/* Smaller text for non-sticky content cells */
+.comparison-table-wrapper table td:not(.product-cell) {
+  font-size: var(--sl-text-sm);
+}
+
+/* Secondary color for product descriptions */
+.comparison-table-wrapper table td.product-cell small {
+  color: var(--sl-color-text-secondary);
+}
+
+/* Center align all columns except the first (Product) column */
+.comparison-table-wrapper table th:not(.product-column),
+.comparison-table-wrapper table td:not(.product-cell) {
+  text-align: center;
+}
+
+/* Specific column widths for better readability */
+.comparison-table-wrapper table th:nth-child(2),
+.comparison-table-wrapper table td:nth-child(2) {
+  min-width: var(--table-col-xs);
+}
+
+.comparison-table-wrapper table th:nth-child(3),
+.comparison-table-wrapper table td:nth-child(3) {
+  min-width: var(--table-col-small);
+}
+
+.comparison-table-wrapper table th:nth-child(4),
+.comparison-table-wrapper table td:nth-child(4) {
+  min-width: var(--table-col-xs);
+}
+
+.comparison-table-wrapper table th:nth-child(5),
+.comparison-table-wrapper table td:nth-child(5) {
+  min-width: var(--table-col-xs);
+}
+
+.comparison-table-wrapper table th:nth-child(6),
+.comparison-table-wrapper table td:nth-child(6) {
+  min-width: var(--table-col-medium);
+}
+
+.comparison-table-wrapper table th:nth-child(7),
+.comparison-table-wrapper table td:nth-child(7) {
+  min-width: var(--table-col-medium);
+}
+
+.comparison-table-wrapper table th:nth-child(8),
+.comparison-table-wrapper table td:nth-child(8) {
+  min-width: var(--table-col-large);
+}
+
+.comparison-table-wrapper table th:nth-child(9),
+.comparison-table-wrapper table td:nth-child(9) {
+  min-width: var(--table-col-xlarge);
+}
+
+.comparison-table-wrapper table th:nth-child(10),
+.comparison-table-wrapper table td:nth-child(10) {
+  min-width: var(--table-col-large);
+}
+
+.comparison-table-wrapper table th:nth-child(11),
+.comparison-table-wrapper table td:nth-child(11) {
+  min-width: var(--table-col-small);
+}
+
+.comparison-table-wrapper table th:nth-child(12),
+.comparison-table-wrapper table td:nth-child(12) {
+  min-width: var(--table-col-large);
+}
+
+.comparison-table-wrapper table th:nth-child(13),
+.comparison-table-wrapper table td:nth-child(13) {
+  min-width: var(--table-col-medium);
+}
+
+/* Light theme overrides for sticky column */
+:root[data-theme='light'] .comparison-table-wrapper table th:first-child,
+:root[data-theme='light'] .comparison-table-wrapper table td:first-child {
+  background: var(--background-main);
+  border-right: 2px solid var(--divider);
+}

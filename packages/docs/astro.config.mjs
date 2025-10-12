@@ -104,6 +104,7 @@ console.log("Telemetry enabled")
           label: "Users",
         },
         {
+          collapsed: true,
           items: [
             "developers/getting-started",
             "developers/architecture",
