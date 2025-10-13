@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   ButtonProps,
-  Link,
   Paper,
   Stack,
   Step,
@@ -21,7 +20,7 @@ import {
   etherscanFileExtension,
 } from "privatefolio-backend/src/extensions/connections/etherscan/etherscan-settings"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { useNavigate, useSearchParams } from "react-router-dom"
+import { useSearchParams } from "react-router-dom"
 import { AppLink } from "src/components/AppLink"
 import { DefaultSpinner } from "src/components/DefaultSpinner"
 import { ExtensionAvatar } from "src/components/ExtensionAvatar"
@@ -122,7 +121,6 @@ export function ImportDataWizard() {
   const extensionId = searchParams.get("extensionId") || undefined
   const activeStep = searchParams.get("step") ? Number(searchParams.get("step")) : 0
 
-  const navigate = useNavigate()
   const rpc = useStore($rpc)
   const activeAccountPath = useStore($activeAccountPath)
 
@@ -147,19 +145,22 @@ export function ImportDataWizard() {
         const importExtensions = x.filter(
           (x) => x.extensionType === "connection" || x.extensionType === "file-import"
         )
-        importExtensions.sort((a, b) => {
+        const allExtensions = [...importExtensions, ...customExtensions]
+        allExtensions.sort((a, b) => {
+          // Sort connections before file imports
           if (a.extensionType === "connection" && b.extensionType === "file-import") {
             return -1
           }
           if (a.extensionType === "file-import" && b.extensionType === "connection") {
             return 1
           }
+          // Sort by name
           if (a.extensionName && b.extensionName) {
             return a.extensionName.localeCompare(b.extensionName)
           }
           return 0
         })
-        return [...importExtensions, ...customExtensions]
+        return allExtensions
       }),
     ])
       .then(([platforms, extensions]) => {
@@ -241,14 +242,6 @@ export function ImportDataWizard() {
     setPlatformFilter(null)
     setVisiblePlatformsCount(PLATFORMS_PER_PAGE - 1)
   }
-
-  const handleAddConnection = useCallback(() => {
-    if (activeAccount) {
-      navigate(`/${activeAccount}/import-data`)
-    } else {
-      navigate("/")
-    }
-  }, [activeAccount, navigate])
 
   const handleShowMore = () => {
     setVisiblePlatformsCount((prev) => prev + PLATFORMS_PER_PAGE)
@@ -403,10 +396,18 @@ export function ImportDataWizard() {
         return (
           <Stack gap={2} alignItems="flex-start">
             <Typography variant="body2" color="text.secondary">
-              Choose how you want to connect to <b>{platform?.name}</b>.
+              Choose how you want to{" "}
+              {platform ? (
+                <>
+                  connect to <b>{platform?.name}</b>
+                </>
+              ) : (
+                <>import your data</>
+              )}
+              .
             </Typography>
             <Stack direction="row" gap={1} flexWrap="wrap">
-              {compatibleExtensions.map((extension) => (
+              {(platform ? compatibleExtensions : extensions).map((extension) => (
                 <OptionButton
                   key={extension.id}
                   selected={extensionId === extension.id}
@@ -463,8 +464,28 @@ export function ImportDataWizard() {
 
     switch (step) {
       case 0:
-        disabled = !platform
-        break
+        return (
+          <Stack direction="row" gap={1}>
+            <Button
+              variant="contained"
+              onClick={handleNext}
+              endIcon={<ArrowForward />}
+              disabled={!platform}
+            >
+              Continue
+            </Button>
+            <Button
+              onClick={() => {
+                searchParams.delete("platformId")
+                setSearchParams(searchParams)
+                handleNext()
+              }}
+              sx={{ paddingX: 2 }}
+            >
+              Skip this step
+            </Button>
+          </Stack>
+        )
       case 1:
         disabled = !extension
 
@@ -561,7 +582,6 @@ export function ImportDataWizard() {
         </Typography>
       </Box>
 
-      {/* Stepper Section */}
       <Stepper activeStep={activeStep} orientation="vertical">
         {steps.map((step, index) => (
           <Step key={step.label}>
@@ -582,41 +602,6 @@ export function ImportDataWizard() {
           </Step>
         ))}
       </Stepper>
-      {activeStep === steps.length && (
-        <Box paddingTop={2}>
-          <Typography variant="body2">Ready to connect!</Typography>
-          <Typography variant="body2" color="text.secondary">
-            You&apos;ve selected {platform?.name} with{" "}
-            {extension?.extensionType === "manual-import"
-              ? "manual entry."
-              : `${extension?.extensionName}.`}{" "}
-            Click the button below to{" "}
-            {extension?.extensionType === "manual-import"
-              ? "start adding transactions"
-              : "set up your connection"}
-            .
-          </Typography>
-          <br />
-          <Button
-            variant="contained"
-            onClick={handleAddConnection}
-            sx={{ marginRight: 1, marginTop: 1 }}
-            endIcon={<ArrowForward />}
-          >
-            Add Connection
-          </Button>
-          <br />
-          <Link
-            onClick={handleReset}
-            sx={{ cursor: "pointer", marginTop: 1 }}
-            variant="body2"
-            underline="hover"
-            color="text.secondary"
-          >
-            Start over
-          </Link>
-        </Box>
-      )}
       <AddConnectionDrawer
         atom={$addConnectionDrawer}
         initialPlatformId={platformId}
