@@ -21019,7 +21019,8 @@ vlq@^1.0.0:
 
 wa-sqlite@rhashimoto/wa-sqlite:
   version "1.0.8"
-  resolved "https://codeload.github.com/rhashimoto/wa-sqlite/tar.gz/4f2b7e8f87acef4e8d9902e6a131f48f656d023e"
+  uid "21cc38a00f54a21eceef0dfc1e31f3c4dae75701"
+  resolved "https://codeload.github.com/rhashimoto/wa-sqlite/tar.gz/21cc38a00f54a21eceef0dfc1e31f3c4dae75701"
 
 walk-up-path@^3.0.1:
   version "3.0.1"
