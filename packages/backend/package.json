@@ -32,7 +32,7 @@
     "@ai-sdk/openai-compatible": "^0.2.16",
     "@ai-sdk/perplexity": "^1.1.9",
     "@privatefolio/commons-node": "^2.0.0-beta.47",
-    "ai": "^4.3.16",
+    "ai": "^5.0.95",
     "big.js": "^6.2.1",
     "comlink": "^4.4.2",
     "croner": "^9.0.0",
