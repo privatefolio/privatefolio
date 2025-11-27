@@ -32,7 +32,7 @@
     "@ai-sdk/openai-compatible": "^0.2.16",
     "@ai-sdk/perplexity": "^1.1.9",
     "@privatefolio/commons-node": "^2.0.0-beta.47",
-    "ai": "^4.3.16",
+    "ai": "^5.0.102",
     "big.js": "^6.2.1",
     "comlink": "^4.4.2",
     "croner": "^9.0.0",
@@ -56,7 +56,7 @@
     "@types/web-push": "^3.6.3",
     "concurrently": "^9.2.0",
     "cross-env": "7.0.3",
-    "vite": "^6.2.2",
+    "vite": "^7.2.4",
     "vitest": "^3.1.4"
   }
 }
